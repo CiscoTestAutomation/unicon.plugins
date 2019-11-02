@@ -1,0 +1,74 @@
+cimc_connect:
+  preface: Escape character is '^]'.
+  prompt: ""
+  commands:
+    "":
+      new_state: cimc_exec
+
+cimc_exec:
+  prompt: Compute-Node-1#
+  commands:
+    "scope cimc":
+      new_state: scope_cimc
+    "scope chassis":
+      new_state: scope_chassis
+    "scope vmedia":
+      new_state: scope_vmedia
+
+scope_chassis:
+  prompt: "Compute-Node-1 /chassis # "
+  commands:
+    "top":
+      new_state: cimc_exec
+    "exit":
+      new_state: cimc_exec
+    "scope hdd":
+      new_state: scope_chassis_hdd
+
+scope_chassis_hdd:
+  prompt: "Compute-Node-1 /chassis/hdd # "
+  commands:
+    "top":
+      new_state: cimc_exec
+    "exit":
+      new_state: scope_chassis
+    "show hdd":
+      response: |
+        Name                 Status               LocateLEDStatus      
+        -------------------- -------------------- -------------------- 
+        HDD1_STATUS          present              TurnOFF              
+        HDD2_STATUS          present              TurnOFF              
+        HDD3_STATUS          absent               TurnOFF              
+        HDD4_STATUS          absent               TurnOFF              
+        HDD5_STATUS          absent               TurnOFF              
+        HDD6_STATUS          absent               TurnOFF              
+        HDD7_STATUS          absent               TurnOFF              
+        HDD8_STATUS          absent               TurnOFF              
+      timing:
+        - 0:,0,0.03
+
+
+scope_cimc:
+  prompt: "Compute-Node-1 /cimc # "
+  commands:
+    "top":
+      new_state: cimc_exec
+    "exit":
+      new_state: cimc_exec
+
+
+scope_vmedia:
+  prompt: "Compute-Node-1 /vmedia # "
+  commands:
+    "unmap testmap":
+      new_state: vmedia_unmap
+    "top":
+      new_state: cimc_exec
+
+vmedia_unmap:
+  prompt: "Save mapping? Enter 'yes' or 'no' to confirm (CTRL-C to cancel) ->"
+  commands:
+    "yes":
+      new_state: scope_vmedia
+
+

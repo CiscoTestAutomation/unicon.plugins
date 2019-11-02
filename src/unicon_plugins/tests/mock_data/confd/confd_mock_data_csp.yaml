@@ -1,0 +1,195 @@
+csp_login:
+  preface: |2
+          _____   _____    _____    _____    ____  
+         / ____| |_   _|  / ____|  / ____|  / __ \ 
+        | |        | |   | (___   | |      | |  | |
+        | |        | |    \___ \  | |      | |  | |
+        | |____   _| |_   ____) | | |____  | |__| |
+         \_____| |_____| |_____/   \_____|  \____/ 
+
+      _____  _____ _____             ___  __  ___   ___  
+     / ____|/ ____|  __ \           |__ \/_ |/ _ \ / _ \ 
+    | |    | (___ | |__) |  ______     ) || | | | | | | |
+    | |     \___ \|  ___/  |______|   / / | | | | | | | |
+    | |____ ____) | |                / /_ | | |_| | |_| |
+     \_____|_____/|_|               |____||_|\___/ \___/ 
+                                                             
+           
+  prompt: "Cisco Cloud Services Platform Login: "
+  commands:
+    "admin":
+      new_state: csp_password
+
+csp_password:
+  prompt: "Password: "
+  commands:
+    "admin":
+      response: |2
+
+
+
+
+                **********************************************
+                **********************************************
+                **********************************************
+                ****                                      ****
+                ****  Cisco Cloud Services Platform 2100  ****
+                ****         Version 02.01.00             ****
+                ****         Build Number 599             ****
+                ****         Built on 2017-10-03          ****
+                ****  Cisco Systems Inc, copyright 2017   ****
+                ****                                      ****
+                **********************************************
+                **********************************************
+                **********************************************
+
+
+
+
+        Verifying server information ...
+        Welcome to the Cisco Cloud Services Platform CLI 
+
+        TAC support: http://www.cisco.com/tac
+        Copyright (c) 2015-2016, Cisco Systems, Inc. All rights reserved.
+        The copyrights to certain works contained in this software are
+        owned by other third parties and used and distributed under
+        license. Certain components of this software are licensed under
+        the GNU General Public License (GPL) version 2.0 or the GNU
+        Lesser General Public License (LGPL) Version 2.1. A copy of each
+        such license is available at
+        http://www.opensource.org/licenses/gpl-2.0.php and
+        http://www.opensource.org/licenses/lgpl-2.1.php
+            
+        admin connected from 127.0.0.1 using ssh on csp-2100
+      new_state: csp_enable
+
+csp_enable:
+  prompt: "csp-2100#"
+  commands:
+    "show version": |2
+
+      Cisco Cloud Services Platform Software, 2100 Software (CSP-2100), Version 2.1.0 Build:599
+      TAC Support: http://www.cisco.com/tac
+      Copyright (c) 2016 by Cisco Systems, Inc
+      Compiled Tuesday 03-October-2017 03:50
+
+      Linux csp-2100 3.10.0-693.el7.x86_64 #1 SMP Thu Jul 6 19:56:57 EDT 2017 x86_64 x86_64 x86_64 GNU/Linux
+      Red Hat Enterprise Linux Server release 7.3 (Maipo)
+      CSP-2100 uptime is 2 days, 5 hours, 40 minutes, 5 seconds
+
+      Cisco UCSC-C220-M3S, Version C220M3.2.0.13a.0.0713160937, processor Intel(R) Xeon(R) CPU E5-2620 0 @ 2.00GHz 
+      24 CPUs with 64398796 kB / 65741912 kB of memory
+      L1d cache 32K, L1i cache 32K, L2 cache 256K, L3 cache 15360K
+
+      6 - Total Physical Interfaces (PNICs)
+         2 -  1 Gbps Physical Interfaces (PNICs) Up
+         4 -  1 Gbps Physical Interfaces (PNICs) Down/Unconnected
+     
+    "config term":
+      new_state: csp_config
+    "system reboot":
+      new_state: csp_reload_confirm
+
+csp_reload_confirm:
+  prompt: "Are you sure you want to reboot the system? [no,yes] "
+  commands:
+    "yes":
+      new_state: csp_login
+
+
+csp_config:
+  prompt: "csp-2100(config)#"
+  commands:
+    "end":
+      new_state: csp_enable
+    "session paginate false": ""
+    "commit": ""
+
+
+
+cimc_ssh_password:
+  prompt: "admin@172.27.132.64's password: "
+  commands:
+    "cisco":
+      new_state: cimc_exec
+
+cimc_exec:
+  prompt: "ucs-c220-m3# "
+  commands:
+    "connect host":
+      response: |
+        CISCO Serial Over LAN:
+        Press Ctrl+x to Exit the session
+      new_state: cimc_sol_console
+
+cimc_sol_console:
+  preface: |2
+    
+    Red Hat Enterprise Linux Server 7.3 (Maipo)
+    Kernel 3.10.0-693.11.6.el7.x86_64 on an x86_64
+    
+  prompt: "csp-2100 login: "
+  commands:
+    "admin":
+      new_state: csp_sol_password
+
+csp_sol_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: csp_console_enable
+
+csp_console_enable:
+  preface: |
+    Last login: Fri Apr 13 01:27:29 on ttyS0
+
+
+
+
+                    **********************************************
+                    **********************************************
+                    **********************************************
+                    ****                                      ****
+                    ****  Cisco Cloud Services Platform 2100  ****
+                    ****         Version 02.02.05             ****
+                    ****         Build Number 655             ****
+                    ****         Built on 2018-02-09          ****
+                    ****  Cisco Systems Inc, copyright 2017   ****
+                    ****                                      ****
+                    **********************************************
+                    **********************************************
+                    **********************************************
+
+
+
+
+    Verifying server information ...
+    Welcome to the Cisco Cloud Services Platform CLI 
+
+    TAC support: http://www.cisco.com/tac
+    Copyright (c) 2015-2017, Cisco Systems, Inc. All rights reserved.
+    The copyrights to certain works contained in this software are
+    owned by other third parties and used and distributed under
+    license. Certain components of this software are licensed under
+    the GNU General Public License (GPL) version 2.0 or the GNU
+    Lesser General Public License (LGPL) Version 2.1. A copy of each
+    such license is available at
+    http://www.opensource.org/licenses/gpl-2.0.php and
+    http://www.opensource.org/licenses/lgpl-2.1.php
+        
+    admin connected from 127.0.0.1 using console on csp-2100
+
+  prompt: "csp-2100# "
+  commands:
+    "system reboot":
+      new_state: are_you_sure
+
+are_you_sure:
+  prompt: "Are you sure you want to reboot the system? [no,yes] "
+  commands:
+    "yes":
+      response: file|mock_data/confd/csp_reload.txt
+      timing:
+        - 0:,5,0.005
+      new_state: cimc_sol_console
+

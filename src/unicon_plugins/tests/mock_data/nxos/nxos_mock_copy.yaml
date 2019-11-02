@@ -1,0 +1,46 @@
+src_file:
+  prompt: "Enter source filename: "
+  commands:
+    "test-1.cfg":
+      new_state: exec
+      response: | 
+        Copy progress 100% 6KB
+        Copy complete, now saving to disk (please wait)...
+    "run-cfg.cfg":
+      new_state: vrf_prompt
+    "/N9K/nxosgolden.bin":
+      new_state: vrf_prompt
+
+vrf_prompt:
+  prompt: "Enter vrf (If no input, current vrf 'default' is considered): "
+  commands:
+    "management":
+      new_state: enter_user
+    "dnsvrf":
+      new_state: enter_scp_server
+
+enter_scp_server:
+  prompt: "Enter hostname for the scp server: "
+  commands:
+    "unknownserver":
+      new_state: enter_user
+
+enter_user:
+  prompt: "Enter username: "
+  commands:
+    "scpuser":
+      new_state: enter_pass
+    "dnsuser":
+      new_state: exec
+      response: |
+          dcos_ssh: Could not resolve hostname unknownserver: host nor service provided, or not known
+
+enter_pass:
+  prompt: "scpuser@10.0.0.7's password: "
+  commands:
+    "scppwd":
+      new_state: exec
+      response: |
+        run-cfg.cfg                                                                                                                                                                                                                                                                                                                                                                                                                                 run-cfg.cfg                                                                                                                                                                                                                                                                                                                                                                                                                                                                    100% 6470     6.3KB/s   00:00
+        Copy complete.
+

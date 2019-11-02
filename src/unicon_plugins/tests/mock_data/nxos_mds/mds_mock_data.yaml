@@ -1,0 +1,28 @@
+  
+exec:
+  prompt: "switch#"
+  commands:
+    "term length 0": ""
+    "term width 511": ""
+    "terminal session-timeout 0": ""
+    "config term":
+      new_state: config
+    "bash":
+      new_state: bash
+
+config:
+  prompt: "switch(config)#"
+  commands:
+    "no logging console": ""
+    "line console": ""
+    "exec-timeout 0": ""
+    "terminal width 511": ""
+    "end":
+      new_state: exec
+
+bash:
+  prompt: "switch(shell)>"
+  commands:
+    "ls": ""
+    "exit":
+      new_state: exec

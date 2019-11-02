@@ -1,0 +1,113 @@
+poap_ha_confirm_reload:
+  prompt: "This command will reboot the system. (y/n)?  [n]"
+  commands:
+    "y":
+      new_state: poap_ha_standby_console
+
+poap_ha_active_console:
+  preface: &BL |
+    CISCO SWITCH Ver 8.35
+
+    CISCO SWITCH Ver 8.35
+    Memory Size (Bytes): 0x0000000080000000 + 0x0000000580000000
+     Relocated to memory
+    Time: 11/15/2018  17:6:53
+    Detected CISCO IOFPGA
+    Booting from Primary Bios 
+    Code Signing Results: 0x0 
+    Using Upgrade FPGA
+    FPGA Revison        : 0x27
+    FPGA ID             : 0x1423741
+    FPGA Date           : 0x20160111
+    Reset Cause Register: 0x20
+    Boot Ctrl Register  : 0x60ff
+    EventLog  Register1 : 0x2000000
+    EventLog  Register2 : 0xfbc77fff
+    ^[[0mVersion 2.16.1240. Copyright (C) 2013 American Megatrends, Inc.                 
+    Board type  1
+    IOFPGA @ 0xe8000000
+    SLOT_ID @ 0x1c
+    Standalone chassis 
+    check_bootmode: grub: Continue grub
+    Trying to read config file /boot/grub/menu.lst.local from (hd0,5) 
+     Filesystem type is ext2fs, partition type 0x83
+    System is coming up ... Please wait ...
+    ....System is coming up ... Please wait ...
+    ....System is coming up ... Please wait ...
+
+    2018 Nov 15 17:10:48 switch %$ VDC-1 %$  %USER-2-SYSTEM_MSG: <<%USBHSD-2-MOUNT>> logflash: online  - usbhsd
+    
+    User Access Verification
+  prompt: "(standby) login: "
+  commands:
+    "admin":
+      new_state: standby_user_password
+
+poap_ha_standby_console:
+  preface: *BL
+  prompt: "Abort Power On Auto Provisioning [yes - continue with normal setup, skip - bypass password and basic configuration, no - continue with Power On Auto Provisioning] (yes/skip/no)[no]: "
+  commands:
+    "y":
+      response: |
+        2018 Nov 15 17:16:54 switch %$ VDC-1 %$ %POAP-2-POAP_FAILURE: [FGE21372M8J-70:7D:B9:00:BC:BF] - POAP DHCP discover phase failed 2018 Nov 15 17:16:56 switch %$ VDC-1 %$ %POAP-2-POAP_INFO:   - Abort Power On Auto Provisioning [yes - continue with normal setup, skip - bypass password and basic configuration, no - continue with Power On Auto Provisioning] (yes/skip/no)[no]:
+        2018 Nov 15 17:17:01 switch %$ VDC-1 %$ %POAP-2-POAP_INFO: [FGE21372M8J-70:7D:B9:00:BC:BF] - USB Initializing Success
+        2018 Nov 15 17:17:01 switch %$ VDC-1 %$ %POAP-2-POAP_INFO: [FGE21372M8J-70:7D:B9:00:BC:BF] - USB disk not detected
+        2018 Nov 15 17:17:01 switch %$ VDC-1 %$ last message repeated 1 time
+        2018 Nov 15 17:17:01 switch %$ VDC-1 %$ %POAP-2-POAP_INFO: [FGE21372M8J-70:7D:B9:00:BC:BF] - Start DHCP v6 session
+        2018 Nov 15 17:17:01 switch %$ VDC-1 %$ %POAP-2-POAP_DHCP_DISCOVER_START: [FGE21372M8J-70:7D:B9:00:BC:BF] - POAP DHCP Discover phase started
+        2018 Nov 15 17:17:01 switch %$ VDC-1 %$ %POAP-2-POAP_INFO:   - Abort Power On Auto Provisioning [yes - continue with normal setup, skip - bypass password and basic configuration, no - continue with Power On Auto Provisioning] (yes/skip/no)[no]:
+        Abort Power On Auto Provisioning [yes - continue with normal setup, skip - bypass password and basic configuration, no - continue with Power On Auto Provisioning] (yes/skip/no)[no]:
+            ---- System Admin Account Setup ----
+        Do you want to enforce secure password standard (yes/no) [y]:
+      timing:
+        - 0:,0,1
+      new_state: password_handling_prompt
+
+password_handling_prompt:
+  prompt: ""
+  commands:
+    "y":
+      new_state: invalid_password_error
+    "n":
+      new_state: enter_password
+
+enter_password:
+  prompt: "Enter the password for \"admin\":"
+  commands:
+    "lab":
+      new_state: confirm_password
+
+confirm_password:
+  prompt: "Confirm the password for \"admin\":"
+  commands:
+    "lab":
+      new_state: basic_config_prompt
+
+invalid_password_error:
+  prompt: "Enter the password for \"admin\":"
+  commands:
+    "lab":
+      response: |
+        Wrong Password, Reason:
+           [Length should be at least 8 characters]
+        Invalid admin password."
+      new_state: invalid_password_error
+
+basic_config_prompt:
+  preface: |
+    ---- Basic System Configuration Dialog VDC: 1 ----
+    This setup utility will guide you through the basic configuration of
+    the system. Setup configures only enough connectivity for management
+    of the system.
+
+    Please register Cisco Nexus9000 Family devices promptly with your
+    supplier. Failure to register may affect response times for initial
+    service calls. Nexus9000 devices must be registered to receive 
+    entitled support services.
+
+    Press Enter at anytime to skip a dialog. Use ctrl-c at anytime
+    to skip the remaining dialogs.
+  prompt: "Would you like to enter the basic configuration dialog (yes/no):"
+  commands:
+    "n":
+      new_state: user_access_veri 

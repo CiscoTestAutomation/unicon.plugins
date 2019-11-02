@@ -1,0 +1,166 @@
+
+
+ncs5k_standby_not_ready:
+  preface: |
+    Tue Jul 24 23:08:31.150 UTC 
+
+  prompt: "Standby card not present or not Ready for failover. Proceed? [confirm]"
+  commands:
+    "":
+      response: |2
+
+        Preparing system for backup. This may take a few minutes especially for large configurations.
+            Status report: node0_RP0_CPU0: START TO BACKUP 
+            Status report: node0_RP0_CPU0: BACKUP HAS COMPLETED SUCCESSFULLY 
+        [Done]
+
+
+      new_state: ncs5k_reload_proceed
+
+ncs5k_reload_proceed:
+  prompt: "Proceed with reload?  [confirm]"
+  commands:
+    "":
+      response: file|mock_data/iosxr/iosxr_ncs5k_reload.txt
+      new_state: ncs5k__press_return
+      timing:
+        - 0:,5,0.005
+
+
+ncs5k__press_return:
+  commands:
+    "":
+      response: |
+
+        SYSTEM CONFIGURATION IN PROCESS
+
+
+        The startup configuration for this device is presently loading.
+        This may take a few minutes. You will be notified upon completion.
+
+        Please do not attempt to reconfigure the device until this process is complete.
+
+        User Access Verification
+
+      new_state: ncs5k_login
+      timing:
+        - 0:,0,0.02
+
+
+ncs5k_login:
+  prompt: "Username: "
+  commands:
+    "lab":
+      new_state: ncs5k_pw
+
+ncs5k_pw:
+  prompt: "Password: "
+  commands:
+    "lab":
+      response: |
+        SYSTEM CONFIGURATION COMPLETED
+      new_state: ncs5k_enable
+
+ncs5k_reload_proceed2:
+  prompt: "Proceed with reload?  [confirm]"
+  commands:
+    "":
+      response: file|mock_data/iosxr/iosxr_ncs5k_reload.txt
+      new_state: ncs5k__press_return2
+      timing:
+        - 0:,5,0.005
+
+
+ncs5k__press_return2:
+  commands:
+    "":
+      response: |
+
+        SYSTEM CONFIGURATION IN PROCESS
+
+
+        The startup configuration for this device is presently loading.
+        This may take a few minutes. You will be notified upon completion.
+
+        Please do not attempt to reconfigure the device until this process is complete.
+
+        User Access Verification
+
+      new_state: ncs5k_login2
+      timing:
+        - 0:,0,0.02
+
+
+ncs5k_login2:
+  prompt: "Username: "
+  commands:
+    "lab2":
+      new_state: ncs5k_pw2
+
+ncs5k_pw2:
+  prompt: "Password: "
+  commands:
+    "lab2":
+      response: |
+        SYSTEM CONFIGURATION COMPLETED
+      new_state: ncs5k_enable
+
+ncs5k_enable:
+  prompt: RP/0/RP0/CPU0:%N#
+  commands:
+    "terminal length 0": ""
+    "terminal width 0": ""
+    "reload":
+      new_state: ncs5k_standby_not_ready
+    "reload2":
+      new_state: ncs5k_reload_proceed2
+    "configure terminal":
+      new_state: ncs5k_config
+    "show terminal": |
+      Thu Jul 26 15:14:37.556 UTC
+      Line "con0_RP0_CPU0", Location "0/RP0/CPU0", Type "Console"
+      Length: 24 lines, Width: 80 columns
+      Baud rate (TX/RX) is 115200, "No" Parity, 2 stopbits, 8 databits
+      Template: console
+      Capabilities: Timestamp Enabled
+      Allowed transports are none.
+
+ncs5k_enable_vty:
+  prompt: RP/0/RP0/CPU0:%N#
+  commands:
+    "terminal length 0": ""
+    "terminal width 0": ""
+    "reload":
+      new_state: ncs5k_standby_not_ready
+    "configure terminal":
+      new_state: ncs5k_config_vty
+    "show terminal": |
+      Sun Jul 29 19:24:40.070 UTC
+      Line "vty0", Location "10.24.92.234", Type "VTY"
+      Length: 0 lines, Width: 0 columns
+      Baud rate (TX/RX) is 0, "Empty" Parity, 0 stopbits, 0 databits
+      Template: default
+      Capabilities: Timestamp Enabled
+      Allowed transports are telnet ssh.
+
+ncs5k_config:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands: &config_cmds
+    "end":
+      new_state: ncs5k_enable
+    "no logging console": ""
+    "line console": ""
+    "exec-timeout 0 0": ""
+    "clock timezone UTC 0 0": ""
+    "commit": ""
+    "absolute-timeout 0": ""
+    "session-timeout 0": ""
+    "line default": ""
+
+
+ncs5k_config_vty:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    <<: *config_cmds
+    "end":
+      new_state: ncs5k_enable_vty

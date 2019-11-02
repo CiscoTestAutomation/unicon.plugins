@@ -1,0 +1,14 @@
+Wed Jan  9 07:25:41.907 UTC                                                                                                                      
+Node              Type                     State                    Config state                                                                 
+--------------------------------------------------------------------------------                                                                 
+0/RP0/CPU0        Sherman(Active)          IOS XR RUN               NSHUT                                                                        
+0/RP0/BMC0        Sherman                  OPERATIONAL              NSHUT                                                                        
+0/FT0             Sherman-FAN-PE           OPERATIONAL              NSHUT                                                                        
+0/FT1             Sherman-FAN-PE           OPERATIONAL              NSHUT                                                                        
+0/FT2             Sherman-FAN-PE           OPERATIONAL              NSHUT                                                                        
+0/FT3             Sherman-FAN-PE           OPERATIONAL              NSHUT                                                                        
+0/FT4             Sherman-FAN-PE           OPERATIONAL              NSHUT                                                                        
+0/PM0             NC55-2KW-ACRV            OPERATIONAL              NSHUT                                                                        
+0/PM1             NC55-2KW-ACRV            OPERATIONAL              NSHUT                                                                        
+
+

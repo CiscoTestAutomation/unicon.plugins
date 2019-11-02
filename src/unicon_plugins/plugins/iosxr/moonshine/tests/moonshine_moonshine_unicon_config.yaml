@@ -1,0 +1,26 @@
+testbed:
+    name: moonshine_moonshine
+ 
+devices:
+    r1:
+        type: moonshine
+        logical: True
+        connections:
+          defaults: {class: unicon.XRUTConnect}
+    r2:
+        type: moonshine
+        logical: True
+        connections:
+          defaults: {class: unicon.XRUTConnect}
+ 
+topology:
+    r1:
+        interfaces:
+            if1.1:
+                link: n1
+                type: ethernet
+    r2:
+        interfaces:
+            if2.1:
+                link: n1
+                type: ethernet

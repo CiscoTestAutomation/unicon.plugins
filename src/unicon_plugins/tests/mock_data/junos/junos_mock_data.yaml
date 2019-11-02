@@ -1,0 +1,57 @@
+connect_ssh:
+  preface: |
+    The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
+    RSA key fingerprint is a1:07:ac:9b:8c:c2:db:c5:4c:dc:70:b5:09:2a:a5:b1.
+  prompt: "Are you sure you want to continue connecting (yes/no)? "
+  commands:
+    "yes":
+      new_state: user_access_veri
+
+exec:
+  prompt: "root@junos_vmx2>"
+  commands:
+    "show interfaces terse | match fxp0" : |
+      fxp0                    up    up
+      fxp0.0                  up    up   inet     172.25.192.115/24
+    "set cli screen-length 0": |
+      Screen length set to 0
+    "set cli screen-width 0": |
+      Screen width set to 0
+    "configure":
+      new_state: config
+    "exit":
+      new_state: ssh
+
+config:
+  prompt: "root@junos_vmx2#"
+  commands:
+    "commit": |
+        commit complete
+
+        [edit]
+    "set snmp health-monitor": |
+
+        [edit]
+    "exit":
+      new_state: exec
+
+ssh:
+  prompt: "root@junos_vmx2:~ #"
+  commands:
+    "ls": |
+      .cshrc    .history  .login    .profile
+    "cli":
+      new_state: exec
+
+user_access_veri:
+  preface: User Access Verification
+  prompt: "login: "
+  commands:
+    "root":
+      new_state: user_password
+
+user_password:
+  prompt: "Password: "
+  commands:
+    "lab":
+      new_state: exec

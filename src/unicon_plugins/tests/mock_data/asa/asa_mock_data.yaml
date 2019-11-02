@@ -1,0 +1,229 @@
+
+connect_ssh:
+  preface: |
+    The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
+    RSA key fingerprint is a1:07:ac:9b:8c:c2:db:c5:4c:dc:70:b5:09:2a:a5:b1.
+  prompt: "Are you sure you want to continue connecting (yes/no)? "
+  commands:
+    "yes":
+      new_state: asa_password
+
+asa_disable:
+  prompt: "ASA>"
+  commands:
+    "enable":
+      new_state: asa_password
+
+asa_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: asa_enable
+
+asa_enable:
+  prompt: "ASA#"
+  commands: &enable_cmds
+    "terminal pager 0": ""
+    "config term":
+      new_state: asa_config
+    "show version": |2
+      Cisco Adaptive Security Appliance Software Version 9.6(4)8 
+      Device Manager Version 7.6(2)
+    "changeto context GLOBAL": "ERROR: 'GLOBAL' is not valid"
+    "network-object host 5.5.50.10": |
+      WARNING: Adding obj (network-object host 5.5.50.10) to grp (Dummy_50) failed; object already exists
+
+asa_enable_more:
+  prompt: "ASA#"
+  commands:
+    "terminal pager 0": ""
+    "config term":
+      new_state: asa_config
+    "show version":
+      response: |
+        Cisco Adaptive Security Appliance Software Version 9.8(3)235
+        Firepower Extensible Operating System Version 2.2(2.100)
+        Device Manager Version 7.9(2)152
+
+        Compiled on Thu 27-Sep-18 14:58 PDT by builders
+        System image file is "disk0:/mnt/boot/installables/switch/fxos-k8-fp2k-npu.2.2.2.100.SPA"
+        Config file at boot was "startup-config"
+
+        FP2130-LK1-FP2130 up 10 hours 51 mins
+        failover cluster up 1 day 9 hours
+
+        Hardware:   FPR-2130, 14852 MB RAM, CPU MIPS 1200 MHz, 1 CPU (12 cores)
+
+        1: Int: Internal-Data0/1    : address is 000f.b748.4800, irq 0
+        3: Ext: Management1/1       : address is d4e8.80b7.4381, irq 0
+        4: Int: Internal-Data1/1    : address is 0000.0100.0001, irq 0
+
+        License mode: Smart Licensing
+        License reservation: Enabled
+
+        Licensed features for this platform:
+        Maximum Physical Interfaces       : Unlimited
+        Maximum VLANs                     : 1024
+        Inside Hosts                      : Unlimited
+        Failover                          : Active/Active
+        Encryption-DES                    : Enabled
+        Encryption-3DES-AES               : Enabled
+        Security Contexts                 : 2
+        Carrier                           : Disabled
+      new_state: version_more
+    " ":
+      response: |
+        AnyConnect Premium Peers : 7500
+        AnyConnect Essentials : Disabled
+        Other VPN Peers : 7500
+        Total VPN Peers : 7500
+        AnyConnect for Mobile : Enabled
+        AnyConnect for Cisco VPN Phone : Enabled
+        Advanced Endpoint Assessment : Enabled
+        Shared License : Disabled
+        Total TLS Proxy Sessions : 8000
+        Cluster : Disabled
+
+        Failover cluster licensed features for this platform:
+        Maximum Physical Interfaces : Unlimited
+        Maximum VLANs : 1024
+        Inside Hosts : Unlimited
+        Failover : Active/Active
+        Encryption-DES : Enabled
+        Encryption-3DES-AES : Enabled
+        Security Contexts : 4
+        Carrier : Disabled
+        AnyConnect Premium Peers : 7500
+        AnyConnect Essentials : Disabled
+        Other VPN Peers : 7500
+        Total VPN Peers : 7500
+        AnyConnect for Mobile : Enabled
+        AnyConnect for Cisco VPN Phone : Enabled
+        Advanced Endpoint Assessment : Enabled
+        Shared License : Disabled
+        Total TLS Proxy Sessions : 8000
+        Cluster : Disabled
+
+        Serial Number: JAD230418PC
+        Configuration last modified by admin at 16:05:17.109 UTC Thu Jun 13 2019
+
+version_more:
+  prompt: "<--- More --->"
+  commands:
+    ' ':
+      new_state: asa_enable_more
+
+
+asa_config:
+  prompt: "ASA(config)#"
+  commands:
+    "terminal pager 0": ""
+    "end":
+      new_state: asa_enable
+    "exit":
+      new_state: asa_enable
+
+asa_disable_pri_act:
+  prompt: "ASA/pri/act>"
+  commands:
+    "enable":
+      new_state: asa_password_pri_act
+
+asa_password_pri_act:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: asa_enable_pri_act
+
+asa_enable_pri_act:
+  prompt: "ASA/pri/act#"
+  commands:
+    "terminal pager 0": ""
+    "config term":
+      new_state: asa_config_pri_act
+
+asa_config_pri_act:
+  prompt: "ASA/pri/act(config)#"
+  commands:
+    "terminal pager 0": ""
+    "end":
+      new_state: asa_enable_pri_act
+    "exit":
+      new_state: asa_enable_pri_act
+
+proceed_reload:
+  prompt: "Proceed with reload? [confirm]"
+  commands:
+    '':
+      new_state: asa_disable
+      response: |
+        ***
+        *** --- START GRACEFUL SHUTDOWN ---
+        Shutting down isakmp
+        Shutting down webvpn
+        Shutting down License Controller
+        Shutting down File system
+        ***
+        *** --- SHUTDOWN NOW ---
+        Process shutdown finished
+        Rebooting... (status 0x9)
+        ..
+        loader: Platform type set to default
+        Platform ASAv
+        loader: Platform type set to default
+        Default virtual bigphys case hit
+        Default virtual bigphys case hit
+        IO memory blocks requested from bigphys 32bit: 87680
+        Loading...
+        The digital signature of the running image verified successfully
+        memif is not enabled.
+        total mem 1710731264 system 2104995840 kernel 17107312 image 0
+        new 1693623952 old 1710731264 reserve 0 priv new 1710731264 priv old 1710731264
+        Processor memory:   2147483648
+        M_MMAP_THRESHOLD 65536, M_MMAP_MAX 32768
+        POST started...
+        POST finished, result is 0 (hint: 1 means it failed)
+        Compiled on Wed 04-Sep-19 11:08 EDT by kkelkar
+        max_free_size is 24092544
+        Total NICs found: 5
+        en_vtun rev00 Backplane Tap Interface     @ index 04 MAC: 0000.0100.0001
+        Cisco Adaptive Security Appliance Software Version 201.3(11)24 
+        ****************************** Waning *******************************
+        This product contains cryptographic features and is
+        subject to United States and local country laws
+        governing, import, export, transfer, and use.
+        Delivery of Cisco cryptographic products does not
+        imply third-party authority to import, export,
+        distribute, or use encryption. Importers, exporters,
+        distributors and users are responsible for compliance
+        with U.S. and local country laws. By using this
+        product you agree to comply with applicable laws and
+        regulations. If you are unable to comply with U.S.
+        and local laws, return the enclosed items immediately.
+        A summary of U.S. laws governing Cisco cryptographic
+        products may be found at:
+        http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+        If you require further assistance please contact us by
+        sending email to export@cisco.com.
+        ******************************* Waning *******************************
+        Cisco Adaptive Security Appliance Software, version 201.3
+        Copyright (c) 1996-2019 by Cisco Systems, Inc.
+        For licenses and notices for open source software used in this product, please visit
+        http://www.cisco.com/go/asa-opensource
+                        Restricted Rights Legend
+        Use, duplication, or disclosure by the Government is
+        subject to restrictions as set forth in subparagraph
+        (c) of the Commercial Computer Software - Restricted
+        Rights clause at FAR sec. 52.227-19 and subparagraph
+        (c) (1) (ii) of the Rights in Technical Data and Computer
+        Software clause at DFARS sec. 252.227-7013.
+                        Cisco Systems, Inc.
+                        170 West Tasman Drive
+                        San Jose, California 95134-1706
+
+asa_reload:
+  prompt: "ASA#"
+  commands:
+    "reload":
+      new_state: proceed_reload
+  

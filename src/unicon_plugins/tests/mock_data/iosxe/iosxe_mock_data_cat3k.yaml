@@ -1,0 +1,320 @@
+cat3k_login:
+  prompt: "Username: "
+  commands:
+    "cisco":
+      new_state: cat3k_password
+
+cat3k_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: cat3k_exec
+
+cat3k_exec:
+  prompt: "Router>"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": &SV |2
+      Cisco IOS XE Software, Version BLD_POLARIS_DEV_LATEST_20170430_051046
+      Cisco IOS Software [Everest], Catalyst L3 Switch Software (CAT3K_CAA-UNIVERSALK9-M), Experimental Version 16.7.20170430:042622 [polaris_dev-/scratch/mcpre/BLD-BLD_POLARIS_DEV_LATEST_20170430_051046 121]
+      Copyright (c) 1986-2017 by Cisco Systems, Inc.
+      Compiled Sun 30-Apr-17 01:51 by mcpre
+
+
+      Cisco IOS-XE software, Copyright (c) 2005-2017 by cisco Systems, Inc.
+      All rights reserved.  Certain components of Cisco IOS-XE software are
+      licensed under the GNU General Public License ("GPL") Version 2.0.  The
+      software code licensed under GPL Version 2.0 is free software that comes
+      with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+      GPL code under the terms of GPL Version 2.0.  For more details, see the
+      documentation or "License Notice" file accompanying the IOS-XE software,
+      or the applicable URL provided on the flyer accompanying the IOS-XE
+      software.
+
+
+      ROM: IOS-XE ROMMON
+      BOOTLDR: CAT3K_CAA Boot Loader (CAT3K_CAA-HBOOT-M) Version 4.58, engineering software (D)
+
+      Switch uptime is 7 minutes
+      Uptime for this control processor is 12 minutes
+      System returned to ROM by reload
+      System image file is "flash:/cat3k_caa-universalk9.BLD_POLARIS_DEV_LATEST_20170430_051046.SSA.bin.r1"
+      Last reload reason: Reload Command
+
+
+
+      This product contains cryptographic features and is subject to United
+      States and local country laws governing import, export, transfer and
+      use. Delivery of Cisco cryptographic products does not imply
+      third-party authority to import, export, distribute or use encryption.
+      Importers, exporters, distributors and users are responsible for
+      compliance with U.S. and local country laws. By using this product you
+      agree to comply with applicable laws and regulations. If you are unable
+      to comply with U.S. and local laws, return this product immediately.
+
+      A summary of U.S. laws governing Cisco cryptographic products may be found at:
+      http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+      If you require further assistance please contact us by sending email to
+      export@cisco.com.
+
+
+      Technology Package License Information: 
+
+      -----------------------------------------------------------------
+      Technology-package                   Technology-package
+      Current             Type             Next reboot  
+      ------------------------------------------------------------------
+      lanbasek9           Permanent        lanbasek9
+
+      cisco WS-C3850-24P (MIPS) processor (revision U0) with 851904K/6147K bytes of memory.
+      Processor board ID FCW1932C0QQ
+      1 Virtual Ethernet interface
+      84 Gigabit Ethernet interfaces
+      12 Ten Gigabit Ethernet interfaces
+      2048K bytes of non-volatile configuration memory.
+      4194304K bytes of physical memory.
+      250456K bytes of Crash Files at crashinfo:.
+      250456K bytes of Crash Files at crashinfo-2:.
+      250456K bytes of Crash Files at crashinfo-3:.
+      1609272K bytes of Flash at flash:.
+      1609272K bytes of Flash at flash-2:.
+      1609272K bytes of Flash at flash-3:.
+      0K bytes of WebUI ODM Files at webui:.
+
+      Base Ethernet MAC Address          : 38:20:56:72:88:00
+      Motherboard Assembly Number        : 73-15805-04
+      Motherboard Serial Number          : FOC19315RWR
+      Model Revision Number              : U0
+      Motherboard Revision Number        : A0
+      Model Number                       : WS-C3850-24P
+      System Serial Number               : FCW1932C0QQ
+
+
+      Switch Ports Model              SW Version        SW Image              Mode   
+      ------ ----- -----              ----------        ----------            ----   
+      *    1 32    WS-C3850-24P       16.7.1            CAT3K_CAA-UNIVERSALK9 BUNDLE 
+           2 32    WS-C3850-24P       16.7.1            CAT3K_CAA-UNIVERSALK9 BUNDLE 
+           3 32    WS-C3850-24P       16.7.1            CAT3K_CAA-UNIVERSALK9 BUNDLE 
+
+
+      Switch 02
+      ---------
+      Switch uptime                      : 13 minutes 
+
+      Base Ethernet MAC Address          : f0:78:16:fd:fc:00
+      Motherboard Assembly Number        : 73-15805-05
+      Motherboard Serial Number          : FOC19184Y3G
+      Model Revision Number              : AC0
+      Motherboard Revision Number        : A0
+      Model Number                       : WS-C3850-24P
+      System Serial Number               : FOC1919U0PB
+
+      Switch 03
+      ---------
+      Switch uptime                      : 12 minutes 
+
+      Base Ethernet MAC Address          : 38:20:56:23:30:80
+      Motherboard Assembly Number        : 73-15805-04
+      Motherboard Serial Number          : FOC19315SAM
+      Model Revision Number              : U0
+      Motherboard Revision Number        : A0
+      Model Number                       : WS-C3850-24P
+      System Serial Number               : FOC1932X0RW
+
+      Configuration register is 0x102
+
+    "enable":
+      new_state: enable_cat3k
+
+
+enable_cat3k:
+  prompt: "Router#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": *SV
+
+    # The following commands are for uniclean testing.
+    "show version | inc System image file is": |2
+      System image file is "flash:/cat3k_caa-universalk9.BLD_POLARIS_DEV_LATEST_20170430_051046.SSA.bin.r1"
+
+
+    "dir /all /recursive flash:/cat3k_caa-universalk9.BLD_POLARIS_DEV_LATEST_20170430_051046.SSA.bin.r1": |2
+      Directory of flash:/cat3k_caa-universalk9.BLD_POLARIS_DEV_LATEST_20170430_051046.SSA.bin.r1
+
+      Directory of flash:/
+
+      23234  -rw-   613363720   May 3 2017 08:59:15 +00:00  cat3k_caa-universalk9.BLD_POLARIS_DEV_LATEST_20170430_051046.SSA.bin.r1
+      1621966848 bytes total (304480256 bytes free)
+
+
+    "config term":
+      new_state: config_cat3k
+
+    "disable":
+      new_state: cat3k_exec
+    "reload":
+      new_state: system_config_change
+
+
+config_cat3k:
+  prompt: "Router(config)#"
+  commands:
+    "no logging console": ""
+    "line console 0":
+      new_state: config_line_cat3k
+
+config_line_cat3k:
+  prompt: "Router(config-line)#"
+  commands:
+    "exec-timeout 0": ""
+    "end":
+      new_state: enable_cat3k
+
+system_config_change:
+  prompt: "System configuration has been modified. Save? [yes/no]:"
+  commands:
+    "n":
+      new_state: cat3k_reload_proceed
+
+cat3k_reload_proceed:
+  prompt: "Proceed with reload? [confirm]"
+  commands:
+    "":
+      new_state: reload_cat3k_logs
+
+reload_cat3k_logs:
+  prompt: |2
+    Chassis 1 reloading, reason - Reload command
+    May  8 05:51:18.676: %PMAN-5-EXITACTION: F0/0: pvp: Process manager is exiting: reload fp action requested
+    May  8 05:51:22.535: %PMAN-5-EXITACTION: R0/0: pvp: Process manager is exiting: process exit with reload stack code
+
+    watchdog: watchdog0: watchdog did not stop!
+    reboot: Restarting system
+
+
+
+    Booting...Initializing RAM +++++++@@@@@@@@++++++++++++++++++++++++++++++++Up 100 Mbps Full duplex (port  0) (SGMII)
+
+    flashfs[7]: 0 files, 1 directories
+    flashfs[7]: 0 orphaned files, 0 orphaned directories
+    flashfs[7]: Total bytes: 6784000
+    flashfs[7]: Bytes used: 1024
+    flashfs[7]: Bytes available: 6782976
+    flashfs[7]: flashfs fsck took 1 seconds.
+    The system is about to execute the autoboot command.
+
+    Interrupt the system within 5 seconds to intervene.
+
+    Reading full image into memory.............................................................................................................................................................................................................................................................................................................................................................................................................................................................done
+    Bundle Image
+    --------------------------------------
+    Kernel Address    : 0x5377882c
+    Kernel Size       : 0x435bc7/4414407
+    Initramfs Address : 0x53bae3f3
+    Initramfs Size    : 0x1aa43bd/27935677
+    Compression Format: mzip
+
+    Bootable image at @ ram:0x5377882c
+    Bootable image segment 0 address range [0x81100000, 0x81da9280] is in range [0x80180000, 0x90000000].
+    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    File "tftp://10.1.7.250//auto/tftp-ssr/Edison/cat3k_caa-universalk9.BLD_V1611_1_THROTTLE_LATEST_20190507_060722_V16_11_0_230.SSA.bin" uncompressed and installed, entry point: 0x81890880
+    Loading Linux kernel with entry point 0x81890880 ...
+    Bootloader: Done loading app on core_mask: 0xf
+
+    ### Launching Linux Kernel (flags = 0x5)
+
+    Linux version 4.9.120 (xelinux@xe-linux-bld2) (gcc version 5.3.0 (GCC) ) #1 SMP Wed Mar 13 18:07:05 PDT 2019
+    CVMSEG size: 2 cache lines (256 bytes)
+    Cavium Inc. SDK-5.1.0
+    bootconsole [early0] enabled
+    CPU0 revision is: 000d900a (Cavium Octeon II)
+    Checking for the multiply/shift bug... no.
+    Checking for the daddiu bug... no.
+    %IOSXEBOOT-57df89c377c20aca5ad3b8ecdfa5523e-new_cksum: (rp/0): 4
+    %IOSXEBOOT-57df89c377c20aca5ad3b8ecdfa5523e-saved_cksum: (rp/0): 4
+
+    Final tar file: mcu_ucode_bundle_6_2_0.tar
+
+    Waiting for 120 seconds for other switches to boot
+
+    Both links down, accelerating discovery and not waiting for other switches
+    Switch number is 1
+
+                  Restricted Rights Legend
+
+    Use, duplication, or disclosure by the Government is
+    subject to restrictions as set forth in subparagraph
+    (c) of the Commercial Computer Software - Restricted
+    Rights clause at FAR sec. 52.227-19 and subparagraph
+    (c) (1) (ii) of the Rights in Technical Data and Computer
+    Software clause at DFARS sec. 252.227-7013.
+
+               Cisco Systems, Inc.
+               170 West Tasman Drive
+               San Jose, California 95134-1706
+
+
+
+    Cisco IOS Software [Gibraltar], Catalyst L3 Switch Software (CAT3K_CAA-UNIVERSALK9-M), Experimental Version 16.11.20190507:063759 [v1611_1_throttle-/nobackup/mcpre/BLD-BLD_V1611_1_THROTTLE_LATEST_20190507_060722 138]
+    Copyright (c) 1986-2019 by Cisco Systems, Inc.
+    Compiled Tue 07-May-19 07:50 by mcpre
+
+
+    This software version supports only Smart Licensing as the software licensing mechanism.
+
+
+    PLEASE READ THE FOLLOWING TERMS CAREFULLY. INSTALLING THE LICENSE OR
+    LICENSE KEY PROVIDED FOR ANY CISCO SOFTWARE PRODUCT, PRODUCT FEATURE,
+    AND/OR SUBSEQUENTLY PROVIDED SOFTWARE FEATURES (COLLECTIVELY, THE
+    "SOFTWARE"), AND/OR USING SUCH SOFTWARE CONSTITUTES YOUR FULL
+    ACCEPTANCE OF THE FOLLOWING TERMS. YOU MUST NOT PROCEED FURTHER IF YOU
+    ARE NOT WILLING TO BE BOUND BY ALL THE TERMS SET FORTH HEREIN.
+
+    Your use of the Software is subject to the Cisco End User License Agreement
+    (EULA) and any relevant supplemental terms (SEULA) found at
+    http://www.cisco.com/c/en/us/about/legal/cloud-and-software/software-terms.html.
+
+    You hereby acknowledge and agree that certain Software and/or features are
+    licensed for a particular term, that the license to such Software and/or
+    features is valid only for the applicable term and that such Software and/or
+    features may be shut down or otherwise terminated by Cisco after expiration
+    of the applicable license term (e.g., 90-day trial period). Cisco reserves
+    the right to terminate any such Software feature electronically or by any
+    other means available. While Cisco may provide alerts, it is your sole
+    responsibility to monitor your usage of any such term Software feature to
+    ensure that your systems and networks are prepared for a shutdown of the
+    Software feature.
+
+
+
+
+    FIPS: Flash Key Check : Begin
+    FIPS: Flash Key Check : End, Not Found, FIPS Mode Not Enabled
+    cisco WS-C3850-24P (MIPS) processor (revision U0) with 802251K/6147K bytes of memory.
+    Processor board ID FOC1932U0ML
+    2048K bytes of non-volatile configuration memory.
+    4194304K bytes of physical memory.
+    250456K bytes of Crash Files at crashinfo:.
+    1609272K bytes of Flash at flash:.
+    0K bytes of WebUI ODM Files at webui:.
+
+    Base Ethernet MAC Address          : 38:20:56:29:73:80
+    Motherboard Assembly Number        : 73-15805-04
+    Motherboard Serial Number          : FOC193182PF
+    Model Revision Number              : U0
+    Motherboard Revision Number        : A0
+    Model Number                       : WS-C3850-24P
+    System Serial Number               : FOC1932U0ML
+
+
+    %INIT: waited 0 seconds for NVRAM to be available
+
+
+
+    Press RETURN to get started!
+  commands:
+    "":
+      new_state: cat3k_exec

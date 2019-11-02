@@ -1,0 +1,101 @@
+
+login:
+  prompt: "Username: "
+  commands:
+    "cisco":
+      new_state: password
+
+password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: exec
+
+exec:
+  prompt: "Router> "
+  commands:
+    "show version": &SV |
+      Cisco IOS Software, 7200 Software (C7200P-ADVENTERPRISEK9-M), Experimental Version 15.0(20100325:222114) [scube_alto-gclendon-alto_precollapse 221]
+      Copyright (c) 1986-2010 by Cisco Systems, Inc.
+      Compiled Sat 27-Mar-10 20:08 by gclendon
+
+      ROM: System Bootstrap, Version 12.4(4r)XD5, RELEASE SOFTWARE (fc1)
+
+      si-ats-7200-28-34 uptime is 7 weeks, 2 days, 51 minutes
+      System returned to ROM by reload at 16:51:21 IST Mon Nov 24 2014
+      System restarted at 16:58:00 IST Mon Nov 24 2014
+      System image file is "disk2:image-si-ats-7200-28-34"
+      Last reload reason: Reload Command
+
+
+
+      This product contains cryptographic features and is subject to United
+      States and local country laws governing import, export, transfer and
+      use. Delivery of Cisco cryptographic products does not imply
+      third-party authority to import, export, distribute or use encryption.
+      Importers, exporters, distributors and users are responsible for
+      compliance with U.S. and local country laws. By using this product you
+      agree to comply with applicable laws and regulations. If you are unable
+      to comply with U.S. and local laws, return this product immediately.
+
+      A summary of U.S. laws governing Cisco cryptographic products may be found at:
+      http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+      If you require further assistance please contact us by sending email to
+      export@cisco.com.
+
+      Cisco 7206VXR (NPE-G2) processor (revision A) with 917504K/65536K bytes of memory.
+      Processor board ID 34579393
+      MPC7448 CPU at 1666Mhz, Implementation 0, Rev 2.2
+      6 slot VXR midplane, Version 2.11
+
+      Last reset from power-on
+
+      PCI bus mb1 (Slots 1, 3 and 5) has a capacity of 600 bandwidth points.
+      Current configuration on bus mb1 has a total of 0 bandwidth points.
+      This configuration is within the PCI bus capacity and is supported.
+
+      PCI bus mb2 (Slots 2, 4 and 6) has a capacity of 600 bandwidth points.
+      Current configuration on bus mb2 has a total of 0 bandwidth points.
+      This configuration is within the PCI bus capacity and is supported.
+
+      Please refer to the following document "Cisco 7200 Series Port Adaptor
+      Hardware Configuration Guidelines" on Cisco.com <http://www.cisco.com>
+      for c7200 bandwidth points oversubscription and usage guidelines.
+
+
+      1 FastEthernet interface
+      3 Gigabit Ethernet interfaces
+      2045K bytes of NVRAM.
+
+      250880K bytes of ATA PCMCIA card at slot 2 (Sector size 512 bytes).
+      65536K bytes of Flash internal SIMM (Sector size 512K).
+      Configuration register is 0x0
+
+    "enable":
+      new_state: enable
+          
+enable:
+  prompt: "Router#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": *SV
+    "config term":
+      new_state: config
+
+
+config:
+  prompt: "Router(conf)#"
+  commands:
+    "no logging console": ""
+    "line console 0":
+      new_state: config_line
+
+config_line:
+  prompt: "Router(config-line)#"
+  commands:
+    "exec-timeout 0": ""
+    "end":
+      new_state: enable
+

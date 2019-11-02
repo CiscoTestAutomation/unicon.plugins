@@ -1,0 +1,464 @@
+ha_confirm_reload:
+  prompt: "This command will reboot the system. (y/n)?  [n]"
+  commands:
+    "y":
+      new_state: ha_active_console
+
+ha_reset_reload:
+  prompt: "Do you want to proceed with reset operation? (y/n)?  [n]"
+  commands:
+    "y":
+      new_state: ha_standby_console
+
+ha_active_console:
+  preface: &BL |
+    >>>
+    >>>
+    >>>
+    NX7k SUP BIOS version ( 2.12 ) : Build - 05/29/2013 11:58:20
+    PM FPGA Version : 0x00000025
+    Power sequence microcode revision - 0x00000009 : card type - 10156EEA0
+    Booting Spi Flash : Primary
+      CPU Signature - 0x000106e4: Version - 0x000106e0
+      CPU - 2 : Cores - 4 : HTEn - 1 : HT - 2 : Features - 0xbfebfbff
+      FSB Clk - 532 Mhz :  Freq - 2145 Mhz - 2128 Mhz
+      MicroCode Version : 0x00000002
+      Memory - 32768 MB : Frequency - 1067 MHZ
+      Loading Bootloader: Done
+      IO FPGA Version   : 0x1000d
+      PLX Version       : 861910b5
+    Bios digital signature verification - Passed
+    USB bootflash status : [1-1:1-1]
+
+    Reset Reason Registers: 0x10 0x0
+     Filesystem type is ext2fs, partition type 0x83
+
+
+                  GNU GRUB  version 0.97
+
+    Autobooting bootflash:/ISSUCleanGolden.kickstart.gbin bootflash:/ISSUCleanGolde
+    n.system.gbin...
+     Filesystem type is ext2fs, partition type 0x83
+    Booting kickstart image: bootflash:/ISSUCleanGolden.kickstart.gbin....
+    ...............................................................................
+    ..........................................
+    Kickstart digital signature verification Successful
+    Image verification OK
+
+      Loading Bootloader: Done
+      IO FPGA Version   : 0x1000d
+      PLX Version       : 861910b5
+    Bios digital signature verification -
+    Passed
+    USB bootflash status : [1-1:1-1]
+
+    Reset Reason Registers: 0x10 0x0
+     Filesystem type is ext2fs, partition type 0x83
+
+    System is coming up ... Please wait ...
+    System is coming up ... Please wait ...
+
+    User Access Verification
+    
+  prompt: "switch(standby) login: "
+  commands:
+    "admin":
+      new_state: standby_user_password
+
+ha_standby_console:
+  preface: *BL
+  prompt: "switch login: "
+  commands:
+    "admin":
+      new_state: user_password
+
+confirm_reload:
+  prompt: "This command will reboot the system. (y/n)?  [n]"
+  commands:
+    "y":
+      new_state: login_after_reload
+
+login_after_reload:
+  preface: |2
+    non_utf-8_character b'[ \xe0'
+    b'[ \xe0'
+    CISCO SWITCH Ver7.33
+    Device detected on 0:6:0 after 0 msecs
+    Device detected on 0:1:1 after 0 msecs
+    Device detected on 0:1:0 after 0 msecs
+    MCFrequency 1333Mhz
+    Relocated to memory
+    Time: 6/13/2019  16:40:9
+    NorthStar/Alpine Present
+    MP Card Present
+    MIFPGA Present
+    Code Signing Results:                                    0x0
+    Using Upgrade FPGA
+    Checking and setting PSU fan directions
+    PMB RD: Nack error
+    FPGA Revison        : 0x13
+    FPGA ID             : 0x1237305
+    FPGA Date           : 0x20140213
+    Power Debug Register: 0x0
+    Reset Cause Register: 0x4
+    Boot Ctrl Register  : 0xe0ff
+    FPGA Update Status  : 0x20
+    Detected CISCO MPFPGA
+    FPGA Update Status  : 0x20
+    Detected CISCO MIFPGA
+    Version 2.16.1240. Copyright (C) 2013 American Megatrends, Inc.
+    Board type  2
+    CISCO TOR
+    IOFPGA @ 0xc8000000
+    SLOT_ID @ 0xf
+    check_bootmode: grub: Continue grub
+    Trying to read config file /boot/grub/menu.lst.local from (hd0,5)
+     Filesystem type is ext2fs, partition type 0x83
+
+    Booting bootflash:/ISSUCleanGolden.system.gbin ...
+    Booting bootflash:/ISSUCleanGolden.system.gbin
+    Trying diskboot
+     Filesystem type is ext2fs, partition type 0x83
+    Image valid
+
+
+    Image Signature verification was Successful.
+
+    Boot Time: 6/13/2019  16:41:2
+    Installing klm_card_index
+    done
+    Linking n9k flash devices
+    INIT: version 2.88 booting
+    Installing ata_piix module ... done.
+    Unsquashing rootfs ...
+    Installing isan procfs ... done.
+    Installing SSE module with card index 21022 ... done.
+    Creating SSE device node 246 ... done.
+    Loading I2C driver ... done.
+    Installing CCTRL driver for card_type 6 1263589
+    with mpa_card_type 1 ... done.
+    Loading IGB driver ... done.
+    Checking SSD firmware ...
+        Model Number:       Micron_M550_MTFDDAT064MAY
+        Serial Number:      MSA183101FN
+        Firmware Revision:  MU01
+
+    Checking all filesystems.
+    Installing SPROM driver ... IS_N9K done.
+    1
+    read MPA_ID : 1
+    Installing pfmsvcs module with SPROM card index 21022 ... done.
+    Installing nvram module ... done.
+    Installing if_index module with port mode 6 ... done.
+    Installing fcfwd
+    Installing RNI lcnd ... done
+    Installing LC netdev ... done
+    Installing psdev module ... done.
+    Installing veobc module ... done.
+    Inserting eMMC module ...
+    Inserting OBFL module ... done.
+    Making OBFL character devices
+    mounting plog for N9k!
+    Mounting OBFL pstore for mtd
+    exit code: 1
+    Starting OpenBSD Secure Shell server: sshd ... done.
+    tune2fs 1.42.1 (17-Feb-2012)
+    Setting reserved blocks percentage to 0% (0 blocks)
+    Starting portmap daemon...
+    creating NFS state directory: done
+    starting 8 nfsd kernel threads: done
+    starting mountd: done
+    starting statd: done
+    Saving image for img-sync ...
+    Loading system software
+    Installing local RPMS
+    Patch Repository Setup completed successfully
+    Creating /dev/mcelog
+    Starting mcelog daemon
+    Overwriting dme stub lib
+    INIT: Entering runlevel: 3
+    Running S93thirdparty-script...
+
+    Populating conf files for hybrid sysmgr ...
+    Starting hybrid sysmgr ...
+    Installing FC2 module using inband eth0 vegas 8 fc2_dom_family 25 ...done
+    inserting /isan/lib/modules/klm_cisco_nb.o ... done
+    Executing Prune clis.
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %USER-0-SYSTEM_MSG:  before access to bkout_cfg  - clis
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-PS_OK: Power supply 1 ok (Serial number DCB1833Y4QL)
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-PS_FANOK: Fan in Power supply 1 ok
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-PS_ABSENT: Power supply 2 is absent/shutdown, ps-redundancy might be affected
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-PS_RED_MODE_CHG: Power supply operational redundancy mode changed to non-redundant
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-FANMOD_FAN_OK: Fan module 1 (Fan1(sys_fan1) fan) ok
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-FANMOD_FAN_OK: Fan module 2 (Fan2(sys_fan2) fan) ok
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-FANMOD_FAN_OK: Fan module 3 (Fan3(sys_fan3) fan) ok
+    2019 Jun 13 16:41:42  %$ VDC-1 %$  %USER-2-SYSTEM_MSG: <<%USBHSD-2-MOUNT>> logflash: online  - usbhsd
+    2019 Jun 13 16:41:44  %$ VDC-1 %$  %DAEMON-2-SYSTEM_MSG: <<%ASCII-CFG-2-CONF_CONTROL>> Ascii replay - ascii-cfg[27976]
+    2019 Jun 13 16:41:46  %$ VDC-1 %$ netstack: Registration with cli server complete
+    2019 Jun 13 16:41:55  %$ VDC-1 %$ %USER-2-SYSTEM_MSG: ssnmgr_app_init called on ssnmgr up - aclmgr
+    2019 Jun 13 16:42:03  %$ VDC-1 %$ %USER-0-SYSTEM_MSG: end of default policer - copp
+    2019 Jun 13 16:42:03  %$ VDC-1 %$ %COPP-2-COPP_DEFAULT_POLICY: Control-plane is unprotected. Default CoPP policy (strict) will be configured.
+    2019 Jun 13 16:42:03  %$ VDC-1 %$ %COPP-2-COPP_POLICY: Control-Plane is protected with policy copp-system-p-policy-strict.
+    2019 Jun 13 16:42:05  %$ VDC-1 %$ %CARDCLIENT-2-FPGA_BOOT_PRIMARY: IOFPGA booted from Primary
+    2019 Jun 13 16:42:05  %$ VDC-1 %$ %CARDCLIENT-2-FPGA_BOOT_PRIMARY: MIFPGA booted from Primary
+    2019 Jun 13 16:42:05  %$ VDC-1 %$ %CARDCLIENT-2-FPGA_BOOT_PRIMARY: GEM_MIFPGA booted from Primary
+    2019 Jun 13 16:42:05  %$ VDC-1 %$ %ASCII-CFG-2-CONFIG_REPLAY_STATUS: Bootstrap Replay Started.
+    2019 Jun 13 16:42:05  %$ VDC-1 %$ %VDC_MGR-2-VDC_ONLINE: vdc 1 has come online
+
+
+    User Access Verification
+  timing:
+    - 0:,5,0.005
+  prompt: "Username: "
+  commands:
+    "cisco":
+      new_state: password_after_reload
+
+reconnect_login:
+  prompt: "Username: "
+  commands:
+    "cisco":
+      new_state: password_after_reload
+
+password_after_reload:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: exec_after_reload
+
+exec_after_reload:
+  prompt: "switch# "
+  commands:
+    "not a real command":
+      response:
+      - |2
+                        ^
+        % Invalid input detected at '^' marker."
+
+    "not a real command partial":
+      response:
+      - |2
+                                ^
+        % Invalid i"
+
+    "term length 0": ""
+    "term width 511": ""
+    "terminal session-timeout 0": ""
+    "config term":
+      new_state: config_lock_1_after_reload
+    "reload":
+      new_state: confirm_reload
+    "show feature": |
+      Feature Name          Instance  State
+      --------------------  --------  --------
+      bash-shell             1          enabled
+      bfd                    1          disabled
+
+config_lock_1_after_reload:
+  preface: |
+    Configuration locked. Ascii config in progress.
+  prompt: "switch#"
+  commands:
+    "config term":
+      new_state: config_lock_2_after_reload
+    "end":
+      new_state: config_lock_1_after_reload
+
+config_lock_2_after_reload:
+  preface: |
+    Configuration locked. Ascii config in progress.
+  prompt: "switch#"
+  commands:
+    "config term":
+      new_state: config_unlock_after_reload
+    "end":
+      new_state: config_lock_2_after_reload
+
+config_unlock_after_reload:
+  prompt: "N93_1(config)#"
+  commands:
+    "no logging console": ""
+    "line console": ""
+    "exec-timeout 0": ""
+    "terminal width 511": ""
+    'feature bash': ""
+    "end":
+      new_state: exec2
+
+confirm_reload2:
+  prompt: "This command will reboot the system. (y/n)?  [n]"
+  commands:
+    "y":
+      new_state: boot_loader
+
+boot_loader:
+  preface: |2
+    non_utf-8_character b'[ \xe0'
+    b'[ \xe0'
+    CISCO SWITCH Ver7.33
+    Device detected on 0:6:0 after 0 msecs
+    Device detected on 0:1:1 after 0 msecs
+    Device detected on 0:1:0 after 0 msecs
+    MCFrequency 1333Mhz
+    Relocated to memory
+    Time: 6/13/2019  16:40:9
+    NorthStar/Alpine Present
+    MP Card Present
+    MIFPGA Present
+    Code Signing Results:                                    0x0
+    Using Upgrade FPGA
+    Checking and setting PSU fan directions
+    PMB RD: Nack error
+    FPGA Revison        : 0x13
+    FPGA ID             : 0x1237305
+    FPGA Date           : 0x20140213
+    Power Debug Register: 0x0
+    Reset Cause Register: 0x4
+    Boot Ctrl Register  : 0xe0ff
+    FPGA Update Status  : 0x20
+    Detected CISCO MPFPGA
+    FPGA Update Status  : 0x20
+    Detected CISCO MIFPGA
+    Version 2.16.1240. Copyright (C) 2013 American Megatrends, Inc.
+    Board type  2
+    CISCO TOR
+    IOFPGA @ 0xc8000000
+    SLOT_ID @ 0xf
+    check_bootmode: grub: Continue grub
+    Trying to read config file /boot/grub/menu.lst.local from (hd0,5)
+     Filesystem type is ext2fs, partition type 0x83
+    No autoboot or failed autoboot. falling to loader
+
+
+
+                Loader Version 7.33
+
+  prompt: "loader > "
+  commands:
+    "boot ISSUCleanGolden.system.gbin":
+      new_state: boot_succeed
+    "boot WrongImage.system.gbin":
+      new_state: loader_prompt
+      response: |
+        Booting WrongImage.system.gbin
+        Trying diskboot
+         Filesystem type is ext2fs, partition type 0x83
+        Boot failed
+
+        Error 9: Unknown boot failure
+    "":
+      new_state: loader_prompt
+
+boot_succeed:
+  preface: |2
+    Booting ISSUCleanGolden.system.gbin
+    Trying diskboot
+     Filesystem type is ext2fs, partition type 0x83
+    Image valid
+
+    Image Signature verification was Successful.
+
+    Boot Time: 6/13/2019  16:41:2
+    Installing klm_card_index
+    done
+    Linking n9k flash devices
+    INIT: version 2.88 booting
+    Installing ata_piix module ... done.
+    Unsquashing rootfs ...
+    Installing isan procfs ... done.
+    Installing SSE module with card index 21022 ... done.
+    Creating SSE device node 246 ... done.
+    Loading I2C driver ... done.
+    Installing CCTRL driver for card_type 6 1263589
+    with mpa_card_type 1 ... done.
+    Loading IGB driver ... done.
+    Checking SSD firmware ...
+        Model Number:       Micron_M550_MTFDDAT064MAY
+        Serial Number:      MSA183101FN
+        Firmware Revision:  MU01
+
+    Checking all filesystems.
+    Installing SPROM driver ... IS_N9K done.
+    1
+    read MPA_ID : 1
+    Installing pfmsvcs module with SPROM card index 21022 ... done.
+    Installing nvram module ... done.
+    Installing if_index module with port mode 6 ... done.
+    Installing fcfwd
+    Installing RNI lcnd ... done
+    Installing LC netdev ... done
+    Installing psdev module ... done.
+    Installing veobc module ... done.
+    Inserting eMMC module ...
+    Inserting OBFL module ... done.
+    Making OBFL character devices
+    mounting plog for N9k!
+    Mounting OBFL pstore for mtd
+    exit code: 1
+    Starting OpenBSD Secure Shell server: sshd ... done.
+    tune2fs 1.42.1 (17-Feb-2012)
+    Setting reserved blocks percentage to 0% (0 blocks)
+    Starting portmap daemon...
+    creating NFS state directory: done
+    starting 8 nfsd kernel threads: done
+    starting mountd: done
+    starting statd: done
+    Saving image for img-sync ...
+    Loading system software
+    Installing local RPMS
+    Patch Repository Setup completed successfully
+    Creating /dev/mcelog
+    Starting mcelog daemon
+    Overwriting dme stub lib
+    INIT: Entering runlevel: 3
+    Running S93thirdparty-script...
+
+    Populating conf files for hybrid sysmgr ...
+    Starting hybrid sysmgr ...
+    Installing FC2 module using inband eth0 vegas 8 fc2_dom_family 25 ...done
+    inserting /isan/lib/modules/klm_cisco_nb.o ... done
+    Executing Prune clis.
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %USER-0-SYSTEM_MSG:  before access to bkout_cfg  - clis
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-PS_OK: Power supply 1 ok (Serial number DCB1833Y4QL)
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-PS_FANOK: Fan in Power supply 1 ok
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-PS_ABSENT: Power supply 2 is absent/shutdown, ps-redundancy might be affected
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-PS_RED_MODE_CHG: Power supply operational redundancy mode changed to non-redundant
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-FANMOD_FAN_OK: Fan module 1 (Fan1(sys_fan1) fan) ok
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-FANMOD_FAN_OK: Fan module 2 (Fan2(sys_fan2) fan) ok
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-FANMOD_FAN_OK: Fan module 3 (Fan3(sys_fan3) fan) ok
+    2019 Jun 13 16:41:42  %$ VDC-1 %$  %USER-2-SYSTEM_MSG: <<%USBHSD-2-MOUNT>> logflash: online  - usbhsd
+    2019 Jun 13 16:41:44  %$ VDC-1 %$  %DAEMON-2-SYSTEM_MSG: <<%ASCII-CFG-2-CONF_CONTROL>> Ascii replay - ascii-cfg[27976]
+    2019 Jun 13 16:41:46  %$ VDC-1 %$ netstack: Registration with cli server complete
+    2019 Jun 13 16:41:55  %$ VDC-1 %$ %USER-2-SYSTEM_MSG: ssnmgr_app_init called on ssnmgr up - aclmgr
+    2019 Jun 13 16:42:03  %$ VDC-1 %$ %USER-0-SYSTEM_MSG: end of default policer - copp
+    2019 Jun 13 16:42:03  %$ VDC-1 %$ %COPP-2-COPP_DEFAULT_POLICY: Control-plane is unprotected. Default CoPP policy (strict) will be configured.
+    2019 Jun 13 16:42:03  %$ VDC-1 %$ %COPP-2-COPP_POLICY: Control-Plane is protected with policy copp-system-p-policy-strict.
+    2019 Jun 13 16:42:05  %$ VDC-1 %$ %CARDCLIENT-2-FPGA_BOOT_PRIMARY: IOFPGA booted from Primary
+    2019 Jun 13 16:42:05  %$ VDC-1 %$ %CARDCLIENT-2-FPGA_BOOT_PRIMARY: MIFPGA booted from Primary
+    2019 Jun 13 16:42:05  %$ VDC-1 %$ %CARDCLIENT-2-FPGA_BOOT_PRIMARY: GEM_MIFPGA booted from Primary
+    2019 Jun 13 16:42:05  %$ VDC-1 %$ %ASCII-CFG-2-CONFIG_REPLAY_STATUS: Bootstrap Replay Started.
+    2019 Jun 13 16:42:05  %$ VDC-1 %$ %VDC_MGR-2-VDC_ONLINE: vdc 1 has come online
+
+
+    User Access Verification
+  prompt: "Username: "
+  commands:
+    "cisco":
+      new_state: password3
+
+loader_prompt:
+  prompt: "loader > "
+  commands:
+    "boot ISSUCleanGolden.system.gbin":
+      new_state: boot_succeed
+    "boot WrongImage.system.gbin":
+      new_state: loader_prompt
+      response: |
+        Booting WrongImage.system.gbin
+        Trying diskboot
+         Filesystem type is ext2fs, partition type 0x83
+        Boot failed
+
+        Error 9: Unknown boot failure
+    "":
+      new_state: loader_prompt

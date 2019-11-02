@@ -1,0 +1,32 @@
+
+staros_connect:
+  preface: Escape character is '^]'.
+  prompt: ""
+  commands:
+    "":
+      new_state: staros_exec
+
+staros_exec:
+  prompt: "[local]host_name# "
+  commands:
+    "terminal length 0": ""
+    "terminal width 512": ""
+    "conf":
+      new_state: staros_config
+
+staros_config:
+  prompt: "[local]host_name(config)# "
+  commands:
+    "test": "123"
+    "test123": "abc"
+    "test_command":
+      response: "executing test command"
+      new_state: test_state
+    "end":
+      new_state: staros_exec
+
+test_state:
+    prompt: "newpattern#"
+    commands:
+      "end":
+        new_state: staros_exec

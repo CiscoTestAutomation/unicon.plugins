@@ -1,0 +1,75 @@
+confirm_switch_activity:
+  prompt: "This will reload the active unit and force a switch of activity [confirm]"
+  commands:
+    "n":
+      new_state: enable
+    "":
+      new_state: press_return2
+      response: |
+        Preparing to switch activity
+
+        unix_reload()
+        UNIX ERR:tcgetattr:Invalid argument
+
+                      Restricted Rights Legend
+
+        Use, duplication, or disclosure by the Government is
+        subject to restrictions as set forth in subparagraph
+        (c) of the Commercial Computer Software - Restricted
+        Rights clause at FAR sec. 52.227-19 and subparagraph
+        (c) (1) (ii) of the Rights in Technical Data and Computer
+        Software clause at DFARS sec. 252.227-7013.
+
+                   Cisco Systems, Inc.
+                   170 West Tasman Drive
+                   San Jose, California 95134-1706
+
+
+
+        Cisco IOS Software [Gibraltar], Linux Software (X86_64BI_LINUXRP-ADVENTERPRISE-M), Experimental Version 17.1.20190527:124904 [polaris_dev-/witspace/mduponch/space_mduponch_CSCvj07875 102]
+        Copyright (c) 1986-2019 by Cisco Systems, Inc.
+        Compiled Mon 27-May-19 05:54 by mduponch
+
+        Linux UnixRP (i686) processor with 796046K bytes of memory.
+        Processor board ID 1044867899
+        4 Ethernet interfaces
+        8 Serial interfaces
+        64K bytes of NVRAM.
+        ERROR no type
+
+press_return2:
+  prompt: "Press RETURN to get started!"
+  commands:
+    "":
+      new_state: exec_standby2
+
+exec_standby2:
+    prompt: Router-standby>
+    commands:
+      "":
+        new_state: exec_standby2
+      "term length 0": ""
+      "term width 0": ""
+      "enable":
+        new_state: enable
+      "sh redundancy stat | inc my state":
+        my state = 8  -STANDBY HOT
+      "sh redundancy state": |2
+               my state = 8  -STANDBY HOT
+             peer state = 13 -ACTIVE
+                   Mode = Duplex
+                Unit ID = 7
+
+        Redundancy Mode (Operational) = SSO
+        Redundancy Mode (Configured)  = SSO
+        Redundancy State              = SSO
+             Maintenance Mode = Disabled
+            Manual Swact = cannot be initiated from this the standby unit
+         Communications = Up
+
+           client count = 102
+         client_notification_TMR = 30000 milliseconds
+                  keep_alive TMR = 1000 milliseconds
+                keep_alive count = 0
+            keep_alive threshold = 50
+                   RF debug mask = 0x0

@@ -1,0 +1,11 @@
+Wed Jan  9 21:10:53.333 UTC
+Cisco IOS XR Software, Version 7.0.1.119I
+Copyright (c) 2013-2018 by Cisco Systems, Inc.
+
+Label: 7.0.1.119I
+
+NCS-Spitfire
+System uptime is 18 hours, 50 minutes
+
+- xr-mandatory 7.0.1.119Iv1.0.0-1
+  - Built on sjc-ads-8354:/nobackup/gpunathi/new-xr-dev/ at Thu Jan 10 18:03:23 2019

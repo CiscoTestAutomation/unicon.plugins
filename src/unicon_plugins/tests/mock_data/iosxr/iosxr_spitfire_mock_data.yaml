@@ -1,0 +1,226 @@
+spitfire_login:
+  prompt: "Username: "
+  commands:
+    "cisco":
+      new_state: spitfire_pw
+
+spitfire_pw:
+  prompt: "Password: "
+  commands:
+    "cisco123":
+      response: |
+        SYSTEM CONFIGURATION COMPLETED
+      new_state: spitfire_enable
+
+spitfire_enable:
+  prompt: RP/0/RP0/CPU0:%N#
+  commands:
+    "ctrl":
+      new_state: spitfire_bmc
+    "terminal length 0": ""
+    "terminal width 0": ""
+    "term length 0": ""
+    "term width 0": ""
+    "show version": file|mock_data/iosxr/spitfire/show_version.txt
+    "bash cat /etc/build-info.txt": file|mock_data/iosxr/spitfire/build-info.txt
+    "bash cat /etc/bake-info.txt": file|mock_data/iosxr/spitfire/build-info.txt
+    "show platform": file|mock_data/iosxr/spitfire/show_platform.txt
+    "show configuration lock":
+      response:
+        - |2
+          Thu Sep 19 14:50:51.247 UTC
+          Not exactly sure what the cli output is like as we only see it sometimes right after reimage and immediate login
+          For now putting some random data and will update once we capture the right cli output.
+        - |2
+          Thu Sep 19 14:50:51.247 UTC
+    "show ztp log | i 'SUCCESSFULLY'":
+      response:
+        - |2
+          Thu Sep 19 14:50:51.247 UTC
+        - |2
+          Thu Sep 19 14:50:51.247 UTC
+          2019-09-23 01:42:28,757 [INFO] {12933 : MainThread} Exiting SUCCESSFULLY   
+    "configure terminal":
+      new_state: spitfire_config
+    "bash":
+      new_state: spitfire_xr_bash
+    "run":
+      new_state: spitfire_xr_run
+    "show redundancy":
+      response:
+        - |2
+          Wed Jul 10 11:06:30.331 UTC
+          Redundancy information for node 0/RP0/CPU0:
+          ==========================================
+          Node 0/RP0/CPU0 is in ACTIVE role
+          Partner node (0/RP1/CPU0) is in STANDBY role
+          Standby node in 0/RP1/CPU0 is ready
+          Standby node in 0/RP1/CPU0 is not NSR-ready
+
+          Details
+          --------
+          Current active rmf state: 4 (I_READY)
+          All standby not-ready bits clear - standby should be ready
+
+          Current active rmf state for NSR: Not ready
+            <jid>       <node>       <name> Reason for standby not NSR-ready
+             1148   0/RP0/CPU0          pim Standby partner proc not connected to Active
+                  Not ready set Wed Jul 10 11:04:15 2019: 2 minutes ago
+             1149   0/RP0/CPU0         pim6 Standby partner proc not connected to Active
+                  Not ready set Wed Jul 10 11:04:15 2019: 2 minutes ago
+
+          Reload and boot info
+          ----------------------
+          RP reloaded Wed Jul 10 11:02:53 2019: 3 minutes ago
+          Active node booted Wed Jul 10 11:02:53 2019: 3 minutes ago
+          Standby node boot Wed Jul 10 11:02:57 2019: 3 minutes ago
+          Standby node last went not ready Wed Jul 10 11:04:40 2019: 1 minute ago
+          Standby node last went ready Wed Jul 10 11:06:28 2019:  2 seconds ago
+          Standby node last went not NSR-ready Wed Jul 10 11:04:13 2019: 2 minutes ago
+          There have been 0 switch-overs since reload
+
+          Active node reload  
+          Standby node reload " "
+          
+        - |2
+          Wed Jul 10 11:10:24.284 UTC
+          Redundancy information for node 0/RP0/CPU0:
+          ==========================================
+          Node 0/RP0/CPU0 is in ACTIVE role
+          Partner node (0/RP1/CPU0) is in STANDBY role
+          Standby node in 0/RP1/CPU0 is ready
+          Standby node in 0/RP1/CPU0 is NSR-ready
+
+          Reload and boot info
+          ----------------------
+          RP reloaded Wed Jul 10 11:02:53 2019: 7 minutes ago
+          Active node booted Wed Jul 10 11:02:53 2019: 7 minutes ago
+          Standby node boot Wed Jul 10 11:02:57 2019: 7 minutes ago
+          Standby node last went not ready Wed Jul 10 11:04:40 2019: 5 minutes ago
+          Standby node last went ready Wed Jul 10 11:06:28 2019: 3 minutes ago
+          Standby node last went not NSR-ready Wed Jul 10 11:04:13 2019: 6 minutes ago
+          Standby node last went NSR-ready Wed Jul 10 11:08:10 2019: 2 minutes ago
+          There have been 0 switch-overs since reload
+
+          Active node reload  
+          Standby node reload " "
+
+    "redundancy switchover":
+      new_state:  spitfire_confirm_switchover
+
+
+spitfire_confirm_switchover:
+  preface: "Wed Jul 10 11:15:37.842 UTC"
+  prompt: "Proceed with switchover 0/RP0/CPU0 -> 0/RP1/CPU0? [confirm]"
+  commands:
+    "":
+      response: file|mock_data/iosxr/spitfire/redundancy_switchover.txt
+      timing:
+        - "0:,0,0.02"
+      new_state:
+        spitfire_console_standby
+
+spitfire_bmc:
+  prompt: "root@spitfire-arm:~#"
+  commands:
+    "ctrl":
+      new_state: spitfire_enable
+
+spitfire_xr_bash:
+  prompt: "[ios:/misc/scratch]$"
+  commands:
+    "exit":
+      new_state: spitfire_enable
+    "xrenv":
+      new_state: spitfire_xr_env
+
+spitfire_xr_run:
+  prompt: "[node0_RP0_CPU0:~]$"
+  commands:
+    "exit":
+      new_state: spitfire_enable
+    "xrenv":
+      new_state: spitfire_xr_env
+
+spitfire_xr_env:
+  prompt: "XR[ios:~]$"
+  commands:
+    "exit":
+      new_state: spitfire_xr_bash
+
+spitfire_config:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands: &config_cmds
+    "end":
+      new_state: spitfire_enable
+    "hostname Router": ""
+    "no logging console": ""
+    "logging console disable": ""
+    "line console": ""
+    "exec-timeout 0": ""
+    "absolute-timeout 0": ""
+    "exec-timeout 0 0": ""
+    "absolute-timeout 0": ""
+    "session-timeout 0": ""
+    "line default": ""
+    "commit": ""
+
+spitfire_console_standby:
+  preface: "\r\nThis (D)RP Node is not ready or active for login /configuration\r\n"
+  prompt: ""
+  commands:
+    "": |2
+       This (D)RP Node is not ready or active for login /configuration
+
+spitfire_switchover_standby:
+  prompt: ""
+  commands:
+    "":
+      new_state: spitfire_login
+
+spitfire_enable_config_lock:
+  prompt: RP/0/RP0/CPU0:%N#
+  commands:
+    "ctrl":
+      new_state: spitfire_bmc
+    "terminal length 0": ""
+    "terminal width 0": ""
+    "term length 0": ""
+    "term width 0": ""
+    "show version": file|mock_data/iosxr/spitfire/show_version.txt
+    "bash cat /etc/build-info.txt": file|mock_data/iosxr/spitfire/build-info.txt
+    "bash cat /etc/bake-info.txt": file|mock_data/iosxr/spitfire/build-info.txt
+    "show platform": file|mock_data/iosxr/spitfire/show_platform.txt
+    "show configuration lock":
+      response:
+        - |2
+          Thu Sep 19 14:50:51.247 UTC
+          Not exactly sure what the cli output is like as we only see it sometimes right after reimage and immediate login
+          For now putting some random data and will update once we capture the right cli output.
+
+spitfire_enable_ztp_lock:
+  prompt: RP/0/RP0/CPU0:%N#
+  commands:
+    "ctrl":
+      new_state: spitfire_bmc
+    "terminal length 0": ""
+    "terminal width 0": ""
+    "term length 0": ""
+    "term width 0": ""
+    "show version": file|mock_data/iosxr/spitfire/show_version.txt
+    "bash cat /etc/build-info.txt": file|mock_data/iosxr/spitfire/build-info.txt
+    "bash cat /etc/bake-info.txt": file|mock_data/iosxr/spitfire/build-info.txt
+    "show platform": file|mock_data/iosxr/spitfire/show_platform.txt
+    "show configuration lock":
+      response:
+        - |2
+          Thu Sep 19 14:50:51.247 UTC
+          Not exactly sure what the cli output is like as we only see it sometimes right after reimage and immediate login
+          For now putting some random data and will update once we capture the right cli output.
+        - |2
+          Thu Sep 19 14:50:51.247 UTC
+    "show ztp log | i 'SUCCESSFULLY'":
+      response:
+        - |2
+          Thu Sep 19 14:50:51.247 UTC
+

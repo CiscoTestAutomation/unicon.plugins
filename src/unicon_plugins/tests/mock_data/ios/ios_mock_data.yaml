@@ -1,0 +1,543 @@
+ios_setup:
+  prompt: "Would you like to enter the initial configuration dialog? [yes/no]: "
+  commands:
+    "": "% Please answer 'yes' or 'no'."
+    "no":
+      new_state: exec
+    "yes":
+      new_state: ios_setup_mgmt
+
+ios_setup_mgmt:
+  prompt: "Would you like to enter basic management setup? [yes/no]: "
+  commands:
+    "no":
+      new_state: enable
+
+ios_connect_console_server:
+  preface: |
+    Trying 127.0.0.1...
+    Connected to localhost.
+    Escape character is '^]'.
+  prompt: ""
+  commands:
+    "":
+      new_state: login
+
+connect_ssh:
+  preface: |
+    The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
+    RSA key fingerprint is a1:07:ac:9b:8c:c2:db:c5:4c:dc:70:b5:09:2a:a5:b1.
+  prompt: "Are you sure you want to continue connecting (yes/no)? "
+  commands:
+    "yes":
+      new_state: login
+
+login:
+  prompt: "Username: "
+  commands:
+    "cisco":
+      new_state: password
+
+custom_login:
+  prompt: "Identifier: "
+  commands:
+    "cisco":
+      new_state: custom_password
+
+custom_password:
+  prompt: "Passe: "
+  commands:
+    "cisco":
+      new_state: exec
+
+password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: exec
+    "abc": &abc
+      response: |2
+
+        % Authentication failed
+         
+      new_state: login
+    "abc1": *abc
+    "abc2": 
+      response: |2
+
+        % Access denied
+         
+      new_state: login
+    "abc3": 
+      response: |2
+
+        % Bad passwords
+         
+      new_state: login
+
+
+exec:
+  prompt: "%N>"
+  commands:
+    "show version": &SV |
+      Cisco IOS Software, 7200 Software (C7200P-ADVENTERPRISEK9-M), Experimental Version 15.0(20100325:222114) [scube_alto-gclendon-alto_precollapse 221]
+      Copyright (c) 1986-2010 by Cisco Systems, Inc.
+      Compiled Sat 27-Mar-10 20:08 by gclendon
+
+      ROM: System Bootstrap, Version 12.4(4r)XD5, RELEASE SOFTWARE (fc1)
+
+      si-ats-7200-28-34 uptime is 7 weeks, 2 days, 51 minutes
+      System returned to ROM by reload at 16:51:21 IST Mon Nov 24 2014
+      System restarted at 16:58:00 IST Mon Nov 24 2014
+      System image file is "disk2:image-si-ats-7200-28-34"
+      Last reload reason: Reload Command
+
+
+
+      This product contains cryptographic features and is subject to United
+      States and local country laws governing import, export, transfer and
+      use. Delivery of Cisco cryptographic products does not imply
+      third-party authority to import, export, distribute or use encryption.
+      Importers, exporters, distributors and users are responsible for
+      compliance with U.S. and local country laws. By using this product you
+      agree to comply with applicable laws and regulations. If you are unable
+      to comply with U.S. and local laws, return this product immediately.
+
+      A summary of U.S. laws governing Cisco cryptographic products may be found at:
+      http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+      If you require further assistance please contact us by sending email to
+      export@cisco.com.
+
+      Cisco 7206VXR (NPE-G2) processor (revision A) with 917504K/65536K bytes of memory.
+      Processor board ID 34579393
+      MPC7448 CPU at 1666Mhz, Implementation 0, Rev 2.2
+      6 slot VXR midplane, Version 2.11
+
+      Last reset from power-on
+
+      PCI bus mb1 (Slots 1, 3 and 5) has a capacity of 600 bandwidth points.
+      Current configuration on bus mb1 has a total of 0 bandwidth points.
+      This configuration is within the PCI bus capacity and is supported.
+
+      PCI bus mb2 (Slots 2, 4 and 6) has a capacity of 600 bandwidth points.
+      Current configuration on bus mb2 has a total of 0 bandwidth points.
+      This configuration is within the PCI bus capacity and is supported.
+
+      Please refer to the following document "Cisco 7200 Series Port Adaptor
+      Hardware Configuration Guidelines" on Cisco.com <http://www.cisco.com>
+      for c7200 bandwidth points oversubscription and usage guidelines.
+
+
+      1 FastEthernet interface
+      3 Gigabit Ethernet interfaces
+      2045K bytes of NVRAM.
+
+      250880K bytes of ATA PCMCIA card at slot 2 (Sector size 512 bytes).
+      65536K bytes of Flash internal SIMM (Sector size 512K).
+      Configuration register is 0x0
+
+    "enable":
+      new_state: enable_password_prompt
+    "ping":
+      new_state: ping_proto
+    "ping vrf management":
+      new_state: ping_proto_ios_vrf 
+    "show int e0/0": &show_int
+      response_type: circular
+      response:
+        - |2
+          Ethernet0/0 is up, line protocol is up 
+            Hardware is AmdP2, address is aabb.cc00.0100 (bia aabb.cc00.0100)
+            Internet address is 10.2.2.1/24
+            MTU 1500 bytes, BW 10000 Kbit/sec, DLY 1000 usec, 
+               reliability 255/255, txload 1/255, rxload 1/255
+            Encapsulation ARPA, loopback not set
+            Keepalive set (10 sec)
+            ARP type: ARPA, ARP Timeout 04:00:00
+            Last input 00:00:00, output 00:00:00, output hang never
+            Last clearing of "show interface" counters never
+            Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: 0
+            Queueing strategy: fifo
+            Output queue: 0/40 (size/max)
+            5 minute input rate 2000 bits/sec, 2 packets/sec
+            5 minute output rate 2000 bits/sec, 2 packets/sec
+               57 packets input, 6659 bytes, 0 no buffer
+               Received 5 broadcasts (0 IP multicasts)
+               0 runts, 0 giants, 0 throttles 
+               0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored
+               0 input packets with dribble condition detected
+               55 packets output, 7253 bytes, 0 underruns
+               0 output errors, 0 collisions, 1 interface resets
+               0 unknown protocol drops
+               0 babbles, 0 late collision, 0 deferred
+               0 lost carrier, 0 no carrier
+               0 output buffer failures, 0 output buffers swapped out
+        - |2
+          Ethernet0/0 is up, line protocol is up 
+            Hardware is AmdP2, address is aabb.cc00.0100 (bia aabb.cc00.0100)
+            Internet address is 10.2.2.1/24
+            MTU 1500 bytes, BW 10000 Kbit/sec, DLY 1000 usec, 
+               reliability 255/255, txload 1/255, rxload 1/255
+            Encapsulation ARPA, loopback not set
+            Keepalive set (10 sec)
+            ARP type: ARPA, ARP Timeout 04:00:00
+            Last input 00:00:00, output 00:00:00, output hang never
+            Last clearing of "show interface" counters never
+            Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: 0
+            Queueing strategy: fifo
+            Output queue: 0/40 (size/max)
+            5 minute input rate 2000 bits/sec, 2 packets/sec
+            5 minute output rate 2000 bits/sec, 2 packets/sec
+               64 packets input, 7141 bytes, 0 no buffer
+               Received 5 broadcasts (0 IP multicasts)
+               0 runts, 0 giants, 0 throttles 
+               0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored
+               0 input packets with dribble condition detected
+               60 packets output, 8911 bytes, 0 underruns
+               0 output errors, 0 collisions, 1 interface resets
+               0 unknown protocol drops
+               0 babbles, 0 late collision, 0 deferred
+               0 lost carrier, 0 no carrier
+               0 output buffer failures, 0 output buffers swapped out
+        - |2
+          Ethernet0/0 is up, line protocol is up 
+            Hardware is AmdP2, address is aabb.cc00.0100 (bia aabb.cc00.0100)
+            Internet address is 10.2.2.1/24
+            MTU 1500 bytes, BW 10000 Kbit/sec, DLY 1000 usec, 
+               reliability 255/255, txload 1/255, rxload 1/255
+            Encapsulation ARPA, loopback not set
+            Keepalive set (10 sec)
+            ARP type: ARPA, ARP Timeout 04:00:00
+            Last input 00:00:00, output 00:00:00, output hang never
+            Last clearing of "show interface" counters never
+            Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: 0
+            Queueing strategy: fifo
+            Output queue: 0/40 (size/max)
+            5 minute input rate 2000 bits/sec, 2 packets/sec
+            5 minute output rate 2000 bits/sec, 2 packets/sec
+               71 packets input, 7623 bytes, 0 no buffer
+               Received 5 broadcasts (0 IP multicasts)
+               0 runts, 0 giants, 0 throttles 
+               0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored
+               0 input packets with dribble condition detected
+               65 packets output, 10569 bytes, 0 underruns
+               0 output errors, 0 collisions, 1 interface resets
+               0 unknown protocol drops
+               0 babbles, 0 late collision, 0 deferred
+               0 lost carrier, 0 no carrier
+               0 output buffer failures, 0 output buffers swapped out
+    "exec2":
+      new_state: exec2
+
+execHashCharacters:
+  prompt: "###########################%N>"
+  commands:
+    "enable":
+      new_state: enable_password_prompt
+
+# Special state 'exec2' to test statemachine failure
+# test_statemachine.py::TestSMGoTo::test_go_to_failure
+exec2:
+  prompt: Router>
+  commands:
+    "enable": ""
+
+
+enable_password_prompt:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: enable
+
+confirm_prompt:
+  prompt: "[confirm]"
+  commands:
+    "":
+      new_state: enable
+
+enable:
+  prompt: "%N#"
+  commands:
+    "setup_mgmt":
+      new_state: ios_setup_mgmt
+    "enable": ""
+    "disable":
+      new_state: exec
+    "term length 0": ""
+    "term width 0": ""
+    "clear line  35":
+      new_state: confirm_prompt
+    "show version": *SV
+    "pwd":
+      new_state: messup_prompt
+    "config term":
+      new_state: config
+    "ping":
+      new_state: ping_proto
+    "ping vrf management":
+      new_state: ping_proto_ios_vrf 
+    "sh redundancy stat | inc my state":
+        my state = 13 -ACTIVE
+
+    "sh redundancy state": |2
+             my state = 13 -ACTIVE 
+           peer state = 8  -STANDBY HOT 
+                 Mode = Duplex
+                 Unit = Primary
+              Unit ID = 48
+
+      Redundancy Mode (Operational) = sso
+      Redundancy Mode (Configured)  = sso
+      Redundancy State              = sso
+          Manual Swact = enabled
+       Communications = Up
+
+         client count = 95
+       client_notification_TMR = 30000 milliseconds
+                 RF debug mask = 0x0   
+
+    "show redundancy sta |  in peer": |
+           peer state = 8  -STANDBY HOT 
+    "show redundancy sta | inc Redundancy State": |
+      Redundancy State              = sso
+    "redundancy force-switchover":
+      new_state: exec_standby
+    "redundancy switch-activity force":
+      new_state: confirm_switch_activity
+    "copy  flash: flash-3:":
+      new_state: copy_src
+    "copy  tftp: bootflash:":
+      new_state: copy_src_tftp
+    "copy  ftp: bootflash:":
+      new_state: copy_src_ftp
+    "copy  tftp://10.1.0.207/some.cfg bootflash:":
+      new_state: dest_file
+    "clear counters":
+      new_state: clear_counters
+    "clear logging":
+      new_state: clear_logging
+    "clear xconnect all":
+      new_state: clear_xcon_all
+    "reload":
+      new_state: reload_confirm_prompt
+    "show int e0/0": *show_int
+    "clear something":
+      new_state: yes_no_prompt
+    "not a real command":
+      response:
+      - |2
+                                ^
+        % Invalid input detected at '^' marker."
+    "not a real command partial":
+      response:
+      - |2
+                                ^
+        % Invalid i"
+    "show command with backspace": "test \x08"
+    "show command with more backspace":
+      new_state: show_command_with_more_backspace_first
+    "show command with escape more backspace":
+      new_state: show_command_with_escape_more_backspace_first
+    "show command with escape more":
+      new_state: show_command_with_escape_more_first
+    "show command with more":
+      new_state: show_command_with_more_first
+
+show_command_with_more_backspace_first:
+  preface: "first"
+  prompt: " --More-- "
+  commands:
+    "":
+      new_state: show_command_with_more_backspace_second
+
+show_command_with_more_backspace_second:
+  preface: "\x08\x08\x08\x08\x08\x08\x08\x08\x08        \x08\x08\x08\x08\x08\x08\x08\x08\x08second"
+  prompt: " --More-- "
+  commands:
+    "":
+      response: "\x08\x08\x08\x08\x08\x08\x08\x08\x08        \x08\x08\x08\x08\x08\x08\x08\x08\x08third"
+      new_state: enable
+
+show_command_with_escape_more_backspace_first:
+  preface: "first"
+  prompt: "\x1b[K --More-- "
+  commands:
+    "":
+      new_state: show_command_with_escape_more_backspace_second
+
+show_command_with_escape_more_backspace_second:
+  preface: "\x08 \x08\x08 \x08\x08 \x08\x08 \x08\x08 \x08\x08 \x08\x08 \x08\x08 \x08\x08 \x08\x08 \x08\x1b[Ksecond"
+  prompt: "\x1b[K --More-- "
+  commands:
+    "":
+      response: "\x08 \x08\x08 \x08\x08 \x08\x08 \x08\x08 \x08\x08 \x08\x08 \x08\x08 \x08\x08 \x08\x08 \x08\x1b[Kthird"
+      new_state: enable
+
+show_command_with_escape_more_first:
+  preface: "first"
+  prompt: "\x1b[7m--More--\x1b[27m"
+  commands:
+    "":
+      new_state: show_command_with_escape_more_second
+
+show_command_with_escape_more_second:
+  preface: "second"
+  prompt: "\x1b[7m--More--\x1b[27m"
+  commands:
+    "":
+      response: "third"
+      new_state: enable
+
+show_command_with_more_first:
+  preface: "first"
+  prompt: " --More-- "
+  commands:
+    "":
+      new_state: show_command_with_more_second
+
+show_command_with_more_second:
+  preface: "second"
+  prompt: " -- More -- "
+  commands:
+    "":
+      response: "third"
+      new_state: enable
+
+yes_no_prompt:
+  prompt: "Confirm [yes/no] "
+  commands:
+    "yes":
+      new_state: enable
+    "y":
+      new_state: enable
+
+
+config:
+  prompt: "%N(conf)#"
+  commands:
+    "no logging console": ""
+    "!end indicator for bulk configure": ""
+    "do show version": *SV
+    "line console 0":
+      new_state: config_line
+    "redundancy":
+      new_state: redundancy
+    "exit":
+      new_state: enable
+    "end":
+      new_state: enable
+
+
+config_line:
+  prompt: "%N(config-line)#"
+  commands:
+    "exec-timeout 0": ""
+    "end":
+      new_state: enable
+
+redundancy:
+  prompt: "%N(conf)#"
+  commands:
+    "main-cpu": ""
+    "standby console enable": ""
+    "end":
+      new_state: enable
+
+messup_prompt:
+  prompt: |
+    system:
+    Router#Sep 26 23:05:38.267 IST: %SYS-5-CONFIG_I: Configured from console by console
+  commands:
+    '':
+      new_state: enable
+
+
+# Escape handler scenarios with autentication
+
+ios_connect_console_server_with_uav:
+  preface: |2
+    Trying 127.0.0.1...
+    Connected to localhost.
+    Escape character is '^]'.
+
+    #######################
+    #          #    ######
+    #         # #   #     #
+    #        #   #  #     #
+    #       #     # ######
+    #       ####### #     #
+    #       #     # #     #
+    ####### #     # ######
+    #######################
+    
+    User Access Verification
+    
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: exec
+
+ios_connect_console_server_with_username:
+  preface: |2
+    Trying 127.0.0.1...
+    Connected to localhost.
+    Escape character is '^]'.
+
+    #######################
+    #          #    ######
+    #         # #   #     #
+    #        #   #  #     #
+    #       #     # ######
+    #       ####### #     #
+    #       #     # #     #
+    ####### #     # ######
+    #######################
+    
+  prompt: "username: "
+  commands:
+    "cisco":
+      new_state: password
+
+ios_connect_console_server_with_password:
+  preface: &CC |2
+    Trying 127.0.0.1...
+    Connected to localhost.
+    Escape character is '^]'.
+    
+  prompt: "password: "
+  commands:
+    "cisco":
+      new_state: exec
+
+
+# Endless password retries
+password_retries:
+  prompt: "Password: "
+  commands:
+    "cisco": ""
+
+console_test_enable:
+  preface: *CC
+  prompt: "%N> "
+  commands:
+    "enable":
+      new_state: check_enable_passwd
+
+check_enable_passwd:
+  prompt: "Password: "
+  commands:
+    "enpasswd":
+      new_state: enable
+
+ts_login:
+  prompt: "login: "
+  commands:
+    "admin":
+      new_state: ts_password
+
+ts_password:
+  prompt: "password: "
+  commands:
+    "lab":
+      new_state: exec

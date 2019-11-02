@@ -1,0 +1,59 @@
+""" A generic IOS-XE connection implementation.
+It covers many IOS-XE platforms, including ASR and ISR.
+ """
+
+__author__ = "Myles Dear <pyats-support@cisco.com>"
+
+
+from unicon_plugins.plugins.generic import ServiceList, HAServiceList
+from unicon.bases.routers.connection import BaseSingleRpConnection
+from unicon_plugins.plugins.iosxe.statemachine import IosXESingleRpStateMachine
+from unicon_plugins.plugins.iosxe.statemachine import IosXEDualRpStateMachine
+from unicon_plugins.plugins.generic import GenericSingleRpConnectionProvider,\
+    GenericDualRPConnection
+from unicon_plugins.plugins.iosxe.settings import IosXESettings
+
+from unicon_plugins.plugins.generic.service_implementation import Reload
+from unicon_plugins.plugins.iosxe import service_implementation as svc
+
+
+class IosXEServiceList(ServiceList):
+    def __init__(self):
+        super().__init__()
+        self.config = svc.Config
+        self.configure = svc.Configure
+        self.execute = svc.Execute
+        self.ping = svc.Ping
+        self.bash_console = svc.BashService
+
+
+class HAIosXEServiceList(HAServiceList):
+    def __init__(self):
+        super().__init__()
+
+        self.config = svc.HAConfig
+        self.configure = svc.HAConfigure
+        self.execute = svc.HAExecute
+        self.reload = svc.HAReload
+        self.switchover = svc.HASwitchover
+        self.ping = svc.Ping
+        self.bash_console = svc.BashService
+
+
+class IosXESingleRpConnection(BaseSingleRpConnection):
+    os = 'iosxe'
+    series = None
+    chassis_type = 'single_rp'
+    state_machine_class = IosXESingleRpStateMachine
+    connection_provider_class = GenericSingleRpConnectionProvider
+    subcommand_list = IosXEServiceList
+    settings = IosXESettings()
+
+
+class IosXEDualRPConnection(GenericDualRPConnection):
+    os = 'iosxe'
+    series = None
+    chassis_type = 'dual_rp'
+    subcommand_list = HAIosXEServiceList
+    state_machine_class = IosXEDualRpStateMachine
+    settings = IosXESettings()

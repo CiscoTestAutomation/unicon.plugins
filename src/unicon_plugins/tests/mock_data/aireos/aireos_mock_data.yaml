@@ -1,0 +1,46 @@
+
+aireos_exec:
+  prompt: "(Cisco Capwap Simulator) >"
+  commands:
+    "config":
+      new_state: aireos_config
+    "reset system forced":
+      response: |2
+
+        Wireless LAN Controller and Access Points could have partially
+        downloaded images and might not come up after reboot.
+        Wireless LAN Controller config will not be saved.
+
+      new_state: aireos_reset_forced
+
+aireos_reset_forced:
+  prompt: "Do you still want to force a reboot (y/N) "
+  commands:
+    "y":
+      response: file|mock_data/aireos/aireos_reload_85.txt
+      timing:
+        - 0:,0,0.005
+      new_state: aireos_login
+
+aireos_login:
+  prompt: "User: "
+  commands:
+    "lab":
+      new_state: aireos_password
+
+aireos_password:
+  prompt: "Password: "
+  commands:
+    "lab":
+      new_state: aireos_exec
+
+aireos_config:
+  prompt: "(Cisco Capwap Simulator) config>"
+  commands:
+    "exit":
+      new_state: aireos_exec
+    "end":
+      new_state: aireos_exec
+    "paging disable": ""
+    "sessions timeout 0": ""
+    "serial timeout 0": ""

@@ -1,0 +1,294 @@
+LEAF# [  475.566970] (1536020404.556871) (09-04-2018 00:20:04 UTC) sys_srvc_cctrl_diag_test: dbg_caller_id is 2
+[  475.566973] (1536020404.556875) (09-04-2018 00:20:04 UTC) sys_srvc_cctrl_diag_test: dbg_caller_id is 3
+[  475.566977] cctrl_cmn_reset_sfp_qsfp_phy_ports: cctrli2: card_index 21026 not supported
+[  475.566979] (1536020404.556882) (09-04-2018 00:20:04 UTC)cctrl2 card_index=21026, link flap not done.
+nvram_klm wrote rr=9 rr_str=PolicyElem Ch reload to nvram
+[  482.664059] Collected 8 ext4 filesystems 
+[  482.713970] Freezing filesystems  
+[  482.812354] Collected 1 ubi filesystems 
+[  482.859176] Freezing filesystems  
+[  482.899813] Done freezing filesystems  
+[  482.945650] Putting SSD in stdby  
+[  483.025047] Done putting SSD in stdby 0 
+[  483.071854] Done offlining SSD 
+[  483.109328] obfl_klm writing reset reason 9, PolicyElem Ch reload
+[  484.181236] write_mtd_flash_panic: successfully wrote 88 bytes at address 0x370 to RR Iter: 0. 
+
+CISCO SWITCH Ver7.41
+Device detected on 0:6:0 after 0 msecs  
+Device detected on 0:1:1 after 0 msecs  
+Device detected on 0:1:0 after 0 msecs  
+MCFrequency 1333Mhz
+Relocated to memory
+Time: 9/4/2018  0:20:27
+Detected CISCO IOFPGA
+Donner Present
+MIFPGA Present
+Code Signing Results:                                    0x0 
+Using Upgrade FPGA
+Checking and setting PSU fan directions 
+Booting from Primary Bios 
+FPGA Revison        : 0x10
+FPGA ID             : 0x1345721
+FPGA Date           : 0x20141210
+Power Debug Register: 0x0
+Reset Cause Register: 0x4
+Boot Ctrl Register  : 0xe0ff
+FPGA Update Status  : 0x20
+Detected CISCO MIFPGA
+FPGA Update Status  : 0x20Version 2.16.1240. Copyright (C) 2013 American Megatrends, Inc.                 
+Board type  2
+IOFPGA @ 0xc8000000
+SLOT_ID @ 0xf
+ Filesystem type is ext2fs, partition type 0x83
+ACI chassis 
+Trying to read config file /boot/grub/menu.lst.local from (hd0,5) 
+ Filesystem type is ext2fs, partition type 0x83
+
+Booting aci-n9000-dk9.13.2.2l.bin...
+Booting aci-n9000-dk9.13.2.2l.bin 
+Trying diskboot 
+ Filesystem type is ext2fs, partition type 0x83
+Image valid
+
+
+Image Signature verification was Successful.
+
+Boot Time: 9/4/2018  0:20:44
+[    0.000000] Reserving ebda at 0x9f000 Len 0x61000 
+
+2018-09-04T10:29:27: %UNICON-INFO: non_utf-8_character b'\x98\x10'
+b'\x98\x10'
+2018-09-04T10:29:27: %UNICON-INFO: non_utf-8_character b'(/\xc2\xe21\xaa\x1d\xb3'
+b'(/\xc2\xe21\xaa\x1d\xb3'switching root to tmpfs 
+INIT: version 2.88 booting
+Usage: grep [OPTION]... PATTERN [FILE]...
+Try `grep --help' for more information.
+Found card_index=21026
+*** Running INXOS PE IFC image  ***
+*** Running INXOS PE IFC image  ***
+Skip /var/sysmgr setup to S26 script HW: 1, IFC: 1
+*** Running INXOS PE IFC image  ***
+Starting udev
+e2fsck 1.42.1 (17-Feb-2012)
+/dev/hd-cfg0: clean, 42/15616 files, 7334/62464 blocks
+e2fsck 1.42.1 (17-Feb-2012)
+/dev/hd-cfg1: clean, 42/15616 files, 7334/62464 blocks
+e2fsck 1.42.1 (17-Feb-2012)
+/dev/hd-pss: clean, 119/31232 files, 34048/124928 blocks
+e2fsck 1.42.1 (17-Feb-2012)
+/dev/hd-bootflash: clean, 7411/494832 files, 748541/1976576 blocks
+e2fsck 1.42.1 (17-Feb-2012)
+/dev/hd-logflash: clean, 190/750720 files, 241291/3000064 blocks
+e2fsck 1.42.1 (17-Feb-2012)
+/dev/hd-recovery: clean, 11/249984 files, 34044/999936 blocks
+e2fsck 1.42.1 (17-Feb-2012)
+/dev/hd-ifc-log: clean, 59/1001712 files, 105851/4000000 blocks
+Early mount of filesystems
+@@@ Checking config for FIPS
+@@@ Checking fips conf in sda9
+@@@ Mounting sda9 to /mnt/ifc/cfg
+Starting Bootlog daemon: Total disk size (MB)64023
+bootlogd.
+dumpe2fs 1.42.1 (17-Feb-2012)
+dumpe2fs 1.42.1 (17-Feb-2012)
+dumpe2fs 1.42.1 (17-Feb-2012)
+Starting mcelog daemon
+dumpe2fs 1.42.1 (17-Feb-2012)
+dumpe2fs 1.42.1 (17-Feb-2012)
+dumpe2fs 1.42.1 (17-Feb-2012)
+dumpe2fs 1.42.1 (17-Feb-2012)
+fs_cmd for sda9 is dumpe2fs -h /dev/sda9
+dumpe2fs 1.42.1 (17-Feb-2012)
+*** Running INXOS PE IFC image  ***
+fs_cmd for sda9 is dumpe2fs -h /dev/sda9
+Total free space (MB)6457
+Total partitions found 9
+Start early extraction of system image
+mount: /dev/sda4 already mounted or /bootflash busy
+mount: according to mtab, /dev/sda4 is already mounted on /bootflash
+*** Running INXOS PE IFC image  ***
+Enter system maintenance mode? (y/n) [n]: ### For now falling back to system mode always ###
+
+Checking partition structure
+Total disk size (MB)64023
+dumpe2fs 1.42.1 (17-Feb-2012)
+dumpe2fs 1.42.1 (17-Feb-2012)
+dumpe2fs 1.42.1 (17-Feb-2012)
+dumpe2fs 1.42.1 (17-Feb-2012)
+dumpe2fs 1.42.1 (17-Feb-2012)
+dumpe2fs 1.42.1 (17-Feb-2012)
+dumpe2fs 1.42.1 (17-Feb-2012)
+fs_cmd for sda9 is dumpe2fs -h /dev/sda9
+dumpe2fs 1.42.1 (17-Feb-2012)
+fs_cmd for sda9 is dumpe2fs -h /dev/sda9
+Total free space (MB)6457
+Total partitions found 9
+Checking all filesystems.........6
+[S26check-flash] logflash cleanup finised.
+ done.
+mount: /dev/sda5 already mounted or /mnt/cfg/0 busy
+mount: according to mtab, /dev/sda5 is already mounted on /mnt/cfg/0
+mount: /dev/sda6 already mounted or /mnt/cfg/1 busy
+mount: according to mtab, /dev/sda6 is already mounted on /mnt/cfg/1
+Setup sysmgr directories HW: 1, IFC: 
+Creating disk sysmgr directory
+mount: /dev/sda5 already mounted or /cfg0 busy
+mount: according to mtab, /dev/sda5 is already mounted on /cfg0
+mount: /dev/sda6 already mounted or /cfg1 busy
+mount: according to mtab, /dev/sda6 is already mounted on /cfg1
+Starting kdump:started up
+*** Running INXOS PE IFC image  ***
+Cannot create link over existing -/var/lock-.
+Cannot create link over existing -/var/log-.
+Cannot create link over existing -/var/run-.
+Cannot create link over existing -/var/tmp-.
+Cannot create link over existing -/etc/resolv.conf-.
+hostname: getline
+hostname: getline
+Starting portmap daemon...
+*** Running INXOS PE IFC image  ***
+Main image
+Wipe out config as requested by earlier run
+Installing SSE module ... done
+Creating the sse device node ... done
+*** Running INXOS PE IFC image  ***
+blogger: nothing to do.
+[   23.362612] sdwrap_dbg_mod_init: Using GFP_ATOMIC for kmalloc!
+[   23.432386] sdwrap_dbg_mod_init: Using GFP_ATOMIC for kmalloc!
+[   23.502169] sdwrap_dbg_mod_init: Using GFP_ATOMIC for kmalloc!
+[   23.571939] sdwrap_dbg_mod_init: Using GFP_ATOMIC for kmalloc!
+[   23.641691] sdwrap_dbg_mod_init: Using GFP_ATOMIC for kmalloc!
+[   23.711441] sdwrap_dbg_mod_init: Using GFP_ATOMIC for kmalloc!
+[   23.781188] sdwrap_dbg_mod_init: Using GFP_ATOMIC for kmalloc!
+[   23.853224] sdwrap_dbg_mod_init: Using GFP_ATOMIC for kmalloc!
+[   24.074771] sdwrap_dbg_mod_init: Using GFP_ATOMIC for kmalloc!
+[   27.803862] imghdr (1959) Ran 5469 msecs in last 5472 msecs
+net.ipv4.ip_nonlocal_bind = 1
+net.core.wmem_max = 655355
+net.core.rmem_max = 4194304
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.default.accept_redirects = 0
+net.ipv4.conf.all.secure_redirects = 0
+net.ipv4.conf.default.secure_redirects = 0
+Chain PREROUTING (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination         
+prefix     all      anywhere             anywhere            vrf  2
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain POSTROUTING (policy ACCEPT)
+target     prot opt source               destination         
+IP: 3.3.2.40 MASK:255.255.0.0 GW:3.3.0.254 UP/DOWN:
+eth0
+Program the interface(eth0)/route
+6
+# This file is automatically generated don't change it
+auto lo
+iface lo inet loopback
+auto eth0
+iface eth0 inet static
+      address 3.3.2.40 
+      netmask 255.255.0.0
+      gateway 3.3.0.254
+ifdown: interface eth0 not configured
+fi[   33.081008] imghdr (1959) Ran 5202 msecs in last 5208 msecs
+nd: `/mnt/ifc/log/xlog/': No such file or directory
+Creating CGROUPS SS, BFD, IFC
+Loading system software
+*** Running INXOS PE IFC image  ***
+MTD FLASH Device found...
+nohup: redirecting stderr to stdout
+Running postinst /etc/rpm-postinsts/100...
+Running postinst /etc/rpm-postinsts/101...
+Running postinst /etc/rpm-postinsts/102...
+adduser: sshd: login already in use
+ System startup links for /etc/init.d/sshd already exist.
+*** Running INXOS PE IFC image  ***
+Starting system_stats daemon
+Starting atd: OK
+*** Running INXOS PE IFC image  ***
+
+..done Tue Sep 4 00:21:21 UTC 2018
+System image extracted and uncompressed in background
+In /etc/rcS.d/S99load-isan System image extracted  37.24
+*** Loading system image from bootflash ***
+In /etc/rcS.d/S99load-isan System image extraction done 37.24
+Load plugins that defined in image conf: /isan/plugin_img/img.conf
+Loading plugin 0: core_plugin...
+*** uncpmpress  done *** 
+[   38.814601] imghdr (1959) Ran 5641 msecs in last 5648 msecs
+[   42.854535] gzip (2704) Ran 5469 msecs in last 5512 msecs
+[   44.155806] imghdr (1959) Ran 5268 msecs in last 5272 msecs
+[   47.945412] gzip (2704) Ran 4996 msecs in last 5020 msecs
+[   49.849361] imghdr (1959) Ran 5610 msecs in last 5624 msecs
+[   53.025235] gzip (2704) Ran 4831 msecs in last 5012 msecs
+[   54.927110] imghdr (1959) Ran 4991 msecs in last 5004 msecs
+handle_platform_specific_conf_files: Pruning package specific files
+card index from cmdline 21026
+*** Running INXOS PE IFC image  ***
+card index from cmdline 21026
+Pruning out MOCK specific files
+Keep TOR/SDK. Remove SPINE,C1,ML specific conf files
+Remove SIM specific conf files
+Removing Dcimgr conf and cli file
+Drop disk caches once plugins are loaded
+Port profile not found, catalog unchanged
+[   65.180316] imghdr (1959) Ran 4597 msecs in last 5072 msecs
+*****************************************
+Digital signature verification succesful for system image: "auto-s"
+*****************************************
+[   71.882846] imghdr (4576) Ran 4957 msecs in last 5096 msecs
+Unzipping pytz (in /usr/lib/python2.7/site-packages/pytz-2016.7-py2.7.egg)
+INIT: Entering runlevel: 3
+*** Running INXOS PE IFC image  ***
+======S99setup_lxc setup lxc for TOR======
+Starting system message bus: dbus.
+*** Running INXOS PE IFC image  ***
+ Restoring saved ssh keys 
+Starting OpenBSD Secure Shell server: sshd external
+Fips mode enable 0
+/etc/ssh/sshd_config_external line 98: Deprecated option UsePrivilegeSeparation
+Starting OpenBSD Secure Shell server: sshd local
+Fips mode enable 0
+/etc/ssh/sshd_config_local line 98: Deprecated option UsePrivilegeSeparation
+done.
+Starting portmap daemon...
+Starting irqbalance: done
+creating NFS state directory: done
+Setting nlm_tcpport to $NLM_TCPPORTdone
+starting 8 nfsd kernel threads: done
+starting mountd: done
+starting statd: done
+Starting crond: OK
+Stopping Bootlog daemon: bootlogd.
+umount: /mnt/.psplash: not mounted
+*** Running INXOS PE IFC image  ***
+Starting crond: OK
+Skip updating lxc aci script
+Starting libvirtd
+Domain CentOS7 defined from /bootflash/lxc//CentOS7/CentOS7.xml
+
+Stopping crond: OK
+Starting crond: OK
+Sending test message to kernel
+Sending filter to KPM
+Sending message to kernel to register the pid
+Launching getty with console speed:9600
+*** Running INXOS PE IFC image  ***
+*** Running INXOS PE IFC image  ***
+card index: 21026, is_hw: 1
+/isan/[   84.053763] sdwrap_dbg_mod_init: Using GFP_ATOMIC for kmalloc!
+[   84.195655] sdwrap_dbg_mod_init: Using GFP_ATOMIC for kmalloc!
+[   84.286331] sdwrap_dbg_mod_init: Using GFP_ATOMIC for kmalloc!
+
+User Access Verification
+(none) login: [   84.399721] sdwrap_dbg_mod_init: Using GFP_ATOMIC for kmalloc!
+

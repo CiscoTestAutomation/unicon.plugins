@@ -1,0 +1,203 @@
+
+connect:
+  preface: |
+    The authenticity of host '[127.0.0.1]:2024 ([127.0.0.1]:2024)' can't be established.
+    RSA key fingerprint is SHA256:AOfP/cv5bHzey4A4m5mja1wl/Y2GTJR3IEyLCiA2nd4.
+  prompt: "Are you sure you want to continue connecting (yes/no)? "
+  commands:
+    "yes": 
+      new_state: cisco_ssh_username
+
+cisco_login:
+  prompt: "Username: "
+  commands:
+    "c": 
+      new_state: cisco_password
+    "admin": 
+      new_state: cisco_password
+
+juniper_login:
+  prompt: "Username: "
+  commands:
+    "c":
+      new_state:
+        juniper_password
+    "admin":
+      new_state:
+        juniper_password
+
+
+juniper_password:
+  prompt: "Password: "
+  commands:
+    "c": 
+      new_state: juniper_exec
+    "admin": 
+      new_state: juniper_exec
+
+cisco_ssh_username:
+  preface: |
+    Warning: Permanently added '[127.0.0.1]:2024' (RSA) to the list of known hosts.
+  prompt: "admin@127.0.0.1's password: "
+  commands:
+    "c":
+      new_state: cisco_exec
+      response: |2
+
+        admin connected from 10.0.2.2 using ssh on nso-dev-server
+
+
+username:
+  prompt: "Username: "
+  commands:
+    "c": 
+      new_state: cisco_password
+
+cisco_password:
+  prompt: "Password: "
+  commands:
+    "c": 
+      new_state: cisco_exec
+    "admin": 
+      new_state: cisco_exec
+
+cisco_config:
+  prompt: "user@ncs(config)# "
+  commands:
+    "switch cli": 
+      new_state: juniper_config
+      response: |
+        [ok][1970-01-01 00:00:00]
+      
+
+    "exit":
+      new_state: cisco_exec
+
+    "end": 
+      new_state: cisco_exec
+    
+    "commit": "Commit complete.\n"
+
+
+logout:
+  preface: "\n\nPress enter to login\n\n"
+  prompt: ""
+  commands:
+    "":
+      new_state: username
+
+cisco_exec:
+  prompt: "user@ncs# "
+  commands: &cisco_cmds
+    "config":
+      new_state: cisco_config
+      response: "Entering configuration mode terminal\n"
+
+    "configure": 
+      new_state: cisco_config
+      response: "Entering configuration mode terminal\n"
+
+    "switch cli": 
+      new_state: juniper_exec
+      response: "[ok][1970-01-01 00:00:00]\n"
+      timing:
+        - "0:,0.05,0.05"
+
+    "exit": 
+      new_state: logout
+      
+    "paginate false": ""
+    "screen-length 0": ""
+    "screen-width 0": ""
+    "idle-timeout 0": ""
+
+    "show devices list": 
+        response: |
+            NAME  ADDRESS       DESCRIPTION  NED ID        ADMIN STATE  
+            ----------------------------------------------------------
+            CE1   172.21.95.85  -            cisco-ios     unlocked     
+            CE2   172.21.95.83  -            cisco-ios     unlocked     
+            CE3   172.21.95.81  -            cisco-ios     unlocked     
+            CE4   172.21.95.88  -            cisco-ios     unlocked     
+            CE5   172.21.95.82  -            cisco-ios     unlocked     
+            CE6   172.21.95.79  -            cisco-ios     unlocked     
+            CE7   172.21.95.80  -            cisco-ios     unlocked     
+            CE8   172.21.95.76  -            cisco-ios     unlocked     
+            PE1   172.21.95.75  -            cisco-ios-xr  unlocked     
+            PE2   172.21.95.78  -            cisco-ios-xr  unlocked     
+            PE3   172.21.95.77  -            cisco-ios-xr  unlocked     
+            PE4   172.21.95.72  -            cisco-ios-xr  unlocked     
+            PE5   172.21.95.71  -            cisco-ios-xr  unlocked     
+            PE6   172.21.95.74  -            cisco-ios-xr  unlocked     
+            PE7   172.21.95.73  -            cisco-ios-xr  unlocked     
+            PE8   172.21.95.84  -            cisco-ios-xr  unlocked     
+        timing:
+            - "0:10,1,0.05"
+            - "10:,2,0.05"
+
+    "show services":
+        response: |
+          services sw-init-l3vpn foo
+           modified devices [ CE1 PE1 ]
+           directly-modified devices [ CE1 PE1 ]
+           device-list [ CE1 PE1 ]
+
+    "rest commit": |
+      System message at 2017-10-17 15:44:30...
+      Commit performed by admin via http using rest.'
+
+    "request software reset":
+      new_state: confirm_reset
+
+
+confirm_reset:
+  prompt: "Are you sure you want to reset to factory defaults? [yes,NO] "
+  commands:
+    "yes":
+      new_state: cisco_exec
+    "y":
+      new_state: cisco_exec
+
+cisco_exec2:
+  prompt: "user.name@ncs-hostname.domain# "
+  commands: *cisco_cmds
+
+juniper_exec:
+  prompt: "user@ncs> "
+  commands:
+    "switch cli": 
+      new_state: cisco_exec
+
+    "set paginate false": ""
+    "set screen length 0": ""
+    "set screen width 0": ""
+    "set idle-timeout 0": ""
+
+    "configure":
+      new_state: juniper_config
+      response: |2
+        Entering configuration mode private
+        [ok][1970-01-01 00:00:00]  
+
+    "show services": |2
+                                                                                           USED BY                                                                      
+                                   LSA                              LSA                    CUSTOMER                          CONFIG                                     
+      NAME  DEVICES      SERVICES  SERVICES  DEVICES      SERVICES  SERVICES  DEVICE LIST  SERVICE   ID  STATUS  NAME  TIME  DATA    ERROR  WHEN  TYPE  LEVEL  MESSAGE  
+      ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      foo   [ CE1 PE1 ]  -         -         [ CE1 PE1 ]  -         -         [ CE1 PE1 ]  -                                                                            
+      
+      [ok][2017-05-11 18:54:41]
+
+
+juniper_config:
+  prompt: "\n[edit]\nuser@ncs% "
+  commands:
+    "commit": "Commit complete.\n"
+    "end": 
+      new_state: juniper_exec
+    "exit":
+      new_state: juniper_exec
+    "switch cli":
+      new_state: cisco_config
+
+

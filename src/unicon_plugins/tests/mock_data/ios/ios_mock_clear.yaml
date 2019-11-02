@@ -1,0 +1,16 @@
+
+clear_logging:
+  prompt: Clear logging buffer [confirm]
+  commands: &clear_cmds
+    "":
+      new_state: enable
+    "y":
+      new_state: enable
+
+clear_xcon_all:
+  prompt: Reprovision all xconnects? [confirm]
+  commands: *clear_cmds
+
+clear_counters:
+  prompt: Clear "show interface" counters on all interfaces [confirm]
+  commands: *clear_cmds

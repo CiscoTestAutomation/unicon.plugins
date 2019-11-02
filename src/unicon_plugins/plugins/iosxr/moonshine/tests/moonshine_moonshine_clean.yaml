@@ -1,0 +1,11 @@
+bringup:
+    BringUpWorker:
+        module: dyntopo.xrut
+        xrut:
+            moonshine_host: ensoft-ucs4
+devices:
+    r1:
+        images: [/auto/xrut/images/enxr-router-spirit-64.vm]
+    r2:
+        images: [/auto/xrut/images/enxr-router-spirit-64.vm]
+

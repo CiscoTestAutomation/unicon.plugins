@@ -1,0 +1,29 @@
+exec_standby:
+    prompt: Router-stby#
+    commands:
+      "": "Standby locked\r\n"
+      "term length 0": ""
+      "term width 0": ""
+      "enable":
+        new_state: enable
+      "exec":
+        new_state: exec
+      "sh redundancy stat | inc my state":
+        my state = 8  -STANDBY HOT
+      "sh redundancy state": |2
+              my state = 8  -STANDBY HOT 
+             peer state = 13 -ACTIVE 
+                   Mode = Duplex
+                   Unit = Primary
+                Unit ID = 48
+
+        Redundancy Mode (Operational) = sso
+        Redundancy Mode (Configured)  = sso
+        Redundancy State              = sso
+            Manual Swact = enabled
+         Communications = Up
+
+           client count = 95
+         client_notification_TMR = 30000 milliseconds
+                   RF debug mask = 0x0   
+

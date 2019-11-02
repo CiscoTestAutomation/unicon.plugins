@@ -1,0 +1,19 @@
+cat9k_ha_reload_proceed:
+  prompt: "Proceed with reload? [confirm]"
+  commands:
+    "":
+
+cat9k_ha_active_console: &BL
+  preface: file|mock_data/iosxe/cat9k_reload_logs.txt
+  prompt: ""
+  commands:
+    "":
+      new_state: asr_exec_standby
+
+cat9k_ha_standby_console:
+  <<: *BL
+  commands:
+    "":
+      new_state: asr_exec
+
+

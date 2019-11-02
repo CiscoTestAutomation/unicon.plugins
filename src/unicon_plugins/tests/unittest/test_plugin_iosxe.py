@@ -1,0 +1,214 @@
+"""
+Unittests for Generic/IOS plugin
+
+Uses the unicon_plugins.tests.mock.mock_device_ios script to test IOS plugin.
+
+"""
+
+__author__ = "Myles Dear <mdear@cisco.com>"
+
+
+import re
+import unittest
+
+from unicon import Connection
+from unicon.core.errors import SubCommandFailure
+
+
+class TestIosPluginConnect(unittest.TestCase):
+
+    def test_asr_login_connect(self):
+        c = Connection(hostname='Router',
+                start=['mock_device_cli --os iosxe --state asr_login'],
+                os='iosxe',
+                username='cisco',
+                tacacs_password='cisco')
+        c.connect()
+        self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
+
+
+    def test_isr_login_connect(self):
+        c = Connection(hostname='Router',
+                start=['mock_device_cli --os iosxe --state isr_login'],
+                os='iosxe',
+                username='cisco',
+                tacacs_password='cisco')
+        c.connect()
+        self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
+
+
+    def test_edison_login_connect(self):
+        c = Connection(hostname='Router',
+                start=['mock_device_cli --os iosxe --state cat3k_login'],
+                os='iosxe',
+                series='cat3k',
+                username='cisco',
+                tacacs_password='cisco')
+        c.connect()
+        self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
+
+
+class TestIosXEPluginExecute(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+         cls.c = Connection(hostname='switch',
+                            start=['mock_device_cli --os iosxe --state isr_exec'],
+                            os='iosxe',
+                            username='cisco',
+                            tacacs_password='cisco')
+         cls.c.connect()
+
+    def test_execute_error_pattern(self):
+        with self.assertRaises(SubCommandFailure) as err:
+            r = self.c.execute('not a real command')
+
+
+    def test_execute_error_pattern_negative(self):
+        r = self.c.execute('not a real command partial')
+
+class TestIosXEPluginPing(unittest.TestCase):
+
+    def test_ping_success_no_vrf(self):
+        c = Connection(hostname='Router',
+                            start=['mock_device_cli --os iosxe --state isr_exec'],
+                            os='iosxe',
+                            username='cisco',
+                            tacacs_password='cisco',
+                            enable_password='cisco')
+        r = c.ping('192.0.0.5', count=30)
+        self.maxDiff = None
+        self.assertEqual(r.strip(), "\r\n".join("""ping
+Protocol [ip]: 
+Target IP address: 192.0.0.5
+Repeat count [5]: 30
+Datagram size [100]: 
+Timeout in seconds [2]: 
+Extended commands [n]: n
+Sweep range of sizes [n]: n
+Type escape sequence to abort.
+Sending 30, 100-byte ICMP Echos to 192.0.0.5, timeout is 2 seconds:
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Success rate is 100 percent (30/30), round-trip min/avg/max = 1/1/3 ms""".\
+splitlines()))
+
+    def test_ping_success_vrf(self):
+        c = Connection(hostname='Router',
+                            start=['mock_device_cli --os iosxe --state isr_exec'],
+                            os='iosxe',
+                            username='cisco',
+                            tacacs_password='cisco',
+                            enable_password='cisco')
+        r = c.ping('192.0.0.6', vrf='test', count=30)
+        self.assertEqual(r.strip(), "\r\n".join("""ping vrf test
+Protocol [ip]: 
+Target IP address: 192.0.0.6
+Repeat count [5]: 30
+Datagram size [100]: 
+Timeout in seconds [2]: 
+Extended commands [n]: n
+Sweep range of sizes [n]: n
+Type escape sequence to abort.
+Sending 30, 100-byte ICMP Echos to 192.0.0.6, timeout is 2 seconds:
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Success rate is 100 percent (30/30), round-trip min/avg/max = 1/1/3 ms""".\
+splitlines()))
+
+    def test_ping_success_vrf_in_cmd(self):
+        c = Connection(hostname='Router',
+                            start=['mock_device_cli --os iosxe --state isr_exec'],
+                            os='iosxe',
+                            username='cisco',
+                            tacacs_password='cisco',
+                            enable_password='cisco')
+        r = c.ping('192.0.0.6', command='ping vrf test', vrf='dont_use_this_vrf', count=30)
+        self.assertEqual(r.strip(), "\r\n".join("""ping vrf test
+Protocol [ip]: 
+Target IP address: 192.0.0.6
+Repeat count [5]: 30
+Datagram size [100]: 
+Timeout in seconds [2]: 
+Extended commands [n]: n
+Sweep range of sizes [n]: n
+Type escape sequence to abort.
+Sending 30, 100-byte ICMP Echos to 192.0.0.6, timeout is 2 seconds:
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Success rate is 100 percent (30/30), round-trip min/avg/max = 1/1/3 ms""".\
+splitlines()))
+
+class TestIosxePlugingTraceroute(unittest.TestCase):
+
+    def test_traceroute_success(self):
+        c = Connection(hostname='Router',
+                            start=['mock_device_cli --os iosxe --state isr_exec'],
+                            os='iosxe',
+                            username='cisco',
+                            tacacs_password='cisco',
+                            enable_password='cisco')
+        r = c.traceroute('192.0.0.5', count=30)
+        self.maxDiff = None
+        self.assertEqual(r.strip(), "\r\n".join("""traceroute
+Protocol [ip]: 
+Target IP address: 192.0.0.5
+Ingress traceroute [n]: 
+Source address or interface: 
+DSCP Value [0]: 
+Numeric display [n]: 
+Timeout in seconds [3]: 
+Probe count [3]: 
+Minimum Time to Live [1]: 
+Maximum Time to Live [30]: 
+Port Number [33434]: 
+Loose, Strict, Record, Timestamp, Verbose[none]: 
+Type escape sequence to abort.
+Tracing the route to 192.0.0.5
+VRF info: (vrf in name/id, vrf out name/id)
+  1 192.0.0.5 msec *  1 msec""".\
+splitlines()))
+
+class TestIosXEluginBashService(unittest.TestCase):
+
+    def test_bash(self):
+        c = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe --state isr_exec'],
+                       os='iosxe',
+                       username='cisco',
+                       tacacs_password='cisco',
+                       enable_password='cisco')
+        with c.bash_console() as console:
+            console.execute('ls')
+        self.assertIn('exit', c.spawn.match.match_output)
+        self.assertIn('Router#', c.spawn.match.match_output)
+
+class TestIosXESDWANConfigure(unittest.TestCase):
+    def test_config_transaction(self):
+        d = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe --state sdwan_enable'],
+                       os='iosxe', series='sdwan',
+                       username='cisco',
+                       tacacs_password='cisco',
+                       enable_password='cisco')
+        d.connect()
+        d.configure('no logging console')
+
+class TestIosXECat3kPluginReload(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.c = Connection(
+            hostname='switch',
+            start=['mock_device_cli --os iosxe --state cat3k_exec'],
+            os='iosxe',
+            series='cat3k',
+            credentials=dict(default=dict(
+                username='cisco', password='cisco'),
+                alt=dict(
+                username='admin', password='lab')))
+        cls.c.connect()
+
+    def test_reload(self):
+        self.c.reload()
+
+
+
+if __name__ == "__main__":
+    unittest.main()
+

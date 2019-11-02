@@ -1,0 +1,1137 @@
+
+connect_serial:
+  preface: "Connected."
+  prompt: ""
+  commands:
+    "":
+      new_state: login
+
+connect_ssh:
+  preface: |
+    The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
+    RSA key fingerprint is a1:07:ac:9b:8c:c2:db:c5:4c:dc:70:b5:09:2a:a5:b1.
+  prompt: "Are you sure you want to continue connecting (yes/no)? "
+  commands:
+    "yes":
+      new_state: password
+
+login:
+  preface: file|mock_data/iosxr/login_banner.txt
+  prompt: "Username: "
+  commands:
+    "admin":
+      new_state: password
+
+login1:
+  preface: file|mock_data/iosxr/login_banner.txt
+  prompt: "Username: "
+  commands:
+    "admin":
+      new_state: password1
+
+password:
+  prompt: "Password: "
+  commands:
+    "admin":
+      response: "\n"
+      new_state: enable
+
+password1:
+  prompt: "Password: "
+  commands:
+    "admin":
+      response: "\n"
+      new_state: enable1
+
+ssh_password:
+  prompt: "cisco@172.16.34.1's password: "
+  commands:
+    "admin":
+      response: "\n"
+      new_state: enable
+
+exec:
+  prompt: "RP/0/RP0/CPU0:Router>"
+  commands:
+    "enable":
+      new_state: enable
+
+enable:
+  prompt: "RP/0/RP0/CPU0:%N#"
+  commands: &enable_cmds
+    "end":
+      new_state: enable
+    "exit":
+      new_state: enable
+    "show version": file|mock_data/iosxr/show_version.txt
+    "configure terminal":
+      new_state: config
+
+    "redundancy switchover":
+      new_state: confirm_switchover
+    "run":
+      new_state: bash_console
+
+    "term len 0": ""
+    "term length 0": ""
+    "term width 0": ""
+    "terminal length 0": ""
+    "terminal width 0": ""
+
+    "admin":
+      new_state: admin
+    "attach location 0/RP0/CPU0":
+      new_state: attach_console
+    "show redundancy":
+      response:
+        - |2
+          Thu Aug  2 01:40:01.802 PST
+          Redundancy information for node 0/RSP1/CPU0:
+          ==========================================
+          Node 0/RSP1/CPU0 is in ACTIVE role
+          Node 0/RSP1/CPU0 has no valid partner
+
+          Group            Primary         Backup          Status
+          ---------        ---------       ---------       ---------
+          v6-routing       0/RSP1/CPU0     N/A             Not Ready
+          mcast-routing    0/RSP1/CPU0     N/A             Not Ready
+          netmgmt          0/RSP1/CPU0     N/A             Not Ready
+          v4-routing       0/RSP1/CPU0     N/A             Not Ready
+          v4-routing       0/RSP1/CPU0     N/A             NSR-not-configured
+          central-services 0/RSP1/CPU0     N/A             Not Ready
+          central-services 0/RSP1/CPU0     N/A             NSR-not-configured
+          dsc              0/RSP1/CPU0     N/A             Not Ready
+          dlrsc            0/RSP1/CPU0     N/A             Not Ready
+
+          Process Group Details
+          ---------------------
+
+          Current primary rmf state:
+              NSR is not configured
+
+          Reload and boot info
+          ----------------------
+          A9K-RSP440-TR reloaded Fri Jul 27 08:02:55 2018: 5 days, 17 hours, 37 minutes ago
+          Active node booted Thu Aug  2 01:32:17 2018: 7 minutes ago
+          Last switch-over Thu Aug  2 01:39:48 2018:  13 seconds ago
+
+          Active node reload  Cause: Initiating switch-over.
+
+        - |2
+          Thu Aug  2 01:42:29.248 PST
+          Redundancy information for node 0/RSP1/CPU0:
+          ==========================================
+          Node 0/RSP1/CPU0 is in ACTIVE role
+          Node Redundancy Partner (0/RSP0/CPU0) is in STANDBY role
+          Standby node in 0/RSP0/CPU0 is ready
+          Standby node in 0/RSP0/CPU0 is NSR-not-configured
+          Node 0/RSP1/CPU0 is in process group PRIMARY role
+          Process Redundancy Partner (0/RSP0/CPU0) is in BACKUP role
+          Backup node in 0/RSP0/CPU0 is not ready
+          Backup node in 0/RSP0/CPU0 is not NSR-ready
+
+          Group            Primary         Backup          Status
+          ---------        ---------       ---------       ---------
+          v6-routing       0/RSP1/CPU0     0/RSP0/CPU0     Not Ready
+          mcast-routing    0/RSP1/CPU0     0/RSP0/CPU0     Not Ready
+          netmgmt          0/RSP1/CPU0     0/RSP0/CPU0     Not Ready
+          v4-routing       0/RSP1/CPU0     0/RSP0/CPU0     Not Ready
+          v4-routing       0/RSP1/CPU0     0/RSP0/CPU0     Not NSR-Ready
+          central-services 0/RSP1/CPU0     0/RSP0/CPU0     Not Ready
+          dsc              0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          dlrsc            0/RSP1/CPU0     0/RSP0/CPU0     Ready
+
+          Process Group Details
+          ---------------------
+
+          Current primary rmf state: Not Ready
+            <jid>       <node>       <name>      <group> Reason for backup not ready
+              397  0/RSP1/CPU0      rmf_svr   v6-routing Waiting for Initial Data Transfer timer
+                  Not ready set Thu Aug  2 01:41:47 2018:  42 seconds ago
+              397  0/RSP1/CPU0      rmf_svr mcast-routing Waiting for Initial Data Transfer timer
+                  Not ready set Thu Aug  2 01:41:47 2018:  42 seconds ago
+              397  0/RSP1/CPU0      rmf_svr      netmgmt Waiting for Initial Data Transfer timer
+                  Not ready set Thu Aug  2 01:41:47 2018:  42 seconds ago
+              397  0/RSP1/CPU0      rmf_svr   v4-routing Waiting for Initial Data Transfer timer
+                  Not ready set Thu Aug  2 01:41:47 2018:  42 seconds ago
+              397  0/RSP1/CPU0      rmf_svr central-services Waiting for Initial Data Transfer timer
+                  Not ready set Thu Aug  2 01:41:47 2018:  42 seconds ago
+
+          Current primary rmf state for NSR: Not Ready
+            <jid>       <node>       <name>      <group> Reason for backup not NSR-ready
+             1063  0/RSP1/CPU0          bgp   v4-routing BGP NSR sessions not synchronized : inst_name=default, inst_id=0
+                  Not ready set Thu Aug  2 01:39:58 2018: 2 minutes ago
+
+          Reload and boot info
+          ----------------------
+          A9K-RSP440-TR reloaded Fri Jul 27 08:02:55 2018: 5 days, 17 hours, 39 minutes ago
+          Active node booted Thu Aug  2 01:32:17 2018: 10 minutes ago
+          Last switch-over Thu Aug  2 01:39:48 2018: 2 minutes ago
+          Standby node boot Thu Aug  2 01:40:26 2018: 2 minutes ago
+          Standby node last went not ready Thu Aug  2 01:41:12 2018: 1 minute ago
+          Standby node last went ready Thu Aug  2 01:42:12 2018:  17 seconds ago
+          There have been 21 switch-overs since reload
+
+          Active node reload  Cause: Initiating switch-over.
+          Standby node reload "Cause: Initiating switch-over."
+
+        - |2
+          Thu Aug  2 01:43:02.679 PST
+          Redundancy information for node 0/RSP1/CPU0:
+          ==========================================
+          Node 0/RSP1/CPU0 is in ACTIVE role
+          Node Redundancy Partner (0/RSP0/CPU0) is in STANDBY role
+          Standby node in 0/RSP0/CPU0 is ready
+          Standby node in 0/RSP0/CPU0 is NSR-not-configured
+          Node 0/RSP1/CPU0 is in process group PRIMARY role
+          Process Redundancy Partner (0/RSP0/CPU0) is in BACKUP role
+          Backup node in 0/RSP0/CPU0 is ready
+          Backup node in 0/RSP0/CPU0 is not NSR-ready
+
+          Group            Primary         Backup          Status
+          ---------        ---------       ---------       ---------
+          v6-routing       0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          mcast-routing    0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          netmgmt          0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          v4-routing       0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          v4-routing       0/RSP1/CPU0     0/RSP0/CPU0     Not NSR-Ready
+          central-services 0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          dsc              0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          dlrsc            0/RSP1/CPU0     0/RSP0/CPU0     Ready
+
+          Process Group Details
+          ---------------------
+
+          Current primary rmf state: Ready
+          All backup not-ready bits clear - backup should be ready
+
+          Current primary rmf state for NSR: Not Ready
+            <jid>       <node>       <name>      <group> Reason for backup not NSR-ready
+             1063  0/RSP1/CPU0          bgp   v4-routing BGP NSR sessions not synchronized : inst_name=default, inst_id=0
+                  Not ready set Thu Aug  2 01:39:58 2018: 3 minutes ago
+
+          Reload and boot info
+          ----------------------
+          A9K-RSP440-TR reloaded Fri Jul 27 08:02:55 2018: 5 days, 17 hours, 40 minutes ago
+          Active node booted Thu Aug  2 01:32:17 2018: 10 minutes ago
+          Last switch-over Thu Aug  2 01:39:48 2018: 3 minutes ago
+          Standby node boot Thu Aug  2 01:40:26 2018: 2 minutes ago
+          Standby node last went not ready Thu Aug  2 01:41:12 2018: 1 minute ago
+          Standby node last went ready Thu Aug  2 01:42:12 2018:  50 seconds ago
+          There have been 21 switch-overs since reload
+
+          Active node reload  Cause: Initiating switch-over.
+          Standby node reload "Cause: Initiating switch-over."
+
+        - |2
+          Thu Aug  2 01:44:19.763 PST
+          Redundancy information for node 0/RSP1/CPU0:
+          ==========================================
+          Node 0/RSP1/CPU0 is in ACTIVE role
+          Node Redundancy Partner (0/RSP0/CPU0) is in STANDBY role
+          Standby node in 0/RSP0/CPU0 is ready
+          Standby node in 0/RSP0/CPU0 is NSR-not-configured
+          Node 0/RSP1/CPU0 is in process group PRIMARY role
+          Process Redundancy Partner (0/RSP0/CPU0) is in BACKUP role
+          Backup node in 0/RSP0/CPU0 is ready
+          Backup node in 0/RSP0/CPU0 is NSR-ready
+
+          Group            Primary         Backup          Status
+          ---------        ---------       ---------       ---------
+          v6-routing       0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          mcast-routing    0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          netmgmt          0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          v4-routing       0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          central-services 0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          dsc              0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          dlrsc            0/RSP1/CPU0     0/RSP0/CPU0     Ready
+
+          Reload and boot info
+          ----------------------
+          A9K-RSP440-TR reloaded Fri Jul 27 08:02:55 2018: 5 days, 17 hours, 41 minutes ago
+          Active node booted Thu Aug  2 01:32:17 2018: 12 minutes ago
+          Last switch-over Thu Aug  2 01:39:48 2018: 4 minutes ago
+          Standby node boot Thu Aug  2 01:40:26 2018: 3 minutes ago
+          Standby node last went not ready Thu Aug  2 01:41:12 2018: 3 minutes ago
+          Standby node last went ready Thu Aug  2 01:42:12 2018: 2 minutes ago
+          There have been 21 switch-overs since reload
+
+          Active node reload  Cause: Initiating switch-over.
+          Standby node reload "Cause: Initiating switch-over."
+
+    "process restart ifmgr location all":
+        response: |2
+          Tue Nov 21 15:22:04.330 UTC
+          Location all can affect the stability of the System. Proceed? [confirm]
+        new_state: prompt_confirm
+
+    "clear logging":
+        response: |2
+          Tue Nov 21 15:26:28.299 UTC
+        new_state: prompt_yn
+
+    "clear logg":
+      new_state: half_confirm_prompt
+
+    "process_restart_msg": |
+      0/RP0/ADMIN0:Jul 7 10:07:42.979 UTC: pm[2890]: %INFRA-Process_Manager-3-PROCESS_RESTART : Process tams (IID: 0) restarted
+
+    "show telemetry | inc ACTIVE":
+      response: |
+        Sat Jul 7 10:08:02.976 UTC
+        State: ACTIVE
+      timing:
+        - 0:,0.05
+    "show platform": |
+      Thu Mar 24 13:16:23.555 UTC
+      Node    Type        State      Config State
+      -----------------------------------------------------------------------------
+      0/RSP0/CPU0     A9K-RSP-4G(Active)        IOS XR RUN       PWR,NSHUT,MON
+      0/RSP1/CPU0     A9K-RSP-4G(Standby)       IOS XR RUN       PWR,NSHUT,MON
+      0/0/CPU0        A9K-MOD80-SE              IOS XR RUN       PWR,NSHUT,MON
+      0/0/0           A9K-MPA-20X1GE            OK               PWR,NSHUT,MON
+      0/0/1           A9K-MPA-20X1GE            OK               PWR,NSHUT,MON
+      0/7/CPU0        A9K-40GE-B                IOS XR RUN       PWR,NSHUT,MON
+
+    "ping":
+      new_state: ping_proto
+
+    "ping vrf management":
+      new_state: ping_proto_vrf
+      
+    "not a real command":
+      response:
+      - |2
+                          ^
+        % Invalid input detected at '^' marker."
+      
+    "not a real command partial":
+      response:
+      - |2
+                                ^
+        % Invalid i"
+    "reload":
+      new_state: reload_confirm_prompt
+
+half_confirm_prompt:
+  prompt: "Clear logging buffer [confirm] [y"
+  commands:
+    "":
+      new_state: again_confirm_prompt
+
+again_confirm_prompt:
+  prompt: "Clear logging buffer [confirm with only 'y' or 'n'] [y/n] :"
+  commands:
+    "y":
+      new_state: enable
+
+confirm_switchover:
+  preface: "Thu Jul 27 17:37:27.047 UTC"
+  prompt: "Proceed with switchover 0/0/CPU0 -> 0/1/CPU0? [confirm]"
+  commands:
+    "":
+      response: file|mock_data/iosxr/redundancy_switchover.txt
+      timing:
+        - "0:,0,0.02"
+      new_state:
+        enable
+
+
+prompt_confirm:
+  prompt: ""
+  commands:
+    "":
+      new_state: enable
+
+prompt_yn:
+  prompt: "Clear logging buffer [confirm] [y/n] : "
+  commands:
+    "y":
+      new_state: enable
+
+admin:
+  prompt: "RP/0/RP0/CPU0:Router(admin)#"
+  commands: &admin_commands
+    "clear configuration inconsistency": |2
+
+      Thu Jul 27 12:13:42.016 UTC
+
+      Creating any missing directories in ADMIN Configuration File system...OK
+      Initializing ADMIN Configuration Version Manager...OK
+      Syncing ADMIN commit database with running configuration...OK
+    "exit":
+      new_state: enable
+    "show platform": |
+      Thu Mar 24 13:16:26.967 UTC
+      Node    Type        State      Config State
+      -----------------------------------------------------------------------------
+      0/RSP0/CPU0     A9K-RSP-4G(Active)        IOS XR RUN       PWR,NSHUT,MON
+      0/RSP1/CPU0     A9K-RSP-4G(Standby)       IOS XR RUN       PWR,NSHUT,MON
+      0/FT0/SP        FAN TRAY                  READY            
+      0/FT1/SP        FAN TRAY                  READY            
+      0/0/CPU0        A9K-MOD80-SE              IOS XR RUN       PWR,NSHUT,MON
+      0/0/0           A9K-MPA-20X1GE            OK               PWR,NSHUT,MON
+      0/0/1           A9K-MPA-20X1GE            OK               PWR,NSHUT,MON
+      0/7/CPU0        A9K-40GE-B                IOS XR RUN       PWR,NSHUT,MON
+      0/PM3/SP        A9K-3KW-AC                READY            PWR,NSHUT,MON
+      0/PM4/SP        A9K-3KW-AC                READY            PWR,NSHUT,MON
+      0/PM5/SP        A9K-3KW-AC                FAILED           PWR,NSHUT,MON
+
+
+config:
+  prompt: "RP/0/RP0/CPU0:Router(config)#"
+  commands: &config_cmds
+    "end":
+      new_state: enable
+    "exit":
+      new_state: enable
+    "logging console disable": ""
+    "no logging console": ""
+    "!end indicator for bulk configure": ""
+    "line con 0":
+      new_state:
+        config_line
+    "line default":
+      new_state: config_line
+    "line console":
+      new_state: config_line
+    "hostname Router": ""
+    "no logging console": ""
+    "large config":
+      new_state: large_config
+    "line console":
+      new_state:
+        line_console
+    "commit":
+      new_state: commit_prompt
+    "commit force": ""
+    "commit replace":
+      new_state: commit_replace
+    "end":
+      new_state: enable
+    "test failed":
+      new_state:
+        failed_config
+
+config_line:
+  prompt: "RP/0/RP0/CPU0:Router(config-line)#"
+  commands: 
+    "exec-timeout 0 0": ""
+    "clock timezone UTC 0 0": ""
+    "commit": ""
+    "end":
+      new_state: enable
+    "absolute-timeout 0": ""
+    "exec-timeout 0 0": ""
+    "absolute-timeout 0": ""
+    "session-timeout 0": ""
+    "line default":
+      new_state: config_line
+    "commit":
+      new_state: commit_prompt
+
+line_console:
+  prompt: "RP/0/RP0/CPU0:Router(config-line)#"
+  commands:
+    "exec-timeout 0 0": ""
+    "absolute-timeout 0": ""
+    "session-timeout 0": ""
+    "line default": ""
+    "commit":
+      new_state: commit_prompt
+    "end":
+      new_state: enable
+
+large_config:
+  prompt: "RP/0/RP0/CPU0:Router(config)#"
+  commands:
+    "end":
+      new_state: delay_enable
+
+delay_enable:
+  prompt: "Uncommitted changes found, commit them before exiting(yes/no/cancel)? [cancel]:"
+  commands:
+    "yes":
+      new_state: enable
+      response: ""
+      timing:
+        - "0:0,15,0,0"
+
+commit_prompt:
+  prompt: "Uncommitted changes found, commit them before exiting(yes/no/cancel)? [cancel]:"
+  commands:
+    "yes":
+      new_state: config
+
+commit_replace:
+  prompt: "This commit will replace or remove the entire running configuration. This\n
+operation can be service affecting.\n
+Do you wish to proceed? [no]:"
+  commands:
+    "yes":
+      new_state: config
+
+failed_config:
+  prompt: "RP/0/RP0/CPU0:Router(config)#"
+  commands:
+    "end":
+      response: "Uncommitted changes found, commit them before exiting(yes/no/cancel)? [cancel]:"
+      new_state: failed_config_uncommitted
+
+failed_config_uncommitted:
+  prompt: ""
+  commands:
+    "yes":
+      response: "% Failed to commit one or more configuration items during a pseudo-atomic operation. All changes made have been reverted. Please issue 'show configuration failed [inheritance]' from this session to view the errors"
+      new_state: failed_config_show
+
+failed_config_show:
+  prompt: "RP/0/RP0/CPU0:Router(config)#"
+  commands:
+    "show configuration failed": |2
+      Fri Aug  3 15:34:40.336 UTC
+      !! SEMANTIC ERRORS: This configuration was rejected by
+      !! the system due to semantic errors. The individual
+      !! errors with each failed configuration command can be
+      !! found below.
+
+
+      test failed
+      !!% Invalid config
+       !
+      !
+      end
+
+    "abort":
+      new_state: enable
+
+config1:
+  prompt: "RP/0/RP0/CPU0:Router(config)#"
+  commands: &config_cmds1
+    "end":
+      new_state: enable1
+    "exit":
+      new_state: enable1
+    "no logging console": ""
+    "line console":
+      new_state: config_line1
+    "show configuration": |
+      Building configuration...
+      !! IOS XR Configuration version = 6.5.1
+      end
+
+config_line1:
+  prompt: "RP/0/RP0/CPU0:Router(config-line)#"
+  commands: 
+    "exec-timeout 0 0": ""
+    "clock timezone UTC 0 0": ""
+    "commit": ""
+    "end":
+      new_state: enable1
+    "absolute-timeout 0": ""
+    "exec-timeout 0 0": ""
+    "absolute-timeout 0": ""
+    "session-timeout 0": ""
+    "line default":
+      new_state: config_line1
+
+enable1:
+  prompt: "RP/0/RP0/CPU0:%N#"
+  commands: &enable_cmds1
+    "end":
+      new_state: enable1
+    "configure terminal":
+      new_state: config1
+    "exit":
+      new_state: enable1
+    "show version": file|mock_data/iosxr/show_version.txt
+    "run":
+      new_state: bash_console
+    "attach location 0/RP0/CPU0":
+      new_state: attach_console
+
+    "term len 0": ""
+    "term width 0": ""
+    "terminal length 0": ""
+    "terminal width 0": ""
+    "pwd": |
+      disk0:
+    "admin":
+      new_state: admin1
+
+    "clear logging":
+        response: |2
+          Tue Nov 21 15:26:28.299 UTC
+        new_state: prompt_yn
+
+    "clear logg":
+      new_state: half_confirm_prompt
+
+admin1:
+  prompt: "sysadmin-vm:0_RP0#"
+  commands: &admin_commands1
+    "clear configuration inconsistency": |2
+
+      Thu Jul 27 12:13:42.016 UTC
+
+      Creating any missing directories in ADMIN Configuration File system...OK
+      Initializing ADMIN Configuration Version Manager...OK
+      Syncing ADMIN commit database with running configuration...OK
+    "exit":
+      new_state: enable1
+    "run":
+      new_state: admin_bash
+    "attach location 0/RP0":
+      new_state: admin_bash
+    "show platform": |
+      Thu Mar 24 13:16:26.967 UTC
+      Node    Type        State      Config State
+      -----------------------------------------------------------------------------
+      0/RSP0/CPU0     A9K-RSP-4G(Active)        IOS XR RUN       PWR,NSHUT,MON
+      0/RSP1/CPU0     A9K-RSP-4G(Standby)       IOS XR RUN       PWR,NSHUT,MON
+      0/FT0/SP        FAN TRAY                  READY            
+      0/FT1/SP        FAN TRAY                  READY            
+      0/0/CPU0        A9K-MOD80-SE              IOS XR RUN       PWR,NSHUT,MON
+      0/0/0           A9K-MPA-20X1GE            OK               PWR,NSHUT,MON
+      0/0/1           A9K-MPA-20X1GE            OK               PWR,NSHUT,MON
+      0/7/CPU0        A9K-40GE-B                IOS XR RUN       PWR,NSHUT,MON
+      0/PM3/SP        A9K-3KW-AC                READY            PWR,NSHUT,MON
+      0/PM4/SP        A9K-3KW-AC                READY            PWR,NSHUT,MON
+      0/PM5/SP        A9K-3KW-AC                FAILED           PWR,NSHUT,MON
+    "config":
+      new_state: admin_config
+    "pwd": |
+      /misc/disk1
+
+admin_config:
+  prompt: "sysadmin-vm:0_RP0(config)#"
+  commands:
+    "show configuration": |
+      % No configuration changes found.
+    "end":
+      new_state: admin1
+    "exit":
+      new_state: admin1
+
+bash_console:
+  prompt: "[xr-vm_node0_RP0_CPU0:~]$"
+  commands:
+    "pwd": |
+      /disk0
+    "cd ../common/": |
+      new_state: bash_dir_console
+    "cd ../disk0": |
+      new_state: bash_console
+    "exit":
+      new_state: enable
+
+bash_dir_console:
+  prompt: '[xr-vm_node0_RP0_CPU0:/common]$'
+  commands:
+    "exit":
+      new_state: enable
+
+attach_console:
+  preface: |
+    export PS1='#'
+  prompt: '#'
+  commands:
+    'ls': |
+      card_instances.txt  cmdline  gpg-file-exist  log.txt
+    'exit':
+      new_state: enable1
+
+admin_bash:
+  prompt: "[sysadmin-vm:0_RP0:~]$"
+  commands:
+    "pwd": |
+      /misc/disk1
+    "cd cisco_support/": |
+      new_state: admin_bash_dir_console
+    "ls": |
+      clihistory  crashList.txt  event_track
+    "exit":
+      new_state: admin1
+
+admin_bash_dir_console:
+  prompt: '[sysadmin-vm:0_RP0:~/cisco_support]$'
+  commands:
+    "exit":
+      new_state: enable1
+
+enable2:
+  prompt: "RP/0/0/CPU0:%N#"
+  commands: &enable_cmds2
+    "run":
+      new_state: bash_console2
+    "admin":
+      new_state: admin2
+    "end":
+      new_state: enable2
+    "configure terminal":
+      new_state: config2
+    "term len 0": ""
+    "term width 0": ""
+    "terminal length 0": ""
+    "terminal width 0": ""
+    "pwd": |
+      disk0a:/usr
+
+config2:
+  prompt: "RP/0/0/CPU0:%N(config)#"
+  commands: &config_cmds2
+    "end":
+      new_state: enable2
+    "exit":
+      new_state: enable2
+    "no logging console": ""
+    "line console":
+      new_state: config_line2
+    "show configuration": |
+      Building configuration...
+      !! IOS XR Configuration version = 6.5.1
+      end
+
+config_line2:
+  prompt: "RP/0/0/CPU0:%N(config-line)#"
+  commands:
+    "exec-timeout 0 0": ""
+    "clock timezone UTC 0 0": ""
+    "commit": ""
+    "end":
+      new_state: enable2
+    "absolute-timeout 0": ""
+    "session-timeout 0": ""
+    "line default":
+      new_state: config_line2
+
+bash_console2:
+  prompt: "#"
+  commands:
+    "pwd": |
+      /disk0:/usr
+    "exit":
+      new_state: enable2
+
+admin2:
+  prompt: "RP/0/0/CPU0:%N(admin)#"
+  commands: &admin_commands2
+    "run":
+      new_state: admin_bash2
+    "exit":
+      new_state: enable2
+    "config":
+      new_state: admin_config2
+    "pwd": |
+      /misc/disk1:/admin
+
+admin_config2:
+  prompt: "RP/0/0/CPU0:%N(admin-config)#"
+  commands:
+    "show configuration": |
+      % No configuration changes found2.
+    "end":
+      new_state: admin2
+    "exit":
+      new_state: admin2
+
+admin_bash2:
+  prompt: "#"
+  commands:
+    "pwd": |
+      /misc/disk1
+    "exit":
+      new_state: admin2
+
+configure_root_system_username:
+  preface: |
+    !!!!!!!!!!!!!!!!!!!! NO root-system username is configured. Need to configure root-system username. !!!!!!!!!!!!!!!!!!!!
+
+             --- Administrative User Dialog ---
+  prompt: "Enter root-system username: "
+  commands:
+    "root":
+      new_state: enter_secret
+
+enter_secret:
+  prompt: "Enter secret: "
+  commands:
+    "secretpassword":
+      new_state: enter_secret_again
+
+enter_secret_again:
+  prompt: "Enter secret again: "
+  commands:
+    "secretpassword":
+      new_state: login3
+    "differentpassword":
+      new_state: passwords_not_match
+
+passwords_not_match:
+  preface: |
+    Passwords entered do not match.
+  prompt: "Enter root-system username: "
+  commands:
+    "root":
+      new_state: enter_secret
+
+login3:
+  preface: file|mock_data/iosxr/login_banner.txt
+  prompt: "Username: "
+  commands:
+    "root":
+      new_state: password3
+
+password3:
+  prompt: "Password: "
+  commands:
+    "secretpassword":
+      response: "\n"
+      new_state: enable3
+
+enable3:
+  prompt: "RP/0/0/CPU0:%N#"
+  commands: &enable_cmds3
+    "end":
+      new_state: enable3
+    "configure terminal":
+      new_state: config3
+    "show version": file|mock_data/iosxr/show_version.txt
+    "term len 0": ""
+    "term width 0": ""
+    "terminal length 0": ""
+    "terminal width 0": ""
+
+config3:
+  prompt: "RP/0/0/CPU0:%N(config)#"
+  commands: &config_cmds3
+    "end":
+      new_state: enable3
+    "exit":
+      new_state: enable3
+    "no logging console": ""
+    "line console":
+      new_state: config_line3
+
+config_line3:
+  prompt: "RP/0/0/CPU0:%N(config-line)#"
+  commands:
+    "exec-timeout 0 0": ""
+    "clock timezone UTC 0 0": ""
+    "commit": ""
+    "end":
+      new_state: enable3
+    "absolute-timeout 0": ""
+    "session-timeout 0": ""
+    "line default":
+      new_state: config_line3
+
+# ---    asr9k  -----
+asr9k_enable:
+  prompt: "RP/0/RSP1/CPU0:PE1#"
+  commands:
+    "admin":
+      new_state: asr9k_admin
+    "term len 0": ""
+    "term width 0": ""
+    "terminal length 0": ""
+    "terminal width 0": ""
+    "configure terminal":
+      new_state: asr9k_config
+
+asr9k_config:
+  prompt: "RP/0/RSP1/CPU0:PE1(config)#"
+  commands:
+    "logging console disable": ""
+    "line con 0":
+      new_state:
+        asr9k_config_line
+    "line default":
+      new_state: asr9k_config_line
+    "line console":
+      new_state: asr9k_config_line
+    "hostname Router": ""
+    "no logging console": ""
+    "line console":
+      new_state:
+        asr9k_line_console        
+
+asr9k_config_line:
+  prompt: "RP/0/RSP1/CPU0:PE1(config-line)#"
+  commands: 
+    "exec-timeout 0 0": ""
+    "clock timezone UTC 0 0": ""
+    "commit": ""
+    "end":
+      new_state: asr9k_enable
+    "absolute-timeout 0": ""
+    "exec-timeout 0 0": ""
+    "absolute-timeout 0": ""
+    "session-timeout 0": ""
+    "line default":
+      new_state: asr9k_config_line
+
+asr9k_line_console:
+  prompt: "RP/0/RSP1/CPU0:PE1(config-line)#"
+  commands:
+    "exec-timeout 0 0": ""
+    "absolute-timeout 0": ""
+    "session-timeout 0": ""
+    "line default": ""
+    "end":
+      new_state: asr9k_enable
+
+asr9k_admin:
+  prompt: "RP/0/RSP1/CPU0:PE1(admin)#"
+  commands:
+    "exit":
+      new_state: asr9k_enable
+
+# ---    iosxrv  ----- 
+iosxrv_enable:
+  prompt: "RP/0/0/CPU0:iosxrv-1#"
+  commands:
+    <<: *enable_cmds
+    "admin":
+      new_state: iosxrv_admin
+    "term len 0": ""
+    "term width 0": ""
+    "terminal length 0": ""
+    "terminal width 0": ""
+    "configure terminal":
+      new_state: iosxrv_config
+
+iosxrv_config:
+  prompt: "RP/0/0/CPU0:iosxrv-1(config)#"
+  commands:
+    "logging console disable": ""
+    "line con 0":
+      new_state:
+        iosxrv_config_line
+    "line default":
+      new_state: iosxrv_config_line
+    "line console":
+      new_state: iosxrv_config_line
+    "hostname Router": ""
+    "no logging console": ""
+    "line console":
+      new_state: iosxrv_line_console        
+
+iosxrv_config_line:
+  prompt: "RP/0/0/CPU0:iosxrv-1(config-line)#"
+  commands: 
+    "exec-timeout 0 0": ""
+    "clock timezone UTC 0 0": ""
+    "commit": ""
+    "end":
+      new_state: asr9k_enable
+    "absolute-timeout 0": ""
+    "exec-timeout 0 0": ""
+    "absolute-timeout 0": ""
+    "session-timeout 0": ""
+    "line default":
+      new_state: iosxrv_config_line
+
+iosxrv_line_console:
+  prompt: "RP/0/0/CPU0:iosxrv-1(config-line)#"
+  commands:
+    "exec-timeout 0 0": ""
+    "absolute-timeout 0": ""
+    "session-timeout 0": ""
+    "line default": ""
+    "end":
+      new_state: iosxrv_enable
+
+iosxrv_admin:
+  prompt: "RP/0/0/CPU0:iosxrv-1(admin)#"
+  commands:
+    <<: *admin_commands
+    "exit":
+      new_state: iosxrv_enable
+
+# ---    moonshine  -----
+
+moonshine_enable:
+  prompt: "RP/0/0/CPU0:Router#"
+  commands:
+    "configure terminal":
+      new_state: moonshine_config
+
+    "term len 0": ""
+    "term width 0": ""
+    "terminal length 0": ""
+    "terminal width 0": ""
+
+moonshine_config:
+  prompt: "RP/0/0/CPU0:Router(config)#"
+  commands:
+    "logging console disable": ""
+    "line con 0":
+      new_state:
+        config_line
+    "line default":
+      new_state: config_line
+    "line console":
+      new_state: config_line
+    "hostname Router": ""
+    "no logging console": ""
+    "line console":
+      new_state:
+        line_console
+    "end":
+      new_state: enable
+    "test failed":
+      new_state:
+        moonshine_failed_config
+
+moonshine_failed_config:
+  prompt: "RP/0/0/CPU0:Router(config)#"
+  commands:
+    "end":
+      response: "Uncommitted changes found, commit them before exiting(yes/no/cancel)? [cancel]:"
+      new_state: moonshine_failed_config_uncommitted
+
+moonshine_failed_config_uncommitted:
+  prompt: ""
+  commands:
+    "yes":
+      response: "% Failed to commit one or more configuration items during a pseudo-atomic operation. All changes made have been reverted. Please issue 'show configuration failed [inheritance]' from this session to view the errors"
+      new_state: moonshine_failed_config_show
+
+moonshine_failed_config_show:
+  prompt: "RP/0/0/CPU0:Router(config)#"
+  commands:
+    "show configuration failed": |2
+      Fri Aug  3 15:34:40.336 UTC
+      !! SEMANTIC ERRORS: This configuration was rejected by
+      !! the system due to semantic errors. The individual
+      !! errors with each failed configuration command can be
+      !! found below.
+
+
+      test failed
+      !!% Invalid config
+       !
+      !
+      end
+
+    "abort":
+      new_state: moonshine_enable
+
+
+
+
+
+sysadmin_config:
+  prompt: "sysadmin-vm:0_RP1(config)#"
+  commands: *config_cmds
+sysadmin1:
+  prompt: "[sysadmin-vm:0_RP1:~]$"
+  commands: *enable_cmds
+sysadmin2:
+  prompt: "[sysadmin-vm:0_1:~]$"
+  commands: *enable_cmds
+iosxr_config_ios:
+  prompt: "RP/0/RP1/CPU0:ios(config)#"
+  commands: *config_cmds
+xr_vm:
+  prompt: "[xr-vm_node0_RP1_CPU0:~]$"
+  commands: *enable_cmds
+host:
+  prompt: "[host:~]$"
+  commands: *enable_cmds
+
+
+ping_proto:
+  prompt: "Protocol [ipv4]: "
+  commands:
+    "":
+      new_state: ping_target
+
+ping_target:
+  prompt: "Target IP address: "
+  commands:
+    "10.0.0.1":
+      new_state: ping1_count
+
+ping1_count:
+  prompt: "Repeat count [5]: "
+  commands:
+    "":
+      new_state: ping1_size
+
+ping1_size:
+  prompt: "Datagram size [100]: "
+  commands:
+    "":
+      new_state: ping1_timeout
+
+ping1_timeout:
+  prompt: "Timeout in seconds [2]: "
+  commands:
+    "":
+      new_state: ping1_extend
+
+ping1_extend:
+  prompt: "Extended commands? [no]: "
+  commands:
+    "n":
+      new_state: ping1_sweep
+
+ping1_sweep:
+  prompt: "Sweep range of sizes? [no]: "
+  commands:
+    "n":
+      new_state: enable
+      response: |
+        Type escape sequence to abort.
+        Sending 5, 100-byte ICMP Echos to 10.0.0.1, timeout is 2 seconds:
+        UUUUU
+        Success rate is 0 percent (0/5)
+
+ping_proto_vrf:
+  prompt: "Protocol [ip]: "
+  commands:
+    "":
+      new_state: ping_target_vrf
+
+ping_target_vrf:
+  prompt: "Target IP address: "
+  commands:
+    "10.0.0.2":
+      new_state: ping1_count_vrf
+
+ping1_count_vrf:
+  prompt: "Repeat count [5]: "
+  commands:
+    "":
+      new_state: ping1_size_vrf
+
+ping1_size_vrf:
+  prompt: "Datagram size [100]: "
+  commands:
+    "":
+      new_state: ping1_timeout_vrf
+
+ping1_timeout_vrf:
+  prompt: "Timeout in seconds [2]: "
+  commands:
+    "":
+      new_state: ping1_extend_vrf
+
+ping1_extend_vrf:
+  prompt: "Extended commands? [no]: "
+  commands:
+    "n":
+      new_state: ping1_sweep_vrf
+
+ping1_sweep_vrf:
+  prompt: "Sweep range of sizes? [no]: "
+  commands:
+    "n":
+      new_state: enable
+      response: |
+        Type escape sequence to abort.
+        Sending 5, 100-byte ICMP Echos to 10.0.0.2, timeout is 2 seconds:
+        !!!!!
+        Success rate is 100 percent (5/5), round-trip min/avg/max = 1/1/3 ms

@@ -1,0 +1,35 @@
+Wed Jan  9 21:14:32.920 UTC
+### XR Information
+
+User = gpunathi
+Host = sjc-ads-8354
+Workspace = /nobackup/gpunathi/new-xr-dev
+Built on: Thu Jan 10 15:18:27 PST 2019
+Lineup = xr-dev.lu%EFR-00000377851
+XR version = 7.0.1.119I-Lindt
+
+### Broadcom SDK Information
+
+Refpoint         : thirdparty/broadcom-pp/fabric/release@tp-main/327
+ Built By         : skamanur
+ Build On         : Fri Jun 29 23:21:11 PDT 2018
+ Build Host       : sjc-ads-1747
+ Workspace        : /auto/panini-projs/fabric/brcm-sdk-6.5.12/tp-29
+ Workspace EFR    : thirdparty EFR-00000368707 Lineup
+ BRCM SDK Version : sdk-6.5.12
+ KBP  SDK Version : KBP SDK 1.4.17
+ KBP  SDK Tarball : KBP_SDK_v1417_20180206_JERICHO_X86.tar.bz2
+ KBP  SRC Tarball : KBP_SRC_v1417_20180206_MP.tar.bz2
+
+### Leaba SDK Information
+
+Build By    : pkerharo
+ Build On    : Tue Dec 11 12:01:47 PST 2018
+ Build Host  : vxr-slurm-113
+ Workspace   : /auto/vxr1/sf_sw_artifacts/1.11.1.4/sdk_ads/pacific-sdk-dev-src
+ SVN version : 1.11.1.4
+
+### Thirdparty Information
+
+Refpoint = thirdparty/opensource/release@tp-main/287
+

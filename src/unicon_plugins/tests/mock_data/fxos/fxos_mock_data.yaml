@@ -1,0 +1,211 @@
+chassis_login:
+  preface: |2
+    Cisco FPR Series Security Appliance
+  prompt: "QP-A-Y-A login: "
+  commands:
+    "admin":
+      new_state: chassis_password
+
+chassis_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      response: |2
+        Successful login attempts for user 'admin' : 4
+        Last login: Wed Nov  1 17:31:13 PDT 2017 on ttyS0
+        Cisco Firepower Extensible Operating System (FX-OS) Software
+      new_state: chassis_exec
+
+chassis_exec_fail:
+  prompt: "this is not a valid prompt"
+
+chassis_exec:
+  prompt: "QP-A-Y-A# "
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": |2
+      FPRM:
+          Running-Vers: 4.3(1.2024)
+          Package-Vers: 2.3(1.8)
+          Activate-Status: Ready
+    "connect module 1 console":
+      new_state: module_console_wait
+    "exit":
+      new_state: chassis_login
+
+console:
+  prompt: "> "
+  commands:
+    "connect fxos":
+      new_state: fxos_exec
+
+module_console_wait:
+  preface: |2
+    Telnet escape character is '~'.
+    Trying 127.5.1.1...
+    Connected to 127.5.1.1.
+    Escape character is '~'.
+     
+    CISCO Serial Over LAN:
+    Close Network Connection to Exit
+
+  prompt: ""
+  commands:
+    "":
+      new_state: module_console
+
+module_ssh_login:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: module_ssh
+
+module_console:
+  prompt: "Firepower-module1> "
+  commands: &console_commands
+    "fail switchto chassis":
+      new_state: chassis_exec_fail
+    "connect ftd":
+      new_state:
+        ftd_console
+    "~q":
+      new_state: chassis_exec
+
+module_ssh:
+  preface: |2
+          Cisco Security Services Platform
+        Type ? for list of commands
+  prompt: "Firepower-module1> "
+  commands: *console_commands
+
+
+module_console_fail:
+  prompt: "this is not a valid prompt"
+
+# telnet_escape:
+#   prompt: "telnet> "
+#   commands:
+#     "q":
+#       new_state: chassis_exec
+
+ftd_console:
+  preface: |
+    Connecting to ftd console... enter exit to return to bootCLI
+  prompt: "> "
+  commands:
+    "expert":
+      new_state: ftd_expert
+    "exit":
+      new_state: module_console
+    "exit2":
+      new_state: module_console_fail
+
+
+ftd_expert:
+  prompt: "admin@Firepower-module1:/opt/bootcli/cisco/cli/bin$ "
+  commands:
+    "sudo su -":
+      new_state:
+        ftd_expert_password
+    "exit":
+      new_state: ftd_console
+
+
+ftd_expert_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state:
+        ftd_module_root
+
+ftd_module_root:
+  prompt: "root@Firepower-module1:~# "
+  commands:
+    "exit":
+      new_state: ftd_expert
+
+
+fxos_connect:
+  preface: Escape character is '^]'.
+  prompt: ""
+  commands:
+    "":
+      new_state: fxos_exec
+
+fxos_exec:
+  prompt: "Firepower# "
+  commands:
+    "exit":
+      new_state: console
+    "scope system":
+      new_state: fxos_system
+    "scope service-profile":
+      new_state: fxos_service_profile
+    "connect fxos":
+      new_state: fx_exec
+    "connect local-mgmt":
+      new_state: local_mgmt
+    "connect cimc 1/1":
+      new_state: connect_cimc
+    "connect cimc 1":
+      new_state: connect_cimc
+    "connect module 1 console":
+      new_state: module_console_wait
+
+
+connect_cimc:
+  preface: |
+    Trying 127.5.1.1...
+    Connected to 127.5.1.1.
+    Escape character is '^]'.
+
+    CIMC Debug Firmware Utility Shell [ support ]
+  prompt: "[ help ]# "
+  commands:
+    "exit":
+      new_state: fxos_exec
+
+local_mgmt:
+  prompt: "Firepower(local-mgmt)# "
+  commands:
+    "exit":
+      new_state: fxos_exec
+
+fx_exec:
+  prompt: "Firepower(fxos)# "
+  commands:
+    "exit":
+      new_state: fxos_exec
+
+fxos_system:
+  prompt: "Firepower /system # "
+  commands:
+    "top":
+      new_state: fxos_exec
+    "scope services":
+      new_state: fxos_system_services
+
+fxos_system_services:
+  prompt: "Firepower /system/services # "
+  commands:
+    "create ntp-server 192.168.200.101":
+      new_state: fxos_system_services_modified
+    "commit-buffer": "Error: update failed"
+
+fxos_system_services_modified:
+  prompt: "Firepower /system/services* # "
+  commands:
+    "show configuration pending": |2
+       scope services
+      +    create ntp-server 192.168.200.101
+       exit
+    "commit-buffer":
+      new_state: fxos_system_services
+
+fxos_service_profile:
+  prompt: "Firepower /service-profile # "
+  commands:
+    "": ""
+    "exit":
+      new_state: fxos_exec

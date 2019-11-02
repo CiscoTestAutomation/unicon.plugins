@@ -1,0 +1,45 @@
+
+cisco_config_service_err:
+  prompt: "admin@ncs(config-endpoint-PE1)# "
+  commands:
+    "commit":
+      new_state: cisco_config_err
+      response: |
+        Aborted: Network Element Driver: device CE1: out of sync
+        admin@ncs(config-endpoint-PE1)# *** ALARM out-of-sync: Device CE1 is out of sync
+
+cisco_config_err:
+  prompt: "admin@ncs(config-endpoint-PE1)# "
+  commands:
+    "exit":
+      new_state: cisco_config
+    "end":
+      new_state: cisco_exec
+
+
+juniper_config_service_err:
+  commands:
+    "commit":
+      new_state: juniper_config_err
+      response: |
+        Aborted: Network Element Driver: device CE1: out of sync
+        admin@ncs% *** ALARM out-of-sync: Device CE1 is out of sync
+
+juniper_config_err:
+  commands:
+    "exit":
+      new_state: juniper_exec
+    "end":
+      new_state: juniper_exec
+
+juniper_exec_syntax_error:
+  prompt: "user@ncs> "
+  commands:
+    "set paginate false": ""
+    "set screen length 0": ""
+    "set screen width 0": ""
+    "set idle-timeout 0": ""
+    "show command error":
+      response: |
+        -----------------------------^
+        syntax error: unknown argument

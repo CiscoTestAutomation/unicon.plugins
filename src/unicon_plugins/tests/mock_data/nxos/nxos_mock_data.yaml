@@ -1,0 +1,363 @@
+
+login:
+  prompt: "Username: "
+  commands:
+    "cisco":
+      new_state: password
+
+password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: exec
+
+username_kerberos:
+  prompt: "Username: Kerberos: No default realm defined for Kerberos!"
+  commands:
+    "":
+      new_state: "login"
+
+
+
+exec:
+  prompt: "switch# "
+  commands:
+    "not a real command":
+      response:
+      - |2
+                        ^
+        % Invalid input detected at '^' marker."
+
+    "not a real command partial":
+      response:
+      - |2
+                                ^
+        % Invalid i"
+
+    "term length 0": ""
+    "term width 0" : ""
+    "term width 511": ""
+    "show version": ""
+    "terminal session-timeout 0": ""
+    "show system redundancy status" : |
+      Redundancy mode
+      ---------------
+            administrative:   HA
+               operational:   HA
+
+      This supervisor (sup-5)
+      -----------------------
+          Redundancy state:   Active
+          Supervisor state:   Active
+            Internal state:   Active with HA standby
+
+      Other supervisor (sup-6)
+      ------------------------
+          Redundancy state:   Standby
+          Supervisor state:   HA standby
+          Internal state:   HA standby
+    "show redundancy status": |
+      Redundancy mode
+      ---------------
+            administrative:   HA
+               operational:   HA
+
+      This supervisor (sup-5)
+      -----------------------
+          Redundancy state:   Active
+          Supervisor state:   Active
+            Internal state:   Active with HA standby
+
+      Other supervisor (sup-6)
+      ------------------------
+          Redundancy state:   Standby
+
+          Supervisor state:   HA standby
+            Internal state:   HA standby
+
+      System start time:          Sat May 19 02:52:21 2018
+
+      System uptime:              5 days, 5 hours, 55 minutes, 9 seconds
+      Kernel uptime:              5 days, 5 hours, 58 minutes, 34 seconds
+      Active supervisor uptime:   5 days, 5 hours, 55 minutes, 9 seconds
+    "config term":
+      new_state: config
+    "run bash":
+      new_state: bash
+    "run bash sudo su":
+      new_state: bash_nxos
+    "guestshell enable":
+      response:
+        - "Note: Guest shell is currently activating or deactivating; please retry request"
+        - "Note: Guest shell is currently activating or deactivating; please retry request"
+        - ""
+        - "ERROR: Guest shell is already enabled"
+    "show guestshell | i State":
+      response:
+        - "  State                 : Installing"
+        - "  State                 : Activating"
+        - "  State                 : Activating"
+        - "  State                 : Activated"
+    "guestshell":
+      new_state: guestshell
+    "attach console module 1":
+      new_state: console_login
+    "reload":
+      new_state: ha_confirm_reload
+    "reload wr erase":
+      new_state: poap_ha_confirm_reload
+    "install reset":
+      new_state: ha_reset_reload
+    "crash command":
+      new_state: loader
+    "copy  scp: bootflash:":
+      new_state: src_file
+    "copy  bootflash: scp://10.0.0.7/tmp/test.cfg":
+      new_state: src_file
+    "copy  bootflash: bootflash:/test-2.cfg":
+      new_state: src_file
+    "ping6 2003::7010 vrf management": |
+      PING6 2003::7010 (2003::7010): 56 data bytes
+      64 bytes from 2003::7010: icmp_seq=0 time=0.595 ms
+      64 bytes from 2003::7010: icmp_seq=1 time=0.489 ms
+      64 bytes from 2003::7010: icmp_seq=2 time=0.479 ms
+      64 bytes from 2003::7010: icmp_seq=3 time=0.478 ms
+      64 bytes from 2003::7010: icmp_seq=4 time=0.479 ms
+
+      --- 2003::7010 ping6 statistics ---
+      5 packets transmitted, 5 packets received, 0.00% packet loss
+      round-trip min/avg/max = 0.478/0.504/0.595 ms
+    "show feature": |
+      Feature Name          Instance  State
+      --------------------  --------  --------
+      bash-shell             1          enabled
+      bfd                    1          disabled
+
+loader:
+  prompt: "loader > "
+  commands:
+    "boot":
+      new_state: exec
+
+config:
+  prompt: "switch(config)#"
+  commands:
+    "no logging console": ""
+    "line console": ""
+    "exec-timeout 0": ""
+    "terminal width 511": ""
+    'feature bash': ""
+    "end":
+      new_state: exec
+
+bash:
+  prompt: "bash-4.2$ "
+  commands:
+    "ls": |
+      bootflash                  system                  bin
+    "sudo yum list installed | grep n9000": |
+      base-files.n9000                        3.0.14-r74.2                   installed
+      bfd.lib32_n9000                         1.0.0-r0                       installed
+    "exit":
+      new_state: exec
+
+guestshell:
+  prompt: "[admin@guestshell ~]$"
+  commands:
+    "pwd": |
+      /home/admin
+    "exit":
+      new_state: exec
+
+login2:
+  prompt: "Username: "
+  commands:
+    "cisco":
+      new_state: password2
+
+password2:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: exec2
+
+exec2:
+  prompt: "N93_1# "
+  commands:
+    "not a real command":
+      response:
+      - |2
+                        ^
+        % Invalid input detected at '^' marker."
+
+    "not a real command partial":
+      response:
+      - |2
+                                ^
+        % Invalid i"
+
+    "term length 0": ""
+    "term width 511": ""
+    "terminal session-timeout 0": ""
+    "config term":
+      new_state: config2
+    "reload":
+      new_state: confirm_reload
+    "show feature": |
+      Feature Name          Instance  State
+      --------------------  --------  --------
+      bash-shell             1          enabled
+      bfd                    1          disabled
+
+config2:
+  prompt: "N93_1(config)#"
+  commands:
+    "no logging console": ""
+    "line console": ""
+    "exec-timeout 0": ""
+    "terminal width 511": ""
+    'feature bash': ""
+    "end":
+      new_state: exec2
+
+login3:
+  prompt: "Username: "
+  commands:
+    "cisco":
+      new_state: password3
+
+password3:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: exec3
+
+exec3:
+  prompt: "N93_1# "
+  commands:
+    "not a real command":
+      response:
+      - |2
+                        ^
+        % Invalid input detected at '^' marker."
+
+    "not a real command partial":
+      response:
+      - |2
+                                ^
+        % Invalid i"
+
+    "term length 0": ""
+    "term width 511": ""
+    "terminal session-timeout 0": ""
+    "config term":
+      new_state: config3
+    "reload":
+      new_state: confirm_reload2
+    "show feature": |
+      Feature Name          Instance  State
+      --------------------  --------  --------
+      bash-shell             1          enabled
+      bfd                    1          disabled
+
+config3:
+  prompt: "N93_1(config)#"
+  commands:
+    "no logging console": ""
+    "line console": ""
+    "exec-timeout 0": ""
+    "terminal width 511": ""
+    'feature bash': ""
+    "end":
+      new_state: exec3
+
+### NXOS on N3K has different bash prompt
+
+exec_n3k:
+  prompt: "switch# "
+  commands:
+    "term length 0": ""
+    "term width 511": ""
+    "terminal session-timeout 0": ""
+    "config term":
+      new_state: config_n3k
+    "run bash":
+      new_state: bash_n3k
+
+config_n3k:
+  prompt: "switch(config)#"
+  commands:
+    "no logging console": ""
+    "line console": ""
+    "exec-timeout 0": ""
+    "terminal width 511": ""
+    "end":
+      new_state: exec_n3k
+
+bash_n3k:
+  prompt: "Linux$ "
+  commands:
+    "ls": ""
+    "exit":
+      new_state: exec_n3k
+
+
+bash_nxos:
+  prompt: 'bash-3.0# '
+  commands:
+    "ls": ""
+    "exit":
+      new_state: exec
+
+console_login:
+  preface: "Escape character is ~,'"
+  prompt: 'login:'
+  commands:
+    'root': 
+      new_state: console_module_1
+
+console_module_1:
+  prompt: 'root@/:~#'
+  commands:
+    "export PS1='AUT0MAT10N# '": 
+      new_state: console_new_prompt
+
+console_new_prompt:
+  prompt: 'AUT0MAT10N# '
+  commands:
+    '': ''
+    'ls': 'aa'
+    'exit':
+      new_state: exit_console
+
+exit_console:
+  prompt: 'login:'
+  commands:
+    '~,': 
+      new_state: exec
+
+user_access_veri:
+  preface: User Access Verification
+  prompt: "switch login: "
+  commands:
+    "admin":
+      new_state: user_password
+
+user_password:
+  prompt: "Password: "
+  commands:
+    "lab":
+      response: |
+        Cisco Nexus Operating System (NX-OS) Software
+        TAC support: http://www.cisco.com/tac
+        Copyright (c) 2002-2013, Cisco Systems, Inc. All rights reserved.
+        The copyrights to certain works contained in this software are
+        owned by other third parties and used and distributed under
+        license. Certain components of this software are licensed under
+        the GNU General Public License (GPL) version 2.0 or the GNU
+        Lesser General Public License (LGPL) Version 2.1. A copy of each
+        such license is available at
+        http://www.opensource.org/licenses/gpl-2.0.php and
+        http://www.opensource.org/licenses/lgpl-2.1.php
+      new_state: exec
+

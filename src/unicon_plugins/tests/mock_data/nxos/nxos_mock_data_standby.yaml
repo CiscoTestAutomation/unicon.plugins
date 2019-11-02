@@ -1,0 +1,128 @@
+
+nxos_exec_standby:
+  prompt: "switch(standby)# "
+  commands:
+    "show version" : |
+        Cisco Nexus Operating System (NX-OS) Software
+        TAC support: http://www.cisco.com/tac
+        Documents: http://www.cisco.com/en/US/products/ps9372/tsd_products_support_series_home.html
+        Copyright (c) 2002-2018, Cisco Systems, Inc. All rights reserved.
+        The copyrights to certain works contained in this software are
+        owned by other third parties and used and distributed under
+        license. Certain components of this software are licensed under
+        the GNU General Public License (GPL) version 2.0 or the GNU
+        Lesser General Public License (LGPL) Version 2.1. A copy of each
+        such license is available at
+        http://www.opensource.org/licenses/gpl-2.0.php and
+        http://www.opensource.org/licenses/lgpl-2.1.php
+
+        Software
+          BIOS:      version 2.12.0
+          kickstart: version 8.3(1) [build 8.3(0.7)] [gdb]
+          system:    version 8.3(1) [build 8.3(0.7)] [gdb]
+          BIOS compile time:       05/29/2013
+          kickstart image file is: bootflash:///n7000-s2-kickstart.8.3.0.7.gbin-n7k1-1
+          kickstart compile time:  7/30/2018 12:00:00 [05/17/2018 16:39:10]
+          system image file is:    bootflash:///n7000-s2-dk9.8.3.0.7.gbin-n7k1-1
+          system compile time:     7/30/2018 12:00:00 [05/17/2018 18:17:12]
+
+
+        Hardware
+          cisco Nexus7000 C7010 (10 Slot) Chassis ("Supervisor Module-2")
+          Intel(R) Xeon(R) CPU         with 12295916 kB of memory.
+          Processor Board ID JAF1902AEHT
+
+          Device name: n7k1-1
+          bootflash:    2007040 kB
+          slot0:              0 kB (expansion flash)
+
+        Kernel uptime is 4 day(s), 10 hour(s), 26 minute(s), 38 second(s)
+
+        Last reset
+          Reason: Unknown
+          System version: 7.3(0)D1(0.125)
+          Service:
+
+        plugin
+        Core Plugin, Ethernet Plugin
+    "term length 0": ""
+    "term width 511": ""
+    "run bash":
+      new_state: stdby_bash
+    "terminal session-timeout 0": ""
+    "show redundancy status": |
+      Redundancy mode
+      ---------------
+            administrative:   HA
+               operational:   HA
+
+      This supervisor (sup-6)
+      -----------------------
+          Redundancy state:   Standby
+          Supervisor state:   HA standby
+            Internal state:   HA standby
+
+      Other supervisor (sup-5)
+      ------------------------
+          Redundancy state:   Active
+
+          Supervisor state:   Active
+            Internal state:   Active with HA standby
+
+      System start time:          Sat May 19 02:52:21 2018
+
+      System uptime:              5 days, 5 hours, 55 minutes, 45 seconds
+      Kernel uptime:              5 days, 5 hours, 58 minutes, 54 seconds
+      This supervisor is not up and running
+    "show system redundancy status" : |
+      Redundancy mode
+      ---------------
+            administrative:   HA
+               operational:   HA
+  
+      This supervisor (sup-6)
+      -----------------------
+          Redundancy state:   Standby
+          Supervisor state:   HA standby
+            Internal state:   HA standby
+
+      Other supervisor (sup-5)
+      ------------------------
+          Redundancy state:   Active
+          Supervisor state:   Active
+            Internal state:   Active with HA standby
+    "config term": "configuration is only allowed on active supervisor"
+
+stdby_bash:
+  prompt: "bash-4.2$ "
+  commands:
+    "ls": |
+      bootflash                  system                  bin
+    "exit":
+      new_state: nxos_exec_standby
+
+standby_user_access_veri:
+  preface: User Access Verification
+  prompt: "switch(standby) login: "
+  commands:
+    "admin":
+      new_state: standby_user_password
+
+standby_user_password:
+  prompt: "Password: "
+  commands:
+    "lab":
+      response: |
+        Cisco Nexus Operating System (NX-OS) Software
+        TAC support: http://www.cisco.com/tac
+        Copyright (c) 2002-2013, Cisco Systems, Inc. All rights reserved.
+        The copyrights to certain works contained in this software are
+        owned by other third parties and used and distributed under
+        license. Certain components of this software are licensed under
+        the GNU General Public License (GPL) version 2.0 or the GNU
+        Lesser General Public License (LGPL) Version 2.1. A copy of each
+        such license is available at
+        http://www.opensource.org/licenses/gpl-2.0.php and
+        http://www.opensource.org/licenses/lgpl-2.1.php
+      new_state: nxos_exec_standby
+

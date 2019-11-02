@@ -1,0 +1,73 @@
+[ 2762.387555] Shutdown Ports..
+[ 2762.421953]  writing reset reason 9, 
+
+INIT: Sending processes the TERM signald Jul
+INIT: Sending processes the KILL signal
+Sending all processes the TERM signal...
+Sending all processes the KILL signal...
+Unmounting filesystems...
+[ 2782.781480] Resetting board
+
+Argon BIOS v.3.6, Wed 05/09/2012, 03:15 PM 
+
+
+Version 2.00.1201. Copyright (C) 2009 American Megatrends, Inc.                 
+
+
+Booting kickstart image: bootflash:/n5000-uk9-kickstart.7.3.5.N1.1.bin....
+...............................................................................
+.................................Image verification OK
+
+
+[2019-07-31 17:47:22,024] non_utf-8_character b'\xff'
+b'\xff'[    4.823574] hub 2-1:1.0: over-current change on port 3
+[    4.990088] hub 2-1:1.0: over-current change on port 4
+INIT: [    8.158103] I2C - Mezz absent 
+[    9.614973] val:4, count7 .
+[    9.648255] TCO_TMR val:1023, SMI_EN= 0x62023  NMI_STS_CNT_REG = 0x21 count7 .
+devmemfd:0x7fde4ba8
+phys->virt: 0x7fde4aec7fde4ba8-->0x0
+devmemfd:0x7fde4be8
+phys->virt: 0xe84000087fde4be8-->0x0
+devmemfd:0x7fde4be8
+phys->virt: 0xe84000087fde4be8-->0x0
+devmemfd:0x7fde4be8
+phys->virt: 0xe84000087fde4be8-->0x0
+Starting system POST.....
+  Executing Mod 1 1 SEEPROM Test:...done (1 seconds)
+  Executing Mod 1 1 GigE Port Test:....done (32 seconds)
+  Executing Mod 1 1 PCIE Test:.................done (0 seconds)
+  Mod 1 1 Post Completed Successfully
+POST is completed
+can't create lock file /var/lock/mtab~201: No such file or directory (use -n flag to override)
+nohup: redirecting stderr to stdout
+Executing /etc/rc.d/rcS.d/S07firmware-upgrade-eusb
+eUSB firmware upgrade not required
+autoneg unmodified, ignoring
+autoneg unmodified, ignoring
+Checking all filesystems..... done.
+Loading system software
+Wed Jul 31 21:48:12 UTC 2019 BIGSUR SYNC getting started issu = 0
+Uncompressing system image: bootflash:/n5000-uk9.7.3.5.N1.1.bin Wed Jul 31 21:48:24 UTC 2019
+
+Load plugins that defined in image conf: /isan/plugin_img/img.conf
+Loading plugin 0: core_plugin...
+load_plugin: Can't get exclude list from /isan/plugin/0/boot/etc/plugin_exclude.conf (rc 0x40ea0017)
+Loading plugin 1: eth_plugin...
+ethernet switching mode
+INIT: Entering runlevel: 3
+touch: cannot touch `/var/lock/subsys/netfs': No
+/isan/bin/muxif_config: fex vlan id: -f,4042
+Set name-type for VLAN subsystem. Should be visible in /proc/net/vlan/config
+Added VLAN with VID == 4042 to IF -:muxif:-
+card index: 0x2b1c
+2019 Jul 31 21:48:58  %$ VDC-1 %$ %SYSLOG-2-SYSTEM_MSG : Syslogs wont be logged into logflash until logflash is online 
+2019 Jul 31 21:49:01  %$ VDC-1 %$ %KERN-0-SYSTEM_MSG: [    8.158103] I2C - Mezz absent  - kernel
+2019 Jul 31 21:49:01  %$ VDC-1 %$ %KERN-0-SYSTEM_MSG: [    9.614973] val:4, count7 . - kernel
+2019 Jul 31 21:49:01  %$ VDC-1 %$ %KERN-0-SYSTEM_MSG: [    9.648255] TCO_TMR val:1023, SMI_EN= 0x62023  NMI_STS_CNT_REG = 0x21 count7 . - kernel
+2019 Jul 31 21:49:29  %$ VDC-1 %$ %USER-2-SYSTEM_MSG: CLIS: loading cmd files begin  - clis
+2019 Jul 31 21:49:44  %$ VDC-1 %$ %USER-2-SYSTEM_MSG: CLIS: loading cmd files end  - clis
+2019 Jul 31 21:49:44  %$ VDC-1 %$ %USER-2-SYSTEM_MSG: CLIS: init begin  - clis
+2019 Jul 31 21:49:45  %$ VDC-1 %$  %DAEMON-2-SYSTEM_MSG: <<%XMLMA-2-XMLMACRIT>> XML master agent: Starting sysmgr handshake.   - xmlma[4083]
+2019 Jul 31 21:49:45  %$ VDC-1 %$  %DAEMON-2-SYSTEM_MSG: <<%XMLMA-2-XMLMACRIT>> XML master agent: Done with sysmgr handshake.   - xmlma[4083]
+2019 Jul 31 21:51:23  %$ VDC-1 %$ %VDC_MGR-2-VDC_ONLINE: vdc 1 has come online 

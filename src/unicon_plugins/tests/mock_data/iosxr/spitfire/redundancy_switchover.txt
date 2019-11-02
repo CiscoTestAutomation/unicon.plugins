@@ -1,0 +1,245 @@
+Initiating switch-over.
+RP/0/RP1/CPU0:Jul 10 11:15:38.981 UTC: rmf_svr[347]: %HA-REDCON-4-FAILOVER_REQUESTED : failover has been requested by operator, waiting to initiate 
+RP/0/RP0/CPU0:ios#[  768.881528] do_IRQ: 0.88 No irq handler for vector
+[  768.971065] cisco_spitfire_fpga_qspi cisco_spitfire_fpga_qspi.17: read transaction timeout
+[  768.981131] cisco_spitfire_fpga_qspi cisco_spitfire_fpga_qspi.17: transfer message failed
+[  768.991460] spi_master spi32765: failed to transfer one message from queue
+[  768.999837] mtd[obfl_fc_18] is not valid
+[  769.004698] mtd[obfl_fc_18] is not valid
+[  769.009621] mtd[obfl_fc_18] is not valid
+[  769.014403] ubi2 error: ubi_io_read: error -19 while reading 262016 bytes from PEB 87:128, read 58368 bytes
+[  769.026449] UBIFS error (ubi2:0 pid 16810): ubifs_leb_read [ubifs]: reading 262016 bytes from LEB 34:0 failed, error -19
+[  769.039752] UBIFS error (ubi2:0 pid 16810): ubifs_start_scan [ubifs]: cannot read 262016 bytes from LEB 34:0, error -19
+[  769.052899] UBIFS error (ubi2:0 pid 16810): do_commit [ubifs]: commit failed, error -19
+[  769.145069] cisco_spitfire_fpga_qspi cisco_spitfire_fpga_qspi.18: read transaction timeout
+[  769.155130] cisco_spitfire_fpga_qspi cisco_spitfire_fpga_qspi.18: transfer message failed
+[  769.165128] spi_master spi32764: failed to transfer one message from queue
+[  769.173514] m25p80 spi32764.0: error -110 reading 5
+[  769.179452] error -110 reading SR
+[  769.184197] cisco_spitfire_fpga_qspi cisco_spitfire_fpga_qspi.18: write transaction timeout
+[  769.194405] cisco_spitfire_fpga_qspi cisco_spitfire_fpga_qspi.18: transfer message failed
+[  769.204364] spi_master spi32764: failed to transfer one message from queue
+[  769.212800] mtd[obfl_fc_19] is not valid
+[  769.217584] mtd[obfl_fc_19] is not valid
+[  769.222667] ubi3 error: do_sync_erase: cannot erase PEB 7, error -19
+[  769.230445] ubi3 error: __erase_worker: failed to erase PEB 7, error -19
+[  769.238645] ubi3 error: do_work: work failed with error code -19
+[  769.245973] ubi3 error: ubi_thread: ubi_bgt3d: work failed with error code -19
+[  769.307334] cisco_spitfire_fpga_qspi cisco_spitfire_fpga_qspi.19: read transaction timeout
+[  769.317402] cisco_spitfire_fpga_qspi cisco_spitfire_fpga_qspi.19: transfer message failed
+[  769.327361] spi_master spi32763: failed to transfer one message from queue
+[  769.335735] m25p80 spi32763.0: error -110 reading 5
+[  769.341667] error -110 reading SR
+[  769.345697] mtd[obfl_fc_20] is not valid
+[  769.350476] mtd[obfl_fc_20] is not valid
+[  769.355258] mtd[obfl_fc_20] is not valid
+[  769.360038] ubi4 error: do_sync_erase: cannot erase PEB 120, error -19
+[  769.368045] ubi4 error: __erase_worker: failed to erase PEB 120, error -19
+[  769.376451] ubi4 error: do_work: work failed with error code -19
+[  769.383760] ubi4 error: ubi_thread: ubi_bgt4d: work failed with error code -19
+RP/0/RP0/CPU0:Jul 10 11:15:40.521 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: FIRE_SENSOR_1A has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.522 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: FIRE_SENSOR_2A has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.522 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: X0_ON_DIE_TM_0 has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.522 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: X0_ON_DIE_TM_1 has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.523 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: BRD_OVER_TEMP1 has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.523 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: BRD_OVER_TEMP2 has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.523 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: FIRE_SENSOR_1B has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.524 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: FIRE_SENSOR_2B has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.524 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: X1_ON_DIE_TM_0 has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.524 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: X1_ON_DIE_TM_1 has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.525 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: BRD_OVER_TEMP5 has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.525 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: BRD_OVER_TEMP6 has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.525 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: POL_CORE_X0_1 has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.525 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: POL_CORE_X0_2 has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.526 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: POL_CORE_X0_3 has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.526 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: POL_CORE_X0_4 has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.526 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: POL_AVDD_X0_1 has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.527 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: POL_AVDD_X0_2 has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.527 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: POL_CORE_X1_1 has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.527 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: POL_CORE_X1_2 has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.527 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: POL_CORE_X1_3 has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.528 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: POL_CORE_X1_4 has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.528 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: POL_AVDD_X1_1 has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.528 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: POL_AVDD_X1_2 has raised a temperature alarm with value of 0 
+RP/0/RP0/CPU0:Jul 10 11:15:40.529 UTC: envmon[273]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :temperature alarm :DECLARE :0/FC1: POL_AVDDH_X012 has raised a temperature alarm with value of 0 
+[FAILED] Failed unmounting /mnt/fuse/parser_server.
+[FAILED] Failed unmounting /dev/syslog.
+[FAILED] Failed unmounting /run/netns.
+[FAILED] Failed unmounting /mnt/mtd0.
+[FAILED] Failed unmounting /mnt/mtd5.
+[  OK  ] Unmounted /mnt/fuse/rdsfs.
+[  OK  ] Unmounted /mnt/fuse/tftp.
+[FAILED] Failed unmounting /mnt/mtd3.
+[  OK  ] Unmounted /mnt/fuse/ftp.
+[  OK  ] Unmounted /mnt/pdtmpfs.
+[FAILED] Failed unmounting /var/xr/disk1.
+[FAILED] Failed unmounting /var/xr/scratch.
+[FAILED] Failed unmounting /mnt/mtd2.
+[FAILED] Failed unmounting /mnt/mtd4.
+[  OK  ] Unmounted /qsm.
+[  OK  ] Unmounted /sys/kernel/debug/tracing.
+[  OK  ] Unmounted /mnt/fuse/nvgen_server.
+         Stopping D-Bus System Message Bus...
+[  OK  ] Stopped Apply Kernel Variables.
+RP/0/RP0/CPU0:Jul 10 11:15:41.237 UTC: npu_drvr[339]: %FABRIC-NPU_DRVR-3-ASIC_FAULTS : [6350] : Fault detected: PCIe link failure due to Core clock failure on ASIC 4 
+RP/0/RP0/CPU0:Jul 10 11:15:41.237 UTC: npu_drvr[339]: %PKT_INFRA-FM-2-FAULT_CRITICAL : ALARM_CRITICAL :Slice Power Domain Failure Alarm :DECLARE :0/FC2: Reload card due to irreversible error on ASIC 4.  
+RP/0/RP0/CPU0:Jul 10 11:15:41.238 UTC: shelfmgr[268]: %PLATFORM-SHELFMGR-0-FAULT : Graceful reload requested for card 0/FC2. Reason: Reload card due to irreversib 
+RP/0/RP0/CPU0:Jul 10 11:15:41.250 UTC: npu_drvr[339]: %FABRIC-NPU_DRVR-3-ASIC_FAULTS : [6355] : Fault detected: PCIe link failure due to Core clock failure on ASIC 7 
+RP/0/RP0/CPU0:Jul 10 11:15:41.252 UTC: npu_drvr[339]: %PKT_INFRA-FM-2-FAULT_CRITICAL : ALARM_CRITICAL :Slice Power Domain Failure Alarm :DECLARE :0/FC3: Reload card due to irreversible error on ASIC 7.  
+RP/0/RP0/CPU0:Jul 10 11:15:41.252 UTC: shelf[  770.579392] UBIFS error (ubi4:0 pid 4567): ubifs_leb_write [ubifs]: writing 72 bytes to LEB 91:191928 failed, error -30
+mgr[268]: %PLATF[  770.594007] UBIFS error (ubi4:0 pid 4567): ubifs_wbuf_write_nolock [ubifs]: cannot write 216 bytes to LEB 91:191928, error -30
+ORM-SHELFMGR-0-F[  770.609343]  magic          0x6101831
+AULT : Graceful [  770.615488]  crc            0x177890f
+reload requested[  770.615489]  node_type      0 (inode node)
+ for card 0/FC3.[  770.615490]  group_type     1 (in node group)
+ Reason: Reload [  770.615491]  sqnum          125130
+card due to irre[  770.615491]  len            160
+versib 
+RP/0/R[  770.615492]    key            (226, inode)
+[  770.615493]  creat_sqnum    51228
+[  770.615493]  size           0
+P0/CPU0:Jul 10 1[  770.615494]  nlink          1
+[  770.615494]  atime          1556282642.0
+[  770.615495]  mtime          1562757341.0
+1:15:41.319 UTC:[  770.615495]  ctime          1562757341.0
+ npu_drvr[339]: [  770.615496]  uid            0
+%FABRIC-NPU_DRVR[  770.615496]  gid            0
+-3-ASIC_FAULTS :[  770.615496]  mode           33206
+ [6348] : Fault [  770.615497]  flags          0x1
+detected: PCIe l[  770.615497]  xattr_cnt      0
+[  770.615498]  xattr_size     0
+[  770.615498]  xattr_names    0
+[  770.615498]  compr_type     0x1
+ink failure due [  770.615499]  data len       0
+[  770.615580] (pid 4567) start dumping LEB 91
+[  770.616758] mtd[obfl_fc_20] is not valid
+[  770.616765] mtd[obfl_fc_20] is not valid
+to Core clock fa[  770.616767] mtd[obfl_fc_20] is not valid
+ilure on ASIC 3 [  770.616770] mtd[obfl_fc_20] is not valid
+
+RP/0/RP0/CPU0[  770.616771] ubi4 error: ubi_io_read: error -19 while reading 262016 bytes from PEB 108:128, read 7 bytes
+[  770.616880] UBIFS error (ubi4:0 pid 4567): ubifs_leb_read [ubifs]: reading 262016 bytes from LEB 91:0 failed, error -19
+:Jul 10 11:15:41[  770.616958] UBIFS error (ubi4:0 pid 4567): ubifs_start_scan [ubifs]: cannot read 262016 bytes from LEB 91:0, error -19
+.319 UTC: npu_dr[  770.616970] UBIFS error (ubi4:0 pid 4567): ubifs_dump_leb [ubifs]: scan error -19
+vr[339]: %PKT_INFRA-FM-2-FAULT_CRITICAL : ALARM_CRITICAL :Slice Power Domain Failure Alarm :DECLARE :0/FC1: Reload card due to irreversible error on ASIC 3.  
+RP/0/RP0/CPU0:Jul 10 11:15:41.320 UTC: shelfmgr[268]: %PLATFORM-SHELFMGR-0-FAULT : Graceful reload requested for card 0/FC1. Reason: Reload card due to irreversib 
+RP/0/RP0/CPU0:Jul 10 11:15:41.372 UTC: npu_drvr[339]: %FABRIC-NPU_DRVR-3-ASIC_FAULTS : [6345] : Fault detected: PCIe link failure due to Core clock failure on ASIC 0 
+RP/0/RP0/CPU0:Jul 10 11:15:41.372 UTC: npu_drvr[339]: %PKT_INFRA-FM-2-FAULT_CRITICAL : ALARM_CRITICAL :Slice Power Domain Failure Alarm :DECLARE :0/FC0: Reload card due to irreversible error on ASIC 0.  
+RP/0/RP0/CPU0:Jul 10 11:15:41.372 UTC: shelfmgr[268]: %PLATFORM-SHELFMGR-0-FAULT : Graceful reload requested for card 0/FC0. Reason: Reload card due to irreversib 
+[  OK  ] Stopped Load Kernel Modules.
+[  OK  ] Stopped D-Bus System Message Bus.
+[  OK  ] Unmounted /boot/efi.
+         Unmounting /boot...
+[  OK  ] Stopped FPGA Setup.
+         Stopping Board Setup...
+[  OK  ] Unmounted /boot.
+[  OK  ] Reached target Unmount All Filesystems.
+[  OK  ] Stopped Board Setup.
+[  772.168542] mtd[obfl_fc_21] is not valid
+[  772.173315] ubi5 error: ubi_io_write: error -19 while writing 112 bytes to PEB 113:48400, written 2255807440 bytes
+[  772.187281] mtd[obfl_fc_21] is not valid
+[  772.192061] ubi5 error: ubi_dump_flash: err -19 while reading 112 bytes from PEB 113:48400, read -1644032327 bytes
+[  772.204885] UBIFS error (ubi5:0 pid 4567): ubifs_leb_write [ubifs]: writing 112 bytes to LEB 91:48272 failed, error -19
+[  772.218302] UBIFS error (ubi5:0 pid 4567): ubifs_wbuf_write_nolock [ubifs]: cannot write 216 bytes to LEB 91:48272, error -19
+[  772.232160]  magic          0x6101831
+[  772.236701]  crc            0x9050d4ca
+[  772.241338]  node_type      0 (inode node)
+[  772.246410]  group_type     1 (in node group)
+[  772.251789]  sqnum          172454
+[  772.256061]  len            160
+[  772.259957]  key            (2470, inode)
+[  772.264919]  creat_sqnum    106420
+[  772.269057]  size           0
+[  772.272669]  nlink          1
+[  772.276274]  atime          1556275180.0
+[  772.281043]  mtime          1562757342.0
+[  772.285814]  ctime          1562757342.0
+[  772.290583]  uid            0
+[  772.294188]  gid            0
+[  772.297792]  mode           33206
+[  772.301813]  flags          0x1
+[  772.305643]  xattr_cnt      0
+[  772.309249]  xattr_size     0
+[  772.312854]  xattr_names    0
+[  772.316459]  compr_type     0x1
+[  772.320266]  data len       0
+[  772.323952] (pid 4567) start dumping LEB 91
+[  772.329260] mtd[obfl_fc_21] is not valid
+[  772.334141] mtd[obfl_fc_21] is not valid
+[  772.339518] mtd[obfl_fc_21] is not valid
+[  772.344398] mtd[obfl_fc_21] is not valid
+[  772.349172] ubi5 error: ubi_io_read: error -19 while reading 262016 bytes from PEB 113:128, read 1 bytes
+[  772.360969] UBIFS error (ubi5:0 pid 4567): ubifs_leb_read [ubifs]: reading 262016 bytes from LEB 91:0 failed, error -19
+[  772.374201] UBIFS error (ubi5:0 pid 4567): ubifs_start_scan [ubifs]: cannot read 262016 bytes from LEB 91:0, error -19
+[  772.387238] UBIFS error (ubi5:0 pid 4567): ubifs_dump_leb [ubifs]: scan error -19
+[  OK  ] Stopped Mount Flash Devices.
+[  OK  ] Stopped target Basic System.
+[  OK  ] Stopped target Paths.
+[  OK  ] Stopped target Slices.
+[  OK  ] Removed slice User and Session Slice.
+[  OK  ] Stopped target Sockets.
+[  OK  ] Closed Docker Socket for the API.
+[  OK  ] Closed D-Bus System Message Bus Socket.
+[  OK  ] Closed RPCbind Server Activation Socket.
+[  OK  ] Closed Syslog Socket.
+[  OK  ] Closed sshd.socket.
+[  OK  ] Reached target Shutdown.
+[  783.693802] UBIFS error (ubi3:0 pid 1): ubifs_leb_write [ubifs]: writing 512 bytes to LEB 1:260096 failed, error -30
+[  783.706700]  magic          0x6101831
+[  783.711151]  crc            0x3ad89dfb
+[  783.715709]  node_type      7 (master node)
+[  783.720796]  group_type     0 (no node group)
+[  783.726091]  sqnum          151885
+[  783.730225]  len            512
+[  783.734032]  highest_inum   389
+[  783.737848]  commit number  3821
+[  783.741769]  flags          0x2
+[  783.745584]  log_lnum       5
+[  783.749188]  root_lnum      114
+[  783.753003]  root_offs      83832
+[  783.757021]  root_len       108
+[  783.760835]  gc_lnum        111
+[  783.764650]  ihead_lnum     114
+[  783.768466]  ihead_offs     83944
+[  783.772484]  index_size     23912
+[  783.776510]  lpt_lnum       7
+[  783.780106]  lpt_offs       107484
+[  783.784240]  nhead_lnum     7
+[  783.787843]  nhead_offs     107504
+[  783.791975]  ltab_lnum      7
+[  783.795579]  ltab_offs      107392
+[  783.799712]  lsave_lnum     0
+[  783.803307]  lsave_offs     0
+[  783.806909]  lscan_lnum     118
+[  783.810724]  leb_cnt        124
+[  783.814539]  empty_lebs     15
+[  783.818247]  idx_lebs       7
+[  783.821851]  total_free     4185544
+[  783.826089]  total_dirty    25113664
+[  783.830434]  total_used     546704
+[  783.834558]  total_dead     0
+[  783.838162]  total_dark     455392
+[  786.283917] pm-fpga: Power cycling local CPU power zone
+
+This product contains cryptographic features and is subject to United 
+States and local country laws governing import, export, transfer and 
+use. Delivery of Cisco cryptographic products does not imply third-party 
+authority to import, export, distribute or use encryption. Importers, 
+exporters, distributors and users are responsible for compliance with 
+U.S. and local country laws. By using this product you agree to comply 
+with applicable laws and regulations. If you are unable to comply with 
+U.S. and local laws, return this product immediately. 
+
+A summary of U.S. laws governing Cisco cryptographic products may be 
+found at:
+http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+If you require further assistance please contact us by sending email to 
+export@cisco.com.
+
+
+
+
+
+ios con0/RP1/CPU0 is in standby
+

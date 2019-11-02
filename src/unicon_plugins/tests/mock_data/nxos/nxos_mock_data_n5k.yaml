@@ -1,0 +1,144 @@
+n5k_exec:
+  prompt: "switch# "
+  commands:
+
+    "term length 0": ""
+    "term width 511": ""
+    "terminal session-timeout 0": ""
+    "config term":
+      new_state: n5k_config
+    "reload":
+      new_state: n5k_confirm_reload
+    "reload2":
+      new_state: n5k_confirm_reload2
+    "show version": file|mock_data/nxos/nxos_n5k_show_version.txt
+
+
+n5k_confirm_reload:
+  prompt: |
+    WARNING: This command will reboot the system
+    Do you want to continue? (y/n) [n]
+  commands:
+    "y":
+      new_state: n5k_poap_reloaded_console
+
+n5k_poap_reloaded_console:
+    prompt: "Abort Power On Auto Provisioning and continue with normal setup ?(yes/no)[n]: "
+    preface: file|mock_data/nxos/nxos_n5k_reload.txt
+    commands:
+      "y":
+        response: |
+            'System no poap' config enabled. Skipping POAP.
+
+                     ---- System Admin Account Setup ----
+
+
+            Do you want to enforce secure password standard (yes/no):
+        new_state:
+            n5k_password_handling_prompt
+
+n5k_password_handling_prompt:
+    prompt: ""
+    commands:
+      "n":
+        new_state: n5k_enter_password
+
+n5k_enter_password:
+  prompt: "Enter the password for \"admin\":"
+  commands:
+    "lab":
+      new_state: n5k_confirm_password
+
+n5k_confirm_password:
+  prompt: "Confirm the password for \"admin\":"
+  commands:
+    "lab":
+      new_state: n5k_basic_config_prompt
+
+# Reload with alternate credentials
+n5k_confirm_reload2:
+  prompt: |
+    WARNING: This command will reboot the system
+    Do you want to continue? (y/n) [n]
+  commands:
+    "y":
+      new_state: n5k_poap_reloaded_console2
+
+n5k_poap_reloaded_console2:
+    prompt: "Abort Power On Auto Provisioning and continue with normal setup ?(yes/no)[n]: "
+    preface: file|mock_data/nxos/nxos_n5k_reload.txt
+    commands:
+      "y":
+        response: |
+            'System no poap' config enabled. Skipping POAP.
+
+                     ---- System Admin Account Setup ----
+
+
+            Do you want to enforce secure password standard (yes/no):
+        new_state:
+            n5k_password_handling_prompt2
+
+n5k_password_handling_prompt2:
+    prompt: ""
+    commands:
+      "n":
+        new_state: n5k_enter_password2
+
+n5k_enter_password2:
+  prompt: "Enter the password for \"admin\":"
+  commands:
+    "lab2":
+      new_state: n5k_confirm_password2
+
+n5k_confirm_password2:
+  prompt: "Confirm the password for \"admin\":"
+  commands:
+    "lab2":
+      new_state: n5k_basic_config_prompt
+
+
+n5k_basic_config_prompt:
+  preface: |
+    ---- Basic System Configuration Dialog ----
+
+    This setup utility will guide you through the basic configuration of
+    the system. Setup configures only enough connectivity for management
+    of the system.
+
+    Please register Cisco Nexus 5000 Family devices promptly with your
+    supplier. Failure to register may affect response times for initial
+    service calls. Nexus devices must be registered to receive entitled
+    support services.
+
+    Press Enter at anytime to skip a dialog. Use ctrl-c at anytime
+    to skip the remaining dialogs.
+  prompt: "Would you like to enter the basic configuration dialog (yes/no): "
+  commands:
+    "n":
+      new_state: n5k_user_access_veri
+
+n5k_user_access_veri:
+  preface: Nexus 5000 Switch
+  prompt: "login: "
+  commands:
+    "admin":
+      new_state: n5k_user_password
+
+n5k_user_password:
+  prompt: "Password: "
+  commands:
+    "lab":
+      new_state: n5k_exec
+
+n5k_config:
+  prompt: "switch(config)#"
+  commands:
+    "no logging console": ""
+    "line console": ""
+    "exec-timeout 0": ""
+    "terminal width 511": ""
+    'feature bash': ""
+    "end":
+      new_state: n5k_exec
+

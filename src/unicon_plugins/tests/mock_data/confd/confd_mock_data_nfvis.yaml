@@ -1,0 +1,62 @@
+nfvis_login:
+  preface: |2
+
+    Cisco Enterprise Network Function Virtualization Infrastructure Software (NFVIS)
+     
+    NFVIS Version: 3.5.1-FC4
+     
+    Copyright (c) 2015-2017 by Cisco Systems, Inc.
+    Cisco, Cisco Systems, and Cisco Systems logo are registered trademarks of Cisco
+    Systems, Inc. and/or its affiliates in the U.S. and certain other countries.
+     
+    The copyrights to certain works contained in this software are owned by other
+    third parties and used and distributed under third party license agreements.
+    Certain components of this software are licensed under the GNU GPL 2.0, GPL 3.0,
+    LGPL 2.1, LGPL 3.0 and AGPL 3.0.
+    
+  prompt: "admin@192.168.66.234's password:"
+  commands:
+    "cisco123":
+      new_state: nfvis_enable
+
+nfvis_enable:
+  prompt: "%N#"
+  commands:
+    "show version": |
+      version name "Enterprise NFV Infrastructure Software"
+      version version 3.5.1-FC4
+      version build-date "Friday, March 31, 2017 [00:12:22 PDT]"
+
+    "config term":
+      new_state: nfvis_config
+    "paginate false": ""
+    "screen-length 0": ""
+    "screen-width 0": ""
+    "idle-timeout 0": ""
+
+nfvis_config:
+  prompt: "%N(config)#"
+  commands:
+    "end":
+      new_state: nfvis_enable
+    "no vm_lifecycle images": ""
+    "commit": ""
+    "no bridges bridge mgmt-br":
+      new_state: nfvis_config_error_mgmt_bridge
+
+
+nfvis_config_error_mgmt_bridge:
+  prompt: "%N(config)#"
+  commands:
+    "commit":
+      response: |
+        Aborted: illegal reference 'networks network mgmt-net bridge'
+    "end":
+      new_state: nfvis_commit_error_mgmt_bridge
+
+nfvis_commit_error_mgmt_bridge:
+  prompt: "Uncommitted changes found, commit them? [yes/no/CANCEL] "
+  commands:
+    "no":
+      new_state: nfvis_enable
+

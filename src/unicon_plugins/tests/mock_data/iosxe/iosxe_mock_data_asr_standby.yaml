@@ -1,0 +1,244 @@
+asr_exec_standby:
+  prompt: Router-stby>
+  commands: 
+    "show version": &SV_SBY |2
+      Cisco IOS XE Software, Version BLD_POLARIS_DEV_LATEST_20170913_031230_2
+      Cisco IOS Software [Fuji], ASR1000 Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Experimental Version 16.7.20170913:022807 [polaris_dev-/scratch/mcpre/BLD-BLD_POLARIS_DEV_LATEST_20170913_031230 164]
+      Copyright (c) 1986-2017 by Cisco Systems, Inc.
+      Compiled Wed 13-Sep-17 04:13 by mcpre
+
+
+      Cisco IOS-XE software, Copyright (c) 2005-2017 by cisco Systems, Inc.
+      All rights reserved.  Certain components of Cisco IOS-XE software are
+      licensed under the GNU General Public License ("GPL") Version 2.0.  The
+      software code licensed under GPL Version 2.0 is free software that comes
+      with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+      GPL code under the terms of GPL Version 2.0.  For more details, see the
+      documentation or "License Notice" file accompanying the IOS-XE software,
+      or the applicable URL provided on the flyer accompanying the IOS-XE
+      software.
+
+
+      ROM: IOS-XE ROMMON
+
+      acl-asr-r1 uptime is 43 minutes
+      Uptime for this control processor is 45 minutes
+      System returned to ROM by Reload Command at 09:38:38 PDT Thu Aug 31 2017
+      System image file is "harddisk:packages.conf"
+      Last reload reason: Reload Command
+
+
+
+      This product contains cryptographic features and is subject to United
+      States and local country laws governing import, export, transfer and
+      use. Delivery of Cisco cryptographic products does not imply
+      third-party authority to import, export, distribute or use encryption.
+      Importers, exporters, distributors and users are responsible for
+      compliance with U.S. and local country laws. By using this product you
+      agree to comply with applicable laws and regulations. If you are unable
+      to comply with U.S. and local laws, return this product immediately.
+
+      A summary of U.S. laws governing Cisco cryptographic products may be found at:
+      http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+      If you require further assistance please contact us by sending email to
+      export@cisco.com.
+
+      License Type: Default. No valid license found.
+      License Level: ipbase
+      Next reload license Level: ipbase
+
+      cisco ASR1006 (RP2) processor (revision RP2) with 4269335K/6147K bytes of memory.
+      Processor board ID FOX1503HCG7
+      5 Gigabit Ethernet interfaces
+      4 Serial interfaces
+      3 ATM interfaces
+      32768K bytes of non-volatile configuration memory.
+      8388608K bytes of physical memory.
+      1925119K bytes of eUSB flash at bootflash:.
+      78085207K bytes of SATA hard disk at harddisk:.
+      0K bytes of WebUI ODM Files at webui:.
+
+      Configuration register is 0x2002
+    "enable":
+      new_state: enable_asr_standby
+
+enable_asr_standby:
+    prompt: Router-stby#
+    commands:
+      "term length 0": ""
+      "term width 0": ""
+      "show version": *SV_SBY
+      "config term": "% Configuration allowed only from Active"
+      "disable":
+        new_state: asr_exec_standby
+      "enable": ""
+      "show redundancy sta |  in peer": |2
+             peer state = 13 -ACTIVE 
+      "show redundancy sta | inc Redundancy State": |2
+        Redundancy State              = sso
+      "sh redundancy stat | inc my state": |2
+        my state = 8  -STANDBY HOT
+      "sh redundancy state": |2
+               my state = 8  -STANDBY HOT 
+             peer state = 13 -ACTIVE 
+                   Mode = Duplex
+                   Unit = Secondary
+                Unit ID = 49
+
+        Redundancy Mode (Operational) = sso
+        Redundancy Mode (Configured)  = sso
+        Redundancy State              = sso
+             Maintenance Mode = Disabled
+            Manual Swact = cannot be initiated from this the standby unit
+         Communications = Up
+
+           client count = 84
+         client_notification_TMR = 30000 milliseconds
+                   RF debug mask = 0x0   
+
+      "show redundancy": |2
+        Redundant System Information :
+        ------------------------------
+               Available system uptime = 20 minutes
+        Switchovers system experienced = 0
+
+                         Hardware Mode = Duplex
+            Configured Redundancy Mode = sso
+             Operating Redundancy Mode = sso
+                      Maintenance Mode = Disabled
+                        Communications = Up
+
+        Current Processor Information :
+        -------------------------------
+                      Standby Location = slot 7
+                Current Software state = STANDBY HOT
+               Uptime in current state = 18 minutes
+                         Image Version = Cisco IOS Software [Fuji], ASR1000 Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Experimental Version 16.7.20170913:022807 [polaris_dev-/scratch/mcpre/BLD-BLD_POLARIS_DEV_LATEST_20170913_031230 164]
+        Copyright (c) 1986-2017 by Cisco Systems, Inc.
+        Compiled Wed 13-Sep-17 04:13 by mcpre
+                                  BOOT = harddisk:packages.conf,12;
+                           CONFIG_FILE = 
+                Configuration register = 0x2002
+
+        Peer (slot: 6, state: ACTIVE) information is not available because this is the standby processor
+
+
+
+
+
+# TBD - The following text describes the dialog on the active to perform
+# switchover This has not yet been incorporated into the
+# mock/unit test switchover test.
+
+#acl-asr-r1#redundancy force-switchover 
+#
+#System configuration has been modified. Save? [yes/no]: yes
+#Building configuration...
+#[OK]Proceed with switchover to standby RP? [confirm]
+
+
+# TBD - The following describes the resulting text that comes from the
+# newly active (formerly standby) board.
+#  This has not yet been incorporated into the mock/unit test switchover test.
+
+#    Manual Swact = enabled
+#
+#Router>
+#Router>
+#Router>
+#Router>
+#Router>
+#Router>
+#Router>Sep 18 13:11:23.959 R1/0: %PMAN-5-EXITACTION: Process manager is exiting: process exit with reload fru code 
+#
+#
+#Initializing Hardware ...
+#
+#Calculating the ROMMON CRC ... CRC is correct
+#
+#
+#System Bootstrap, Version 16.2(1r), RELEASE SOFTWARE 
+#Copyright (c) 1994-2016 by cisco Systems, Inc.
+#
+#Current image running: Boot ROM0
+#Last reset cause: LocalSoft
+#
+#ASR1000-RP2 platform with 8388608 Kbytes of main memory
+#
+#File size is 0x26f0cf64
+#Located test-image-acl-asr-r1-13155626 
+#Image size 653315940 inode num 13, bks cnt 159501 blk size 8*512
+##############################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################
+#Boot image size = 653315940 (0x26f0cf64) bytes
+#
+#Package header rev 0 structure detected
+#Calculating SHA-1 hash...done
+#validate_package_cs: SHA-1 hash:
+#    calculated db270a2e:7bbdf676:7a6e3208:1417d13d:d87a19af
+#    expected   db270a2e:7bbdf676:7a6e3208:1417d13d:d87a19af
+#Validating main package signatures
+#
+#RSA Signed DEVELOPMENT Image Signature Verification Successful.
+#Image validated
+#%IOSXEBOOT-4-BOOT_SRC: (rp/1): HD Boot
+#
+#              Restricted Rights Legend
+#
+#Use, duplication, or disclosure by the Government is
+#subject to restrictions as set forth in subparagraph
+#(c) of the Commercial Computer Software - Restricted
+#Rights clause at FAR sec. 52.227-19 and subparagraph
+#(c) (1) (ii) of the Rights in Technical Data and Computer
+#Software clause at DFARS sec. 252.227-7013.
+#
+#           cisco Systems, Inc.
+#           170 West Tasman Drive
+#           San Jose, California 95134-1706
+#
+#
+#
+#Cisco IOS Software, ASR1000 Software (X86_64_LINUX_IOSD-ADVENTERPRISEK9-M), Experimental Version 15.5(20140819:103311) [mcp_dev-BLD-BLD_MCP_DEV_LATEST_20140819_081033-ios 182]
+#Copyright (c) 1986-2014 by Cisco Systems, Inc.
+#Compiled Tue 19-Aug-14 08:35 by mcpre
+#
+#
+#
+#Cisco IOS-XE software, Copyright (c) 2005-2014 by cisco Systems, Inc.
+#All rights reserved.  Certain components of Cisco IOS-XE software are
+#licensed under the GNU General Public License ("GPL") Version 2.0.  The
+#software code licensed under GPL Version 2.0 is free software that comes
+#with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+#GPL code under the terms of GPL Version 2.0.  For more details, see the
+#documentation or "License Notice" file accompanying the IOS-XE software,
+#or the applicable URL provided on the flyer accompanying the IOS-XE
+#software.
+#
+#
+#
+#This product contains cryptographic features and is subject to United
+#States and local country laws governing import, export, transfer and
+#use. Delivery of Cisco cryptographic products does not imply
+#third-party authority to import, export, distribute or use encryption.
+#Importers, exporters, distributors and users are responsible for
+#compliance with U.S. and local country laws. By using this product you
+#agree to comply with applicable laws and regulations. If you are unable
+#to comply with U.S. and local laws, return this product immediately.
+#
+#A summary of U.S. laws governing Cisco cryptographic products may be found at:
+#http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+#
+#If you require further assistance please contact us by sending email to
+#export@cisco.com.
+#
+#cisco ASR1006 (RP2) processor (revision RP2) with 4158204K/6147K bytes of memory.
+#Processor board ID FOX1503HCG7
+#32768K bytes of non-volatile configuration memory.
+#8388608K bytes of physical memory.
+#1925119K bytes of eUSB flash at bootflash:.
+#78085207K bytes of SATA hard disk at harddisk:.
+#
+#
+#
+#Press RETURN to get started!
+#

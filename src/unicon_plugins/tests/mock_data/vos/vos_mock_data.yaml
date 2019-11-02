@@ -1,0 +1,75 @@
+
+vos_connect:
+  prompt: "admin@10.0.0.1's password:"
+  commands:
+    "lab":
+      response: |
+        Command Line Interface is starting up, please wait ...
+
+           Welcome to the Platform Command Line Interface
+
+        VMware Installation:
+          2 vCPU: Intel(R) Xeon(R) CPU           E5640  @ 2.67GHz
+          Disk 1: 80GB, Partitions aligned
+          6144 Mbytes RAM
+      new_state: vos_exec
+
+vos_exec:
+  prompt: "admin:"
+  commands:
+    "set cli pagination off": ""
+    "some command": "some output"
+    "some other command": "some other output"
+    "show tech dbstateinfo": 
+      response: |
+        ------------------------ Show tech dbstateinfo -------------------
+
+
+        Database State Info
+
+        Output is in /cm/trace/dbl/showtechdbstateinfo211506.txt
+
+      new_state: press_enter
+    "utils core active analyze":
+      response: |
+        This command may use a considerable amount of I/O
+        and running it may impact system performance.
+
+        It is highly recommended that this command be
+        run off-hours.
+
+      new_state: continue_prompt
+
+continue_prompt:
+  prompt: "Continue (y/n)?"
+  commands:
+    "y":
+      new_state: vos_exec
+
+
+press_enter:
+  prompt: ESC[1mPress <enter> for 1 line, <space> for one page, or <q> to quitESC[0mESC[K
+  commands:
+    "":
+      new_state: press_enter2
+
+press_enter2:
+  preface: |
+    Please use "file view activelog /cm/trace/dbl/showtechdbstateinfo211506.txt" to see the 
+        contents of File
+  prompt: ESC[1mPress <enter> for 1 line, <space> for one page, or <q> to quitESC[0mESC[K
+  commands:
+    "":
+      new_stae: press_enter3
+
+press_enter3:
+  preface: |
+    Error Output is in /cm/trace/dbl/showtechdbstateinfo_cdr_err211506.out
+
+    Please use "file view activelog /cm/trace/dbl/showtechdbstateinfo_cdr_err211506.out" command to see the contents of File
+  prompt: ESC[1mPress <enter> for 1 line, <space> for one page, or <q> to quitESC[0mESC[K
+  commands:
+    "":
+      new_state: vos_exec
+
+

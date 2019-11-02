@@ -1,0 +1,381 @@
+Initiating switch-over.
+RP/0/1/CPU0:Jul 27 17:37:29.747 : rmf_svr[343]: %HA-REDCON-4-FAILOVER_REQUESTED : failover has been requested by operator, waiting to initiate 
+
+
+System reload. Waiting for pending output..........
+
+
+Reboot reason: "Cause: Initiating switch-over.                                                Process: rmf_svr                                                                Traceback: 8217148 82179ed 821784b 4205b0a 420aade 822d416"
+  Cause code : 0x04000004
+  Reboot code: 0x00000004, "REBOOT_CAUSE_FAILOVER"
+  Dump type  : 0x04000000, "Unknown"
+  Proc name  : "rmf_svr"
+  (Reboot was via reboot API)
+  (Kernel dump not required)
+Normal reboot
+Calling platform_kd_reboot ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[H[J[H[J[?25l[m[H[J[2;30HGNU GRUB  version 2.00
+
+[m[4;2H+--------------------------------------------------------------------------+[5;2H|[5;77H|[6;2H|[6;77H|[7;2H|[7;77H|[8;2H|[8;77H|[9;2H|[9;77H|[10;2H|[10;77H|[11;2H|[11;77H|[12;2H|[12;77H|[13;2H|[13;77H|[14;2H|[14;77H|[15;2H|[15;77H|[16;2H+--------------------------------------------------------------------------+[m[17;2H[m
+      Use the ^ and v keys to select which entry is highlighted.      
+      Press enter to boot the selected OS, `e' to edit the commands      
+      before booting or `c' for a command-line. ESC to return      
+      previous menu.      
+      [5;78H [7m[5;3HIOS XRv                                                                  [m [5;76H[m[m[6;3HIOS XRv fallback                                                         [m [6;76H[m[m[7;3H                                                                         [m [7;76H[m[m[8;3H                                                                         [m [8;76H[m[m[9;3H                                                                         [m [9;76H[m[m[10;3H                                                                         [m [10;76H[m[m[11;3H                                                                         [m [11;76H[m[m[12;3H                                                                         [m [12;76H[m[m[13;3H                                                                         [m [13;76H[m[m[14;3H                                                                         [m [14;76H[m[m[15;3H                                                                         [m [15;76H[m[15;78H [5;76H[22;1H   The highlighted entry will be executed automatically in 5s.
+                                                                               [5;76H[22;1H   The highlighted entry will be executed automatically in 4s.
+                                                                               [5;76H[22;1H   The highlighted entry will be executed automatically in 3s.
+                                                                               [5;76H[22;1H   The highlighted entry will be executed automatically in 2s.
+                                                                               [5;76H[22;1H   The highlighted entry will be executed automatically in 1s.
+                                                                               [5;76H[22;1H   The highlighted entry will be executed automatically in 0s.
+                                                                               [5;76H[?25h[H[J[H[J  Booting `IOS XRv'
+
+   Startup-code initializing, running on XRVR
+   BSP date: Mar  5 2014 15:04:21
+   Debugging enabled; debug_flag = 3, vendor_debug_flag = 0
+   Page Address Extension mode (PAE) enabled with 36bit physical addressing.
+   Reading back MTRR config from boot processor.
+LAPIC id: 0000
+LAPIC addr: 0x00000000fee00000
+   Initialized PIC
+   Initialized APIC LINT for CPU0 only
+   Family = 0000000f, Model = 00000006
+   Note: Using built-in syspage setting
+   Region shmwin1: a0000000:b0000000
+   Region pakman: b0000000:b4000000
+   Region buffman: b4000000:b8000000
+############################################################################################
+Header size=0x0000009c, Total Size=0x00001088, #Cpu=1, Type=0
+Section:system_private offset:0x000001d8 size:0x00000068
+  syspage ptr user:fed15000 kernel:fed17000
+  cpupage ptr user:fed16440 kernel:fed18440 spacing:84
+  kdebug info:00000000 callback:00000000
+  boot pgms: idx=0
+    0) base paddr:0043f000 start addr:fe0419f8
+    1) base paddr:00a67000 start addr:fe69c948
+  ramsize:00000000 pagesize:00001000
+Section:qtime offset:0x00000130 size:0x00000060
+  boot:597a24ea CPS:00000000a122f99c rate/scale:838095345/-15 intr:0
+Section:callout offset:0x000000a0 size:0x00000048
+  reboot:fed182ab power:00000000
+  timer_load:fed182d5 reload:00000000 value:fed182fc
+  0) display:fed18315 poll:fed18331 break:fed1834e
+  1) display:fed18367 poll:fed18383 break:fed183a0
+Section:cpuinfo offset:0x00000190 size:0x00000020
+  0) cpu:00000632 flags:c000ffff speed:00000ae0 cache i/d:255/255 name:121
+Section:cacheattr offset:0x00001088 size:0x00000000
+Section:meminfo offset:0x00001088 size:0x00000000
+Section:asinfo offset:0x00000968 size:0x000003a0
+  0000) 0000000000000000-000000000000ffff o:ffff a:0000 p:100 c:00000000 n:71
+  0020) 0000000000000000-0000000fffffffff o:ffff a:0010 p:100 c:00000000 n:74
+  0040) 0000000000000000-00000000ffffffff o:0020 a:0010 p:100 c:00000000 n:81
+  0060) 0000000000000000-0000000000ffffff o:0020 a:0010 p:100 c:00000000 n:89
+  0080) 0000000006000000-00000000ffefffff o:0020 a:0013 p:100 c:00000000 n:93
+  00a0) 00000000fff00000-00000000ffffffff o:0020 a:0005 p:100 c:00000000 n:100
+  00c0) 0000000000000000-000000000009fbff o:0060 a:0017 p:100 c:00000000 n:104
+  00e0) 0000000000100000-0000000000ffffff o:0060 a:0037 p:100 c:00000000 n:104
+  0100) 0000000001000000-0000000005ffffff o:0040 a:0037 p:100 c:00000000 n:104
+  0120) 0000000006000000-00000000bfffdfff o:0080 a:0017 p:100 c:00000000 n:104
+  0140) 0000000000000000-00000000ffffffff o:ffff a:0010 p:100 c:00000000 n:334
+  0160) 0000000004200000-000000000fffffff o:0140 a:0000 p:100 c:00000000 n:342
+  0180) 00000000a0000000-00000000afffffff o:0140 a:0010 p:100 c:00000000 n:356
+  01a0) 00000000a0000000-00000000afffffff o:0180 a:0000 p:100 c:00000000 n:342
+  01c0) 00000000b0000000-00000000b3ffffff o:0140 a:0010 p:100 c:00000000 n:364
+  01e0) 00000000b0000000-00000000b3ffffff o:01c0 a:0000 p:100 c:00000000 n:342
+  0200) 00000000b4000000-00000000b7ffffff o:0140 a:0010 p:100 c:00000000 n:371
+  0220) 00000000b4000000-00000000b7ffffff o:0200 a:0000 p:100 c:00000000 n:342
+  0240) 000000000043d288-0000000003e3878b o:0020 a:0005 p:100 c:00000000 n:379
+  0260) 0000000000400180-000000000043d287 o:0020 a:0007 p:100 c:00000000 n:387
+  0280) 000000000043d288-0000000003e3878b o:0020 a:0007 p:100 c:00000000 n:395
+  02a0) 00000000ee000000-00000000fdffffff o:0140 a:0000 p:100 c:00000000 n:403
+  02c0) 00000000fe040000-00000000fe6f37d4 o:0140 a:0000 p:100 c:00000000 n:408
+  02e0) 00000000b7ffe000-00000000bfffdfff o:0120 a:0007 p:100 c:00000000 n:414
+  0300) 0000000000001000-000000000000cfff o:00c0 a:0007 p:100 c:00000000 n:423
+  0320) 0000000000018ce4-000000000009fbff o:00c0 a:0007 p:100 c:00000000 n:423
+  0340) 0000000000100000-000000000043d287 o:00e0 a:0007 p:100 c:00000000 n:423
+  0360) 0000000003e3878c-0000000005ffffff o:0100 a:0027 p:100 c:00000000 n:423
+  0380) 0000000006000000-00000000b7ffdfff o:0120 a:0007 p:100 c:00000000 n:423
+Section:hwinfo offset:0x00000508 size:0x00000460
+  0) size:3 tag:3 isize:3, iname:0, owner:65535, kids:2
+  12) size:3 tag:17 isize:3, iname:9, owner:0, kids:3
+  24) size:3 tag:3 isize:3, iname:21, owner:12, kids:2
+  36) size:4 tag:33 isize:18, iname:28, owner:24, kids:0
+     00 00 00 00
+  52) size:1 tag:40
+  56) size:6 tag:44
+     04 00 00 00 f8 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  80) size:2 tag:53
+     04 00 00 00
+  88) size:3 tag:57
+     00 00 10 02 10 00 00 00
+  100) size:2 tag:66
+     00 c2 01 00
+  108) size:4 tag:33 isize:18, iname:28, owner:24, kids:0
+     00 00 00 00
+  124) size:1 tag:40
+  128) size:6 tag:44
+     04 00 00 00 f8 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  152) size:2 tag:53
+     03 00 00 00
+  160) size:3 tag:57
+     00 00 10 02 10 00 00 00
+  172) size:2 tag:66
+     00 c2 01 00
+  180) size:3 tag:3 isize:3, iname:108, owner:12, kids:1
+  192) size:4 tag:33 isize:10, iname:112, owner:180, kids:0
+     00 00 00 00
+  208) size:6 tag:44
+     02 00 00 00 70 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  232) size:3 tag:17 isize:3, iname:89, owner:0, kids:2
+  244) size:3 tag:3 isize:3, iname:139, owner:232, kids:1
+  256) size:4 tag:33 isize:12, iname:144, owner:244, kids:0
+     00 00 00 00
+  272) size:2 tag:53
+     01 00 00 00
+  280) size:6 tag:44
+     05 00 00 00 60 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  304) size:3 tag:3 isize:3, iname:21, owner:232, kids:1
+  316) size:4 tag:33 isize:21, iname:28, owner:304, kids:0
+     00 00 00 00
+  332) size:2 tag:53
+     04 00 00 00
+  340) size:1 tag:40
+  344) size:6 tag:44
+     07 00 00 00 f8 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  368) size:2 tag:53
+     03 00 00 00
+  376) size:6 tag:44
+     07 00 00 00 f8 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  400) size:3 tag:3 isize:3, iname:139, owner:12, kids:1
+  412) size:4 tag:33 isize:33, iname:150, owner:400, kids:0
+     00 00 00 00
+  428) size:1 tag:40
+  432) size:6 tag:44
+     00 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  456) size:6 tag:44
+     00 01 00 00 00 ff 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  480) size:6 tag:44
+     00 40 03 00 00 00 0a 00 00 00 00 00 00 00 20 00 00 00 00 00
+  504) size:6 tag:44
+     00 a0 02 00 00 60 0d 00 00 00 00 00 00 00 20 00 00 00 00 00
+  528) size:2 tag:53
+     0e 00 00 00
+  536) size:2 tag:53
+     0f 00 00 00
+  544) size:3 tag:3 isize:124, iname:157, owner:65535, kids:0
+  556) size:4 tag:163
+     00 00 00 00 00 00 00 00 00 00 00 00
+  572) size:2 tag:174
+     05 00 00 00
+  580) size:2 tag:196
+     0a 00 00 00
+  588) size:4 tag:219
+     00 00 00 00 00 00 00 00 01 00 00 00
+  604) size:5 tag:241
+     ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+  624) size:6 tag:259
+     66 02 3c 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  648) size:33 tag:285
+     00 00 00 00 55 6e 6b 6e 6f 77 6e 20 66 69 6c 65 6e 61 6d 65 00 98 e3 03 08 00 00 00 c8 98 e3 03 f0 98 e3 03 00 99 e3 03 10 00 00 00 f0 20 41 00 00 99 e3 03 f0 98 e3 03 00 00 00 00 f0 98 e3 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  780) size:65 tag:308
+     00 00 00 00 55 6e 6b 6e 6f 77 6e 20 66 69 6c 65 6e 61 6d 65 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+Section:typed_strings offset:0x00000240 size:0x00000118
+  off:0 type:528 string:'1'
+  off:8 type:514 string:'256'
+  off:16 type:527 string:'256'
+  off:24 type:515 string:'0x100'
+  off:36 type:516 string:'0xffffe7df'
+  off:52 type:517 string:'20'
+  off:60 type:520 string:'0'
+  off:68 type:521 string:'65536'
+  off:80 type:519 string:'
+
+System Bootstrap, Version 1.00 (20010101:000000) [CRS-1 BIOS]
+
+Copyright (c) 1994-2007 by cisco Systems, Inc.
+
+'
+  off:200 type:526 string:'ROMMON 1.00'
+  off:216 type:525 string:'ROMMON 1.00'
+  off:232 type:5 string:'xrvr'
+  off:244 type:203 string:'UTC0'
+  off:256 type:2 string:'localhost'
+Section:strings offset:0x00000358 size:0x000001b0
+  [0]'hw' [3]'Group' [9]'unknown' [17]'Bus' [21]'serial' [28]'8250'
+  [33]'Device' [40]'pad' [44]'location' [53]'irq' [57]'inputclk' [66]'baud'
+  [71]'io' [74]'memory' [81]'below4G' [89]'isa' [93]'device' [100]'rom'
+  [104]'ram' [108]'rtc' [112]'mc146818' [121]'Intel ?86 F15M6S1' [139]'misc'
+  [144]'pckbd' [150]'in-use' [157]'cisco' [163]'cisco/xray'
+  [174]'cisco/boxinfo/lowmark' [196]'cisco/boxinfo/highmark'
+  [219]'cisco/boxinfo/memsize' [241]'cisco/boxinfo/rsi'
+  [259]'cisco/boxinfo/machineinfo' [285]'cisco/boxinfo/bootinfo'
+  [308]'cisco/boxinfo/bootinfo_V2' [334]'virtual' [342]'prealloc_vmem'
+  [356]'shmwin1' [364]'pakman' [371]'buffman' [379]'imagefs' [387]'startup'
+  [395]'bootram' [403]'1to1' [408]'vboot' [414]'reserved' [423]'sysram'
+Section:intrinfo offset:0x00000d08 size:0x00000380
+  0) vector_base:00000000, #vectors:7, cascade_vector:7fffffff
+     cpu_intr_base:00000030, cpu_intr_stride:1, flags:0000
+      id => flags:0800, size:0000, rtn:fed18088
+     eoi => flags:0000, size:0004, rtn:fed18088
+     mask:fed1808c, unmask:fed1809d, config:fed180b0
+  1) vector_base:00000007, #vectors:1, cascade_vector:7fffffff
+     cpu_intr_base:00000037, cpu_intr_stride:1, flags:0000
+      id => flags:0000, size:000b, rtn:fed180bf
+     eoi => flags:0000, size:0004, rtn:fed180ca
+     mask:fed180ce, unmask:fed180d7, config:00000000
+  2) vector_base:00000008, #vectors:7, cascade_vector:7fffffff
+     cpu_intr_base:00000038, cpu_intr_stride:1, flags:0000
+      id => flags:0800, size:0004, rtn:fed180e0
+     eoi => flags:0000, size:0004, rtn:fed180e4
+     mask:fed180e8, unmask:fed180f9, config:00000000
+  3) vector_base:0000000f, #vectors:1, cascade_vector:7fffffff
+     cpu_intr_base:0000003f, cpu_intr_stride:1, flags:0000
+      id => flags:0000, size:000f, rtn:fed1810c
+     eoi => flags:0000, size:0004, rtn:fed1811b
+     mask:fed1811f, unmask:fed18128, config:00000000
+  4) vector_base:80000000, #vectors:2, cascade_vector:7fffffff
+     cpu_intr_base:00000002, cpu_intr_stride:0, flags:a000
+      id => flags:0000, size:001b, rtn:fed18131
+     eoi => flags:1000, size:002a, rtn:fed1814c
+     mask:fed18176, unmask:fed1818a, config:fed181a0
+  5) vector_base:00000080, #vectors:16, cascade_vector:7fffffff
+     cpu_intr_base:00000030, cpu_intr_stride:1, flags:0000
+      id => flags:0800, size:0001, rtn:fed181af
+     eoi => flags:0000, size:0012, rtn:fed181b0
+     mask:fed181c2, unmask:fed181c5, config:fed181c8
+  6) vector_base:00000090, #vectors:16, cascade_vector:7fffffff
+     cpu_intr_base:00000040, cpu_intr_stride:1, flags:0000
+      id => flags:0800, size:0001, rtn:fed181cb
+     eoi => flags:0000, size:0012, rtn:fed181cc
+     mask:fed181de, unmask:fed181e1, config:fed181e4
+  7) vector_base:000000a0, #vectors:16, cascade_vector:7fffffff
+     cpu_intr_base:00000050, cpu_intr_stride:1, flags:0000
+      id => flags:0800, size:0001, rtn:fed181e7
+     eoi => flags:0000, size:0012, rtn:fed181e8
+     mask:fed181fa, unmask:fed181fd, config:fed18200
+  8) vector_base:000000b0, #vectors:16, cascade_vector:7fffffff
+     cpu_intr_base:00000060, cpu_intr_stride:1, flags:0000
+      id => flags:0800, size:0001, rtn:fed18203
+     eoi => flags:0000, size:0012, rtn:fed18204
+     mask:fed18216, unmask:fed18219, config:fed1821c
+  9) vector_base:000000c0, #vectors:16, cascade_vector:7fffffff
+     cpu_intr_base:00000070, cpu_intr_stride:1, flags:0000
+      id => flags:0800, size:0001, rtn:fed1821f
+     eoi => flags:0000, size:0012, rtn:fed18220
+     mask:fed18232, unmask:fed18235, config:fed18238
+  10) vector_base:000000d0, #vectors:16, cascade_vector:7fffffff
+     cpu_intr_base:00000080, cpu_intr_stride:1, flags:0000
+      id => flags:0800, size:0001, rtn:fed1823b
+     eoi => flags:0000, size:0012, rtn:fed1823c
+     mask:fed1824e, unmask:fed18251, config:fed18254
+  11) vector_base:000000e0, #vectors:16, cascade_vector:7fffffff
+     cpu_intr_base:00000090, cpu_intr_stride:1, flags:0000
+      id => flags:0800, size:0001, rtn:fed18257
+     eoi => flags:0000, size:0012, rtn:fed18258
+     mask:fed1826a, unmask:fed1826d, config:fed18270
+  12) vector_base:000000f0, #vectors:16, cascade_vector:7fffffff
+     cpu_intr_base:000000a0, cpu_intr_stride:1, flags:0000
+      id => flags:0800, size:0001, rtn:fed18273
+     eoi => flags:0000, size:0012, rtn:fed18274
+     mask:fed18286, unmask:fed18289, config:fed1828c
+  13) vector_base:00000100, #vectors:16, cascade_vector:7fffffff
+     cpu_intr_base:000000d0, cpu_intr_stride:1, flags:0000
+      id => flags:0800, size:0001, rtn:fed1828f
+     eoi => flags:0000, size:0012, rtn:fed18290
+     mask:fed182a2, unmask:fed182a5, config:fed182a8
+Section:smp offset:0x00001088 size:0x00000000
+Section:pminfo offset:0x00001088 size:0x00000000
+Section:mdriver offset:0x00001088 size:0x00000000
+Section:boxinfo offset:0x000001b0 size:0x00000028
+  hw_flags:00000040
+Section:diskinfo offset:0x00001088 size:0x00000000
+Section:smpinfo offset:0x00001088 size:0x00000000
+Section:gdt offset:0x00000068
+  base:fed18494
+  off:08 base:fed18494 limit:0000013f  off:10 base:fed165d4 limit:0000070f
+  off:20 base:fed16440 limit:00000053  off:78 base:fec00000 limit:00000fff
+  off:80 base:00000000 limit:ffffffff  off:88 base:00000000 limit:ffffffff
+  off:90 base:00000000 limit:ffffffff  off:98 base:00000000 limit:ffffffff
+  off:a0 base:fed1853c limit:00000027  off:c0 base:00000000 limit:ffffffff
+  off:c8 base:00000000 limit:ffffffff  off:e0 base:00000000 limit:ffffffff
+  off:e8 base:00000000 limit:ffffffff  off:f0 base:00000000 limit:ffffffff
+  off:f8 base:00000000 limit:ffffffff
+Section:idt offset:0x0000006c
+  base:fed185d4
+Section:pgdir offset:0x00000070
+  Page Directory 0000d000: PAE
+
+System page at phys:00017000 user:fed15000 kern:fed17000
+Starting next program at vfe0419f8
+Unable to access "/dev/ser1" (2)
+
+              Restricted Rights Legend
+
+Use, duplication, or disclosure by the Government is
+subject to restrictions as set forth in subparagraph
+(c) of the Commercial Computer Software - Restricted
+Rights clause at FAR sec. 52.227-19 and subparagraph
+(c) (1) (ii) of the Rights in Technical Data and Computer
+Software clause at DFARS sec. 252.227-7013.
+
+           cisco Systems, Inc.
+           170 West Tasman Drive
+           San Jose, California 95134-1706
+
+
+
+Cisco IOS XR Software for the Cisco XR IOSXRv, Version 5.2.3.12I
+Copyright (c) 2014 by Cisco Systems, Inc.
+Jul 27 17:38:27.377: Install Setup: Using install device 'disk0:'
+Jul 27 17:38:27.387: Install Setup: Using MBI device 'bootflash:'
+Jul 27 17:38:30.747: Install Setup: Preparing devices:
+Jul 27 17:38:30.757: Install Setup:   Complete
+Jul 27 17:38:31.187: Install Setup: Starting package and meta-data sync
+Jul 27 17:38:31.207: Install Setup: Cleaning packages not in sync list
+Jul 27 17:38:31.207: Install Setup:   Complete
+Jul 27 17:38:54.356: Install Setup: Syncing meta-data:
+Jul 27 17:38:55.975: Install Setup:   Complete
+Jul 27 17:38:55.985: Install Setup: Completed sync of all packages and meta-data
+Jul 27 17:38:55.985: Install Setup: Starting MBI sync
+Jul 27 17:39:02.085: Install Setup: Completed sync of MBIs
+RP/0/0/CPU0:Jul 27 17:39:41.402: syslogd: [376]:  Received a SYNC notification for global channel 
+RP/0/0/CPU0:Jul 27 17:39:41.422: syslogd: [376]:  Received a SYNC notification for global channel 
+
+SAM detects CA certificate(Code Signing Server Certificate Authority,O=Cisco,C=US) has expired. The validity period is Oct 17, 2000 01:46:24 UTC - Oct 17, 2015 01:51:47 UTC. Continue at risk? (Y/N) [Default: N w/in 10]: y
+ This (D)RP Node is not ready or active for login /configuration 
+
+
+
+iosxrvr1 con0/0/CPU0 is in standby
+
+
+
+

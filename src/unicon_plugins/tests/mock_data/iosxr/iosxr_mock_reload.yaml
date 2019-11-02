@@ -1,0 +1,118 @@
+reload_confirm_prompt:
+  preface: |
+    Preparing system for backup. This may take a few minutes especially for large configurations.
+      Status report: node0_RSP1_CPU0: START TO BACKUP
+      Status report: node0_RSP1_CPU0: BACKUP HAS COMPLETED SUCCESSFULLY
+    [Done]
+  prompt: "Proceed with reload? [confirm]"
+  commands:
+    "":
+      new_state: console_standby
+      response: |
+        [0x2f9eba97a2a49] Record Reboot History, reboot cause = 0x4000001, descr = Cause: User Initiated reload                                                  Process: reload                                                                 Traceback: 70f80001 4rebooting
+
+        Selecting ROMMON Image... B
+        DDR in Interleaved mode
+        POST 1 : PASSED : code 0 : DDR2 Memory Quick Test
+
+        CPU Reset Reason = 0x000d
+        POST 2 : PASSED : code 0 : FPGA Flash Image CRC Checks
+
+        Loading Field Programmable Devices:
+        FPGA 0-B PROGRAMMED  : image: 0xff500028 - 0xff576cca, et: 117ms
+        FPGA 1-B PROGRAMMED  : image: 0xff400028 - 0xff4d1034, et: 206ms
+        FPGA 2-B PROGRAMMED  : image: 0xff100028 - 0xff276358, et: 369ms
+        FPGA 3-B PROGRAMMED  : image: 0xff000028 - 0xff0454a8, et: 69ms
+
+        System Bootstrap, Version 1.06(20120210:003513) [ASR9K ROMMON],
+        Copyright (c) 1994-2012 by Cisco Systems, Inc.
+        Compiled Thu 09-Feb-12 16:35 by saurabja
+
+          CPUCtrl:  1.17  [00000001/00000011]
+          ClkCtrl:  1.23  [00000001/00000017]
+          IntCtrl:  1.15  [00000001/0000000f]
+             Punt:  1.5   [00000001/00000005]
+              CBC:  1.3
+              BID: 0x0006
+
+
+        PPC 8641D (partnum 0x8004), Revision 02.01, (Core Version 02.02)
+        M8641 CLKIN:   66 Mhz
+         Core Clock: 1333 Mhz
+          MPX Clock:  533 Mhz
+          LBC Clock:   33 Mhz
+
+        POST 3 : PASSED : code 0 : Slot ID/Board Type Validity
+        PCI-E1: Ready as Root Complex
+        PCI-E2: Ready as Root Complex
+
+
+        set_chassis_type: chassis_type=0xef02ff found=TRUE
+        ASR9K (8641D PPC) platform with 4096 Mb of main memory
+
+        program load complete, entry point: 0x100000, size: 0x2ac18
+        program load complete, entry point: 0x100000, size: 0x2ac18
+        MBI Candidate = disk0:asr9k-os-mbi-5.3.1.20I/0x100000/mbiasr9k-rp.vm
+
+            CARD_SLOT_NUMBER: 0
+                CPU_INSTANCE: 1
+        MBI Validation starts ...
+
+        Mgt LAN 0 interface is selected
+        tsec_init_hw: configuring FE (port 2) for: Auto Speed, Auto Duplex
+
+        tsec_init_interface: hardware initialization completed
+        Interface link changed state to UP.
+        Interface link state up.
+
+        MBI validation sending request.
+        HIT CTRL-C to abort
+        ....
+        mbi_val_process_packet: received repsonse (rack 0)
+        Local image to boot : disk0:asr9k-os-mbi-5.3.1.20I/0x100000/mbiasr9k-rp.vm
+        program load complete, entry point: 0x100000, size: 0x2ac18
+
+        MBI size from header = 21492792,Bootflash resident MBI filesize = 21492792
+        ..................................................................................
+        program load complete, entry point: 0x204088, size: 0x147e538
+        Attempting to start second CPU
+        Config = SMP, Running = SMP
+        Board type: 0x00100302
+        Card Capability = 0xffffffff
+        ##############################################################################################################
+        BSP: Board type : RO-RSP2
+        tracelogger: starting tracing in background ring mode
+        tracelogger running with args: -startring -F 1 -F 2
+                      Restricted Rights Legend
+
+        Use, duplication, or disclosure by the Government is
+        subject to restrictions as set forth in subparagraph
+        (c) of the Commercial Computer Software - Restricted
+        Rights clause at FAR sec. 52.227-19 and subparagraph
+        (c) (1) (ii) of the Rights in Technical Data and Computer
+        Software clause at DFARS sec. 252.227-7013.
+
+                   cisco Systems, Inc.
+                   170 West Tasman Drive
+                   San Jose, California 95134-1706
+
+
+
+        Cisco IOS XR Software for the Cisco XR ASR9K, Version 5.3.1.20I
+        Copyright (c) 2015 by Cisco Systems, Inc.
+        Sep 16 11:51:59.989: Install Setup: Using install device 'disk0:'
+        Sep 16 11:52:04.006: Install Setup: Using MBI device 'bootflash:'
+        Sep 16 11:52:04.054: Install Setup: Preparing devices:
+        Sep 16 11:52:04.062: Install Setup:   Complete
+        Sep 16 11:52:14.437: Install Setup: Starting package and meta-data sync
+        Sep 16 11:52:14.450: Install Setup: Cleaning packages not in sync list
+        Sep 16 11:52:14.453: Install Setup:   Complete
+        Sep 16 11:52:20.974: Install Setup: Syncing meta-data:
+        Sep 16 11:52:21.528: Install Setup:   Complete
+        Sep 16 11:52:21.528: Install Setup: Completed sync of all packages and meta-data
+        Sep 16 11:52:21.528: Install Setup: Starting MBI sync
+        Sep 16 11:52:38.594: Install Setup: Completed sync of MBIs
+
+        SAM detects CA certificate(Code Signing Server Certificate Authority,O=Cisco,C=US) has expired. The validity period is Oct 17, 2000 01:46:24 UTC - Oct 17, 2015 01:51:47 UTC. Continue at risk? (Y/N) [Default: N w/in 10]:
+
+        ios con0/RSP0/CPU0 is in standby

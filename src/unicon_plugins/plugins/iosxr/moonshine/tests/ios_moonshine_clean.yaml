@@ -1,0 +1,17 @@
+bringup:
+    BringUpWorker:
+        module: dyntopo.xrut
+        log_level: warning
+
+        xrut:
+            log_level: quiet
+            dynamips_idlepc:
+                ios: 0x609a07a0
+                ios_pagent: 0x60e31274
+            moonshine_host: ensoft-ucs4
+
+devices:
+  r1:
+    images: [/auto/xrut/images/enxr-router-spirit-64.vm]
+
+

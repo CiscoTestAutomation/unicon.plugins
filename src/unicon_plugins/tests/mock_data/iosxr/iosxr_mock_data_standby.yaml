@@ -1,0 +1,26 @@
+
+console_standby:
+  prompt: ""
+  commands:
+    "": |2
+       This (D)RP Node is not ready or active for login /configuration
+
+switchover_standby:
+  prompt: ""
+  commands:
+    "":
+      new_state: login
+
+enable_standby:
+  prompt: ""
+  preface: |
+    MRP/0/1/CPU0:Jul 27 17:37:50.256: syslogd: [376]:  Received a SYNC notification for global channel 
+    RP/0/1/CPU0:Jul 27 17:37:34.017 : dsc[170]: %PLATFORM-DSC-4-WARNING_HB_THRESHOLD : Missed 5 consecutive heartbeats from node 0/0/CPU0. Please check transport connectivity to node 
+    RP/0/1/CPU0:Jul 27 17:37:47.236 : sysldr[375]: %PLATFORM-SYSLDR-3-PARTNER_HEARTBEAT_DELAY : Heartbeat not received from node0_0_CPU0 for 17.339 seconds. This breaches the maximum threshold of 17 seconds. 
+    RP/0/1/CPU0:Jul 27 17:38:20.454 : sysmgr[73]: %OS-SYSMGR-3-ERROR : lpts_pa(1) (jid 286) did not signal availability    
+    RP/0/1/CPU0:Jul 27 17:38:25.953 : sam_server[348]: %SECURITY-SAM-4-WARNING : Failed to initialize nvram digest 
+  commands:
+    "":
+      new_state: login
+
+

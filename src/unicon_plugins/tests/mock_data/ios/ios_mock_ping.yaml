@@ -1,0 +1,253 @@
+
+ping_proto:
+  prompt: "Protocol [ip]: "
+  commands:
+    "":
+      new_state: ping_target
+
+ping_target:
+  prompt: "Target IP address: "
+  commands:
+    "1.1.1.1":
+      new_state: ping1_count
+    "2.2.2.2":
+      new_state: ping2_count
+    "3.3.3.3":
+      new_state: ping3_count
+    "10.10.10.10":
+      new_state: ping10_count
+
+# ping 1.1.1.1
+# Successful ping
+
+ping1_count:
+  prompt: "Repeat count [5]: "
+  commands:
+    "":
+      new_state: ping1_size
+
+ping1_size:
+  prompt: "Datagram size [100]: "
+  commands:
+    "":
+      new_state: ping1_timeout
+
+ping1_timeout:
+  prompt: "Timeout in seconds [2]: "
+  commands:
+    "":
+      new_state: ping1_extend
+
+ping1_extend:
+  prompt: "Extended commands [n]: "
+  commands:
+    "n":
+      new_state: ping1_sweep
+
+ping1_sweep:
+  prompt: "Sweep range of sizes [n]: "
+  commands:
+    "n":
+      new_state: enable
+      response: |
+        Type escape sequence to abort.
+        Sending 5, 100-byte ICMP Echos to 1.1.1.1, timeout is 2 seconds:
+        !!!!!
+        Success rate is 100 percent (5/5), round-trip min/avg/max = 1/1/1 ms
+
+# ping 2.2.2.2
+# Device crash
+
+ping2_count:
+  prompt: "Repeat count [5]: "
+  commands:
+    "":
+      new_state: ping2_size
+
+ping2_size:
+  prompt: "Datagram size [100]: "
+  commands:
+    "":
+      new_state: ping2_timeout
+
+ping2_timeout:
+  prompt: "Timeout in seconds [2]: "
+  commands:
+    "":
+      new_state: ping2_extend
+
+ping2_extend:
+  prompt: "Extended commands [n]: "
+  commands:
+    "n":
+      new_state: ping2_sweep
+
+ping2_sweep:
+  prompt: "Sweep range of sizes [n]: "
+  commands:
+    "n":
+      new_state: ping_crash
+      response: |2
+
+        %Software-forced reload
+
+
+         07:55:35 EDT Thu Sep 17 2015: Breakpoint exception, CPU signal 23, PC = 0x42E33BD8
+
+
+
+        --------------------------------------------------------------------
+           Possible software fault. Upon reccurence, please collect
+           crashinfo, "show tech" and contact Cisco Technical Support.
+        --------------------------------------------------------------------
+
+
+        -Traceback= 42E33BD8 42E3172C 42644FC8 4264664C 429E41D0 429E4328 42E269EC
+        $0 : 00000000, AT : 44B40000, v0 : 46740000, v1 : 00000000
+        a0 : 4796DB90, a1 : 00000001, a2 : 00000000, a3 : 00000000
+        t0 : 42E26B30, t1 : 34008101, t2 : 42E26B58, t3 : FFFF00FF
+        t4 : 42E26B30, t5 : 500122E8, t6 : 00000000, t7 : C6EF55F2
+        s0 : 00000000, s1 : 44A20000, s2 : 00000000, s3 : 44990000
+        s4 : 44990000, s5 : 44990000, s6 : 44110000, s7 : 00000001
+        t8 : 5001234C, t9 : 00000000, k0 : 00000000, k1 : 00000000
+        gp : 44B3B9A0, sp : 50012418, s8 : 44110000, ra : 42E3172C
+        EPC  : 42E33BD8, ErrorEPC : 42A7A4CC, SREG     : 34008103
+        MDLO : 00000000, MDHI     : 00000000, BadVaddr : 00000000
+        DATA_START : 0x444E4CD0
+        Cause 00001824 (Code 0x9): Breakpoint exception
+
+ping_crash:
+  prompt: ""
+  commands:
+    "exit":
+      new_state: enable
+      
+
+# ping 10.10.10.10
+# timed response
+# 100% loss
+
+ping10_count:
+  prompt: "Repeat count [5]: "
+  commands:
+    "":
+      new_state: ping10_size
+
+ping10_size:
+  prompt: "Datagram size [100]: "
+  commands:
+    "":
+      new_state: ping10_timeout
+
+ping10_timeout:
+  prompt: "Timeout in seconds [2]: "
+  commands:
+    "":
+      new_state: ping10_extend
+
+ping10_extend:
+  prompt: "Extended commands [n]: "
+  commands:
+   "n":
+     new_state: ping10_sweep
+
+ping10_sweep:
+  prompt: "Sweep range of sizes [n]: "
+  commands:
+   "n":
+    new_state: enable
+    response: |
+      Type escape sequence to abort.
+      Sending 5, 100-byte ICMP Echos to 10.10.10.10, timeout is 2 seconds:
+      .....
+      Success rate is 0 percent (0/5)
+    timing:
+      - "0:2,0,0.05"
+      - "2:3,0,0,2"
+      - "3:,0.5"
+
+
+# ping 3.3.3.3
+# options check
+
+ping3_count:
+  prompt: "Repeat count [5]: "
+  commands:
+    "":
+      new_state: ping3_size
+
+ping3_size:
+  prompt: "Datagram size [100]: "
+  commands:
+    "":
+      new_state: ping3_timeout
+
+ping3_timeout:
+  prompt: "Timeout in seconds [2]: "
+  commands:
+    "":
+      new_state: ping3_extend
+
+ping3_extend:
+  prompt: "Extended commands [n]: "
+  commands:
+   "n":
+     new_state: ping3_sweep
+
+ping3_sweep:
+  prompt: "Sweep range of sizes [n]: "
+  commands:
+   "n":
+    new_state: enable
+    response: |
+      Type escape sequence to abort.
+      Sending 5, 1500-byte ICMP Echos to 3.3.3.3, timeout is 2 seconds:
+      !!!!!
+      Success rate is 100 percent (5/5), round-trip min/avg/max = 1/1/1 ms
+
+ping_proto_ios_vrf:
+  prompt: "Protocol [ip]: "
+  commands:
+   "":
+    new_state: ping_target_ip_vrf
+
+ping_target_ip_vrf:
+  prompt: "Target IP address: "
+  commands:
+   "1.1.1.1":
+    new_state: ping_count_vrf
+
+ping_count_vrf:
+  prompt: "Repeat count [5]: "
+  commands:
+   "":
+    new_state: ping_size_vrf
+
+ping_size_vrf:
+  prompt: "Datagram size [100]: "
+  commands:
+   "":
+    new_state: ping_timeout_vrf
+
+ping_timeout_vrf:
+  prompt: "Timeout in seconds [2]: "
+  commands:
+   "":
+    new_state: ping_extend_vrf
+
+ping_extend_vrf:
+  prompt: "Extended commands? [no]: "
+  commands:
+   "n":
+    new_state: ping_sweep_vrf
+
+ping_sweep_vrf:
+  prompt: "Sweep range of sizes? [no]: "
+  commands:
+   "n":
+    new_state: enable
+    response: |
+      Type escape sequence to abort.
+      Sending 5, 100-byte ICMP Echos to 1.1.1.1, timeout is 2 seconds:
+      !!!!!
+      Success rate is 100 percent (5/5), round-trip min/avg/max = 1/1/3 ms

@@ -1,0 +1,51 @@
+Cisco Nexus Operating System (NX-OS) Software
+TAC support: http://www.cisco.com/tac
+Documents: http://www.cisco.com/en/US/products/ps9372/tsd_products_support_series_home.html
+Copyright (c) 2002-2019, Cisco Systems, Inc. All rights reserved.
+The copyrights to certain works contained herein are owned by
+other third parties and are used and distributed under license.
+Some parts of this software are covered under the GNU Public
+License. A copy of the license is available at
+http://www.gnu.org/licenses/gpl.html.
+
+Software
+  BIOS:      version 3.6.0
+  Power Sequencer Firmware: 
+             Module 1: v3.0
+             Module 1: v1.0
+             Module 2: v5.0
+  Microcontroller Firmware:        version v1.1.0.1
+  QSFP Microcontroller Firmware:   
+             Module not detected
+  CXP Microcontroller Firmware:   
+             Module not detected
+  kickstart: version 7.3(5)N1(1)
+  system:    version 7.3(5)N1(1)
+  BIOS compile time:       05/09/2012
+  kickstart image file is: bootflash:///n5000-uk9-kickstart.7.3.5.N1.1.bin
+  kickstart compile time:  2/11/2019 2:00:00 [02/11/2019 11:28:55]
+  system image file is:    bootflash:///n5000-uk9.7.3.5.N1.1.bin
+  system compile time:     2/11/2019 2:00:00 [02/11/2019 15:35:53]
+
+
+Hardware
+  cisco Nexus5548 Chassis ("O2 32X10GE/Modular Supervisor")
+  Intel(R) Xeon(R) CPU         with 8253792 kB of memory.
+  Processor Board ID JAF1451BQNB
+
+  Device name: switch
+  bootflash:    2007040 kB
+
+Kernel uptime is 0 day(s), 1 hour(s), 41 minute(s), 37 second(s)
+
+Last reset at 473415 usecs after  Wed Jul 31 21:46:09 2019
+
+  Reason: Reset Requested by CLI command reload
+  System version: 7.3(5)N1(1)
+  Service: 
+
+plugin
+  Core Plugin, Ethernet Plugin
+
+Active Package(s)
+

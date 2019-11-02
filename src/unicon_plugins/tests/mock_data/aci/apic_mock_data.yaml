@@ -1,0 +1,60 @@
+apic_connect:
+  preface: Escape character is '^]'.
+  prompt: ""
+  commands:
+    "":
+      new_state: apic_exec
+
+
+apic_exec:
+  prompt: APC#
+  commands: &exec_commands
+    "terminal length 0": ""
+    "terminal width 0": ""
+    "show version": |2
+       Role        Pod         Node        Name                      Version              
+       ----------  ----------  ----------  ------------------------  -------------------- 
+       controller  1           1           APC-0001-2001             3.2(2l)              
+       spine       1           1101        SPI-1101-1790             n9000-13.2(2l)       
+       spine       1           1102        SPI-1102-1800             n9000-13.2(2l)       
+       leaf        1           3101        LEA-3101-1791             n9000-13.2(2l)       
+       leaf        1           3102        LEA-3102-1801             n9000-13.2(2l)       
+       leaf        1           3107        LEA-3107-1681             n9000-13.2(2l)       
+       leaf        1           3108        LEA-3108-1671             n9000-13.2(2l)       
+    "acidiag reboot":
+      new_state: apic_restart_confirm
+
+
+apic_hostname_with_escape_codes:
+  prompt: "ESC[0mESC[27mESC[24mESC[JAPC-0001-2001# "
+  commands: *exec_commands
+
+
+apic_restart_confirm:
+  prompt: "This command will restart this device, Proceed? [y/N] "
+  commands:
+    "y":
+      response: file|mock_data/aci/apic_reboot.txt
+      timing:
+        - 0:,0,0.001
+      new_state: apic_login
+
+apic_login:
+  prompt: "APC login: "
+  commands:
+    "admin":
+      new_state: apic_password
+
+apic_password:
+  prompt: "Password: "
+  commands:
+    "cisco123":
+      new_state: apic_exec
+
+apic_ssh_password:
+  preface: |
+    Application Policy Infrastructure Controller
+  prompt: "admin@2001:dead:beef::1's password:"
+  commands:
+    "cisco123":
+      new_state: apic_exec
