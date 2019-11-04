@@ -44,6 +44,7 @@ class TraceroutePatterns(object):
         self.maximum_ttl = r'^.*Maximum Time to Live \[.+\]\s?:\s?$'
         self.port_number = r'^.*Port Number \[.+\]\s?:\s?$'
         self.style = r'^.*Loose, Strict, Record, Timestamp, Verbose\[.+\]\s?:\s?$'
+        self.resolve_as_number = r'Resolve +AS +number +in.*'
 
 # Ping patterns
 class PingPatterns():

@@ -628,10 +628,16 @@ tr_style = Statement(pattern=tr_pat.style,
                      loop_continue=True,
                      continue_timer=False)
 
+tr_resolve_as_number = Statement(pattern=tr_pat.resolve_as_number,
+                       action=ping_handler,
+                       args={'send_key': 'resolve_as_number'},
+                       loop_continue=True,
+                       continue_timer=False)
+
 trace_route_dialog_list = [unkonwn_protocol, protocol, tr_target, tr_ingress,
                            tr_source, tr_numeric, tr_dscp, tr_timeout,
                            tr_probe, tr_minimum_ttl, tr_maximum_ttl, tr_port,
-                           tr_style]
+                           tr_style, tr_resolve_as_number]
 
 ####################################################################
 # Sweep Related Statement

@@ -1069,7 +1069,7 @@ class Traceroute(BaseService):
         con.log.debug("+++ traceroute +++")
         traceroute_options = ['addr', 'proto', 'ingress', 'source', 'dscp', 'numeric',
                               'timeout', 'probe', 'minimum_ttl', 'maximum_ttl',
-                              'port', 'style' ]
+                              'port', 'style', 'resolve_as_number' ]
 
         if error_pattern is None:
             self.error_pattern = con.settings.TRACEROUTE_ERROR_PATTERN
