@@ -107,13 +107,10 @@ develop:
 	@echo "--------------------------------------------------------------------"
 	@echo "Building and installing $(PKG_NAME) development distributable: $@"
 	@echo ""
-
+	@pip uninstall -y $(PKG_NAME)
 	@pip install $(DEPENDENCIES)
-
 	@$(PYTHON) setup.py develop --no-deps
-
 	@pip install -e ".[dev]"
-
 	@echo ""
 	@echo "Completed building and installing: $@"
 	@echo ""
