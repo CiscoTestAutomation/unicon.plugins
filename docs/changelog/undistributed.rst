@@ -14,4 +14,5 @@ Features and Bug Fixes:
 
 - aireos plugin updates: support known states, support for hostname learning
   `execute` service raises SubCommandFailure if error is detected in CLI output.
- 
+
+- Regex added for Resolve AS number option
