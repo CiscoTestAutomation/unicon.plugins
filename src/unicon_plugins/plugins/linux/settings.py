@@ -33,6 +33,12 @@ class LinuxSettings(GenericSettings):
         # the terminal is set in eal/backend/pty_backend code.
         self.TERM = 'vt100'
 
+        # Environment settings to set before starting connection command
+        self.ENV = {
+            'TERM': 'vt100',
+            'LC_ALL': 'C'  # Setting LC_ALL to C avoids 'LC_ALL: cannot change locale' errors
+        }
+
         # Default error pattern
         self.ERROR_PATTERN=[
             r'^.*?No such file or directory\s*$'
