@@ -25,4 +25,5 @@ supported_os = [
     'junos',
     'staros',
     'aci',
+    'viptela',
 ]
