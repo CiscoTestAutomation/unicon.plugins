@@ -1063,13 +1063,13 @@ class Traceroute(BaseService):
         self.dialog = Dialog(trace_route_dialog_list)
         self.__dict__.update(kwargs)
 
-    def call_service(self, addr, command="traceroute", vrf=None, timeout = None,
+    def call_service(self, addr, command="traceroute", timeout = None,
                      error_pattern=None, **kwargs):
         con = self.connection
         con.log.debug("+++ traceroute +++")
         traceroute_options = ['addr', 'proto', 'ingress', 'source', 'dscp', 'numeric',
                               'timeout', 'probe', 'minimum_ttl', 'maximum_ttl',
-                              'port', 'style', 'resolve_as_number', 'vrf' ]
+                              'port', 'style', 'resolve_as_number' ]
 
         if error_pattern is None:
             self.error_pattern = con.settings.TRACEROUTE_ERROR_PATTERN
@@ -1100,8 +1100,6 @@ class Traceroute(BaseService):
         
         # Stringify the command in case it is an object.
         trace_route_str = str(command)
-        if 'vrf' not in trace_route_str and vrf:
-            trace_route_str = trace_route_str.replace('traceroute', 'traceroute vrf {}'.format(str(vrf)))
         dialog = self.service_dialog(service_dialog=self.dialog)
         spawn = self.get_spawn()
         sm = self.get_sm()
