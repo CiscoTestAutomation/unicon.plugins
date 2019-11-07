@@ -5,10 +5,6 @@ Uses the mock_device_cli script to test.
 
 """
 
-__copyright__ = "# Copyright (c) 2018 by cisco Systems, Inc. All rights reserved."
-__author__ = "Dave Wapstra <dwapstra@cisco.com>"
-
-
 import re
 import unittest
 
