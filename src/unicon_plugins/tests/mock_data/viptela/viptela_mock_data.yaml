@@ -1,17 +1,17 @@
 
-viptela_login:
+sdwan_login:
   prompt: "vedge login: "
   commands:
     "admin":
-      new_state: viptela_password
+      new_state: sdwan_password
 
-viptela_password:
+sdwan_password:
   prompt: "Password: "
   commands:
     "admin":
-      new_state: viptela_exec
+      new_state: sdwan_exec
 
-viptela_exec:
+sdwan_exec:
   prompt: vedge#
   commands: &commands
     "screen-length 0": ""
@@ -29,13 +29,13 @@ cpe_hostname:
   prompt: "CPE101#"
   commands:
     "exec":
-      new_state: viptela_exec
+      new_state: sdwan_exec
 
 vshell:
   prompt: "vedge:~$ "
   commands:
     "exit":
-      new_state: viptela_exec
+      new_state: sdwan_exec
     "cd /tmp":
       new_state: vshell_tmp
 
@@ -58,7 +58,7 @@ vshell_tmp:
       drwxr-xr-x 11 root root  220 Jun 19 15:10 xml
 
 
-viptela_console:
+sdwan_console:
   preface: admin connected from 127.0.0.1 using console on vedge
   prompt: vedge#
   commands: *commands
@@ -72,8 +72,8 @@ reboot_confirm:
       new_state: reboot
 
 reboot:
-  preface: file|mock_data/viptela/viptela_boot_log.txt
+  preface: file|mock_data/sdwan/sdwan_boot_log.txt
   prompt: ""
   commands:
     "":
-      new_state: viptela_login
+      new_state: sdwan_login

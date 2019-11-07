@@ -1,5 +1,5 @@
 """
-Unittests for Viptela plugin
+Unittests for SDWAN plugin
 
 Uses the mock_device_cli script to test.
 
@@ -14,12 +14,12 @@ from unicon.core.errors import SubCommandFailure
 from unicon import Connection
 
 
-class TestViptelaPlugin(unittest.TestCase):
+class TestSDWANPlugin(unittest.TestCase):
 
     def test_connect_cisco_exec(self):
         c = Connection(hostname='vedge',
-                            start=['mock_device_cli --os viptela --state viptela_exec'],
-                            os='viptela',
+                            start=['mock_device_cli --os sdwan --state sdwan_exec'],
+                            os='sdwan',
                             username='admin',
                             tacacs_password='admin')
         c.connect()
@@ -27,8 +27,8 @@ class TestViptelaPlugin(unittest.TestCase):
 
     def test_connect_reboot(self):
         c = Connection(hostname='vedge',
-                            start=['mock_device_cli --os viptela --state viptela_exec'],
-                            os='viptela',
+                            start=['mock_device_cli --os sdwan --state sdwan_exec'],
+                            os='sdwan',
                             username='admin',
                             tacacs_password='admin')
         c.connect()
@@ -38,8 +38,8 @@ class TestViptelaPlugin(unittest.TestCase):
 
     def test_connect_reboot_console(self):
         c = Connection(hostname='vedge',
-                            start=['mock_device_cli --os viptela --state viptela_console'],
-                            os='viptela',
+                            start=['mock_device_cli --os sdwan --state sdwan_console'],
+                            os='sdwan',
                             username='admin',
                             tacacs_password='admin')
         c.connect()
@@ -48,8 +48,8 @@ class TestViptelaPlugin(unittest.TestCase):
 
     def test_vshell(self):
         c = Connection(hostname='vedge',
-                            start=['mock_device_cli --os viptela --state viptela_exec'],
-                            os='viptela',
+                            start=['mock_device_cli --os sdwan --state sdwan_exec'],
+                            os='sdwan',
                             username='admin',
                             tacacs_password='admin')
         c.connect()
@@ -61,8 +61,8 @@ class TestViptelaPlugin(unittest.TestCase):
 
     def test_hostname(self):
         c = Connection(hostname='CPE101',
-                            start=['mock_device_cli --os viptela --state viptela_exec'],
-                            os='viptela',
+                            start=['mock_device_cli --os sdwan --state sdwan_exec'],
+                            os='sdwan',
                             username='admin',
                             tacacs_password='admin')
         c.connect()

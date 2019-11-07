@@ -4,9 +4,9 @@ from unicon.eal.dialogs import Dialog, Statement
 from unicon_plugins.plugins.generic.statements import GenericStatements
 from unicon_plugins.plugins.confd.statemachine import ConfdStateMachine
 
-from .patterns import ViptelaPatterns
+from .patterns import SDWANPatterns
 
-patterns = ViptelaPatterns()
+patterns = SDWANPatterns()
 statements = GenericStatements()
 
 default_statement_list = [statements.more_prompt_stmt,
@@ -14,7 +14,7 @@ default_statement_list = [statements.more_prompt_stmt,
                           statements.yes_no_stmt]
 
 
-class ViptelaStateMachine(ConfdStateMachine):
+class SDWANStateMachine(ConfdStateMachine):
     def __init__(self, hostname=None):
         super().__init__(hostname)
 

@@ -1,6 +1,6 @@
 from unicon_plugins.plugins.confd.patterns import ConfdPatterns
 
-class ViptelaPatterns(ConfdPatterns):
+class SDWANPatterns(ConfdPatterns):
     def __init__(self):
         super().__init__()
         self.cisco_prompt = r'^(.*?)((%N|vedge)#)\s*$'

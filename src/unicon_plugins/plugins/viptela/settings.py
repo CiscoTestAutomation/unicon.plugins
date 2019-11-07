@@ -1,7 +1,7 @@
 from unicon_plugins.plugins.confd.settings import ConfdSettings
 
 
-class ViptelaSettings(ConfdSettings):
+class SDWANSettings(ConfdSettings):
     """" Generic platform settings """
     def __init__(self):
         """ initialize
