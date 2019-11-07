@@ -1,10 +1,4 @@
-""" NFVIS regex patterns """
-
-__copyright__ = "# Copyright (c) 2018 by cisco Systems, Inc. All rights reserved."
-__author__ = "Dave Wapstra <dwapstra@cisco.com>"
-
-
-from unicon.plugins.confd.patterns import ConfdPatterns
+from unicon_plugins.plugins.confd.patterns import ConfdPatterns
 
 class ViptelaPatterns(ConfdPatterns):
     def __init__(self):

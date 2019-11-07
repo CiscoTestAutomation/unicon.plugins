@@ -1,9 +1,3 @@
-""" Viptela services """
-
-__copyright__ = "# Copyright (c) 2017 by cisco Systems, Inc. All rights reserved."
-__author__ = "Dave Wapstra <dwapstra@cisco.com>"
-
-
 import re
 import collections
 from time import sleep
@@ -12,10 +6,10 @@ from unicon.bases.routers.services import BaseService
 from unicon.core.errors import SubCommandFailure, StateMachineError
 from unicon.eal.dialogs import Dialog, Statement
 
-from unicon.plugins.generic.statements import GenericStatements, \
+from unicon_plugins.plugins.generic.statements import GenericStatements, \
     authentication_statement_list
-from unicon.plugins.confd.patterns import ConfdPatterns
-from unicon.plugins.generic import GenericUtils
+from unicon_plugins.plugins.confd.patterns import ConfdPatterns
+from unicon_plugins.plugins.generic import GenericUtils
 
 from .service_statements import reload_statement_list, reload_ready_statement_list
 

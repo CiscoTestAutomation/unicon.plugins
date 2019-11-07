@@ -1,11 +1,8 @@
-__copyright__ = "# Copyright (c) 2018 by cisco Systems, Inc. All rights reserved."
-__author__ = "Dave Wapstra <dwapstra@cisco.com>"
-
 from unicon.statemachine import State, Path, StateMachine
 from unicon.eal.dialogs import Dialog, Statement
 
-from unicon.plugins.generic.statements import GenericStatements
-from unicon.plugins.confd.statemachine import ConfdStateMachine
+from unicon_plugins.plugins.generic.statements import GenericStatements
+from unicon_plugins.plugins.confd.statemachine import ConfdStateMachine
 
 from .patterns import ViptelaPatterns
 

@@ -1,9 +1,5 @@
-__copyright__ = "# Copyright (c) 2018 by cisco Systems, Inc. All rights reserved."
-__author__ = "Dave Wapstra <dwapstra@cisco.com>"
-
-
 from unicon.eal.dialogs import Dialog, Statement
-from unicon.plugins.confd import ConfdServiceList, ConfdConnection, ConfdConnectionProvider
+from unicon_plugins.plugins.confd import ConfdServiceList, ConfdConnection, ConfdConnectionProvider
 
 from .settings import ViptelaSettings
 from .statemachine import ViptelaStateMachine

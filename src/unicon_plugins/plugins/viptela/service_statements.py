@@ -2,7 +2,7 @@
 from time import sleep
 
 from unicon.eal.dialogs import Statement
-from unicon.plugins.generic.statements import GenericStatements
+from unicon_plugins.plugins.generic.statements import GenericStatements
 
 from .service_patterns import ReloadPatterns
 
