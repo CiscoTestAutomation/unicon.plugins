@@ -29,7 +29,6 @@ class NxosSettings(GenericSettings):
             r'^%\s*[Aa]mbiguous (command|input)',
             r'^%\s*[Cc]an not open.*',
             r'^%\s*[Nn]ot supported.*',
-            r'^%\s*[Ff]ailed.*',
             r'^%\s*[Ff]ail.*',
             r'^%\s*[Aa]bort.*'
         ]
