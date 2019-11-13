@@ -106,23 +106,25 @@ If you want to pass a multiline string as a single command, you should pass
 a list where the list item as a multiline string, see example below.
 
 
-==================   ======================    ====================================================
-Argument             Type                      Description
-==================   ======================    ====================================================
-timeout              int (default 60 sec)      timeout value for the command execution takes.
-reply                Dialog                    additional dialog
-command              str                       command to execute on device handle
-target               standby/active            by default commands will be executed on active,
-                                               use target=standby to execute command on standby.
-prompt_recovery      bool (default False)      Enable/Disable prompt recovery feature
-error_pattern        list                      List of regex strings to check output for errors.
-search_size          int (default 8K bytes)    maximum size in bytes to search at the
-                                               end of the buffer
-allow_state_change   bool (default False)      By default, end state should be same as start state.
-                                               If True, end state can be any valid state.
-service_dialog       Dialog                    service_dialog overrides the execute service
-                                               dialog.
-==================   ======================    ====================================================
+===================   ========================    ====================================================
+Argument              Type                        Description
+===================   ========================    ====================================================
+timeout               int (default 60 sec)        timeout value for the command execution takes.
+reply                 Dialog                      additional dialog
+command               str                         command to execute on device handle
+target                standby/active              by default commands will be executed on active,
+                                                  use target=standby to execute command on standby.
+prompt_recovery       bool (default False)        Enable/Disable prompt recovery feature
+error_pattern         list                        List of regex strings to check output for errors.
+search_size           int (default 8K bytes)      maximum size in bytes to search at the
+                                                  end of the buffer
+allow_state_change    bool (default False)        By default, end state should be same as start state.
+                                                  If True, end state can be any valid state.
+service_dialog        Dialog                      service_dialog overrides the execute service
+                                                  dialog.
+matched_retries       int (default 1)             retry times if statement pattern is matched
+matched_retry_sleep   float (default 0.05 sec)    sleep between matched_retries
+===================   ========================    ====================================================
 
 By default, device start state should be same as end state. For example, if we
 use `execute()` service when device is at enable state then after running the command,
