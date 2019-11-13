@@ -554,6 +554,21 @@ class TestExecuteService(unittest.TestCase):
         self.assertEqual(output, 'first\r\n\r\nsecond\r\n\r\nthird')
         self.assertEqual(repr(output), repr('first\r\n\r\nsecond\r\n\r\nthird'))
 
+    def test_execute_with_transient_match_1(self):
+        output = self.d.execute('show command with transient match',
+                                matched_retries=3,
+                                matched_retry_sleep=7)
+        self.assertEqual(output, 'head\r\nRouter#\r\ntail')
+
+    def test_execute_with_transient_match_2(self):
+        self.d.execute.matched_retry_sleep = 20
+        try:
+            output = self.d.execute('show command with transient match')
+            self.assertEqual(output, 'head\r\nRouter#\r\ntail')
+        finally:
+            self.d.execute.matched_retry_sleep = \
+                self.d.settings.EXECUTE_MATCHED_RETRY_SLEEP
+
 
 class TestTransmitReceive(unittest.TestCase):
 

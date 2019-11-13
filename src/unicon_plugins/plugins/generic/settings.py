@@ -90,6 +90,10 @@ class GenericSettings(Settings):
         self.BULK_CONFIG_CHUNK_LINES = 50
         self.BULK_CONFIG_CHUNK_SLEEP = 0.5
 
+        # for execute matched retry on state pattern
+        self.EXECUTE_MATCHED_RETRIES = 1
+        self.EXECUTE_MATCHED_RETRY_SLEEP = 0.05
+
         # User defined login and password prompt pattern.
         self.LOGIN_PROMPT = None
         self.PASSWORD_PROMPT = None
