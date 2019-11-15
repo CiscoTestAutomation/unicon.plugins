@@ -10,3 +10,7 @@ Features and Bug Fixes:
 - add plugins sdwan/viptela and sdwan/iosxe
 
 - enhance iosxe/cat3k to find boot image from rommon
+
+- aireos plugin updates: support known states, support for hostname learning
+  `execute` service raises SubCommandFailure if error is detected in CLI output.
+ 

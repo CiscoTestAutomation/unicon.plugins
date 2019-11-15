@@ -391,7 +391,7 @@ class LogFile(BaseService):
         return self.result
 
 class ExpectLogging(BaseService):
-    """ Service to enable expect internal logging.
+    r""" Service to enable expect internal logging.
 
     By default it enables on both file and screen, provided filename is specified.
     If not it will log the message on screen.
@@ -905,9 +905,10 @@ class Configure(BaseService):
             raise SubCommandFailure('Configuration failed', err) \
                 from err
         cmd_result = cmd_result.match_output
-        host_idx = cmd_result.rfind(self.connection.hostname)
-        cmd_result = cmd_result[:host_idx] if host_idx \
-            else cmd_result
+        cmd_result = utils.truncate_trailing_prompt(
+            handle.state_machine.get_state(handle.state_machine.current_state),
+            cmd_result,
+            hostname=self.connection.hostname)
         self.result += cmd_result
 
 

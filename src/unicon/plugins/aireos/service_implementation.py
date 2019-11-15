@@ -5,15 +5,22 @@ from unicon.bases.routers.services import BaseService
 from unicon.core.errors import SubCommandFailure
 from unicon.eal.dialogs import Dialog
 
-from .patterns import (AireosPatterns, AireosReloadPatterns,
-    AireosPingPatterns, AireosCopyPatterns)
+from unicon_plugins.plugins.generic.service_implementation import Execute as GenericExecute
+from .patterns import (AireosPatterns, AireosReloadPatterns, AireosPingPatterns, AireosCopyPatterns)
 
-from .service_statements import reload_statements
+from .service_statements import reload_statements, execute_statements
 
 pr = AireosReloadPatterns()
 pp = AireosPingPatterns()
 pc = AireosCopyPatterns()
 p = AireosPatterns()
+
+
+class AireosExecute(GenericExecute):
+
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.dialog += Dialog(execute_statements)
 
 
 class AireosReload(BaseService):
@@ -140,20 +147,14 @@ class AireosCopy(BaseService):
         con = self.connection
 
         if 'config' in kwargs:
-            prompt = p.shell
-
-            con.spawn.sendline('devshell shell')
-            con.spawn.expect([prompt])
+            con.execute('devshell shell', allow_state_change=True)
             con.spawn.sendline('cat <<END_OF_FILE >sim.txt')
             con.spawn.sendline(kwargs['config'])
-            con.spawn.sendline('END_OF_FILE')
-            con.spawn.expect([prompt])
-            con.execute('exit')
+            con.execute('END_OF_FILE')
+            con.execute('exit', allow_state_change=True)
 
             # Save conf file
-            con.sendline('save config')
-            con.spawn.expect([pc.are_you_sure_save])
-            con.execute('y')
+            con.execute('save config')
             con.reload()
             self.result = ""
             return
@@ -170,19 +171,14 @@ class AireosCopy(BaseService):
         for key in kwargs:
             param[key] = kwargs[key]
 
+        # Validate input
+        for parameter in ['source_file', 'path', 'server']:
+            if not param.get(parameter):
+                raise SubCommandFailure(f'{parameter} must be specified')
+
         # Extract directory and filename
-        if len(param['source_file']) is '':
-            raise SubCommandFailure('Source file must be specified')
         param['path'] = os.path.dirname(param['source_file'])
         param['source_file'] = os.path.basename(param['source_file'])
-
-        # Validate input
-        if param['source_file'] is '':
-            raise SubCommandFailure('Source file must be specified')
-        if param['path'] is '':
-            raise SubCommandFailure('Server path must be specified')
-        if param['server'] is '':
-            raise SubCommandFailure('Server address must be specified for remote copy')
 
         # Sets the time it takes to download and trigger reboot
         if param['mode'] is 'code':
