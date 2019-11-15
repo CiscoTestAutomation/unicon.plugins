@@ -20,6 +20,7 @@ class TestSDWANPlugin(unittest.TestCase):
         c = Connection(hostname='vedge',
                             start=['mock_device_cli --os sdwan --state sdwan_exec'],
                             os='sdwan',
+                            series='viptela',
                             username='admin',
                             tacacs_password='admin')
         c.connect()
@@ -29,6 +30,7 @@ class TestSDWANPlugin(unittest.TestCase):
         c = Connection(hostname='vedge',
                             start=['mock_device_cli --os sdwan --state sdwan_exec'],
                             os='sdwan',
+                            series='viptela',
                             username='admin',
                             tacacs_password='admin')
         c.connect()
@@ -40,6 +42,7 @@ class TestSDWANPlugin(unittest.TestCase):
         c = Connection(hostname='vedge',
                             start=['mock_device_cli --os sdwan --state sdwan_console'],
                             os='sdwan',
+                            series='viptela',
                             username='admin',
                             tacacs_password='admin')
         c.connect()
@@ -50,6 +53,7 @@ class TestSDWANPlugin(unittest.TestCase):
         c = Connection(hostname='vedge',
                             start=['mock_device_cli --os sdwan --state sdwan_exec'],
                             os='sdwan',
+                            series='viptela',
                             username='admin',
                             tacacs_password='admin')
         c.connect()
@@ -63,11 +67,19 @@ class TestSDWANPlugin(unittest.TestCase):
         c = Connection(hostname='CPE101',
                             start=['mock_device_cli --os sdwan --state sdwan_exec'],
                             os='sdwan',
+                            series='viptela',
                             username='admin',
                             tacacs_password='admin')
         c.connect()
         c.execute('new_hostname')
         c.execute('exec')
+
+    def test_sdwan_no_series(self):
+        with self.assertRaises(NotImplementedError):
+            Connection(hostname='CPE101',
+                       start=['mock_device_cli --os sdwan --state sdwan_exec'],
+                       os='sdwan',
+                       series='sdwan')
 
 
 if __name__ == "__main__":

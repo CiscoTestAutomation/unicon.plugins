@@ -72,7 +72,7 @@ reboot_confirm:
       new_state: reboot
 
 reboot:
-  preface: file|mock_data/sdwan/sdwan_boot_log.txt
+  preface: file|mock_data/sdwan/viptela_boot_log.txt
   prompt: ""
   commands:
     "":

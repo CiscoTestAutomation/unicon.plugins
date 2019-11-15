@@ -190,6 +190,17 @@ class TestIosXESDWANConfigure(unittest.TestCase):
         d.connect()
         d.configure('no logging console')
 
+    def test_config_transaction_sdwan_iosxe(self):
+        d = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe --state sdwan_enable'],
+                       os='sdwan', series='iosxe',
+                       username='cisco',
+                       tacacs_password='cisco',
+                       enable_password='cisco')
+        d.connect()
+        d.configure('no logging console')
+
+
 class TestIosXECat3kPluginReload(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

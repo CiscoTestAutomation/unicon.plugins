@@ -1,10 +1,10 @@
 from unicon.eal.dialogs import Dialog, Statement
 from unicon_plugins.plugins.confd import ConfdServiceList, ConfdConnection, ConfdConnectionProvider
 
-from .settings import SDWANSettings
-from .statemachine import SDWANStateMachine
+from .settings import ViptelaSettings
+from .statemachine import ViptelaStateMachine
 
-from . import service_implementation as sdwan_svc
+from . import service_implementation as Viptela_svc
 
 
 def console_session(spawn, context):
@@ -17,7 +17,7 @@ connected_console_stmt = Statement(pattern=r"^(.*?)connected from .* using conso
                                    continue_timer=False)
 
 
-class SDWANConnectionProvider(ConfdConnectionProvider):
+class ViptelaConnectionProvider(ConfdConnectionProvider):
     """
         Connection provided class for ConfD connections.
     """
@@ -28,17 +28,18 @@ class SDWANConnectionProvider(ConfdConnectionProvider):
         return connection_dialogs
 
 
-class SDWANServiceList(ConfdServiceList):
+class ViptelaServiceList(ConfdServiceList):
     def __init__(self):
         super().__init__()
         delattr(self, 'cli_style')
-        self.reload = sdwan_svc.Reload
+        self.reload = Viptela_svc.Reload
 
 
-class SDWANSingleRPConnection(ConfdConnection):
+class ViptelaSingleRPConnection(ConfdConnection):
     os = 'sdwan'
+    series = 'viptela'
     chassis_type = 'single_rp'
-    state_machine_class = SDWANStateMachine
-    connection_provider_class = SDWANConnectionProvider
-    subcommand_list = SDWANServiceList
-    settings = SDWANSettings()
+    state_machine_class = ViptelaStateMachine
+    connection_provider_class = ViptelaConnectionProvider
+    subcommand_list = ViptelaServiceList
+    settings = ViptelaSettings()
