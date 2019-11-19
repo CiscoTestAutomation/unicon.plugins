@@ -1,3 +1,37 @@
+cat3k_rommon:
+  prompt: "switch: "
+  commands:
+    "dir flash:": |
+      Directory of flash:/
+
+      170369  drwx  4096       .
+           2  drwx  4096       ..
+      170384  -rwx  539187403  rp_super_universalk9.edison.bin.old
+      170384  -rwx  539187403  rp_super_universalk9.edison.bin
+       46479  -rw-  8089       start.cfg
+       46480  -rw-  2097152    nvram_config_bkup
+       46481  -rw-  9390       startup_cfg.txt
+
+      516395008 bytes available (1131499520 bytes used)
+    "boot": ""
+    "boot flash:rp_super_universalk9.edison.bin":
+      response: file|mock_data/iosxe/cat3k_rommon_boot.txt
+      timing:
+        - 0:,0,0.05
+      new_state:
+        cat3k_return_to_get_started
+
+cat3k_return_to_get_started:
+  preface: |2
+    
+    Press RETURN to get started!
+    
+  prompt: ""
+  commands:
+     "":
+      new_state: cat3k_exec
+
+
 cat3k_login:
   prompt: "Username: "
   commands:
