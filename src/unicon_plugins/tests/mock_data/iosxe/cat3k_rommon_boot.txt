@@ -1,0 +1,117 @@
+Reading full image into memory......................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................done
+Bundle Image
+--------------------------------------
+Kernel Address    : 0x53779724
+Kernel Size       : 0x34e760/3467104
+Initramfs Address : 0x53ac7e84
+Initramfs Size    : 0x117fbcc/18349004
+Compression Format: mzip
+
+Bootable image at @ ram:0x53779724
+Bootable image segment 0 address range [0x81100000, 0x81b8adc0] is in range [0x80180000, 0x90000000].
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+File "flash:rp_super_universalk9.edison.bin" uncompressed and installed, entry point: 0x81690280
+Loading Linux kernel with entry point 0x81690280 ...
+Bootloader: Done loading app on core_mask: 0xf
+
+### Launching Linux Kernel (flags = 0x5)
+
+%IOSXEBOOT-45fb0cb6300f5736ca594a06074d09bc-new_cksum: (rp/0): 4
+%IOSXEBOOT-45fb0cb6300f5736ca594a06074d09bc-saved_cksum: (rp/0): 4
+%IOSXEBOOT-Mon-###: (rp/0): Nov 18 23:35:24 Universal 2019 PLEASE DO NOT POWER CYCLE ### BOOT LOADER UPGRADING 4
+%IOSXEBOOT-loader-boot: (rp/0): upgrade successful 4
+
+
+Front-end Microcode IMG MGR: found 4 microcode images for 1 device.
+Image for front-end 0: /tmp/microcode_update/front_end/fe_type_6_0
+Image for front-end 0: /tmp/microcode_update/front_end/fe_type_6_1
+Image for front-end 0: /tmp/microcode_update/front_end/fe_type_6_2
+Image for front-end 0: /tmp/microcode_update/front_end/fe_type_6_3
+
+Front-end Microcode IMG MGR: Preparing to program device microcode...
+Front-end Microcode IMG MGR: Preparing to program device[0]...594412 bytes.... Skipped[0].
+Front-end Microcode IMG MGR: Preparing to program device[0]...395430 bytes.
+Front-end Microcode IMG MGR: Programming device 0...rwRrrrrrrw..0%.........................................................................10%..........................................................................20%........................................................................30%..........................................................................40%..........................................................................50%........................................................................60%..........................................................................70%.........................................................................80%..........................................................................90%..........................................................................100%
+Front-end Microcode IMG MGR: Preparing to program device[0]...25186 bytes.
+Front-end Microcode IMG MGR: Programming device 0...rrrrrrw..0%....10%....20%......30%...40%......50%....60%......70%...80%......90%....100%wRr!
+Front-end Microcode IMG MGR: Microcode programming complete for device 0.
+Front-end Microcode IMG MGR: Preparing to program device[0]...86370 bytes.... Skipped[3].
+Front-end Microcode IMG MGR: Microcode programming complete in 247 seconds
+
+Both links down, not waiting for other switches
+Switch number is 1
+
+              Restricted Rights Legend
+
+Use, duplication, or disclosure by the Government is
+subject to restrictions as set forth in subparagraph
+(c) of the Commercial Computer Software - Restricted
+Rights clause at FAR sec. 52.227-19 and subparagraph
+(c) (1) (ii) of the Rights in Technical Data and Computer
+Software clause at DFARS sec. 252.227-7013.
+
+           cisco Systems, Inc.
+           170 West Tasman Drive
+           San Jose, California 95134-1706
+
+
+
+Cisco IOS Software [Denali], Catalyst L3 Switch Software (CAT3K_CAA-UNIVERSALK9-M), Experimental Version 16.3.20170807:193332 [UNKNOWN BRANCH-rmuccifo 107]
+Copyright (c) 1986-2017 by Cisco Systems, Inc.
+Compiled Mon 07-Aug-17 21:52 by rmuccifo
+
+
+
+Cisco IOS-XE software, Copyright (c) 2005-2017 by cisco Systems, Inc.
+All rights reserved.  Certain components of Cisco IOS-XE software are
+licensed under the GNU General Public License ("GPL") Version 2.0.  The
+software code licensed under GPL Version 2.0 is free software that comes
+with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+GPL code under the terms of GPL Version 2.0.  For more details, see the
+documentation or "License Notice" file accompanying the IOS-XE software,
+or the applicable URL provided on the flyer accompanying the IOS-XE
+software.
+
+
+
+
+FIPS: Flash Key Check : Begin
+FIPS: Flash Key Check : End, Not Found, FIPS Mode Not Enabled
+
+This product contains cryptographic features and is subject to United
+States and local country laws governing import, export, transfer and
+use. Delivery of Cisco cryptographic products does not imply
+third-party authority to import, export, distribute or use encryption.
+Importers, exporters, distributors and users are responsible for
+compliance with U.S. and local country laws. By using this product you
+agree to comply with applicable laws and regulations. If you are unable
+to comply with U.S. and local laws, return this product immediately.
+
+A summary of U.S. laws governing Cisco cryptographic products may be found at:
+http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+If you require further assistance please contact us by sending email to
+export@cisco.com.
+
+cisco WS-C3850-24P (MIPS) processor (revision F0) with 865133K/6147K bytes of memory.
+Processor board ID FOC1727V0FV
+2048K bytes of non-volatile configuration memory.
+4194304K bytes of physical memory.
+250456K bytes of Crash Files at crashinfo:.
+1609272K bytes of Flash at flash:.
+0K bytes of  at webui:.
+
+Base Ethernet MAC Address          : f8:4f:57:aa:bb:cc
+Motherboard Assembly Number        : 73-14441-06
+Motherboard Serial Number          : FOC12345678
+Model Revision Number              : F0
+Motherboard Revision Number        : B0
+Model Number                       : WS-C3850-24P
+System Serial Number               : FOC12345678
+
+
+%INIT: waited 0 seconds for NVRAM to be available
+
+
+
+
