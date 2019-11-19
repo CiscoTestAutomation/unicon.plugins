@@ -1,0 +1,79 @@
+
+sdwan_login:
+  prompt: "vedge login: "
+  commands:
+    "admin":
+      new_state: sdwan_password
+
+sdwan_password:
+  prompt: "Password: "
+  commands:
+    "admin":
+      new_state: sdwan_exec
+
+sdwan_exec:
+  prompt: vedge#
+  commands: &commands
+    "screen-length 0": ""
+    "screen-width 256": ""
+    "idle-timeout 0": ""
+    "autowizard false": ""
+    "reboot": 
+      new_state: reboot_confirm
+    "vshell":
+      new_state: vshell
+    "new_hostname":
+      new_state: cpe_hostname
+
+cpe_hostname:
+  prompt: "CPE101#"
+  commands:
+    "exec":
+      new_state: sdwan_exec
+
+vshell:
+  prompt: "vedge:~$ "
+  commands:
+    "exit":
+      new_state: sdwan_exec
+    "cd /tmp":
+      new_state: vshell_tmp
+
+vshell_tmp:
+  prompt: "vedge:/tmp$ "
+  commands:
+    "cd":
+      new_state: vshell
+    "ls -l" : |
+      total 28
+      -rw-r--r--  1 root root   16 Jun 19 15:10 baud_rate
+      -rw-r--r--  1 root root   73 Jun 19 15:10 bootcmd.env
+      -rw-r--r--  1 root root    0 Jun 19 20:51 cpuinfo.out
+      -rw-r--r--  1 root root  111 Jun 19 15:10 ext_usb_setup.env
+      -rw-r--r--  1 root root   55 Jun 19 20:51 neigh.tbl
+      -rw-r--r--  1 root root   49 Jun 19 15:09 reboot_reason
+      drwxr-xr-x 11 root root  220 Jun 19 15:10 tmp
+      -rw-r--r--  1 root root 1097 Jun 19 15:09 u-boot.log
+      -rw-r--r--  1 root root  122 Jun 19 15:09 uboot_ver
+      drwxr-xr-x 11 root root  220 Jun 19 15:10 xml
+
+
+sdwan_console:
+  preface: admin connected from 127.0.0.1 using console on vedge
+  prompt: vedge#
+  commands: *commands
+
+reboot_confirm:
+  prompt: "Are you sure you want to reboot? [yes,NO] "
+  commands:
+    "y":
+      new_state: reboot
+    "yes":
+      new_state: reboot
+
+reboot:
+  preface: file|mock_data/sdwan/viptela_boot_log.txt
+  prompt: ""
+  commands:
+    "":
+      new_state: sdwan_login
