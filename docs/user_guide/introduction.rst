@@ -1,5 +1,5 @@
 Introduction
-==============
+============
 
 Unicon is a framework for developing device control libraries for routers,
 switches and servers. It is developed purely in python, hence no dependency on
@@ -19,20 +19,20 @@ All the platform implementations are arranged in a hierarchical fashion in order
 to provide a good fault isolation. We will talk about more on framework details
 in next iteration of documentation update, which will follow shortly.
 
-unicon_plugins is plugins for different platforms.
+``unicon.plugins`` is plugins for different platforms.
 
 Installation
-============
+------------
 
-unicon and unicon_plugins can be installed using the `pip` command. Assuming
+unicon and unicon.plugins can be installed using the `pip` command. Assuming
 that you have already sourced your virtualenv, run the following commands
 on the shell::
 
     pip install unicon
-    pip install unicon_plugins
+    pip install unicon.plugins
 
 Community
-=========
+---------
 
 Feel free to join us by visiting our DevNet portal at
 https://developer.cisco.com/site/pyats/.

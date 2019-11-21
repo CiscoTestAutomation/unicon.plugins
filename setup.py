@@ -25,7 +25,7 @@ install_requires = ['setuptools',
 
 # launch setup
 setup(
-    name = 'unicon_plugins',
+    name = 'unicon.plugins',
     version = version,
 
     # descriptions

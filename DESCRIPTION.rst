@@ -1,5 +1,5 @@
 Introduction
-==============
+============
 
 Unicon is a framework for developing device control libraries for routers,
 switches and servers. It is developed purely in python, hence no dependency on

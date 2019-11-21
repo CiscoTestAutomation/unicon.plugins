@@ -1,5 +1,5 @@
-Junos Services
-==============
+Junos
+=====
 
 This section lists down all those services which are only specific to Junos.
 For a list of all the other services please refer to

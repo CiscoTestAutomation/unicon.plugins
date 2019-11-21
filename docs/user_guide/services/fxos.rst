@@ -1,5 +1,5 @@
-FXOS Services
-=============
+FXOS
+====
 
 This section lists the services which are supported with Firepower Extensible Operating System (FXOS) Unicon plugin.
 

@@ -52,11 +52,7 @@ else:
 
 
 # Add any paths that contain templates here, relative to this directory.
-if os.environ.get('DEVNET', None) == 'true':
-    # do not use template for devnet builds
-    templates_path = []
-else:
-    templates_path = ['_templates',]
+templates_path = []
 
 # The suffix of source filenames.
 source_suffix = '.rst'
@@ -68,10 +64,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-if os.environ.get('DEVNET', None) == 'true':
-    project = 'Unicon'
-else:
-    project = 'Cisco-Shared (Unicon)'
+project = 'Unicon Plugins'
 
 copyright = '2014-2019, Cisco Systems Inc.'
 
@@ -98,12 +91,7 @@ release = ''
 # directories to ignore when looking for source files.
 # README.rst and DESCRIPTION.rst are placed in some packages, but are not
 # built into the cisco-shared Sphinx documentation.
-if os.environ.get('DEVNET', None) == 'true':
-    # modify exclude_patterns for devnet builds
-    exclude_patterns = ['_build', 'tests']
-else:
-    exclude_patterns = ['_build', 'tests', '_static/*.dev.js']
-
+exclude_patterns = ['_build', 'tests']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -165,11 +153,14 @@ html_favicon = 'favicon.ico'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-if os.environ.get('DEVNET', None) == 'true':
-    # do not use statics for devnet builds
-    html_static_path = []
-else:
-    html_static_path = ['_static',]
+html_static_path = ['_static',]
+
+# Add any paths that contain custom static files (such as style sheets) here,
+# relative to this directory. They are copied after the builtin static files,
+# so a file named "default.css" will overwrite the builtin "default.css".
+html_css_files = [
+    'css/custom.css',
+]
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -272,7 +263,7 @@ htmlhelp_basename = 'pyATSdoc'
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'Cisco-Shared(pyats)', 'Cisco-Shared Documentation',
-     ['ATS-ASG Team'], 1)
+     ['DevX pyATS Engineering'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -286,7 +277,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'Cisco-Shared(pyats)', 'Cisco-Shared Documentation',
-   'ATS-ASG Team', 'One line description of project.',
+   'DevX pyATS Engineering', 'One line description of project.',
    'Miscellaneous'),
 ]
 

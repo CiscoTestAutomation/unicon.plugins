@@ -1,5 +1,5 @@
-NXOS Services
-=============
+NXOS
+====
 
 This section lists down all those services which are only specific to NXOS.
 For list of all the other service please refer this:

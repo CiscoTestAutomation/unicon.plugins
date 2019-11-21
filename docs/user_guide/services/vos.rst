@@ -1,5 +1,5 @@
-VOS Services
-============
+VOS
+===
 
 This section lists the CLI services which are supported with the Voice Operating System plugin.
 

@@ -1,6 +1,6 @@
 .. _mock:
 
-Unicon plugin unittests
+Develop & Run Unittests
 =======================
 
 It is strongly recommended to write unittest for plugins to ensure proper test coverage.

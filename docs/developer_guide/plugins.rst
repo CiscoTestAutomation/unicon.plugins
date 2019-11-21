@@ -1,5 +1,5 @@
-Unicon Plugins/Platform Implementations
-=======================================
+Plugin Implementation
+=====================
 
 Unicon plugins are the actual implementation, which defines the connections
 class, services and state machine for the platform it is implementing.
@@ -8,8 +8,8 @@ based on the input parameters
 
 There are two methods of writing plugins for Unicon.
 
-    1. by contributing directly to unicon_plugins source code under
-       ``unicon_plugins repository``, and following the folder structure and
+    1. by contributing directly to ``unicon.plugins`` source code under
+       ``unicon.plugins repository``, and following the folder structure and
        examples there.
 
     2. by writing your own package, which installs using ``pip`` and extends
@@ -17,10 +17,10 @@ There are two methods of writing plugins for Unicon.
 
 Both methods have its pros & cons. See below for details.
 
-Contributing Plugins To unicon_plugins repository
--------------------------------------------------
+Contribution
+------------
 
-Any plugins contributed to Unicon code under ``unicon_plugins repository``,
+Any plugins contributed to Unicon code under ``unicon.plugins repository``,
 becomes part of Unicon. This is a great method to use if your plugin
 is generic, since it is installed automatically as part of every Unicon installation.
 
@@ -49,8 +49,8 @@ a reference/starting point for new platform implementation
   * Also it is highly recommended to use the generic plugins Statemachine and services
     as the base class for your implementations statemachine and services.
 
-Writing Your own Unicon Plugin Package
---------------------------------------
+Writing Your own Plugin
+-----------------------
 
 - If all you are looking for is to write plugins that support your own
   platforms without modifying the original Unicon code
@@ -117,8 +117,8 @@ automatically by Unicon.
 For more details, follow the detailed Unicon plugin example 
 presented at https://github.com/CiscoDevNet/pyats-plugin-examples.
 
-How to implement a New platform
---------------------------------
+Implementing a New Platform
+---------------------------
 
 Creating a Unicon plugin for a new platform can be sub divided into four
 main steps,
