@@ -41,3 +41,13 @@ class HaNxosReloadPatterns:
         self.run_init = r' Entering runlevel'
         self.system_up = r'System is coming up ... Please wait'
 
+class ConfigurePatterns:
+
+    def __init__(self):
+        # NXOS configure pattern
+        self.configure = [
+            r'^%\s*[Cc]an not open.*',
+            r'^%\s*[Nn]ot supported.*',
+            r'^%\s*[Ff]ail.*',
+            r'^%\s*[Aa]bort.*'
+        ]

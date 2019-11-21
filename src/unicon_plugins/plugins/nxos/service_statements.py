@@ -13,6 +13,7 @@ from time import sleep
 
 from unicon_plugins.plugins.nxos.service_patterns import HaNxosReloadPatterns
 from unicon_plugins.plugins.nxos.service_patterns import ReloadPatterns
+from unicon_plugins.plugins.nxos.service_patterns import ConfigurePatterns
 from unicon.eal.dialogs import Statement
 
 # from unicon.core.errors import SubCommandFailure
@@ -157,3 +158,16 @@ ha_nxos_reload_statement_list = [save_env, reboot, secure_password,
 
 additional_connection_dialog = [enable_vdc, boot_vdc, snmp_port,
                                 admin_password, secure_password, auto_provision]
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+# Configure  Statements
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+
+pat = ConfigurePatterns()
+configure = Statement(pattern=pat.configure,
+                     action=send_response,
+                     args={'error': 'Failed in applying configuration'},
+                     loop_continue=True,
+                     continue_timer=False)
+
+configure_statement_list = [configure]
