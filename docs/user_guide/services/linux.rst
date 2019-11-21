@@ -1,5 +1,5 @@
-Linux Services
-==============
+Linux
+=====
 
 This section lists the services which are supported on Linux.
 

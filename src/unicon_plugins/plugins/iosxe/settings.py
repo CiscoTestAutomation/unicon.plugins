@@ -18,3 +18,5 @@ class IosXESettings(GenericSettings):
             r'^%\s*[Aa]mbiguous (command|input)'
         ]
 
+        self.EXECUTE_MATCHED_RETRIES = 1
+        self.EXECUTE_MATCHED_RETRY_SLEEP = 0.1

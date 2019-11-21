@@ -2,8 +2,9 @@
 # Q&D Helper script to generate the ReStructered text file for the dialogs
 # prints to stdout
 
-import os
+import os, sys
 import unicon
+import traceback
 from unicon import Connection
 from unicon.eal.dialogs import Dialog
 
@@ -87,10 +88,14 @@ if __name__ == "__main__":
 
     print("""
 
-Service dialogs
-===============
+Service Patterns
+================
 
-This document is automatically generated and is intended to document the default dialogs used by the plugins.
+.. note::
+
+    This document is automatically generated and is intended to document
+    the default per-platform patterns used to match CLI dialogs for each 
+    plugin, and the corresponding action when a pattern is matched.
 
 """)
 
@@ -112,17 +117,25 @@ This document is automatically generated and is intended to document the default
             series = p.series
         else:
             series = None
-        c = Connection(hostname='Router', start=['bash'], os=_os, series=series, log_stdout=False)
-        # c = Connection(hostname='Router', start=['bash'], os=_os, series=series)
-        c.init_service()
-        c.connection_provider = c.connection_provider_class(c)
+        
+        try:
+            c = Connection(hostname='Router', start=['bash'], os=_os, series=series, log_stdout=False)
+            # c = Connection(hostname='Router', start=['bash'], os=_os, series=series)
+            c.init_service()
+            c.connection_provider = c.connection_provider_class(c)
+        
+        except:
+            print('---------------- ERROR ---------------', file = sys.stderr)
+            traceback.print_exc()
+            print('--------------------------------------', file = sys.stderr)
 
-        s = '%s dialogs' % plugin_name
-        print('\n\n%s' % s)
-        print('-' * len(s) + '\n')
+        else:
+            print('\n\n')
+            print(plugin_name)
+            print('-' * len(plugin_name) + '\n')
 
-        print_dialogs('default', c.state_machine.default_dialog)
+            print_dialogs('default', c.state_machine.default_dialog)
 
-        print_dialogs('connect', c.connection_provider.get_connection_dialog())
+            print_dialogs('connect', c.connection_provider.get_connection_dialog())
 
-        print_dialogs('execute', c.execute.dialog if c.execute.dialog else Dialog([]))
+            print_dialogs('execute', c.execute.dialog if c.execute.dialog else Dialog([]))

@@ -1,5 +1,5 @@
-ConfD Services
-==============
+ConfD
+=====
 
 This section lists the services which are supported with ConfD based CLI. This plugin
 can be used with NSO, CSP, ESC and NFVIS. For the CSP, ESC and NFVIS plugins, specify the

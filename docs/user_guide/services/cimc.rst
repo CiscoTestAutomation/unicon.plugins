@@ -1,5 +1,5 @@
-CIMC Services
-=============
+CIMC
+====
 
 This section lists the services which are supported on Cisco Integrated Management Console (CIMC).
 

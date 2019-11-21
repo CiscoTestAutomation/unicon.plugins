@@ -1,5 +1,5 @@
-NXOS Services
-=============
+NXOS
+====
 
 This section lists down all those services which are only specific to NXOS.
 For list of all the other service please refer this:
@@ -55,7 +55,7 @@ to respond to the password prompt.  Credentials are available in ``rtr.credentia
 .. code-block:: python
 
     from unicon.eal.dialogs import Dialog
-    from unicon.plugins.generic.statements import GenericStatements
+    from unicon_plugins.plugins.generic.statements import GenericStatements
     statements = GenericStatements()
     password_stmt = statements.password_stmt
 

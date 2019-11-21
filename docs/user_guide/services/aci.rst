@@ -1,5 +1,5 @@
-ACI Services
-============
+ACI
+===
 
 This section lists the services which are supported on Application Centric Infrastructure (ACI).
 

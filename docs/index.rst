@@ -13,7 +13,7 @@ with/without `Cisco pyATS`_.
 This package was initially developed internally in Cisco, and is now 
 available to the general public starting late 2017 through `Cisco DevNet`_. 
 
-unicon_plugins is plugins for different platforms. All the platform
+``unicon.plugins`` is plugins for different platforms. All the platform
 implementations are arranged in a hierarchical fashion in order  to provide
 a good fault isolation.
 
@@ -28,6 +28,7 @@ User Guide
 
 .. toctree::
    :maxdepth: 2
+   :caption: User Guide
 
    user_guide/introduction
    user_guide/supported_platforms
@@ -39,7 +40,8 @@ Developer Guide
 
 .. toctree::
    :maxdepth: 2
-   
+   :caption: Developer Guide
+
    developer_guide/plugins
    developer_guide/unittests
 
@@ -48,6 +50,7 @@ Change Log
 
 .. toctree::
    :maxdepth: 2
+   :caption: Resources
 
    changelog/index
 

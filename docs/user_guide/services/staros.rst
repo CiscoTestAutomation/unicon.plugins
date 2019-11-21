@@ -1,5 +1,5 @@
-StarOS Services
-===============
+StarOS
+======
 
 This section lists the services which are supported on Starent OS (staros).
 

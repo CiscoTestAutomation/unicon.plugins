@@ -528,6 +528,28 @@ class TestLinuxPluginTERM(unittest.TestCase):
       term = l.execute('echo $TERM')
       self.assertEqual(term, os.environ['TERM'])
 
+class TestLinuxPluginENV(unittest.TestCase):
+
+  def test_linux_ENV(self):
+      testbed = """
+      devices:
+        lnx:
+          os: linux
+          type: linux
+          connections:
+            defaults:
+              class: unicon.Unicon
+            vty:
+              command: bash
+      """
+      tb = loader.load(testbed)
+      l = tb.devices.lnx
+      l.connect()
+      term = l.execute('echo $TERM')
+      self.assertEqual(term, l.settings.ENV['TERM'])
+      lc = l.execute('echo $LC_ALL')
+      self.assertEqual(lc, l.settings.ENV['LC_ALL'])
+
 
 class TestLinuxPluginExecute(unittest.TestCase):
 

@@ -1,5 +1,5 @@
-IOSXR Services
-==============
+IOSXR
+=====
 
 This section lists down all those services which are only specific to IOSXR.
 For list of all the other service please refer this:

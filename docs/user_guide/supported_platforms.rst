@@ -1,9 +1,6 @@
 Supported Platforms
 ===================
 
-Platforms
----------
-
 At the moment `unicon_plugins` supports the following platforms.
 Platform name means os, series and model.
 They are used in testbed.yaml or Connection object. (See examples below)
@@ -48,8 +45,8 @@ They are used in testbed.yaml or Connection object. (See examples below)
     - ``junos``
 
 
-Example testbed.yaml for single router
---------------------------------------
+Example: Single Router
+----------------------
 
 .. code-block:: text
 
@@ -81,8 +78,8 @@ Example testbed.yaml for single router
             ip: 2.2.2.2
 
 
-Example testbed.yaml for HA router
-----------------------------------
+Example: HA router
+------------------
 
 **HA router has connections a and b**
 
@@ -119,8 +116,8 @@ Example testbed.yaml for HA router
             ip: 2.2.2.2
 
 
-Example testbed.yaml for linux
-------------------------------
+Example: Linux Server
+---------------------
 
 .. code-block:: text
 

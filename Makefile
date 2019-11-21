@@ -1,35 +1,5 @@
-################################################################################
-#                                                                              #
-#                      Cisco Systems Proprietary Software                      #
-#        Not to be distributed without consent from Test Technology            #
-#                               Cisco Systems, Inc.                            #
-#                                                                              #
-################################################################################
-#                            unicon_plugins Internal Makefile
-#
-# Author:
-#   pyats-support@cisco.com
-#
-# Support:
-#   pyats-support@cisco.com
-#
-# Version:
-#   v3.0
-#
-# Date:
-#   November 2018
-#
-# About This File:
-#   This script will build the unicon_plugins package for
-#   distribution in PyPI server
-#
-# Requirements:
-#	1. Module name is the same as package name.
-#	2. setup.py file is stored within the module folder
-################################################################################
-
 # Variables
-PKG_NAME      = unicon-plugins
+PKG_NAME      = unicon.plugins
 BUILD_DIR     = $(shell pwd)/__build__
 DIST_DIR      = $(BUILD_DIR)/dist
 SOURCEDIR     = .
@@ -40,7 +10,10 @@ TESTCMD       = $(PYTHON) setup.py test
 BUILD_CMD     = $(PYTHON) setup.py bdist_wheel --dist-dir=$(DIST_DIR)
 PYPIREPO      = pypitest
 
-DEPENDENCIES = cisco-distutils robotframework pyyaml
+
+DEPENDENCIES = robotframework pyyaml dill coverage Sphinx \
+			   sphinxcontrib-napoleon sphinxcontrib-mockautodoc \
+			   sphinx-rtd-theme asyncssh
 
 
 .PHONY: clean package distribute develop undevelop help devnet\
@@ -56,21 +29,15 @@ help:
 	@echo "develop               Build and install development package"
 	@echo "undevelop             Uninstall development package"
 	@echo "docs                  Build Sphinx documentation for this package"
-	@echo "install_build_deps    install pyats-distutils"
-	@echo "uninstall_build_deps  remove pyats-distutils"
+	@echo "install_build_deps    does nothing - just following pyATS pkg standard"
+	@echo "uninstall_build_deps  does nothing - just following pyATS pkg standard"
 	@echo ""
 
 install_build_deps:
-	@echo "--------------------------------------------------------------------"
-	@echo "Installing cisco-distutils"
-	@pip install --index-url=http://pyats-pypi.cisco.com/simple \
-		         --trusted-host=pyats-pypi.cisco.com \
-				 cisco-distutils
+	@echo ""
 
 uninstall_build_deps:
-	@echo "--------------------------------------------------------------------"
-	@echo "Uninstalling pyats-distutils"
-	@pip uninstall cisco-distutils
+	@echo ""
 
 html: docs
 
@@ -110,7 +77,6 @@ develop:
 	@pip uninstall -y $(PKG_NAME)
 	@pip install $(DEPENDENCIES)
 	@$(PYTHON) setup.py develop --no-deps
-	@pip install -e ".[dev]"
 	@echo ""
 	@echo "Completed building and installing: $@"
 	@echo ""

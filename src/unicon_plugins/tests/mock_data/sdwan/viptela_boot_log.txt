@@ -1,0 +1,285 @@
+Wed May 30 05:15:37 UTC 2018: The system is going down for reboot NOW!
+Stopping services...
+ok: down: button: 0s, normally up
+ok: down: cloudinit: 50854s, normally up
+ok: down: ephemeral: 0s, normally up
+ok: down: getty-ttyS0: 0s, normally up
+ok: down: logrotate: 0s, normally up
+ok: down: tcsd: 1s, normally up, want up
+ok: down: watchdog: 50768s, normally up
+ok: down: sysmgr: 0s, normally up
+ok: down: syslogd: 0s, normally up
+ok: down: klogd: 0s, normally up
+Saving this session's debug logs...
+Sending all processes the TERM signal...
+octeon_wdt: WDT device closed unexpectedly.  WDT will not stop!
+Sending all processes the KILL signal...
+Saving system clock time to hardware clock...
+Saving system clock timestamp...
+Unmounting file systems...
+Freeing of pool 0 is missing 3 skbuffs
+Warning: Freeing of pool 1 is missing 8 buffers
+Restarting system.
+
+
+U-Boot 2013.07-g3c51474 (Build time: Mar 28 2018 - 17:24:00)
+
+Skipping PCIe port 0 BIST, reset not done. (port not configured)
+Skipping PCIe port 1 BIST, reset not done. (port not configured)
+BIST check passed.
+CUST_N821 board revision major:7, minor:1, serial #: 11OG440170174
+OCTEON CN6130-AAP pass 1.1, Core clock: 1000 MHz, IO clock: 600 MHz, DDR clock: 533 MHz (1066 Mhz DDR)
+Base DRAM address used by u-boot: 0x10f000000, size: 0x1000000
+DRAM: 4 GiB
+Clearing DRAM...... done
+Flash: 16 MiB
+PCIe: Port 0 is SGMII, skipping.
+PCIe: Link timeout on port 1, probably the slot is empty
+Net:   octmgmt0, octeth0, octeth1, octeth2, octeth3, octeth4, octeth5, octeth6, octeth7
+MMC:   not available
+USB0:   USB EHCI 1.00
+scanning bus 0 for devices... 2 USB Device(s) found
+Type the command 'usb start' to scan for USB storage devices.
+
+Activating default image
+(Re)start USB...
+USB0:   USB EHCI 1.00
+scanning bus 0 for devices... 2 USB Device(s) found
+       scanning usb for storage devices... 1 Storage Device(s) found
+
+/------------------------------------------------------------------------------\
+|                       Viptela vEdge-1000 Boot Console                        |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|                 /--------------------------------------------\               |
+|                 |                                            |               |
+|                 | Please wait ... locating software versions |               |
+|                 |                                            |               |
+|                 \--------------------------------------------/               |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+\------------------------------------------------------------------------------/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/------------------------------------------------------------------------------\
+|                       Viptela vEdge-1000 Boot Console                        |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|                              /-----------------\                             |
+|                              | 18.1.2 (active) |                             |
+|                              |    preserve     |                             |
+|                              \-----------------/                             |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|        Press <ENTER> to boot image, <ESC> to enter Viptela Recovery          |
+|           Menu. Press <Up> or <Down> to select different image.              |
+|                   Booting from default image in 0 seconds                    |
+\------------------------------------------------------------------------------/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Booting Image [18.1.2 (active)]...
+Setting bus to 1
+writing 0x303 to addr: 0x8001180000001628
+(Re)start USB...
+USB0:   USB EHCI 1.00
+scanning bus 0 for devices... 2 USB Device(s) found
+       scanning usb for storage devices... 1 Storage Device(s) found
+Allocated 0x20000000 bytes at address: 0x30000000, name: almushtarika
+24239052 bytes read in 4746 ms (4.9 MiB/s)
+Bootloader: Done loading app on coremask: 0xe
+32135760 bytes read in 5981 ms (5.1 MiB/s)
+argv[2]: coremask=1
+argv[3]: endbootargs
+Allocating memory for ELF segment: addr: 0xffffffff80100000 (adjusted to: 0x100000), size 0x20bb660
+## Loading big-endian Linux kernel with entry point: 0xffffffff8088e1c0 ...
+Bootloader: Done loading app on coremask: 0x1
+Starting cores:
+ 0xf
+p 1:~CONSOLE-> InUistiniagl diezivnicge c gtrroeue
+  subsys cpuset
+Initializing cgroup subsys cpu
+Initializing cgroup subsys cpuacct
+Linux version 3.10.62-ltsi (vbamboo@sjc-vip-bld07) (gcc version 4.8.2 (GCC) ) #2 SMP PREEMPT Sun Apr 29 20:42:53 PDT 2018
+CVMSEG size: 2 cache lines (256 bytes)
+Cavium Inc. SDK-3.1
+bootconsole [early0] enabled
+CPU revision is: 000d9301 (Cavium Octeon II)
+Checking for the multiply/shift bug... no.
+Checking for the daddiu bug... no.
+Determined physical RAM map:
+ memory: 000000000cc00000 @ 0000000002300000 (usable)
+ memory: 0000000010000000 @ 0000000020000000 (usable)
+ memory: 000000009dc00000 @ 0000000052400000 (usable)
+ memory: 0000000000fff000 @ 00000000f0001000 (usable)
+ memory: 0000000000a5d000 @ 0000000000100000 (usable)
+ memory: 0000000001453000 @ 0000000000b5d000 (usable after init)
+Booting ...
+sd 0:0:0:0: [sda] No Caching mode page found
+sd 0:0:0:0: [sda] Assuming drive cache: write through
+sd 0:0:0:0: [sda] No Caching mode page found
+sd 0:0:0:0: [sda] Assuming drive cache: write through
+sd 0:0:0:0: [sda] No Caching mode page found
+sd 0:0:0:0: [sda] Assuming drive cache: write through
+e2fsck 1.43.4 (31-Jan-2017)
+Pass 1: Checking inodes, blocks, and sizes
+Pass 2: Checking directory structure
+Pass 3: Checking directory connectivity
+Pass 4: Checking reference counts
+Pass 5: Checking group summary information
+boot: 60/65664 files (5.0% non-contiguous), 44255/262144 blocks
+Mounting /dev/sda1 at /boot
+Image found in /dev/sda1 ... 
+Boot device found in: /dev/sda1
+Checking /dev/sda1...
+e2fsck 1.43.4 (31-Jan-2017)
+Pass 1: Checking inodes, blocks, and sizes
+Pass 2: Checking directory structure
+Pass 3: Checking directory connectivity
+Pass 4: Checking reference counts
+Pass 5: Checking group summary information
+boot: 60/65664 files (5.0% non-contiguous), 44255/262144 blocks
+Mounting /dev/sda1 at /boot
+Resetting to version 18.1.2
+Formatting /dev/sda2
+DRAM Size is 4096 M
+Checking signature for /boot/18.1.2/vmlinux
+Kernel integrity check successful
+Checking signature for /boot/18.1.2/rootfs.img
+Rootfs integrity check successful
+Mounting /boot/18.1.2/rootfs.img at /rootfs.ro
+Starting version 18.1.2...
+Checking /dev/sda2...
+e2fsck 1.43.4 (31-Jan-2017)
+Pass 1: Checking inodes, blocks, and sizes
+Pass 2: Checking directory structure
+Pass 3: Checking directory connectivity
+Pass 4: Checking reference counts
+Pass 5: Checking group summary information
+root: 11/413712 files (0.0% non-contiguous), 45994/1654191 blocks
+tune2fs 1.43.4 (31-Jan-2017)
+cat: can't open '/rootfs.rw/etc/default/personality': No such file or directory
+Mounting /dev/sda2 at /rootfs.rw
+Checking integrity of /boot/18.1.2/fp
+Fast path integrity check successful
+Mounting aufs at /rootfs
+Mounting pseudo filesystems...
+Setting up hotplug...
+Mounting filesystems...
+Setting hostname...
+Configuring kernel parameters...
+Configuring network interfaces...
+Setting up syslogd service..
+Setting up klogd service..
+Verifying current time against timestamp...
+Setting up log files...
+Starting services...
+
+viptela 18.1.2 
+
+vedge login: 
+
+Wed May 30 05:19:48 UTC 2018: System Ready
+
+

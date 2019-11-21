@@ -555,6 +555,8 @@ class Execute(BaseService):
         search_size: maximum size in bytes to search at the end of the buffer
         allow_state_change: Boolean. Default is None. If True, end state can be any state.
         service_dialog: Instance of Dialog that overrides the execute service dialog.
+        matched_retries: retry times if state pattern is matched, default is 1
+        matched_retry_sleep: sleep between matched_retries, default is 0.05 sec
 
     Returns:
         String for single command, list for repeated single command,
@@ -580,6 +582,8 @@ class Execute(BaseService):
         self.__dict__.update(kwargs)
         self.utils = utils
         self.dialog = Dialog(execution_statement_list)
+        self.matched_retries = connection.settings.EXECUTE_MATCHED_RETRIES
+        self.matched_retry_sleep = connection.settings.EXECUTE_MATCHED_RETRY_SLEEP
 
     def log_service_call(self):
         pass
@@ -593,6 +597,8 @@ class Execute(BaseService):
                      error_pattern=None,
                      search_size=None,
                      allow_state_change=None,
+                     matched_retries=None,
+                     matched_retry_sleep=None,
                      *args, **kwargs):
         con = self.connection
         sm = self.get_sm()
@@ -612,6 +618,11 @@ class Execute(BaseService):
         else:
             con.spawn.search_size = con.settings.SEARCH_SIZE
 
+        matched_retries = self.matched_retries \
+            if matched_retries is None else matched_retries
+        matched_retry_sleep = self.matched_retry_sleep \
+            if matched_retry_sleep is None else matched_retry_sleep
+
         if not isinstance(reply, Dialog):
             raise SubCommandFailure(
                 "dialog passed via 'reply' must be an instance of Dialog")
@@ -625,9 +636,17 @@ class Execute(BaseService):
                 raise SubCommandFailure(
                     "dialog passed via 'service_dialog' must be an instance of Dialog")
 
-            dialog = self.service_dialog(service_dialog=service_dialog+reply)
+            dialog = self.service_dialog(
+                service_dialog=service_dialog + reply,
+                matched_retries=matched_retries,
+                matched_retry_sleep=matched_retry_sleep
+            )
         else:
-            dialog = self.dialog + self.service_dialog(service_dialog=reply)
+            dialog = self.dialog + self.service_dialog(
+                service_dialog=reply,
+                matched_retries=matched_retries,
+                matched_retry_sleep=matched_retry_sleep
+            )
 
             # add default execution statements
             custom_auth_stmt = custom_auth_statements(con.settings.LOGIN_PROMPT,
@@ -640,11 +659,19 @@ class Execute(BaseService):
             # The current state is already added by the service_dialog method
             if state.name != sm.current_state:
                 if allow_state_change:
-                    dialog.append(Statement(pattern=state.pattern))
+                    dialog.append(Statement(
+                        pattern=state.pattern,
+                        matched_retries=matched_retries,
+                        matched_retry_sleep=matched_retry_sleep
+                    ))
                 else:
-                    dialog.append(Statement(pattern=state.pattern,
-                                            action=exec_state_change_action,
-                                            args={'err_state': state, 'sm': sm}))
+                    dialog.append(Statement(
+                        pattern=state.pattern,
+                        action=exec_state_change_action,
+                        args={'err_state': state, 'sm': sm},
+                        matched_retries=matched_retries,
+                        matched_retry_sleep=matched_retry_sleep
+                    ))
 
         # store the last used dialog, used by unittest
         self._last_dialog = dialog
@@ -1622,6 +1649,8 @@ class HaExecService(BaseService):
         target: Target RP where to execute service
         reply: Additional Dialog( i.e patterns) to be handled
         timeout: Timeout value in sec, Default Value is 60 sec
+        matched_retries: retry times if state pattern is matched, default is 1
+        matched_retry_sleep: sleep between matched_retries, default is 0.05 sec
 
     Returns:
         String for single command, list for repeated single command,
@@ -1646,6 +1675,8 @@ class HaExecService(BaseService):
         self.timeout = connection.settings.EXEC_TIMEOUT
         self.__dict__.update(kwargs)
         self.dialog = Dialog(execution_statement_list)
+        self.matched_retries = connection.settings.EXECUTE_MATCHED_RETRIES
+        self.matched_retry_sleep = connection.settings.EXECUTE_MATCHED_RETRY_SLEEP
 
     def pre_service(self, *args, **kwargs):
         self.prompt_recovery = kwargs.get('prompt_recovery', False)
@@ -1660,6 +1691,8 @@ class HaExecService(BaseService):
                      error_pattern=None,
                      search_size=None,
                      allow_state_change=None,
+                     matched_retries=None,
+                     matched_retry_sleep=None,
                      *args,
                      **kwargs):
         """send the command on the right rp and return the output"""
@@ -1692,6 +1725,11 @@ class HaExecService(BaseService):
         else:
             handle.spawn.search_size = con.settings.SEARCH_SIZE
 
+        matched_retries = self.matched_retries \
+            if matched_retries is None else matched_retries
+        matched_retry_sleep = self.matched_retry_sleep \
+            if matched_retry_sleep is None else matched_retry_sleep
+
         if not isinstance(reply, Dialog):
             raise SubCommandFailure(
                 "dialog passed via 'reply' must be an instance of Dialog")
@@ -1707,11 +1745,19 @@ class HaExecService(BaseService):
                 raise SubCommandFailure(
                     "dialog passed via 'service_dialog' must be an instance of Dialog")
 
-            dialog = self.service_dialog(service_dialog=service_dialog + reply,
-                                         handle=handle)
+            dialog = self.service_dialog(
+                service_dialog=service_dialog + reply,
+                handle=handle,
+                matched_retries=matched_retries,
+                matched_retry_sleep=matched_retry_sleep
+            )
         else:
-            dialog = self.dialog + self.service_dialog(service_dialog=reply,
-                                                       handle=handle)
+            dialog = self.dialog + self.service_dialog(
+                service_dialog=reply,
+                handle=handle,
+                matched_retries=matched_retries,
+                matched_retry_sleep=matched_retry_sleep
+            )
 
             # add default execution statements
             custom_auth_stmt = custom_auth_statements(con.settings.LOGIN_PROMPT,
@@ -1724,11 +1770,19 @@ class HaExecService(BaseService):
             # The current state is already added by the service_dialog method
             if state.name != sm.current_state:
                 if allow_state_change:
-                    dialog.append(Statement(pattern=state.pattern))
+                    dialog.append(Statement(
+                        pattern=state.pattern,
+                        matched_retries=matched_retries,
+                        matched_retry_sleep=matched_retry_sleep
+                    ))
                 else:
-                    dialog.append(Statement(pattern=state.pattern,
-                                            action=exec_state_change_action,
-                                            args={'err_state': state, 'sm': sm}))
+                    dialog.append(Statement(
+                        pattern=state.pattern,
+                        action=exec_state_change_action,
+                        args={'err_state': state, 'sm': sm},
+                        matched_retries=matched_retries,
+                        matched_retry_sleep=matched_retry_sleep
+                    ))
 
         if isinstance(command, str):
             if len(command) == 0:

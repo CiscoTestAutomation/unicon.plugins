@@ -1,5 +1,5 @@
-FXOS/FTD Services
-=================
+FXOS/FTD
+========
 
 This section lists the services which are supported with FXOS Firepower Threat Defence (FTD) Unicon plugin. This plugin is used when `os=fxos` and `series=ftd` are specified.
 
