@@ -13,7 +13,6 @@ from time import sleep
 
 from unicon_plugins.plugins.nxos.service_patterns import HaNxosReloadPatterns
 from unicon_plugins.plugins.nxos.service_patterns import ReloadPatterns
-from unicon_plugins.plugins.nxos.service_patterns import ConfigurePatterns
 from unicon.eal.dialogs import Statement
 
 # from unicon.core.errors import SubCommandFailure
