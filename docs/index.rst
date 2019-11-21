@@ -27,13 +27,13 @@ User Guide
 ----------
 
 .. toctree::
-   :maxdepth: 2
-   :caption: User Guide
+    :maxdepth: 2
+    :caption: User Guide
 
-   user_guide/introduction
-   user_guide/supported_platforms
-   user_guide/services/index
-   user_guide/services/service_dialogs
+    user_guide/introduction
+    user_guide/supported_platforms
+    user_guide/services/index
+    user_guide/services/service_dialogs
 
 Developer Guide
 ---------------

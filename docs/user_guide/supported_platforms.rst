@@ -1,7 +1,7 @@
 Supported Platforms
 ===================
 
-At the moment `unicon_plugins` supports the following platforms.
+At the moment `unicon.plugins` supports the following platforms.
 Platform name means os, series and model.
 They are used in testbed.yaml or Connection object. (See examples below)
 

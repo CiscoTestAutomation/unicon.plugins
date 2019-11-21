@@ -22,8 +22,8 @@ The mock device class is part of the `unicon.mock.mock_device` module. The YAML 
 `unicon_plugins.tests.mock_data` directory. Each OS type has its own sub-directory for mock data.
 
 
-Creating a mock device
-----------------------
+Creating Mock Device
+--------------------
 
 A new mock device can be created by executing the `mock_device_cli` command with the `--os`
 and `--state` options or by creating a new module with the name
@@ -249,8 +249,8 @@ Example data:
 
 
 
-Example unittest using mock device
-----------------------------------
+Example: using mock device
+--------------------------
 
 Create YAML data with the state, prompt and command(s) that you want to match.
 
@@ -301,8 +301,8 @@ Execute the commands or service and verify the response data.
 
 
 
-Example unittest using HA mock device
--------------------------------------
+Example: using HA mock device
+-----------------------------
 
 
 
@@ -356,8 +356,8 @@ Example unittest using HA mock device
 
 
 
-Future enhancements / current limitations
------------------------------------------
+Known Limitations
+-----------------
 
 The current mock device has a number of limitations.
 
