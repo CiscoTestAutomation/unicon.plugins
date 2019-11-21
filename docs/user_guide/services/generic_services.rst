@@ -214,6 +214,7 @@ on prompt_recovery feature.
 Argument          Type                       Description
 ================  =======================    ========================================
 timeout           int (default 60 sec)       timeout value for the command execution takes.
+error_pattern     list                       List of regex strings to check output for errors.
 reply             Dialog                     additional dialog
 command           list                       list of commands to configure
 prompt_recovery   bool (default False)       Enable/Disable prompt recovery feature

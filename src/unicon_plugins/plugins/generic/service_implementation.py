@@ -763,6 +763,7 @@ class Configure(BaseService):
         commands : list/single config command
         reply: Addition Dialogs for interactive config commands.
         timeout : Timeout value in sec, Default Value is 30 sec
+        error_pattern: list of regex to detect command errors
         target: Target RP where to execute service, for DualRp only
         lock_retries: retry times if config mode is locked, default is 0
         lock_retry_sleep: sleep between retries, default is 2 sec
@@ -809,6 +810,7 @@ class Configure(BaseService):
                      command=[],
                      reply=Dialog([]),
                      timeout=None,
+                     error_pattern=None,
                      target=None,
                      lock_retries=None,
                      lock_retry_sleep=None,
@@ -818,6 +820,12 @@ class Configure(BaseService):
                      *args,
                      **kwargs):
         timeout = timeout or self.timeout
+
+        if error_pattern is None:
+            self.error_pattern = con.settings.CONFIGURE_ERROR_PATTERN
+        else:
+            self.error_pattern = error_pattern
+
         bulk = self.bulk if bulk is None else bulk
         bulk_chunk_lines = self.bulk_chunk_lines if bulk_chunk_lines is None \
             else bulk_chunk_lines

@@ -472,6 +472,12 @@ class TestConfigureService(unittest.TestCase):
         cls.d_ha.disconnect()
         cls.ha.stop()
 
+    def test_configure_error_pattern(self):
+        with self.assertRaises(SubCommandFailure) as err:
+          r = self.d.configure('can not open')
+
+    def test_configure_error_pattern_negative(self):
+        r = self.d.configure('Configured successfully')
 
 class TestExecuteService(unittest.TestCase):
 

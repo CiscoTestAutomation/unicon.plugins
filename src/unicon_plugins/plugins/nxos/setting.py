@@ -27,6 +27,8 @@ class NxosSettings(GenericSettings):
             r'^%\s*[Ii]nvalid (command|input)',
             r'^%\s*[Ii]ncomplete (command|input)',
             r'^%\s*[Aa]mbiguous (command|input)',
+        ]
+        self.CONFIGURE_ERROR_PATTERN = [
             r'^%\s*[Cc]an not open.*',
             r'^%\s*[Nn]ot supported.*',
             r'^%\s*[Ff]ail.*',
