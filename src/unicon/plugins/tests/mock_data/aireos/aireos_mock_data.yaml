@@ -99,7 +99,7 @@ aireos_password:
       new_state: aireos_exec
 
 aireos_config:
-  prompt: "(Cisco Capwap Simulator) config>"
+  prompt: "(%N) config>"
   commands:
     "exit":
       new_state: aireos_exec
