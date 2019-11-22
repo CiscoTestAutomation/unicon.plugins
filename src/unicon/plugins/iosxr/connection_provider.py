@@ -16,7 +16,6 @@ from unicon.eal.dialogs import Dialog
 from unicon.bases.routers.connection_provider \
     import BaseDualRpConnectionProvider
 
-from unicon.bases.connection import DEFAULT_LEARNED_HOSTNAME
 
 patterns = IOSXRPatterns()
 
@@ -140,9 +139,9 @@ class IOSXRVirtualConnectionProviderLaunchWaiter(object):
 
         initial_prompts = [
             patterns.enable_prompt.replace('%N',
-                DEFAULT_LEARNED_HOSTNAME if learn_hostname else hostname),
+                con.settings.DEFAULT_LEARNED_HOSTNAME if learn_hostname else hostname),
             patterns.config_prompt.replace('%N',
-                DEFAULT_LEARNED_HOSTNAME if learn_hostname else hostname),
+                con.settings.DEFAULT_LEARNED_HOSTNAME if learn_hostname else hostname),
             patterns.secret_password_prompt,
             patterns.username_prompt,
             patterns.password_prompt,

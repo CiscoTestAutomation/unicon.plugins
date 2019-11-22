@@ -5,12 +5,17 @@ from unicon.plugins.generic.patterns import GenericPatterns
 class AireosPatterns(GenericPatterns):
     def __init__(self):
         super().__init__()
-        self.base = r'\s*\([^\r\n]*\)\s+'
-        self.mode = self.base + '[^\n\r]+>\s*$'
-        self.bare = self.base + '\s*>\s*$'
-        self.user = r'^.*User:\s*$'
-        self.shell = r'bash.*#'
-        self.prompt = r'^(.*?)' + self.base
+        self.base_prompt = r'^(.*?)\(%N\)\s*'
+        self.enable_prompt = self.base_prompt + r'>\s*$'
+        self.show_prompt = self.base_prompt + r'show>\s*$'
+        self.config_prompt = self.base_prompt + r'config>\s*$'
+        self.debug_prompt = self.base_prompt + r'debug>\s*$'
+        self.test_prompt = self.base_prompt + r'test>\s*$'
+        self.transfer_prompt = self.base_prompt + r'transfer>\s*$'
+        self.license_prompt = self.base_prompt + r'license>\s*$'
+        self.reset_prompt = self.base_prompt + r'reset>\s*$'
+        self.save_prompt = self.base_prompt + r'save>\s*$'
+        self.shell_prompt = r'bash.*#\s*$'
 
 
 class AireosReloadPatterns(UniconCorePatterns):
@@ -38,3 +43,8 @@ class AireosCopyPatterns(UniconCorePatterns):
         self.are_you_sure_save = r'Are you sure you want to save\? \(y/n\)'
 
 
+class AireosExecutePatterns(UniconCorePatterns):
+    def __init__(self):
+        super().__init__()
+        self.press_any_key = r'(.*?)Press any key to continue'
+        self.are_you_sure = r'(.*?)Are you sure .*\([yY]/[nN]\) *?$'

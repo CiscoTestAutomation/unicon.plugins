@@ -1,9 +1,25 @@
 
 aireos_exec:
-  prompt: "(Cisco Capwap Simulator) >"
+  prompt: "(%N) >"
   commands:
+    "show":
+      new_state: aireos_show
+    "test":
+      new_state: aireos_test
+    "debug":
+      new_state: aireos_debug
+    "transfer":
+      new_state: aireos_transfer
+    "license":
+      new_state: aireos_license
+    "reset":
+      new_state: aireos_reset
+    "save":
+      new_state: aireos_save
     "config":
       new_state: aireos_config
+    "devshell shell":
+      new_state: aireos_devshell
     "reset system forced":
       response: |2
 
@@ -12,6 +28,54 @@ aireos_exec:
         Wireless LAN Controller config will not be saved.
 
       new_state: aireos_reset_forced
+    "grep exclude generation 'show run-config startup-commands'":
+      new_state: aireos_press_any_key
+    "show command with more":
+      new_state: aireos_show_command_with_more
+    "save config":
+      new_state: aireos_confirm_save
+    "show memory statistics": |2
+      
+    System Memory Statistics:
+      Total System Memory............: 33158025216 bytes (30.88 GB)
+      Used System Memory.............: 3555262464 bytes (3.31 GB)
+      Free System Memory.............: 29602762752 bytes (27.56 GB)
+      Effective Free Memory..........: 29323431936 bytes (27.30 GB)
+      Bytes allocated from RTOS......: 828815680 bytes (790.47 MB)
+      Chunks Free....................: 87 bytes 
+      Number of mmapped regions......: 28
+      Total space in mmapped regions.: 929271808 bytes (886.28 MB)
+      Total allocated space..........: 764280224 bytes (728.92 MB)
+      Total non-inuse space..........: 64535456 bytes (61.55 MB)
+      Top-most releasable space......: 92064 bytes (89.90 KB)
+      Total allocated (incl mmap)....: 1758087488 bytes (1.63 GB)
+      Total used (incl mmap).........: 1693552032 bytes (1.57 GB)
+
+
+
+
+aireos_confirm_save:
+  prompt: Are you sure you want to save? (y/n)
+  commands:
+    "y":
+      new_state: aireos_exec
+
+aireos_show_command_with_more:
+  prompt: " --More-- "
+  commands:
+    " ":
+      new_state: aireos_exec
+
+
+aireos_press_any_key:
+  prompt: Press any key to continue..
+  commands:
+     " ":
+       response: |
+        # WLC Config Begin <Wed Nov 13 16:10:02 2019>"
+       new_state: aireos_exec
+
+
 
 aireos_reset_forced:
   prompt: "Do you still want to force a reboot (y/N) "
@@ -44,3 +108,55 @@ aireos_config:
     "paging disable": ""
     "sessions timeout 0": ""
     "serial timeout 0": ""
+    "paging mistake": wrong argument for paging
+
+
+# AireOS states
+
+aireos_show:
+  prompt: "(%N) show>"
+  commands:
+    "exit":
+      new_state: aireos_exec
+
+aireos_test:
+  prompt: "(%N) test>"
+  commands:
+    "exit":
+      new_state: aireos_exec
+
+aireos_debug:
+  prompt: "(%N) debug>"
+  commands:
+    "end":
+      new_state: aireos_exec
+
+aireos_transfer:
+  prompt: "(%N) transfer>"
+  commands:
+    "exit":
+      new_state: aireos_exec
+
+aireos_license:
+  prompt: "(%N) license>"
+  commands:
+    "exit":
+      new_state: aireos_exec
+
+aireos_reset:
+  prompt: "(%N) reset>"
+  commands:
+    "exit":
+      new_state: aireos_exec
+
+aireos_save:
+  prompt: "(%N) save>"
+  commands:
+    "exit":
+      new_state: aireos_exec
+
+aireos_devshell:
+  prompt: bash-3.00#
+  commands:
+    "exit":
+      new_state: aireos_exec

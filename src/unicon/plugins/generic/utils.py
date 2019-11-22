@@ -1,6 +1,6 @@
 """ Generic utilities. """
 
-from collections import Sequence
+from collections.abc import Sequence
 import re
 import time
 
