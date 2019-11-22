@@ -23,10 +23,8 @@ framework.
 
 This package was initially developed internally in Cisco, and is now 
 release to the general public starting late 2017 through [Cisco DevNet]. 
-
-    https://developer.cisco.com/pyats/
     
-.. _Cisco DevNet: https://developer.cisco.com/
+[Cisco DevNet]: https://developer.cisco.com/
 
 # Development Mode
 
