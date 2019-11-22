@@ -1,0 +1,46 @@
+"""
+Module:
+    unicon.plugins.junos
+
+Authors:
+    pyATS TEAM (pyats-support@cisco.com, pyats-support-ext@cisco.com)
+
+Description:
+    This subpackage implements services specific to Junos
+
+"""
+
+from unicon.bases.routers.services import BaseService
+from unicon.plugins.generic.service_implementation import BashService, \
+                                                          Send, Sendline, \
+                                                          Expect, Execute, \
+                                                          Configure ,\
+                                                          Enable, Disable, \
+                                                          ExpectLogging, LogUser
+from unicon.eal.dialogs import Dialog
+
+
+class BashService(BashService):
+
+    class ContextMgr(BashService.ContextMgr):
+        def __init__(self, connection,
+                           enable_bash = False,
+                           timeout = None):
+            # overwrite the prompt
+            super().__init__(connection=connection,
+                             enable_bash=enable_bash,
+                             timeout=timeout)
+
+        def __enter__(self):
+            self.conn.log.debug('+++ attaching bash shell +++')
+
+            # please enable this part of code when Junos HA comes to life
+            # if self.conn.is_ha:
+            #     conn = self.conn.active
+            # else:
+            #     conn = self.conn
+
+            sm = self.conn.state_machine
+            sm.go_to('shell', self.conn.spawn)
+
+            return self

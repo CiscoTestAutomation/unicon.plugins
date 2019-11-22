@@ -32,7 +32,7 @@ your plugin.
 Under this repository, Unicon follows a hierarchical directory structure for writing
 plugins, which is distributes based on the OS, series, model of the platform 
 which the plugin implements. Any new OS implementations will contribute to a 
-new sub directory under ``unicon_plugins/plugins`` and its series/model will go under that
+new sub directory under ``unicon.plugins/plugins`` and its series/model will go under that
 
 .. image:: images/plugins.jpg
 

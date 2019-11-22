@@ -1,0 +1,55 @@
+"""
+Module:
+    unicon.plugins.generic
+
+Authors:
+    pyATS TEAM (pyats-support@cisco.com, pyats-support-ext@cisco.com)
+
+Description:
+    Module for defining all the Patterns required for the
+    generic implementation
+"""
+from unicon.patterns import UniconCorePatterns
+
+class GenericPatterns(UniconCorePatterns):
+
+    """
+        Class defines all the patterns required
+        for generic
+    """
+
+    def __init__(self):
+
+        """ initialises all generic patterns
+        """
+        super().__init__()
+        # self.enable_prompt = r'.*%N#\s?$'
+        self.default_hostname_pattern = r'RouterRP|Router|[Ss]witch|Controller|ios'
+
+        self.enable_prompt = r'^(.*?)(Router|Router-stby|Router-sdby|RouterRP|RouterRP-standby|%N-standby|%N\(standby\)|%N-sdby|%N-stby|(S|s)witch|(S|s)witch\(standby\)|Controller|ios|-Slot[0-9]+|%N)(\(boot\))*#\s?$'
+
+        # self.disable_prompt = r'.*%N>\s?$'
+        self.disable_prompt = r'^(.*?)(Router|Router-stby|Router-sdby|RouterRP|RouterRP-standby|%N-standby|%N-sdby|%N-stby|(S|s)witch|s(S|s)witch\(standby\)|Controller|ios|-Slot[0-9]+|%N)(\(boot\))*>\s?$'
+
+        # self.config_prompt = r'.*%N\(config.*\)#\s?$'
+        self.config_prompt = r'^(.*)\(.*(con|cfg|ipsec-profile)\S*\)#\s?$'
+        self.rommon_prompt = r'rommon[\s\d]*>\s?$'
+        # self.standby_enable_prompt = r'^(.*?)(RouterRP-standby|%N-standby|%N-sdby|%N\(standby\))#\s?$'
+        # self.standby_disable_prompt = r'^(.*?)(RouterRP-standby|%N-standby|%N-sdby|%N\(standby\))>\s?$'
+        self.standby_locked = r'[S|s]tandby console disabled'
+        self.shell_prompt = r'^(.*)%N\(shell\)>\s?'
+
+        self.disconnect_message = r'Received disconnect from .*:'
+        self.password_ok = r'Password OK\s*$'
+
+        self.continue_connect = r'Are you sure you want to continue connecting \(yes/no\)'
+
+        self.cisco_commit_changes_prompt = r'Uncommitted changes found, commit them\? \[yes/no/CANCEL\]'
+        self.juniper_commit_changes_prompt = r'Discard changes and continue\? \[yes,no\]'
+
+        self.hit_enter = r'Hit Enter to proceed:'
+        self.press_ctrlx = r"^(.*?)Press Ctrl\+x to Exit the session"
+        self.connected = r'^(.*?)Connected.'
+
+        self.enter_basic_mgmt_setup = r'Would you like to enter basic management setup\? \[yes/no\]:'
+        self.kerberos_no_realm = r'^(.*)Kerberos: No default realm defined for Kerberos!'

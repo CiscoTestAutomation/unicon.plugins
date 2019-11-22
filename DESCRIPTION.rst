@@ -15,7 +15,7 @@ the platforms. This makes it very easy for a developer to implement connection
 library for a targeted platform, as she only ends up writing the differential
 code.
 
-unicon_plugins is plugins for different platforms. All the platform
+unicon.plugins is plugins for different platforms. All the platform
 implementations are arranged in a hierarchical fashion in order  to provide
 a good fault isolation. It was initially developed internally in Cisco, and is
 now available to the general public starting late 2017.
@@ -23,12 +23,12 @@ now available to the general public starting late 2017.
 Installation
 ============
 
-unicon and unicon_plugins can be installed using the `pip` command. Assuming
+unicon and unicon.plugins can be installed using the `pip` command. Assuming
 that you have already sourced your virtualenv, run the following commands
 on the shell::
 
     pip install unicon
-    pip install unicon_plugins
+    pip install unicon.plugins
 
 Community
 =========

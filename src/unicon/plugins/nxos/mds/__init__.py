@@ -1,0 +1,33 @@
+__author__ = "Dave Wapstra <dwapstra@cisco.com>"
+
+from unicon.plugins.nxos.connection_provider import NxosSingleRpConnectionProvider
+from unicon.plugins.nxos.connection_provider import NxosDualRpConnectionProvider
+from unicon.plugins.nxos import NxosServiceList
+from unicon.plugins.nxos import HANxosServiceList
+from unicon.plugins.nxos import NxosSingleRpConnection
+from unicon.plugins.nxos import NxosDualRPConnection
+from unicon.plugins.nxos.setting import NxosSettings
+
+from .statemachine import NxosMdsSingleRpStateMachine
+from .statemachine import NxosMdsDualRpStateMachine
+
+
+class NxosMdsSingleRpConnection(NxosSingleRpConnection):
+    os = 'nxos'
+    series = 'mds'
+    chassis_type = 'single_rp'
+    state_machine_class = NxosMdsSingleRpStateMachine
+    connection_provider_class = NxosSingleRpConnectionProvider
+    subcommand_list = NxosServiceList
+    settings = NxosSettings()
+
+
+class NxosMdsDualRPConnection(NxosDualRPConnection):
+    os = 'nxos'
+    series = 'mds'
+    chassis_type = 'dual_rp'
+    state_machine_class = NxosMdsDualRpStateMachine
+    connection_provider_class = NxosDualRpConnectionProvider
+    subcommand_list = HANxosServiceList
+    settings = NxosSettings()
+

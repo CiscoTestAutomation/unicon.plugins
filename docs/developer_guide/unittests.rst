@@ -19,7 +19,7 @@ For more information on YAML syntax, see `yaml.org`_.
 .. _yaml.org: http://yaml.org/
 
 The mock device class is part of the `unicon.mock.mock_device` module. The YAML files are located under the
-`unicon_plugins.tests.mock_data` directory. Each OS type has its own sub-directory for mock data.
+`unicon.plugins.tests.mock_data` directory. Each OS type has its own sub-directory for mock data.
 
 
 Creating Mock Device
@@ -308,7 +308,7 @@ Example: using HA mock device
 
 .. code:: python
 
-    from unicon_plugins.tests.mock.mock_device_ios import MockDeviceTcpWrapperIOS
+    from unicon.plugins.tests.mock.mock_device_ios import MockDeviceTcpWrapperIOS
 
 
     class TestIosPluginHAConnect(unittest.TestCase):

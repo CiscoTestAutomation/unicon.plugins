@@ -16,7 +16,7 @@ from ciscodistutils.common import (AUTHOR,
                                    LICENSE)
 
 # compute version range
-version, version_range = version_info('src', 'unicon_plugins', '__init__.py')
+version, version_range = version_info('src', 'unicon', 'plugins', '__init__.py')
 
 install_requires = ['setuptools',
                     'pyyaml',
@@ -49,7 +49,7 @@ setup(
     keywords = 'unicon connection pyats cisco',
 
     # project packages
-    packages = find_packages(where = 'src'),
+    packages = ['unicon.%s' %i for i in find_packages(where = 'src/unicon')],
 
     # project directory
     package_dir = {
