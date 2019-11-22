@@ -15,7 +15,7 @@ box = dict()
 box['hostname'] = 'Cisco Capwap Simulator'
 box['username'] = 'lab'
 box['tacacs_password'] = 'lab'
-box['cmd'] = 'python -m unicon_plugins.tests.mock.mock_device_aireos --state aireos_exec'
+box['cmd'] = 'python -m unicon.plugins.tests.mock.mock_device_aireos --state aireos_exec'
 
 ping_failure = '192.168.2.3'
 
@@ -211,11 +211,11 @@ class TestAireOsPlugin(unittest.TestCase):
 
     def setUp(self):
         self.c = Connection(hostname='Cisco Capwap Simulator',
-                            start=['python -m unicon_plugins.tests.mock.mock_device_aireos --state aireos_exec'],
+                            start=['python -m unicon.plugins.tests.mock.mock_device_aireos --state aireos_exec'],
                             os='aireos',
                             username='lab')
         self.cc = Connection(hostname='Cisco Capwap Simulator',
-                             start=['python -m unicon_plugins.tests.mock.mock_device_aireos --state aireos_exec'],
+                             start=['python -m unicon.plugins.tests.mock.mock_device_aireos --state aireos_exec'],
                              os='aireos',
                              credentials=dict(default=dict(username='lab', password='lab')))
 
@@ -246,7 +246,7 @@ class TestAireOsPlugin(unittest.TestCase):
 class TestAireOsPluginLearnHostname(unittest.TestCase):
     def test_learn_hostname(self):
         c = Connection(hostname='Controller',
-                       start=['python -m unicon_plugins.tests.mock.mock_device_aireos --state aireos_exec'],
+                       start=['python -m unicon.plugins.tests.mock.mock_device_aireos --state aireos_exec'],
                        os='aireos',
                        username='lab',
                        learn_hostname=True,
@@ -258,7 +258,7 @@ class TestAireosPluginStates(unittest.TestCase):
 
     def setUp(self):
         self.c = Connection(hostname='Controller',
-                            start=['python -m unicon_plugins.tests.mock.mock_device_aireos --state aireos_exec --hostname Controller'],
+                            start=['python -m unicon.plugins.tests.mock.mock_device_aireos --state aireos_exec --hostname Controller'],
                             os='aireos',
                             username='lab',
                             init_config_commands=[])

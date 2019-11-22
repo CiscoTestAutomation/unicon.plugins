@@ -5,7 +5,7 @@ from unicon.bases.routers.services import BaseService
 from unicon.core.errors import SubCommandFailure
 from unicon.eal.dialogs import Dialog
 
-from unicon_plugins.plugins.generic.service_implementation import Execute as GenericExecute
+from unicon.plugins.generic.service_implementation import Execute as GenericExecute
 from .patterns import (AireosPatterns, AireosReloadPatterns, AireosPingPatterns, AireosCopyPatterns)
 
 from .service_statements import reload_statements, execute_statements

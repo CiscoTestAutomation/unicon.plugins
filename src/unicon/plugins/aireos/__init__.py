@@ -1,6 +1,6 @@
 
 from unicon.bases.routers.connection import BaseSingleRpConnection
-from unicon_plugins.plugins.generic.connection_provider import GenericSingleRpConnectionProvider
+from unicon.plugins.generic.connection_provider import GenericSingleRpConnectionProvider
 from unicon.eal.dialogs import Dialog
 from unicon.plugins.aireos.settings import AireosSettings
 from unicon.plugins.aireos.statemachine import AireosStateMachine
