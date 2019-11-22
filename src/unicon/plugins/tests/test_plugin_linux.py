@@ -19,7 +19,7 @@ from pprint import pformat
 
 from unittest.mock import Mock, call, patch
 
-from ats.topology import loader
+from pyats.topology import loader
 
 import unicon
 from unicon import Connection
@@ -400,7 +400,7 @@ class TestPS1PS2(unittest.TestCase):
             cli:
               command: mock_device_cli --os linux --state exec_ps1
       """
-      from ats.topology import loader
+      from pyats.topology import loader
       tb = loader.load(testbed)
       n = tb.devices['lnx-server']
       n.connect(learn_hostname=False)

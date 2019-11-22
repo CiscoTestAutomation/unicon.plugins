@@ -12,7 +12,7 @@ import yaml
 import unittest
 from unittest.mock import patch
 
-from ats.topology import loader
+from pyats.topology import loader
 
 import unicon
 from unicon import Connection

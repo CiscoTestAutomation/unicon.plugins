@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-from ats import aetest
-from ats.kleenex import BringUp
+from pyats import aetest
+from pyats.kleenex import BringUp
 import re, logging
 
 # NOTE: uut1 device must be Moonshine for this test to work.
@@ -57,8 +57,8 @@ class common_setup(aetest.CommonSetup):
 
 if __name__ == '__main__':
     import argparse
-    from ats.topology import loader
-    from ats.aetest.main import AEtest
+    from pyats.topology import loader
+    from pyats.aetest.main import AEtest
     import logging
 
     temp_aetest = AEtest()

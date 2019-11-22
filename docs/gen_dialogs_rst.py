@@ -8,7 +8,7 @@ import traceback
 from unicon import Connection
 from unicon.eal.dialogs import Dialog
 
-from ats.datastructures import AttrDict
+from pyats.datastructures import AttrDict
 
 
 def find_plugins():

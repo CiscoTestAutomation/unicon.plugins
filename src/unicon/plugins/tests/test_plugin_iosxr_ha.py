@@ -3,7 +3,7 @@ import unittest
 from time import sleep
 
 from unicon import Connection
-from ats.topology import loader
+from pyats.topology import loader
 
 from unicon.plugins.tests.mock.mock_device_iosxr import MockDeviceTcpWrapperIOSXR
 

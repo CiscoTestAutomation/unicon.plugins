@@ -13,7 +13,7 @@ import unittest
 
 import unicon
 
-from ats.topology import loader
+from pyats.topology import loader
 
 from unicon import Connection
 from unicon.core.errors import SubCommandFailure

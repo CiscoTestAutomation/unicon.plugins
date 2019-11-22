@@ -5,7 +5,7 @@ from time import sleep
 
 import unicon
 from unicon import Connection
-from ats.topology import loader
+from pyats.topology import loader
 from unicon.eal.dialogs import Statement
 
 

@@ -11,7 +11,7 @@ __author__ = "Dave Wapstra <dwapstra@cisco.com>"
 import re
 import unittest
 
-from ats.topology import loader
+from pyats.topology import loader
 
 from unicon import Connection
 from unicon.core.errors import SubCommandFailure

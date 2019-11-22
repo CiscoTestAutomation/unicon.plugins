@@ -321,7 +321,7 @@ class LogUser(BaseService):
             else:
                 # add it
                 try:
-                    from ats.log import managed_handlers
+                    from pyats.log import managed_handlers
                 except Exception:
                     sh = logs.UniconStreamHandler()
                     sh.setFormatter(logging.Formatter(fmt='[%(asctime)s] %(message)s'))

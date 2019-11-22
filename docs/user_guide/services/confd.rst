@@ -67,7 +67,7 @@ If you want to avoid errors being detected with any command, you can pass an emp
 
 .. code-block:: python
 
-    >>> from ats.topology import loader
+    >>> from pyats.topology import loader
     >>>
     >>> tb = loader.load('testbed.yaml')
     >>> ncs = tb.devices.ncs

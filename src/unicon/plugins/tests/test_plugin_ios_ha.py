@@ -6,7 +6,7 @@ from unittest.mock import Mock, patch
 
 import unicon
 from unicon import Connection
-from ats.topology import loader
+from pyats.topology import loader
 
 from unicon.plugins.tests.mock.mock_device_ios import MockDeviceTcpWrapperIOS
 

@@ -13,7 +13,7 @@ import re
 import yaml
 import unittest
 
-from ats.topology import loader
+from pyats.topology import loader
 
 import unicon
 from unicon import Connection

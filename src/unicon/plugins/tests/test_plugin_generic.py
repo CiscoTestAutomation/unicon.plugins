@@ -13,7 +13,7 @@ import time
 import unittest
 from unittest.mock import Mock, call, patch
 
-from ats.datastructures import AttrDict
+from pyats.datastructures import AttrDict
 
 import unicon
 from unicon import Connection

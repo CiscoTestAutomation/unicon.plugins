@@ -1,6 +1,6 @@
 import os
 import sys
-from ats.easypy import run
+from pyats.easypy import run
 
 def main():
     test_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

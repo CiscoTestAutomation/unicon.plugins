@@ -8,7 +8,7 @@ Uses the mock_device_cli script to test.
 import re
 import unittest
 
-from ats.topology import loader
+from pyats.topology import loader
 
 from unicon.core.errors import SubCommandFailure
 from unicon import Connection
