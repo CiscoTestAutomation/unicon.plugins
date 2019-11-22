@@ -55,7 +55,7 @@ to respond to the password prompt.  Credentials are available in ``rtr.credentia
 .. code-block:: python
 
     from unicon.eal.dialogs import Dialog
-    from unicon.plugins.plugins.generic.statements import GenericStatements
+    from unicon.plugins.generic.statements import GenericStatements
     statements = GenericStatements()
     password_stmt = statements.password_stmt
 
