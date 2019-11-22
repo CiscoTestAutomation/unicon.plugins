@@ -822,7 +822,7 @@ class Configure(BaseService):
         timeout = timeout or self.timeout
 
         if error_pattern is None:
-            self.error_pattern = con.settings.CONFIGURE_ERROR_PATTERN
+            self.error_pattern = self.connection.settings.CONFIGURE_ERROR_PATTERN
         else:
             self.error_pattern = error_pattern
 
