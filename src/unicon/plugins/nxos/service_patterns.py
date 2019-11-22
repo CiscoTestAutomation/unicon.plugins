@@ -40,4 +40,3 @@ class HaNxosReloadPatterns:
         self.password = r'^.*[Pp]assword: ?$'
         self.run_init = r' Entering runlevel'
         self.system_up = r'System is coming up ... Please wait'
-
