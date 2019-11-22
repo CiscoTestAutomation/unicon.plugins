@@ -79,6 +79,7 @@ class GenericSettings(Settings):
 
         # Default error pattern
         self.ERROR_PATTERN=[]
+        self.CONFIGURE_ERROR_PATTERN = []
 
         # Number of times to retry for config mode by configure service.
         self.CONFIG_LOCK_RETRIES = 0
