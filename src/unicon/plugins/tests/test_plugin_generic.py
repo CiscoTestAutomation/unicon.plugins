@@ -454,11 +454,20 @@ class TestConfigureService(unittest.TestCase):
             self.d.configure('no logging console', lock_retries=2)
 
     def test_configure_error_pattern(self):
-        with self.assertRaises(SubCommandFailure) as err:
-          r = self.d.configure('Not valid configuration')
+        with self.assertRaises(SubCommandFailure):
+            r = self.d.configure('Not valid configuration',
+                                 error_pattern=[r'% Invalid command'])
 
-    def test_configure_error_pattern_negative(self):
-        r = self.d.configure('no logging console')
+    def test_configure_error_pattern2(self):
+        error_pattern = [r'% Invalid command']
+        try:
+            self.d.settings.CONFIGURE_ERROR_PATTERN, error_pattern = \
+                error_pattern, self.d.settings.CONFIGURE_ERROR_PATTERN
+            with self.assertRaises(SubCommandFailure):
+                r = self.d.configure('Not valid configuration')
+        finally:
+            self.d.settings.CONFIGURE_ERROR_PATTERN, error_pattern = \
+                error_pattern, self.d.settings.CONFIGURE_ERROR_PATTERN
 
     def test_ha_config_lock_retries_succeed(self):
         self.d_ha.execute('set config lock count 2')
