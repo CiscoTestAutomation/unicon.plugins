@@ -1,41 +1,47 @@
 [![published](https://static.production.devnetcloud.com/codeexchange/assets/images/devnet-published.svg)](https://developer.cisco.com/codeexchange/github/repo/CiscoTestAutomation/unicon.plugins)
 
-# Unicon
+# Unicon Plugins
 
-Unicon is a framework for developing device control libraries for routers,
-switches and servers. It is developed purely in python, hence no dependency on
-Tcl based infrastructure. Unicon is also test framework agnostic and can be used
-with/without pyats.
+Unicon is a package aiming to provide a unified connection experience to network
+devices through typical command-line management interface. By wrapping the 
+underlying session (eg, telnet, ssh), Unicon provides:
 
-As a framework it provides a set of classes and settings which can be
-further sub-classed to create platform specific implementations.
+- direct and proxied connections through any common CLI interface (telnet, ssh, serial etc)
+- power of expect-like programming without having to deal with low-level logic
+- multi-vendor support through an agnostic API interface
+- seamless handling of CLI modes (eg, enable, configure, admin-configure mode)
+- rejected commands, command error detections
+- value-add statful services (specific to the platform)
 
-One of the main design goals of unicon is `DRY` (Do Not Repeat Yourself).
-Hence the base classes handle all the common stuff which are applicable to all
-the platforms. This makes it very easy for a developer to implement connection
-library for a targeted platform, as she only ends up writing the differential
-code.
+and is extensible: platform supports and services are implemented via 
+open-source plugins.
 
-The unicon.plugins package provides built-in plugins for a variety of platforms.
-All the platform implementations are arranged in a hierarchical fashion in order 
-to provide a good fault isolation. It was initially developed internally in Cisco, 
-and is now available to the general public starting late 2017 through [Cisco DevNet].
+Unicon is the standard, go-to CLI connection implementation for [Cisco pyATS]
+framework.
 
-[Cisco DevNet]: https://developer.cisco.com/
+[Cisco pyATS]: https://developer.cisco.com/site/pyats/
 
-# Installation
+This package was initially developed internally in Cisco, and is now 
+release to the general public starting late 2017 through [Cisco DevNet]. 
 
-Installation guide can be found on [our website].
+    https://developer.cisco.com/pyats/
+    
+.. _Cisco DevNet: https://developer.cisco.com/
 
-[our website]: https://developer.cisco.com/site/pyats/
+# Development Mode
+
+To start developing plugins for Unicon, clone this repository into your pyATS
+virtual environment, and run `make develop`:
+
+```shell
+
+bash$ cd ~/pyats
+bash$ git clone https://github.com/CiscoTestAutomation/unicon.plugins
+bash$ cd unicon.plugins
+bash$ make develop
 
 ```
-$ pip install unicon
-$ pip install unicon.plugins
-```
 
-# ChangeLog
+# Support & Community
 
-Change logs can be found [here](docs/changelog).
-
-> Copyright (c) 2019 Cisco Systems, Inc. and/or its affiliates
+See https://developer.cisco.com/docs/pyats/#!license-support page for details.

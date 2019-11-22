@@ -1,37 +1,71 @@
-Introduction
-============
+Unicon Plugins
+==============
 
-Unicon is a framework for developing device control libraries for routers,
-switches and servers. It is developed purely in python, hence no dependency on
-Tcl based infrastructure. Unicon is also test framework agnostic and can be used
-with/without pyats.
+.. note::
 
-As a framework it provides a set of classes and settings which can be
-further sub-classed to create platform specific implementations.
+    this is the plugins component of Unicon. The usage of this package requires
+    ``unicon`` main package.
 
-One of the main design goals of unicon is `DRY` (Do Not Repeat Yourself).
-Hence the base classes handle all the common stuff which are applicable to all
-the platforms. This makes it very easy for a developer to implement connection
-library for a targeted platform, as she only ends up writing the differential
-code.
+Unicon is a package aiming to provide a unified connection experience to network
+devices through typical command-line management interface. By wrapping the 
+underlying session (eg, telnet, ssh), Unicon provides:
 
-unicon.plugins is plugins for different platforms. All the platform
-implementations are arranged in a hierarchical fashion in order  to provide
-a good fault isolation. It was initially developed internally in Cisco, and is
-now available to the general public starting late 2017.
+- direct and proxied connections through any common CLI interface (telnet, ssh, serial etc)
+- power of expect-like programming without having to deal with low-level logic
+- multi-vendor support through an agnostic API interface
+- seamless handling of CLI modes (eg, enable, configure, admin-configure mode)
+- rejected commands, command error detections
+- value-add statful services (specific to the platform)
 
-Installation
-============
+and is extensible: platform supports and services are implemented via 
+open-source plugins.
 
-unicon and unicon.plugins can be installed using the `pip` command. Assuming
-that you have already sourced your virtualenv, run the following commands
-on the shell::
+Unicon is the standard, go-to CLI connection implementation for `Cisco pyATS`_
+framework.
 
-    pip install unicon
-    pip install unicon.plugins
+.. _Cisco pyATS: https://developer.cisco.com/site/pyats/
 
-Community
-=========
+This package was initially developed internally in Cisco, and is now 
+release to the general public starting late 2017 through `Cisco DevNet`_. 
 
-Feel free to join us by visiting our DevNet portal at
-https://developer.cisco.com/site/pyats/.
+    https://developer.cisco.com/pyats/
+    
+.. _Cisco DevNet: https://developer.cisco.com/
+
+
+Requirements
+------------
+
+- Linux/macOS/WSL
+- Python 3.4+
+
+Quick Start
+-----------
+
+.. code-block:: bash
+
+    bash$ pip install unicon
+
+
+For more information on setting up your Python development environment,
+such as creating virtual environment and installing ``pip`` on your system, 
+please refer to `Virtual Environment and Packages`_ in Python tutorials.
+
+.. _Virtual Environment and Packages: https://docs.python.org/3/tutorial/venv.html
+
+Examples
+--------
+
+See example of a Unicon connection usage with Cisco IOS devices at:
+
+    https://github.com/CiscoDevNet/pyats-ios-sample
+
+In addition, there is a sample plugin package you can follow to develop Unicon
+plugins for new platforms on top of Unicon:
+
+    https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_example
+
+Support & Community
+-------------------
+
+See https://developer.cisco.com/docs/pyats/#!license-support page for details.

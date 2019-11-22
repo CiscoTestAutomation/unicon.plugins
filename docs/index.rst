@@ -1,5 +1,17 @@
-Unicon Connection Library
-=========================
+Unicon: Plugins
+===============
+
+.. note::
+
+    This is the developer documentation for Unicon plugins. 
+
+    This portion of documentation is specific to everything related to the 
+    individual platform plugins (their services, apis, patterns). 
+
+    This index file is not directly used in the final Unicon documentation hosted 
+    on DevNet - only the sub-pages/content are. The final Unicon documentation
+    retroactively includes the user guides for these plugins.
+
 
 Unicon is a framework for developing device control libraries for routers,
 switches and servers. It is developed purely in Python.
