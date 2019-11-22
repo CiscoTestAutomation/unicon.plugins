@@ -6,7 +6,7 @@ SOURCEDIR     = .
 PROD_USER     = pyadm@pyats-ci
 PROD_PKGS     = /auto/pyats/packages/cisco-shared
 PYTHON        = python
-TESTCMD       = $(PYTHON) setup.py test
+TESTCMD       = runAll --path=tests/
 BUILD_CMD     = $(PYTHON) setup.py bdist_wheel --dist-dir=$(DIST_DIR)
 PYPIREPO      = pypitest
 
