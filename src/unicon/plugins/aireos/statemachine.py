@@ -2,7 +2,7 @@
 from unicon.statemachine import Path, State, StateMachine
 from .patterns import AireosPatterns
 
-from unicon_plugins.plugins.generic.statements import default_statement_list
+from unicon.plugins.generic.statements import default_statement_list
 
 
 p = AireosPatterns()
