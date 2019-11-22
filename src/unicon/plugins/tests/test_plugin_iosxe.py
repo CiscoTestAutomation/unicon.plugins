@@ -165,6 +165,33 @@ VRF info: (vrf in name/id, vrf out name/id)
   1 192.0.0.5 msec *  1 msec""".\
 splitlines()))
 
+    def test_traceroute_vrf(self):
+        c = Connection(hostname='Router',
+                                start=['mock_device_cli --os iosxe --state isr_exec'],
+                                os='iosxe',
+                                username='cisco',
+                                tacacs_password='cisco',
+                                enable_password='cisco')
+        r = c.traceroute('192.0.0.5', vrf='MG501')
+        self.assertEqual(r.strip(), "\r\n".join("""traceroute vrf MG501
+Protocol [ip]: 
+Target IP address: 192.0.0.5
+Ingress traceroute [n]: 
+Source address or interface: 
+DSCP Value [0]: 
+Numeric display [n]: 
+Timeout in seconds [3]: 
+Probe count [3]: 
+Minimum Time to Live [1]: 
+Maximum Time to Live [30]: 
+Port Number [33434]: 
+Loose, Strict, Record, Timestamp, Verbose[none]: 
+Type escape sequence to abort.
+Tracing the route to 192.0.0.5
+VRF info: (vrf in name/id, vrf out name/id)
+1 192.0.0.5 msec *  1 msec""".\
+splitlines()))
+
 class TestIosXEluginBashService(unittest.TestCase):
 
     def test_bash(self):

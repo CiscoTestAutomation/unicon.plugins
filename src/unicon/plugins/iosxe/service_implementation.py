@@ -65,7 +65,6 @@ class Ping(GenericPing):
             "ping vrf {vrf}".format(vrf=vrf) if vrf else "ping"
         super().call_service(addr=addr, command=command, **kwargs)
 
-
 # HA Services
 # -----------
 class HAConfigure(GenericHAConfigure):

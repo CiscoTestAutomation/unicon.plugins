@@ -150,6 +150,9 @@ enable_isr:
 
     "traceroute":
       new_state: traceroute_proto_isr
+    
+    "traceroute vrf MG501":
+      new_state: traceroute_proto_isr
       
     "not a real command":
       response:
