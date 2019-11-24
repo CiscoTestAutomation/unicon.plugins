@@ -520,6 +520,7 @@ class TestLinuxPluginTERM(unittest.TestCase):
       l = tb.devices.lnx
       s = LinuxSettings()
       delattr(s, 'TERM')
+      delattr(s, 'ENV')
       l.connect(settings=s)
       l.execute('PS1=bash#')
       # forcing the prompt pattern without $
