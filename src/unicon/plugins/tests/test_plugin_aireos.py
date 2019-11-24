@@ -233,7 +233,7 @@ class TestAireOsPlugin(unittest.TestCase):
 
     def test_press_any_key(self):
         self.c.connect()
-        self.c.execute("grep exclude generation 'show run-config startup-commands'", timeout=2)
+        self.c.execute("grep exclude generation 'show run-config startup-commands'")
 
     def test_more(self):
         self.c.connect()
