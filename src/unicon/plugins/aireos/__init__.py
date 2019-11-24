@@ -19,6 +19,7 @@ class AireosServiceList(ServiceList):
         self.ping = svc.AireosPing
         self.copy = svc.AireosCopy
         self.execute = svc.AireosExecute
+        self.configure = svc.AireosConfigure
 
 
 class AireosConnection(BaseSingleRpConnection):

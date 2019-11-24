@@ -794,13 +794,24 @@ class Configure(BaseService):
         self.service_name = 'config'
         self.timeout = connection.settings.CONFIG_TIMEOUT
         self.commit_cmd = ''
-        self.utils = utils
         self.lock_retries = connection.settings.CONFIG_LOCK_RETRIES
         self.lock_retry_sleep = connection.settings.CONFIG_LOCK_RETRY_SLEEP
         self.bulk = connection.settings.BULK_CONFIG
         self.bulk_chunk_lines = connection.settings.BULK_CONFIG_CHUNK_LINES
         self.bulk_chunk_sleep = connection.settings.BULK_CONFIG_CHUNK_SLEEP
         self.__dict__.update(kwargs)
+
+        class ConfigUtils(GenericUtils):
+            def truncate_trailing_prompt(self, con_state,
+                                         result,
+                                         hostname=None,
+                                         result_match=None):
+                host_idx = result.rfind(hostname)
+                result = result[:host_idx] if host_idx \
+                    else result
+                return result
+
+        self.utils = ConfigUtils()
 
     def pre_service(self, *args, **kwargs):
         self.prompt_recovery = kwargs.get('prompt_recovery', False)
@@ -904,11 +915,12 @@ class Configure(BaseService):
         except Exception as err:
             raise SubCommandFailure('Configuration failed', err) \
                 from err
-        cmd_result = cmd_result.match_output
-        cmd_result = utils.truncate_trailing_prompt(
+
+        cmd_result = self.utils.truncate_trailing_prompt(
             handle.state_machine.get_state(handle.state_machine.current_state),
-            cmd_result,
-            hostname=self.connection.hostname)
+            cmd_result.match_output,
+            hostname=self.connection.hostname,
+            result_match=cmd_result)
         self.result += cmd_result
 
 
