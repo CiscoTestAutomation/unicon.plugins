@@ -172,7 +172,8 @@ splitlines()))
                                 username='cisco',
                                 tacacs_password='cisco',
                                 enable_password='cisco')
-        r = c.traceroute('192.0.0.5', vrf='MG501')
+        r = c.traceroute('192.0.0.5', vrf='MG501', count=30)
+        self.maxDiff = None
         self.assertEqual(r.strip(), "\r\n".join("""traceroute vrf MG501
 Protocol [ip]: 
 Target IP address: 192.0.0.5
@@ -189,7 +190,7 @@ Loose, Strict, Record, Timestamp, Verbose[none]:
 Type escape sequence to abort.
 Tracing the route to 192.0.0.5
 VRF info: (vrf in name/id, vrf out name/id)
-1 192.0.0.5 msec *  1 msec""".\
+  1 192.0.0.5 msec *  1 msec""".\
 splitlines()))
 
 class TestIosXEluginBashService(unittest.TestCase):
