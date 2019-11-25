@@ -120,8 +120,9 @@ setup(
     # NOTE: asyncssh is also a dev dependency needed to run unit test,
     # but is left off the list to allow continued python 3.4 support.
     extras_require = {
-        'robot': ['robotframework'],
-        'dev': ['cisco-distutils',
+        'dev': ['setuptools',
+                'pip',
+                'wheel',
                 'coverage',
                 'restview',
                 'Sphinx',
