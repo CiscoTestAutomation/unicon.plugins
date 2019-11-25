@@ -12,7 +12,8 @@ from unicon.plugins.generic.service_implementation import \
     HaConfigureService as GenericHAConfigure,\
     HaExecService as GenericHAExecute,\
     HAReloadService as GenericHAReload,\
-    SwitchoverService as GenericHASwitchover
+    SwitchoverService as GenericHASwitchover, \
+    Traceroute as GenericTraceroute
 
 
 from .service_statements import overwrite_previous, are_you_sure, \
@@ -49,13 +50,20 @@ class Execute(GenericExecute):
                                confirm,
                                want_continue])
 
+class Traceroute(GenericTraceroute):
+    def call_service(self, addr, command="traceroute", vrf=None, timeout = None,
+                     error_pattern=None, **kwargs):
+        if 'vrf' not in command and vrf:
+            command = command.replace('traceroute', 'traceroute vrf {}'.
+                format(str(vrf)))
+        super().call_service(addr=addr, command=command, 
+            error_pattern=error_pattern, timeout=timeout, **kwargs)
 
 class Ping(GenericPing):
     def call_service(self, addr, command="", *, vrf=None, **kwargs):
         command = command if command else \
             "ping vrf {vrf}".format(vrf=vrf) if vrf else "ping"
         super().call_service(addr=addr, command=command, **kwargs)
-
 
 # HA Services
 # -----------

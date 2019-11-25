@@ -24,6 +24,7 @@ class IosXEServiceList(ServiceList):
         self.configure = svc.Configure
         self.execute = svc.Execute
         self.ping = svc.Ping
+        self.traceroute = svc.Traceroute
         self.bash_console = svc.BashService
 
 

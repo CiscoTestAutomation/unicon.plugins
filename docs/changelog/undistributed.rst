@@ -14,4 +14,7 @@ Features and Bug Fixes:
 
 - aireos plugin updates: support known states, support for hostname learning
   `execute` service raises SubCommandFailure if error is detected in CLI output.
- 
+
+- Regex added for Resolve AS number option
+
+- IOSXE and Generic plugins were modified. Service pattern added to support "Resolve AS number" output. VRF variable support added for IOSXE Traceroute
