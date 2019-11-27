@@ -183,7 +183,7 @@ class AireosCopy(BaseService):
         # Validate input
         for parameter in ['source_file', 'path', 'server']:
             if not param.get(parameter):
-                raise SubCommandFailure(f'{parameter} must be specified')
+                raise SubCommandFailure('{} must be specified'.format(parameter))
 
         # Extract directory and filename
         param['path'] = os.path.dirname(param['source_file'])
