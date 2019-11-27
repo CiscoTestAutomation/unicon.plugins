@@ -1,6 +1,39 @@
 November 2019
 =============
 
+November 27th
+-------------
+
+.. csv-table:: Module Versions
+    :header: "Modules", "Versions"
+
+        ``unicon.plugins``, v19.11.1
+
+
+Install Instructions
+^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+    bash$ pip install unicon.plugins
+
+
+Upgrade Instructions
+^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+    bash$ pip install --upgrade unicon.plugins
+
+
+Features and Bug Fixes:
+^^^^^^^^^^^^^^^^^^^^^^^
+
+- aireos plugin
+
+  - remove f-strings that is not supported on python 3.4 and 3.5
+
+
 November 26th
 -------------
 
