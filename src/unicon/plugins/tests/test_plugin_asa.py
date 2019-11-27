@@ -40,7 +40,8 @@ class TestAsaPluginConnect(unittest.TestCase):
                        os='asa',
                        enable_password='cisco',
                        password='cisco')
-        c.connect()
+        r = c.connect()
+        self.assertEqual(r, 'ASA/pri/act>')
 
     def test_login_connect_ssh(self):
         c = Connection(hostname='ASA',
@@ -50,7 +51,8 @@ class TestAsaPluginConnect(unittest.TestCase):
                             tacacs_password='cisco',
                             line_password='cisco',
                             enable_password='cisco')
-        c.connect()
+        r = c.connect()
+        self.assertEqual(r, 'Are you sure you want to continue connecting (yes/no)? yes\r\nPassword: cisco\r\nASA#')
 
     def test_connect_more(self):
         c = Connection(hostname='ASA',
@@ -61,7 +63,8 @@ class TestAsaPluginConnect(unittest.TestCase):
                             line_password='cisco',
                             enable_password='cisco',
                             init_exec_commands=['show version'])
-        c.connect()
+        r = c.connect()
+        self.assertEqual(r, 'ASA#')
 
     def test_asa_reload(self):
         c = Connection(hostname='ASA',
@@ -78,7 +81,7 @@ class TestAsaPluginConnect(unittest.TestCase):
 class TestAsaPluginExecute(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.c = Connection(hostname='switch',
+        cls.c = Connection(hostname='ASA',
                         start=['mock_device_cli --os asa --state asa_enable'],
                         os='asa',
                         username='cisco',
@@ -96,6 +99,25 @@ class TestAsaPluginExecute(unittest.TestCase):
         with self.assertRaises(SubCommandFailure) as err:
           r = self.c.execute('network-object host 5.5.50.10')
 
+    def test_show_version_looks_like_prompt(self):
+        v = self.c.execute('show version 2')
+        self.assertEqual(v.replace('\r',''), mock_data['asa_enable']['commands']['show version 2']['response'].rstrip())
+
+
+class TestAsaPluginLearnHostname(unittest.TestCase):
+
+    def test_learn_hostname(self):
+        c = Connection(hostname='ASA',
+                       start=['mock_device_cli --os asa --state asa_enable --hostname "MyFirewall"'],
+                       os='asa',
+                       username='cisco',
+                       tacacs_password='cisco',
+                       init_exec_commands=[],
+                       init_config_commands=[],
+                       learn_hostname=True
+                       )
+        c.connect()
+        self.assertEqual(c.hostname, 'MyFirewall')
 
 
 if __name__ == "__main__":

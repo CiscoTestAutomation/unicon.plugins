@@ -9,7 +9,7 @@ connect_ssh:
       new_state: asa_password
 
 asa_disable:
-  prompt: "ASA>"
+  prompt: "%N>"
   commands:
     "enable":
       new_state: asa_password
@@ -21,7 +21,7 @@ asa_password:
       new_state: asa_enable
 
 asa_enable:
-  prompt: "ASA#"
+  prompt: "%N#"
   commands: &enable_cmds
     "terminal pager 0": ""
     "config term":
@@ -29,12 +29,18 @@ asa_enable:
     "show version": |2
       Cisco Adaptive Security Appliance Software Version 9.6(4)8 
       Device Manager Version 7.6(2)
+    "show version 2":
+      response: |
+        Cisco Adaptive Security Appliance Software Version 9.6(4)8 <system>
+        Device Manager Version 7.12(1)
+      timing:
+        - 0:,0,0.2
     "changeto context GLOBAL": "ERROR: 'GLOBAL' is not valid"
     "network-object host 5.5.50.10": |
       WARNING: Adding obj (network-object host 5.5.50.10) to grp (Dummy_50) failed; object already exists
 
 asa_enable_more:
-  prompt: "ASA#"
+  prompt: "%N#"
   commands:
     "terminal pager 0": ""
     "config term":
@@ -107,6 +113,7 @@ asa_enable_more:
         Serial Number: JAD230418PC
         Configuration last modified by admin at 16:05:17.109 UTC Thu Jun 13 2019
 
+
 version_more:
   prompt: "<--- More --->"
   commands:
@@ -115,7 +122,7 @@ version_more:
 
 
 asa_config:
-  prompt: "ASA(config)#"
+  prompt: "%N(config)#"
   commands:
     "terminal pager 0": ""
     "end":
@@ -124,7 +131,7 @@ asa_config:
       new_state: asa_enable
 
 asa_disable_pri_act:
-  prompt: "ASA/pri/act>"
+  prompt: "%N/pri/act>"
   commands:
     "enable":
       new_state: asa_password_pri_act
@@ -136,14 +143,14 @@ asa_password_pri_act:
       new_state: asa_enable_pri_act
 
 asa_enable_pri_act:
-  prompt: "ASA/pri/act#"
+  prompt: "%N/pri/act#"
   commands:
     "terminal pager 0": ""
     "config term":
       new_state: asa_config_pri_act
 
 asa_config_pri_act:
-  prompt: "ASA/pri/act(config)#"
+  prompt: "%N/pri/act(config)#"
   commands:
     "terminal pager 0": ""
     "end":
@@ -222,7 +229,7 @@ proceed_reload:
                         San Jose, California 95134-1706
 
 asa_reload:
-  prompt: "ASA#"
+  prompt: "%N#"
   commands:
     "reload":
       new_state: proceed_reload
