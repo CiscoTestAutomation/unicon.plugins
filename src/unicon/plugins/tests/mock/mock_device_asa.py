@@ -70,7 +70,7 @@ def main(args=None):
         parser = argparse.ArgumentParser()
         parser.add_argument('--state', help='initial state')
         parser.add_argument('-d', action='store_true', help='Debug')
-        parser.add_argument('--hostname', help='Device hostname (default: Router')
+        parser.add_argument('--hostname', help='Device hostname (default: ASA')
         args = parser.parse_args()
 
     if args.d:
@@ -84,7 +84,7 @@ def main(args=None):
     if args.hostname:
         hostname = args.hostname
     else:
-        hostname = 'Router'
+        hostname = 'ASA'
 
     md = MockDeviceAsa(hostname=hostname, state=state)
     md.run()
