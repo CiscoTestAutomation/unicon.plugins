@@ -30,6 +30,8 @@ aireos_exec:
       new_state: aireos_reset_forced
     "grep exclude generation 'show run-config startup-commands'":
       new_state: aireos_press_any_key
+    "show run-config":
+      new_state: aireos_press_enter_key
     "show command with more":
       new_state: aireos_show_command_with_more
     "save config":
@@ -75,7 +77,13 @@ aireos_press_any_key:
         # WLC Config Begin <Wed Nov 13 16:10:02 2019>"
        new_state: aireos_exec
 
-
+aireos_press_enter_key:
+  prompt: Press Enter to continue..
+  commands:
+     "":
+       response: |
+        System Inventory
+       new_state: aireos_exec
 
 aireos_reset_forced:
   prompt: "Do you still want to force a reboot (y/N) "

@@ -235,6 +235,10 @@ class TestAireOsPlugin(unittest.TestCase):
         self.c.connect()
         self.c.execute("grep exclude generation 'show run-config startup-commands'")
 
+    def test_press_enter_key(self):
+        self.c.connect()
+        self.c.execute("show run-config")
+
     def test_more(self):
         self.c.connect()
         self.c.execute("show command with more")
