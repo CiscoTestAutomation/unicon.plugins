@@ -1163,7 +1163,8 @@ class Ping(BaseService):
                               '(U|u)nknown (H|h)ost',
                               'Success rate is 0 percent',
                               '100.00% packet loss',
-                              '100 % packet loss']
+                              '100 % packet loss',
+                              'Invalid host']
 
         self.__dict__.update(kwargs)
 
