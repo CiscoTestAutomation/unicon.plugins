@@ -8,20 +8,25 @@ class SpitfirePatterns(IOSXRPatterns):
         ## Always have the first match group (.*?) as this is the data 
         ## returned as the cli output . 
         self.enable_prompt = \
-            r'^(.*?)RP/\d+/RP[01]/CPU\d+:(%N|ios)\s*#\s*?$'
+            r'^(.*?)RP/\d+/RP[01]/CPU\d+:(%N|ios)\s*#.*?$'
         self.config_prompt = \
-            r'^(.*?)RP/\d+/RP[01]/CPU\d+:(%N|ios)\s*\(config.*\)\s*#\s*?$'
+            r'^(.*?)RP/\d+/RP[01]/CPU\d+:(%N|ios)\s*\(config.*\)\s*#.*?$'
         self.bmc_prompt = \
-            r'^(.*?)root@spitfire-arm:.+?#\s*?$'
+            r'^(.*?)root@spitfire-arm:.+?#.*?$'
         self.xr_bash_prompt = \
-            r'^(.*?)\[(ios|%N):.+?\]\$\s*?$'
+            r'^(.*?)\[(ios|%N):.+?\]\$.*?$'
         self.xr_run_prompt = \
-            r'^(.*?)\[node\d_(?:RP|)[01]_CPU\d:.+?\]\$\s*?$'
+            r'^(.*?)\[node\d_(?:RP|)[01]_CPU\d:.+?\]\$.*?$'
         self.bmc_login_prompt = \
-            r'^(.*?)spitfire-arm login:\s*?$'
+            r'^(.*?)spitfire-arm login:.*?$'
         self.xr_env_prompt = \
-            r'^(.*?)XR\[(ios|%N):(?:~|.+?)\]\$\s*?$'
+            r'^(.*?)XR\[(ios|%N):(?:~|.+?)\]\$.*?$'
         self.bad_passwords = \
             r'^.*?% (Bad passwords|Access denied|Authentication failed|Login incorrect)' 
         self.confirm_prompt = \
-            r'^(.*?)\[confirm\]\s*$'
+            r'^(.*?)\[confirm\]\s*.*?$'
+        self.username_prompt = \
+            r'^.*([Uu]sername|[Ll]ogin):.*?$'
+        self.password_prompt = \
+            r'^.*[Pp]assword:.*?$'
+
