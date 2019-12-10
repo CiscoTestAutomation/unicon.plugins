@@ -351,6 +351,35 @@ class TestIosXrSpitfirePluginConnectConfigLock(unittest.TestCase):
         self.md.stop()
 
 
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
+class TestIosXrSpitfirePluginSwitchTo(unittest.TestCase):
+    
+    @classmethod
+    def setUpClass(self):
+        self.c = Connection(hostname='Router',
+                            start=['mock_device_cli --os iosxr --state spitfire_enable'],
+                            os='iosxr',
+                            series='spitfire',
+                            username='cisco',
+                            enable_password='cisco123',
+                            )
+        self.c.connect()
+
+
+    def test_switchto(self):
+        self.c.switchto("config")
+        self.assertEqual(self.c.spawn.match.match_output,'configure terminal\r\nRP/0/RP0/CPU0:Router(config)#')
+        self.c.switchto('enable')
+        self.assertEqual(self.c.spawn.match.match_output,'end\r\nRP/0/RP0/CPU0:Router#')
+
+
+    @classmethod
+    def tearDownClass(self):
+        self.c.disconnect()
+
+
+
 if __name__ == "__main__":
     unittest.main()
 
