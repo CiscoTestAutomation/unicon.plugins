@@ -46,8 +46,8 @@ class SpitfireSingleRpStateMachine(IOSXRSingleRpStateMachine):
            ])
 
         def switch_x86_to_bmc_console(statemachine, spawn, context):
-            spawn.sendline("\027") # Old ctrl+w , leaving for backward compatibility
-            spawn.sendline("\015") # new ctrl+o 
+            spawn.sendline("\x17") # Old ctrl+w , leaving for backward compatibility
+            spawn.sendline("\x0F") # new ctrl+o 
             time.sleep(3)
             spawn.sendline("\r")
 
@@ -58,8 +58,8 @@ class SpitfireSingleRpStateMachine(IOSXRSingleRpStateMachine):
         self.add_path(xr_bash_to_bmc)
 
         def switch_bmc_to_x86_console(statemachine, spawn, context):
-            spawn.sendline("\027") # Old ctrl+w , leaving for backward compatibility
-            spawn.sendline("\015") # new ctrl+o 
+            spawn.sendline("\x17") # Old ctrl+w , leaving for backward compatibility
+            spawn.sendline("\x0F") # new ctrl+o 
             time.sleep(3)
             spawn.sendline("\r")
 
