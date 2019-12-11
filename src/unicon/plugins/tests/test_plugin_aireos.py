@@ -244,12 +244,9 @@ class TestAireOsPlugin(unittest.TestCase):
         self.c.execute("show command with more")
 
     def test_execute_error_pattern(self):
-        with self.assertRaises(SubCommandFailure) as err:
-          r = self.c.execute('transfer upload start')
-        with self.assertRaises(SubCommandFailure) as err:
-          r = self.c.execute('show foo')
-        with self.assertRaises(SubCommandFailure) as err:
-          r = self.c.execute('debug lwapp')
+        for cmd in ['transfer upload start', 'show foo', 'debug lwapp']:
+            with self.assertRaises(SubCommandFailure) as err:
+                r = self.c.execute(cmd)
 
     def test_save_config(self):
         self.c.connect()
