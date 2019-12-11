@@ -243,6 +243,10 @@ class TestAireOsPlugin(unittest.TestCase):
         self.c.connect()
         self.c.execute("show command with more")
 
+    def test_execute_error_pattern(self):
+        with self.assertRaises(SubCommandFailure) as err:
+          r = self.c.execute('transfer upload start')
+
     def test_save_config(self):
         self.c.connect()
         self.c.execute('save config')
