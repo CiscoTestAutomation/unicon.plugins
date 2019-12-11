@@ -36,6 +36,9 @@ aireos_exec:
       new_state: aireos_show_command_with_more
     "save config":
       new_state: aireos_confirm_save
+    "transfer upload start": "% Error: Config file transfer failed - Unknown error - refer to log"
+    "show foo": "Incorrect usage.  Use the '?' or <TAB> key to list commands."
+    "debug lwapp": "This command has been deprecated! Please use 'debug capwap' instead."
     "show memory statistics": |2
       
     System Memory Statistics:
