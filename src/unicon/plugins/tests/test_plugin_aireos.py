@@ -246,11 +246,14 @@ class TestAireOsPlugin(unittest.TestCase):
     def test_execute_error_pattern(self):
         with self.assertRaises(SubCommandFailure) as err:
           r = self.c.execute('transfer upload start')
+        with self.assertRaises(SubCommandFailure) as err:
+          r = self.c.execute('show foo')
+        with self.assertRaises(SubCommandFailure) as err:
+          r = self.c.execute('debug lwapp')
 
     def test_save_config(self):
         self.c.connect()
         self.c.execute('save config')
-
 
 class TestAireOsPluginLearnHostname(unittest.TestCase):
     def test_learn_hostname(self):
