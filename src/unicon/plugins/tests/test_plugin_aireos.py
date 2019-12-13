@@ -235,14 +235,22 @@ class TestAireOsPlugin(unittest.TestCase):
         self.c.connect()
         self.c.execute("grep exclude generation 'show run-config startup-commands'")
 
+    def test_press_enter_key(self):
+        self.c.connect()
+        self.c.execute("show run-config")
+
     def test_more(self):
         self.c.connect()
         self.c.execute("show command with more")
 
+    def test_execute_error_pattern(self):
+        for cmd in ['transfer upload start', 'show foo', 'debug lwapp']:
+            with self.assertRaises(SubCommandFailure) as err:
+                r = self.c.execute(cmd)
+
     def test_save_config(self):
         self.c.connect()
         self.c.execute('save config')
-
 
 class TestAireOsPluginLearnHostname(unittest.TestCase):
     def test_learn_hostname(self):

@@ -26,7 +26,9 @@ class AireOsStatements():
         self.yes_no_stmt = [execute_patterns.are_you_sure,
                             'sendline(y)',
                             None, True, False]
-
+        self.press_enter_stmt = [execute_patterns.press_enter_stmt,
+                                 'sendline()',
+                                 None, True, False]
 
 aireos_statements = AireOsStatements()
 
@@ -35,4 +37,5 @@ reload_statements = [aireos_statements.are_you_sure_stmt,
                      aireos_statements.enter_user_name_stmt]  # loop_continue=False
 
 execute_statements = [aireos_statements.press_any_key_stmt,
-                      aireos_statements.yes_no_stmt]
+                      aireos_statements.yes_no_stmt,
+                      aireos_statements.press_enter_stmt]

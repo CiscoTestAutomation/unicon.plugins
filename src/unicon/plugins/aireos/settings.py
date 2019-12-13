@@ -14,7 +14,7 @@ class AireosSettings(GenericSettings):
         ]
         self.RELOAD_TIMEOUT = 400
         self.ERROR_PATTERN = [
-            r'^Error:',
+            r'^(%\s*)?Error:',
             r'syntax error',
             r'Aborted',
             r'result false',
