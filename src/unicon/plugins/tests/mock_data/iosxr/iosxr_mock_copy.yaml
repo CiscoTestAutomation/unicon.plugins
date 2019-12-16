@@ -1,0 +1,49 @@
+copy_harddisk_wildcard_tftp:
+  prompt: "Source filename [/harddisk:]?"
+  commands:
+    "*.txt":
+      new_state: copy_harddisk_wildcard_tftp_address
+
+copy_harddisk_wildcard_tftp_address:
+  prompt: "Address or name of remote host [1.1.1.1]?"
+  commands:
+    "1.1.1.1":
+      new_state: copy_harddisk_wildcard_tftp_dest_directory
+
+copy_harddisk_wildcard_tftp_dest_directory:
+  prompt: "Destination directory []?"
+  commands:
+    "auto/tftp/user/log_tmp":
+      new_state: copy_harddisk_wildcard_tftp_dest_confirm_1
+
+copy_harddisk_wildcard_tftp_dest_confirm_1:
+  prompt: "Copy harddisk:/1.txt to tftp://1.1.1.1/auto/tftp/user/log_tmp/1.txt[confirm]"
+  commands:
+    "":
+      new_state: copy_harddisk_wildcard_tftp_dest_confirm_2
+      response: |
+        Writing tftp://1.1.1.1/auto/tftp/user/log_tmp/1.txt
+        C
+        907 bytes copied in      0 sec
+
+copy_harddisk_wildcard_tftp_dest_confirm_2:
+  prompt: "Copy harddisk:/2.txt to tftp://1.1.1.1/auto/tftp/user/log_tmp/2.txt[confirm]"
+  commands:
+    "":
+      new_state: copy_harddisk_wildcard_tftp_dest_confirm_3
+      response: |
+        Writing tftp://1.1.1.1/auto/tftp/user/log_tmp/2.txt
+        CCCC
+        59719 bytes copied in      1 sec
+
+copy_harddisk_wildcard_tftp_dest_confirm_3:
+  prompt: "Copy harddisk:/3.txt to tftp://1.1.1.1/auto/tftp/user/log_tmp/3.txt[confirm]"
+  commands:
+    "":
+      new_state: enable
+      response: |
+        Writing tftp://1.1.1.1/auto/tftp/user/log_tmp/3.txt
+        CCCCCCCC
+        120273 bytes copied in      1 sec
+
+        Copy operation success

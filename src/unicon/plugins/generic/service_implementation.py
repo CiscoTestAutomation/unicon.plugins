@@ -1313,7 +1313,8 @@ class Copy(BaseService):
         # Inputs supported
         copy_options = ['source', 'dest', 'dest_file', 'source_file',
                         'server', 'user', 'password', 'vrf', 'erase',
-                        'partition', 'overwrite', 'timeout', 'net_type']
+                        'partition', 'overwrite', 'timeout', 'net_type',
+                        'dest_directory']
 
         # Default values
         copy_context = AttributeDict({})

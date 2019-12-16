@@ -169,6 +169,14 @@ def copy_dest_handler(spawn, context):
     else:
         spawn.sendline(context['dest_file'])
 
+
+def copy_dest_directory_handler(spawn, context):
+    if context['dest_directory'] is '':
+        spawn.sendline()
+    else:
+        spawn.sendline(context['dest_directory'])
+
+
 def handle_poap_prompt(spawn, session):
     if 'poap_flag' not in session:
         session.poap_flag = True
@@ -899,14 +907,21 @@ dest_file = Statement(pattern=pat.dest_file,
                       loop_continue=True,
                       continue_timer=True)
 
-copy_statement_list = [copy_retry_message, copy_error_message, source_filename, copy_file, src_file,
-                       hostname, dest_file, host, nx_hostname, partition,
-                       config, writeto, file_to_write, username,
-                       password, erase_before_copy, net_type, copy_confirm,
-                       memory, copy_confirm_1, copy_confirm_yes, copy_reconfirm,
-                       copy_reconfirm, copy_progress, rcp_confirm, copy_overwrite,
-                       copy_nx_vrf, copy_proceed, tftp_addr, copy_continue,
-                       copy_complete, copy_other]
+dest_directory = Statement(pattern=pat.dest_directory,
+                           action=copy_dest_directory_handler,
+                           args=None,
+                           loop_continue=True,
+                           continue_timer=False)
+
+copy_statement_list = [copy_retry_message, copy_error_message, source_filename,
+                       copy_file, src_file, hostname, dest_file, dest_directory,
+                       host, nx_hostname, partition, config, writeto,
+                       file_to_write, username, password, erase_before_copy,
+                       net_type, copy_confirm, memory, copy_confirm_1,
+                       copy_confirm_yes, copy_reconfirm, copy_reconfirm,
+                       copy_progress, rcp_confirm, copy_overwrite, copy_nx_vrf,
+                       copy_proceed, tftp_addr, copy_continue, copy_complete,
+                       copy_other]
 
 
 #############################################################################
