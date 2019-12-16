@@ -118,6 +118,39 @@ class TestCopyService(unittest.TestCase):
         self.assertEqual(err.exception.args[0], 'Copy failed')
 
 
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
+class TestIosxrCopyService(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.d = Connection(hostname='Router',
+                           start=['mock_device_cli --os iosxr --state enable'],
+                           os='iosxr')
+        cls.d.connect()
+        cls.md = mock_device.MockDevice(device_os='iosxr', state='enable')
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.d.disconnect()
+
+    def test_wildcard_copy(self):
+        output = self.d.copy(
+            source='harddisk:',
+            source_file='*.txt',
+            dest='tftp:',
+            dest_directory='auto/tftp/user/log_tmp',
+            server='1.1.1.1',
+        )
+        output = '\n'.join(output.splitlines())
+        file_confirms = ['copy_harddisk_wildcard_tftp_dest_confirm_1',
+                         'copy_harddisk_wildcard_tftp_dest_confirm_2',
+                         'copy_harddisk_wildcard_tftp_dest_confirm_3']
+        for confirm in file_confirms:
+            self.assertIn(
+                self.md.mock_data[confirm]['commands']['']['response'], output)
+
+
 class TestNxosCopyService(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

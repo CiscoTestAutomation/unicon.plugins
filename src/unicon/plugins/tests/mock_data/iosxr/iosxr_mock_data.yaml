@@ -312,6 +312,8 @@ enable:
         % Invalid i"
     "reload":
       new_state: reload_confirm_prompt
+    "copy  harddisk: tftp:":
+      new_state: copy_harddisk_wildcard_tftp
 
 half_confirm_prompt:
   prompt: "Clear logging buffer [confirm] [y"

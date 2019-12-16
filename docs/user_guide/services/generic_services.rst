@@ -661,6 +661,7 @@ source              filename/device partition/remote type ( i.e image.bin/disk0:
 source_file         source file name in device disk/tftp (file name with path)
 dest                destination filename/device partition/remote type( i.e startup-config/disk0:/scp:)
 dest_file           destination file name on device disk / tftp (file name with path)
+dest_directory      destination directory for wildcard copy
 server              tftp/ftp server address or a name known to DNS
 user                tftp/ftp/scp username for image copy
 password            tftp/ftp/scp password for image copy.  May be specified as a :ref:`secret string<secret_strings>` device credential.

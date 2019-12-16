@@ -125,6 +125,7 @@ class CopyPatterns():
         self.host = r'Address or name of remote host.*\?'
         self.src_file = r'Name of file to copy\?'
         self.dest_file = r'Destination filename.*$'
+        self.dest_directory = r'Destination directory.*$'
         #Move this to NXOS group
         self.nx_hostname = r'^.*Enter hostname for the (tftp|ftp|scp) server:\s*$'
         self.partition = r'^.*Which partition\?.*$'
@@ -134,7 +135,7 @@ class CopyPatterns():
         self.password = r'^.*[Pp]assword.*(\[.*\])?.*$'
         self.erase_before_copy = r'^.*Erase .*before (writing|copying)\?\s*\[confirm\]\s*$'
         self.net_type = r'^.*Copy.*from.*\?.*\[confirm\].*$'
-        self.copy_confirm = r'^.*Copy.*from.*\?.*\[confirm\].*$'
+        self.copy_confirm = r'^.*Copy.*(from|to).*\[confirm\].*$'
         self.memory = r'^.* memory\?\s*\[confirm\]\s*$'
         self.copy_confirm_1 = r'^.*Are you sure\?.*\[confirm\]\s*$'
         self.copy_confirm_yesno = r'^.*Are you sure\?.*$'
