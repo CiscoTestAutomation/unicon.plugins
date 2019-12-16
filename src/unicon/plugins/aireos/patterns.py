@@ -22,7 +22,7 @@ class AireosReloadPatterns(UniconCorePatterns):
     def __init__(self):
         super().__init__()
         self.force_reboot = r'^(.*?)Do you still want to force a reboot \(y/N\)'
-        self.are_you_sure = r'^(.*?)Are you sure you want to start.*\(y/N\)'
+        self.are_you_sure = r'^(.*?)Are you sure you (would like to reset the system|want to start)\?\s*\(y/N\)'
         self.enter_user_name = r'^(.*?)Enter User Name \(.*\)'
 
 
