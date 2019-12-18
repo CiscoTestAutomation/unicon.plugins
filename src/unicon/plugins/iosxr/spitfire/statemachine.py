@@ -26,12 +26,13 @@ def switch_console(statemachine, spawn, context):
     # Try ctrl-o (\x0f) and then ctrl-w (\x17)
     for cmd in ['\x0f', '\x17']:
         spawn.send(cmd)
-        sm.go_to('any', spawn)
+        sm.go_to('any', spawn, timeout=spawn.timeout)
         if sm.current_state == target_state:
             spawn.sendline()
             return
 
     raise StateMachineError('Unable to switch console state')
+
 
 
 class SpitfireSingleRpStateMachine(IOSXRSingleRpStateMachine):

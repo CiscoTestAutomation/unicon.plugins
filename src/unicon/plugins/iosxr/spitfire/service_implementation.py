@@ -31,7 +31,6 @@ class Switchto(BaseService):
         if self.get_sm().current_state == target_state:
             self.connection.log.info("Device already at the target state %s" % (target_state))
             return
-    
         self.connection.log.info("+++ %s: %s +++" % (self.service_name, target_state))
 
     def call_service(self, target_state,
@@ -49,7 +48,6 @@ class Switchto(BaseService):
             statements.password_stmt,
             statements.login_stmt
             ])
-        
         timeout = timeout if timeout is not None else self.timeout
 
         valid_states = [x.name for x in sm.states]
@@ -57,11 +55,19 @@ class Switchto(BaseService):
             con.log.warning('%s is not a valid state, ignoring switchto' % target_state)
             return
 
-        con.state_machine.go_to(target_state, con.spawn,
+        if sm.current_state == 'xr_env':
+            con.sendline('exit')
+            con.state_machine.go_to(['xr_bash', 'xr_run'], con.spawn,
                                     context=self.context,
-                                    hop_wise=True,
+                                    hop_wise=False,
                                     timeout=timeout,
                                     dialog=login_dialog)
+
+        con.state_machine.go_to(target_state, con.spawn,
+                                context=self.context,
+                                hop_wise=True,
+                                timeout=timeout,
+                                dialog=login_dialog)
 
         self.end_state = sm.current_state
 
