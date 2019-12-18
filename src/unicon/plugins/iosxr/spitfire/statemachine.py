@@ -63,6 +63,23 @@ class SpitfireSingleRpStateMachine(IOSXRSingleRpStateMachine):
             time.sleep(3)
             spawn.sendline("\r")
 
+        def path_to_xr_enable_from_xr_env(statemachine, spawn, context):
+            sm = statemachine
+
+            #send an exit first to see which state we end up in 
+            spawn.sendline('exit')
+
+            #update current state with latest state
+            sm.go_to('any', spawn, dialog=Dialog([statements.escape_char_stmt, statements.press_return_stmt]))
+
+            # Run the go to once again to reach enable state if we arent already there magically.
+            if sm.current_state != 'enable':
+                sm.go_to('enable', spawn,
+                                   context=context,
+                                   hop_wise=True,
+                                   timeout=spawn.timeout)
+
+
         bmc_to_xr = Path(bmc, xr, switch_bmc_to_x86_console, login_dialog)
         self.add_path(bmc_to_xr)
 
@@ -90,6 +107,9 @@ class SpitfireSingleRpStateMachine(IOSXRSingleRpStateMachine):
         self.add_path(xr_run_to_xr_env)
         xr_env_to_xr_run = Path(xr_env, xr_run, "exit", None)
         self.add_path(xr_env_to_xr_run)
+        
+        xr_env_to_xr = Path (xr_env,xr,path_to_xr_enable_from_xr_env, login_dialog)
+        self.add_path(xr_env_to_xr)
 
         self.add_default_statements(self.default_commands)
 
