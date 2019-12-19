@@ -1,6 +1,37 @@
 December 2019
 =============
 
+December 19th
+-------------
+
+.. csv-table:: Module Versions
+    :header: "Modules", "Versions"
+
+        ``unicon.plugins``, v19.12.1
+
+
+Install Instructions
+^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+    bash$ pip install unicon.plugins
+
+
+Upgrade Instructions
+^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+    bash$ pip install --upgrade unicon.plugins
+
+
+Features and Bug Fixes:
+^^^^^^^^^^^^^^^^^^^^^^^
+
+- Introduction of ios/pagent plugin
+
+
 December 17th
 -------------
 

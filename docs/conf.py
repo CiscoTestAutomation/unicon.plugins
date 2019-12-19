@@ -43,11 +43,14 @@ if os.environ.get('DEVNET', None) == 'true':
     intersphinx_mapping = {
         'python': ('http://docs.python.org/3.6', None ),
         'pyats':  ('https://pubhub.devnetcloud.com/media/pyats/docs', None ),
+        'unicon':  ('https://pubhub.devnetcloud.com/media/unicon/docs', None ),
     }
 else:
     intersphinx_mapping = {
         'python': ('http://docs.python.org/3.6', None ),
         'pyats':  ('http://wwwin-pyats.cisco.com/documentation/latest', None ),
+        'unicon':  ('http://wwwin-pyats.cisco.com/cisco-shared/unicon/latest',
+             None ),
     }
 
 

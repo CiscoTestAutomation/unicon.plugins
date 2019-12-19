@@ -28,6 +28,7 @@ network device, and corresponds to ther pyATS testbed YAML counterparts.
     ``ios``, ``ap``
     ``ios``, ``iol``
     ``ios``, ``iosv``
+    ``ios``, ``pagent``,,"See example below."
     ``iosxe``
     ``iosxe``, ``cat3k``
     ``iosxe``, ``cat3k``, ``ewlc``
@@ -155,3 +156,42 @@ Example: Linux Server
           linux:
             protocol: ssh
             ip: 2.2.2.2
+
+
+Example: IOS Pagent
+-------------------
+
+The ios/pagent plugin requires the ``pagent_key`` to be specified
+as an argument to connection.  When the device transitions to enable state
+the plugin enters the pagent key for you.
+
+.. code-block:: yaml
+
+   device.connect(pagent_key='123412341234')
+
+Alternatively, you could specify the pagent key as an argument in your
+pyATS testbed YAML:
+
+.. code-block:: yaml
+
+    # Example
+    # -------
+    #
+    #   testbed yaml for a single pagent device using Unicon
+
+    device1:
+        os: 'ios'
+        series: 'pagent'
+        type: 'router'
+        credentials:
+            default:
+                username: lab
+                password: lab
+        connections:
+          a:
+            protocol: telnet
+            ip: 10.64.70.11
+            port: 2042
+
+            arguments:
+              pagent_key: '123412341234'
