@@ -233,7 +233,7 @@ class TestAireOsPlugin(unittest.TestCase):
 
     def test_restart(self):
         self.c.connect()
-        self.c.execute("restart")
+        self.c.reload("restart")
 
     def test_press_any_key(self):
         self.c.connect()

@@ -37,9 +37,9 @@ aireos_statements = AireOsStatements()
 
 reload_statements = [aireos_statements.are_you_sure_stmt,
                      aireos_statements.force_reboot_stmt,
-                     aireos_statements.enter_user_name_stmt]  # loop_continue=False
+                     aireos_statements.enter_user_name_stmt,
+                     aireos_statements.would_you_like_to_save_stmt]  # loop_continue=False
 
 execute_statements = [aireos_statements.press_any_key_stmt,
                       aireos_statements.yes_no_stmt,
-                      aireos_statements.press_enter_stmt,
-                      aireos_statements.would_you_like_to_save_stmt]
+                      aireos_statements.press_enter_stmt]
