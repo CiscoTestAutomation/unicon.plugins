@@ -231,6 +231,10 @@ class TestAireOsPlugin(unittest.TestCase):
         self.cc.connect()
         self.cc.reload()
 
+    def test_restart(self):
+        self.c.connect()
+        self.c.execute("restart")
+
     def test_press_any_key(self):
         self.c.connect()
         self.c.execute("grep exclude generation 'show run-config startup-commands'")

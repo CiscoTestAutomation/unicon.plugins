@@ -49,3 +49,4 @@ class AireosExecutePatterns(UniconCorePatterns):
         self.press_any_key = r'(.*?)Press any key to continue'
         self.are_you_sure = r'(.*?)Are you sure .*\([yY]/[nN]\) *?$'
         self.press_enter_stmt = r'(.?)Press Enter to continue.*'
+        self.would_you_like_to_save = r'Would you like to save them now?\? \(y/N\)'
