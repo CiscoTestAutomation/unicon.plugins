@@ -373,6 +373,21 @@ class TestIosXrSpitfirePluginSwitchTo(unittest.TestCase):
         self.c.switchto('enable')
         self.assertEqual(self.c.spawn.match.match_output,'end\r\nRP/0/RP0/CPU0:Router#')
 
+    def test_switchto_xr_env(self):
+        self.c.switchto("xr_run")
+        self.assertEqual(self.c.spawn.match.match_output,'run\r\n[node0_RP0_CPU0:~]$')
+        self.c.switchto("xr_env")
+        self.assertEqual(self.c.spawn.match.match_output,'xrenv\r\nXR[ios:~]$')
+        self.c.switchto('enable')
+        self.assertEqual(self.c.spawn.match.match_output,'exit\r\nRP/0/RP0/CPU0:Router#')
+        self.c.switchto("xr_bash")
+        self.assertEqual(self.c.spawn.match.match_output,'bash\r\n[ios:/misc/scratch]$')
+        self.c.switchto("xr_env")
+        self.assertEqual(self.c.spawn.match.match_output,'xrenv\r\nXR[ios:~]$')
+        self.c.switchto('enable')
+        self.assertEqual(self.c.spawn.match.match_output,'exit\r\nRP/0/RP0/CPU0:Router#')
+
+
 
     @classmethod
     def tearDownClass(self):
