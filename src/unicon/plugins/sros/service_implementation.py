@@ -41,7 +41,7 @@ class SrosServiceMixin(object):
         super().post_service(*args, **kwargs)
 
 
-class SrosExecute(SrosServiceMixin, Execute):
+class SrosMdcliExecute(SrosServiceMixin, Execute):
 
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
@@ -50,7 +50,7 @@ class SrosExecute(SrosServiceMixin, Execute):
         self.service_name = 'execute'
 
 
-class SrosConfigure(SrosServiceMixin, Configure):
+class SrosMdcliConfigure(SrosServiceMixin, Configure):
 
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
@@ -74,7 +74,7 @@ class SrosClassicExecute(SrosServiceMixin, Execute):
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'classiccli'
-        self.end_state = 'mdcli'
+        self.end_state = 'classiccli'
         self.service_name = 'classic_execute'
 
 
@@ -83,6 +83,6 @@ class SrosClassicConfigure(SrosServiceMixin, Configure):
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'classiccli'
-        self.end_state = 'mdcli'
+        self.end_state = 'classiccli'
         self.service_name = 'classic_config'
         self.commit_cmd = ''

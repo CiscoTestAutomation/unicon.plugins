@@ -26,28 +26,28 @@ class TestSrosPlugin(unittest.TestCase):
 
     def tearDown(self):
         cmd = 'show router interface coreloop'
-        output = self.con.execute(cmd)
+        output = self.con.mdcli_execute(cmd)
         expect = self.md.mock_data['execute']['commands'][cmd]
         self.assertEqual(self.joined(output), self.joined(expect))
 
     def test_connect(self):
         self.assertIn('A:grpc@COTKON04XR2#', self.con.spawn.match.match_output)
 
-    def test_execute(self):
+    def test_mdcli_execute(self):
         cmd = 'show router interface coreloop'
-        output = self.con.execute(cmd)
+        output = self.con.mdcli_execute(cmd)
         expect = self.md.mock_data['execute']['commands'][cmd]
         self.assertEqual(self.joined(output), self.joined(expect))
 
-    def test_configure(self):
+    def test_mdcli_configure(self):
         cmd = 'router interface coreloop ipv4 primary address 1.1.1.1 prefix-length 32'
-        output = self.con.configure('global', cmd)
+        output = self.con.mdcli_configure('global', cmd)
         expect = self.md.mock_data['configure_global']['commands'][cmd]
         self.assertIn(self.joined(expect), self.joined(output))
 
-    def test_configure_commit_fail(self):
+    def test_mdcli_configure_commit_fail(self):
         cmd = 'router interface coreloop ipv4 primary address 2.2.2.2 prefix-length 32'
-        output = self.con.configure('private', cmd)
+        output = self.con.mdcli_configure('private', cmd)
         expect = self.md.mock_data['configure_private']['commands'][cmd]
         commit = self.md.mock_data['configure_private']['commands']['commit']
         self.assertIn(self.joined(expect), self.joined(output))
