@@ -1,4 +1,4 @@
 Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-- add plugin for Nokia TiMOS
+- add plugin for Nokia SR-OS

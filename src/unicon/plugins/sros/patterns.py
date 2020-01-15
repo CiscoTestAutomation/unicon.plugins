@@ -3,7 +3,7 @@ __author__ = 'Difu Hu <pyats-support@cisco.com;pyats-support-ext@cisco.com>'
 from unicon.patterns import UniconCorePatterns
 
 
-class TimosPatterns(UniconCorePatterns):
+class SrosPatterns(UniconCorePatterns):
 
     def __init__(self):
         super().__init__()

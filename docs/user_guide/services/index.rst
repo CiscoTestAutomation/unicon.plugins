@@ -20,6 +20,6 @@ This part of the document covers all the services supported by Unicon.
     nxos  
     staros
     vos
-    timos
+    sros
 
 .. sectionauthor:: ATS Team
