@@ -27,4 +27,5 @@ supported_os = [
     'staros',
     'aci',
     'sdwan',
+    'timos'
 ]
