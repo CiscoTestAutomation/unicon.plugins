@@ -1,6 +1,6 @@
 Timos
 =====
-This section lists all services for Timos.
+This section lists all services for Nokia SR-OS.
 
 execute
 -------

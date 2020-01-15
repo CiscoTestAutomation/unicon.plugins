@@ -2,12 +2,12 @@ __author__ = 'Difu Hu <pyats-support@cisco.com;pyats-support-ext@cisco.com>'
 
 from unicon.statemachine import State, Path, StateMachine
 
-from .patterns import TimosPatterns
+from .patterns import SrosPatterns
 
-patterns = TimosPatterns()
+patterns = SrosPatterns()
 
 
-class TimosSingleRpStateMachine(StateMachine):
+class SrosSingleRpStateMachine(StateMachine):
 
     def create(self):
         mdcli = State('mdcli', patterns.mdcli_prompt)

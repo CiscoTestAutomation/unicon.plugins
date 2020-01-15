@@ -4,12 +4,12 @@ from unicon.eal.dialogs import Dialog, Statement
 from unicon.core.errors import SubCommandFailure
 from unicon.plugins.generic.service_implementation import Configure, Execute
 
-from .statements import timos_statements
+from .statements import sros_statements
 
 KEY_RETURN_ROOT = '\x1a'
 
 
-class TimosServiceMixin(object):
+class SrosServiceMixin(object):
 
     def return_to_cli_root(self, state):
         handle = self.get_handle()
@@ -20,7 +20,7 @@ class TimosServiceMixin(object):
                               loop_continue=False,
                               continue_timer=False,
                               trim_buffer=True)
-        dialog = Dialog([timos_statements.discard_uncommitted, statement])
+        dialog = Dialog([sros_statements.discard_uncommitted, statement])
         handle.spawn.send(KEY_RETURN_ROOT)
         try:
             dialog.process(handle.spawn)
@@ -41,7 +41,7 @@ class TimosServiceMixin(object):
         super().post_service(*args, **kwargs)
 
 
-class TimosExecute(TimosServiceMixin, Execute):
+class SrosExecute(SrosServiceMixin, Execute):
 
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
@@ -50,7 +50,7 @@ class TimosExecute(TimosServiceMixin, Execute):
         self.service_name = 'execute'
 
 
-class TimosConfigure(TimosServiceMixin, Configure):
+class SrosConfigure(SrosServiceMixin, Configure):
 
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
@@ -69,7 +69,7 @@ class TimosConfigure(TimosServiceMixin, Configure):
         super().call_service(command, *args, **kwargs)
 
 
-class TimosClassicExecute(TimosServiceMixin, Execute):
+class SrosClassicExecute(SrosServiceMixin, Execute):
 
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
@@ -78,7 +78,7 @@ class TimosClassicExecute(TimosServiceMixin, Execute):
         self.service_name = 'classic_execute'
 
 
-class TimosClassicConfigure(TimosServiceMixin, Configure):
+class SrosClassicConfigure(SrosServiceMixin, Configure):
 
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)

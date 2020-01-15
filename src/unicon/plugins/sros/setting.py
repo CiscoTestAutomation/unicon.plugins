@@ -3,7 +3,7 @@ __author__ = 'Difu Hu <pyats-support@cisco.com;pyats-support-ext@cisco.com>'
 from unicon.plugins.generic import GenericSettings
 
 
-class TimosSettings(GenericSettings):
+class SrosSettings(GenericSettings):
 
     def __init__(self):
         super().__init__()

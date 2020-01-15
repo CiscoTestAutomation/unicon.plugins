@@ -5,21 +5,21 @@ from unittest.mock import patch
 
 from unicon import Connection
 from unicon.mock.mock_device import MockDevice
-from unicon.plugins.timos import service_implementation
+from unicon.plugins.sros import service_implementation
 
 patch.TEST_PREFIX = ('test', 'setUp', 'tearDown')
 
 
 @patch.object(service_implementation, 'KEY_RETURN_ROOT', 'ctrl+z\n')
-class TestTimosPlugin(unittest.TestCase):
+class TestSrosPlugin(unittest.TestCase):
 
     def setUp(self):
-        self.md = MockDevice(device_os='timos', state='execute')
+        self.md = MockDevice(device_os='sros', state='execute')
         self.joined = lambda string: '\n'.join(string.splitlines())
         self.con = Connection(
-            os='timos',
+            os='sros',
             hostname='COTKON04XR2',
-            start=['mock_device_cli --os timos --state connect_ssh'],
+            start=['mock_device_cli --os sros --state connect_ssh'],
             credentials={'default': {'username': 'grpc', 'password': 'nokia'}}
         )
         self.con.connect()

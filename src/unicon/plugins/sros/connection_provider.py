@@ -3,13 +3,13 @@ __author__ = 'Difu Hu <pyats-support@cisco.com;pyats-support-ext@cisco.com>'
 from unicon.bases.routers.connection_provider import BaseSingleRpConnectionProvider
 from unicon.eal.dialogs import Dialog
 
-from .statements import (timos_pre_connection_statement_list,
-                         timos_auth_other_statement_list,
-                         timos_auth_username_password_statement_list,
+from .statements import (sros_pre_connection_statement_list,
+                         sros_auth_other_statement_list,
+                         sros_auth_username_password_statement_list,
                          custom_auth_username_password_statements)
 
 
-class TimosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
+class SrosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
 
     def init_handle(self):
         con = self.connection
@@ -28,7 +28,7 @@ class TimosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
             con.settings.PASSWORD_PROMPT
         )
         return con.connect_reply \
-               + Dialog(timos_pre_connection_statement_list
-                        + timos_auth_other_statement_list
+               + Dialog(sros_pre_connection_statement_list
+                        + sros_auth_other_statement_list
                         + custom_user_pw_stmt
-                        + timos_auth_username_password_statement_list)
+                        + sros_auth_username_password_statement_list)
