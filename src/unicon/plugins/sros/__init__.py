@@ -17,8 +17,8 @@ class SrosServiceList(object):
         self.expect_log = svc.ExpectLogging
         self.log_user = svc.LogUser
         self.log_file = svc.LogFile
-        self.execute = sros_svc.SrosExecute
-        self.configure = sros_svc.SrosConfigure
+        self.mdcli_execute = sros_svc.SrosMdcliExecute
+        self.mdcli_configure = sros_svc.SrosMdcliConfigure
         self.classic_execute = sros_svc.SrosClassicExecute
         self.classic_configure = sros_svc.SrosClassicConfigure
 

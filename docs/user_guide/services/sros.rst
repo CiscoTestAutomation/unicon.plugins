@@ -2,14 +2,14 @@ Timos
 =====
 This section lists all services for Nokia SR-OS.
 
-execute
--------
+mdcli_execute
+-------------
 Service to execute commands on device via MD-CLI.
 Please refer to:
 :doc:`Common Services  <generic_services>`
 
-configure
----------
+mdcli_configure
+---------------
 Service to configure commands on device via MD-CLI.
 Please refer to:
 :doc:`Common Services  <generic_services>`
@@ -27,7 +27,7 @@ mode       str      Configuration mode (exclusive, global, private, read-only)
         #Example
         --------
         cmd = 'router interface coreloop ipv4 primary address 1.1.1.1 prefix-length 32'
-        output = device.configure('private', cmd)
+        output = device.mdcli_configure('private', cmd)
 
 classic_execute
 ---------------
