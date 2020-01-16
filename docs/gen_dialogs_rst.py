@@ -138,4 +138,9 @@ Dialog Patterns
 
             print_dialogs('connect', c.connection_provider.get_connection_dialog())
 
-            print_dialogs('execute', c.execute.dialog if c.execute.dialog else Dialog([]))
+            try:
+                print_dialogs('execute', c.execute.dialog if c.execute.dialog else Dialog([]))
+            except:
+                print('---------------- ERROR ---------------', file = sys.stderr)
+                traceback.print_exc()
+                print('--------------------------------------', file = sys.stderr)
