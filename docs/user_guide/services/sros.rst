@@ -1,5 +1,5 @@
-Timos
-=====
+SROS
+====
 This section lists all services for Nokia SR-OS.
 
 mdcli_execute
