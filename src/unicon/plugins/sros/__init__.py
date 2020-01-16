@@ -3,10 +3,10 @@ __author__ = 'Difu Hu <pyats-support@cisco.com;pyats-support-ext@cisco.com>'
 from unicon.bases.routers.connection import BaseSingleRpConnection
 from unicon.plugins.generic import service_implementation as svc
 
-from .connection_provider import SrosSingleRpConnectionProvider
-from .statemachine import SrosSingleRpStateMachine
-from .setting import SrosSettings
 from . import service_implementation as sros_svc
+from .connection_provider import SrosSingleRpConnectionProvider
+from .setting import SrosSettings
+from .statemachine import SrosSingleRpStateMachine
 
 
 class SrosServiceList(object):
@@ -19,8 +19,12 @@ class SrosServiceList(object):
         self.log_file = svc.LogFile
         self.mdcli_execute = sros_svc.SrosMdcliExecute
         self.mdcli_configure = sros_svc.SrosMdcliConfigure
-        self.classic_execute = sros_svc.SrosClassicExecute
-        self.classic_configure = sros_svc.SrosClassicConfigure
+        self.classiccli_execute = sros_svc.SrosClassiccliExecute
+        self.classiccli_configure = sros_svc.SrosClassiccliConfigure
+        self.execute = sros_svc.SrosExecute
+        self.configure = sros_svc.SrosConfigure
+        self.switch_cli_engine = sros_svc.SrosSwitchCliEngine
+        self.get_cli_engine = sros_svc.SrosGetCliEngine
 
 
 class SrosSingleRpConnection(BaseSingleRpConnection):

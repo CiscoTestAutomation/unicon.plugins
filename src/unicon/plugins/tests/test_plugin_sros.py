@@ -7,8 +7,6 @@ from unicon import Connection
 from unicon.mock.mock_device import MockDevice
 from unicon.plugins.sros import service_implementation
 
-patch.TEST_PREFIX = ('test', 'setUp', 'tearDown')
-
 
 @patch.object(service_implementation, 'KEY_RETURN_ROOT', 'ctrl+z\n')
 class TestSrosPlugin(unittest.TestCase):
@@ -24,14 +22,8 @@ class TestSrosPlugin(unittest.TestCase):
         )
         self.con.connect()
 
-    def tearDown(self):
-        cmd = 'show router interface coreloop'
-        output = self.con.mdcli_execute(cmd)
-        expect = self.md.mock_data['mdcli_execute']['commands'][cmd]
-        self.assertEqual(self.joined(output), self.joined(expect))
-
     def test_connect(self):
-        self.assertIn('A:grpc@COTKON04XR2#', self.con.spawn.match.match_output)
+        self.assertIn('COTKON04XR2#', self.con.spawn.match.match_output)
 
     def test_mdcli_execute(self):
         cmd = 'show router interface coreloop'
@@ -41,28 +33,63 @@ class TestSrosPlugin(unittest.TestCase):
 
     def test_mdcli_configure(self):
         cmd = 'router interface coreloop ipv4 primary address 1.1.1.1 prefix-length 32'
-        output = self.con.mdcli_configure('global', cmd)
+        output = self.con.mdcli_configure(cmd, mode='global')
         expect = self.md.mock_data['mdcli_configure_global']['commands'][cmd]
         self.assertIn(self.joined(expect), self.joined(output))
 
     def test_mdcli_configure_commit_fail(self):
         cmd = 'router interface coreloop ipv4 primary address 2.2.2.2 prefix-length 32'
-        output = self.con.mdcli_configure('private', cmd)
+        output = self.con.mdcli_configure(cmd)
         expect = self.md.mock_data['mdcli_configure_private']['commands'][cmd]
         commit = self.md.mock_data['mdcli_configure_private']['commands']['commit']
         self.assertIn(self.joined(expect), self.joined(output))
         self.assertIn(self.joined(commit), self.joined(output))
 
-    def test_classic_execute(self):
+    def test_classiccli_execute(self):
         cmd = 'show router interface coreloop'
-        output = self.con.classic_execute(cmd)
-        expect = self.md.mock_data['classic_execute']['commands'][cmd]
+        output = self.con.classiccli_execute(cmd)
+        expect = self.md.mock_data['classiccli_execute']['commands'][cmd]
         self.assertEqual(self.joined(output), self.joined(expect))
 
-    def test_classic_configure(self):
+    def test_classiccli_configure(self):
         cmd = 'configure router interface coreloop address 111.1.1.1 255.255.255.255'
-        output = self.con.classic_configure(cmd)
-        expect = self.md.mock_data['classic_execute']['commands'][cmd]['response']
+        output = self.con.classiccli_configure(cmd)
+        expect = self.md.mock_data['classiccli_execute']['commands'][cmd]['response']
+        self.assertIn(self.joined(expect), self.joined(output))
+
+    def test_execute_and_cli_engine(self):
+        self.con.switch_cli_engine('classiccli')
+        engine = self.con.get_cli_engine()
+        self.assertEqual(engine, 'classiccli')
+        cmd = 'show router interface coreloop'
+        output = self.con.execute(cmd)
+        expect = self.md.mock_data['classiccli_execute']['commands'][cmd]
+        self.assertEqual(self.joined(output), self.joined(expect))
+
+        self.con.switch_cli_engine('mdcli')
+        engine = self.con.get_cli_engine()
+        self.assertEqual(engine, 'mdcli')
+        cmd = 'show router interface coreloop'
+        output = self.con.execute(cmd)
+        expect = self.md.mock_data['mdcli_execute']['commands'][cmd]
+        self.assertEqual(self.joined(output), self.joined(expect))
+
+    def test_configure_and_cli_engine(self):
+        self.con.switch_cli_engine('mdcli')
+        engine = self.con.get_cli_engine()
+        self.assertEqual(engine, 'mdcli')
+        self.con.mdcli_configure.mode = 'global'
+        cmd = 'router interface coreloop ipv4 primary address 1.1.1.1 prefix-length 32'
+        output = self.con.configure(cmd)
+        expect = self.md.mock_data['mdcli_configure_global']['commands'][cmd]
+        self.assertIn(self.joined(expect), self.joined(output))
+
+        self.con.switch_cli_engine('classiccli')
+        engine = self.con.get_cli_engine()
+        self.assertEqual(engine, 'classiccli')
+        cmd = 'configure router interface coreloop address 111.1.1.1 255.255.255.255'
+        output = self.con.configure(cmd)
+        expect = self.md.mock_data['classiccli_execute']['commands'][cmd]['response']
         self.assertIn(self.joined(expect), self.joined(output))
 
 

@@ -27,19 +27,44 @@ mode       str      Configuration mode (exclusive, global, private, read-only)
         #Example
         --------
         cmd = 'router interface coreloop ipv4 primary address 1.1.1.1 prefix-length 32'
-        output = device.mdcli_configure('private', cmd)
+        output = device.mdcli_configure(cmd)
+        output = device.mdcli_configure(cmd, mode='global')
+        device.mdcli_configure.mode = 'global'
+        output = device.mdcli_configure(cmd)
 
-classic_execute
----------------
+classiccli_execute
+------------------
 Service to execute commands on device via Classic CLI.
 Please refer to:
 :doc:`Common Services  <generic_services>`
 
-classic_configure
------------------
+classiccli_configure
+--------------------
 Service to configure commands on device via Classic CLI.
 Please refer to:
 :doc:`Common Services  <generic_services>`
+
+switch_cli_engine
+-----------------
+Service to switch CLI engine.
+
+=========  =====    ===========================================================
+Argument   Type     Description
+=========  =====    ===========================================================
+engine     str      CLI engine name (mdcli, classiccli)
+=========  =====    ===========================================================
+
+get_cli_engine
+--------------
+Service to get current CLI engine name.
+
+execute
+-------
+Service to execute commands on device via current CLI engine, eg. via mdcli_execute, classiccli_execute.
+
+configure
+---------
+Service to configure commands on device via current CLI engine, eg. via mdcli_configure, classiccli_configure.
 
 send
 ----
