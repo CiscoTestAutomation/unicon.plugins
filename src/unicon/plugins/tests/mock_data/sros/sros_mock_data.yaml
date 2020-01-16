@@ -46,7 +46,7 @@ mdcli_execute:
     "//":
       response: |
         INFO: CLI #2051: Switching to the classic CLI engine
-      new_state: classic_execute
+      new_state: classiccli_execute
 
 mdcli_execute_show:
   prompt: "[show]\r\nA:grpc@COTKON04XR2# "
@@ -117,7 +117,7 @@ mdcli_configure_private_discard_uncommitted:
         WARNING: CLI #2073: Exiting private configuration mode - uncommitted changes are discarded
       new_state: mdcli_execute
 
-classic_execute:
+classiccli_execute:
   prompt: "A:COTKON04XR2# "
   commands:
     "show version": |

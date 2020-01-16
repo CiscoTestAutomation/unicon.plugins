@@ -14,8 +14,8 @@ class SrosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
     def init_handle(self):
         con = self.connection
         con._is_connected = True
-        con.state_machine.go_to('mdcli',
-                                self.connection.spawn,
+        con.state_machine.go_to(con.settings.DEFAULT_CLI_ENGINE,
+                                con.spawn,
                                 context=con.context,
                                 prompt_recovery=self.prompt_recovery,
                                 timeout=con.connection_timeout)

@@ -9,3 +9,7 @@ class SrosSettings(GenericSettings):
         super().__init__()
         self.HA_INIT_EXEC_COMMANDS = []
         self.HA_INIT_CONFIG_COMMANDS = []
+
+        self.DEFAULT_CLI_ENGINE = 'classiccli'
+
+        self.MDCLI_CONFIGURE_DEFAULT_MODE = 'private'
