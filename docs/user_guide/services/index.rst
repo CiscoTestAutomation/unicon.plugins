@@ -17,9 +17,9 @@ This part of the document covers all the services supported by Unicon.
     junos
     linux
     nso
-    nxos  
+    nxos
+    sros
     staros
     vos
-    sros
 
 .. sectionauthor:: ATS Team
