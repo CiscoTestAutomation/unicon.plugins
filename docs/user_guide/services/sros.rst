@@ -1,25 +1,129 @@
 SROS
 ====
-This section lists all services for Nokia SR-OS.
 
-mdcli_execute
--------------
-Service to execute commands on device via MD-CLI.
-For more arguments and examples, please refer to generic "execute" service:
-:doc:`Common Services  <generic_services>`
+This section documents the services available for Nokia SR-OS (a.k.a. TiMOS).
+The implementations to Nokia SR-OS follows documentation available at:
+https://infocenter.nokia.com/public/7750SR160R1A/index.jsp?topic=%2Fcom.sr.mdcli%2Fhtml%2Fusing_mdcli.html
+
+
+switch_cli_engine
+-----------------
+
+API to switch CLI engine for this device connection
+
+=========  =====    ===========================================================
+Argument   Type     Description
+=========  =====    ===========================================================
+engine     str      CLI engine name (mdcli, classiccli)
+=========  =====    ===========================================================
 
 .. code-block:: python
 
-        #Example
-        --------
+        # Example
+        # -------
+
+        # switch to md-cli
+        device.switch_cli_engine('mdcli')
+
+        # switch to classic-cli
+        device.switch_cli_engine('classiccli')
+
+get_cli_engine
+--------------
+
+returns the current cli-engine set for this device connection.
+
+.. code-block:: python
+
+        # Example
+        # -------
+
+        current_engine = device.get_cli_engine()
+
+
+execute
+-------
+
+Similar to generic "execute" service, this api runs aribitrary commands on the
+target device, which yields output, and returns to prompt.
+
+This API will issue the provided command on **current** active CLI engine, 
+internally calling the respective "specific command". Eg:
+
+- if the device is in **MD-CLI** mode, issues command using ``mdcli_execute``
+
+- if the device is in **classic-CLI** mode, issues command using 
+  ``classiccli_execute``
+
+.. code-block:: python
+
+        # Example
+        # -------
+        
+        # set to md-cli mode
+        device.switch_cli_engine('mdcli')
+
+        # device.execute() will now issue command using mdcli mode
+        output = device.execute('show version')
+
+        # switch back to classic cli mode, and issue classic-cli commands
+        device.switch_cli_engine('classiccli')
+        output = device.execute('show router interface "coreloop"')
+
+configure
+---------
+
+Similar to generic "configure" service, this api applies the provided config
+to target device and commits it.
+
+This API will issue the provided command on **current** active CLI engine, 
+internally calling the respective "specific command". Eg:
+
+- if the device is in **MD-CLI** mode, issues command using ``mdcli_configure``
+
+- if the device is in **classic-CLI** mode, issues command using 
+  ``classiccli_configure``
+
+This API accepts a positional argument ``mode`` (used by md-cli), specifying 
+the config mode. Defaults to ``mode='private'``.
+
+.. code-block:: python
+
+        # Example
+        # -------
+
+        # set to md-cli
+        device.switch_cli_engine('mdcli')
+
+        # apply configuration
+        output = device.configure('router interface coreloop ipv4 primary address 1.1.1.1 prefix-length 32')
+
+        # apply configuration using specific configuration mode
+        # (default mode is 'private', and can be changed via configuration)
+        output = device.configure('delete router interface "coreloop" ipv4', mode='private')
+
+        # switch to classic-cli & apply config
+        device.switch_cli_engine('classiccli')
+        output = device.configure('configure router interface "coreloop" address 111.1.1.1 255.255.255.255')
+
+
+mdcli_execute
+-------------
+
+The specific service that implements ``execute()`` api under MD-CLI
+
+.. code-block:: python
+
+        # Example
+        # -------
         output = device.mdcli_execute('show version')
         output = device.mdcli_execute('show router interface "coreloop"')
 
 mdcli_configure
 ---------------
-Service to configure commands on device via MD-CLI.
-For more arguments and examples, please refer to generic "configure" service:
-:doc:`Common Services  <generic_services>`
+
+The specific service that implements ``configure()`` api under MD-CLI
+
 
 One more different argument from `configure` of "Common Services":
 
@@ -31,8 +135,9 @@ mode       str      Configuration mode (exclusive, global, private, read-only)
 
 .. code-block:: python
 
-        #Example
-        --------
+        # Example
+        # -------
+
         cmd = 'router interface coreloop ipv4 primary address 1.1.1.1 prefix-length 32'
         output = device.mdcli_configure(cmd)  # configure on default mode "private"
         output = device.mdcli_configure(cmd, mode='global')  # configure on mode "global"
@@ -41,119 +146,40 @@ mode       str      Configuration mode (exclusive, global, private, read-only)
 
 classiccli_execute
 ------------------
-Service to execute commands on device via Classic CLI.
-For more arguments and examples, please refer to generic "execute" service:
-:doc:`Common Services  <generic_services>`
+
+The specific service that implements ``execute()`` api under Classic-CLI
 
 .. code-block:: python
 
-        #Example
-        --------
+        # Example
+        # -------
+
         output = device.classiccli_execute('show version')
         output = device.classiccli_execute('show router interface "coreloop"')
 
 classiccli_configure
 --------------------
-Service to configure commands on device via Classic CLI.
-For more arguments and examples, please refer to generic "configure" service.
-Please refer to:
-:doc:`Common Services  <generic_services>`
+The specific service that implements ``configure()`` api under classic-CLI
 
 .. code-block:: python
 
-        #Example
-        --------
+        # Example
+        # -------
+
         cmd = 'configure router interface "coreloop" address 111.1.1.1 255.255.255.255'
         output = device.classiccli_configure(cmd)
 
-switch_cli_engine
------------------
-Service to switch CLI engine.
 
-=========  =====    ===========================================================
-Argument   Type     Description
-=========  =====    ===========================================================
-engine     str      CLI engine name (mdcli, classiccli)
-=========  =====    ===========================================================
 
-.. code-block:: python
-
-        #Example
-        --------
-        device.switch_cli_engine('mdcli')
-        device.switch_cli_engine('classiccli')
-
-get_cli_engine
+Other Services
 --------------
-Service to get current CLI engine.
 
-.. code-block:: python
+The following low-level, generic services are also supported for Nokia SR-OS. 
+See :doc:`Common Services  <generic_services>` documentation for usage details.
 
-        #Example
-        --------
-        current_engine = device.get_cli_engine()
-
-execute
--------
-Service to execute commands on device via current CLI engine, eg. via service mdcli_execute or classiccli_execute.
-
-.. code-block:: python
-
-        #Example
-        --------
-        device.switch_cli_engine('mdcli')
-        output = device.execute('show version')  # execute by mdcli_execute
-
-        device.switch_cli_engine('classiccli')
-        output = device.execute('show router interface "coreloop"')  # execute by classiccli_execute
-
-configure
----------
-Service to configure commands on device via current CLI engine, eg. via service mdcli_configure or classiccli_configure.
-
-.. code-block:: python
-
-        #Example
-        --------
-        device.switch_cli_engine('mdcli')
-        output = device.configure('router interface coreloop ipv4 primary address 1.1.1.1 prefix-length 32')  # configure by mdcli_configure
-        output = device.configure('delete router interface "coreloop" ipv4', mode='private')  # configure by mdcli_configure
-
-        device.switch_cli_engine('classiccli')
-        output = device.configure('configure router interface "coreloop" address 111.1.1.1 255.255.255.255')  # configure by classiccli_configure
-
-send
-----
-Service to send the **'command/string'** to spawned channel.
-Please refer to:
-:doc:`Common Services  <generic_services>`
-
-sendline
---------
-Service to send the **'command/string'** with "\r" to spawned channel.
-Please refer to:
-:doc:`Common Services  <generic_services>`
-
-expect
-------
-Service to match a list of patterns against the buffer.
-Please refer to:
-:doc:`Common Services  <generic_services>`
-
-expect_log
-----------
-Service to enable/disable expect debug log.
-Please refer to:
-:doc:`Common Services  <generic_services>`
-
-log_user
---------
-Service to enable/disable device log on screen.
-Please refer to:
-:doc:`Common Services  <generic_services>`
-
-log_file
---------
-Service to get or change device `FileHandler` file.
-Please refer to:
-:doc:`Common Services  <generic_services>`
+- ``send``
+- ``sendline``
+- ``expect``
+- ``expect_log``
+- ``log_user``
+- ``log_file``

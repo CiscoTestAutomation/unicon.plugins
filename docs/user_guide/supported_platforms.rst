@@ -49,6 +49,7 @@ network device, and corresponds to ther pyATS testbed YAML counterparts.
     ``nxos``, ``n9k``
     ``nxos``, ``nxosv``
     ``nso``
+    ``sros``
     ``staros``
     ``vos``
     ``junos``
