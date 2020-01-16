@@ -11,9 +11,9 @@ password:
   prompt: "grpc@10.1.1.11's password: "
   commands:
     "nokia":
-      new_state: execute
+      new_state: mdcli_execute
 
-execute:
+mdcli_execute:
   prompt: "[]\r\nA:grpc@COTKON04XR2# "
   commands:
     "show version": |
@@ -34,21 +34,21 @@ execute:
       Interfaces : 1
       ===============================================================================
     "show":
-      new_state: execute_show
+      new_state: mdcli_execute_show
     "exit": |
 
     "ctrl+z": |
 
     "configure private":
-      new_state: configure_private
+      new_state: mdcli_configure_private
     "configure global":
-      new_state: configure_global
+      new_state: mdcli_configure_global
     "//":
       response: |
         INFO: CLI #2051: Switching to the classic CLI engine
       new_state: classic_execute
 
-execute_show:
+mdcli_execute_show:
   prompt: "[show]\r\nA:grpc@COTKON04XR2# "
   commands:
     "version": |
@@ -69,29 +69,29 @@ execute_show:
       Interfaces : 1
       ===============================================================================
     "exit":
-      new_state: execute
+      new_state: mdcli_execute
     "ctrl+z":
-      new_state: execute
+      new_state: mdcli_execute
 
-configure_global:
+mdcli_configure_global:
   prompt: "[gl:configure]\r\nA:grpc@COTKON04XR2# "
   commands:
     "exit":
-      new_state: execute
+      new_state: mdcli_execute
     "ctrl+z":
-      new_state: execute
+      new_state: mdcli_execute
     "router interface coreloop ipv4 primary address 1.1.1.1 prefix-length 32": |
 
       *
     "commit": ""
 
-configure_private:
+mdcli_configure_private:
   prompt: "[pr:configure]\r\nA:grpc@COTKON04XR2# "
   commands:
     "exit":
-      new_state: configure_private_discard_uncommitted
+      new_state: mdcli_configure_private_discard_uncommitted
     "ctrl+z":
-      new_state: configure_private_discard_uncommitted
+      new_state: mdcli_configure_private_discard_uncommitted
     "router interface coreloop ipv4 primary address 2.2.2.2 prefix-length 32": |
 
       *
@@ -100,7 +100,7 @@ configure_private:
 
       *
 
-configure_private_discard_uncommitted:
+mdcli_configure_private_discard_uncommitted:
   preface: |
     INFO: CLI #2071: Uncommitted changes are present in the candidate configuration. Exiting private configuration mode will discard those changes.
 
@@ -110,12 +110,12 @@ configure_private_discard_uncommitted:
       response: |
 
         *
-      new_state: configure_private
+      new_state: mdcli_configure_private
 
     "y":
       response: |
         WARNING: CLI #2073: Exiting private configuration mode - uncommitted changes are discarded
-      new_state: execute
+      new_state: mdcli_execute
 
 classic_execute:
   prompt: "A:COTKON04XR2# "
@@ -147,4 +147,4 @@ classic_execute:
     "//":
       response: |
         INFO: CLI #2052: Switching to the MD-CLI engine
-      new_state: execute
+      new_state: mdcli_execute
