@@ -185,5 +185,5 @@ timeout                 int (default in None)     timeout in sec for executing c
 .. code-block:: python
     
         device.switchto("xr_env")
-        .... some code blocks that may fail ....
+        .... some commands that need to be run in xr_env state ....
         device.switchto("enable") 
