@@ -53,7 +53,6 @@ network device, and corresponds to ther pyATS testbed YAML counterparts.
     ``staros``
     ``vos``
     ``junos``
-    ``sros``
 
 To use this table - locate your device's os/series/model information, and fill 
 your pyATS testbed YAML with it:
