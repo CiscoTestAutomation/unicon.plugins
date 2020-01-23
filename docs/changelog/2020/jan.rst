@@ -30,4 +30,9 @@ Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 - Introduction of sros plugin for Nokia SR devices.
+
 - Added switchto service to iosxr/spitfire plugin.
+
+- aireos plugin
+
+  - handle 'Would you like to save them now?' prompt.
