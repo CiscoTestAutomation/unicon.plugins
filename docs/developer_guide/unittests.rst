@@ -275,7 +275,8 @@ Create YAML data with the state, prompt and command(s) that you want to match.
 
 
 Note: the above example data is incomplete, see 
-:download:`ios_mock_data.yaml <ios_mock_data.yaml>` for all the data.
+:download:`ios_mock_data.yaml <ios_mock_data.yaml>` 
+for a more complete example.
 
 
 Create a unittest that executes the mock device with the state that you created. 

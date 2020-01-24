@@ -436,7 +436,7 @@ logto        str (stadout/file/both)     to log logs only on file/console/both.
 ==========   =======================     ========================================
 
 
-.. code-block:: python
+.. code-block:: bash
 
     Example::
 
