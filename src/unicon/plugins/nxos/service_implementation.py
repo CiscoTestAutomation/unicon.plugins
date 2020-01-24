@@ -40,7 +40,8 @@ from unicon.plugins.generic.service_statements import send_response
 from unicon.plugins.nxos.service_statements import nxos_reload_statement_list, \
     ha_nxos_reload_statement_list
 from unicon.settings import Settings
-from unicon.utils import AttributeDict, pyats_credentials_available
+from unicon.utils import (AttributeDict, pyats_credentials_available,
+    to_plaintext)
 from .patterns import NxosPatterns
 
 from .utils import NxosUtils
@@ -1138,7 +1139,7 @@ class SwitchVdc(BaseService):
         if credentials:
             credential = vdc_cred or con.context.default_cred_name
             try:
-                vdc_passwd = credentials[credential]['password']
+                vdc_passwd = to_plaintext(credentials[credential]['password'])
             except KeyError:
                 raise UniconAuthenticationError("No password found "
                     "for credential {}.".format(credential))
