@@ -33,6 +33,10 @@ Features and Bug Fixes:
 
 - Added switchto service to iosxr/spitfire plugin.
 
-- aireos plugin
+- aireos plugin:
 
-  - handle 'Would you like to save them now?' prompt.
+  - Handle 'Would you like to save them now?' prompt.
+
+- nxos and fxos/ftd plugins:
+
+  - Fix a bug where credentials were not properly converted to plaintext.
