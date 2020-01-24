@@ -1,5 +1,5 @@
-Changelog
-=========
+Plugins Changelog
+=================
 
 .. toctree::
    :maxdepth: 2
