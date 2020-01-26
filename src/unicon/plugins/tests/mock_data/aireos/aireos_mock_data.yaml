@@ -20,6 +20,8 @@ aireos_exec:
       new_state: aireos_config
     "devshell shell":
       new_state: aireos_devshell
+    "restart":
+      new_state: aireos_would_you_like_to_save
     "reset system forced":
       response: |2
 
@@ -65,12 +67,17 @@ aireos_confirm_save:
     "y":
       new_state: aireos_exec
 
+aireos_would_you_like_to_save:
+  prompt: "Would you like to save them now? (y/N)"
+  commands:
+    "y":
+      new_state: aireos_restart
+
 aireos_show_command_with_more:
   prompt: " --More-- "
   commands:
     " ":
       new_state: aireos_exec
-
 
 aireos_press_any_key:
   prompt: Press any key to continue..
@@ -95,6 +102,13 @@ aireos_reset_forced:
       response: file|mock_data/aireos/aireos_reload_85.txt
       timing:
         - 0:,0,0.005
+      new_state: aireos_login
+
+aireos_restart:
+  prompt: "Are you sure you would like to reset the system? (y/N) "
+  commands:
+    "y":
+      response: file|mock_data/aireos/aireos_restart.txt
       new_state: aireos_login
 
 aireos_login:

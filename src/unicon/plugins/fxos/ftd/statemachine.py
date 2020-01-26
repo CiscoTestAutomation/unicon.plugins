@@ -7,6 +7,7 @@ import re
 from unicon.core.errors import SubCommandFailure, StateMachineError
 from unicon.statemachine import State, Path, StateMachine
 from unicon.eal.dialogs import Dialog, Statement
+from unicon.utils import to_plaintext
 
 from unicon.plugins.generic.statements import GenericStatements
 from unicon.plugins.generic.patterns import GenericPatterns
@@ -73,7 +74,8 @@ def sudo_password_handler(spawn, context):
     credentials = context.get('credentials')
     if credentials:
         try:
-            spawn.sendline(credentials[SUDO_CRED_NAME]['password'])
+            spawn.sendline(
+                to_plaintext(credentials[SUDO_CRED_NAME]['password']))
         except KeyError as exc:
             raise UniconAuthenticationError("No password has been defined "
                 "for credential '{}'.".format(SUDO_CRED_NAME))

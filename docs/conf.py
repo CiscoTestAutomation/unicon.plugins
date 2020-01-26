@@ -69,7 +69,7 @@ master_doc = 'index'
 # General information about the project.
 project = 'Unicon Plugins'
 
-copyright = '2014-2019, Cisco Systems Inc.'
+copyright = '2014-2020, Cisco Systems Inc.'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

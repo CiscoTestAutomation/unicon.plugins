@@ -24,4 +24,9 @@ class SpitfirePatterns(IOSXRPatterns):
         self.bad_passwords = \
             r'^.*?% (Bad passwords|Access denied|Authentication failed|Login incorrect)' 
         self.confirm_prompt = \
-            r'^(.*?)\[confirm\]\s*$'
+            r'^(.*?)\[confirm\]\s*\s*?$'
+        self.username_prompt = \
+            r'^.*([Uu]sername|[Ll]ogin):\s*?$'
+        self.password_prompt = \
+            r'^.*[Pp]assword:\s*?$'
+

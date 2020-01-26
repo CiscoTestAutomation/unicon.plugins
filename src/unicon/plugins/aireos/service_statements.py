@@ -29,12 +29,16 @@ class AireOsStatements():
         self.press_enter_stmt = [execute_patterns.press_enter_stmt,
                                  'sendline()',
                                  None, True, False]
+        self.would_you_like_to_save_stmt = [execute_patterns.would_you_like_to_save,
+                                 'sendline(y)',
+                                 None, True, False]
 
 aireos_statements = AireOsStatements()
 
 reload_statements = [aireos_statements.are_you_sure_stmt,
                      aireos_statements.force_reboot_stmt,
-                     aireos_statements.enter_user_name_stmt]  # loop_continue=False
+                     aireos_statements.enter_user_name_stmt,  # loop_continue=False
+                     aireos_statements.would_you_like_to_save_stmt]  
 
 execute_statements = [aireos_statements.press_any_key_stmt,
                       aireos_statements.yes_no_stmt,

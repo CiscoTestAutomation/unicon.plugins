@@ -1,0 +1,177 @@
+
+
+Updating HBL license statistics file
+ Done.
+
+
+Configuration Saved!
+System will now restart!
+Updating license storage ...  Done.
+
+ Exiting SL process !
+Terminated
+sh: can't kill pid 18154: No such process
+Unloading host drivers...
+Stopping Hardware Acceleration...
+Shutting down NA Connector...
+Shutting down DB Services...
+Shutting down Web Services...
+Unloading host NIC drivers...
+
+
+                      .o88b. d888888b .d8888.  .o88b.  .d88b.
+                     d8P  Y8   `88'   88'  YP d8P  Y8 .8P  Y8.
+                     8P         88    `8bo.   8P      88    88
+                     8b         88      `Y8b. 8b      88    88
+                     Y8b  d8   .88.   db   8D Y8b  d8 `8b  d8'
+                      `Y88P' Y888888P `8888Y'  `Y88P'  `Y88P'
+
+
+Restarting application...
+Press any key now to reboot instead...
+Detecting Hardware ...
+
+
+
+Loading host drivers..
+Loading host NIC drivers..
+Starting Hardware Acceleration...
+Starting Web Services...
+Starting Ulogd...
+Starting NA Connector...
+Starting DB Services...
+
+Cryptographic library self-test....
+Testing SHA1 Short Message 1
+Testing SHA256 Short Message 1
+Testing SHA384 Short Message 1
+SHA1 POST PASSED
+Testing HMAC SHA1 Short Message 1
+Testing HMAC SHA2 Short Message 1
+Testing HMAC SHA384 Short Message 1
+passed!
+
+XML config selected
+iptables: Chain already exists.
+ip6tables: Chain already exists.
+Validating XML configuration
+octeon_device_init: found 1 DPs
+Cisco is a trademark of Cisco Systems, Inc.
+Software Copyright Cisco Systems, Inc. All rights reserved.
+
+Cisco AireOS Version 8.5.140.0
+Initializing OS Services: ok
+Initializing Serial Services: ok
+Initializing Network Services: ok
+Initializing Licensing Services: ok
+Starting Statistics Service: ok
+Starting ARP Services: ok
+Starting Trap Manager: ok
+
+
+License daemon start initialization.....
+
+License daemon running.....
+Starting Data Externalization services: ok
+Starting Network Interface Management Services: ok
+Starting System Services: ok
+Starting FIPS Features: ok : Not enabled
+Starting SNMP services: ok
+Starting Fastpath Hardware Acceleration: ok
+Starting Fastpath DP Heartbeat : ok
+Fastpath CPU0.00(0): Starting Fastpath Application. SDK-Cavium Inc. OCTEON SDK version 3.1.0, build 549. Flags-[DUTY CYCLE] : ok
+Fastpath CPU0.00(0): Initializing last packet received queue. Num of cores(24)
+Fastpath CPU0.00(0): Initializing Global Packet Queue. Num of packets supported(1000)
+Fastpath CPU0.00(0): Init MBUF size: 1856, Subsequent MBUF size: 2040
+Fastpath CPU0.00(0): Core 0 Initialization and FIPS self-test: ok
+Fastpath CPU0.00(0): 24 Cores are being initialized
+Fastpath CPU0.00(0): Initializing Timer...
+Fastpath CPU0.00(0): Initializing Timer...done.
+Fastpath CPU0.00(0): Initializing Timer...
+Fastpath CPU0.00(0): Initializing NBAR AGING Timer...done.
+Fastpath CPU0.01(0): Core 1 Initialization and FIPS self-test: ok
+Fastpath CPU0.02(0): Core 2 Initialization and FIPS self-test: ok
+Fastpath CPU0.03(1): Core 3 Initialization and FIPS self-test: ok
+Fastpath CPU0.04(2): Core 4 Initialization and FIPS self-test: ok
+Fastpath CPU0.05(3): Core 5 Initialization and FIPS self-test: ok
+Fastpath CPU0.06(4): Core 6 Initialization and FIPS self-test: ok
+Fastpath CPU0.07(5): Core 7 Initialization and FIPS self-test: ok
+Fastpath CPU0.08(6): Core 8 Initialization and FIPS self-test: ok
+Fastpath CPU0.09(7): Core 9 Initialization and FIPS self-test: ok
+Fastpath CPU0.10(8): Core 10 Initialization and FIPS self-test: ok
+Fastpath CPU0.11(9): Core 11 Initialization and FIPS self-test: ok
+Fastpath CPU0.12(10): Core 12 Initialization and FIPS self-test: ok
+Fastpath CPU0.13(11): Core 13 Initialization and FIPS self-test: ok
+Starting Switching Services: ok
+Starting QoS Services: ok
+Starting Policy Manager: ok
+Starting Data Transport Link Layer: ok
+Starting Access Control List Services: ok
+Starting System Interfaces: ok
+Starting Client Troubleshooting Service: ok
+Starting Certificate Database: Initializing Curl Globally..
+ok
+Starting VPN Services: ok
+Starting Management Frame Protection: ok
+Starting DNS Services: ok
+ok
+HBL initialization is successful
+Starting Licensing Services: ok
+Starting Redundancy: ok
+Start rmgrPingTask: ok
+Starting LWAPP: ok
+Starting CAPWAP: ok
+Starting LOCP: ok
+Starting Security Services: ok
+Starting OpenDNS Services: ok
+Starting Policy Manager: ok
+Starting TrustSec Services: ok
+Starting Authentication Engine: ok
+Starting Mobility Management: ok
+Starting Capwap Ping Component: ok
+Starting AVC Services: ok
+Starting AVC Flex Services: ok
+Starting Virtual AP Services: ok
+Starting AireWave Director: ok
+Starting Network Time Services: ok
+Starting Cisco Discovery Protocol: ok
+Starting Broadcast Services: ok
+Starting Logging Services: ok
+Starting DHCP Server: ok
+Starting IDS Signature Manager: ok
+Starting RFID Tag Tracking: ok
+Starting RF Profiles: ok
+Starting Environment Status Monitoring Service: ok
+Starting RAID Volume Status Monitoring Service: ok
+Starting Mesh Services:  ok
+Starting TSM: ok
+Starting CIDS Services: ok
+Starting Ethernet-over-IP: ok
+Starting DTLS server:  enabled in CAPWAP
+Starting CleanAir: ok
+Starting WIPS: ok
+Starting SSHPM LSC PROV LIST: ok
+Starting RRC Services: ok
+Starting SXP Services: ok
+Starting Alarm Services: ok
+Starting FMC HS: ok
+Starting IPv6 Services: ok
+Starting Config Sync Manager : ok
+Starting Hotspot Services: Fan Policy : Low power
+ok
+Starting Tunnel Services New: ok
+Starting PMIP Services: ok
+Starting Portal Server Services: ok
+Starting mDNS Services: ok
+Starting Management Services:
+   Web Server:    CLI:    Secure Web: ok
+Starting IPSec Profiles component: ok
+Starting FEW Services: ok
+Starting MS Agent Services: ok
+Starting CPU ACL Logging services: ok
+
+(Cisco Controller) 
+
+Enter User Name (or 'Recover-Config' this one-time only to reset configuration to factory defaults)
+
+User:

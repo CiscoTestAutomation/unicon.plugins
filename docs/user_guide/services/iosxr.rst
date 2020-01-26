@@ -159,3 +159,31 @@ prompt                  str                       bash prompt (default # )
         output1 = conn.execute('ls')
         output2 = conn.execute('pwd')
 
+switchto
+""""""""
+
+Service to switch the router console to any state that user needs in order to perform
+his tests. The api becomes a no-op if the console is already at the state user wants 
+to reach.
+
+The states available to switch to are :
+
+* enable
+* config
+* bmc
+* xr_bash
+* xr_run
+* xr_env
+
+====================    ======================    ========================================
+Argument                Type                      Description
+====================    ======================    ========================================
+target_state            str                       target state user wants the console at
+timeout                 int (default in None)     timeout in sec for executing commands
+====================    ======================    ========================================
+
+.. code-block:: python
+    
+        device.switchto("xr_env")
+        .... some commands that need to be run in xr_env state ....
+        device.switchto("enable") 

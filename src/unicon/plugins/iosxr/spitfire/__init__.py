@@ -7,7 +7,7 @@ from unicon.bases.routers.connection import BaseDualRpConnection
 from unicon.plugins.iosxr import service_implementation as svc
 from unicon.plugins.iosxe.service_implementation import Ping as IosXePing
 
-
+from unicon.plugins.iosxr.spitfire.service_implementation import Switchto
 from unicon.plugins.iosxr.spitfire.statemachine import SpitfireSingleRpStateMachine,SpitfireDualRpStateMachine
 from unicon.plugins.iosxr.spitfire.connection_provider import SpitfireSingleRpConnectionProvider,SpitfireDualRpConnectionProvider
 from unicon.plugins.iosxr.spitfire.settings import SpitfireSettings
@@ -22,6 +22,7 @@ class SpitfireServiceList(ServiceList):
         self.attach_console = svc.AttachModuleConsole
         self.bash_console = svc.BashService
         self.ping = IosXePing
+        self.switchto = Switchto
 
 class SpitfireHAServiceList(HAServiceList):
     """ Generic dual rp services. """
@@ -31,6 +32,7 @@ class SpitfireHAServiceList(HAServiceList):
         self.configure= svc.HaConfigureService
         self.switchover = svc.Switchover
         self.bash_console = svc.BashService
+        self.switchto = Switchto
 
 class SpitfireSingleRpConnection(BaseSingleRpConnection):
     os = 'iosxr'
