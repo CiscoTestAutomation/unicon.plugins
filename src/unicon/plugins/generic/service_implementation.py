@@ -2011,6 +2011,7 @@ will be deprecated in next release. Please use 'reload_command' parameter ***")
             con.active.state_machine.go_to('any',
                                            con.active.spawn,
                                            prompt_recovery=self.prompt_recovery,
+                                           timeout=con.connection_timeout,
                                            context=self.context)
 
             # Bring standby to good state.

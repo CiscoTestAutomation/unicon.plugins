@@ -74,6 +74,7 @@ class Reload(BaseService):
                 prompt_recovery=self.prompt_recovery)
             con.state_machine.go_to(['disable', 'enable'], con.spawn,
                                     context=context,
+                                    timeout=con.connection_timeout,
                                     prompt_recovery=self.prompt_recovery)
         except Exception as err:
             raise SubCommandFailure("Reload failed : {}".format(err))
