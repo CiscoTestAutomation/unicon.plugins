@@ -26,6 +26,7 @@ class IosXEServiceList(ServiceList):
         self.ping = svc.Ping
         self.traceroute = svc.Traceroute
         self.bash_console = svc.BashService
+        self.copy = svc.Copy
 
 
 class HAIosXEServiceList(HAServiceList):

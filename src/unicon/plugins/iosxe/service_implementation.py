@@ -13,7 +13,8 @@ from unicon.plugins.generic.service_implementation import \
     HaExecService as GenericHAExecute,\
     HAReloadService as GenericHAReload,\
     SwitchoverService as GenericHASwitchover, \
-    Traceroute as GenericTraceroute
+    Traceroute as GenericTraceroute, \
+    Copy as GenericCopy
 
 
 from .service_statements import overwrite_previous, are_you_sure, \
@@ -64,6 +65,13 @@ class Ping(GenericPing):
         command = command if command else \
             "ping vrf {vrf}".format(vrf=vrf) if vrf else "ping"
         super().call_service(addr=addr, command=command, **kwargs)
+
+class Copy(GenericCopy):
+    def call_service(self, reply=Dialog([]), vrf=None, *args, **kwargs):
+        if vrf is not None:
+            kwargs['extra_options'] = kwargs.setdefault('extra_options', '') \
+                                      + ' vrf {}'.format(vrf)
+        super().call_service(reply=reply, *args, **kwargs)
 
 # HA Services
 # -----------

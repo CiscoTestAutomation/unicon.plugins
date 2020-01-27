@@ -1,4 +1,7 @@
 Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-- add plugin for Nokia SR-OS
+- iosxe plugin
+
+    - Now copy service passes in vrf via the command line instead of
+      expecting to be prompted for vrf.
