@@ -45,6 +45,29 @@ class TestIosXECat3kEwlcCopy(unittest.TestCase):
                     source_file='/boot/vrf_rp_super_universalk9.edison.bin',
                     dest_file='vrf_rp_super_universalk9.edison.bin')
 
+class TestIosXECat3kEwlcConfigure(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.d = Connection(hostname='Router',
+                           start=['mock_device_cli --os iosxe --state ewlc_enable'],
+                           os='iosxe',
+                           series='cat3k',
+                           model='ewlc',
+                           username='cisco',
+                           tacacs_password='cisco')
+        cls.d.connect()
+
+    @classmethod
+    @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+    @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
+    def tearDownClass(cls):
+        cls.d.disconnect()
+
+    def test_config_with_prompt(self):
+        self.d.expect_log(enable=True)
+        self.d.configure("wlan shutdown")
+
 
 if __name__ == '__main__':
     unittest.main()

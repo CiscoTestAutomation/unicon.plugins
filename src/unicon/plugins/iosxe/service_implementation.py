@@ -17,8 +17,8 @@ from unicon.plugins.generic.service_implementation import \
     Copy as GenericCopy
 
 
-from .service_statements import overwrite_previous, are_you_sure, \
-    delete_filename, confirm, wish_continue, want_continue
+from .service_statements import (overwrite_previous, are_you_sure,
+    delete_filename, confirm, wish_continue, want_continue)
 
 from unicon.plugins.generic.service_implementation import BashService
 
@@ -28,8 +28,12 @@ from unicon.plugins.generic.service_implementation import BashService
 class Configure(GenericConfigure):
     def call_service(self, command=[], reply=Dialog([]), timeout=None, *args,
                      **kwargs):
-        super().call_service(command, reply=reply + Dialog([are_you_sure]),
-                             timeout=timeout, *args, **kwargs)
+        super().call_service(command, reply=reply + \
+            Dialog([are_you_sure,
+                    wish_continue,
+                    confirm,
+                    want_continue]),
+            timeout=timeout, *args, **kwargs)
 
 
 class Config(Configure):
@@ -38,7 +42,9 @@ class Config(Configure):
         self.connection.log.warn('**** This service is deprecated. ' +
                                  'Please use "configure" service ****')
         super().call_service(command, reply=reply + Dialog([are_you_sure,
-                                                            wish_continue]),
+                                                            wish_continue,
+                                                            confirm,
+                                                            want_continue]),
                              timeout=timeout, *args, **kwargs)
 
 
@@ -57,7 +63,7 @@ class Traceroute(GenericTraceroute):
         if 'vrf' not in command and vrf:
             command = command.replace('traceroute', 'traceroute vrf {}'.
                 format(str(vrf)))
-        super().call_service(addr=addr, command=command, 
+        super().call_service(addr=addr, command=command,
             error_pattern=error_pattern, timeout=timeout, **kwargs)
 
 class Ping(GenericPing):
@@ -78,8 +84,12 @@ class Copy(GenericCopy):
 class HAConfigure(GenericHAConfigure):
     def call_service(self, command=[], reply=Dialog([]), timeout=None, *args,
                      **kwargs):
-        super().call_service(command, reply=reply + Dialog([are_you_sure]),
-                             timeout=timeout, *args, **kwargs)
+        super().call_service(command, reply=reply + \
+            Dialog([are_you_sure,
+                    wish_continue,
+                    confirm,
+                    want_continue]),
+            timeout=timeout, *args, **kwargs)
 
 
 class HAConfig(HAConfigure):
@@ -87,9 +97,12 @@ class HAConfig(HAConfigure):
                      **kwargs):
         self.connection.log.warn('**** This service is deprecated. ' +
                                  'Please use "configure" service ****')
-        super().call_service(command, reply=reply + Dialog([are_you_sure,
-                                                            wish_continue]),
-                             timeout=timeout, *args, **kwargs)
+        super().call_service(command, reply=reply + \
+            Dialog([are_you_sure,
+                    wish_continue,
+                    confirm,
+                    want_continue]),
+            timeout=timeout, *args, **kwargs)
 
 
 class HAExecute(GenericHAExecute):

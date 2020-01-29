@@ -118,6 +118,18 @@ ewlc_config:
     "no logging console": ""
     "line console 0":
       new_state: ewlc_config_line
+    "wlan shutdown":
+      new_state: ewlc_wlan_shutdown_confirm
+      response: |2
+        Warning! All WLANs will be disabled.
+    "end":
+      new_state: ewlc_enable
+
+ewlc_wlan_shutdown_confirm:
+    prompt: "Are you sure you want to continue? (y/n)[y]"
+    commands:
+        "y":
+          new_state: ewlc_config
 
 ewlc_config_line:
   prompt: "Router(config-line)#"

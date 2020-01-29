@@ -14,7 +14,7 @@ class IosXEPatterns(GenericPatterns):
         self.overwrite_previous = \
             r'^.*Overwrite the previous NVRAM configuration\?\[confirm\].*$'
         self.are_you_sure = \
-            r'^.*Are you sure you want to continue\? \(y\/n\)\[y\]:\s?$'
+            r'^.*Are you sure you want to continue\? \(y\/n\)\[y\]:?\s?$'
         self.delete_filename = r'^.*Delete filename \[.*\]\?\s*$'
         self.confirm = r'^.*\[confirm\]\s*$'
         self.wish_continue = r'^.*Do you wish to continue\? \[yes\]:\s*$'
