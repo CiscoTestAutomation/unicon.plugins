@@ -280,7 +280,20 @@ class TestAireosPluginStates(unittest.TestCase):
     def test_all_states(self):
         states = ['show', 'test', 'debug', 'transfer', 'license', 'reset', 'save', 'shell']
         for state in states:
+            self.c.log.info('Changing to state %s' % state)
             self.c.state_machine.go_to(state, self.c.spawn)
+            self.assertEqual(self.c.state_machine.current_state, state)
+
+
+class TestAireosPluginConnect(unittest.TestCase):
+
+    def test_connect_with_capwap_sim(self):
+        c = Connection(hostname='Controller',
+                            start=['mock_device_cli --os aireos  --state aireos_exec --hostname "Cisco Capwap Simulator"'],
+                            os='aireos',
+                            username='lab',
+                            init_config_commands=[])
+        c.connect()
 
 
 if __name__ == '__main__':  # pragma: no cover

@@ -525,6 +525,19 @@ password_retries:
   commands:
     "cisco": ""
 
+# Special login state to handle differing enable password
+login_enable:
+  prompt: "Username: "
+  commands:
+    "admin":
+      new_state: password_enable
+
+password_enable:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: console_test_enable
+
 console_test_enable:
   preface: *CC
   prompt: "%N> "
@@ -537,6 +550,9 @@ check_enable_passwd:
   commands:
     "enpasswd":
       new_state: enable
+    "enpasswd2":
+      response: "Invalid password."
+      new_state: console_test_enable
 
 ts_login:
   prompt: "login: "

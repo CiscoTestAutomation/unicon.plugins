@@ -56,12 +56,12 @@ def xr_login_handler(spawn, context, session):
 def bmc_login_handler(spawn, context, session):
     """ handles bmc login prompt
     """
-    credential = get_current_credential(context=context, session=session)
+    credential = BMC_CRED
+    session['bmc_login']=1
     if credential:
         common_cred_username_handler(
             spawn=spawn, context=context, credential=credential)
     else:
-        session['bmc_login']=1
         spawn.sendline(context['bmc_username'])
 
 class SpitfireStatements(GenericStatements):

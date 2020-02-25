@@ -16,6 +16,8 @@ from unicon.bases.routers.connection import ENABLE_CRED_NAME
 from unicon.plugins.utils import (get_current_credential,
     common_cred_password_handler, )
 
+from unicon.plugins.generic.statements import enable_password_handler
+
 from unicon.core.errors import UniconAuthenticationError
 from unicon.utils import to_plaintext
 
@@ -23,19 +25,6 @@ from unicon.utils import to_plaintext
 
 patterns = ASAPatterns()
 settings = ASASettings()
-
-def enable_password_handler(spawn, context, session):
-    credentials = context.get('credentials')
-    enable_credential = credentials[ENABLE_CRED_NAME] if credentials else None
-    if enable_credential:
-        try:
-            spawn.sendline(to_plaintext(enable_credential['password']))
-        except KeyError as exc:
-            raise UniconAuthenticationError("No password has been defined "
-                "for credential {}.".format(ENABLE_CRED_NAME))
-
-    else:
-        spawn.sendline(context['enable_password'])
 
 
 def line_password_handler(spawn, context, session):

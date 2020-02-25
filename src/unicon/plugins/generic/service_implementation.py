@@ -1194,11 +1194,11 @@ class Ping(BaseService):
 
         ping_context = AttributeDict({})
         for a in ping_options:
-            if a is "novell_type":
+            if a == "novell_type":
                 ping_context[a] = "\r"
-            elif a is "sweep_ping":
+            elif a == "sweep_ping":
                 ping_context[a] = "n"
-            elif a is 'extd_ping':
+            elif a == 'extd_ping':
                 ping_context[a] = "n"
             else:
                 ping_context[a] = ""
@@ -1212,7 +1212,7 @@ class Ping(BaseService):
             ping_context[key] = str(kwargs[key])
 
         # Validate Inputs
-        if ping_context['addr'] is "":
+        if ping_context['addr'] == "":
             if addr:
                 # Do string conversion on addr, if specified,
                 # in case the user passes in an ipaddress object instead of a
@@ -1221,17 +1221,17 @@ class Ping(BaseService):
             else:
                 raise SubCommandFailure("Address is not specified ")
 
-        if ping_context['src_route_type'] is not "":
+        if ping_context['src_route_type'] != "":
             if ping_context['src_route_addr'] in "":
                 raise SubCommandFailure("If src route type is set, "
                                         "then src route addr is mandatory \n")
-        elif ping_context['src_route_addr'] is not "":
+        elif ping_context['src_route_addr'] != "":
             raise SubCommandFailure("If src route addr is set, "
                                     "then src route type is mandatory \n")
         # Stringify the command in case it is an object.
         ping_str = str(command)
 
-        if ping_context['topo'] is not "":
+        if ping_context['topo'] != "":
             ping_str = ping_str + "  topo " + ping_context['topo']
 
         spawn = self.get_spawn()
@@ -1319,17 +1319,17 @@ class Copy(BaseService):
         # Default values
         copy_context = AttributeDict({})
         for a in copy_options:
-            if a is "partition":
+            if a == "partition":
                 copy_context[a] = 0
-            elif a is "erase":
+            elif a == "erase":
                 copy_context[a] = "n"
-            elif a is 'overwrite':
+            elif a == 'overwrite':
                 copy_context[a] = True
-            elif a is 'vrf':
+            elif a == 'vrf':
                 copy_context[a] = "Mgmt-intf"
-            elif a is 'timeout':
+            elif a == 'timeout':
                 copy_context[a] = self.timeout
-            elif a is 'password':
+            elif a == 'password':
                 password = kwargs.pop('password', None)
                 if password:
                     copy_context[a] = to_plaintext(password)
@@ -1350,11 +1350,11 @@ class Copy(BaseService):
             self.max_attempts = kwargs['max_attempts']
 
         # Validate input
-        if copy_context['source'] is "" or copy_context['dest'] is "":
+        if copy_context['source'] == "" or copy_context['dest'] == "":
             raise SubCommandFailure(
                 "Source and Destination must be specified ")
 
-        if copy_context['source_file'] is "":
+        if copy_context['source_file'] == "":
             copy_context['source_file'] = copy_context['source']
         remote_source = ""
         remote_dest = ""
@@ -1365,7 +1365,7 @@ class Copy(BaseService):
         if copy_match:
             remote_dest = copy_match.group()
 
-        if remote_dest is not "" or remote_source is not "":
+        if remote_dest != "" or remote_source != "":
             match_server = ""
             src_server_match = re.search(self.copy_pat.addr_in_remote, copy_context['source'])
             dest_server_match = re.search(self.copy_pat.addr_in_remote, copy_context['dest'])
@@ -1379,8 +1379,8 @@ class Copy(BaseService):
                          ipaddress.ip_address(match_server)
                      except Exception:
                          match_server = ""
-            if copy_context['server'] is "":
-                if match_server is "":
+            if copy_context['server'] == "":
+                if match_server == "":
                     raise SubCommandFailure(
                         "Server address must be specified for remote copy")
                 else:
@@ -1553,7 +1553,7 @@ class GetRPState(BaseService):
                      **kwargs):
         """send the command on the right rp and return the output"""
         handle = 'my'
-        if target is 'standby':
+        if target == 'standby':
             handle = 'peer'
 
         try:
@@ -1732,13 +1732,13 @@ class HaExecService(BaseService):
         else:
             self.error_pattern = error_pattern
 
-        if target is 'active':
+        if target == 'active':
             handle = con.active
-        elif target is 'standby':
+        elif target == 'standby':
             handle = con.standby
-        elif target is 'a':
+        elif target == 'a':
             handle = con.a
-        elif target is 'b':
+        elif target == 'b':
             handle = con.b
 
         # user specified search buffer size

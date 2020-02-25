@@ -190,9 +190,9 @@ class AireosCopy(BaseService):
         param['source_file'] = os.path.basename(param['source_file'])
 
         # Sets the time it takes to download and trigger reboot
-        if param['mode'] is 'code':
+        if param['mode'] == 'code':
             timeout = 200
-        elif param['mode'] is 'simconfig':
+        elif param['mode'] == 'simconfig':
             timeout = 50
         else:
             raise SubCommandFailure('Copy mode must be \'code\' or \'simconfig\'')

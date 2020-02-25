@@ -87,10 +87,10 @@ class IOSXRDualRpConnectionProvider(BaseDualRpConnectionProvider):
         """ Identifies the Role of each handle and designates if it is active or
             standby and bring the active RP to enable state """
         con = self.connection
-        if con.a.state_machine.current_state is 'standby_locked':
+        if con.a.state_machine.current_state == 'standby_locked':
             target_rp = 'b'
             other_rp = 'a'
-        elif con.b.state_machine.current_state is 'standby_locked':
+        elif con.b.state_machine.current_state == 'standby_locked':
             target_rp = 'a'
             other_rp = 'b'
         else:

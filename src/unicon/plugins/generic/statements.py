@@ -132,22 +132,64 @@ def user_access_verification(session):
     session['tacacs_login'] = 1
 
 
-def enable_password_handler(spawn, context, session):
+def get_enable_credential_password(context):
+    """ Get the enable password from the credentials.
+
+    1. If there is a previous credential (the last credential used to respond to
+       a password prompt), use its enable_password member if it exists.
+    2. Otherwise, if the user specified a list of credentials, pick the final one in the list and
+       use its enable_password member if it exists.
+    3. Otherwise, if there is a default credential, use its enable_password member if it exists.
+    4. Otherwise, use the well known "enable" credential, password member if it exists.
+    5. Otherwise, use the default credential "password" member if it exists.
+    6. Otherwise, raise error that no enable password could be found.
+
+    """
     credentials = context.get('credentials')
-    enable_credential = credentials[ENABLE_CRED_NAME] if credentials else None
-    if enable_credential:
-        try:
-            spawn.sendline(to_plaintext(enable_credential['password']))
-        except KeyError as exc:
-            raise UniconAuthenticationError("No password has been defined "
-                "for credential {}.".format(ENABLE_CRED_NAME))
-    else:
-        if 'password_attempts' not in session:
-            session['password_attempts'] = 1
+    enable_credential_password = ""
+    login_creds = context.get('login_creds', [])
+    fallback_cred = context.get('default_cred_name', "")
+    if not login_creds:
+        login_creds=[fallback_cred]
+    if not isinstance (login_creds, list):
+        login_creds = [login_creds]
+
+    # Pick the last item in the login_creds list to select the intended
+    # credential even if the device does not ask for a password on login
+    # and the given credential is not consumed.
+    final_credential = login_creds[-1] if login_creds else ""
+    if credentials:
+        enable_pw_checks = [
+            (context.get('previous_credential', ""), 'enable_password'),
+            (final_credential, 'enable_password'),
+            (fallback_cred, 'enable_password'),
+            (ENABLE_CRED_NAME, 'password'),
+            (context.get('default_cred_name', ""), 'password'),
+        ]
+        for cred_name, key in enable_pw_checks:
+            if cred_name:
+                candidate_enable_pw = credentials.get(cred_name, {}).get(key)
+                if candidate_enable_pw:
+                    enable_credential_password = candidate_enable_pw
+                    break
         else:
-            session['password_attempts'] += 1
-        if session.password_attempts > spawn.settings.PASSWORD_ATTEMPTS:
-            raise UniconAuthenticationError('Too many enable password retries')
+            raise UniconAuthenticationError('{}: Could not find an enable credential.'.\
+                format(context.get('hostname', "")))
+    return to_plaintext(enable_credential_password)
+
+
+def enable_password_handler(spawn, context, session):
+    if 'password_attempts' not in session:
+        session['password_attempts'] = 1
+    else:
+        session['password_attempts'] += 1
+    if session.password_attempts > spawn.settings.PASSWORD_ATTEMPTS:
+        raise UniconAuthenticationError('Too many enable password retries')
+
+    enable_credential_password = get_enable_credential_password(context=context)
+    if enable_credential_password:
+        spawn.sendline(enable_credential_password)
+    else:
         spawn.sendline(context['enable_password'])
 
 
@@ -410,7 +452,8 @@ authentication_statement_list = [generic_statements.bad_password_stmt,
                                  generic_statements.login_stmt,
                                  generic_statements.useraccess_stmt,
                                  generic_statements.password_stmt,
-                                 generic_statements.clear_kerberos_no_realm
+                                 generic_statements.clear_kerberos_no_realm,
+                                 generic_statements.password_ok_stmt,
                                  ]
 
 #############################################################

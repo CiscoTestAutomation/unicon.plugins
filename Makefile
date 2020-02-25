@@ -34,7 +34,7 @@ help:
 	@echo ""
 
 install_build_deps:
-	@echo ""
+	@pip install --upgrade pip setuptools wheel
 
 uninstall_build_deps:
 	@echo ""

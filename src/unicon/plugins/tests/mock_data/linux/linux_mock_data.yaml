@@ -120,6 +120,8 @@ exec:
         new_state: exec13
     "prompt14":
         new_state: exec14
+    "prompt14":
+        new_state: exec15
     "ls": |
       /tmp
       /var
@@ -289,6 +291,10 @@ exec13:
 
 exec14:
   prompt: "ESC]0;rally@rally: /workspace\x07rally@rally:/workspace$ ESC[K"
+  commands: *cmds
+
+exec15:
+  prompt: "$ "
   commands: *cmds
 
 sma_prompt:

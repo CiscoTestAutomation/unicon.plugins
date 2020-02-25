@@ -16,6 +16,7 @@ import unittest
 from unittest.mock import Mock, call, patch
 
 import unicon
+from pyats.topology import loader
 from unicon import Connection
 from unicon.core.errors import SubCommandFailure, ConnectionError as UniconConnectionError
 from unicon.eal.dialogs import Dialog
@@ -338,6 +339,36 @@ class TestIosPagentPluginConnect(unittest.TestCase):
                             pagent_key='899573834241')
         c.connect()
         self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
+
+
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0)
+class TestIosPluginConnectCredentials(unittest.TestCase):
+
+    def setUp(self):
+        self.testbed = """
+        devices:
+          Router:
+            os: ios
+            type: router
+            credentials:
+                default:
+                    username: admin
+                    password: cisco
+                    enable_password: enpasswd
+            connections:
+              defaults:
+                class: unicon.Unicon
+              a:
+                command: "mock_device_cli --os ios --state login_enable"
+        """
+
+    def test_connect(self):
+        tb = loader.load(self.testbed)
+        r = tb.devices.Router
+        r.connect()
+        self.assertEqual(r.spawn.match.match_output, 'end\r\nRouter#')
+
 
 
 

@@ -48,6 +48,17 @@ class TestIosPluginConnect(unittest.TestCase):
         self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
 
 
+    def test_edison_login_connect_password_ok(self):
+        c = Connection(hostname='Router',
+                start=['mock_device_cli --os iosxe --state cat3k_login'],
+                os='iosxe',
+                series='cat3k',
+                username='cisco',
+                tacacs_password='cisco1')
+        c.connect()
+        self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
+
+
 class TestIosXEPluginExecute(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

@@ -157,21 +157,21 @@ def copy_error_handler(context, retry=False):
 
 
 def copy_partition_handler(spawn, context):
-    if context['partition'] is "0":
+    if context['partition'] == "0":
         spawn.sendline()
     else:
         spawn.sendline(context[partition])
 
 
 def copy_dest_handler(spawn, context):
-    if context['dest_file'] is "":
+    if context['dest_file'] == "":
         spawn.sendline()
     else:
         spawn.sendline(context['dest_file'])
 
 
 def copy_dest_directory_handler(spawn, context):
-    if context['dest_directory'] is '':
+    if context['dest_directory'] == '':
         spawn.sendline()
     else:
         spawn.sendline(context['dest_directory'])
@@ -286,7 +286,9 @@ reload_statement_list = [save_env, confirm_reset, reload_confirm,
                          confirm_config, setup_dialog, auto_install_dialog,
                          module_reload, save_module_cfg, reboot_confirm,
                          secure_passwd_std, admin_password, auto_provision,
-                         login_stmt, password_stmt]
+                         login_stmt, password_stmt,
+                         generic_statements.password_ok_stmt,
+                        ]
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 # Ping Statements
@@ -987,7 +989,9 @@ ha_reload_statement_list = [save_env, sso_ready, press_enter,
                             reload_this_shelf, useracess, config_byte,
                             setup_dialog, auto_install_dialog,
                             login_notready, redundant, default_prompts,
-                            auto_provision, login_stmt, password_stmt]
+                            auto_provision, login_stmt, password_stmt,
+                            generic_statements.password_ok_stmt,
+                           ]
 
 #############################################################################
 # Reset Standby  Command  Statement
@@ -1092,8 +1096,9 @@ switchover_statement_list = [save_config, build_config, prompt_switchover,
                              switchover_init, switchover_reason,
                              switchover_fail1, switchover_fail2,
                              switchover_fail3, switchover_fail4,
-                             press_enter, login_stmt, password_stmt
-                             ]
+                             press_enter, login_stmt, password_stmt,
+                             generic_statements.password_ok_stmt,
+                            ]
 
 
 

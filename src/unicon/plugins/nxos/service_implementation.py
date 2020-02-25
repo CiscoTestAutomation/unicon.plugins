@@ -145,7 +145,7 @@ class Reload(GenericReload):
         if not isinstance(dialog, Dialog):
             raise SubCommandFailure(
                 "dialog passed must be an instance of Dialog")
-        dialog = dialog
+        dialog = self.service_dialog(service_dialog=dialog)
         dialog += self.dialog
         con.spawn.sendline(reload_command)
 
@@ -258,11 +258,11 @@ class Ping6(BaseService):
         # Default value setting
         ping_context = AttributeDict({})
         for a in ping_options:
-            if a is "novell_type":
+            if a == "novell_type":
                 ping_context[a] = "\r"
-            elif a is "sweep_ping":
+            elif a == "sweep_ping":
                 ping_context[a] = "n"
-            elif a is 'extd_ping':
+            elif a == 'extd_ping':
                 ping_context[a] = "n"
             else:
                 ping_context[a] = ""
@@ -273,18 +273,18 @@ class Ping6(BaseService):
             ping_context[key] = str(kwargs[key])
 
         # Validate Inputs
-        if ping_context['addr'] is "":
+        if ping_context['addr'] == "":
             if args[0]:
                 # Stringify address in case it is passed as an object.
                 ping_context['addr'] = str(args[0])
             else:
                 raise SubCommandFailure("Address is not specified ")
 
-        if ping_context['src_route_type'] is not "":
+        if ping_context['src_route_type'] != "":
             if ping_context['src_route_addr'] in "":
                 raise SubCommandFailure(
                     "If src route type is set, then src route addr is mandatory \n")
-        elif ping_context['src_route_addr'] is not "":
+        elif ping_context['src_route_addr'] != "":
             raise SubCommandFailure(
                 "If src route addr is set, then src route type is mandatory \n")
 

@@ -18,6 +18,7 @@ This part of the document covers all the services supported by Unicon.
     linux
     nso
     nxos
+    sdwan
     sros
     staros
     vos

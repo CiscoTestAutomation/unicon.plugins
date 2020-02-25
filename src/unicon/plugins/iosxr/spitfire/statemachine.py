@@ -13,6 +13,13 @@ patterns = SpitfirePatterns()
 statements = SpitfireStatements()
 
 
+login_dialog = Dialog([statements.bmc_login_stmt,
+                       statements.password_stmt,
+                       statements.login_stmt
+                       ])
+
+
+
 def switch_console(statemachine, spawn, context):
     sm = statemachine
     # switch between XR and BMC console
@@ -26,7 +33,7 @@ def switch_console(statemachine, spawn, context):
     # Try ctrl-o (\x0f) and then ctrl-w (\x17)
     for cmd in ['\x0f', '\x17']:
         spawn.send(cmd)
-        sm.go_to('any', spawn, timeout=spawn.timeout)
+        sm.go_to('any', spawn, timeout=spawn.timeout ,context=context, dialog=login_dialog)
         if sm.current_state == target_state:
             spawn.sendline()
             return
@@ -54,13 +61,6 @@ class SpitfireSingleRpStateMachine(IOSXRSingleRpStateMachine):
         self.add_state(xr_bash)
         self.add_state(xr_run)
         self.add_state(xr_env)
-
-
-        login_dialog = Dialog([
-            statements.bmc_login_stmt,
-            statements.password_stmt,
-            statements.login_stmt
-            ])
 
         config_dialog = Dialog([
            [patterns.commit_changes_prompt, 'sendline(yes)', None, True, False],

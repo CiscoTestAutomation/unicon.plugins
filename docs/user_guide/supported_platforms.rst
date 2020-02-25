@@ -49,11 +49,13 @@ network device, and corresponds to ther pyATS testbed YAML counterparts.
     ``nxos``, ``n9k``
     ``nxos``, ``nxosv``
     ``nso``
+    ``sdwan``, ``viptela``,,"Identical to os=viptela."
     ``sros``
     ``staros``
     ``vos``
     ``junos``
     ``sros``
+    ``viptela``,,,"Identical to os=sdwan, series=viptela."
 
 To use this table - locate your device's os/series/model information, and fill 
 your pyATS testbed YAML with it:

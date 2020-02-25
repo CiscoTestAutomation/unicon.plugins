@@ -16,6 +16,15 @@ from unicon import Connection
 
 class TestSDWANPlugin(unittest.TestCase):
 
+    def test_os_viptela(self):
+        c = Connection(hostname='vedge',
+                            start=['mock_device_cli --os sdwan --state sdwan_exec'],
+                            os='viptela',
+                            username='admin',
+                            tacacs_password='admin')
+        c.connect()
+        self.assertEqual(c.spawn.match.match_output.split()[-1], 'vedge#')
+
     def test_connect_cisco_exec(self):
         c = Connection(hostname='vedge',
                             start=['mock_device_cli --os sdwan --state sdwan_exec'],
@@ -73,13 +82,6 @@ class TestSDWANPlugin(unittest.TestCase):
         c.connect()
         c.execute('new_hostname')
         c.execute('exec')
-
-    def test_sdwan_no_series(self):
-        with self.assertRaises(NotImplementedError):
-            Connection(hostname='CPE101',
-                       start=['mock_device_cli --os sdwan --state sdwan_exec'],
-                       os='sdwan',
-                       series='sdwan')
 
 
 if __name__ == "__main__":

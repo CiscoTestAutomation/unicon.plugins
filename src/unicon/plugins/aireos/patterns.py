@@ -5,7 +5,7 @@ from unicon.plugins.generic.patterns import GenericPatterns
 class AireosPatterns(GenericPatterns):
     def __init__(self):
         super().__init__()
-        self.base_prompt = r'^(.*?)\(%N\)\s*'
+        self.base_prompt = r'^(.*?)\((%N|Cisco Capwap Simulator)\)\s*'
         self.enable_prompt = self.base_prompt + r'>\s*$'
         self.show_prompt = self.base_prompt + r'show>\s*$'
         self.config_prompt = self.base_prompt + r'config>\s*$'

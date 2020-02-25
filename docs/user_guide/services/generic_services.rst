@@ -13,6 +13,8 @@ please refer to the platform specific service documentations. For example
 NXOS supports `vdc` handling APIs which are not relevant on other platfroms
 line XR or IOS etc. Also in case of linux we only have `execute` service.
 
+.. _controlled_settings:
+
 **Error pattern handling**
 
 If you want to execute services that could fail to execute properly and you want to verify
@@ -70,6 +72,27 @@ Sample usage:
         print('Connection closed, try reconnect')
         d.disconnect()
         d.connect()
+
+**Printing matched patterns**
+
+If you want to print the dialog statements matched patterns during the run
+, you can specify the `STATEMENT_LOG_DEBUG` option to True.
+
+Default value is False.
+
+.. code-block:: python
+
+    >>> from pyats.topology import loader
+    >>>
+    >>> tb = loader.load('testbed.yaml')
+    >>> uut = tb.devices['uut']
+    >>>
+    >>> uut.connect()
+    >>> uut.settings.STATEMENT_LOG_DEBUG=True
+
+.. note ::
+
+   Settings can also be patched in the testbed yaml file as shown :ref:`here<settings_control>`.
 
 
 execute

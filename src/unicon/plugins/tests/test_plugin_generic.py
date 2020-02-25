@@ -26,7 +26,8 @@ from pyats.topology import loader
 from pyats.topology.credentials import Credentials
 
 from unicon.core.errors import (SubCommandFailure, StateMachineError,
-    SpawnInitError, CredentialsExhaustedError, UniconAuthenticationError, )
+    SpawnInitError, CredentialsExhaustedError, UniconAuthenticationError,
+    ConnectionError )
 
 
 class TestPasswordHandler(unittest.TestCase):
@@ -217,6 +218,173 @@ class TestCredentialLoginPasswordHandlers(unittest.TestCase):
                 credentials=self.context.credentials)
         d.connect()
 
+
+    def test_enable_password_default_cred_explicit(self):
+        credentials = Credentials({
+            'default': {'username': 'admin', 'password': 'cisco', 'enable_password': 'enpasswd'},
+            'enable': {'password': 'enpasswd2'},
+        })
+
+        d = Connection(hostname='Router',
+                start=['mock_device_cli --os ios '\
+                    '--state console_test_enable'],
+                os='ios', connection_timeout=15,
+                credentials=credentials,
+                login_creds=None
+                )
+        d.connect()
+
+        d = Connection(hostname='Router',
+                start=['mock_device_cli --os ios '\
+                    '--state login_enable'],
+                os='ios', connection_timeout=15,
+                credentials=credentials
+                )
+        d.connect()
+
+
+    def test_enable_password_default_cred_revert_enable(self):
+        credentials = Credentials({
+            'default': {'username': 'admin', 'password': 'cisco', },
+            'enable': {'password': 'enpasswd'},
+        })
+
+        d = Connection(hostname='Router',
+                start=['mock_device_cli --os ios '\
+                    '--state console_test_enable'],
+                os='ios', connection_timeout=15,
+                credentials=credentials
+                )
+        d.connect()
+
+        d = Connection(hostname='Router',
+                start=['mock_device_cli --os ios '\
+                    '--state login_enable'],
+                os='ios', connection_timeout=15,
+                credentials=credentials
+                )
+        d.connect()
+
+
+    def test_enable_password_default_cred_default_enable(self):
+        credentials = Credentials({
+            'default': {'username': 'admin', 'password': 'cisco', },
+        })
+
+        d = Connection(hostname='Router',
+                start=['mock_device_cli --os ios '\
+                    '--state console_test_enable'],
+                os='ios', connection_timeout=15,
+                credentials=credentials
+                )
+        with self.assertRaises(ConnectionError):
+            d.connect()
+
+        d = Connection(hostname='Router',
+                start=['mock_device_cli --os ios '\
+                    '--state login_enable'],
+                os='ios', connection_timeout=15,
+                credentials=credentials
+                )
+        with self.assertRaises(ConnectionError):
+            d.connect()
+
+
+    def test_enable_password_explicit(self):
+        credentials = Credentials({
+            'default': {'username': 'defun', 'password': 'defpw', 'enable_password': 'enpasswd2'},
+            'mycred': {'username': 'admin', 'password': 'cisco', 'enable_password': 'enpasswd'},
+            'enable': {'password': 'enpasswd3'},
+        })
+
+        d = Connection(hostname='Router',
+                start=['mock_device_cli --os ios '\
+                    '--state console_test_enable'],
+                os='ios', connection_timeout=15,
+                credentials=credentials,
+                login_creds='mycred')
+        d.connect()
+
+        d = Connection(hostname='Router',
+                start=['mock_device_cli --os ios '\
+                    '--state login_enable'],
+                os='ios', connection_timeout=15,
+                credentials=credentials,
+                login_creds='mycred')
+        d.connect()
+
+
+    def test_enable_password_explicit_revert_default(self):
+        credentials = Credentials({
+            'default': {'username': 'defun', 'password': 'defpw', 'enable_password': 'enpasswd'},
+            'mycred': {'username': 'admin', 'password': 'cisco', },
+            'enable': {'password': 'enpasswd2'},
+        })
+
+        d = Connection(hostname='Router',
+                start=['mock_device_cli --os ios '\
+                    '--state console_test_enable'],
+                os='ios', connection_timeout=15,
+                credentials=credentials,
+                login_creds='mycred')
+        d.connect()
+
+        d = Connection(hostname='Router',
+                start=['mock_device_cli --os ios '\
+                    '--state login_enable'],
+                os='ios', connection_timeout=15,
+                credentials=credentials,
+                login_creds='mycred')
+        d.connect()
+
+
+    def test_enable_password_explicit_revert_enable(self):
+        credentials = Credentials({
+            'default': {'username': 'defun', 'password': 'defpw', },
+            'mycred': {'username': 'admin', 'password': 'cisco', },
+            'enable': {'password': 'enpasswd'},
+        })
+
+        d = Connection(hostname='Router',
+                start=['mock_device_cli --os ios '\
+                    '--state console_test_enable'],
+                os='ios', connection_timeout=15,
+                credentials=credentials,
+                login_creds='mycred')
+        d.connect()
+
+        d = Connection(hostname='Router',
+                start=['mock_device_cli --os ios '\
+                    '--state login_enable'],
+                os='ios', connection_timeout=15,
+                credentials=credentials,
+                login_creds='mycred')
+        d.connect()
+
+
+    def test_enable_password_explicit_revert_default_enable(self):
+        credentials = Credentials({
+            'default': {'username': 'defun', 'password': 'defpw', },
+            'mycred': {'username': 'admin', 'password': 'cisco', },
+        })
+
+        d = Connection(hostname='Router',
+                start=['mock_device_cli --os ios '\
+                    '--state console_test_enable'],
+                os='ios', connection_timeout=15,
+                credentials=credentials,
+                login_creds='mycred')
+        with self.assertRaises(ConnectionError):
+            d.connect()
+
+        d = Connection(hostname='Router',
+                start=['mock_device_cli --os ios '\
+                    '--state login_enable'],
+                os='ios', connection_timeout=15,
+                credentials=credentials,
+                login_creds='mycred')
+        with self.assertRaises(ConnectionError):
+            d.connect()
 
 
 

@@ -6,7 +6,7 @@ Authors:
     pyATS TEAM (pyats-support@cisco.com, pyats-support-ext@cisco.com)
 
 Description:
-    This subpackage implements Ise 
+    This subpackage implements Ise
 """
 
 import time
@@ -30,7 +30,7 @@ class IseSettings(LinuxSettings):
 
 def send_enter(spawn):
     time.sleep(2)
-    spawn.sendline('')
+    spawn.sendline()
 
 def more_handler(spawn):
     time.sleep(0.1)

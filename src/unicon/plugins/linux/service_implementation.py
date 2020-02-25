@@ -195,7 +195,7 @@ class Ping(BaseService):
 
         # Read input values passed
         # Convert to string in case users passes non-string types
-        for key in kwargs:
+        for key in kwargs.copy():
             if key in self._ping_option_long_to_short:
                 new_key = self._ping_option_long_to_short[key]
                 kwargs[new_key] = kwargs[key]
