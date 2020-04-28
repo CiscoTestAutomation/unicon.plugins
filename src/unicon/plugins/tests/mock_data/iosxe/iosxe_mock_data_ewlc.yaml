@@ -111,6 +111,8 @@ ewlc_enable:
       new_state: ewlc_copy_tftp_flash_remote
     "copy  tftp: flash:  vrf Mgmt-vrf":
       new_state: ewlc_copy_tftp_flash_vrf_remote
+    "redundancy reload peer":
+      response: file|mock_data/iosxe/iosxe_reset_standby.txt
 
 ewlc_config:
   prompt: "Router(config)#"

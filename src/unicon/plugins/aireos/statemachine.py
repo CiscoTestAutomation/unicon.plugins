@@ -74,3 +74,12 @@ class AireosStateMachine(StateMachine):
         self.add_path(shell_to_enable)
 
         self.add_default_statements(default_statement_list)
+
+
+class AireosDualRpStateMachine(AireosStateMachine):
+
+    def create(self):
+        super().create()
+
+        standby = State('standby', p.standby_exec)
+        self.add_state(standby)

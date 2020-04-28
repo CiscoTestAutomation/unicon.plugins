@@ -1,3 +1,4 @@
+import warnings
 from unicon.plugins.generic import GenericSingleRpConnection, service_implementation as svc
 from unicon.plugins.generic.connection_provider import GenericSingleRpConnectionProvider
 
@@ -17,6 +18,11 @@ class AciApicConnectionProvider(GenericSingleRpConnectionProvider):
 
         """ Initializes the generic connection provider
         """
+
+        warnings.warn("This plugin aci/apic wil be deprecated, it has been moved"
+            "to be a seperate plugin. Please set it in the testbed yaml file as "
+            "follows:\nos: apic", DeprecationWarning)
+
         super().__init__(*args, **kwargs)
 
     def get_connection_dialog(self):
@@ -54,6 +60,7 @@ class AciApicConnection(GenericSingleRpConnection):
     """
         Connection class for aci connections.
     """
+
     os = 'aci'
     series = 'apic'
     chassis_type = 'single_rp'
@@ -61,4 +68,3 @@ class AciApicConnection(GenericSingleRpConnection):
     connection_provider_class = AciApicConnectionProvider
     subcommand_list = AciApicServiceList
     settings = AciSettings()
-

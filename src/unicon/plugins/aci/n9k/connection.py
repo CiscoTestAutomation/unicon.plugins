@@ -1,3 +1,4 @@
+import warnings
 from unicon.plugins.generic import GenericSingleRpConnection, service_implementation as svc
 from unicon.plugins.generic.connection_provider import GenericSingleRpConnectionProvider
 
@@ -15,6 +16,11 @@ class AciN9KConnectionProvider(GenericSingleRpConnectionProvider):
 
         """ Initializes the generic connection provider
         """
+
+        warnings.warn("This plugin aci/n9k wil be deprecated, it has been"
+            "moved under nxos. Please set it in the testbed yaml file as "
+            "follows:\nos: nxos\nseries: aci" , DeprecationWarning)
+
         super().__init__(*args, **kwargs)
 
 
@@ -31,6 +37,7 @@ class AciN9KConnection(GenericSingleRpConnection):
     """
         Connection class for aci connections.
     """
+
     os = 'aci'
     series = 'n9k'
     chassis_type = 'single_rp'
@@ -38,4 +45,3 @@ class AciN9KConnection(GenericSingleRpConnection):
     connection_provider_class = AciN9KConnectionProvider
     subcommand_list = AciN9KServiceList
     settings = AciSettings()
-

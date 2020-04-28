@@ -27,10 +27,16 @@ connect_ssh:
   preface: |
     The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
     RSA key fingerprint is a1:07:ac:9b:8c:c2:db:c5:4c:dc:70:b5:09:2a:a5:b1.
-  prompt: "Are you sure you want to continue connecting (yes/no)? "
+  prompt: "Are you sure you want to continue connecting (yes/no/[fingerprint])? "
   commands:
     "yes":
       new_state: login
+
+connect_ssh_passphrase:
+  prompt: "Enter passphrase for key '/home/admin/.ssh/id_rsa': "
+  commands:
+    "this is a secret":
+      new_state: enable
 
 login:
   prompt: "Username: "

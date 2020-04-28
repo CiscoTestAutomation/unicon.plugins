@@ -21,7 +21,9 @@ username_kerberos:
 
 exec:
   prompt: "switch# "
-  commands:
+  commands: &exec_cmds
+    "maint":
+      new_state: exec_maint
     "not a real command":
       response:
       - |2
@@ -141,7 +143,9 @@ loader:
 
 config:
   prompt: "switch(config)#"
-  commands:
+  commands: &config_cmds
+    "maint":
+      new_state: config_maint
     "no logging console": ""
     "line console": ""
     "exec-timeout 0": ""
@@ -361,3 +365,18 @@ user_password:
         http://www.opensource.org/licenses/lgpl-2.1.php
       new_state: exec
 
+
+
+exec_maint:
+  prompt: "%N(maint-mode)# "
+  commands:
+    <<: *exec_cmds
+    exec:
+      new_state: exec
+
+config_maint:
+  prompt: "%N(maint-mode)(config)# "
+  commands:
+    <<: *config_cmds
+    config:
+      new_state: config

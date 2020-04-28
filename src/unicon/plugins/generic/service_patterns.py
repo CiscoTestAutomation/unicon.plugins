@@ -152,7 +152,7 @@ class CopyPatterns():
                                   r'|Not |too big|exceeds|detected|[Nn]o route to host' \
                                   r'|image is not allowed|Could not resolve|No such'
         self.copy_retry_message = r'fail|[Tt]imed out|Error|Problem|NOT|Failed|Bad|bogus|lose|abort|Not |too big|exceeds|detected'
-        self.copy_continue = r'Are you sure you want to continue connecting (yes/no)?'
+        self.copy_continue = r'Are you sure you want to continue connecting ((yes/no)|\((yes/no(/\[fingerprint\])?)?\))?'
         self.copy_other = r'^.*\[yes\/no\]\s*\?*\s*$'
         self.remote_param ='ftp:|tftp:|http:|rcp:|scp:'
         self.remote_in_dest = r'(ftp:|sftp:|tftp:|http:|rcp:|scp:)/*$'

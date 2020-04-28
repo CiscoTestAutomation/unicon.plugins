@@ -1,0 +1,995 @@
+[   [31m*[1;31m*[0m[31m*[0m] (1 of 6) A stop job is running for ...f65-ce6ccdb89886 (8s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (1 of 6) A stop job is running for ...f65-ce6ccdb89886 (8s / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (2 of 6) A stop job is running for ...rtual/block/dm-8 (9s / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (2 of 6) A stop job is running for ...rtual/block/dm-8 (9s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (2 of 6) A stop job is running for ...tual/block/dm-8 (10s / 1min 30s)
+[K[[0m[31m*     [0m] (3 of 6) A stop job is running for snmpd (10s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (3 of 6) A stop job is running for snmpd (11s / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (3 of 6) A stop job is running for snmpd (11s / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (4 of 6) A stop job is running for ...d7-2f96abb178e8 (12s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (4 of 6) A stop job is running for ...d7-2f96abb178e8 (12s / 1min 30s)
+[K[   [31m*[1;31m*[0m[31m*[0m] (4 of 6) A stop job is running for ...d7-2f96abb178e8 (13s / 1min 30s)
+[K[    [31m*[1;31m*[0m] (5 of 6) A stop job is running for ...d7-2f96abb178e8 (13s / 1min 30s)
+[K[     [31m*[0m] (5 of 6) A stop job is running for ...d7-2f96abb178e8 (14s / 1min 30s)
+[K[    [31m*[1;31m*[0m] (5 of 6) A stop job is running for ...d7-2f96abb178e8 (14s / 1min 30s)
+[K[   [31m*[1;31m*[0m[31m*[0m] (6 of 6) A stop job is running for /dev/dm-8 (15s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (6 of 6) A stop job is running for /dev/dm-8 (15s / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (6 of 6) A stop job is running for /dev/dm-8 (16s / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (1 of 6) A stop job is running for ...65-ce6ccdb89886 (16s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (1 of 6) A stop job is running for ...65-ce6ccdb89886 (17s / 1min 30s)
+[K[[0m[31m*     [0m] (1 of 6) A stop job is running for ...65-ce6ccdb89886 (17s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (2 of 6) A stop job is running for ...tual/block/dm-8 (18s / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (2 of 6) A stop job is running for ...tual/block/dm-8 (18s / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (2 of 6) A stop job is running for ...tual/block/dm-8 (19s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (3 of 6) A stop job is running for snmpd (19s / 1min 30s)
+[K[   [31m*[1;31m*[0m[31m*[0m] (3 of 6) A stop job is running for snmpd (20s / 1min 30s)
+[K[    [31m*[1;31m*[0m] (3 of 6) A stop job is running for snmpd (20s / 1min 30s)
+[K[     [31m*[0m] (4 of 6) A stop job is running for ...d7-2f96abb178e8 (21s / 1min 30s)
+[K[    [31m*[1;31m*[0m] (4 of 6) A stop job is running for ...d7-2f96abb178e8 (21s / 1min 30s)
+[K[   [31m*[1;31m*[0m[31m*[0m] (4 of 6) A stop job is running for ...d7-2f96abb178e8 (22s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (5 of 6) A stop job is running for ...d7-2f96abb178e8 (22s / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (5 of 6) A stop job is running for ...d7-2f96abb178e8 (23s / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (5 of 6) A stop job is running for ...d7-2f96abb178e8 (23s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (6 of 6) A stop job is running for /dev/dm-8 (24s / 1min 30s)
+[K[[0m[31m*     [0m] (6 of 6) A stop job is running for /dev/dm-8 (24s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (6 of 6) A stop job is running for /dev/dm-8 (25s / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (1 of 6) A stop job is running for ...65-ce6ccdb89886 (25s / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (1 of 6) A stop job is running for ...65-ce6ccdb89886 (26s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (1 of 6) A stop job is running for ...65-ce6ccdb89886 (26s / 1min 30s)
+[K[   [31m*[1;31m*[0m[31m*[0m] (2 of 6) A stop job is running for ...tual/block/dm-8 (27s / 1min 30s)
+[K[    [31m*[1;31m*[0m] (2 of 6) A stop job is running for ...tual/block/dm-8 (27s / 1min 30s)
+[K[     [31m*[0m] (2 of 6) A stop job is running for ...tual/block/dm-8 (28s / 1min 30s)
+[K[    [31m*[1;31m*[0m] (3 of 6) A stop job is running for snmpd (28s / 1min 30s)
+[K[   [31m*[1;31m*[0m[31m*[0m] (3 of 6) A stop job is running for snmpd (29s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (3 of 6) A stop job is running for snmpd (29s / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (4 of 6) A stop job is running for ...d7-2f96abb178e8 (30s / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (4 of 6) A stop job is running for ...d7-2f96abb178e8 (30s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (4 of 6) A stop job is running for ...d7-2f96abb178e8 (31s / 1min 30s)
+[K[[0m[31m*     [0m] (5 of 6) A stop job is running for ...d7-2f96abb178e8 (31s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (5 of 6) A stop job is running for ...d7-2f96abb178e8 (32s / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (5 of 6) A stop job is running for ...d7-2f96abb178e8 (32s / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (6 of 6) A stop job is running for /dev/dm-8 (33s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (6 of 6) A stop job is running for /dev/dm-8 (33s / 1min 30s)
+[K[   [31m*[1;31m*[0m[31m*[0m] (6 of 6) A stop job is running for /dev/dm-8 (34s / 1min 30s)
+[K[    [31m*[1;31m*[0m] (1 of 6) A stop job is running for ...65-ce6ccdb89886 (34s / 1min 30s)
+[K[     [31m*[0m] (1 of 6) A stop job is running for ...65-ce6ccdb89886 (35s / 1min 30s)
+[K[    [31m*[1;31m*[0m] (1 of 6) A stop job is running for ...65-ce6ccdb89886 (35s / 1min 30s)
+[K[   [31m*[1;31m*[0m[31m*[0m] (2 of 6) A stop job is running for ...tual/block/dm-8 (36s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (2 of 6) A stop job is running for ...tual/block/dm-8 (36s / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (2 of 6) A stop job is running for ...tual/block/dm-8 (37s / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (3 of 6) A stop job is running for snmpd (37s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (3 of 6) A stop job is running for snmpd (38s / 1min 30s)
+[K[[0m[31m*     [0m] (3 of 6) A stop job is running for snmpd (38s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (4 of 6) A stop job is running for ...d7-2f96abb178e8 (39s / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (4 of 6) A stop job is running for ...d7-2f96abb178e8 (39s / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (4 of 6) A stop job is running for ...d7-2f96abb178e8 (40s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (5 of 6) A stop job is running for ...d7-2f96abb178e8 (40s / 1min 30s)
+[K[   [31m*[1;31m*[0m[31m*[0m] (5 of 6) A stop job is running for ...d7-2f96abb178e8 (41s / 1min 30s)
+[K[    [31m*[1;31m*[0m] (5 of 6) A stop job is running for ...d7-2f96abb178e8 (41s / 1min 30s)
+[K[     [31m*[0m] (6 of 6) A stop job is running for /dev/dm-8 (42s / 1min 30s)
+[K[    [31m*[1;31m*[0m] (6 of 6) A stop job is running for /dev/dm-8 (42s / 1min 30s)
+[K[   [31m*[1;31m*[0m[31m*[0m] (6 of 6) A stop job is running for /dev/dm-8 (43s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (1 of 6) A stop job is running for ...65-ce6ccdb89886 (43s / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (1 of 6) A stop job is running for ...65-ce6ccdb89886 (44s / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (1 of 6) A stop job is running for ...65-ce6ccdb89886 (44s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (2 of 6) A stop job is running for ...tual/block/dm-8 (45s / 1min 30s)
+[K[[0m[31m*     [0m] (2 of 6) A stop job is running for ...tual/block/dm-8 (45s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (2 of 6) A stop job is running for ...tual/block/dm-8 (46s / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (3 of 6) A stop job is running for snmpd (46s / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (3 of 6) A stop job is running for snmpd (47s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (3 of 6) A stop job is running for snmpd (47s / 1min 30s)
+[K[   [31m*[1;31m*[0m[31m*[0m] (4 of 6) A stop job is running for ...d7-2f96abb178e8 (48s / 1min 30s)
+[K[    [31m*[1;31m*[0m] (4 of 6) A stop job is running for ...d7-2f96abb178e8 (48s / 1min 30s)
+[K[     [31m*[0m] (4 of 6) A stop job is running for ...d7-2f96abb178e8 (49s / 1min 30s)
+[K[    [31m*[1;31m*[0m] (5 of 6) A stop job is running for ...d7-2f96abb178e8 (49s / 1min 30s)
+[K[   [31m*[1;31m*[0m[31m*[0m] (5 of 6) A stop job is running for ...d7-2f96abb178e8 (50s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (5 of 6) A stop job is running for ...d7-2f96abb178e8 (50s / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (6 of 6) A stop job is running for /dev/dm-8 (51s / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (6 of 6) A stop job is running for /dev/dm-8 (51s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (6 of 6) A stop job is running for /dev/dm-8 (52s / 1min 30s)
+[K[[0m[31m*     [0m] (1 of 6) A stop job is running for ...65-ce6ccdb89886 (52s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (1 of 6) A stop job is running for ...65-ce6ccdb89886 (53s / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (1 of 6) A stop job is running for ...65-ce6ccdb89886 (53s / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (2 of 6) A stop job is running for ...tual/block/dm-8 (54s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (2 of 6) A stop job is running for ...tual/block/dm-8 (54s / 1min 30s)
+[K[   [31m*[1;31m*[0m[31m*[0m] (2 of 6) A stop job is running for ...tual/block/dm-8 (55s / 1min 30s)
+[K[    [31m*[1;31m*[0m] (3 of 6) A stop job is running for snmpd (55s / 1min 30s)
+[K[     [31m*[0m] (3 of 6) A stop job is running for snmpd (56s / 1min 30s)
+[K[    [31m*[1;31m*[0m] (3 of 6) A stop job is running for snmpd (56s / 1min 30s)
+[K[   [31m*[1;31m*[0m[31m*[0m] (4 of 6) A stop job is running for ...d7-2f96abb178e8 (57s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (4 of 6) A stop job is running for ...d7-2f96abb178e8 (57s / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (4 of 6) A stop job is running for ...d7-2f96abb178e8 (58s / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (5 of 6) A stop job is running for ...d7-2f96abb178e8 (58s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (5 of 6) A stop job is running for ...d7-2f96abb178e8 (59s / 1min 30s)
+[K[[0m[31m*     [0m] (5 of 6) A stop job is running for ...d7-2f96abb178e8 (59s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (6 of 6) A stop job is running for /dev/dm-8 (1min / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (6 of 6) A stop job is running for /dev/dm-8 (1min / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (6 of 6) A stop job is running for /dev/dm-8 (1min 1s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (1 of 6) A stop job is running for ...e6ccdb89886 (1min 1s / 1min 30s)
+[K[   [31m*[1;31m*[0m[31m*[0m] (1 of 6) A stop job is running for ...e6ccdb89886 (1min 2s / 1min 30s)
+[K[    [31m*[1;31m*[0m] (1 of 6) A stop job is running for ...e6ccdb89886 (1min 2s / 1min 30s)
+[K[     [31m*[0m] (2 of 6) A stop job is running for .../block/dm-8 (1min 3s / 1min 30s)
+[K[    [31m*[1;31m*[0m] (2 of 6) A stop job is running for .../block/dm-8 (1min 3s / 1min 30s)
+[K[   [31m*[1;31m*[0m[31m*[0m] (2 of 6) A stop job is running for .../block/dm-8 (1min 4s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (3 of 6) A stop job is running for snmpd (1min 4s / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (3 of 6) A stop job is running for snmpd (1min 5s / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (3 of 6) A stop job is running for snmpd (1min 5s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (4 of 6) A stop job is running for ...f96abb178e8 (1min 6s / 1min 30s)
+[K[[0m[31m*     [0m] (4 of 6) A stop job is running for ...f96abb178e8 (1min 6s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (4 of 6) A stop job is running for ...f96abb178e8 (1min 7s / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (5 of 6) A stop job is running for ...f96abb178e8 (1min 7s / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (5 of 6) A stop job is running for ...f96abb178e8 (1min 8s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (5 of 6) A stop job is running for ...f96abb178e8 (1min 8s / 1min 30s)
+[K[   [31m*[1;31m*[0m[31m*[0m] (6 of 6) A stop job is running for /dev/dm-8 (1min 9s / 1min 30s)
+[K[    [31m*[1;31m*[0m] (6 of 6) A stop job is running for /dev/dm-8 (1min 9s / 1min 30s)
+[K[     [31m*[0m] (6 of 6) A stop job is running for /dev/dm-8 (1min 10s / 1min 30s)
+[K[    [31m*[1;31m*[0m] (1 of 6) A stop job is running for ...6ccdb89886 (1min 10s / 1min 30s)
+[K[   [31m*[1;31m*[0m[31m*[0m] (1 of 6) A stop job is running for ...6ccdb89886 (1min 11s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (1 of 6) A stop job is running for ...6ccdb89886 (1min 11s / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (2 of 6) A stop job is running for ...block/dm-8 (1min 12s / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (2 of 6) A stop job is running for ...block/dm-8 (1min 12s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (2 of 6) A stop job is running for ...block/dm-8 (1min 13s / 1min 30s)
+[K[[0m[31m*     [0m] (3 of 6) A stop job is running for snmpd (1min 13s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (3 of 6) A stop job is running for snmpd (1min 14s / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (3 of 6) A stop job is running for snmpd (1min 14s / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (4 of 6) A stop job is running for ...96abb178e8 (1min 15s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (4 of 6) A stop job is running for ...96abb178e8 (1min 15s / 1min 30s)
+[K[   [31m*[1;31m*[0m[31m*[0m] (4 of 6) A stop job is running for ...96abb178e8 (1min 16s / 1min 30s)
+[K[    [31m*[1;31m*[0m] (5 of 6) A stop job is running for ...96abb178e8 (1min 16s / 1min 30s)
+[K[     [31m*[0m] (5 of 6) A stop job is running for ...96abb178e8 (1min 17s / 1min 30s)
+[K[    [31m*[1;31m*[0m] (5 of 6) A stop job is running for ...96abb178e8 (1min 17s / 1min 30s)
+[K[   [31m*[1;31m*[0m[31m*[0m] (6 of 6) A stop job is running for /dev/dm-8 (1min 18s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (6 of 6) A stop job is running for /dev/dm-8 (1min 18s / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (6 of 6) A stop job is running for /dev/dm-8 (1min 19s / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (1 of 6) A stop job is running for ...6ccdb89886 (1min 19s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (1 of 6) A stop job is running for ...6ccdb89886 (1min 20s / 1min 30s)
+[K[[0m[31m*     [0m] (1 of 6) A stop job is running for ...6ccdb89886 (1min 20s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (2 of 6) A stop job is running for ...block/dm-8 (1min 21s / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (2 of 6) A stop job is running for ...block/dm-8 (1min 21s / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (2 of 6) A stop job is running for ...block/dm-8 (1min 22s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (3 of 6) A stop job is running for snmpd (1min 22s / 1min 30s)
+[K[   [31m*[1;31m*[0m[31m*[0m] (3 of 6) A stop job is running for snmpd (1min 23s / 1min 30s)
+[K[    [31m*[1;31m*[0m] (3 of 6) A stop job is running for snmpd (1min 23s / 1min 30s)
+[K[     [31m*[0m] (4 of 6) A stop job is running for ...96abb178e8 (1min 24s / 1min 30s)
+[K[    [31m*[1;31m*[0m] (4 of 6) A stop job is running for ...96abb178e8 (1min 24s / 1min 30s)
+[K[   [31m*[1;31m*[0m[31m*[0m] (4 of 6) A stop job is running for ...96abb178e8 (1min 25s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (5 of 6) A stop job is running for ...96abb178e8 (1min 25s / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (5 of 6) A stop job is running for ...96abb178e8 (1min 26s / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (5 of 6) A stop job is running for ...96abb178e8 (1min 26s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (6 of 6) A stop job is running for /dev/dm-8 (1min 27s / 1min 30s)
+[K[[0m[31m*     [0m] (6 of 6) A stop job is running for /dev/dm-8 (1min 27s / 1min 30s)
+[K[[1;31m*[0m[31m*    [0m] (6 of 6) A stop job is running for /dev/dm-8 (1min 28s / 1min 30s)
+[K[[31m*[1;31m*[0m[31m*   [0m] (1 of 6) A stop job is running for ...6ccdb89886 (1min 28s / 1min 30s)
+[K[ [31m*[1;31m*[0m[31m*  [0m] (1 of 6) A stop job is running for ...6ccdb89886 (1min 29s / 1min 30s)
+[K[  [31m*[1;31m*[0m[31m* [0m] (1 of 6) A stop job is running for ...6ccdb89886 (1min 29s / 1min 30s)
+[K[   [31m*[1;31m*[0m[31m*[0m] (2 of 6) A stop job is running for ...block/dm-8 (1min 30s / 1min 30s)
+[K[[32m  OK  [0m] Stopped snmpd.
+
+[[32m  OK  [0m] Stopped sharedmemmgr.
+
+         Stopping sharedmemmgr...
+
+[[32m  OK  [0m] Removed slice ifc.slice.
+
+         Stopping mgmt...
+
+[[32m  OK  [0m] Stopped mgmt.
+
+[[32m  OK  [0m] Stopped target Network.
+
+         Stopping LSB: Bring up/down networking...
+
+         Stopping log-preservation...
+
+[[32m  OK  [0m] Stopped log-preservation.
+
+[[32m  OK  [0m] Stopped LSB: Bring up/down networking.
+
+[[32m  OK  [0m] Stopped bootstrap.
+
+         Stopping bootstrap...
+
+[[32m  OK  [0m] Stopped target Basic System.
+
+[[32m  OK  [0m] Stopped target Sockets.
+
+[[32m  OK  [0m] Closed RPCbind Server Activation Socket.
+
+[[32m  OK  [0m] Closed D-Bus System Message Bus Socket.
+
+[[32m  OK  [0m] Stopped target Slices.
+
+[[32m  OK  [0m] Removed slice User and Session Slice.
+
+[[32m  OK  [0m] Stopped target Paths.
+
+[[32m  OK  [0m] Stopped target System Initialization.
+
+         Stopping Update UTMP about System Boot/Shutdown...
+
+[[32m  OK  [0m] Stopped target Encrypted Volumes.
+
+         Stopping Cryptography Setup for luk...1-9e01-4d16-b8d7-2f96abb178e8...
+
+[[32m  OK  [0m] Stopped target Swap.
+
+[[32m  OK  [0m] Stopped Setup Virtual Console.
+
+         Stopping Setup Virtual Console...
+
+[[32m  OK  [0m] Stopped Apply Kernel Variables.
+
+         Stopping Apply Kernel Variables...
+
+         Stopping Load/Save Random Seed...
+
+[[32m  OK  [0m] Stopped Import network configuration from initramfs.
+
+         Stopping Import network configuration from initramfs...
+
+[[32m  OK  [0m] Stopped Update UTMP about System Boot/Shutdown.
+
+[[32m  OK  [0m] Stopped Load/Save Random Seed.
+
+         Stopping Security Auditing Service...
+
+[[32m  OK  [0m] Stopped Security Auditing Service.
+
+[[32m  OK  [0m] Stopped target Local File Systems.
+
+         Unmounting /run/bashroot/lib...
+
+         Unmounting /run/bashroot/sys/fs/fuse/connections...
+
+         Unmounting /run/bashroot/data2...
+
+         Unmounting /run/bashroot/sys/fs/cgroup/blkio...
+
+         Unmounting /var/log/glusterfs...
+
+         Unmounting /firmware...
+
+         Unmounting /usr/share/vim...
+
+         Unmounting /run/bashroot/data/challenge.plugin...
+
+         Unmounting /run/bashroot/data/log.lastupgrade...
+
+         Unmounting /run/bashroot/var/log/external...
+
+         Unmounting /run/mgmt/shell-data...
+
+         Unmounting /data/nginx/html...
+
+         Unmounting /run/mgmt/log...
+
+         Unmounting /logs...
+
+         Unmounting /mgmt/opt/controller/sbin/trimtechsupport.py...
+
+         Unmounting /run/bashroot/controller/sbin/trimtechsupport.py...
+
+         Unmounting /usr/share/lxc...
+
+         Unmounting /run/bashroot/usr/share/lxc...
+
+         Unmounting /run/bashroot/dev/hugepages...
+
+         Unmounting /etc/hosts...
+
+         Unmounting /run/bashroot/var/log/dme/nginx...
+
+         Unmounting /run/bashroot/dev/shm...
+
+         Unmounting /data/admin/bin/collectLocalDbs.py...
+
+         Unmounting /mgmt/opt/controller/sbin/techsupport-filter...
+
+         Unmounting /run/bashroot/sys/fs/cgroup/net_cls...
+
+         Unmounting /run/bashroot/tmp...
+
+         Unmounting /run/bashroot/controller/sbin/category.yaml...
+
+         Unmounting /mgmt/opt/controller/sbin/category.yaml...
+
+         Unmounting /run/bashroot/var/log/dme/oldlog...
+
+         Unmounting /var/log/dme/oldlog...
+
+         Unmounting /run/bashroot/sys/fs/cgroup/cpuset...
+
+         Unmounting /run/bashroot/var/run/utmp...
+
+         Unmounting /run/bashroot/sys/fs/cgroup/systemd...
+
+         Unmounting /run/bashroot/sys/fs/cgroup/pids...
+
+         Unmounting /var/lib/lxc...
+
+         Unmounting /rfs1...
+
+         Unmounting /securedata...
+
+         Unmounting /data2...
+
+         Unmounting /run/bashroot/sys/kernel/security...
+
+         Unmounting /run/bashroot/controller/sbin/techsupport-filter...
+
+         Unmounting /run/bashroot/sys/fs/cgroup/perf_event...
+
+         Unmounting /run/bashroot/bin...
+
+         Unmounting /run/bashroot/usr/share/vim...
+
+         Stopping Monitoring of LVM2 mirrors... dmeventd or progress polling...
+
+         Unmounting /run/bashroot/sbin...
+
+         Unmounting /techsupport...
+
+         Unmounting /data/admin/bin/category.yaml...
+
+         Unmounting /run/bashroot/sys/fs/cgroup/memory...
+
+         Unmounting /run/bashroot/var/lib/lxc...
+
+         Unmounting /run/bashroot/data/techsupport...
+
+         Unmounting /run/bashroot/.download...
+
+         Unmounting /run/bashroot/var/log/dme/log.lastupgrade...
+
+         Unmounting /run/bashroot/opt/cisco...
+
+         Unmounting /scratch...
+
+         Unmounting /run/bashroot/dev/pts...
+
+         Unmounting /run/bashroot/sys/fs/cgroup/cpu,cpuacct...
+
+         Unmounting /run/bashroot/sys/fs/pstore...
+
+         Unmounting /run/bashroot/lib64...
+
+         Unmounting /var/tmp...
+
+         Unmounting /data/shell-data...
+
+         Unmounting /run/bashroot/etc/hosts...
+
+         Unmounting /run/bashroot/var/log/lxc...
+
+         Unmounting /run/bashroot/var/log/messages...
+
+         Unmounting /mgmt/opt/controller/sbin/collectLocalDbs.py...
+
+         Unmounting /dmecores...
+
+         Unmounting /data/log...
+
+[[32m  OK  [0m] Stopped Configure read-only root support.
+
+         Stopping Configure read-only root support...
+
+         Unmounting /run/bashroot/var/log/dme/core...
+
+         Unmounting /run/bashroot/sys/kernel/debug...
+
+         Unmounting /run/bashroot/sys/fs/cgroup/freezer...
+
+         Unmounting /data/techsupport...
+
+         Unmounting /efiboot...
+
+         Unmounting /run/bashroot/var/log/dme/log...
+
+         Unmounting /data/admin/bin/techsupport-filter...
+
+         Unmounting /run/bashroot/firmware...
+
+         Unmounting /run/bashroot/home...
+
+         Unmounting /boot...
+
+         Unmounting /run/bashroot/proc/fs/nfsd...
+
+         Unmounting /run/bashroot/dev/mqueue...
+
+         Unmounting /run/bashroot/data/devicescript...
+
+         Unmounting /run/bashroot/controller/sbin/collectLocalDbs.py...
+
+         Unmounting /data/admin/bin/trimtechsupport.py...
+
+         Unmounting /run/bashroot/var/run/mgmt/log...
+
+         Unmounting /run/bashroot/sys/fs/cgroup/devices...
+
+[[32m  OK  [0m] Unmounted /run/bashroot/lib.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/sys/fs/fuse/connections.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/data2.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/sys/fs/cgroup/blkio.
+
+[[32m  OK  [0m] Failed unmounting /var/log/glusterfs.
+
+[[32m  OK  [0m] Unmounted /firmware.
+
+[[32m  OK  [0m] Unmounted /usr/share/vim.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/data/challenge.plugin.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/data/log.lastupgrade.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/var/log/external.
+
+[[32m  OK  [0m] Unmounted /run/mgmt/shell-data.
+
+[[32m  OK  [0m] Unmounted /data/nginx/html.
+
+[[32m  OK  [0m] Unmounted /run/mgmt/log.
+
+[[32m  OK  [0m] Unmounted /logs.
+
+[[32m  OK  [0m] Unmounted /mgmt/opt/controller/sbin/trimtechsupport.py.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/controller/sbin/trimtechsupport.py.
+
+[[32m  OK  [0m] Unmounted /usr/share/lxc.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/usr/share/lxc.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/dev/hugepages.
+
+[[32m  OK  [0m] Unmounted /etc/hosts.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/var/log/dme/nginx.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/dev/shm.
+
+[[32m  OK  [0m] Unmounted /data/admin/bin/collectLocalDbs.py.
+
+[[32m  OK  [0m] Unmounted /mgmt/opt/controller/sbin/techsupport-filter.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/sys/fs/cgroup/net_cls.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/tmp.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/controller/sbin/category.yaml.
+
+[[32m  OK  [0m] Unmounted /mgmt/opt/controller/sbin/category.yaml.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/var/log/dme/oldlog.
+
+[[32m  OK  [0m] Unmounted /var/log/dme/oldlog.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/sys/fs/cgroup/cpuset.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/var/run/utmp.
+
+[[32m  OK  [0m] Failed unmounting /run/bashroot/sys/fs/cgroup/systemd.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/sys/fs/cgroup/pids.
+
+[[32m  OK  [0m] Unmounted /var/lib/lxc.
+
+[[32m  OK  [0m] Unmounted /rfs1.
+
+[[32m  OK  [0m] Failed unmounting /data2.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/sys/kernel/security.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/controller/sbin/techsupport-filter.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/sys/fs/cgroup/perf_event.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/bin.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/usr/share/vim.
+
+[[32m  OK  [0m] Stopped Monitoring of LVM2 mirrors,...ng dmeventd or progress polling.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/sbin.
+
+[[32m  OK  [0m] Unmounted /techsupport.
+
+[[32m  OK  [0m] Unmounted /data/admin/bin/category.yaml.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/sys/fs/cgroup/memory.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/var/lib/lxc.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/data/techsupport.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/.download.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/var/log/dme/log.lastupgrade.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/opt/cisco.
+
+[[32m  OK  [0m] Unmounted /scratch.
+
+[[32m  OK  [0m] Failed unmounting /run/bashroot/dev/pts.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/sys/fs/cgroup/cpu,cpuacct.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/sys/fs/pstore.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/lib64.
+
+[[32m  OK  [0m] Unmounted /var/tmp.
+
+[[32m  OK  [0m] Unmounted /data/shell-data.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/etc/hosts.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/var/log/lxc.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/var/log/messages.
+
+[[32m  OK  [0m] Unmounted /mgmt/opt/controller/sbin/collectLocalDbs.py.
+
+[[32m  OK  [0m] Unmounted /dmecores.
+
+[[32m  OK  [0m] Unmounted /data/log.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/sys/kernel/debug.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/sys/fs/cgroup/freezer.
+
+[[32m  OK  [0m] Unmounted /efiboot.
+
+[[32m  OK  [0m] Unmounted /data/admin/bin/techsupport-filter.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/proc/fs/nfsd.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/dev/mqueue.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/data/devicescript.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/controller/sbin/collectLocalDbs.py.
+
+[[32m  OK  [0m] Unmounted /data/admin/bin/trimtechsupport.py.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/var/run/mgmt/log.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/sys/fs/cgroup/devices.
+
+         Unmounting /run/bashroot/proc...
+
+         Unmounting /run/bashroot/etc...
+
+         Unmounting /tmp...
+
+         Stopping LVM2 metadata daemon...
+
+         Unmounting /run/bashroot/dev...
+
+         Unmounting /run/bashroot/usr...
+
+         Unmounting /run/bashroot/controller/sbin...
+
+         Unmounting /mgmt/opt/controller/sbin...
+
+         Unmounting /run/mgmt...
+
+         Unmounting /run/bashroot/sys/fs/cgroup...
+
+[[32m  OK  [0m] Stopped LVM2 metadata daemon.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/var/log/dme/core.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/var/log/dme/log.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/home.
+
+[[32m  OK  [0m] Failed unmounting /run/bashroot/proc.
+
+[[32m  OK  [0m] Failed unmounting /run/bashroot/dev.
+
+[[32m  OK  [0m] Unmounted /mgmt/opt/controller/sbin.
+
+[[32m  OK  [0m] Failed unmounting /run/bashroot/sys/fs/cgroup.
+
+         Unmounting /run/bashroot/sys...
+
+         Unmounting /run/bashroot/var/log/dme...
+
+[[32m  OK  [0m] Failed unmounting /run/bashroot/sys.
+
+[[32m  OK  [0m] Unmounted /securedata.
+
+[[32m  OK  [0m] Unmounted /boot.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/usr.
+
+[[32m  OK  [0m] Unmounted /data/techsupport.
+
+         Unmounting /data...
+
+[[32m  OK  [0m] Unmounted /run/bashroot/etc.
+
+[[32m  OK  [0m] Unmounted /run/mgmt.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/var/log/dme.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/controller/sbin.
+
+[[32m  OK  [0m] Unmounted /tmp.
+
+         Unmounting /run/bashroot/controller...
+
+[[32m  OK  [0m] Unmounted /run/bashroot/controller.
+
+[[32m  OK  [0m] Unmounted /data.
+
+[[32m  OK  [0m] Unmounted /run/bashroot/firmware.
+
+[[32m  OK  [0m] Stopped target Local File Systems (Pre).
+
+[[32m  OK  [0m] Stopped Remount Root and Kernel File Systems.
+
+         Stopping Remount Root and Kernel File Systems...
+
+[[32m  OK  [0m] Stopped Create Static Device Nodes in /dev.
+
+         Stopping Create Static Device Nodes in /dev...
+
+[[32m  OK  [0m] Stopped Cryptography Setup for luks...0c1-9e01-4d16-b8d7-2f96abb178e8.
+
+[[32m  OK  [0m] Reached target Unmount All Filesystems.
+
+[[32m  OK  [0m] Removed slice system-systemd\x2dcryptsetup.slice.
+
+[[32m  OK  [0m] Stopped Collect Read-Ahead Data.
+
+         Stopping Collect Read-Ahead Data...
+
+[[32m  OK  [0m] Reached target Shutdown.
+
+cgroup: option or name mismatch, new: 0x0 "", old: 0x4 "systemd"
+systemd-shutdown[1]: Failed to finalize  file systems, DM devices, ignoring
+reboot: Restarting system
+[=3h[0m[37m[40m[2J[01;01H[02;01H[0m[36m[40m Cisco Systems, Inc. [20;01H[1m[37m[40mCisco IMC IPv4 : 3.3.2.42[02;22H[0m[36m[40m[21;01H[1m[37m[40mMAC ADDR : 00:FC:BA:74:56:2E[02;22H[0m[36m[40m[03;01H[0m[37m[40m Configuring and testing memory...[03;33H.[0m[37m[40m [04;01H Configuring platform hardware...
+[2J[1;1H[2J[1;1H[1;1H[0;37;40m                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               [25;80H[8;1H[8;1HPress <F2> Setup, <F6> Boot Menu, <F7> Diagnostics, <F8>Cisco IMC Configuration,[9;1H<F12> Network Boot[11;1H[11;1HBios Version : C220M4.3.0.3c.0.0831170216[12;1H[12;1HPlatform ID  : C220M4[14;1H[1;37;40m[14;1HCisco IMC IPv4 Address : 3.3.2.42[15;1H[15;1HCisco IMC MAC Address : 00:FC:BA:74:56:2E[17;1H[0;37;40m[17;1HProcessor(s) Intel(R) Xeon(R) CPU E5-2620 v3 @ 2.40GHz[18;1H[18;1HTotal Memory  = 128 GB Effective Memory = 128 GB[19;1H[19;1HMemory Operating Speed 1866 Mhz€ € [01;00H[0m[2;37;40m                                                                                [02;00H                                                                                [03;00H                                                                                € [01;00HInitializing Intel(R) Boot Agent GE v1.5.81                                     [02;00HPXE 2.1 Build 092 (WfM 2.0)                                                     [03;00H                                                                                € [01;00HInitializing Intel(R) Boot Agent GE v1.5.81                                     [02;00HPXE 2.1 Build 092 (WfM 2.0)                                                     [03;00H                                                                                [04;00HInitializing Intel(R) Boot Agent GE v1.5.81                                     [05;00HPXE 2.1 Build 092 (WfM 2.0)                                                     [06;00H                                                                                [07;00HAVAGO MegaRAID SAS-MFI BIOS                                                     [08;00HVersion 6.30.03.0 (Build August 28, 2015)                                       [09;00HCopyright(c) 2015 AVAGO Technologies                                            [10;00H                                                                                [11;00H                                                                                [12;00H                                                                                [13;00H                                                                                [14;00H                                                                                [15;00H                                                                                [16;00H                                                                                [17;00H                                                                                [18;00H                                                                                [19;00H                                                                                [20;00H                                                                                [21;00H                                                                                [22;00H                                                                                [23;00H                                                                                [24;00H                                                                               [24;00H[10;01H[11;00HHA -0 (Bus 5 Dev 0) Cisco 12G SAS Modular Raid Controller                       [12;00HPCI Slot Number: 4                                                              [14;00HID LUN VENDOR    PRODUCT                     REVISION            CAPACITY       [15;00H-- --- ------    -------                     --------            --------       [16;00H       AVAGO     Cisco 12G SAS Modular Raid  4.620.01-7265       0MB            [17;00H8  0   HGST      HUC101812CSS200             AD50                1144641MB      [18;00H9  0   HGST      HUC101812CSS200             AD50                1144641MB      [19;00HPress <CTRL><P> to pause  or <CTRL><V> to skip                                  [19;47H[01;00H-- --- ------    -------                     --------            --------       [02;00H10 0   ATA       INTEL SSDSC2BX20            CS01                190782MB       [03;00H   0   AVAGO     Virtual Drive               RAID1               1143455MB      [04;00H   1   AVAGO     Virtual Drive               RAID0               189781MB       [05;00H                                                                                [07;00H                                                                                [08;00H                                                                                [09;00H                                                                                [11;00H                                                                                [12;00H                                                                                [14;00H                                                                                [15;00H                                                                                [16;00H                                                                                [17;00H                                                                                [18;00H                                                                                [19;00H                                                                                [05;01H[06;00H0 JBOD(s) found on the host adapter                                             [07;00H0 JBOD(s) handled by BIOS                                                       [09;00H2 Virtual Drive(s) found on the host adapter.                                   [10;00H2 Virtual Drive(s) handled by BIOS                                              [12;00HPress <Ctrl><R> to Run MegaRAID Configuration Utility                           [13;01H[2J[1;1H[2J[1;1H[1;1H[0;37;40m                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                Press <F2> Setup, <F6> Boot Menu, <F7> Diagnostics, <F8>Cisco IMC Configuration,<F12> Network Boot                                                                                                                                              Bios Version : C220M4.3.0.3c.0.0831170216                                       Platform ID  : C220M4                                                                                                                                           [1;37;40mCisco IMC IPv4 Address : 3.3.2.42[0;37;40m                                               [1;37;40mCisco IMC MAC Address : 00:FC:BA:74:56:2E[0;37;40m                                                                                                                       Processor(s) Intel(R) Xeon(R) CPU E5-2620 v3 @ 2.40GHz                          Total Memory  = 128 GB Effective Memory = 128 GB                                Memory Operating Speed 1866 Mhz                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                [19;32H[2J[1;1H[1;37;40m[2J[1;1H[1;1HPlease wait, preparing to boot..[1;34H[1;34H.[1;35H.[1;36H.[1;37H.[1;38H.[1;39H.[1;40H.[1;41H.[1;42H.[1;43H.[1;44H.[1;45H.[1;46H.[1;47H.[1;48H.[1;49H.[1;50H.[1;51H.[1;52H.[1;53H.[1;54H.[1;55H.[1;56H.[1;57H.[1;58H.[1;59H.[1;60H.[1;61H.[1;62H.[1;63H.[1;64H.[1;65H.[1;66H.[1;67H.[1;68H.[1;69H.[1;70H.[1;71H.[1;72H.[1;73H.[1;74H.[1;75H.[1;76H.[1;77H.[1;78H.[1;79H.[1;80H..[2;1H.[2;2H.[2;3H.[2;4H.[2;5H.[2;6H.[2;7H.[2;8H.[2;9H.[2;10H.[2;11H.[2;12H.[2;13H.[2;14H.[2;15H.[2;16H.[2;17H.[2;18H.[2;19H.[2;20H.[2;21H.[2;22H.[2;23H.[2;24H.[2;25H.[2;26H.[2;27H.[2;28H.[2;29H.[2;30H.[2;31H.[2;32H.[2;33H.[2;34H.[2;35H.[2;36H.[2;37H.[2;38H.[2;39H.[2;40H.[2;41H.[2;42H.[2;43H.[2;44H.[2;45H.[2;46H.[2;47H.[2;48H.[2;49H.[2;50H.[2;51H.[2;52H.[2;53H.[2;54H.[2;55H.[2;56H.[2;57H.[2;58H.[2;59H.[2;60H.[2;61H.[2J[1;1H[2J[1;1H€ [01;00H                                                                                [02;00H                                                                                [03;00H                                                                                [04;00HBooting Insieme Fabric Controller 3.2.2l on /rfs2 in 14 seconds...              [05;00H                                                                                [06;00H                                                                                [07;00H                                                                                [08;00H                                                                                [09;00H                                                                                [10;00H                                                                                [11;00H                                                                                [12;00H                                                                                [13;00H                                                                                [14;00H                                                                                [15;00H                                                                                [16;00H                                                                                [17;00H                                                                                [18;00H                                                                                [19;00H                                                                                [20;00H                                                                                [21;00H                                                                                [22;00H                                                                                [23;00H                                                                                [24;00H                                                                               [24;00H[04;67H[01;00HPress any key to enter the menu                                                 [04;00HBooting Insieme Fabric Controller 3.2.2l on /rfs2 in 13 seconds...              [04;67H[04;00HBooting Insieme Fabric Controller 3.2.2l on /rfs2 in 12 seconds...              [04;67H[04;00HBooting Insieme Fabric Controller 3.2.2l on /rfs2 in 11 seconds...              [04;67H[04;00HBooting Insieme Fabric Controller 3.2.2l on /rfs2 in 10 seconds...              [04;67H[04;00HBooting Insieme Fabric Controller 3.2.2l on /rfs2 in 9 seconds....              [04;66H[04;00HBooting Insieme Fabric Controller 3.2.2l on /rfs2 in 8 seconds....              [04;66H[04;00HBooting Insieme Fabric Controller 3.2.2l on /rfs2 in 7 seconds....              [04;66H[04;00HBooting Insieme Fabric Controller 3.2.2l on /rfs2 in 6 seconds....              [04;66H[04;00HBooting Insieme Fabric Controller 3.2.2l on /rfs2 in 5 seconds....              [04;66H[04;00HBooting Insieme Fabric Controller 3.2.2l on /rfs2 in 4 seconds....              [04;66H[04;00HBooting Insieme Fabric Controller 3.2.2l on /rfs2 in 3 seconds....              [04;66H[04;00HBooting Insieme Fabric Controller 3.2.2l on /rfs2 in 2 seconds....              [04;66H[04;00HBooting Insieme Fabric Controller 3.2.2l on /rfs2 in 1 seconds....              [04;66H[04;00HBooting Insieme Fabric Controller 3.2.2l on /rfs2 in 0 seconds....              [04;66Hmegaraid_sas 0000:05:00.0: Init cmd success
+megaraid_sas 0000:05:00.0: INIT adapter done
+power_meter ACPI000D:00: Ignoring unsafe software power cap!
+power_meter ACPI000D:01: Ignoring unsafe software power cap!
+EDAC sbridge: Couldn't find mci handler
+EDAC sbridge: Couldn't find mci handler
+%G%GCouldn't open /dev/ttyS0
+
+%G%Ginsmod: ERROR: could not load module /lib/modules/4.4.125.0.1insieme-1/kernel/drivers/char/tpm/tpm_tis.ko: No such file or directory
+
+RTNETLINK answers: File exists
+
+e2fsck 1.42.9 (28-Dec-2013)
+
+
+
+Welcome to [0;31mCentOS Linux 7 (Core)[0m!
+
+
+
+[[32m  OK  [0m] Set up automount Arbitrary Executab...ats File System Automount Point.
+
+[[32m  OK  [0m] Reached target Swap.
+
+[[32m  OK  [0m] Created slice Root Slice.
+
+[[32m  OK  [0m] Listening on Device-mapper event daemon FIFOs.
+
+[[32m  OK  [0m] Listeningsystemd-readahead[1689]: Failed to create fanotify object: Function not implemented
+ on Delayed Shutdown Socket.
+
+[[32m  OK  [0m] Created slice User and Session Slice.
+
+[[32m  OK  [0m] Listening on udev Kernel Socket.
+
+[[32m  OK  [0m] Created slice ifc.slice.
+
+[[32m  OK  [0m] Listening on udev Control Socket.
+
+[[32m  OK  [0m] Listening on LVM2 poll daemon socket.
+
+[[32m  OK  [0m] Listening on /dev/initctl Compatibility Named Pipe.
+
+[[32m  OK  [0m] Listening on Journal Socket.
+
+[[32m  OK  [0m] Listening on LVM2 metadata daemon socket.
+
+[[32m  OK  [0m] Created slice Infra Add-ons Slice.
+
+[[32m  OK  [0m] Created slice System Slice.
+
+[[32m  OK  [0m] Created slice system-getty.slice.
+
+         Starting Collect Read-Ahead Data...
+
+[[32m  OK  [0m] Created slice Appstore Slice.
+
+[[32m  OK  [0m] Created slice system-serial\x2dgetty.slice.
+
+         Mounting Debug File System...
+
+         Starting Monitoring of LVM2 mirrors... dmeventd or progress polling...
+
+         Mounting POSIX Message Queue File System...
+
+         Starting Create list of required st... nodes for the current kernel...
+
+         Starting Journal Service...
+
+         Mounting Huge Pages File System...
+
+         Mounting NFSD configuration filesystem...
+
+[[32m  OK  [0m] Created slice Gluster Slice.
+
+[[32m  OK  [0m] Reached target Slices.
+
+[[32m  OK  [0m] Created slice system-systemd\x2dcryptsetup.slice.
+
+[[32m  OK  [0m] Started Create list of required sta...ce nodes for the current kernel.
+
+[[32m  OK  [0m] Mounted Debug File System.
+
+[[32m  OK  [0m] Mounted POSIX Message Queue File System.
+
+[[32m  OK  [0m] Mounted Huge Pages File System.
+
+[[32m  OK  [0m] Started Collect Read-Ahead Data.
+
+         Starting Remount Root and Kernel File Systems...
+
+         Mounting FUSE Control File System...
+
+         Starting Apply Kernel Variables...
+
+         Starting Create Static Device Nodes in /dev...
+
+         Starting Setup Virtual Console...
+
+[[32m  OK  [0m] Mounted FUSE Control File System.
+
+[[32m  OK  [0m] Started Remount Root and Kernel File Systems.
+
+         Starting Load/Save Random Seed...
+
+         Starting udev Coldplug all Devices...
+
+         Starting Configure read-only root support...
+
+%G[[32m  OK  [0m] Started Setup Virtual Console.
+
+[[32m  OK  [0m] Started Apply Kernel Variables.
+
+[[32m  OK  [0m] Mounted NFSD configuration filesystem.
+
+[[32m  OK  [0m] Started Create Static Device Nodes in /dev.
+
+         Starting udev Kernel Device Manager...
+
+[[32m  OK  [0m] Reached target Local File Systems (Pre).
+
+         Mounting /tmp...
+
+[[32m  OK  [0m] Started Load/Save Random Seed.
+
+[[32m  OK  [0m] Started udev Coldplug all Devices.
+
+[[32m  OK  [0m] Mounted /tmp.
+
+[[32m  OK  [0m] Started LVM2 metadata daemon.
+
+         Starting LVM2 metadata daemon...
+
+         Mounting /var/tmp...
+
+[[32m  OK  [0m] Mounted /var/tmp.
+
+[[32m  OK  [0m] Started Journal Service.
+
+         Starting Flush Journal to Persistent Storage...
+
+[[32m  OK  [0m] Started udev Kernel Device Manager.
+
+         Starting Show Plymouth Boot Screen...
+
+[[32m  OK  [0m] Started Configure read-only root support.
+
+[[32m  OK  [0m] Started Flush Journal to Persistent Storage.
+
+[[32m  OK  [0m] Started Show Plymouth Boot Screen.
+
+[[32m  OK  [0m] Found device /dev/ttyS0.
+
+%G[[32m  OK  [0m] Found device /dev/disk/by-uuid/d4f690c1-9e01-4d16-b8d7-2f96abb178e8.
+
+         Starting Cryptography Setup for luk...1-9e01-4d16-b8d7-2f96abb178e8...
+
+[[32m  OK  [0m] Found device /dev/mapper/vg_ifc0_ssd-data.
+
+         Mounting /data...
+
+[[32m  OK  [0m] Started Cryptography Setup for luks...0c1-9e01-4d16-b8d7-2f96abb178e8.
+
+[[32m  OK  [0m] Reached target Encrypted Volumes.
+
+[[32m  OK  [0m] Mounted /data.
+
+[[32m  OK  [0m] Found device /dev/mapper/vg_ifc0-firmware.
+
+         Mounting /firmware...
+
+[[32m  OK  [0m] Created slice system-lvm2\x2dpvscan.slice.
+
+         Starting LVM2 PV scan on device 8:16...
+
+[[32m  OK  [0m] Found device /dev/mapper/vg_ifc0-data2.
+
+         Mounting /data2...
+
+[[32m  OK  [0m] Found device /dev/mapper/vg_ifc0-logs.
+
+         Mounting /logs...
+
+[[32m  OK  [0m] Started Monitoring of LVM2 mirrors,...ng dmeventd or progress polling.
+
+[[32m  OK  [0m] Mounted /firmware.
+
+[[32m  OK  [0m] Mounted /data2.
+
+[[32m  OK  [0m] Mounted /logs.
+
+[[32m  OK  [0m] Found device /dev/mapper/vg_ifc0-techsupport.
+
+         Mounting /techsupport...
+
+[[32m  OK  [0m] Found device /dev/mapper/vg_ifc0-scratch.
+
+         Mounting /scratch...
+
+         Starting LVM2 PV scan on device 8:3...
+
+[[32m  OK  [0m] Found device UCSC-MRAID12G 2.
+
+         Mounting /efiboot...
+
+[[32m  OK  [0m] Mounted /techsupport.
+
+[[32m  OK  [0m] Mounted /scratch.
+
+[[32m  OK  [0m] Started LVM2 PV scan on device 8:16.
+
+[[32m  OK  [0m] Found device /dev/mapper/vg_ifc0-dmecores.
+
+         Mounting /dmecores...
+
+[[32m  OK  [0m] Mounted /efiboot.
+
+[[32m  OK  [0m] Found device UCSC-MRAID12G 1.
+
+         Mounting /boot...
+
+[[32m  OK  [0m] Mounted /dmecores.
+
+[[32m  OK  [0m] Started LVM2 PV scan on device 8:3.
+
+[[32m  OK  [0m] Mounted /boot.
+
+[[32m  OK  [0m] Reached target Local File Systems.
+
+         Starting Import network configuration from initramfs...
+
+         Starting Tell Plymouth To Write Out Runtime Data...
+
+         Starting Security Auditing Service...
+
+         Starting Preprocess NFS configuration...
+
+[[32m  OK  [0m] Started Tell Plymouth To Write Out Runtime Data.
+
+[[32m  OK  [0m] Started Preprocess NFS configuration.
+
+[[32m  OK  [0m] Started Import network configuration from initramfs.
+
+[[32m  OK  [0m] Started Security Auditing Service.
+
+         Starting Update UTMP about System Boot/Shutdown...
+
+[[32m  OK  [0m] Started Update UTMP about System Boot/Shutdown.
+
+[[32m  OK  [0m] Reached target System Initialization.
+
+[[32m  OK  [0m] Reached target Timers.
+
+[[32m  OK  [0m] Listening on D-Bus System Message Bus Socket.
+
+[[32m  OK  [0m] Listening on RPCbind Server Activation Socket.
+
+[[32m  OK  [0m] Reached target Sockets.
+
+[[32m  OK  [0m] Reached target Paths.
+
+[[32m  OK  [0m] Reached target Basic System.
+
+[[32m  OK  [0m] Started D-Bus System Message Bus.
+
+         Starting D-Bus System Message Bus...
+
+         Starting GSSAPI Proxy Daemon...
+
+         Starting bootstrap...
+
+         Starting Dump dmesg to /var/log/dmesg...
+
+         Starting Trigger update on detecting scheduler cert change...
+
+         Starting Machine Check Exception Logging Daemon...
+
+         Starting log-preservation...
+
+         Starting Login Service...
+
+         Starting setenv...
+
+         Starting Trigger update on detecting scheduler token change...
+
+         Starting Resets System Activity Logs...
+
+[[32m  OK  [0m] Started Self Monitoring and Reporting Technology (SMART) Daemon.
+
+         Starting Self Monitoring and Reporting Technology (SMART) Daemon...
+
+         Starting TCG Core Services Daemon...
+
+         Starting System Logging Service...
+
+[[32m  OK  [0m] Started statscollect.
+
+         Starting statscollect...
+
+[[32m  OK  [0m] Started log-preservation.
+
+[[32m  OK  [0m] Started Machine Check Exception Logging Daemon.
+
+[[32m  OK  [0m] Started Login Service.
+
+[[32m  OK  [0m] Started Dump dmesg to /var/log/dmesg.
+
+[[32m  OK  [0m] Started Resets System Activity Logs.
+
+[[1;31mFAILED[0m] Failed to start TCG Core Services Daemon.
+
+See 'systemctl status tcsd.service' for details.
+
+[[32m  OK  [0m] Started System Logging Service.
+
+[[32m  OK  [0m] Started GSSAPI Proxy Daemon.
+
+[[32m  OK  [0m] Reached target NFS client services.
+
+[[32m  OK  [0m] Reached target Remote File Systems (Pre).
+
+[[32m  OK  [0m] Reached target Remote File Systems.
+
+         Starting Permit User Sessions...
+
+[[32m  OK  [0m] Started Permit User Sessions.
+
+         Starting Wait for Plymouth Boot Screen to Quit...
+
+         Starting Terminate Plymouth Boot Screen...
+
+[[32m  OK  [0m] Started Command Scheduler.
+
+         Starting Command Scheduler...
+
+
+
+Application Policy Infrastructure Controller

@@ -115,7 +115,7 @@ class TestNxosPluginBashService(unittest.TestCase):
     def test_bash_ha_standby(self):
         ha = MockDeviceTcpWrapperNXOS(port=0, state='exec,nxos_exec_standby')
         ha.start()
-        d = Connection(hostname='Router',
+        d = Connection(hostname='switch',
                         start=['telnet 127.0.0.1 '+  str(ha.ports[0]), 'telnet 127.0.0.1 '+ str(ha.ports[1]) ],
                        os='nxos', username='cisco', tacacs_password='cisco')
         d.connect()
@@ -189,20 +189,22 @@ class TestNxosPluginGuestshellService(unittest.TestCase):
     def test_ha_guestshell_basic(self):
         ha = MockDeviceTcpWrapperNXOS(port=0, state='exec,nxos_exec_standby')
         ha.start()
-        d = Connection(hostname='Router',
+        d = Connection(hostname='switch',
                        start=['telnet 127.0.0.1 ' + str(ha.ports[0]),
                               'telnet 127.0.0.1 ' + str(ha.ports[1])],
                        os='nxos',
                        username='cisco',
                        tacacs_password='cisco')
-        d.connect()
-        with d.guestshell() as gs:
-            output = gs.execute('pwd')
-        self.assertEqual('/home/admin', output)
-        self.assertIn('exit', d.active.spawn.match.match_output)
-        self.assertIn('switch#', d.active.spawn.match.match_output)
-        d.disconnect()
-        ha.stop()
+        try:
+            d.connect()
+            with d.guestshell() as gs:
+                output = gs.execute('pwd')
+            self.assertEqual('/home/admin', output)
+            self.assertIn('exit', d.active.spawn.match.match_output)
+            self.assertIn('switch#', d.active.spawn.match.match_output)
+            d.disconnect()
+        finally:
+            ha.stop()
 
 
 class TestNxosPluginAttachConsoleService(unittest.TestCase):
@@ -222,7 +224,7 @@ class TestNxosPluginPing6Service(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.d = Connection(hostname='Router',
+        cls.d = Connection(hostname='switch',
                             start=['mock_device_cli --os nxos --state exec'],
                             os='nxos',
                             username='cisco',
@@ -230,7 +232,7 @@ class TestNxosPluginPing6Service(unittest.TestCase):
         cls.d.connect()
         cls.ha = MockDeviceTcpWrapperNXOS(port=0, state='exec,nxos_exec_standby')
         cls.ha.start()
-        cls.ha_device = Connection(hostname='Router',
+        cls.ha_device = Connection(hostname='switch',
                                     start=['telnet 127.0.0.1 '+  str(cls.ha.ports[0]), 'telnet 127.0.0.1 '+ str(cls.ha.ports[1]) ],
                                     os='nxos', username='cisco', tacacs_password='cisco')
         cls.ha_device.connect()
@@ -364,6 +366,27 @@ class TestNxosPluginReloadService(unittest.TestCase):
         dev.start = ['mock_device_cli --os nxos --state reconnect_login']
         with self.assertRaises(ConnectionError):
             dev.reload(config_lock_retries=1, config_lock_retry_sleep=1)
+
+
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
+class TestNxosPluginMaintenanceMode(unittest.TestCase):
+
+    def test_maint_mode(self):
+        dev = Connection(
+            hostname='N93_1',
+            start=['mock_device_cli --os nxos --state exec_maint'],
+            os='nxos',
+            credentials={
+                'defaut': {
+                    'username': 'cisco',
+                    'password': 'cisco'
+                }
+            }
+        )
+        dev.connect()
+        dev.disconnect()
+
 
 
 if __name__ == "__main__":

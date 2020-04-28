@@ -96,7 +96,7 @@ Argument                    Description
 addr                        Destination address
 proto                       protocol(ip/ipv6)
 count                       Number of pings to transmit
-src_add                     IP for source field in ping packet
+src_addr                    IP for source field in ping packet
 data_pat                    data pattern that would be used to perform ping.
 dest_end                    ending network 127 address
 dest_start                  beginning network 127 address

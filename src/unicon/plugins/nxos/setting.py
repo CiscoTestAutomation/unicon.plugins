@@ -24,7 +24,7 @@ class NxosSettings(GenericSettings):
         self.GUESTSHELL_RETRY_SLEEP = 5
         self.ATTACH_CONSOLE_DISABLE_SLEEP = 250
         self.ERROR_PATTERN = [
-            r'^%\s*[Ii]nvalid (command|input)',
+            r'^%\s*[Ii]nvalid (command|input|number)',
             r'^%\s*[Ii]ncomplete (command|input)',
             r'^%\s*[Aa]mbiguous (command|input)',
         ]
@@ -33,4 +33,5 @@ class NxosSettings(GenericSettings):
             r'^%\s*[Nn]ot supported.*',
             r'^%\s*[Ff]ail.*',
             r'^%\s*[Aa]bort.*'
+            r'^%\s*[Ee](RROR|rror).*',
         ]

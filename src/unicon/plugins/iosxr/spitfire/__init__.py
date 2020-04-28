@@ -30,6 +30,7 @@ class SpitfireHAServiceList(HAServiceList):
         super().__init__()
         self.execute = svc.HAExecute
         self.configure= svc.HaConfigureService
+        self.attach_console = svc.AttachModuleConsole        
         self.switchover = svc.Switchover
         self.bash_console = svc.BashService
         self.switchto = Switchto

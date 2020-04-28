@@ -22,5 +22,6 @@ This part of the document covers all the services supported by Unicon.
     sros
     staros
     vos
+    windows
 
 .. sectionauthor:: ATS Team

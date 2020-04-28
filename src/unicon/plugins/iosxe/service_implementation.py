@@ -14,7 +14,8 @@ from unicon.plugins.generic.service_implementation import \
     HAReloadService as GenericHAReload,\
     SwitchoverService as GenericHASwitchover, \
     Traceroute as GenericTraceroute, \
-    Copy as GenericCopy
+    Copy as GenericCopy, \
+    ResetStandbyRP as GenericResetStandbyRP
 
 
 from .service_statements import (overwrite_previous, are_you_sure,
@@ -171,3 +172,40 @@ class BashService(BashService):
                 conn.execute(cmd, timeout = self.timeout, target=self.target)
 
             return self
+
+class ResetStandbyRP(GenericResetStandbyRP):
+    """ Service to reset the standby rp.
+
+    Arguments:
+
+        command: command to reset standby, default is"redundancy reload peer"
+        dialog: Dialog which include list of Statements for
+                 additional dialogs prompted by standby reset command,
+                 in-case it is not in the current list.
+        timeout: Timeout value in sec, Default Value is 500 sec
+
+    Returns:
+        True on Success, raise SubCommandFailure on failure.
+
+    Example:
+        .. code-block:: python
+
+            rtr.reset_standby_rp()
+            # If command is other than 'redundancy reload peer'
+            rtr.reset_standby_rp(command="command which will reset standby rp",
+            timeout=600)
+
+    """
+
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.prompt_recovery = connection.prompt_recovery
+
+    def call_service(self, command='redundancy reload peer',
+                     reply=Dialog([]),
+                     timeout=None,
+                     *args,
+                     **kwargs):
+        super().call_service(command='redundancy reload peer',
+            reply=Dialog([]), timeout=None, standby_check='STANDBY HOT',
+            *args, **kwargs)

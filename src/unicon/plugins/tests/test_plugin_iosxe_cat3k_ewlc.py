@@ -68,6 +68,21 @@ class TestIosXECat3kEwlcConfigure(unittest.TestCase):
         self.d.expect_log(enable=True)
         self.d.configure("wlan shutdown")
 
+class TestIosXECat3kEwlcStandbyReload(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.d = Connection(hostname='Router',
+                           start=['mock_device_cli --os iosxe --state ewlc_enable'],
+                           os='iosxe',
+                           series='cat3k',
+                           model='ewlc',
+                           username='cisco',
+                           tacacs_password='cisco')
+        cls.d.connect()
+
+    def test_reset_standby(self):
+        r = self.d.execute('redundancy reload peer')
 
 if __name__ == '__main__':
     unittest.main()

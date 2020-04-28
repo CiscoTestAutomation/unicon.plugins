@@ -7,7 +7,7 @@ import unicon
 from unicon import Connection
 from pyats.topology import loader
 from unicon.eal.dialogs import Statement
-
+from unicon.plugins.iosxe.service_implementation import Copy
 
 from unicon.plugins.tests.mock.mock_device_iosxe import MockDeviceTcpWrapperIOSXE
 
@@ -75,6 +75,12 @@ class TestIosXEPluginHAConnect(unittest.TestCase):
         r.switchover()
         r.disconnect()
 
+    def test_copy(self):
+        tb = loader.load(self.testbed)
+        dev = tb.devices.Router
+        dev.connect()
+        self.assertEqual(isinstance(dev.copy, Copy), True)
+        dev.disconnect()
 
 
 if __name__ == "__main__":

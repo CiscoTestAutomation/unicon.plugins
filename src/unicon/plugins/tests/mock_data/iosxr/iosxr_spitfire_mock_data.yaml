@@ -107,6 +107,27 @@ spitfire_enable:
 
     "redundancy switchover":
       new_state:  spitfire_confirm_switchover
+    "attach location 0/RP0/CPU0":
+      new_state:  spitfire_attach_console
+      response: 
+        - |2
+          RP/0/RP0/CPU0:ios#attach location 0/RP0/CPU0
+          Sun Mar  1 18:49:07.320 UTC
+
+          export PS1='#'
+          [node0_RP0_CPU0:~]$export PS1='#'
+          #
+
+    "attach location 0/0/CPU0":
+      new_state:  spitfire_attach_console
+      response: 
+        - |2
+          RP/0/RP0/CPU0:ios#attach location 0/0/CPU0
+          Sun Mar  1 18:49:07.320 UTC
+
+          export PS1='#'
+          [node0_0_CPU0:~]$export PS1='#'
+          #
 
 
 spitfire_confirm_switchover:
@@ -224,3 +245,13 @@ spitfire_enable_ztp_lock:
         - |2
           Thu Sep 19 14:50:51.247 UTC
 
+spitfire_attach_console:
+  prompt: "#"
+  commands:
+    "exit":
+      response: 
+        - |2
+          logout
+      new_state: spitfire_enable
+    "ls": |
+        dummy_file dummy_file2

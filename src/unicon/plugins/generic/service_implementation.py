@@ -870,7 +870,7 @@ class Configure(BaseService):
         self.result = ''
         if command:
             flat_cmd = self.utils.flatten_splitlines_command(command)
-            dialog = self.service_dialog(service_dialog=reply)
+            dialog = self.service_dialog(handle=handle,service_dialog=reply)
             sp = handle.spawn
             if bulk:
                 indicator = self.connection.settings.BULK_CONFIG_END_INDICATOR
@@ -2241,7 +2241,11 @@ class SwitchoverService(BaseService):
             # Clear Standby buffer
             con.standby.spawn.sendline("\r")
             con.standby.spawn.expect(".*")
-            con.standby.state_machine.go_to('any', con.standby.spawn, context=con.context)
+            try:
+                con.standby.state_machine.go_to('disable', con.standby.spawn, context=con.context)
+            except:
+                con.standby.state_machine.go_to('any', con.standby.spawn, context=con.context)
+
             con.enable(target='standby')
         # Verify switchover is Successful
         if con.active.start == standby_start_cmd:
@@ -2286,6 +2290,7 @@ class ResetStandbyRP(BaseService):
         self.__dict__.update(kwargs)
 
     def pre_service(self, *args, **kwargs):
+        self.prompt_recovery = kwargs.get('prompt_recovery', False)
         if self.connection.is_connected:
             return
         elif self.connection.reconnect:
@@ -2318,7 +2323,12 @@ class ResetStandbyRP(BaseService):
 
         # Check is switchover possible?
         rp_state = con.get_rp_state(target='standby', timeout=100)
-        if rp_state.find('DISABLED') == -1:
+        if 'standby_check' in kwargs:
+            check = kwargs['standby_check']
+        else:
+            check = 'DISABLED'
+
+        if re.search(check, rp_state):
             raise SubCommandFailure("No Standby found")
 
         dialog = self.service_dialog(handle=con.active,
@@ -2337,6 +2347,7 @@ class ResetStandbyRP(BaseService):
         reset_counter = timeout / 10
 
         counter = 0
+        reloadGood = False
         while counter < reset_counter:
             try:
                 rp_state = con.get_rp_state(target='standby',
@@ -2346,6 +2357,17 @@ class ResetStandbyRP(BaseService):
                 counter += 1
                 continue
             else:
+                # first need to insure reload happens
+                # no false positives
+                if not reloadGood:
+                    if not re.search('DISABLED', rp_state):
+                        sleep(2)
+                        counter += 1
+                        continue
+                    else:
+                        reloadGood = True
+                        counter = 0
+
                 if re.search('STANDBY HOT', rp_state):
                     counter = reset_counter + 1
                 else:

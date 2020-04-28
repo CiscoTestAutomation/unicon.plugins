@@ -4,7 +4,7 @@ from unicon.patterns import UniconCorePatterns
 class IsePatterns(UniconCorePatterns):
     def __init__(self):
         super().__init__()
-        self.continue_connect = r'Are you sure you want to continue connecting \(yes/no\)'
+        self.continue_connect = r'Are you sure you want to continue connecting \(yes/no(/\[fingerprint\])?\)'
         # Prompt on ise device is <hostname>/<user-id>#.
         # If user login as root on ise device then the device
         # behaves like linux. For root login on ise use os as linux.

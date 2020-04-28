@@ -1,0 +1,367 @@
+Router#
+redundancy reload peer
+Reload peer [confirm]
+Preparing to reload peer
+
+Router#
+[2020-04-10 13:44:30,124] +++ Router: get_rp_state +++
+[2020-04-10 13:44:30,124] +++ Router: execute +++
+[2020-04-10 13:44:30,125] +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = 1  -DISABLED
+    Manual Swact = disabled (system is simplex (no peer unit))
+Router#
+[2020-04-10 13:44:31,290] +++ Router: execute +++
+[2020-04-10 13:44:31,291] +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = Non Redundant
+Router#
+[2020-04-10 13:44:42,053] +++ Router: get_rp_state +++
+[2020-04-10 13:44:42,054] +++ Router: execute +++
+[2020-04-10 13:44:42,055] +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = 1  -DISABLED
+    Manual Swact = disabled (system is simplex (no peer unit))
+Router#
+[2020-04-10 13:44:42,417] +++ Router: execute +++
+[2020-04-10 13:44:42,418] +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = Non Redundant
+Router#
+[2020-04-10 13:44:52,800] +++ Router: get_rp_state +++
+[2020-04-10 13:44:52,801] +++ Router: execute +++
+[2020-04-10 13:44:52,802] +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = 1  -DISABLED
+    Manual Swact = disabled (system is simplex (no peer unit))
+Router#
+[2020-04-10 13:44:53,492] +++ Router: execute +++
+[2020-04-10 13:44:53,493] +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = Non Redundant
+Router#
+[2020-04-10 13:45:03,862] +++ Router: get_rp_state +++
+[2020-04-10 13:45:03,862] +++ Router: execute +++
+[2020-04-10 13:45:03,863] +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = 1  -DISABLED
+    Manual Swact = disabled (system is simplex (no peer unit))
+Router#
+[2020-04-10 13:45:04,213] +++ Router: execute +++
+[2020-04-10 13:45:04,214] +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = Non Redundant
+Router#
+[2020-04-10 13:45:14,611] +++ Router: get_rp_state +++
+[2020-04-10 13:45:14,612] +++ Router: execute +++
+[2020-04-10 13:45:14,614] +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = 1  -DISABLED
+    Manual Swact = disabled (system is simplex (no peer unit))
+Router#
+[2020-04-10 13:45:14,967] +++ Router: execute +++
+[2020-04-10 13:45:14,967] +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = Non Redundant
+Router#
+[2020-04-10 13:45:25,320] +++ Router: get_rp_state +++
+[2020-04-10 13:45:25,320] +++ Router: execute +++
+[2020-04-10 13:45:25,321] +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = 1  -DISABLED
+    Manual Swact = disabled (system is simplex (no peer unit))
+Router#
+[2020-04-10 13:45:25,672] +++ Router: execute +++
+[2020-04-10 13:45:25,673] +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = Non Redundant
+Router#
+[2020-04-10 13:45:36,079] +++ Router: get_rp_state +++
+[2020-04-10 13:45:36,079] +++ Router: execute +++
+[2020-04-10 13:45:36,081] +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = 1  -DISABLED
+    Manual Swact = disabled (system is simplex (no peer unit))
+Router#
+[2020-04-10 13:45:36,459] +++ Router: execute +++
+[2020-04-10 13:45:36,459] +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = Non Redundant
+Router#
+[2020-04-10 13:45:46,858] +++ Router: get_rp_state +++
+[2020-04-10 13:45:46,858] +++ Router: execute +++
+[2020-04-10 13:45:46,860] +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = 1  -DISABLED
+    Manual Swact = disabled (system is simplex (no peer unit))
+Router#
+[2020-04-10 13:45:47,316] +++ Router: execute +++
+[2020-04-10 13:45:47,317] +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = Non Redundant
+Router#
+[2020-04-10 13:45:57,704] +++ Router: get_rp_state +++
+[2020-04-10 13:45:57,704] +++ Router: execute +++
+[2020-04-10 13:45:57,705] +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = 1  -DISABLED
+    Manual Swact = disabled (system is simplex (no peer unit))
+Router#
+[2020-04-10 13:45:58,304] +++ Router: execute +++
+[2020-04-10 13:45:58,305] +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = Non Redundant
+Router#
+[2020-04-10 13:46:08,771] +++ Router: get_rp_state +++
+[2020-04-10 13:46:08,771] +++ Router: execute +++
+[2020-04-10 13:46:08,773] +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = 1  -DISABLED
+    Manual Swact = disabled (system is simplex (no peer unit))
+Router#
+[2020-04-10 13:46:09,674] +++ Router: execute +++
+[2020-04-10 13:46:09,675] +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = Non Redundant
+Router#
+[2020-04-10 13:46:20,211] +++ Router: get_rp_state +++
+[2020-04-10 13:46:20,211] +++ Router: execute +++
+[2020-04-10 13:46:20,213] +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = 1  -DISABLED
+    Manual Swact = disabled (system is simplex (no peer unit))
+Router#
+[2020-04-10 13:46:20,755] +++ Router: execute +++
+[2020-04-10 13:46:20,756] +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = Non Redundant
+Router#
+[2020-04-10 13:46:31,732] +++ Router: get_rp_state +++
+[2020-04-10 13:46:31,733] +++ Router: execute +++
+[2020-04-10 13:46:31,736] +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = 1  -DISABLED
+    Manual Swact = disabled (system is simplex (no peer unit))
+Router#
+[2020-04-10 13:46:32,635] +++ Router: execute +++
+[2020-04-10 13:46:32,635] +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = Non Redundant
+Router#
+[2020-04-10 13:46:43,141] +++ Router: get_rp_state +++
+[2020-04-10 13:46:43,142] +++ Router: execute +++
+[2020-04-10 13:46:43,144] +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = 4  -STANDBY COLD
+    Manual Swact = disabled (peer unit not yet in terminal standby state)
+Router#
+[2020-04-10 13:46:43,556] +++ Router: execute +++
+[2020-04-10 13:46:43,557] +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = sso
+Router#
+[2020-04-10 13:46:54,774] +++ Router: get_rp_state +++
+[2020-04-10 13:46:54,775] +++ Router: execute +++
+[2020-04-10 13:46:54,778] +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = in progress to standby cold-config
+    Manual Swact = disabled (peer unit not yet in terminal standby state)
+Router#
+[2020-04-10 13:46:55,291] +++ Router: execute +++
+[2020-04-10 13:46:55,291] +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = sso
+Router#
+[2020-04-10 13:47:05,708] +++ Router: get_rp_state +++
+[2020-04-10 13:47:05,708] +++ Router: execute +++
+[2020-04-10 13:47:05,710] +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = in progress to standby cold-config
+    Manual Swact = disabled (peer unit not yet in terminal standby state)
+Router#
+[2020-04-10 13:47:06,203] +++ Router: execute +++
+[2020-04-10 13:47:06,203] +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = sso
+Router#
+[2020-04-10 13:47:17,167] +++ Router: get_rp_state +++
+[2020-04-10 13:47:17,167] +++ Router: execute +++
+[2020-04-10 13:47:17,168] +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = in progress to standby cold-config
+    Manual Swact = disabled (peer unit not yet in terminal standby state)
+Router#
+[2020-04-10 13:47:17,561] +++ Router: execute +++
+[2020-04-10 13:47:17,562] +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = sso
+Router#
+[2020-04-10 13:47:28,046] +++ Router: get_rp_state +++
+[2020-04-10 13:47:28,047] +++ Router: execute +++
+[2020-04-10 13:47:28,048] +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = 5  -STANDBY COLD-CONFIG
+    Manual Swact = disabled (peer unit not yet in terminal standby state)
+Router#
+[2020-04-10 13:47:28,412] +++ Router: execute +++
+[2020-04-10 13:47:28,413] +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = sso
+Router#
+[2020-04-10 13:47:38,885] +++ Router: get_rp_state +++
+[2020-04-10 13:47:38,886] +++ Router: execute +++
+[2020-04-10 13:47:38,887] +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = 8  -STANDBY HOT
+Router#
+[2020-04-10 13:47:39,244] +++ Router: execute +++
+[2020-04-10 13:47:39,245] +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = sso
+Router#
+
+Chassis 2 reloading, reason - Admin reload CLI
+Apr 10 16:09:23.667: %PMAN-5-EXITACTION: F0/0: pvp: Process manager is exiting:
+Apr 10 16:09:25.203: %PMAN-5-EXITACTION: R0/0: pvp: Process manager is exiting: process exit with reload fru code
+
+
+
+*Apr 10 16:09:26.993: %IOSXEBOOT-4-FACTORY_RESET: (rp/0): This was not selected via cli. Rebooting like normal
+
+[2020-04-10 13:47:39,739] +++ Router: enable +++
+
+    GNU GRUB  version 0.97  (638K lower / 3143552K upper memory)
+
+ +-------------------------------------------------------------------------+
+ | vWLC - vwlc.bin                                                         |
+ | vWLC - packages.conf                                                    |
+ | vWLC - GOLDEN IMAGE                                                     |
+ |                                                                         |
+ |                                                                         |
+ |                                                                         |
+ |                                                                         |
+ |                                                                         |
+ |                                                                         |
+ |                                                                         |
+ |                                                                         |
+ |                                                                         |
+ +-------------------------------------------------------------------------+
+      Use the ^ and v keys to select which entry is highlighted.
+      Press enter to boot the selected OS, or 'c' for a command-line.
+
+
+
+   The highlighted entry will be booted automatically in 1 seconds.
+  Booting 'vWLC - vwlc.bin'
+
+root (hd0,0)
+ Filesystem type is ext2fs, partition type 0x83
+kernel /vwlc.bin rw root=/dev/ram max_loop=64 HARDWARE=virtual  console=tty0 SR
+_BOOT=bootflash:vwlc.bin
+package header rev 3 structure detected
+Calculating SHA-1 hash...done
+SHA-1 hash:
+        calculated   8ad5fdd0:d015e65a:f365a78f:83da7b1:20383768
+        expected     8ad5fdd0:d015e65a:f365a78f:83da7b1:20383768
+Package type:0x7530, flags:0x0
+package header rev 3 structure detected
+   [Linux-bzImage, setup=0x3c00, size=0x682e48]
+   [isord  @ 0x3f789000, 0x26257fa bytes]
+   [isopkg @ 0x41daf000, 0x3e240000 bytes]
+
+%IOSXEBOOT-4-PART_VERIFY: (local/local): Verifying partition table for device /dev/bootflash...
+%IOSXEBOOT-4-PART_VERIFY: (local/local): Selected MBR v1 partition layout.
+
+*Apr 10 16:10:22.222: %IOSXEBOOT-4-BOOT_SRC: (rp/0): Checking for grub upgrade
+
+*Apr 10 16:10:22.353: %IOSXEBOOT-4-BOOT_SRC: (rp/0): Checking grub versions 1.1 vs 1.1
+
+*Apr 10 16:10:22.357: %IOSXEBOOT-4-BOOT_SRC: (rp/0): Bootloader upgrade not necessary.
+
+Waiting for remote chassis to join
+
+Chassis number is 2
+All chassis in the stack have been discovered. Accelerating discovery
+Apr 10 16:10:39.777: %PMAN-3-PROC_EMPTY_EXEC_FILE: R0/0: pvp: Empty executable used for process bt_logger
+Apr 10 16:10:41.110: %PMAN-3-PROC_EMPTY_EXEC_FILE: R0/0: pvp: Empty executable used for process bt_logger
+Apr 10 16:10:41.864: %PMAN-3-PROC_EMPTY_EXEC_FILE: R0/0: pvp: Empty executable used for process bt_logger
+Apr 10 16:10:42.584: %PMAN-3-PROC_EMPTY_EXEC_FILE: R0/0: pvp: Empty executable used for process bt_logger
+Apr 10 16:10:56.099: %PMAN-3-PROC_EMPTY_EXEC_FILE: R0/0: pvp: Empty executable used for process bt_logger
+Apr 10 16:11:19.146: %PMAN-3-PROC_EMPTY_EXEC_FILE: R0/0: pvp: Empty executable used for process bt_logger
+
+              Restricted Rights Legend
+
+Use, duplication, or disclosure by the Government is
+subject to restrictions as set forth in subparagraph
+(c) of the Commercial Computer Software - Restricted
+Rights clause at FAR sec. 52.227-19 and subparagraph
+(c) (1) (ii) of the Rights in Technical Data and Computer
+Software clause at DFARS sec. 252.227-7013.
+
+           Cisco Systems, Inc.
+           170 West Tasman Drive
+           San Jose, California 95134-1706
+
+
+
+Cisco IOS Software [Amsterdam], C9800-CL Software (C9800-CL-K9_IOSXE), Experimental Version 17.3.20200410:133451 [S2C-build-polaris_dev-BLD_POLARIS_DEV_S2C_20200410_101703-/nobackup/mcpre/s2c-build-ws 102]
+Copyright (c) 1986-2020 by Cisco Systems, Inc.
+Compiled Fri 10-Apr-20 06:36 by mcpre
+
+
+This software version supports only Smart Licensing as the software licensing mechanism.
+
+
+PLEASE READ THE FOLLOWING TERMS CAREFULLY. INSTALLING THE LICENSE OR
+LICENSE KEY PROVIDED FOR ANY CISCO SOFTWARE PRODUCT, PRODUCT FEATURE,
+AND/OR SUBSEQUENTLY PROVIDED SOFTWARE FEATURES (COLLECTIVELY, THE
+"SOFTWARE"), AND/OR USING SUCH SOFTWARE CONSTITUTES YOUR FULL
+ACCEPTANCE OF THE FOLLOWING TERMS. YOU MUST NOT PROCEED FURTHER IF YOU
+ARE NOT WILLING TO BE BOUND BY ALL THE TERMS SET FORTH HEREIN.
+
+Your use of the Software is subject to the Cisco End User License Agreement
+(EULA) and any relevant supplemental terms (SEULA) found at
+http://www.cisco.com/c/en/us/about/legal/cloud-and-software/software-terms.html.
+
+You hereby acknowledge and agree that certain Software and/or features are
+licensed for a particular term, that the license to such Software and/or
+features is valid only for the applicable term and that such Software and/or
+features may be shut down or otherwise terminated by Cisco after expiration
+of the applicable license term (e.g., 90-day trial period). Cisco reserves
+the right to terminate any such Software feature electronically or by any
+other means available. While Cisco may provide alerts, it is your sole
+responsibility to monitor your usage of any such term Software feature to
+ensure that your systems and networks are prepared for a shutdown of the
+Software feature.
+
+
+
+FIPS: Flash Key Check : Key Not Found, FIPS Mode Not Enabled
+platform init
+All TCP AO KDF Tests Pass
+cisco C9800-CL (VXE) processor (revision VXE) with 4106935K/3075K bytes of memory.
+Processor board ID 9TPMPAKDTM1
+Router operating mode: Autonomous
+1 Virtual Ethernet interface
+1 Gigabit Ethernet interface
+32768K bytes of non-volatile configuration memory.
+8106656K bytes of physical memory.
+6201343K bytes of virtual hard disk at bootflash:.
+6201343K bytes of virtual hard disk at bootflash-1:.
+Installation mode is BUNDLE
+
+
+Num of cpu cores     4
+Maximum number of AP's supported   1000
+
+
+
+Press RETURN to get started!
+
+
+Router-stby>
+Router-stby>enable
+Router-stby#
+[2020-04-10 13:47:41,233] Successfully reloaded Standby RP
+True
+>>>

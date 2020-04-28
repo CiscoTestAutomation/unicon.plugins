@@ -28,7 +28,6 @@ class HaNxosReloadPatterns:
         self.snmp_port = r'^.*Enable the SNMP port\? \(yes\/no\) \[y\]:'
         self.boot_vdc = r'^.*Boot up system with default vdc \(yes\/no\) \[y\]\:'
         self.reload_proceed = r'^(.*)Proceed with reload\? \[confirm\]$'
-        self.nxos_default_prompts= r'($prompt|Router|Switch|ios|switch)(\\(standby\\))?(\\(boot\\))?(>|#)'
         self.loader_prompt = r'^(.*)loader\s*>'
         self.redundant = r'^.*REDUNDANCY mode is (RPR|SSO).*'
         self.config_byte = r'Uncompressed configuration from [0-9]+ bytes to [0-9]+ bytes'

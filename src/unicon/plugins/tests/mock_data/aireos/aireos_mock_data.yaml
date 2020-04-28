@@ -41,6 +41,8 @@ aireos_exec:
     "transfer upload start": "% Error: Config file transfer failed - Unknown error - refer to log"
     "show foo": "Incorrect usage.  Use the '?' or <TAB> key to list commands."
     "debug lwapp": "This command has been deprecated! Please use 'debug capwap' instead."
+    "config time ntp delete foo": "Incorrect input! Use 'config time ntp delete <index>'"
+    "config time ntp delete 2": "Error! Server Index is invalid"
     "show memory statistics": |2
       
     System Memory Statistics:
@@ -59,7 +61,10 @@ aireos_exec:
       Total used (incl mmap).........: 1693552032 bytes (1.57 GB)
 
 
-
+aireos_exec_standby:
+  prompt: "(%N-Standby) >"
+  commands:
+    "": ""
 
 aireos_confirm_save:
   prompt: Are you sure you want to save? (y/n)

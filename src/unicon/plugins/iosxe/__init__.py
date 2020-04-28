@@ -40,6 +40,8 @@ class HAIosXEServiceList(HAServiceList):
         self.switchover = svc.HASwitchover
         self.ping = svc.Ping
         self.bash_console = svc.BashService
+        self.copy = svc.Copy
+        self.reset_standby_rp = svc.ResetStandbyRP
 
 
 class IosXESingleRpConnection(BaseSingleRpConnection):

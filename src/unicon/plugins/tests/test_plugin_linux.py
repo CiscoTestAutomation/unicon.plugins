@@ -225,7 +225,9 @@ class TestLinuxPluginPrompts(unittest.TestCase):
       'prompt11',
       'prompt12',
       'prompt13',
-      'prompt14'
+      'prompt14',
+      'prompt15',
+      'prompt16'
     ]
 
     @classmethod

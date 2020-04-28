@@ -42,7 +42,7 @@ class GenericPatterns(UniconCorePatterns):
         self.disconnect_message = r'Received disconnect from .*:'
         self.password_ok = r'Password OK\s*$'
 
-        self.continue_connect = r'Are you sure you want to continue connecting \(yes/no\)'
+        self.continue_connect = r'Are you sure you want to continue connecting \(yes/no(/\[fingerprint\])?\)'
 
         self.cisco_commit_changes_prompt = r'Uncommitted changes found, commit them\? \[yes/no/CANCEL\]'
         self.juniper_commit_changes_prompt = r'Discard changes and continue\? \[yes,no\]'
@@ -53,3 +53,5 @@ class GenericPatterns(UniconCorePatterns):
 
         self.enter_basic_mgmt_setup = r'Would you like to enter basic management setup\? \[yes/no\]:'
         self.kerberos_no_realm = r'^(.*)Kerberos: No default realm defined for Kerberos!'
+
+        self.passphrase_prompt = r'^.*Enter passphrase for key .*?:\s*?'

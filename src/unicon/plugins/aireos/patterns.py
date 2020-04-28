@@ -16,6 +16,7 @@ class AireosPatterns(GenericPatterns):
         self.reset_prompt = self.base_prompt + r'reset>\s*$'
         self.save_prompt = self.base_prompt + r'save>\s*$'
         self.shell_prompt = r'bash.*#\s*$'
+        self.standby_exec = r'^(.*?)\((%N|Cisco Capwap Simulator)-Standby\)\s*>\s*?'
 
 
 class AireosReloadPatterns(UniconCorePatterns):

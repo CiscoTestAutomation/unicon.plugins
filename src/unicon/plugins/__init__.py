@@ -1,4 +1,4 @@
-__version__ = '20.2'
+__version__ = '20.4'
 
 supported_chassis = [
     'single_rp',
@@ -26,5 +26,7 @@ supported_os = [
     'staros',
     'aci',
     'sdwan',
-    'sros'
+    'sros',
+    'apic',
+    'windows'
 ]

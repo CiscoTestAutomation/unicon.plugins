@@ -70,12 +70,6 @@ admin_password = Statement(pattern=pat.admin_password,
                            loop_continue=True,
                            continue_timer=False)
 
-nxos_default_prompts = Statement(pattern=pat.nxos_default_prompts,
-                                 action=None,
-                                 args=None,
-                                 loop_continue=False,
-                                 continue_timer=False)
-
 enable_vdc = Statement(pattern=pat.enable_vdc,
                        action=send_response,
                        args={'response': 'no'},
@@ -140,7 +134,7 @@ reload_confirm_nxos = Statement(pattern=pat.reload_confirm_nxos,
 
 nxos_reload_statement_list = [save_env, confirm_reset, reload_confirm_nxos,
                               press_enter, login_stmt, password_stmt,
-                              confirm_config, setup_dialog, 
+                              confirm_config, setup_dialog,
                               auto_install_dialog, module_reload,
                               save_module_cfg, secure_passwd_std,
                               admin_password, auto_provision, enable_vdc]
@@ -151,9 +145,8 @@ ha_nxos_reload_statement_list = [save_env, reboot, secure_password,
                                  auto_install_dialog, admin_password,
                                  setup_dialog, config_byte, enable_vdc,
                                  snmp_port, boot_vdc, login_notready,
-                                 redundant,  nxos_default_prompts,
-                                 login_stmt, password_stmt, system_up,
-                                 run_init, useracess1]
+                                 redundant, login_stmt, password_stmt,
+                                 system_up, run_init, useracess1]
 
 additional_connection_dialog = [enable_vdc, boot_vdc, snmp_port,
                                 admin_password, secure_password, auto_provision]

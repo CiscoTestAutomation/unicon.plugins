@@ -56,6 +56,7 @@ network device, and corresponds to ther pyATS testbed YAML counterparts.
     ``junos``
     ``sros``
     ``viptela``,,,"Identical to os=sdwan, series=viptela."
+    ``windows``
 
 To use this table - locate your device's os/series/model information, and fill 
 your pyATS testbed YAML with it:

@@ -120,8 +120,10 @@ exec:
         new_state: exec13
     "prompt14":
         new_state: exec14
-    "prompt14":
+    "prompt15":
         new_state: exec15
+    "prompt16":
+        new_state: exec16
     "ls": |
       /tmp
       /var
@@ -295,6 +297,10 @@ exec14:
 
 exec15:
   prompt: "$ "
+  commands: *cmds
+
+exec16:
+  prompt: "root@sj21-pxe-03.cisco.com:~/"
   commands: *cmds
 
 sma_prompt:

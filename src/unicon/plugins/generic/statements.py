@@ -70,7 +70,7 @@ def escape_char_callback(spawn):
 
     # Device is already asking for authentication
     if re.search(
-        '.*(User Access Verification|sername:\s*$|assword:\s*$|login:\s*$)',
+        r'.*(User Access Verification|sername:\s*$|assword:\s*$|login:\s*$)',
         spawn.buffer):
         return
 
@@ -224,6 +224,17 @@ def password_handler(spawn, context, session):
             spawn.sendline(context['tacacs_password'])
         else:
             spawn.sendline(context['line_password'])
+
+
+def passphrase_handler(spawn, context, session):
+    """ Handles SSH passphrase prompt """
+    credential = get_current_credential(context=context, session=session)
+    try:
+        spawn.sendline(to_plaintext(
+            context['credentials'][credential]['passphrase']))
+    except KeyError:
+        raise UniconAuthenticationError("No passphrase found "
+                                        "for credential {}.".format(credential))
 
 
 def bad_password_handler(spawn):
@@ -423,6 +434,12 @@ class GenericStatements():
                                         loop_continue=True,
                                         continue_timer=False)
 
+        self.passphrase_stmt = Statement(pattern=pat.passphrase_prompt,
+                                         action=passphrase_handler,
+                                         args=None,
+                                         loop_continue=True,
+                                         continue_timer=False)
+
 #############################################################
 #  Statement lists
 #############################################################
@@ -454,6 +471,7 @@ authentication_statement_list = [generic_statements.bad_password_stmt,
                                  generic_statements.password_stmt,
                                  generic_statements.clear_kerberos_no_realm,
                                  generic_statements.password_ok_stmt,
+                                 generic_statements.passphrase_stmt
                                  ]
 
 #############################################################

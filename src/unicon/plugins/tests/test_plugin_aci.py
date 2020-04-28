@@ -22,7 +22,10 @@ from unicon.mock.mock_device import MockDeviceSSHWrapper
 
 class TestAciApicPlugin(unittest.TestCase):
 
-    def test_login_connect(self):
+    # ==================
+    # old Implementation
+    # ==================
+    def test_login_connect_old(self):
         c = Connection(hostname='APC',
                             start=['mock_device_cli --os aci --state apic_connect'],
                             os='aci',
@@ -31,7 +34,7 @@ class TestAciApicPlugin(unittest.TestCase):
                             tacacs_password='cisco')
         c.connect()
 
-    def test_login_connect_credentials(self):
+    def test_login_connect_credentials_old(self):
         c = Connection(hostname='APC',
                             start=['mock_device_cli --os aci --state apic_connect'],
                             os='aci',
@@ -41,7 +44,7 @@ class TestAciApicPlugin(unittest.TestCase):
                                 'password': 'cisco123'}})
         c.connect()
 
-    def test_connect_escape_codes_learn_hostname(self):
+    def test_connect_escape_codes_learn_hostname_old(self):
         c = Connection(hostname='APC',
                             start=['mock_device_cli --os aci --state apic_hostname_with_escape_codes'],
                             os='aci',
@@ -51,7 +54,7 @@ class TestAciApicPlugin(unittest.TestCase):
                             learn_hostname=True)
         c.connect()
 
-    def test_reload(self):
+    def test_reload_old(self):
         c = Connection(hostname='APC',
                             start=['mock_device_cli --os aci --state apic_connect'],
                             os='aci',
@@ -62,7 +65,7 @@ class TestAciApicPlugin(unittest.TestCase):
         c.settings.POST_RELOAD_WAIT = 1
         c.reload()
 
-    def test_reload_credentails(self):
+    def test_reload_credentails_old(self):
         c = Connection(hostname='APC',
                             start=['mock_device_cli --os aci --state apic_connect'],
                             os='aci',
@@ -73,12 +76,14 @@ class TestAciApicPlugin(unittest.TestCase):
         c.connect()
         c.settings.POST_RELOAD_WAIT = 1
         c.reload()
-
 
 
 class TestAciN9kPlugin(unittest.TestCase):
 
-    def test_login_connect(self):
+    # ==================
+    # old Implementation
+    # ==================
+    def test_login_connect_old(self):
         c = Connection(hostname='LEAF',
                             start=['mock_device_cli --os aci --state n9k_login'],
                             os='aci',
@@ -87,7 +92,7 @@ class TestAciN9kPlugin(unittest.TestCase):
                             tacacs_password='cisco123')
         c.connect()
 
-    def test_login_connect_credentials(self):
+    def test_login_connect_credentials_old(self):
         c = Connection(hostname='LEAF',
                             start=['mock_device_cli --os aci --state n9k_login'],
                             os='aci',
@@ -97,7 +102,7 @@ class TestAciN9kPlugin(unittest.TestCase):
                                 'password': 'cisco123'}})
         c.connect()
 
-    def test_reload(self):
+    def test_reload_old(self):
         c = Connection(hostname='LEAF',
                             start=['mock_device_cli --os aci --state n9k_login'],
                             os='aci',
@@ -113,6 +118,9 @@ class TestAciN9kPlugin(unittest.TestCase):
 @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestAciSSH(unittest.TestCase):
 
+    # ==================
+    # old Implementation
+    # ==================
     @classmethod
     def setUpClass(cls):
         cls.apic_md_ssh = MockDeviceSSHWrapper(hostname='APC', device_os='aci', port=0, state='apic_exec',

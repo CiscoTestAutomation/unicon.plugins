@@ -132,7 +132,6 @@ Spitfire
 ^^^^^^^^
 
 The spitfire sub plugin supports all services provided by :doc `Common Services <generic_services>`.
-It currently doesnt support any of the DUAL RP Services .
 
 In addition to the common services spitfire also supports the following services
 
@@ -140,7 +139,8 @@ attach_console
 """"""""""""""
 
 Service to attach to line card console/Standby RP to execute commands in. Returns a
-router-like object to execute commands on using python context managers.
+router-like object to execute commands on using python context managers.This service is 
+supported in HA as well.
 
 ====================    ======================    ========================================
 Argument                Type                      Description
@@ -164,7 +164,8 @@ switchto
 
 Service to switch the router console to any state that user needs in order to perform
 his tests. The api becomes a no-op if the console is already at the state user wants 
-to reach.
+to reach. This service is supported in HA as well. 
+
 
 The states available to switch to are :
 

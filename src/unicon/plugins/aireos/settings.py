@@ -14,12 +14,14 @@ class AireosSettings(GenericSettings):
         ]
         self.RELOAD_TIMEOUT = 400
         self.ERROR_PATTERN = [
-            r'^(%\s*)?Error:',
+            r'^(%\s*)?Error',
             r'syntax error',
             r'Aborted',
             r'result false',
             r'^This command has been deprecated',
-            r'^Incorrect usage.'
+            r'^Incorrect usage.',
+            r'^Incorrect input',
+            r'^HELP',
         ]
         self.LOGIN_PROMPT = r'^.*?User:\s*$'
         self.DEFAULT_LEARNED_HOSTNAME = r'(.*?)'
