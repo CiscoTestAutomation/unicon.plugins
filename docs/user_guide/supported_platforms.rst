@@ -8,6 +8,10 @@ model (specific model support).
 These values help Unicon load the most accurate connection plugin for the given
 network device, and corresponds to ther pyATS testbed YAML counterparts.
 
+For example, if ``os=iosxe`` and ``series=abc``, since ``abc`` is not found in 
+the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If 
+``os=iosxe`` and ``series=cat3k``, it will use the specific plugin ``iosxe/cat3k``.
+
 .. csv-table:: Unicon Supported Platforms
     :align: center
     :widths: 20, 20, 20, 40
@@ -48,6 +52,7 @@ network device, and corresponds to ther pyATS testbed YAML counterparts.
     ``nxos``, ``n5k``
     ``nxos``, ``n9k``
     ``nxos``, ``nxosv``
+    ``nxos``, ``aci``, ``n9k``, "Identical to os=aci, series=n9k"
     ``nso``
     ``sdwan``, ``viptela``,,"Identical to os=viptela."
     ``sros``

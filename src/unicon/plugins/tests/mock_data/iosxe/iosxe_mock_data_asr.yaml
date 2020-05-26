@@ -98,6 +98,8 @@ enable_asr:
     "config term":
       new_state: config_asr
 
+    "request platform software system shell":
+      new_state: asr_act_reply
 
     "show redundancy sta |  in peer": |2
            peer state = 8  -STANDBY HOT 
@@ -158,3 +160,21 @@ config_asr_redundancy_main_cpu:
       "standby console enable": ""
       "end":
         new_state: enable_asr
+
+asr_bash:
+  prompt: "[Router_RP_0:/]$"
+  commands:
+    "df /bootflash/": |
+      Filesystem     1K-blocks    Used Available Use% Mounted on
+      /dev/sda1        5974888 3569476   2101900  63% /bootflash
+    "stty cols 200": ""
+    "stty rows 200": ""
+    "exit":
+      new_state: enable_asr
+
+asr_act_reply:
+  prompt: "Are you sure you want to continue? [y/n] "
+  commands:
+    "y":
+      new_state: asr_bash
+      

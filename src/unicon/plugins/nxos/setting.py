@@ -27,6 +27,8 @@ class NxosSettings(GenericSettings):
             r'^%\s*[Ii]nvalid (command|input|number)',
             r'^%\s*[Ii]ncomplete (command|input)',
             r'^%\s*[Aa]mbiguous (command|input)',
+            r'^.*?Overwriting/deleting this image is not allowed',
+            r'^.*?Copying to/from this server name is not permitted'
         ]
         self.CONFIGURE_ERROR_PATTERN = [
             r'^%\s*[Cc]an not open.*',

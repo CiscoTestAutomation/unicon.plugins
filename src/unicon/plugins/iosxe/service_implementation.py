@@ -206,6 +206,6 @@ class ResetStandbyRP(GenericResetStandbyRP):
                      timeout=None,
                      *args,
                      **kwargs):
-        super().call_service(command='redundancy reload peer',
-            reply=Dialog([]), timeout=None, standby_check='STANDBY HOT',
+        super().call_service(command=command,
+            reply=reply, timeout=timeout, standby_check='STANDBY HOT',
             *args, **kwargs)

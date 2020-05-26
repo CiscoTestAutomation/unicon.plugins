@@ -187,7 +187,7 @@ class TestNxosPluginGuestshellService(unittest.TestCase):
                          str(err.exception))
 
     def test_ha_guestshell_basic(self):
-        ha = MockDeviceTcpWrapperNXOS(port=0, state='exec,nxos_exec_standby')
+        ha = MockDeviceTcpWrapperNXOS(port=0, state='exec,nxos_exec_standby', hostname='switch')
         ha.start()
         d = Connection(hostname='switch',
                        start=['telnet 127.0.0.1 ' + str(ha.ports[0]),
@@ -289,6 +289,13 @@ class TestNxosPluginExecute(unittest.TestCase):
 
     def test_execute_error_pattern_negative(self):
         r = self.c.execute('not a real command partial')
+
+    def test_execute_copy_not_allowed(self):
+        with self.assertRaises(SubCommandFailure):
+            self.c.execute('copy sftp://server/root/nxos.7.0.3.I7.8.bin bootflash:///nxos.7.0.3.I7.8.bin vrf management')
+
+        with self.assertRaises(SubCommandFailure):
+            self.c.execute('copy scp://localhost/nxos.7.0.3.I7.8.bin bootflash:///nxos.7.0.3.I7.8.bin vrf management')
 
 
 class TestNxosCrash(unittest.TestCase):

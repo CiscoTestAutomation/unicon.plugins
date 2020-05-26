@@ -158,7 +158,12 @@ class TestIosXrSpitfirePluginSvcs(unittest.TestCase):
     def test_execute(self):
         self.c.execute("bash", allow_state_change=True)
         self.assertEqual(self.c.spawn.match.match_output,'bash\r\n[ios:/misc/scratch]$')
-    
+
+    def test_execute_2(self):
+        self.c.execute("ls", allow_state_change=True)
+        self.assertEqual(self.c.spawn.match.match_output,'ls\r\nakrhegde_15888571384782863_mppinband_rtr1.log  '
+            'akrhegde_15888589016873305_mppinband_rtr1.log  asic-err-logs-backup  clihistory\r\n[ios:/misc/scratch]$')
+
     @classmethod
     def tearDownClass(self):
         self.c.disconnect()

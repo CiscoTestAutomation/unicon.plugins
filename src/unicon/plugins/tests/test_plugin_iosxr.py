@@ -151,6 +151,15 @@ class TestIosXrPlugin(unittest.TestCase):
         self.assertIn("^(.*?)Connected.", str(c.connection_provider.get_connection_dialog()))
         c.disconnect()
 
+    def test_connect_different_prompt_format(self):
+        c = Connection(hostname='KLMER02-SU1',
+            start=['mock_device_cli --os iosxr --state enable4'],
+            os='iosxr')
+
+        c.connect()
+        self.assertEqual(c.spawn.match.match_output,'end\r\nRP/B0/CB0/CPU0:KLMER02-SU1#')
+        c.disconnect()
+
 class TestIosXRPluginExecute(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

@@ -87,6 +87,19 @@ linux_password3:
     "cisco":
       new_state: exec
 
+linux_password4:
+  prompt: "admin@1.1.1.1's password: "
+  commands:
+    "cisco":
+      response: |
+        Command Line Interface is starting up, please wait ...
+        Welcome to the Platform Command Line Interface
+        VMware Installation:
+                2 vCPU: Intel(R) Xeon(R) CPU E5-2680 0 @ 2.70GHz
+                Disk 1: 110GB, Partitions aligned
+                8192 Mbytes RAM
+      new_state: exec17
+
 exec:
   prompt: "Linux$ "
   commands: &cmds
@@ -301,6 +314,10 @@ exec15:
 
 exec16:
   prompt: "root@sj21-pxe-03.cisco.com:~/"
+  commands: *cmds
+
+exec17:
+  prompt: "admin:"
   commands: *cmds
 
 sma_prompt:

@@ -380,7 +380,13 @@ class BashService(BashService):
                 conn = self.conn
 
             sm = conn.state_machine
-            sm.go_to('run', conn.spawn)
+
+            if hasattr(conn, 'series') and \
+                conn.series == 'spitfire':
+                # In case of spitfire plugin
+                sm.go_to('xr_run', conn.spawn)
+            else:
+                sm.go_to('run', conn.spawn)
 
             return self
 

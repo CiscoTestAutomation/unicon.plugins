@@ -210,6 +210,15 @@ class TestLinuxPluginConnect(unittest.TestCase):
         self.assertIn("^(.*?)Password:", str(c.connection_provider.get_connection_dialog()))
         c.disconnect()
 
+  def test_connect_admin_prompt(self):
+        c = Connection(hostname='linux',
+                       start=['mock_device_cli --os linux --state linux_password4'],
+                       os='linux',
+                       username='admin',
+                       password='cisco')
+        c.connect()
+        c.disconnect()
+
 class TestLinuxPluginPrompts(unittest.TestCase):
     prompt_cmds = [
       'prompt1',

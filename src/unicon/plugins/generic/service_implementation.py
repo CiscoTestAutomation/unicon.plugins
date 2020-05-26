@@ -816,7 +816,10 @@ class Configure(BaseService):
 
     def pre_service(self, *args, **kwargs):
         self.prompt_recovery = kwargs.get('prompt_recovery', False)
-
+        
+    def post_service(self, *args, **kwargs):
+        pass
+        
     def call_service(self,
                      command=[],
                      reply=Dialog([]),
@@ -2323,13 +2326,14 @@ class ResetStandbyRP(BaseService):
 
         # Check is switchover possible?
         rp_state = con.get_rp_state(target='standby', timeout=100)
-        if 'standby_check' in kwargs:
-            check = kwargs['standby_check']
-        else:
-            check = 'DISABLED'
 
-        if re.search(check, rp_state):
+        if re.search('DISABLED', rp_state):
             raise SubCommandFailure("No Standby found")
+
+        if 'standby_check' in kwargs and \
+            not re.search(kwargs['standby_check'], rp_state):
+            raise SubCommandFailure("Standby found but not "
+                "in the expected state")
 
         dialog = self.service_dialog(handle=con.active,
                                      service_dialog=self.dialog)
@@ -2411,7 +2415,39 @@ class BashService(BaseService):
         self.end_state = "enable"
         self.service_name = "bash_console"
         self.bash_enabled = False
+        
+    def pre_service(self, *args, **kwargs):
+        """ Common pre_service procedure for all Services """
+        self.prompt_recovery = kwargs.get('prompt_recovery', False)
+        if self.connection.is_connected:
+            return
+        elif self.connection.reconnect:
+            self.connection.connect()
+        else:
+            raise ConnectionError("Connection is not established to device")
+        if 'target' in kwargs:
+            handle = self.get_handle(kwargs['target'])
+        else:
+            handle = self.get_handle()
+        handle.state_machine.go_to(
+            self.start_state,
+            handle.spawn,
+            context=self.connection.context,
+            prompt_recovery=self.prompt_recovery
+        )
 
+    def post_service(self, *args, **kwargs):
+        if 'target' in kwargs:
+            handle = self.get_handle(kwargs['target'])
+        else:
+            handle = self.get_handle()
+        handle.state_machine.go_to(
+            self.start_state,
+            handle.spawn,
+            context=self.connection.context,
+            prompt_recovery=self.prompt_recovery
+        )
+        
     def call_service(self, **kwargs):
         self.result = self.__class__.ContextMgr(connection = self.connection,
                                             enable_bash = not self.bash_enabled,

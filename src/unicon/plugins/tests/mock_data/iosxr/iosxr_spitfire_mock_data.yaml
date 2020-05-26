@@ -154,6 +154,8 @@ spitfire_xr_bash:
       new_state: spitfire_enable
     "xrenv":
       new_state: spitfire_xr_env
+    "ls": |
+      akrhegde_15888571384782863_mppinband_rtr1.log  akrhegde_15888589016873305_mppinband_rtr1.log  asic-err-logs-backup  clihistory
 
 spitfire_xr_run:
   prompt: "[node0_RP0_CPU0:~]$"

@@ -8,7 +8,7 @@ from unicon.plugins.generic.patterns import GenericPatterns
 class IOSXRPatterns(GenericPatterns):
     def __init__(self):
         super().__init__()
-        self.enable_prompt = r'^(.*?)RP/\d+(/\S+)?/\S+\d+:(%N|ios|xr)\s?#\s?$'
+        self.enable_prompt = r'^(.*?)RP/\w+(/\S+)?/\S+\d+:(%N|ios|xr)\s?#\s?$'
         # don't use hostname match in config prompt - hostname may be truncated
         # see CSCve48115 and CSCve51502
         self.run_prompt = r'^(.*?)(?:\[xr-vm_.*:([\s\S]+)?\]\s?\$\s?|[\r\n]+\s?#\s?)$'

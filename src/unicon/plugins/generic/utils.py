@@ -32,6 +32,10 @@ class GenericUtils(Utils):
             redundancy_details['role'] = "standby"
             redundancy_details['state'] =\
                 show_red_out[show_red_out.find('-') + 1:].strip()
+        elif re.search("DISABLED|disabled", show_red_out):
+            redundancy_details['role'] = "disabled"
+            redundancy_details['state'] =\
+                show_red_out[show_red_out.find('-') + 1:].strip()
         show_red_out = connection.execute(
             "show redundancy sta | inc Redundancy State")
         redundancy_details['mode'] =\

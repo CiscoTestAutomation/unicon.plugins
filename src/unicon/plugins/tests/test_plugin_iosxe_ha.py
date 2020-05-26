@@ -83,5 +83,26 @@ class TestIosXEPluginHAConnect(unittest.TestCase):
         dev.disconnect()
 
 
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0)
+class TestIosXEPluginSwitchoverWithStandbyCredentials(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.c = Connection(
+            hostname='switch1',
+            start=['mock_device_cli --os iosxe --state c9k_login3'],
+            os='iosxe',
+            credentials=dict(
+                default=dict(
+                    username='admin', password='cisco'),
+                enable=dict(
+                    username='admin', password='cisco'),
+                disable=dict(
+                    username='admin', password='cisco')))
+        cls.c.connect()
+
+    def test_switchover(self):
+        self.c.execute('redundancy force-switchover')
+
 if __name__ == "__main__":
     unittest.main()

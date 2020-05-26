@@ -8,7 +8,7 @@ from unicon.plugins.generic.service_patterns import ReloadPatterns
 class IosXEPatterns(GenericPatterns):
     def __init__(self):
         super().__init__()
-        self.shell_prompt = r'^(.*?)\[%N.*\]\$\s?$'
+        self.shell_prompt = r'^(.*?)\[%N|[S|s]witch.*(\]\$)?\s?$'
         self.access_shell = \
             r'^.*Are you sure you want to continue\? \[y/n\]\s?.*$'
         self.overwrite_previous = \
@@ -20,11 +20,10 @@ class IosXEPatterns(GenericPatterns):
         self.wish_continue = r'^.*Do you wish to continue\? \[yes\]:\s*$'
         self.want_continue = r'^.*Do you want to continue\? \[no\]:\s*$'
         self.disable_prompt = \
-            r'^(.*?)(Router|Switch|ios|switch|%N)(\(standby\))?(-stby)?(\(boot\))?>\s?$'
+            r'^(.*?)(Router|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(\(boot\))?>\s?$'
         self.enable_prompt = \
-            r'^(.*?)(Router|Switch|ios|switch|%N)(\(standby\))?(-stby)?(\(boot\))?#\s?$'
+            r'^(.*?)(Router|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(\(boot\))?#\s?$'
         self.press_enter = ReloadPatterns().press_enter
-
 
 class IosXEReloadPatterns(ReloadPatterns):
     def __init__(self):
@@ -37,7 +36,7 @@ class IosXEReloadPatterns(ReloadPatterns):
         self.useracess = r'^.*User Access Verification'
         self.setup_dialog = r'^.*(initial|basic) configuration dialog.*\s?'
         self.autoinstall_dialog = r'^(.*)Would you like to terminate autoinstall\? ?\[yes\]: $'
-        self.default_prompts = r'^(.*?)(Router|Switch|ios|switch|.*)(\(standby\))?(\(boot\))?(>|#)'
+        self.default_prompts = r'^(.*?)(Router|Switch|ios|switch|.*)([0-9])?(\(standby\))?(\(boot\))?(>|#)'
         self.telnet_prompt = r'^.*telnet>\s?'
         self.please_reset = r'^(.*)Please reset'
 

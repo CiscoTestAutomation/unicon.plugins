@@ -20,7 +20,7 @@ username_kerberos:
 
 
 exec:
-  prompt: "switch# "
+  prompt: "%N# "
   commands: &exec_cmds
     "maint":
       new_state: exec_maint
@@ -134,6 +134,12 @@ exec:
       --------------------  --------  --------
       bash-shell             1          enabled
       bfd                    1          disabled
+    "copy sftp://server/root/nxos.7.0.3.I7.8.bin bootflash:///nxos.7.0.3.I7.8.bin vrf management": |
+      Switch is booted with 'nxos.7.0.3.I7.8.bin'. Overwriting/deleting this image is not allowed
+      Destination file is a boot image.Cannot overwrite. Check 'Show Boot'.
+    "copy scp://localhost/nxos.7.0.3.I7.8.bin bootflash:///nxos.7.0.3.I7.8.bin vrf management": |
+      Copying to/from this server name is not permitted
+
 
 loader:
   prompt: "loader > "
@@ -142,7 +148,7 @@ loader:
       new_state: exec
 
 config:
-  prompt: "switch(config)#"
+  prompt: "%N(config)#"
   commands: &config_cmds
     "maint":
       new_state: config_maint
@@ -278,7 +284,7 @@ config3:
 ### NXOS on N3K has different bash prompt
 
 exec_n3k:
-  prompt: "switch# "
+  prompt: "%N# "
   commands:
     "term length 0": ""
     "term width 511": ""
@@ -289,7 +295,7 @@ exec_n3k:
       new_state: bash_n3k
 
 config_n3k:
-  prompt: "switch(config)#"
+  prompt: "%N(config)#"
   commands:
     "no logging console": ""
     "line console": ""

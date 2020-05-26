@@ -1022,7 +1022,46 @@ moonshine_failed_config_show:
 
 
 
+# ========Prompt variation=============
+enable4:
+  prompt: "RP/B0/CB0/CPU0:KLMER02-SU1#"
+  commands:
+    "exit":
+      new_state: enable4
+    "show version": file|mock_data/iosxr/show_version.txt
+    "end":
+      new_state: enable4
+    "configure terminal":
+      new_state: config4
+    "term len 0": ""
+    "term width 0": ""
+    "terminal length 0": ""
+    "terminal width 0": ""
 
+config4:
+  prompt: "RP/B0/CB0/CPU0:KLMER02-SU1(config)#"
+  commands:
+    "end":
+      new_state: enable4
+    "exit":
+      new_state: enable4
+    "no logging console": ""
+    "line console":
+      new_state: config_line4
+
+config_line4:
+  prompt: "RP/B0/CB0/CPU0:KLMER02-SU1(config-line)#"
+  commands:
+    "exec-timeout 0 0": ""
+    "clock timezone UTC 0 0": ""
+    "commit": ""
+    "end":
+      new_state: enable4
+    "absolute-timeout 0": ""
+    "session-timeout 0": ""
+    "line default":
+      new_state: config_line4
+#=============================
 
 sysadmin_config:
   prompt: "sysadmin-vm:0_RP1(config)#"

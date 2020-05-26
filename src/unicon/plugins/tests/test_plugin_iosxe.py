@@ -58,6 +58,16 @@ class TestIosPluginConnect(unittest.TestCase):
         c.connect()
         self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
 
+    def test_cat9k_login_connect(self):
+        c = Connection(hostname='Router',
+                start=['mock_device_cli --os iosxe --state c9k_login4'],
+                os='iosxe',
+                series='cat9k',
+                username='cisco',
+                tacacs_password='cisco')
+        c.connect()
+        self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
+
 
 class TestIosXEPluginExecute(unittest.TestCase):
     @classmethod
@@ -218,6 +228,19 @@ class TestIosXEluginBashService(unittest.TestCase):
         self.assertIn('exit', c.spawn.match.match_output)
         self.assertIn('Router#', c.spawn.match.match_output)
 
+    def test_bash_asr(self):
+        c = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe --state asr_exec'],
+                       os='iosxe',
+                       username='cisco',
+                       tacacs_password='cisco',
+                       enable_password='cisco')
+        with c.bash_console() as console:
+            console.execute('df /bootflash/')
+        self.assertIn('exit', c.spawn.match.match_output)
+        self.assertIn('Router#', c.spawn.match.match_output)
+
+
 class TestIosXESDWANConfigure(unittest.TestCase):
     def test_config_transaction(self):
         d = Connection(hostname='Router',
@@ -257,6 +280,23 @@ class TestIosXECat3kPluginReload(unittest.TestCase):
     def test_reload(self):
         self.c.reload()
 
+
+class TestIosXECat9kPluginReload(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.c = Connection(
+            hostname='switch',
+            start=['mock_device_cli --os iosxe --state c9k_login4'],
+            os='iosxe',
+            series='cat9k',
+            credentials=dict(default=dict(
+                username='cisco', password='cisco'),
+                alt=dict(
+                username='admin', password='lab')))
+        cls.c.connect()
+
+    def test_reload(self):
+        self.c.reload()
 
 
 if __name__ == "__main__":
