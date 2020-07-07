@@ -71,9 +71,9 @@ class TestIosPluginHAConnect(unittest.TestCase):
         self.assertEqual(r.a.spawn.match.match_output, '\r\nRouter>')
         self.assertEqual(r.b.spawn.match.match_output, '\r\nStandby locked\r\nRouter-stby#')
         with self.assertRaisesRegex(unicon.core.errors.ConnectionError, 'handles are not yet designated'):
-            assert r.active != None
+            assert r.active is not None
         with self.assertRaisesRegex(unicon.core.errors.ConnectionError, 'handles are not yet designated'):
-            assert r.standby != None
+            assert r.standby is not None
 
 
 

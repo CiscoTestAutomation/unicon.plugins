@@ -25,7 +25,6 @@ class CimcServiceList(ServiceList):
         self.send = svc.Send
         self.sendline = svc.Sendline
         self.expect = svc.Expect
-        self.expect_log = svc.ExpectLogging
         self.log_user = svc.LogUser
         self.execute = cimc_svc.Execute
 

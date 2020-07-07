@@ -57,7 +57,6 @@ class ServiceList:
         self.ping = svc.Ping
         self.traceroute = svc.Traceroute
         self.copy = svc.Copy
-        self.expect_log = svc.ExpectLogging
         self.log_user = svc.LogUser
         self.log_file = svc.LogFile
 

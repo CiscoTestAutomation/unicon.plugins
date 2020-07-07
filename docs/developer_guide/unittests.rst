@@ -235,6 +235,24 @@ of a line. The line and char interval timings are optional and can be omitted.
            - "<line range>,<start delay>,<line interval>,<char interval>"
            - "<line range>,<start delay>,<line interval>,<char interval>"
 
+     keys:
+       # same kind of response structure as commands
+       "<key>": ""
+       "<key>": |2
+          <response data>
+
+       # response with additional options
+       "<cmd>":
+
+         # (optional) state transition
+         new_state: <state>
+
+       # ... etc, see above
+
+       # special keys: Control-X where X is one of 0ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_
+       # example: ctrl-y
+       "ctrl-y": "Control Y pressed"
+
 
 Example data:
 

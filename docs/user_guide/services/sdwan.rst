@@ -36,7 +36,6 @@ Both plugins support below generic services:
   * `send <generic_services.html#send>`__
   * `sendline <generic_services.html#sendline>`__
   * `expect <generic_services.html#expect>`__
-  * `expect_log <generic_services.html#expect-log>`__
   * `log_user <generic_services.html#log-user>`__
 
 

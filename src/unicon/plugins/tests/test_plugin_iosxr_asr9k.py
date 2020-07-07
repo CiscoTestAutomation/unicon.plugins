@@ -71,6 +71,19 @@ class TestIosXrPlugin(unittest.TestCase):
         c.state_machine.go_to('admin', c.spawn)
         self.assertEqual(c.spawn.match.match_output,'admin\r\nRP/0/RSP1/CPU0:PE1(admin)#')
 
+    def test_get_rp_state_asr9k(self):
+        c = Connection(hostname='PE1',
+                            start=['mock_device_cli --os iosxr --state asr9k_enable',
+                                   'mock_device_cli --os iosxr --state asr9k_enable'],
+                            os='iosxr',
+                            series='asr9k',
+                            username='cisco',
+                            line_password='admin',
+                            tacacs_password='admin',
+                            )
+        c.connect()
+        state = c.get_rp_state()
+        self.assertEqual(state, 'ACTIVE')
 
 
 if __name__ == "__main__":

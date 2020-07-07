@@ -29,6 +29,10 @@ class JunosSettings(GenericSettings):
 
         # Default error pattern
         self.ERROR_PATTERN=[]
+        self.CONFIGURE_ERROR_PATTERN = [
+            r'.*error: +problem +checking +file:.*',
+            r'.*error: +configuration +check-out +failed.*'
+        ]
 
         # Maximum number of retries for password handler
         self.PASSWORD_ATTEMPTS = 3

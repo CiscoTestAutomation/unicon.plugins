@@ -17,10 +17,9 @@ from pyats.datastructures import AttrDict
 
 import unicon
 from unicon import Connection
-from unicon.mock import mock_device
 from unicon.eal.dialogs import Dialog
 from unicon.plugins.tests.mock.mock_device_ios import MockDeviceTcpWrapperIOS
-from unicon.mock.mock_device import MockDeviceTcpWrapper
+from unicon.mock.mock_device import MockDevice, MockDeviceTcpWrapper
 from unicon.plugins.generic.statements import login_handler, password_handler, passphrase_handler
 from pyats.topology import loader
 from pyats.topology.credentials import Credentials
@@ -436,7 +435,7 @@ class TestGenericServices(unittest.TestCase):
                             tacacs_password='cisco',
                             service_attributes=dict(ping=dict(timeout=2468)))
         cls.d.connect()
-        cls.md = mock_device.MockDevice(device_os='ios', state='exec')
+        cls.md = MockDevice(device_os='ios', state='exec')
         cls.ha = MockDeviceTcpWrapperIOS(port=0, state='login,exec_standby')
 
         # Add command output with 80K lines
@@ -685,6 +684,9 @@ class TestConfigureService(unittest.TestCase):
         with self.assertRaises(SubCommandFailure):
             self.d_ha.configure('no logging console', lock_retries=2)
 
+    def test_configure_ca_trustpoint(self):
+        self.d.configure(['crypto pki trustpoint KEYPAIR', 'rsakeypair SSHKEYS'])
+
     @classmethod
     @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
     @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
@@ -703,7 +705,7 @@ class TestExecuteService(unittest.TestCase):
                             username='cisco',
                             tacacs_password='cisco')
         cls.d.connect()
-        cls.md = mock_device.MockDevice(device_os='ios', state='exec')
+        cls.md = MockDevice(device_os='ios', state='exec')
         cls.ha = MockDeviceTcpWrapperIOS(port=0, state='login,exec_standby')
         cls.ha.start()
         cls.ha_device = Connection(hostname='Router',
@@ -909,7 +911,7 @@ class TestLearnHostname(unittest.TestCase):
                             learn_hostname=True)
         c.settings.TERM='vt100'
         c.connect()
-        md = mock_device.MockDevice(device_os='ios', state='exec')
+        md = MockDevice(device_os='ios', state='exec')
         expected_output = md.mock_data['exec']['commands']['show version'].rstrip()
         output = c.execute('show version').replace('\r', '')
         self.assertEqual(output, expected_output)
@@ -924,7 +926,7 @@ class TestLearnHostname(unittest.TestCase):
         c.settings.TERM='vt100'
         c.connect()
         self.assertEqual(c.hostname, 'R1')
-        md = mock_device.MockDevice(device_os='ios', state='exec')
+        md = MockDevice(device_os='ios', state='exec')
         expected_output = md.mock_data['exec']['commands']['show version'].rstrip()
         output = c.execute('show version').replace('\r', '')
         self.assertEqual(output, expected_output)
@@ -972,7 +974,7 @@ class TestConnect(unittest.TestCase):
 
     def test_connect_start_cmd_not_present(self):
         d = Connection(hostname='Router', start=['xtelnetx 127.0.0.1'], os='ios')
-        with self.assertRaises(SpawnInitError):
+        with self.assertRaises(unicon.core.errors.SpawnInitError):
             d.connect()
 
     def test_connect_with_setup(self):

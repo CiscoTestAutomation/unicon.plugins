@@ -35,14 +35,13 @@ mdcli_execute:
       ===============================================================================
     "show":
       new_state: mdcli_execute_show
-    "exit": |
-
-    "ctrl+z": |
-
+    "exit": ""
     "configure private":
       new_state: mdcli_configure_private
     "configure global":
       new_state: mdcli_configure_global
+  keys:
+    'ctrl-z': ""
     "//":
       response: |
         INFO: CLI #2051: Switching to the classic CLI engine
@@ -70,15 +69,17 @@ mdcli_execute_show:
       ===============================================================================
     "exit":
       new_state: mdcli_execute
-    "ctrl+z":
+  keys:
+    "ctrl-z":
       new_state: mdcli_execute
 
 mdcli_configure_global:
   prompt: "[gl:configure]\r\nA:grpc@COTKON04XR2# "
+  keys:
+    "ctrl-z":
+      new_state: mdcli_execute
   commands:
     "exit":
-      new_state: mdcli_execute
-    "ctrl+z":
       new_state: mdcli_execute
     "router interface coreloop ipv4 primary address 1.1.1.1 prefix-length 32": |
 
@@ -87,10 +88,11 @@ mdcli_configure_global:
 
 mdcli_configure_private:
   prompt: "[pr:configure]\r\nA:grpc@COTKON04XR2# "
+  keys:
+    "ctrl-z":
+      new_state: mdcli_configure_private_discard_uncommitted
   commands:
     "exit":
-      new_state: mdcli_configure_private_discard_uncommitted
-    "ctrl+z":
       new_state: mdcli_configure_private_discard_uncommitted
     "router interface coreloop ipv4 primary address 2.2.2.2 prefix-length 32": |
 
@@ -138,12 +140,12 @@ classiccli_execute:
       Interfaces : 1
       ===============================================================================
     "exit": ""
-    "ctrl+z": |
-
     "configure router interface coreloop address 111.1.1.1 255.255.255.255":
       response: |
         MINOR: CLI Modification of the configuration is not allowed - 'model-driven' management interface configuration mode active
     "commit": ""
+  keys:
+    "ctrl-z": ""
     "//":
       response: |
         INFO: CLI #2052: Switching to the MD-CLI engine

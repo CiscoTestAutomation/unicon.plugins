@@ -235,6 +235,10 @@ class TestAireOsPlugin(unittest.TestCase):
         self.c.connect()
         self.c.reload("restart")
 
+    def test_force_switchover(self):
+        self.c.connect()
+        self.c.reload("redundancy force-switchover")
+
     def test_press_any_key(self):
         self.c.connect()
         self.c.execute("grep exclude generation 'show run-config startup-commands'")

@@ -40,6 +40,7 @@ class IOSXRHAServiceList(HAServiceList):
         self.admin_console = svc.AdminService
         self.admin_attach_console = svc.AdminAttachModuleConsole
         self.admin_bash_console = svc.AdminBashService
+        self.get_rp_state = svc.GetRPState
 
 
 class IOSXRSingleRpConnection(BaseSingleRpConnection):

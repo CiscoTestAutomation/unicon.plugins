@@ -9,7 +9,10 @@ from unicon.plugins.generic.patterns import GenericPatterns
 patterns = GenericPatterns()
 
 def enter_license_handler(spawn, context):
-    output = spawn.match.match_output
+    mid = ''
+    m = re.search(r'Machine ID: (?P<mid>\d+)', spawn.match.match_output)
+    if m:
+        mid = m['mid']
     try:
         spawn.sendline(context['pagent_key'])
         spawn.expect(r'.*is valid.*done')

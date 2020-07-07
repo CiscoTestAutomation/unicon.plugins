@@ -14,6 +14,12 @@ class StarosSettings(GenericSettings):
 
         self.HA_INIT_EXEC_COMMANDS = [
             'terminal length 0',
-            'terminal width 512'
+            'terminal width 512',
+            'no timestamps'
         ]
         self.HA_INIT_CONFIG_COMMANDS = []
+
+        self.ERROR_PATTERN = [
+            r'^Failure:',
+        ]
+

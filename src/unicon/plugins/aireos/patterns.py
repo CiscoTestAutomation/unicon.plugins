@@ -25,7 +25,7 @@ class AireosReloadPatterns(UniconCorePatterns):
         self.force_reboot = r'^(.*?)Do you still want to force a reboot \(y/N\)'
         self.are_you_sure = r'^(.*?)Are you sure you (would like to reset the system|want to start)\?\s*\(y/N\)'
         self.enter_user_name = r'^(.*?)Enter User Name \(.*\)'
-
+        self.are_you_sure = r'(.*?)Are you sure.*\([yY]/[nN]\)\s*$'
 
 class AireosPingPatterns(UniconCorePatterns):
     def __init__(self):
@@ -48,6 +48,6 @@ class AireosExecutePatterns(UniconCorePatterns):
     def __init__(self):
         super().__init__()
         self.press_any_key = r'(.*?)Press any key to continue'
-        self.are_you_sure = r'(.*?)Are you sure .*\([yY]/[nN]\) *?$'
+        self.are_you_sure = r'(.*?)Are you sure.*\([yY]/[nN]\)\s*$'
         self.press_enter_stmt = r'(.?)Press Enter to continue.*'
         self.would_you_like_to_save = r'Would you like to save them now?\? \(y/N\)'

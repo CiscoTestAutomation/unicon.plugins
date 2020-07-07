@@ -26,7 +26,6 @@ from unicon.core.errors import SubCommandFailure, StateMachineError, \
     CopyBadNetworkError, TimeoutError
 from unicon.eal.dialogs import Dialog
 from unicon.eal.dialogs import Statement
-from unicon.eal.utils import expect_log
 from unicon.plugins.generic.statements import chatty_term_wait, custom_auth_statements
 from unicon.plugins.generic.service_statements import reload_statement_list, \
     ping_dialog_list, extended_ping_dialog_list, copy_statement_list, \
@@ -390,73 +389,6 @@ class LogFile(BaseService):
     def get_service_result(self):
         return self.result
 
-class ExpectLogging(BaseService):
-    r""" Service to enable expect internal logging.
-
-    By default it enables on both file and screen, provided filename is specified.
-    If not it will log the message on screen.
-
-    Arguments:
-        filename: File name to log the messages
-        enable: True/False for enabling and disabling the expect_log
-        logto: stdout/file to enable logging on screen/file or both.
-
-
-    Example:
-
-        .. code::
-
-            rtr.expect_log(filename='/ws/lshekhar-bgl/rtr-expect.log', enable=True)
-            rtr.execute("term length 0")
-            Expect Sending  term length 0
-            Expect Got :: 'term len'
-            Expect Got :: 'gth 0\\r\\r\\n\\rn7k2-1# '
-            Expect Got  ::  'term length 0\\r\\r\\n\\rn7k2-1# '
-            Pattern Matched:: ^(.*?)(n7k2-1|Router|RouterRP|RouterRP-standby|n7k2-1-standby|n7k2-1\(standby\)|n7k2-1-sdby|(S|s)witch|Controller|ios|-Slot[0-9]+)(\(boot\))*#\s?$
-            Pattern List:: ['^.*--\\s?[Mm]ore\\s?--', '^.*\\[confirm\\(y/n\\)?\\]', '^.*\\[yes/no\\]\\s?:?$', '^(.*?)(n7k2-1|Router|RouterRP|RouterRP-standby|n7k2-1-standby|n7k2-1\\(standby\\)|n7k2-1-sdby|(S|s)witch|Controller|ios|-Slot[0-9]+)(\\(boot\\))*#\\s?$']
-
-        .. code::
-
-            rtr.execute("term width 511")
-            Expect Sending  term width 511
-            Expect Got :: 'term width 511\\r\\r\\n'
-            Expect Got :: '\\rn7k2-1# '
-            Expect Got  ::  'term width 511\\r\\r\\n\\rn7k2-1# '
-            Pattern Matched:: ^(.*?)(n7k2-1|Router|RouterRP|RouterRP-standby|n7k2-1-standby|n7k2-1\(standby\)|n7k2-1-sdby|(S|s)witch|Controller|ios|-Slot[0-9]+)(\(boot\))*#\s?$
-            Pattern List:: ['^.*--\\s?[Mm]ore\\s?--', '^.*\\[confirm\\(y/n\\)?\\]', '^.*\\[yes/no\\]\\s?:?$', '^(.*?)(n7k2-1|Router|RouterRP|RouterRP-standby|n7k2-1-standby|n7k2-1\\(standby\\)|n7k2-1-sdby|(S|s)witch|Controller|ios|-Slot[0-9]+)(\\(boot\\))*#\\s?$', '^.*--\\s?[Mm]ore\\s?--', '^.*\\[confirm\\(y/n\\)?\\]', '^.*\\[yes/no\\]\\s?:?$', '^(.*?)(n7k2-1|Router|RouterRP|RouterRP-standby|n7k2-1-standby|n7k2-1\\(standby\\)|n7k2-1-sdby|(S|s)witch|Controller|ios|-Slot[0-9]+)(\\(boot\\))*#\\s?$']
-    """
-
-    def log_service_call(self):
-        pass
-
-    def pre_service(self, *args, **kwargs):
-        pass
-
-    def post_service(self, *args, **kwargs):
-        pass
-
-    def call_service(self, filename='',
-                     enable=False,
-                     logto='stdout',
-                     *args, **kwargs):
-
-        con = self.connection
-        filename = filename
-        enable = enable
-        logto = logto
-        con.log.debug("+++ expect_log  +++")
-        try:
-            expect_log(filename=filename,
-                       enable=enable,
-                       logto=logto)
-        except Exception as err:
-            raise SubCommandFailure("Failed to enable/disable expect_log",
-                                    err)
-        self.result = True
-
-    def get_service_result(self):
-        return self.result
-
 
 class Enable(BaseService):
     """ Brings device to enable
@@ -485,9 +417,15 @@ class Enable(BaseService):
         self.service_name = 'enable'
         self.__dict__.update(kwargs)
 
-    def call_service(self, target=None, *args, **kwargs):
+    def call_service(self, target=None, command='', *args, **kwargs):
         spawn = self.get_spawn(target)
         sm = self.get_sm(target)
+        # override command to be enable when command is given
+        if command:
+            disable = sm.get_state('disable')
+            enable = sm.get_state('enable')
+            pt = sm.get_path(disable, enable)
+            sm.paths[sm.paths.index(pt)].command = command
         try:
             sm.go_to(self.start_state,
                      spawn,

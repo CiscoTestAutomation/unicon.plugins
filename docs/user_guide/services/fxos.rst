@@ -10,7 +10,6 @@ The following generic services are also available:
   * send
   * sendline
   * expect
-  * expect_log
   * log_user
 
 

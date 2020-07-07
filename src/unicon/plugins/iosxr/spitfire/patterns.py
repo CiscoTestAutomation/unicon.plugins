@@ -14,7 +14,7 @@ class SpitfirePatterns(IOSXRPatterns):
         self.bmc_prompt = \
             r'^(.*?)root@spitfire-arm:.+?#\s*?$'
         self.xr_bash_prompt = \
-            r'^(.*?)\[(ios|%N):.+?\]\$\s*?$'
+            r'^(.*?)(?<!XR)\[(ios|%N):.+?\]\$\s*?$'
         self.xr_run_prompt = \
             r'^(.*?)\[node\d_(?:RP[01]|[\d+])_CPU\d:.+?\]\$\s*?$'
         self.bmc_login_prompt = \

@@ -1,7 +1,4 @@
-April 2020
-=============
-
-April 28th
+May 2020
 -------------
 
 .. csv-table:: Module Versions

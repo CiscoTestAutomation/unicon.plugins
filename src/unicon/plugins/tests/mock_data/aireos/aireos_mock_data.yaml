@@ -38,6 +38,8 @@ aireos_exec:
       new_state: aireos_show_command_with_more
     "save config":
       new_state: aireos_confirm_save
+    "redundancy force-switchover":
+      new_state: aireos_switchover
     "transfer upload start": "% Error: Config file transfer failed - Unknown error - refer to log"
     "show foo": "Incorrect usage.  Use the '?' or <TAB> key to list commands."
     "debug lwapp": "This command has been deprecated! Please use 'debug capwap' instead."
@@ -45,20 +47,20 @@ aireos_exec:
     "config time ntp delete 2": "Error! Server Index is invalid"
     "show memory statistics": |2
       
-    System Memory Statistics:
-      Total System Memory............: 33158025216 bytes (30.88 GB)
-      Used System Memory.............: 3555262464 bytes (3.31 GB)
-      Free System Memory.............: 29602762752 bytes (27.56 GB)
-      Effective Free Memory..........: 29323431936 bytes (27.30 GB)
-      Bytes allocated from RTOS......: 828815680 bytes (790.47 MB)
-      Chunks Free....................: 87 bytes 
-      Number of mmapped regions......: 28
-      Total space in mmapped regions.: 929271808 bytes (886.28 MB)
-      Total allocated space..........: 764280224 bytes (728.92 MB)
-      Total non-inuse space..........: 64535456 bytes (61.55 MB)
-      Top-most releasable space......: 92064 bytes (89.90 KB)
-      Total allocated (incl mmap)....: 1758087488 bytes (1.63 GB)
-      Total used (incl mmap).........: 1693552032 bytes (1.57 GB)
+      System Memory Statistics:
+        Total System Memory............: 33158025216 bytes (30.88 GB)
+        Used System Memory.............: 3555262464 bytes (3.31 GB)
+        Free System Memory.............: 29602762752 bytes (27.56 GB)
+        Effective Free Memory..........: 29323431936 bytes (27.30 GB)
+        Bytes allocated from RTOS......: 828815680 bytes (790.47 MB)
+        Chunks Free....................: 87 bytes 
+        Number of mmapped regions......: 28
+        Total space in mmapped regions.: 929271808 bytes (886.28 MB)
+        Total allocated space..........: 764280224 bytes (728.92 MB)
+        Total non-inuse space..........: 64535456 bytes (61.55 MB)
+        Top-most releasable space......: 92064 bytes (89.90 KB)
+        Total allocated (incl mmap)....: 1758087488 bytes (1.63 GB)
+        Total used (incl mmap).........: 1693552032 bytes (1.57 GB)
 
 
 aireos_exec_standby:
@@ -114,6 +116,15 @@ aireos_restart:
   commands:
     "y":
       response: file|mock_data/aireos/aireos_restart.txt
+      new_state: aireos_login
+
+aireos_switchover:
+  prompt: "This will reload the active unit and force a switch of activity. Are you sure? (y/N)"
+  commands:
+    "y":
+      response: file|mock_data/aireos/aireos_force_switchover.txt
+      timing:
+        - 0:,0,0.005
       new_state: aireos_login
 
 aireos_login:

@@ -26,7 +26,7 @@ apic_exec:
 
 
 apic_hostname_with_escape_codes:
-  prompt: "ESC[0mESC[27mESC[24mESC[JAPC-0001-2001# "
+  prompt: "%1B[0m%1B[27m%1B[24m%1B[JAPC-0001-2001# "
   commands: *exec_commands
 
 

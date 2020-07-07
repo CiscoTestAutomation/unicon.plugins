@@ -25,7 +25,6 @@ class JunosServiceList(object):
         self.configure = svc.Configure
         self.enable = svc.Enable
         self.disable = svc.Disable
-        self.expect_log = svc.ExpectLogging
         self.log_user = svc.LogUser
         self.bash_console = svc.BashService
 

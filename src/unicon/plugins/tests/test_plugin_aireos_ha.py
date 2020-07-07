@@ -11,8 +11,6 @@ from pyats.topology import loader
 from unicon.plugins.tests.mock.mock_device_aireos import MockDeviceTcpWrapperAireos
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0)
 class TestAireosPluginHAConnect(unittest.TestCase):
     """ Run unit testing on a mocked AireOS HA device """
 
@@ -39,13 +37,15 @@ class TestAireosPluginHAConnect(unittest.TestCase):
                 ip: 127.0.0.1
                 port: {}
         """.format(cls.md.ports[0], cls.md.ports[1])
+        tb = loader.load(cls.testbed)
+        cls.wlc = tb.devices['WLC']
+        cls.wlc.connect(settings=dict(POST_DISCONNECT_WAIT_SEC=0,
+                                      GRACEFUL_DISCONNECT_WAIT_SEC=0))
 
     @classmethod
     def tearDownClass(cls):
+        cls.wlc.disconnect()
         cls.md.stop()
 
-    def test_connect(self):
-        tb = loader.load(self.testbed)
-        wlc = tb.devices['WLC']
-        wlc.connect()
-        wlc.disconnect()
+    def test_save_config(self):
+        self.wlc.execute('save config')

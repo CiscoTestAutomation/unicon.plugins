@@ -160,6 +160,18 @@ class TestIosXrPlugin(unittest.TestCase):
         self.assertEqual(c.spawn.match.match_output,'end\r\nRP/B0/CB0/CPU0:KLMER02-SU1#')
         c.disconnect()
 
+    def test_configure_commit_retry(self):
+        c = Connection(
+            hostname='Router',
+            start=['mock_device_cli --os iosxr --state enable_commit_retry'],
+            os='iosxr',
+            username='root',
+            tacacs_password='secretpassword'
+        )
+        c.settings.COMMIT_RETRY_SLEEP = 10
+        c.settings.COMMIT_RETRIES = 2
+        c.connect()
+
 class TestIosXRPluginExecute(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -329,6 +341,18 @@ class TestIosXrPluginAdminConfigureService(unittest.TestCase):
         conn.connect()
         out = conn.admin_configure('show configuration')
         self.assertIn('% No configuration changes found2.', out)
+        self.assertEqual(conn.state_machine.current_state, 'enable')
+        conn.disconnect()
+
+    def test_admin_configure3(self):
+        conn = Connection(hostname='Router',
+                          start=['mock_device_cli --os iosxr --state enable2'],
+                          os='iosxr',
+                          enable_password='cisco')
+        conn.connect()
+        out = conn.admin_configure('username root\nsecret 123\ngroup cisco-support\nexit')
+        self.assertEqual('username root\r\nRP/0/0/CPU0:secret 123\r\nRP/0/0/CPU0:group cisco-support\r\n'
+            'RP/0/0/CPU0:exit\r\nRP/0/0/CPU0:commit\r\nRP/0/0/CPU0:', out)
         self.assertEqual(conn.state_machine.current_state, 'enable')
         conn.disconnect()
 

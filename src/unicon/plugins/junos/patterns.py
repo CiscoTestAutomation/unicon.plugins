@@ -24,7 +24,7 @@ class JunosPatterns(UniconCorePatterns):
         self.password = r'^.*[Pp]assword: ?$'
         
         # root@junos_vmx1:~ # 
-        self.shell_prompt = r'^(.*)?(%N)\:\~ *\#\s?$'
+        self.shell_prompt = r'^(.*)?(%N)\:\~ *\#\s?$|^%\s*$'
 
         # root@junos_vmx1>
         self.enable_prompt = r'^(.*?)([-\.\w]+@(%N)+>)\s*$'

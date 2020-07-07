@@ -95,7 +95,6 @@ class ConfdServiceList:
         self.send = svc.Send
         self.sendline = svc.Sendline
         self.expect = svc.Expect
-        self.expect_log = svc.ExpectLogging
         self.log_user = svc.LogUser
         self.execute = confd_svc.Execute
         self.configure = confd_svc.Configure

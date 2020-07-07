@@ -1,12 +1,11 @@
 """
-Unittests for Generic/IOS plugin
+Unittests for Generic/IOSXE plugin
 
-Uses the unicon.plugins.tests.mock.mock_device_ios script to test IOS plugin.
+Uses the unicon.plugins.tests.mock.mock_device_ios script to test IOSXE plugin.
 
 """
 
 __author__ = "Myles Dear <mdear@cisco.com>"
-
 
 import re
 import unittest
@@ -15,7 +14,7 @@ from unicon import Connection
 from unicon.core.errors import SubCommandFailure
 
 
-class TestIosPluginConnect(unittest.TestCase):
+class TestIosXEPluginConnect(unittest.TestCase):
 
     def test_asr_login_connect(self):
         c = Connection(hostname='Router',
@@ -26,16 +25,15 @@ class TestIosPluginConnect(unittest.TestCase):
         c.connect()
         self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
 
-
     def test_isr_login_connect(self):
         c = Connection(hostname='Router',
                 start=['mock_device_cli --os iosxe --state isr_login'],
                 os='iosxe',
                 username='cisco',
-                tacacs_password='cisco')
+                tacacs_password='cisco',
+                enable_password='cisco')
         c.connect()
         self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
-
 
     def test_edison_login_connect(self):
         c = Connection(hostname='Router',
@@ -68,6 +66,15 @@ class TestIosPluginConnect(unittest.TestCase):
         c.connect()
         self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
 
+    def test_general_login_connect(self):
+        c = Connection(hostname='Router',
+                start=['mock_device_cli --os iosxe --state general_login'],
+                os='iosxe',
+                username='cisco',
+                tacacs_password='cisco')
+        c.connect()
+        self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
+
 
 class TestIosXEPluginExecute(unittest.TestCase):
     @classmethod
@@ -76,16 +83,40 @@ class TestIosXEPluginExecute(unittest.TestCase):
                             start=['mock_device_cli --os iosxe --state isr_exec'],
                             os='iosxe',
                             username='cisco',
-                            tacacs_password='cisco')
+                            tacacs_password='cisco',
+                            enable_password='cisco')
          cls.c.connect()
 
     def test_execute_error_pattern(self):
         with self.assertRaises(SubCommandFailure) as err:
             r = self.c.execute('not a real command')
 
-
     def test_execute_error_pattern_negative(self):
         r = self.c.execute('not a real command partial')
+
+
+class TestIosXEPluginDisableEnable(unittest.TestCase):
+
+    def test_disable_enable(self):
+        c = Connection(hostname='Router',
+                            start=['mock_device_cli --os iosxe --state isr_exec'],
+                            os='iosxe',
+                            username='cisco',
+                            tacacs_password='cisco',
+                            enable_password='cisco')
+
+        r = c.disable()
+        self.assertEqual(c.spawn.match.match_output, 'disable\r\nRouter>')
+
+        r = c.enable()
+        self.assertEqual(c.spawn.match.match_output, 'cisco\r\nRouter#')
+
+        r = c.disable()
+        self.assertEqual(c.spawn.match.match_output, 'disable\r\nRouter>')
+
+        r = c.enable(command='enable 7')
+        self.assertEqual(c.spawn.match.match_output, 'cisco\r\nRouter#')
+
 
 class TestIosXEPluginPing(unittest.TestCase):
 
@@ -156,6 +187,7 @@ Sending 30, 100-byte ICMP Echos to 192.0.0.6, timeout is 2 seconds:
 Success rate is 100 percent (30/30), round-trip min/avg/max = 1/1/3 ms""".\
 splitlines()))
 
+
 class TestIosxePlugingTraceroute(unittest.TestCase):
 
     def test_traceroute_success(self):
@@ -213,6 +245,7 @@ Tracing the route to 192.0.0.5
 VRF info: (vrf in name/id, vrf out name/id)
   1 192.0.0.5 msec *  1 msec""".\
 splitlines()))
+
 
 class TestIosXEluginBashService(unittest.TestCase):
 
@@ -297,7 +330,6 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
 
     def test_reload(self):
         self.c.reload()
-
 
 if __name__ == "__main__":
     unittest.main()

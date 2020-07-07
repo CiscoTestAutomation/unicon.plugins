@@ -5,7 +5,9 @@ from unicon.bases.routers.services import BaseService
 from unicon.core.errors import SubCommandFailure
 from unicon.eal.dialogs import Dialog
 
-from unicon.plugins.generic.service_implementation import Execute as GenericExecute, Configure as GenericConfigure
+from unicon.plugins.generic.service_implementation import Execute as GenericExecute, \
+    Configure as GenericConfigure, \
+    HaExecService as GenericHaExecute
 from unicon.plugins.generic.utils import GenericUtils
 
 from .patterns import (AireosPatterns, AireosReloadPatterns, AireosPingPatterns, AireosCopyPatterns)
@@ -19,6 +21,13 @@ p = AireosPatterns()
 
 
 class AireosExecute(GenericExecute):
+
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.dialog += Dialog(execute_statements)
+
+
+class AireosHaExecute(GenericHaExecute):
 
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)

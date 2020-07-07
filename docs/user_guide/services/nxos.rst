@@ -483,4 +483,3 @@ reload_creds              list or str ('default')     Credentials to use if devi
 
         # using return_output
         result, output = rtr.reload(return_output=True)
-

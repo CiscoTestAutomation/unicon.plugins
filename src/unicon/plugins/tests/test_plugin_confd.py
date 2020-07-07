@@ -176,8 +176,8 @@ user@ncs% """)
                             tacacs_password='admin')
         c.connect()
         r = c.execute('configure')
-        self.assertEqual(r, """Entering configuration mode private
-[ok][1970-01-01 00:00:00]""".replace('\n', '\r\n'))
+        self.assertEqual(r, """Entering configuration mode private\r
+[ok][1970-01-01 00:00:00]  \r\n\n[edit]""")
 
     def test_cisco_execute_command_list(self):
         c = Connection(hostname='ncs',
@@ -293,8 +293,7 @@ class TestConfdPluginConfigure(unittest.TestCase):
         c.connect()
         cmd = 'services sw-init-l3vpn foo endpoint PE2 pe-interface 0/0/0/1 ce CE1 ce-interface 0/1 ce-address 1.1.1.1 pe-address 1.1.1.2'
         r = c.execute(['configure', cmd, 'commit'])
-        self.assertEqual(r['commit'], 'Commit complete.')
-        self.assertEqual(r[cmd].replace(' \x08', ''), '')
+        self.assertEqual(r['commit'], 'Commit complete.\r\n\n[edit]')
 
     def test_cisco_configure_command_list(self):
         c = Connection(hostname='ncs',

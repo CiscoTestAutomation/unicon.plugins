@@ -90,6 +90,26 @@ Default value is False.
     >>> uut.connect()
     >>> uut.settings.STATEMENT_LOG_DEBUG=True
 
+**Commit retry functionality**
+
+When configuration session is locked, you can resend `commit` command to ensure
+successfull configuration, this is achieved by setting `COMMIT_RETRY_SLEEP` and
+`COMMIT_RETRIES` in the testbed yaml file or under the device settings attribute.
+
+Default value is 10 seconds and 2 retries respectively.
+
+.. code-block:: python
+
+    >>> from pyats.topology import loader
+    >>>
+    >>> tb = loader.load('testbed.yaml')
+    >>> uut = tb.devices['uut']
+    >>>
+    >>> uut.connect()
+    >>> uut.settings.COMMIT_RETRY_SLEEP=10
+    >>> uut.settings.COMMIT_RETRIES=2
+
+
 .. note ::
 
    Settings can also be patched in the testbed yaml file as shown :ref:`here<settings_control>`.
@@ -444,43 +464,15 @@ This service takes no arguments.
 
 expect_log
 ----------
-Service to enable expect internal logging.
+This service is removed. Please use Connection logger setLevel API 
+to enable/disable internal debug logging.
 
+.. code-block:: python
 
-==========   =======================     ========================================
-Argument     Type                        Description
-==========   =======================     ========================================
-enable       bool                        to enable or disable expect internal logs
-filename     str                         filename to which logs will be logged
-logto        str (stadout/file/both)     to log logs only on file/console/both.
-                                         By default it enables on both file and screen,
-                                         provided filename is specified. If not it will
-                                         log the message on screen.
-==========   =======================     ========================================
+          Example ::
 
-
-.. code-block:: bash
-
-    Example::
-
-      rtr.expect_log(filename='/ws/lshekhar-bgl/rtr-expect.log', enable=True)
-      rtr.execute("term length 0")
-
-      Expect Sending  term length 0
-      Expect Got :: 'term len'
-      Expect Got :: 'gth 0\r\r\n\rn7k2-1# '
-      Expect Got  ::  'term length 0\r\r\n\rn7k2-1# '
-      Pattern Matched:: ^(.*?)(n7k2-1|Router|RouterRP|RouterRP-standby|n7k2-1-standby|n7k2-1\(standby\)|n7k2-1-sdby|(S|s)witch|Controller|ios|-Slot[0-9]+)(\(boot\))*#\s?$
-      Pattern List:: ['^.*--\\s?[Mm]ore\\s?--', '^.*\\[confirm\\(y/n\\)?\\]', '^.*\\[yes/no\\]\\s?:?$', '^(.*?)(n7k2-1|Router|RouterRP|RouterRP-standby|n7k2-1-standby|n7k2-1\\(standby\\)|n7k2-1-sdby|(S|s)witch|Controller|ios|-Slot[0-9]+)(\\(boot\\))*#\\s?$']
-
-      rtr.execute("term width 511")
-
-      Expect Sending  term width 511
-      Expect Got :: 'term width 511\r\r\n'
-      Expect Got :: '\rn7k2-1# '
-      Expect Got  ::  'term width 511\r\r\n\rn7k2-1# '
-      Pattern Matched:: ^(.*?)(n7k2-1|Router|RouterRP|RouterRP-standby|n7k2-1-standby|n7k2-1\(standby\)|n7k2-1-sdby|(S|s)witch|Controller|ios|-Slot[0-9]+)(\(boot\))*#\s?$
-      Pattern List:: ['^.*--\\s?[Mm]ore\\s?--', '^.*\\[confirm\\(y/n\\)?\\]', '^.*\\[yes/no\\]\\s?:?$', '^(.*?)(n7k2-1|Router|RouterRP|RouterRP-standby|n7k2-1-standby|n7k2-1\\(standby\\)|n7k2-1-sdby|(S|s)witch|Controller|ios|-Slot[0-9]+)(\\(boot\\))*#\\s?$', '^.*--\\s?[Mm]ore\\s?--', '^.*\\[confirm\\(y/n\\)?\\]', '^.*\\[yes/no\\]\\s?:?$', '^(.*?)(n7k2-1|Router|RouterRP|RouterRP-standby|n7k2-1-standby|n7k2-1\\(standby\\)|n7k2-1-sdby|(S|s)witch|Controller|ios|-Slot[0-9]+)(\\(boot\\))*#\\s?$']
+            rtr.connect()
+            rtr.log.setLevel(logging.DEBUG)
 
 
 log_user
@@ -522,9 +514,11 @@ enable
 
 Service to change the device mode to enable from any state. Brings the standby
 handle to enable state, if standby is passed as input.
+If command is given, it will be issued on the device to become in enable mode.
 
     arg :
         * target='standby'
+        * command='enable 7'
 
     return :
         * True on Success, raise SubCommandFailure on failure.
@@ -536,6 +530,7 @@ handle to enable state, if standby is passed as input.
 
         rtr.enable()
         rtr.enable(target='standby')
+        rtr.enable(command='enable 7')
 
 
 disable

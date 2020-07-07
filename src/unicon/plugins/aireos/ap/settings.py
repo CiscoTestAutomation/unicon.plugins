@@ -7,7 +7,8 @@ class AireosAPSettings(GenericSettings):
         self.HA_INIT_EXEC_COMMANDS = [
             'terminal length 0',
             'terminal width 0',
-            'exec-timeout 0 0'
+            'exec-timeout 0 0',
+            'logging console disable'
         ]
         self.HA_INIT_CONFIG_COMMANDS = []
 

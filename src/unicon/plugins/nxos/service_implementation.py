@@ -186,12 +186,14 @@ class Reload(GenericReload):
         con.configure.lock_retries = config_lock_retries
         config_lock_retry_sleep_ori = con.configure.lock_retry_sleep
         con.configure.lock_retry_sleep = config_lock_retry_sleep
+
         try:
             con.connect()
         finally:
             con.learn_hostname = learn_hostname_ori
             con.configure.lock_retries = config_lock_retries_ori
             con.configure.lock_retry_sleep = config_lock_retry_sleep_ori
+
         con.log.debug("+++ Reload Completed Successfully +++")
         self.result = True
         if return_output:
@@ -561,12 +563,14 @@ class HANxosReloadService(GenericHAReload):
         con.configure.lock_retries = config_lock_retries
         config_lock_retry_sleep_ori = con.configure.lock_retry_sleep
         con.configure.lock_retry_sleep = config_lock_retry_sleep
+
         try:
             con.connect()
         finally:
             con.learn_hostname = learn_hostname_ori
             con.configure.lock_retries = config_lock_retries_ori
             con.configure.lock_retry_sleep = config_lock_retry_sleep_ori
+
         con.log.debug("+++ Reload Completed Successfully +++")
         self.result = True
         if return_output:
@@ -628,7 +632,7 @@ class NxosSwitchoverService(GenericSwitchover):
                       % (con.hostname, command, timeout))
 
         # Check is switchover possible?
-        rp_state = con.get_rp_state(target='standby', timeout=100)
+        rp_state = con.get_rp_state(target='standby', timeout=timeout)
         if rp_state.find('STANDBY HOT') == -1:
             raise SubCommandFailure(
                 "Switchover can't be issued in %s state" % rp_state)
@@ -651,7 +655,7 @@ class NxosSwitchoverService(GenericSwitchover):
             dialog.process(con.active.spawn,
                            context=context,
                            prompt_recovery=self.prompt_recovery,
-                           timeout=100)
+                           timeout=timeout)
         except TimeoutError:
             pass
         except SubCommandFailure as err:
@@ -665,7 +669,7 @@ class NxosSwitchoverService(GenericSwitchover):
             con.active.state_machine.go_to('any',
                                            con.active.spawn,
                                            context=context,
-                                           timeout=100,
+                                           timeout=timeout,
                                            prompt_recovery=self.prompt_recovery,
                                            dialog=con.connection_provider.get_connection_dialog())
         except Exception as err:
@@ -778,62 +782,6 @@ class ResetStandbyRP(BaseService):
         con = self.connection
         con.log.warning("reset_standby_rp is not supported on NXOS")
         return
-        command = command or self.command
-        timeout = timeout or self.timeout
-        # resetting the standby rp for
-        con.log.debug("+++ Issuing reset on  %s  with "
-                      "reset_command %s and timeout is %s +++"
-                      % (con.hostname, command, timeout))
-
-        # Check is switchover possible?
-        rp_state = con.get_rp_state(target='standby', timeout=100)
-        if rp_state.find('DISABLED') == -1:
-            raise SubCommandFailure("No Standby found")
-
-        dialog = self.service_dialog(handle=con.active,
-                                     service_dialog=self.dialog)
-        # Issue switchover command
-        con.active.spawn.sendline(command)
-        try:
-            dialog.process(con.active.spawn, context=self.context, timeout=30)
-        except TimeoutError:
-            pass
-        except SubCommandFailure as err:
-            raise SubCommandFailure("Failed to reset standby rp %s" % str(err))
-
-        reset_counter = timeout / 10
-
-        counter = 0
-        while counter < reset_counter:
-            try:
-                rp_state = con.get_rp_state(target='standby',
-                                            timeout=60)
-            except (SubCommandFailure, TimeoutError):
-                sleep(10)
-                counter += 1
-                continue
-            else:
-                if re.search('STANDBY HOT', rp_state):
-                    counter = reset_counter + 1
-                else:
-                    sleep(10)
-                    counter += 1
-
-        # Clear Standby buffer
-        try:
-            con.standby.spawn.sendline("\r")
-            con.standby.spawn.expect(".*")
-            con.standby.state_machine.go_to('any',
-                                            con.standby.spawn,
-                                            context=self.context,
-                                            timeout=100,
-                                            dialog=con.connection_provider.get_connection_dialog())
-            con.enable(target='standby')
-        except SubCommandFailure as err:
-            raise SubCommandFailure(
-                "Failed to bring the standby to enable state : %s" % str(err))
-        con.log.info("Successfully reloaded Standby RP")
-        self.result = True
 
 
 class ShellExec(BaseService):

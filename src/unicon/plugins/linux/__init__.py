@@ -30,7 +30,6 @@ class LinuxServiceList:
         self.receive = svc.ReceiveService
         self.receive_buffer = svc.ReceiveBufferService
         self.expect = svc.Expect
-        self.expect_log = svc.ExpectLogging
         self.log_user = svc.LogUser
         self.execute = lnx_svc.Execute
         self.ping = lnx_svc.Ping

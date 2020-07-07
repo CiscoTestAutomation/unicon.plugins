@@ -55,3 +55,48 @@ user_password:
   commands:
     "lab":
       new_state: exec
+
+# ================================
+exec2:
+  prompt: "root@junos_vsrx>"
+  commands:
+    "start shell":
+      new_state: shell
+    "set cli screen-length 0": |
+      Screen length set to 0
+    "set cli screen-width 0": |
+      Screen width set to 0
+    "exit":
+      new_state: user_access_veri
+
+shell:
+  prompt: "% "
+  commands:
+    "ls": |
+      :golden_config_snapshot phase3_golden_config
+    "exit":
+      new_state: exec2
+
+# ===============================
+exec3:
+  prompt: "root@junos_dev>"
+  commands:
+    "configure":
+      new_state: config3
+
+config3:
+  prompt: "root@junos_dev#"
+  commands:
+    "commit": |
+        [edit interfaces ge-0/0/0]
+
+          'unit 29'
+
+            Only unit 0 is valid for this encapsulation
+
+        error: configuration check-out failed
+
+        [edit]
+    "exit":
+      new_state: exec3
+

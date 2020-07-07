@@ -57,7 +57,7 @@ class TestIosXrSpitfirePluginDevice(unittest.TestCase):
         tb = loader.load(self.testbed)
         self.r = tb.devices.Router
         self.r.connect()
-        self.assertEqual(self.r.spawn.match.match_output,'end\r\nRP/0/RP0/CPU0:Router#')
+        self.assertEqual(self.r.spawn.match.match_output,'\r\nRP/0/RP0/CPU0:Router#')
         self.r.disconnect()
 
     @classmethod
@@ -206,7 +206,7 @@ class TestIosXrSpitfireHAConnect(unittest.TestCase):
         self.r.connect(prompt_recovery=True)
 
     def test_connect(self):
-        self.assertEqual(self.r.active.spawn.match.match_output,'end\r\nRP/0/RP0/CPU0:Router#')
+        self.assertEqual(self.r.active.spawn.match.match_output,'\r\nRP/0/RP0/CPU0:Router#')
     
     def test_handle(self):
         self.assertEqual(self.r.a.role,"active",)
@@ -393,7 +393,6 @@ class TestIosXrSpitfirePluginSwitchTo(unittest.TestCase):
         self.assertEqual(self.c.spawn.match.match_output,'exit\r\nRP/0/RP0/CPU0:Router#')
 
 
-
     @classmethod
     def tearDownClass(self):
         self.c.disconnect()
@@ -430,6 +429,38 @@ class TestIosXrSpitfirePluginAttachConsoleService(unittest.TestCase):
         ret = conn.spawn.match.match_output
         self.assertEqual(ret,'exit\r\nlogout\r\nRP/0/RP0/CPU0:Router#')
 
+
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
+class TestIosXrSpitfirePluginAttachConsoleService(unittest.TestCase):
+
+    def test_attach_console_rp0(self):
+        conn = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxr --state spitfire_enable'],
+                       os='iosxr',
+                       series='spitfire',
+                       username='cisco',
+                       enable_password='cisco123')
+
+        with conn.attach_console('0/RP0/CPU0') as console:
+            out = console.execute('ls')
+            self.assertIn('dummy_file', out)
+        ret = conn.spawn.match.match_output
+        self.assertEqual(ret,'exit\r\nlogout\r\nRP/0/RP0/CPU0:Router#')
+
+    def test_attach_console_lc0(self):
+        conn = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxr --state spitfire_enable'],
+                       os='iosxr',
+                       series='spitfire',
+                       username='cisco',
+                       enable_password='cisco123')
+
+        with conn.attach_console('0/0/CPU0') as console:
+            out = console.execute('ls')
+            self.assertIn('dummy_file', out)
+        ret = conn.spawn.match.match_output
+        self.assertEqual(ret,'exit\r\nlogout\r\nRP/0/RP0/CPU0:Router#')
 
 
 if __name__ == "__main__":

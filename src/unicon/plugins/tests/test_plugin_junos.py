@@ -93,6 +93,19 @@ class TestJunosPluginConfigure(unittest.TestCase):
         ret = c.configure(cmd).replace('\r', '')
         self.assertIn(expected_response, ret)
 
+    def test_configure_commit_on_failure(self):
+        c = Connection(hostname='junos_dev',
+                        start=['mock_device_cli --os junos --state exec3'],
+                        os='junos',
+                        username='root',
+                        tacacs_password='lab',
+                        init_exec_commands=[],
+                        init_config_commands=[]
+                        )
+        c.connect()
+        with self.assertRaises(SubCommandFailure):
+            c.configure('commit')
+
 
 class TestJunosPluginBashService(unittest.TestCase):
 
@@ -107,6 +120,22 @@ class TestJunosPluginBashService(unittest.TestCase):
             console.execute('ls')
         self.assertIn('cli', c.spawn.match.match_output)
         self.assertIn('root@junos_vmx2>', c.spawn.match.match_output)
+
+
+class TestJunosVsrxPluginBashService(unittest.TestCase):
+
+    def test_bash(self):
+        c = Connection(hostname='junos_vsrx',
+                       start=['mock_device_cli --os junos --state exec2'],
+                       os='junos',
+                       series='vsrx',
+                       username='root',
+                       tacacs_password='lab')
+
+        with c.bash_console() as console:
+            console.execute('ls')
+        self.assertIn('exit', c.spawn.match.match_output)
+        self.assertIn('root@junos_vsrx>', c.spawn.match.match_output)
 
 
 

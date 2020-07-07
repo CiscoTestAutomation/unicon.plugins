@@ -19,7 +19,6 @@ class ApServiceList(ServiceList):
         self.enable = gsvc.Enable
         self.disable = gsvc.Disable
         self.reload = gsvc.Reload
-        self.expect_log = gsvc.ExpectLogging
         self.log_user = gsvc.LogUser
 
 

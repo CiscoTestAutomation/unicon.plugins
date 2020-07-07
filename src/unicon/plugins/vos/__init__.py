@@ -35,7 +35,6 @@ class VosServiceList(ServiceList):
         self.sendline = svc.Sendline
         self.expect = svc.Expect
         self.execute = vos_svc.Execute
-        self.expect_log = svc.ExpectLogging
         self.log_user = svc.LogUser
 
 

@@ -43,8 +43,8 @@ def version_info(*paths):
 # compute version range
 version, version_range = version_info('src', 'unicon', 'plugins', '__init__.py')
 
-install_requires = ['pyyaml',
-                    'unicon {range}'.format(range = version_range)],
+install_requires = ['unicon {range}'.format(range = version_range),
+                    'pyyaml']
 
 # launch setup
 setup(

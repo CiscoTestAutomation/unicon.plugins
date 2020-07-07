@@ -10,12 +10,10 @@ The following generic services are also available:
   * `send`_
   * `sendline`_
   * `expect`_
-  * `expect_log`_
 
 .. _send: generic_services.html#send
 .. _sendline: generic_services.html#sendline
 .. _expect: generic_services.html#expect
-.. _expect_log: generic_services.html#expect-log
 
 
 

@@ -141,10 +141,10 @@ class TestLinuxPluginConnect(unittest.TestCase):
         tb=loader.load(testbed)
         l = tb.devices['agent-lab11-pm']
         with self.assertRaises(UniconConnectionError):
-            l.connect(connection_timeout=20, expect_log=True)
+            l.connect(connection_timeout=20)
         l.destroy()
         l.connect(login_creds=['default'])
-        self.assertEqual(l.spawn.match.match_output, 'stty rows 200\r\nroot@agent-lab11-pm:~# ')
+        self.assertEqual(l.spawn.match.match_output, '\r\nroot@agent-lab11-pm:~# ')
         l.disconnect()
 
   def test_connect_for_login_incorrect(self):
@@ -178,7 +178,7 @@ class TestLinuxPluginConnect(unittest.TestCase):
         tb=loader.load(testbed)
         l = tb.devices['lnx-server']
         l.connect(connection_timeout=20)
-        self.assertEqual(l.spawn.match.match_output, 'stty rows 200\r\n[user@host ~]$ ')
+        self.assertEqual(l.spawn.match.match_output, '\r\n[user@host ~]$ ')
         l.disconnect()
 
   def test_connect_timeout_error(self):
@@ -236,7 +236,9 @@ class TestLinuxPluginPrompts(unittest.TestCase):
       'prompt13',
       'prompt14',
       'prompt15',
-      'prompt16'
+      'prompt16',
+      'prompt17',
+      'prompt18'
     ]
 
     @classmethod
@@ -245,7 +247,6 @@ class TestLinuxPluginPrompts(unittest.TestCase):
                             start=['mock_device_cli --os linux --state exec'],
                             os='linux')
         cls.c.connect()
-        # cls.c.expect_log(enable=True)
 
 
     def test_connect(self):
@@ -283,6 +284,7 @@ class TestLearnHostname(unittest.TestCase):
           'exec15': LinuxSettings().DEFAULT_LEARNED_HOSTNAME,
           'sma_prompt' : 'sma03',
           'sma_prompt_1' : 'pod-esa01',
+          'exec18': LinuxSettings().DEFAULT_LEARNED_HOSTNAME,
         }
 
         for state in states:
@@ -307,12 +309,14 @@ class TestLearnHostname(unittest.TestCase):
           c.connect(learn_hostname=True)
           self.assertEqual(c.learned_hostname, states[state])
 
-          x = c.execute('xml')
-          self.assertEqual(x.replace('\r', ''), mock_data['exec']['commands']['xml']['response'].strip())
-          x = c.execute('banner1')
-          self.assertEqual(x.replace('\r', ''), mock_data['exec']['commands']['banner1']['response'].strip())
-          x = c.execute('banner2')
-          self.assertEqual(x.replace('\r', ''), mock_data['exec']['commands']['banner2']['response'].strip())
+          # only check for supported prompts
+          if states[state] != LinuxSettings().DEFAULT_LEARNED_HOSTNAME:
+            x = c.execute('xml')
+            self.assertEqual(x.replace('\r', ''), mock_data['exec']['commands']['xml']['response'].strip())
+            x = c.execute('banner1')
+            self.assertEqual(x.replace('\r', ''), mock_data['exec']['commands']['banner1']['response'].strip())
+            x = c.execute('banner2')
+            self.assertEqual(x.replace('\r', ''), mock_data['exec']['commands']['banner2']['response'].strip())
 
     def test_connect_disconnect_without_learn_hostname(self):
         testbed = """
@@ -559,9 +563,9 @@ class TestLinuxPluginENV(unittest.TestCase):
       l = tb.devices.lnx
       l.connect()
       term = l.execute('echo $TERM')
-      self.assertEqual(term, l.settings.ENV['TERM'])
+      self.assertIn(l.settings.ENV['TERM'], term)
       lc = l.execute('echo $LC_ALL')
-      self.assertEqual(lc, l.settings.ENV['LC_ALL'])
+      self.assertIn(l.settings.ENV['LC_ALL'], lc)
 
 
 class TestLinuxPluginExecute(unittest.TestCase):

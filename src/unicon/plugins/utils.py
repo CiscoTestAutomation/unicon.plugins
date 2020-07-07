@@ -10,6 +10,7 @@ Description:
     Module for defining utilities used across various plugins.
 """
 
+import re
 from unicon.utils import to_plaintext
 from unicon.core.errors import (UniconAuthenticationError,
     CredentialsExhaustedError, )
@@ -121,3 +122,15 @@ def common_cred_password_handler(spawn, context, session, credential,
             "for credential {}.".format(credential))
     if not reuse_current_credential:
         invalidate_current_credential(context=context, session=session)
+
+
+def slugify(text):
+    """ Simple slugify
+
+    Returns string stripped of special chars, replaced with _
+    """
+    text = text.lower()
+    pattern = re.compile(r'[^a-z0-9]+')
+    text = re.sub(pattern, '_', text)
+    text = re.sub(r'_{2,}', '_', text).strip('_')
+    return text

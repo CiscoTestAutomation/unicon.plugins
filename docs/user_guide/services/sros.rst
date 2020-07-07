@@ -180,6 +180,5 @@ See :doc:`Common Services  <generic_services>` documentation for usage details.
 - ``send``
 - ``sendline``
 - ``expect``
-- ``expect_log``
 - ``log_user``
 - ``log_file``

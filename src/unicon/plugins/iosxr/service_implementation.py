@@ -9,11 +9,15 @@ from unicon.bases.routers.services import BaseService
 from unicon.core.errors import SubCommandFailure
 from unicon.eal.dialogs import Dialog
 from unicon.plugins.generic.service_implementation import BashService
+from unicon.plugins.generic.service_implementation import GetRPState as GenericGetRPState
 
 from .service_statements import (switchover_statement_list,
                                  config_commit_stmt_list,
                                  execution_statement_list)
 
+from .utils import IosxrUtils
+
+utils = IosxrUtils()
 
 def get_commit_cmd(**kwargs):
     if 'force' in kwargs and kwargs['force'] is True:
@@ -413,3 +417,38 @@ class AdminBashService(BashService):
             sm.go_to('admin_run', conn.spawn)
 
             return self
+
+
+class GetRPState(GenericGetRPState):
+    """ Get Rp state
+
+    Service to get the redundancy state of the device rp.
+    Returns standby rp state if standby is passed as input.
+
+    Arguments:
+        target: Service target, by default active
+
+    Returns:
+        Expected return values are ACTIVE, STANDBY COLD, STANDBY HOT
+        raise SubCommandFailure on failure.
+
+    Example:
+        .. code-block:: python
+
+            rtr.get_rp_state()
+            rtr.get_rp_state(target='standby')
+    """
+    def call_service(self,
+                     target='active',
+                     timeout=None,
+                     utils=utils,
+                     *args,
+                     **kwargs):
+
+        """send the command on the right rp and return the output"""
+        super().call_service(
+            target = target,
+            timeout = timeout,
+            utils = utils,
+            *args,
+            **kwargs)

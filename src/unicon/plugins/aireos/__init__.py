@@ -27,7 +27,7 @@ class AireosServiceList(ServiceList):
 class HAAireosServiceList(AireosServiceList):
     def __init__(self):
         super().__init__()
-        self.execute = svc.HaExecService
+        self.execute = aireos_svc.AireosHaExecute
 
 
 class AireosConnection(GenericSingleRpConnection):

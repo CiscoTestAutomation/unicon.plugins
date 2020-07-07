@@ -14,7 +14,6 @@ class SrosServiceList(object):
         self.send = svc.Send
         self.sendline = svc.Sendline
         self.expect = svc.Expect
-        self.expect_log = svc.ExpectLogging
         self.log_user = svc.LogUser
         self.log_file = svc.LogFile
         self.mdcli_execute = sros_svc.SrosMdcliExecute

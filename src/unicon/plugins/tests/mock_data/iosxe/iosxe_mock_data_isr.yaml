@@ -10,6 +10,12 @@ isr_password:
     "cisco":
       new_state: isr_exec
 
+isr_enable_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: enable_isr
+
 isr_exec:
   prompt: "Router>"
   commands: 
@@ -80,7 +86,13 @@ isr_exec:
 
 
     "enable":
-      new_state: enable_isr
+      new_state: isr_enable_password
+
+    "enable 7":
+      new_state: isr_enable_password
+
+    "disable":
+      new_state: disable_isr
 
 
 isr_bash:
@@ -172,6 +184,14 @@ enable_isr:
     "copy  bootflash: tftp:  vrf Mgmt-intf":
       new_state: copy_from_tftp
 
+disable_isr:
+  prompt: "Router>"
+  commands:
+    "enable":
+      new_state: isr_enable_password
+    "enable 7":
+      new_state: isr_enable_password
+
 config_isr:
   prompt: "Router(config)#"
   commands:
@@ -185,7 +205,6 @@ config_line_isr:
     "exec-timeout 0": ""
     "end":
       new_state: enable_isr
-
 
 traceroute_proto_isr:
   prompt: "Protocol [ip]: "
@@ -263,9 +282,6 @@ traceroute_loose_isr:
         Tracing the route to 192.0.0.5
         VRF info: (vrf in name/id, vrf out name/id)
           1 192.0.0.5 msec *  1 msec
-
-
-
 
 ping_proto_isr:
   prompt: "Protocol [ip]: "

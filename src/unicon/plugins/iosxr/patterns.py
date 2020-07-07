@@ -21,10 +21,12 @@ class IOSXRPatterns(GenericPatterns):
         self.logout_prompt = r'^.*Press RETURN to get started\..*'
         self.commit_replace_prompt = r'Do you wish to proceed?.*$'
         self.admin_prompt = r'^(.*?)(?:sysadmin-vm:0_(.*)\s?#\s?$|RP/\S+\(admin\)\s?#\s?)$'
-        self.admin_conf_prompt = r'^(.*?)(?:sysadmin-vm:0_(.*)\(config.*\)\s?#\s?|RP/\S+\(admin-config\)\s?#\s?)$'
+        self.admin_conf_prompt = r'^(.*?)(?:sysadmin-vm:0_(.*)\(config.*\)\s?#\s?|RP/\S+\(admin-config(\S+)?\)\s?#\s?)$'
         self.admin_run_prompt = r'^(.*?)(?:\[sysadmin-vm:0_.*:([\s\S]+)?\]\s?\$\s?|[\r\n]+\s?#\s?)$'
         self.unreachable_prompt = r'apples are green but oranges are red'
         self.configuration_failed_message = r'^.*Please issue \'show configuration failed \[inheritance\].*[\r\n]*'
         self.standby_prompt = r'^.*This \(D\)RP Node is not ready or active for login \/configuration.*'
         self.rp_extract_status = r'^\d+\s+(\w+)\s+\-?\d+.*$'
         self.confirm_y_prompt = r"\[confirm( with only 'y' or 'n')?\]\s*\[y/n\].*$"
+        self.commit_retry = r"^.*% Failed to commit .. Another configuration session.*"
+        self.commit_verified = r"^.*[a-zA-Z]+ +[a-zA-Z]+ +[0-9]+ +[\d\:\.]+ +[A-Z]+.*"

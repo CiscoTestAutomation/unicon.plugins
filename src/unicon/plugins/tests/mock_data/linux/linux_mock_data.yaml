@@ -137,6 +137,10 @@ exec:
         new_state: exec15
     "prompt16":
         new_state: exec16
+    "prompt17":
+        new_state: exec17
+    "prompt18":
+        new_state: exec18
     "ls": |
       /tmp
       /var
@@ -285,7 +289,7 @@ exec8:
   commands: *cmds
 
 exec9:
-  prompt: "ESC]0;cisco@dev-server:~^Gcisco@dev-server:3> "
+  prompt: "%1B]0;cisco@dev-server:~^Gcisco@dev-server:3> "
   commands: *cmds
 
 exec10:
@@ -305,7 +309,7 @@ exec13:
   commands: *cmds
 
 exec14:
-  prompt: "ESC]0;rally@rally: /workspace\x07rally@rally:/workspace$ ESC[K"
+  prompt: "%1B]0;rally@rally: /workspace\x07rally@rally:/workspace$ %1B[K"
   commands: *cmds
 
 exec15:
@@ -318,6 +322,17 @@ exec16:
 
 exec17:
   prompt: "admin:"
+  commands: *cmds
+
+exec18:
+  preface:
+    response: |
+      ########################################################################
+
+      <host:root>/root:
+    timing:
+      - 0:,0,0.05
+  prompt: "# "
   commands: *cmds
 
 sma_prompt:
