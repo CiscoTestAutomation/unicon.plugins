@@ -97,8 +97,8 @@ class IosXEDualRpStateMachine(StateMachine):
         # Paths
         disable_to_enable = Path(disable, enable, 'enable',
                                  Dialog([statements.enable_password_stmt, statements.bad_password_stmt]))
-        enable_to_disable = Path(enable, disable, 'disable',
-                                 Dialog([statements.enable_password_stmt, statements.bad_password_stmt]))
+
+        enable_to_disable = Path(enable, disable, 'disable', None)
 
         enable_to_config = Path(enable, config, 'config term', None)
 

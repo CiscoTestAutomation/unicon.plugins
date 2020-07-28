@@ -77,6 +77,17 @@ class TestAciApicPlugin(unittest.TestCase):
         c.settings.POST_RELOAD_WAIT = 1
         c.reload()
 
+    def test_config_prompt(self):
+        c = Connection(hostname='APC',
+                       start=['mock_device_cli --os aci --state apic_connect'],
+                       os='aci',
+                       series='apic',
+                       credentials={'default':{
+                           'username': 'admin',
+                           'password': 'cisco123'}})
+        c.connect()
+        c.configure('tenant test')
+
 
 class TestAciN9kPlugin(unittest.TestCase):
 

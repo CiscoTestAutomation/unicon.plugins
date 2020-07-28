@@ -24,7 +24,7 @@ class Switchto(BaseService):
 
     def pre_service(self, target_state, *args, **kwargs):
 
-        if not self.connection.connected:
+        if not self.connection.is_connected:
             self.connection.log.warning('Device is not connected, ignoring switchto')
             return
 
@@ -37,7 +37,7 @@ class Switchto(BaseService):
                      timeout=None,
                      *args, **kwargs):
 
-        if not self.connection.connected:
+        if not self.connection.is_connected:
             return
 
         con = self.get_handle()

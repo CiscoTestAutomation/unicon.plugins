@@ -90,25 +90,6 @@ Default value is False.
     >>> uut.connect()
     >>> uut.settings.STATEMENT_LOG_DEBUG=True
 
-**Commit retry functionality**
-
-When configuration session is locked, you can resend `commit` command to ensure
-successfull configuration, this is achieved by setting `COMMIT_RETRY_SLEEP` and
-`COMMIT_RETRIES` in the testbed yaml file or under the device settings attribute.
-
-Default value is 10 seconds and 2 retries respectively.
-
-.. code-block:: python
-
-    >>> from pyats.topology import loader
-    >>>
-    >>> tb = loader.load('testbed.yaml')
-    >>> uut = tb.devices['uut']
-    >>>
-    >>> uut.connect()
-    >>> uut.settings.COMMIT_RETRY_SLEEP=10
-    >>> uut.settings.COMMIT_RETRIES=2
-
 
 .. note ::
 

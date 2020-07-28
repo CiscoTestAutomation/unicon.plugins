@@ -53,7 +53,8 @@ class TestFxosFtdPlugin(unittest.TestCase):
                        enable_password='cisco',
                        line_password='cisco')
         c.connect()
-        c.switchto('ftd expert')
+        c.spawn.timeout = 30
+        c.switchto('ftd expert', timeout=60)
         c.execute(['sudo su -'],
                   reply=Dialog([password_stmt, escape_char_stmt]),
                   allow_state_change=True)

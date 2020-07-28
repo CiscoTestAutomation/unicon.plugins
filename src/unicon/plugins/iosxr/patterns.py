@@ -13,6 +13,7 @@ class IOSXRPatterns(GenericPatterns):
         # see CSCve48115 and CSCve51502
         self.run_prompt = r'^(.*?)(?:\[xr-vm_.*:([\s\S]+)?\]\s?\$\s?|[\r\n]+\s?#\s?)$'
         self.config_prompt = r'^(.*?)RP/\S+\(config.*\)\s?#\s?$'
+        self.exclusive_prompt = r'^(.*?)RP/\S+\(config.*\)#\s?$'
         self.telnet_prompt = r'^.*Escape character is.*'
         self.username_prompt = r'^.*([Uu]sername|[Ll]ogin):\s*$'
         self.password_prompt = r'^.*[Pp]assword:\s?$'
@@ -28,5 +29,3 @@ class IOSXRPatterns(GenericPatterns):
         self.standby_prompt = r'^.*This \(D\)RP Node is not ready or active for login \/configuration.*'
         self.rp_extract_status = r'^\d+\s+(\w+)\s+\-?\d+.*$'
         self.confirm_y_prompt = r"\[confirm( with only 'y' or 'n')?\]\s*\[y/n\].*$"
-        self.commit_retry = r"^.*% Failed to commit .. Another configuration session.*"
-        self.commit_verified = r"^.*[a-zA-Z]+ +[a-zA-Z]+ +[0-9]+ +[\d\:\.]+ +[A-Z]+.*"

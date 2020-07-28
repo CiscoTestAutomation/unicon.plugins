@@ -367,9 +367,7 @@ class TestIosPluginConnectCredentials(unittest.TestCase):
         tb = loader.load(self.testbed)
         r = tb.devices.Router
         r.connect()
-        self.assertEqual(r.spawn.match.match_output, '\r\nRouter#')
-
-
+        self.assertEqual(r.is_connected(), True)
 
 
 if __name__ == "__main__":

@@ -395,6 +395,23 @@ class TestNxosPluginMaintenanceMode(unittest.TestCase):
         dev.disconnect()
 
 
+class TestNxosIncorrectLogin(unittest.TestCase):
+
+    def test_incorrect_login(self):
+        dev = Connection(
+            hostname='switch',
+            start=['mock_device_cli --os nxos --state password4'],
+            os='nxos',
+            credentials={
+                'default': {
+                    'username': 'admin',
+                    'password': 'cisco'
+                }
+            }
+        )
+        dev.connect()
+        dev.disconnect()
+
 
 if __name__ == "__main__":
     unittest.main()

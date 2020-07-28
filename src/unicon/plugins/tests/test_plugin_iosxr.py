@@ -160,17 +160,6 @@ class TestIosXrPlugin(unittest.TestCase):
         self.assertEqual(c.spawn.match.match_output,'end\r\nRP/B0/CB0/CPU0:KLMER02-SU1#')
         c.disconnect()
 
-    def test_configure_commit_retry(self):
-        c = Connection(
-            hostname='Router',
-            start=['mock_device_cli --os iosxr --state enable_commit_retry'],
-            os='iosxr',
-            username='root',
-            tacacs_password='secretpassword'
-        )
-        c.settings.COMMIT_RETRY_SLEEP = 10
-        c.settings.COMMIT_RETRIES = 2
-        c.connect()
 
 class TestIosXRPluginExecute(unittest.TestCase):
     @classmethod
@@ -579,6 +568,23 @@ Sending 5, 100-byte ICMP Echos to 10.0.0.2, timeout is 2 seconds:
 Success rate is 100 percent (5/5), round-trip min/avg/max = 1/1/3 ms
 RP/0/RP0/CPU0:""".\
 splitlines()))
+
+
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
+class TestIosXrPluginConfigureExclusiveService(unittest.TestCase):
+
+    def test_configure_exclusive(self):
+        conn = Connection(hostname='Router',
+                          start=['mock_device_cli --os iosxr --state enable'],
+                          os='iosxr',
+                          enable_password='cisco')
+        conn.connect()
+        out = conn.configure_exclusive('logging console disable')
+        self.assertIn('logging console disable', out)
+        self.assertEqual(conn.state_machine.current_state, 'enable')
+        conn.disconnect()
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -460,6 +460,7 @@ config_lock_retries       int (default 20)            retry times if config mode
 config_lock_retry_sleep   int (default 9 sec)         sleep between config_lock_retries
 image_to_boot             str                         n9k plugin only: boot from specified image if device goes into loader state
 reload_creds              list or str ('default')     Credentials to use if device prompts for user/pw.
+reconnect_sleep           int (default 60 sec)        sleep time interval before reconnect device
 =======================   =======================     ========================================
 
     return :

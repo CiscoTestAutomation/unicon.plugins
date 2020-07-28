@@ -23,6 +23,7 @@ class TestSDWANPlugin(unittest.TestCase):
                             username='admin',
                             tacacs_password='admin')
         c.connect()
+        c.execute('')
         self.assertEqual(c.spawn.match.match_output.split()[-1], 'vedge#')
 
     def test_connect_cisco_exec(self):
@@ -33,6 +34,7 @@ class TestSDWANPlugin(unittest.TestCase):
                             username='admin',
                             tacacs_password='admin')
         c.connect()
+        c.execute('')
         self.assertEqual(c.spawn.match.match_output.split()[-1], 'vedge#')
 
     def test_connect_reboot(self):
@@ -45,6 +47,7 @@ class TestSDWANPlugin(unittest.TestCase):
         c.connect()
         c.settings.RELOAD_WAIT=3
         c.reload()
+        c.execute('')
         self.assertEqual(c.spawn.match.match_output.split()[-1], 'vedge#')
 
     def test_connect_reboot_console(self):
@@ -56,6 +59,7 @@ class TestSDWANPlugin(unittest.TestCase):
                             tacacs_password='admin')
         c.connect()
         c.reload()
+        c.execute('')
         self.assertEqual(c.spawn.match.match_output.split()[-1], 'vedge#')
 
     def test_vshell(self):

@@ -69,3 +69,6 @@ class TestNxosN5kPluginReloadService(unittest.TestCase):
         dev.connect()
         dev.reload(reload_command="reload2", reload_creds='alt')
         dev.disconnect()
+
+if __name__ == "__main__":
+    unittest.main()

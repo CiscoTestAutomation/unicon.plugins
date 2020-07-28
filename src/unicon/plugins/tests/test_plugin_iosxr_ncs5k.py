@@ -78,8 +78,7 @@ class TestIosXrNcs5kPlugin(unittest.TestCase):
         c.connect()
         c.settings.RELOAD_WAIT=2
         c.reload()
-        self.assertEqual(c.spawn.match.match_output,'\r\nRP/0/RP0/CPU0:Router#')
-
+        self.assertEqual(c.spawn.match.match_output,'end\r\nRP/0/RP0/CPU0:Router#')
 
 
 if __name__ == "__main__":

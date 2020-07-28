@@ -57,7 +57,7 @@ class TestIosXrSpitfirePluginDevice(unittest.TestCase):
         tb = loader.load(self.testbed)
         self.r = tb.devices.Router
         self.r.connect()
-        self.assertEqual(self.r.spawn.match.match_output,'\r\nRP/0/RP0/CPU0:Router#')
+        self.assertEqual(self.r.is_connected(),True)
         self.r.disconnect()
 
     @classmethod
@@ -206,7 +206,7 @@ class TestIosXrSpitfireHAConnect(unittest.TestCase):
         self.r.connect(prompt_recovery=True)
 
     def test_connect(self):
-        self.assertEqual(self.r.active.spawn.match.match_output,'\r\nRP/0/RP0/CPU0:Router#')
+        self.assertEqual(self.r.is_connected(),True)
     
     def test_handle(self):
         self.assertEqual(self.r.a.role,"active",)

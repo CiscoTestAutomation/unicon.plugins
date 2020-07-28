@@ -37,7 +37,7 @@ def connect_module_console(state_machine, spawn, context):
     dialog = Dialog([escape_char_stmt])
     dialog += Dialog([Statement(state.pattern, loop_continue=False) for state in sm.states])
     spawn.sendline('connect module %s console' % context.get('_module', 1))
-    sm.go_to('any', spawn, dialog=Dialog([escape_char_stmt]))
+    sm.go_to('any', spawn, timeout=spawn.timeout, dialog=Dialog([escape_char_stmt]))
 
     if sm.current_state != 'module_console':
         sm.go_to('module_console', spawn,

@@ -11,11 +11,10 @@ Description:
 """
 from time import sleep
 
-from unicon.plugins.nxos.service_patterns import HaNxosReloadPatterns
-from unicon.plugins.nxos.service_patterns import ReloadPatterns
 from unicon.eal.dialogs import Statement
+from unicon.plugins.nxos.service_patterns import ReloadPatterns
+from unicon.plugins.nxos.service_patterns import HaNxosReloadPatterns
 
-# from unicon.core.errors import SubCommandFailure
 from unicon.plugins.generic.service_statements import send_response,\
     login_handler, password_handler
 from unicon.plugins.generic.service_statements import save_env,\
@@ -26,7 +25,6 @@ from unicon.plugins.generic.service_statements import save_env,\
 
 from unicon.plugins.utils import (get_current_credential,
     common_cred_username_handler, common_cred_password_handler, )
-
 
 
 def run_level():

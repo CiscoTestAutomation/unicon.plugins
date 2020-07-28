@@ -125,6 +125,19 @@ Has same arguments as generic configure service.
     output = device.admin_configure('no logging console')
 
 
+configure_exclusive
+-------------------
+
+Service to configure device while locking the
+router configuration. The system configuration can be made
+only from the login terminal.
+Has same arguments as generic configure service.
+
+.. code-block:: python
+
+    output = device.configure_exclusive('logging console disable')
+
+
 Sub-Plugins
 -----------
 

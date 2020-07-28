@@ -244,18 +244,24 @@ def bad_password_handler(spawn):
 
 
 def incorrect_login_handler(spawn, context, session):
+    # In nxos device if the first attempt password prompt occur before
+    # username prompt, it will get Login incorrect error.
+    # Reset the cred_iter to try again
+    if 'incorrect_login_attempts' not in session:
+        session.pop('cred_iter', None)
+
     credential = get_current_credential(context=context, session=session)
-    if credential:
+    if credential and 'incorrect_login_attempts' in session:
         # If credentials have been supplied, there are no login retries.
         # The user must supply appropriate credentials to ensure login
-        # does not fail.
+        # does not fail. Skip it for the first attempt
         raise UniconAuthenticationError(
             'Login failure, either wrong username or password')
     else:
         if 'incorrect_login_attempts' not in session:
             session['incorrect_login_attempts'] = 1
 
-        # Let's give a change for unicon to login with right credentials
+        # Let's give a chance for unicon to login with right credentials
         # let's give three attempts
         if session['incorrect_login_attempts'] <=3:
             session['incorrect_login_attempts'] = \

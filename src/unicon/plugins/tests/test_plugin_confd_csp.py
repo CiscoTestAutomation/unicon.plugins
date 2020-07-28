@@ -124,6 +124,7 @@ class TestConfdCspPlugin(unittest.TestCase):
         c.settings.RELOAD_WAIT = 1
         r = c.reload()
         from unicon.utils import Utils
+        c.execute('show version')
         output = Utils().remove_ansi_escape_codes(c.spawn.match.match_output.splitlines()[-1])
         self.assertEqual(output, 'csp-2100#')
 

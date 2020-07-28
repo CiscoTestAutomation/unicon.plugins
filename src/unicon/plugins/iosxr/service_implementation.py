@@ -50,6 +50,15 @@ class Configure(svc.Configure):
                              reply=reply + Dialog(config_commit_stmt_list),
                              timeout=timeout, *args, **kwargs)
 
+
+class ConfigureExclusive(Configure):
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.start_state = 'exclusive'
+        self.end_state = 'enable'
+        self.service_name = 'exclusive'
+
+
 class HaConfigureService(svc.HaConfigureService):
     def call_service(self, command=[], reply=Dialog([]), target='active',
                       timeout=None, *args, **kwargs):

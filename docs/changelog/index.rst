@@ -4,6 +4,7 @@ Plugins Changelog
 .. toctree::
    :maxdepth: 2
 
+   2020/july
    2020/june
    2020/may
    2020/april

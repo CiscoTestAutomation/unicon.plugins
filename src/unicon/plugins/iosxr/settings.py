@@ -35,12 +35,11 @@ class IOSXRSettings(GenericSettings):
         self.STANDBY_EXPECTED_STATE = ['ready', 'NSR-ready']
         self.STANDBY_STATE_INTERVAL = 15
         self.ERROR_PATTERN = [
-            r'^%\s*[Ii]nvalid (command|input)',
-            r'^%\s*[Ii]ncomplete (command|input)',
-            r'^%\s*[Aa]mbiguous (command|input)'
+            r'^%\s*Failed to commit.*',
+            r'^%\s*[Ii]nvalid (command|input).*',
+            r'^%\s*[Ii]ncomplete (command|input).*',
+            r'^%\s*[Aa]mbiguous (command|input).*'
         ]
 
         self.EXECUTE_MATCHED_RETRIES = 1
         self.EXECUTE_MATCHED_RETRY_SLEEP = 0.1
-        self.COMMIT_RETRY_SLEEP = 10
-        self.COMMIT_RETRIES = 1

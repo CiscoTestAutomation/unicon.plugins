@@ -512,7 +512,7 @@ enable_c9k2:
     "execute":
       commands:
         "redundancy force-switchover":
-          response: file|mock_data/iosxe/redundancy_switchover.txt
+          response: file|mock_data/iosxe/c9k_redundancy_switchover.txt
 
 config_c9k2:
   prompt: "Router(conf)#"
@@ -549,7 +549,7 @@ switchover:
   prompt: "Proceed with switchover to standby RP? [confirm]"
   commands:
     "":
-      response: file|mock_data/iosxe/redundancy_switchover.txt
+      response: file|mock_data/iosxe/c9k_redundancy_switchover.txt
       new_state: enable_c9k2
 
 

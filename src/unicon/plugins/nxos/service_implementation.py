@@ -128,6 +128,7 @@ class Reload(GenericReload):
                      config_lock_retries=None,
                      config_lock_retry_sleep=None,
                      reload_creds=None,
+                     reconnect_sleep=60,
                      *args, **kwargs):
         con = self.connection
         timeout = timeout or self.timeout
@@ -176,8 +177,13 @@ class Reload(GenericReload):
                     con.spawn.sendline()
         except Exception as err:
             raise SubCommandFailure("Reload failed : %s" % err)
+
+        con.log.info("Disconnecting")
         con.disconnect()
-        sleep(10)
+
+        con.log.info("Sleeping for %s secs before reconnect" % reconnect_sleep)
+        sleep(reconnect_sleep)
+
         learn_hostname_ori = con.learn_hostname
         # During initialization after reload, hostname may temporarily be "switch".
         # When initialization finishes, hostname will be back to original hostname.

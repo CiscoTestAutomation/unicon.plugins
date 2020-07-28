@@ -136,10 +136,10 @@ class Reload(BaseService):
                     output += con.connect()
                 except:
                     con.log.warning('Connection failed')
-                if con.connected:
+                if con.is_connected:
                     break
 
-            if not con.connected:
+            if not con.is_connected:
                 raise SubCommandFailure('Reload failed - could not reconnect')
 
         self.result = output

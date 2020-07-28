@@ -144,7 +144,7 @@ class TestLinuxPluginConnect(unittest.TestCase):
             l.connect(connection_timeout=20)
         l.destroy()
         l.connect(login_creds=['default'])
-        self.assertEqual(l.spawn.match.match_output, '\r\nroot@agent-lab11-pm:~# ')
+        self.assertEqual(l.is_connected(), True)
         l.disconnect()
 
   def test_connect_for_login_incorrect(self):
@@ -178,7 +178,7 @@ class TestLinuxPluginConnect(unittest.TestCase):
         tb=loader.load(testbed)
         l = tb.devices['lnx-server']
         l.connect(connection_timeout=20)
-        self.assertEqual(l.spawn.match.match_output, '\r\n[user@host ~]$ ')
+        self.assertEqual(l.is_connected(), True)
         l.disconnect()
 
   def test_connect_timeout_error(self):

@@ -6,7 +6,7 @@ class AciPatterns(GenericPatterns):
     def __init__(self):
         super().__init__()
         self.enable_prompt = r'^(.*?)(%N)#'
-        self.config_prompt = r'^(.*?)(%N)\(config\)#'
+        self.config_prompt = r'^(.*?)(%N)\(config.*\)#'
         self.bash_prompt = r'^(.*?)[-\.\w]+@(%N):(~|[-\w]+)>\s*$'
 
 class AciSetupPatterns(object):

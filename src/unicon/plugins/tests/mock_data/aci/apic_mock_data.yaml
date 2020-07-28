@@ -23,6 +23,8 @@ apic_exec:
        leaf        1           3108        LEA-3108-1671             n9000-13.2(2l)       
     "acidiag reboot":
       new_state: apic_restart_confirm
+    "configure":
+      new_state: apic_config
 
 
 apic_hostname_with_escape_codes:
@@ -57,4 +59,18 @@ apic_ssh_password:
   prompt: "admin@2001:dead:beef::1's password:"
   commands:
     "cisco123":
+      new_state: apic_exec
+
+apic_config:
+  prompt: APC(config)#
+  commands: 
+    "tenant test":
+      new_state: apic_config_tenant
+    "end":
+      new_state: apic_exec
+
+apic_config_tenant:
+  prompt: APC(config-tenant)#
+  commands: 
+    "end":
       new_state: apic_exec

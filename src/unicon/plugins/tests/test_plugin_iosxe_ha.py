@@ -89,7 +89,7 @@ class TestIosXEPluginSwitchoverWithStandbyCredentials(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.c = Connection(
-            hostname='switch1',
+            hostname='Router',
             start=['mock_device_cli --os iosxe --state c9k_login3'],
             os='iosxe',
             credentials=dict(

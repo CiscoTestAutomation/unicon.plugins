@@ -24,6 +24,7 @@ class IOSXRSingleRpStateMachine(StateMachine):
     def create(self):
         enable = State('enable', patterns.enable_prompt)
         config = State('config', patterns.config_prompt)
+        exclusive = State('exclusive', patterns.exclusive_prompt)
         run = State('run', patterns.run_prompt)
 
         admin = State('admin', patterns.admin_prompt)
@@ -32,6 +33,7 @@ class IOSXRSingleRpStateMachine(StateMachine):
 
         self.add_state(enable)
         self.add_state(config)
+        self.add_state(exclusive)
         self.add_state(run)
         self.add_state(admin)
         self.add_state(admin_conf)
@@ -44,6 +46,7 @@ class IOSXRSingleRpStateMachine(StateMachine):
             self.handle_failed_config, None, True, False]
            ])
 
+        enable_to_exclusive = Path(enable, exclusive, 'configure exclusive', None)
         enable_to_config = Path(enable, config, 'configure terminal', None)
         enable_to_run = Path(enable, run, 'run', None)
         enable_to_admin = Path(enable, admin, 'admin', None)
@@ -54,9 +57,12 @@ class IOSXRSingleRpStateMachine(StateMachine):
         admin_to_enable = Path(admin, enable, 'exit', None)
         run_to_enable = Path(run, enable, 'exit', None)
         config_to_enable = Path(config, enable, 'end', config_dialog)
+        exclusive_to_enable = Path(exclusive, enable, 'end', config_dialog)
 
         self.add_path(config_to_enable)
         self.add_path(enable_to_config)
+        self.add_path(exclusive_to_enable)
+        self.add_path(enable_to_exclusive)
         self.add_path(enable_to_admin)
         self.add_path(enable_to_run)
         self.add_path(admin_to_enable)

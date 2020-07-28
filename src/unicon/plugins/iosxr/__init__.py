@@ -17,6 +17,7 @@ class IOSXRServiceList(ServiceList):
         super().__init__()
         self.execute = svc.Execute
         self.configure = svc.Configure
+        self.configure_exclusive = svc.ConfigureExclusive
         self.admin_execute = svc.AdminExecute
         self.admin_configure = svc.AdminConfigure
         self.attach_console = svc.AttachModuleConsole

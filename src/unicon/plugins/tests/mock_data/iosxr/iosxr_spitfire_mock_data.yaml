@@ -257,3 +257,4 @@ spitfire_attach_console:
       new_state: spitfire_enable
     "ls": |
         dummy_file dummy_file2
+          
