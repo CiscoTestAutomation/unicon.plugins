@@ -48,7 +48,6 @@ class Command(BaseService):
         super().__init__(connection, context, **kwargs)
         self.timeout_pattern = ['Timeout occurred', ]
         self.result = None
-        self.service_name = 'command'
         self.timeout = connection.settings.EXEC_TIMEOUT
 
     def call_service(self, command,
@@ -139,7 +138,6 @@ class Configure(BaseService):
     """
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
-        self.service_name = 'configure'
         self.timeout = connection.settings.CONFIG_TIMEOUT
 
     def call_service(self, command=[],
@@ -247,7 +245,6 @@ class Execute(GenericServices.Execute):
     """
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
-        self.service_name = 'execute'
 
     def pre_service(self, command, *args, **kwargs):
         super().pre_service(*args, **kwargs)
@@ -296,7 +293,6 @@ class CliStyle(BaseService):
         # Connection object will have all the received details
         super().__init__(connection, context, **kwargs)
         self.__dict__.update(kwargs)
-        self.service_name = 'cli_style'
 
     def call_service(self, style, *args, **kwargs):
         # Get current state of the state machine and determine end state

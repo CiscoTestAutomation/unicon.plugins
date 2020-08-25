@@ -36,10 +36,12 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
     ``iosxe``
     ``iosxe``, ``cat3k``
     ``iosxe``, ``cat3k``, ``ewlc``
+    ``iosxe``, ``cat9k``
     ``iosxe``, ``csr1000v``
     ``iosxe``, ``csr1000v``, ``vewlc``
     ``iosxe``, ``sdwan``
     ``iosxr``
+    ``iosxr``, ``asr9k``
     ``iosxr``, ``iosxrv``
     ``iosxr``, ``iosxrv9k``
     ``iosxr``, ``moonshine``
@@ -147,6 +149,91 @@ Example: HA router
           vty:
             protocol: ssh
             ip: 2.2.2.2
+
+
+Example: Stack router
+------------------
+
+**Stack router has connections peer_1, peer_2, peer_3**
+
+.. code-block:: yaml
+
+    devices:
+      router_hostname:
+        os: iosxe
+        series: cat3k
+        type: iosxe
+        chassis_type: stack            <<< define the chassis_type as 'stack'
+        credentials:
+          default:
+            username: xxx
+            password: yyy
+          enable:
+            password: zzz
+        connections:
+          defaults:
+            class: unicon.Unicon
+            connections: [peer_1, peer_2, peer_3]  <<< define the connections to use
+          peer_1:
+            protocol: telnet
+            ip: 1.1.1.1
+            port: 2001
+            member: 1    <<< peer rp id
+          peer_2:
+            protocol: telnet
+            ip: 1.1.1.1
+            port: 2002
+            member: 2    <<< peer rp id
+          peer_3:
+            protocol: telnet
+            ip: 1.1.1.1
+            port: 2003
+            member: 3    <<< peer rp id
+
+
+Example: Quad Sup router
+------------------
+
+**Quad Sup router has two chassis 1, 2 and 4 connections a, b, c, d**
+
+.. code-block:: yaml
+
+    devices:
+      router_hostname:
+        os: iosxe
+        series: cat9k
+        type: iosxe
+        chassis_type: quad             <<< define the chassis_type as 'quad'
+        credentials:
+          default:
+            username: xxx
+            password: yyy
+          enable:
+            password: zzz
+        connections:
+          defaults:
+            class: unicon.Unicon
+            connections: [a, b, c, d]  <<< define the connections to use
+          a:
+            protocol: telnet
+            ip: 1.1.1.1
+            port: 2001
+            member: 1    <<< chassis id
+          b:
+            protocol: telnet
+            ip: 1.1.1.1
+            port: 2002
+            member: 2    <<< chassis id
+          c:
+            protocol: telnet
+            ip: 1.1.1.1
+            port: 2003
+            member: 1    <<< chassis id
+          d:
+            protocol: telnet
+            ip: 1.1.1.1
+            port: 2004
+            member: 2    <<< chassis id
 
 
 Example: Linux Server

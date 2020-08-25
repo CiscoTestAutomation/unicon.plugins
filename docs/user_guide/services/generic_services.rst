@@ -90,6 +90,24 @@ Default value is False.
     >>> uut.connect()
     >>> uut.settings.STATEMENT_LOG_DEBUG=True
 
+**Environment variables**
+
+If you want to set environment variables for the connection, you can set them
+by adding key-value pairs to the `ENV` dictionary.
+
+.. code-block:: python
+
+    >>> uut.settings.ENV = {'MYENV': 'mystring'}
+
+**Terminal size settings**
+
+To set the terminal size (rows, cols) you can use the `ROWS` and `COLUMNS`
+environment variables. The default terminal size is 24 x 80. Some plugins
+like linux and nxos/aci have their own defaults.
+
+.. code-block:: python
+
+    >>> uut.settings.ENV = {'ROWS': 200, 'COLUMNS': 200}
 
 .. note ::
 
@@ -718,7 +736,7 @@ Argument          Type                        Description
 ===============   =======================     ========================================
 reload_command    str                         reload command to be issued on device.
                                               default reload_command is "reload"
-dialog            Dialog                      additional dialogs/new dialogs which are not handled by default.
+reply             Dialog                      additional dialogs/new dialogs which are not handled by default.
 timeout           int                         timeout value in sec, Default Value is 300 sec
 reload_creds      list or str ('default')     Credentials to use if device prompts for user/pw.
 prompt_recovery   bool (default False)        Enable/Disable prompt recovery feature
@@ -895,11 +913,11 @@ Argument          Type                        Description
 ===============   =======================     ========================================
 command           str                         switchover command to be issued on device.
                                               default command is "redundancy force-switchover"
-dialog            Dialog                      additional dialogs/new dialogs which are not handled by default.
+reply             Dialog                      additional dialogs/new dialogs which are not handled by default.
 timeout           int                         timeout value in sec, Default Value is 500 sec
 sync_standby      boolean                     Flag to decide whether to wait for standby to be UP or Not. default: True
 prompt_recovery   boolean                     Enable/Disable prompt recovery feature. Default is False.
-reload_creds      list or str ('default')     Credentials to use if device prompts for user/pw.
+switchover_creds  list or str ('default')     Credentials to use if device prompts for user/pw.
 ===============   =======================     ========================================
 
  return :
@@ -934,7 +952,7 @@ Argument          Type          Description
 ===============   ==========    ========================================
 command           str           command to be issued on device.
                                 default command is "redundancy reload peer"
-dialog            Dialog        additional dialogs/new dialogs which are not handled by default.
+reply             Dialog        additional dialogs/new dialogs which are not handled by default.
 timeout           int           timeout value in sec, Default Value is 500 sec
 
 ===============   ==========    ========================================
@@ -954,3 +972,236 @@ timeout           int           timeout value in sec, Default Value is 500 sec
       # If command is other than 'redundancy reload peer'
       rtr.reset_standby_rp(command="command which invoke reload on standby-rp",
                            timeout=600)
+
+
+
+Stack RP Services
+================
+
+In addition to the common services, following are applicable only for
+*ha* platforms with *stack* RP.
+
+
+get_rp_state
+------------
+
+Service to get the redundancy state of the device rp. Returns peer rp
+state if peer rp alias is passed as input.
+
+
+==========   ======================    ========================================
+Argument     Type                      Description
+==========   ======================    ========================================
+target       str                       target rp to check rp state. Default value is `active`
+timeout      int (default 60 sec)      timeout in sec for executing commands
+==========   ======================    ========================================
+
+return :
+
+    * Target rp state on Success. Possible states ACTIVE, STANDBY, MEMBER
+
+    * raise SubCommandFailure on failure.
+
+.. code-block:: python
+
+        #Example
+        --------
+
+        rtr.get_rp_state()
+        rtr.get_rp_state(target='standby')
+
+
+switchover
+----------
+
+Service to switchover the stack device.
+
+Refer :ref:`prompt_recovery_label` for details on `prompt_recovery` argument.
+
+
+===============   =======================     ========================================
+Argument          Type                        Description
+===============   =======================     ========================================
+command           str                         switchover command to be issued on device.
+                                              default command is "redundancy force-switchover"
+reply             Dialog                      additional dialogs/new dialogs which are not handled by default.
+timeout           int                         timeout value in sec, Default Value is 600 sec
+prompt_recovery   boolean                     Enable/Disable prompt recovery feature. Default is False.
+===============   =======================     ========================================
+
+ return :
+    * True on Success
+
+    * raise SubCommandFailure on failure.
+
+
+.. code-block:: python
+
+    Example ::
+
+    rtr.switchover()
+
+    # If switchover command is other than 'redundancy force-switchover'
+    rtr.switchover(command="command which invoke switchover",
+                   timeout=700)
+
+    # using prompt_recovery option
+    rtr.switchover(prompt_recovery=True)
+
+
+reload
+------
+
+Service to reload the stack device.
+
+===============   =======================     ========================================
+Argument          Type                        Description
+===============   =======================     ========================================
+reload_command    str                         reload command to be issued on device.
+                                              default reload_command is "redundancy reload shelf"
+reply             Dialog                      additional dialogs/new dialogs which are not handled by default.
+timeout           int                         timeout value in sec, Default Value is 900 sec
+image_to_boot     str                         image to boot from rommon state
+prompt_recovery   bool (default False)        Enable/Disable prompt recovery feature
+return_output     bool (default False)        Return namedtuple with result and reload command output
+===============   =======================     ========================================
+
+    return :
+        * True on Success
+
+        * raise SubCommandFailure on failure.
+
+        * If return_output is True, return a namedtuple with result and reload command output
+
+.. code-block:: python
+
+        #Example
+        --------
+
+        rtr.reload()
+        # If reload command is other than 'redundancy reload shelf'
+        rtr.reload(reload_command="reload location all", timeout=400)
+
+        # using prompt_recovery option
+        rtr.reload(prompt_recovery=True)
+
+        # using return_output
+        result, output = rtr.reload(return_output=True)
+
+
+
+Quad RP Services
+================
+
+In addition to the common services, following are applicable only for
+*ha* platforms with *quad* RP.
+
+
+get_rp_state
+------------
+
+Service to get the redundancy state for the quad rp device. Returns target rp
+state if target is passed as input.
+
+
+==========   ======================    ========================================
+Argument     Type                      Description
+==========   ======================    ========================================
+target       str                       target rp to check rp state. Default value is `active`
+timeout      int (default 60 sec)      timeout in sec for executing commands
+==========   ======================    ========================================
+
+return :
+
+    * Target rp state on Success. Possible states ACTIVE, STANDBY, MEMBER, IN_CHASSIS_STANDBY
+
+    * raise SubCommandFailure on failure.
+
+.. code-block:: python
+
+        #Example
+        --------
+
+        rtr.get_rp_state()
+        rtr.get_rp_state(target='standby')
+
+
+switchover
+----------
+
+Service to switchover the quad rp device.
+
+Refer :ref:`prompt_recovery_label` for details on `prompt_recovery` argument.
+
+
+===============   =======================     ========================================
+Argument          Type                        Description
+===============   =======================     ========================================
+command           str                         switchover command to be issued on device.
+                                              default command is "redundancy force-switchover"
+reply             Dialog                      additional dialogs/new dialogs which are not handled by default.
+timeout           int                         timeout value in sec, Default Value is 600 sec
+sync_standby      boolean                     Flag to decide whether to wait for standby to be UP or Not. default: True
+prompt_recovery   boolean                     Enable/Disable prompt recovery feature. Default is False.
+===============   =======================     ========================================
+
+ return :
+    * True on Success
+
+    * raise SubCommandFailure on failure.
+
+
+.. code-block:: python
+
+    Example ::
+
+    rtr.switchover()
+
+    # If switchover command is other than 'redundancy force-switchover'
+    rtr.switchover(command="command which invoke switchover",
+                   timeout=700)
+
+    # Switchover and not wait for standby to
+    rtr.switchover(sync_standby=False)
+
+    # using prompt_recovery option
+    rtr.switchover(prompt_recovery=True)
+
+
+reload
+------
+
+Service to reload the quad rp device.
+
+===============   =======================     ========================================
+Argument          Type                        Description
+===============   =======================     ========================================
+reload_command    str                         reload command to be issued on device.
+                                              default reload_command is "reload"
+reply             Dialog                      additional dialogs/new dialogs which are not handled by default.
+timeout           int                         timeout value in sec, Default Value is 900 sec
+prompt_recovery   bool (default False)        Enable/Disable prompt recovery feature
+return_output     bool (default False)        Return namedtuple with result and reload command output
+===============   =======================     ========================================
+
+    return :
+        * True on Success
+
+        * raise SubCommandFailure on failure.
+
+        * If return_output is True, return a namedtuple with result and reload command output
+
+.. code-block:: python
+
+        #Example
+        --------
+
+        rtr.reload()
+        # If reload command is other than 'reload'
+        rtr.reload(reload_command="reload location all", timeout=600)
+
+        # using prompt_recovery option
+        rtr.reload(prompt_recovery=True)
+
+        # using return_output
+        result, output = rtr.reload(return_output=True)

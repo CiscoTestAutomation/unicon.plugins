@@ -17,6 +17,8 @@ class AireosDualRpConnectionProvider(GenericDualRpConnectionProvider):
         # The following stages invoke execute and configure services on the
         # device, which require a connection.
         self.connection._is_connected = True
+        for subconnection in con.subconnections:
+            subconnection._is_connected = True
 
         # Maintain initial state
         if not con.mit:
@@ -36,6 +38,7 @@ class AireosDualRpConnectionProvider(GenericDualRpConnectionProvider):
         """ Identifies the Role of each handle and designates if it is active or
             standby and bring the active RP to enable state """
         con = self.connection
+
         if con.a.state_machine.current_state == 'standby':
             target_rp = 'b'
             other_rp = 'a'
@@ -48,8 +51,10 @@ class AireosDualRpConnectionProvider(GenericDualRpConnectionProvider):
             other_rp = 'b'
         target_handle = getattr(con, target_rp)
         other_handle = getattr(con, other_rp)
-        target_handle.role = 'active'
-        other_handle.role = 'standby'
+
+        con._set_active_alias(target_rp)
+        con._set_standby_alias(other_rp)
+
         target_handle.state_machine.go_to('enable',
                                           target_handle.spawn,
                                           context=con.context,

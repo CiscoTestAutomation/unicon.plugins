@@ -100,3 +100,21 @@ config3:
     "exit":
       new_state: exec3
 
+# ===============================
+exec4:
+  prompt: "root@junos_dev>"
+  commands:
+    "configure":
+      new_state: config4
+
+config4:
+  prompt: "root@junos_dev#"
+  commands:
+    "commit": |
+        [edit interfaces ge-0/0/0]
+
+          Users currently editing the configuration:
+
+        [edit]
+    "exit":
+      new_state: exec4

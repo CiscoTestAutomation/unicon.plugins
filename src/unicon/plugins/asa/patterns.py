@@ -10,3 +10,4 @@ class ASAPatterns(UniconCorePatterns):
         self.enable_password = r'^.*Password:\s?$'
         self.bad_passwords = r'^Permission denied, please try again.$'
         self.disconnect_message = r'^Connection to .+? closed by remote host$'
+        self.reload_confirm = r'^(.*?)Proceed with reload\? \[confirm\]'

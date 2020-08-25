@@ -55,3 +55,5 @@ class GenericPatterns(UniconCorePatterns):
         self.kerberos_no_realm = r'^(.*)Kerberos: No default realm defined for Kerberos!'
 
         self.passphrase_prompt = r'^.*Enter passphrase for key .*?:\s*?'
+
+        self.learn_os_prompt = r'^(.*?([>\$~%]|[^#\s]#|~ #|~/|^admin:|^#)\s?(\x1b\S+)?)$|(^.*This \(D\)RP Node is not ready or active for login \/configuration.*)'

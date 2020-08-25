@@ -19,10 +19,7 @@ class LinuxSettings(GenericSettings):
         """ initialize
         """
         super().__init__()
-        self.LINUX_INIT_EXEC_COMMANDS = [
-            'stty cols 200',
-            'stty rows 200'
-        ]
+        self.LINUX_INIT_EXEC_COMMANDS = []
 
         ## Prompt recovery commands for Linux
         # Default commands: Enter key , Ctrl-C, Enter Key
@@ -36,11 +33,14 @@ class LinuxSettings(GenericSettings):
         # Environment settings to set before starting connection command
         self.ENV = {
             'TERM': 'vt100',
-            'LC_ALL': 'C'  # Setting LC_ALL to C avoids 'LC_ALL: cannot change locale' errors
+            'LC_ALL': 'C',  # Setting LC_ALL to C avoids 'LC_ALL: cannot change locale' errors
+            # ROWS and COLUMNS will be used to set the terminal size
+            'ROWS': 200,
+            'COLUMNS': 200
         }
 
         # Default error pattern
-        self.ERROR_PATTERN=[
+        self.ERROR_PATTERN = [
             r'^.*?No such file or directory\s*$'
         ]
 

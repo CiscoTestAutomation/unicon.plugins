@@ -156,7 +156,6 @@ class Ping(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'shell'
         self.end_state = 'shell'
-        self.service_name = 'ping'
         self.timeout = 60
         # Ping error Patterns
         self.default_error_pattern = ['[123456789]+0*% packet loss']

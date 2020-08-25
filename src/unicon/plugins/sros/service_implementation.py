@@ -52,7 +52,6 @@ class SrosMdcliExecute(SrosServiceMixin, Execute):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'mdcli'
         self.end_state = 'mdcli'
-        self.service_name = 'mdcli_execute'
 
 
 class SrosMdcliConfigure(SrosServiceMixin, Configure):
@@ -61,7 +60,6 @@ class SrosMdcliConfigure(SrosServiceMixin, Configure):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'mdcli'
         self.end_state = 'mdcli'
-        self.service_name = 'mdcli_config'
         self.commit_cmd = 'commit'
         self.mode = connection.settings.MDCLI_CONFIGURE_DEFAULT_MODE
 
@@ -81,7 +79,6 @@ class SrosClassiccliExecute(SrosServiceMixin, Execute):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'classiccli'
         self.end_state = 'classiccli'
-        self.service_name = 'classiccli_execute'
 
 
 class SrosClassiccliConfigure(SrosServiceMixin, Configure):
@@ -90,7 +87,6 @@ class SrosClassiccliConfigure(SrosServiceMixin, Configure):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'classiccli'
         self.end_state = 'classiccli'
-        self.service_name = 'classiccli_config'
         self.commit_cmd = ''
 
 
@@ -98,7 +94,6 @@ class SrosExecute(BaseService):
 
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
-        self.service_name = 'execute'
         self.execute_map = {'classiccli': 'classiccli_execute',
                             'mdcli': 'mdcli_execute'}
 
@@ -119,7 +114,6 @@ class SrosConfigure(BaseService):
 
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
-        self.service_name = 'config'
         self.configure_map = {'classiccli': 'classiccli_configure',
                               'mdcli': 'mdcli_configure'}
 
@@ -140,7 +134,6 @@ class SrosSwitchCliEngine(BaseService):
 
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
-        self.service_name = 'switch_cli_engine'
 
     def pre_service(self, *args, **kwargs):
         pass
@@ -166,7 +159,6 @@ class SrosGetCliEngine(BaseService):
 
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
-        self.service_name = 'get_cli_engine'
 
     def pre_service(self, *args, **kwargs):
         pass

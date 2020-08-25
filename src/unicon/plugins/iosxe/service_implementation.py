@@ -143,33 +143,20 @@ class BashService(BashService):
     class ContextMgr(BashService.ContextMgr):
         def __init__(self, connection,
                            enable_bash = False,
-                           target='active',
                            timeout = None):
             super().__init__(connection=connection,
                              enable_bash=enable_bash,
-                             target = target,
                              timeout=timeout)
 
         def __enter__(self):
             self.conn.log.debug('+++ attaching bash shell +++')
             # enter shell prompt
-
-            if self.conn.is_ha:
-                conn = self.conn
-                if self.target == 'standby':
-                    conn.state_machine = self.conn.standby.state_machine
-                    conn.spawn = self.conn.standby.spawn
-                elif self.target == 'active':
-                    conn.state_machine = self.conn.active.state_machine
-                    conn.spawn = self.conn.active.spawn
-            else:
-                conn = self.conn
-
-            conn.state_machine.go_to('shell', conn.spawn,
+            self.conn.state_machine.go_to('shell', self.conn.spawn,
                                      timeout = self.timeout)
 
-            for cmd in conn.settings.BASH_INIT_COMMANDS:
-                conn.execute(cmd, timeout = self.timeout, target=self.target)
+            for cmd in self.conn.settings.BASH_INIT_COMMANDS:
+                self.conn.execute(
+                    cmd, timeout = self.timeout)
 
             return self
 

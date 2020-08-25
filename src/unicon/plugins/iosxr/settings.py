@@ -30,6 +30,8 @@ class IOSXRSettings(GenericSettings):
 
         self.RELOAD_TIMEOUT = 400
         self.RELOAD_WAIT = 60
+        # number of retries to reconnect after reloading
+        self.RELOAD_RECONNECT_ATTEMPTS = 3
 
         self.STANDBY_STATE_REGEX = r'Backup node .* is (.*)'
         self.STANDBY_EXPECTED_STATE = ['ready', 'NSR-ready']

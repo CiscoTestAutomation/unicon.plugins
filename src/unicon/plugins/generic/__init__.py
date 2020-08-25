@@ -59,6 +59,7 @@ class ServiceList:
         self.copy = svc.Copy
         self.log_user = svc.LogUser
         self.log_file = svc.LogFile
+        self.expect_log = svc.ExpectLogging
 
 
 class HAServiceList(ServiceList):

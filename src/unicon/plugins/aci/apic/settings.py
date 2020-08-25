@@ -17,5 +17,8 @@ class AciSettings(GenericSettings):
             'terminal width 0'
             ]
         self.HA_INIT_CONFIG_COMMANDS = []
+        self.ERROR_PATTERN = [
+            r'^(%\s*)?Error',
+        ]
 
         self.POST_RELOAD_WAIT = 180

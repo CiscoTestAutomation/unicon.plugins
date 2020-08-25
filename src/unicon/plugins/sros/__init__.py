@@ -24,6 +24,7 @@ class SrosServiceList(object):
         self.configure = sros_svc.SrosConfigure
         self.switch_cli_engine = sros_svc.SrosSwitchCliEngine
         self.get_cli_engine = sros_svc.SrosGetCliEngine
+        self.expect_log = svc.ExpectLogging
 
 
 class SrosSingleRpConnection(BaseSingleRpConnection):

@@ -55,6 +55,7 @@ def escape_char_handler(spawn):
 
     spawn.sendline()
 
+
 login_password = Statement(pattern=patterns.line_password,
                            action=line_password_handler,
                            args=None,
@@ -97,3 +98,9 @@ disconnect_error_stmt = Statement(pattern=patterns.disconnect_message,
                                   'err': 'received disconnect from router'},
                                   loop_continue=False,
                                   continue_timer=False)
+
+reload_confirm_stmt = Statement(pattern=patterns.reload_confirm,
+                                action='sendline(y)',
+                                args=None,
+                                loop_continue=True,
+                                continue_timer=False)

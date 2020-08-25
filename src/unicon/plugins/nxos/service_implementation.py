@@ -17,7 +17,7 @@ import warnings
 from time import sleep
 
 from unicon.bases.routers.services import BaseService
-from unicon.plugins.generic.service_implementation import BashService
+from unicon.plugins.generic.service_implementation import BashService as GenericBashService
 from unicon.core.errors import (SubCommandFailure, TimeoutError,
     UniconAuthenticationError, )
 
@@ -115,7 +115,6 @@ class Reload(GenericReload):
         self.start_state = 'enable'
         self.end_state = 'enable'
         self.dialog = Dialog(nxos_reload_statement_list)
-        self.service_name = 'reload'
         self.timeout = connection.settings.RELOAD_TIMEOUT
         self.command = 'reload'
         self.__dict__.update(kwargs)
@@ -216,7 +215,6 @@ class Ping6(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'enable'
         self.end_state = 'enable'
-        self.service_name = 'ping6'
         self.timeout = 60
         self.dialog = Dialog(ping6_statement_list)
         self.result = None
@@ -240,10 +238,7 @@ class Ping6(BaseService):
         self.__dict__.update(kwargs)
 
     def call_service(self, *args, **kwargs):
-        if self.connection.is_ha:
-            con = self.connection.active
-        else:
-            con = self.connection
+        con = self.get_handle()
 
         # Ping Options
         ping_options = ['multicast', 'transport', 'mask', 'vcid', 'tunnel',
@@ -432,7 +427,6 @@ class HANxosReloadService(GenericHAReload):
         self.start_state = 'enable'
         self.end_state = 'enable'
         self.result = None
-        self.service_name = 'reload'
         self.timeout = connection.settings.HA_RELOAD_TIMEOUT
         self.dialog = Dialog(ha_nxos_reload_statement_list)
         self.command = 'reload'
@@ -469,16 +463,20 @@ class HANxosReloadService(GenericHAReload):
             handle=con.active, service_dialog=self.dialog)
         standby_dialog = dialog + self.service_dialog(
             handle=con.standby, service_dialog=self.dialog)
+
+        if reload_creds:
+            context = con.active.context.copy()
+            context.update(cred_list=reload_creds)
+            sby_context = con.standby.context.copy()
+            sby_context.update(cred_list=reload_creds)
+        else:
+            context = con.active.context
+            sby_context = con.standby.context
+
         state_machine.go_to('enable',
                             con.active.spawn,
                             prompt_recovery=self.prompt_recovery,
                             context=self.context)
-
-        if reload_creds:
-            context = self.context.copy()
-            context.update(cred_list=reload_creds)
-        else:
-            context = self.context
 
         # Issue reload command
         con.active.spawn.sendline(reload_command)
@@ -491,7 +489,7 @@ class HANxosReloadService(GenericHAReload):
             )
             reload_op_standby=standby_dialog.process(
                 con.standby.spawn,
-                context=self.context,
+                context=sby_context,
                 prompt_recovery=self.prompt_recovery,
                 timeout=timeout
             )
@@ -503,11 +501,11 @@ class HANxosReloadService(GenericHAReload):
                 counter = counter + 1
                 try:
                     state_machine.go_to('any',
-                                        con.active.spawn,
-                                        context=self.context,
-                                        timeout=100,
-                                        prompt_recovery=self.prompt_recovery,
-                                        dialog=con.connection_provider.get_connection_dialog())
+                        con.active.spawn,
+                        context=context,
+                        timeout=100,
+                        prompt_recovery=self.prompt_recovery,
+                        dialog=con.connection_provider.get_connection_dialog())
                     break
                 except Exception as err:
                     if counter >= 3:
@@ -523,11 +521,11 @@ class HANxosReloadService(GenericHAReload):
                 stdby_counter = stdby_counter + 1
                 try:
                     state_machine.go_to('any',
-                                        con.standby.spawn,
-                                        context=self.context,
-                                        timeout=100,
-                                        prompt_recovery=self.prompt_recovery,
-                                        dialog=con.connection_provider.get_connection_dialog())
+                        con.standby.spawn,
+                        context=sby_context,
+                        timeout=100,
+                        prompt_recovery=self.prompt_recovery,
+                        dialog=con.connection_provider.get_connection_dialog())
                     break
                 except Exception as err:
                     if stdby_counter >= 3:
@@ -536,12 +534,18 @@ class HANxosReloadService(GenericHAReload):
         except Exception as err:
             raise SubCommandFailure("Reload failed : %s" % err)
 
+        # Re-designate handles before applying config.
+        self.connection.connection_provider.designate_handles()
+
+        state_machine.go_to('enable',
+                            con.active.spawn,
+                            prompt_recovery=self.prompt_recovery,
+                            context=context)
+
         # Issue init commands to disable console logging
         exec_commands = self.connection.settings.HA_INIT_EXEC_COMMANDS
         for command in exec_commands:
             con.execute(command)
-        # Re-designate handlers before applying config.
-        self.connection.connection_provider.designate_handles()
         config_commands = self.connection.settings.HA_INIT_CONFIG_COMMANDS
         try:
             con.configure(config_commands,
@@ -616,7 +620,6 @@ class NxosSwitchoverService(GenericSwitchover):
         self.start_state = 'enable'
         self.end_state = 'enable'
         self.result = None
-        self.service_name = 'switchover'
         self.timeout = connection.settings.SWITCHOVER_TIMEOUT
         self.dialog = Dialog(switchover_statement_list)
         self.command = 'system switchover'
@@ -643,11 +646,13 @@ class NxosSwitchoverService(GenericSwitchover):
             raise SubCommandFailure(
                 "Switchover can't be issued in %s state" % rp_state)
 
+        # Use the standby credentials when processing because any
+        # authentication request is expected to come from the new active.
         if switchover_creds:
-            context = self.context.copy()
+            context = con.standby.context.copy()
             context.update(cred_list=switchover_creds)
         else:
-            context = self.context
+            context = con.standby.context
 
         # Save current active and standby handle details
         standby_start_cmd = con.standby.start
@@ -773,7 +778,6 @@ class ResetStandbyRP(BaseService):
         self.start_state = 'enable'
         self.end_state = 'enable'
         self.result = None
-        self.service_name = 'reset_standby_rp'
         self.timeout = connection.settings.HA_RELOAD_TIMEOUT
         self.dialog = Dialog(standby_reset_rp_statement_list)
         self.command = 'system standby manual-boot'
@@ -818,7 +822,6 @@ class ShellExec(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'shell'
         self.end_state = 'enable'
-        self.service_name = 'shellexec'
         self.timeout = connection.settings.EXEC_TIMEOUT
         self.result = None
         self.__dict__.update(kwargs)
@@ -835,7 +838,7 @@ class ShellExec(BaseService):
                                     con.spawn,
                                     context=self.context)
         except Exception as err:
-            raise SubCommandFailure("Failed to Bring device to shell State",
+            raise SubCommandFailure("Failed to bring device to shell State",
                                     err)
         # if commands is a list
         if isinstance(command, collections.abc.Sequence):
@@ -928,7 +931,6 @@ class HAShellExec(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'shell'
         self.end_state = 'enable'
-        self.service_name = 'shellexec'
         self.timeout = connection.settings.EXEC_TIMEOUT
         self.result = None
         # add the keyword arguments to the object
@@ -944,28 +946,16 @@ class HAShellExec(BaseService):
         timeout = timeout or self.timeout
         self.command_list_is_empty = False
 
-        if target == 'standby':
-            spawn = con.standby.spawn
-            handle = con.standby
-            state_machine = con.standby.state_machine
-            try:
-                state_machine.go_to(self.start_state,
-                                    spawn,
-                                    context=self.context)
-            except Exception as err:
-                raise SubCommandFailure("Failed to Bring device to Shell State",
-                                        err)
-        else:
-            spawn = con.active.spawn
-            handle = con.active
-            state_machine = con.active.state_machine
-            try:
-                state_machine.go_to(self.start_state,
-                                    spawn,
-                                    context=self.context)
-            except Exception as err:
-                raise SubCommandFailure("Failed to Bring device to shell State",
-                                        err)
+        spawn = self.get_spawn(target)
+        handle = self.get_handle(target)
+        state_machine = self.get_sm(target)
+        try:
+            state_machine.go_to(self.start_state,
+                                spawn,
+                                context=self.context)
+        except Exception as err:
+            raise SubCommandFailure("Failed to Bring device to Shell State",
+                                    err)
 
         # if commands is a list
         if isinstance(command, collections.abc.Sequence):
@@ -1031,7 +1021,6 @@ class ListVdc(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'enable'
         self.end_state = 'enable'
-        service_name = 'list_vdc'
 
     def call_service(self, timeout=10, command="show vdc"):
         initial_vdc = self.connection.current_vdc
@@ -1073,7 +1062,6 @@ class SwitchVdc(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'enable'
         self.end_state = 'enable'
-        self.service_name = 'switchto vdc'
 
     def call_service(self, vdc_name,
                      timeout=20,
@@ -1171,7 +1159,6 @@ class SwitchbackVdc(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'enable'
         self.end_state = 'enable'
-        self.service_name = 'switchback'
 
     def call_service(self, timeout=10, command="switchback", dialog=Dialog()):
         # this service should be called only if we are on the VDC
@@ -1193,7 +1180,6 @@ class CreateVdc(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'enable'
         self.end_state = 'enable'
-        self.service_name = "create vdc"
 
     def call_service(self, vdc_name, command="vdc", dialog=Dialog(),
                      timeout=120):
@@ -1223,7 +1209,6 @@ class DeleteVdc(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = "enable"
         self.end_state = "enable"
-        self.service_name = "delete vdc"
 
     def call_service(self, vdc_name, command="no vdc", dialog=Dialog(),
                      timeout=90):
@@ -1271,7 +1256,6 @@ class AttachModuleConsole(BaseService):
 
         self.start_state = "enable"
         self.end_state = "enable"
-        self.service_name = "attach_console_module"
 
     def call_service(self, module_num, **kwargs):
         self.result = self.__class__.ContextMgr(connection = self.connection,
@@ -1381,37 +1365,30 @@ class AttachModuleConsole(BaseService):
                                  % (self.__class__.__name__, attr))
 
 
-class BashService(BashService):
+class BashService(GenericBashService):
 
-    class ContextMgr(BashService.ContextMgr):
+    class ContextMgr(GenericBashService.ContextMgr):
         def __init__(self, connection, 
                            enable_bash = False,
-                           target='active',
                            timeout = None):
             # overwrite the prompt
             super().__init__(connection=connection,
                              enable_bash=enable_bash,
-                             target=target,
                              timeout=timeout)
 
         def __enter__(self):
             self.conn.log.debug('+++ attaching bash shell +++')
-
             # overwrite the command to go into the shell
             if self.enable_bash:
                 # enable bash feature
-                self.conn.configure('feature bash', timeout = self.timeout)
+                if self.conn.parent:
+                    self.conn.parent.active.configure(
+                        'feature bash', timeout=self.timeout)
+                else:
+                    self.conn.configure('feature bash', timeout=self.timeout)
 
-            if self.conn.is_ha:
-                if self.target == 'standby':
-                    conn = self.conn.standby
-                elif self.target == 'active':
-                    conn = self.conn.active
-            else:
-                conn = self.conn
-
-            sm = conn.state_machine
-            sm.go_to('shell', conn.spawn)
+            sm = self.conn.state_machine
+            sm.go_to('shell', self.conn.spawn)
 
             return self
 
@@ -1443,7 +1420,6 @@ class GuestshellService(BaseService):
         super().__init__(*args, **kwargs)
         self.start_state = "enable"
         self.end_state = "enable"
-        self.service_name = "guestshell"
 
     def call_service(self, **kwargs):
         self.result = self.__class__.ContextMgr(connection=self.connection,

@@ -29,3 +29,4 @@ class IOSXRPatterns(GenericPatterns):
         self.standby_prompt = r'^.*This \(D\)RP Node is not ready or active for login \/configuration.*'
         self.rp_extract_status = r'^\d+\s+(\w+)\s+\-?\d+.*$'
         self.confirm_y_prompt = r"\[confirm( with only 'y' or 'n')?\]\s*\[y/n\].*$"
+        self.reload_module_prompt = r"^(.*)?Reload hardware module ? \[no,yes\].*$"

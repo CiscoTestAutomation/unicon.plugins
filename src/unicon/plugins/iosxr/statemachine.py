@@ -91,5 +91,3 @@ class IOSXRDualRpStateMachine(IOSXRSingleRpStateMachine):
 
         standby_locked = State('standby_locked', patterns.standby_prompt)
         self.add_state(standby_locked)
-
-

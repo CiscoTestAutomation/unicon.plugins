@@ -32,6 +32,7 @@ class IOSXRHAServiceList(HAServiceList):
     def __init__(self):
         super().__init__()
         self.execute = svc.HAExecute
+        self.reload = svc.HaReload
         self.configure= svc.HaConfigureService
         self.admin_execute = svc.HaAdminExecute
         self.admin_configure = svc.HaAdminConfigure

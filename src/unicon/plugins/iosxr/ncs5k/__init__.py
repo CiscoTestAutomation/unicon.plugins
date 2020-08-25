@@ -13,8 +13,6 @@ from . import service_implementation as ncs_svc
 from .settings import NCS5KSettings
 
 
-
-
 class Ncs5kServiceList(IOSXRServiceList):
     def __init__(self):
         super().__init__()
@@ -24,8 +22,7 @@ class Ncs5kHAServiceList(IOSXRHAServiceList):
     """ Generic dual rp services. """
     def __init__(self):
         super().__init__()
-        self.reload = ncs_svc.Reload
-
+        self.reload = ncs_svc.HAReload
 
 
 class Ncs5kSingleRpConnection(IOSXRSingleRpConnection):

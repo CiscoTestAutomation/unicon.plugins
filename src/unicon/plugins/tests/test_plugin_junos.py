@@ -105,6 +105,19 @@ class TestJunosPluginConfigure(unittest.TestCase):
         c.connect()
         with self.assertRaises(SubCommandFailure):
             c.configure('commit')
+    
+    def test_configure_commit_on_failure_1(self):
+        c = Connection(hostname='junos_dev',
+                        start=['mock_device_cli --os junos --state exec4'],
+                        os='junos',
+                        username='root',
+                        tacacs_password='lab',
+                        init_exec_commands=[],
+                        init_config_commands=[]
+                        )
+        c.connect()
+        with self.assertRaises(SubCommandFailure):
+            c.configure('commit')
 
 
 class TestJunosPluginBashService(unittest.TestCase):

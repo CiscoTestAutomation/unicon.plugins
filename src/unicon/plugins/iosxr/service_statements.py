@@ -1,6 +1,7 @@
 #Unicon
 from unicon.eal.dialogs import Statement
-from .service_patterns import IOSXRSwitchoverPatterns
+from .service_patterns import (IOSXRSwitchoverPatterns,
+                               IOSXRReloadPatterns)
 from unicon.plugins.iosxr.patterns import IOSXRPatterns
 
 
@@ -38,6 +39,14 @@ confirm_y_prompt_stmt = Statement(pattern=pat.confirm_y_prompt,
                                   loop_continue=True,
                                   continue_timer=False)
 
+pat = IOSXRReloadPatterns()
+confirm_module_reload_stmt = Statement(pattern=pat.reload_module_prompt,
+                                       action='sendline(yes)',
+                                       args=None,
+                                       loop_continue=True,
+                                       continue_timer=False)
+
+
 switchover_statement_list = [prompt_switchover_stmt,
                              rp_in_standby_stmt # loop_continue = False
                              ]
@@ -48,4 +57,6 @@ config_commit_stmt_list = [commit_changes_stmt,
 
 execution_statement_list = [commit_replace_stmt,
                             confirm_y_prompt_stmt]
+
+reload_statement_list = [confirm_module_reload_stmt]
 

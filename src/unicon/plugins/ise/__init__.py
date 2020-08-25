@@ -96,6 +96,7 @@ class IseServiceList:
         self.log_user = svc.LogUser
         self.execute = ise_svc.Execute
         self.configure = ise_svc.Configure
+        self.expect_log = svc.ExpectLogging
 
 
 class IseConnection(BaseLinuxConnection):

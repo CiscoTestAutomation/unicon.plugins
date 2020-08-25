@@ -61,7 +61,6 @@ class Reload(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'enable'
         self.end_state = 'enable'
-        self.service_name = 'reload'
         self.timeout = connection.settings.RELOAD_TIMEOUT
         self.dialog = Dialog(reload_statement_list)
         self.__dict__.update(kwargs)

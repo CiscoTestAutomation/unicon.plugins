@@ -22,7 +22,10 @@ class TestIosIolPluginHASwitchover(unittest.TestCase):
             tacacs_password='cisco',
             enable_password='cisco',
         )
-        cls.d_ha.connect()
+        try:
+            cls.d_ha.connect()
+        except Exception:
+            cls.ha.stop()
 
     @classmethod
     @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)

@@ -532,7 +532,7 @@ login_ssh_delay:
     response: |
       Last login: Tue Dec 11 16:01:04 2018 from localhost
     timing:
-      - 0:,4
+      - 0:,10
   prompt: "[user@host ~]$ "
   commands: *cmds
 

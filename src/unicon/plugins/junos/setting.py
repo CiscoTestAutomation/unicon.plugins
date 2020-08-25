@@ -31,7 +31,8 @@ class JunosSettings(GenericSettings):
         self.ERROR_PATTERN=[]
         self.CONFIGURE_ERROR_PATTERN = [
             r'.*error: +problem +checking +file:.*',
-            r'.*error: +configuration +check-out +failed.*'
+            r'.*error: +configuration +check-out +failed.*',
+            r'.*Users +currently +editing +the +configuration:.*',
         ]
 
         # Maximum number of retries for password handler

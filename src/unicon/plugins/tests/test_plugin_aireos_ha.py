@@ -49,3 +49,7 @@ class TestAireosPluginHAConnect(unittest.TestCase):
 
     def test_save_config(self):
         self.wlc.execute('save config')
+
+if __name__ == "__main__":
+    unittest.main()
+    

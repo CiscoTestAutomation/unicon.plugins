@@ -294,6 +294,15 @@ enable:
       0/0/1           A9K-MPA-20X1GE            OK               PWR,NSHUT,MON
       0/7/CPU0        A9K-40GE-B                IOS XR RUN       PWR,NSHUT,MON
 
+    "show terminal": |
+      Thu Jul 30 14:04:58.767 UTC
+      Line "con0_RSP1_CPU0", Location "0/RSP1/CPU0", Type "Console"
+      Length: 0 lines, Width: 0 columns
+      Baud rate (TX/RX) is 9600, "No" Parity, 2 stopbits, 8 databits
+      Template: console
+      Capabilities: Timestamp Enabled
+      Allowed transports are none.
+
     "ping":
       new_state: ping_proto
 
@@ -313,6 +322,8 @@ enable:
         % Invalid i"
     "reload":
       new_state: reload_confirm_prompt
+    "admin hw-module location all reload":
+      new_state: reload_hardware_confirm_prompt
     "copy  harddisk: tftp:":
       new_state: copy_harddisk_wildcard_tftp
 

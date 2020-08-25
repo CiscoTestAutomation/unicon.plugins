@@ -124,6 +124,108 @@ class GenericSettings(Settings):
                               'bad context', 'Failed to resolve',
                               '(U|u)nknown (H|h)ost']
 
+        self.LEARN_OS_COMMANDS = [
+            'show version',
+            'uname',
+        ]
+
+        self.OS_MAPPING = {
+            'nxos': {
+                'os': ['Nexus Operating System'],
+                'series': {
+                    'aci': ['aci'],
+                    'mds': ['mds'],
+                    'n5k': ['n5k'],
+                    'n9k': ['n9k'],
+                    'nxosv': ['nxosv'],
+                },
+            },
+            'iosxe': {
+                'os': ['IOS( |-)XE Software'],
+                'series': {
+                    'cat3k': ['cat3k'],
+                    'cat9k': ['cat9k'],
+                    'csr1000v': ['csr1000v'],
+                    'sdwan': ['sdwan'],
+                    'nxosv': ['nxosv'],
+                },
+            },
+            'iosxr': {
+                'os': ['IOS XR Software'],
+                'series': {
+                    'asr9k': ['asr9k'],
+                    'iosxrv': ['iosxrv'],
+                    'iosxrv9k': ['iosxrv9k'],
+                    'moonshine': ['moonshine'],
+                    'ncs5k': ['ncs5k'],
+                    'spitfire': ['spitfire'],
+                },
+            },
+            'ios': {
+                'os': ['IOS Software'],
+                'series': {
+                    'ap': ['TBD'],
+                    'iol': ['TBD'],
+                    'iosv': ['TBD'],
+                    'pagent': ['TBD'],
+                },
+            },
+            'junos': {
+                'os': ['JUNOS Software'],
+                'series': {
+                    'vsrx': ['vsrx'],
+                },
+            },
+            'linux': {
+                'os': ['Linux'],
+            },
+            'aireos': {
+                'os': ['aireos'],
+            },
+            'cheetah': {
+                'os': ['cheetah'],
+            },
+            'ise': {
+                'os': ['ise'],
+            },
+            'asa': {
+                'os': ['asa'],
+            },
+            'nso': {
+                'os': ['nso'],
+            },
+            'confd': {
+                'os': ['confd'],
+            },
+            'vos': {
+                'os': ['vos'],
+            },
+            'cimc': {
+                'os': ['cimc'],
+            },
+            'fxos': {
+                'os': ['fxos'],
+            },
+            'staros': {
+                'os': ['staros'],
+            },
+            'aci': {
+                'os': ['aci'],
+            },
+            'sdwan': {
+                'os': ['sdwan'],
+            },
+            'sros': {
+                'os': ['sros'],
+            },
+            'apic': {
+                'os': ['apic'],
+            },
+            'windows': {
+                'os': ['windows'],
+            },
+        }
+
 #TODO
 #take addtional dialogs for all service
 #move all commands to settings

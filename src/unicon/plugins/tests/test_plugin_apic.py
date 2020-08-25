@@ -79,6 +79,16 @@ class TestAciApicPlugin(unittest.TestCase):
         c.connect()
         c.configure('tenant test')
 
+    def test_execute_error_pattern(self):
+        c = Connection(hostname='APC',
+                            start=['mock_device_cli --os apic --state apic_connect'],
+                            os='apic',
+                            username='cisco',
+                            tacacs_password='cisco')
+        c.connect()
+        for cmd in ['invalid command']:
+            with self.assertRaises(SubCommandFailure) as err:
+                r = c.execute(cmd)
 
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
 @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)

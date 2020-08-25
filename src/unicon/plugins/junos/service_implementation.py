@@ -34,12 +34,6 @@ class BashService(BashService):
         def __enter__(self):
             self.conn.log.debug('+++ attaching bash shell +++')
 
-            # please enable this part of code when Junos HA comes to life
-            # if self.conn.is_ha:
-            #     conn = self.conn.active
-            # else:
-            #     conn = self.conn
-
             sm = self.conn.state_machine
             sm.go_to('shell', self.conn.spawn)
 

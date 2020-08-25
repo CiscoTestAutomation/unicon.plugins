@@ -50,7 +50,6 @@ class Command(BaseService):
         super().__init__(connection, context, **kwargs)
         self.timeout_pattern = ['Timeout occurred', ]
         self.result = None
-        self.service_name = 'command'
         self.timeout = connection.settings.EXEC_TIMEOUT
 
     def log_service_call(self):
@@ -140,7 +139,6 @@ class Configure(BaseService):
     """
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
-        self.service_name = 'configure'
         self.start_state = 'config'
         self.end_state = 'enable'
         self.timeout = connection.settings.CONFIG_TIMEOUT
@@ -252,7 +250,7 @@ class Monitor(GenericExecute):
                 for x in m:
                     k = slugify(x[1] + x[2])
                     v = slugify(x[3])
-                    self.connection.log.debug(f'Updating {k} to {v}')
+                    self.connection.log.debug('Updating {k} to {v}'.format(k=k, v=v))
                     self.monitor_state.update({k: {'state': v, 'id': x[0]}})
 
         if len(kwargs):
@@ -263,7 +261,8 @@ class Monitor(GenericExecute):
         for kw in kwargs:
             if kw in self.monitor_state:
                 target_state = kwargs.get(kw)
-                conn.log.debug(f'{kw} target state {target_state}')
+                conn.log.debug('{kw} target state {target_state}'.format(
+                                kw=kw, target_state=target_state))
 
                 if kw == 'verbosity_level':
                     self._update_verbosity(target_state)
@@ -306,7 +305,7 @@ class Monitor(GenericExecute):
             for x in m:
                 k = slugify(x[1])
                 v = slugify(x[2])
-                self.connection.log.debug(f'Updating {k} to {v}')
+                self.connection.log.debug('Updating {k} to {v}'.format(k=k, v=v))
                 self.monitor_state.update({k: {'state': v, 'id': x[0]}})
 
     def _update_app_specific_diameter(self, target_state):
@@ -325,7 +324,8 @@ class Monitor(GenericExecute):
                 self._update_app_specific_diameter_status(monitor_output.match_output)
                 current_state = self.monitor_state[kw].get('state')
                 if current_state != target_sub_state:
-                    raise SubCommandFailure(f'Could not change {kw} to state {target_sub_state}')
+                    raise SubCommandFailure('Could not change {kw} to state {target_sub_state}'
+                                            .format(kw=kw, target_sub_state=target_sub_state))
         conn.send('b')
         conn.expect(pat.monitor_main_prompt)
 
@@ -338,7 +338,8 @@ class Monitor(GenericExecute):
         while current_state != target_state:
             tries += 1
             if tries > max_tries:
-                raise SubCommandFailure(f'Could not change {kw} to state {target_state}')
+                raise SubCommandFailure('Could not change {kw} to state {target_state}'
+                                        .format(kw=kw, target_state=target_state))
             conn.send(cmd)
             m = conn.expect(update_pattern)
             if m:
@@ -356,7 +357,8 @@ class Monitor(GenericExecute):
             if m:
                 current_state = slugify(m.last_match.group(update_index).strip())
                 if current_state != target_state:
-                    raise SubCommandFailure(f'Could not change {kw} to state {target_state}')
+                    raise SubCommandFailure('Could not change {kw} to state {target_state}'
+                                            .format(kw=kw, target_state=target_state))
                 self.monitor_state[kw]['state'] = current_state
 
     def get_buffer(self, truncate=False):

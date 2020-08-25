@@ -288,6 +288,10 @@ enable:
       new_state: ping_proto_ios_vrf 
     "sh redundancy stat | inc my state":
         my state = 13 -ACTIVE
+    "show redundancy sta |  in my": |
+             my state = 13 -ACTIVE 
+    "show redundancy sta |  in peer": |
+           peer state = 8  -STANDBY HOT 
 
     "sh redundancy state": |2
              my state = 13 -ACTIVE 

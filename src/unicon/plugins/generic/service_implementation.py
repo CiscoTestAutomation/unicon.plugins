@@ -13,6 +13,7 @@ Description:
 """
 
 import re, os
+import copy
 import logging
 import collections
 import ipaddress
@@ -47,6 +48,7 @@ def exec_state_change_action(spawn, err_state, sm):
     # Update device current state with unexpected state.
     sm.update_cur_state(err_state)
     raise StateMachineError(msg)
+
 
 class Send(BaseService):
     """Service to send the command/string with "\\r" to spawned channel.
@@ -191,6 +193,7 @@ class Expect(BaseService):
     def get_service_result(self):
         return self.result
 
+
 class ReceiveService(BaseService):
     """match a pattern from spawn buffer
 
@@ -222,7 +225,6 @@ class ReceiveService(BaseService):
 
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
-        self.service_name = 'receive'
     def pre_service(self, *args, **kwargs):
         pass
     def post_service(self, *args, **kwargs):
@@ -249,6 +251,7 @@ class ReceiveService(BaseService):
     def get_service_result(self):
         return self.result
 
+
 class ReceiveBufferService(BaseService):
     """Returns data match by receive() service pattern.
 
@@ -268,7 +271,6 @@ class ReceiveBufferService(BaseService):
 
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
-        self.service_name = 'receive_buffer'
     def pre_service(self, *args, **kwargs):
         pass
     def post_service(self, *args, **kwargs):
@@ -278,11 +280,16 @@ class ReceiveBufferService(BaseService):
             self.result = self.connection.receiveBuffer
         except AttributeError as err:
             raise SubCommandFailure(
-                  "receive_buffer should be invoke after receive call", err)
+                  "receive_buffer should be invoked after receive call", err)
         except Exception as err:
             raise SubCommandFailure("Error in receive_buffer", err) from err
+
     def get_service_result(self):
-        return self.result
+        result = copy.copy(self.result)
+        delattr(self.connection, 'receiveBuffer')
+        return result
+
+
 
 class LogUser(BaseService):
     """ Service to enable or disable a device logs on screen.
@@ -340,6 +347,7 @@ class LogUser(BaseService):
     def get_service_result(self):
         return self.result
 
+
 class LogFile(BaseService):
     """ Service to get or change Device FileHandler file.
         If no argument passed then it return current filename of FileHandler.
@@ -390,6 +398,45 @@ class LogFile(BaseService):
         return self.result
 
 
+class ExpectLogging(BaseService):
+    r""" Service to enable expect internal logging.
+
+    Arguments:
+        enable: True/False for enabling and disabling the expect_log
+
+    Example:
+
+        .. code::
+
+            rtr.expect_log(enable=True)
+    """
+
+    def log_service_call(self):
+        pass
+
+    def pre_service(self, *args, **kwargs):
+        pass
+
+    def post_service(self, *args, **kwargs):
+        pass
+
+    def call_service(self, enable=False,
+                     *args, **kwargs):
+
+        con = self.connection
+        if enable:
+            con.log.info("+++ enable debug logging +++")
+            con.log.setLevel(logging.DEBUG)
+        else:
+            con.log.info("+++ disable debug logging +++")
+            con.log.setLevel(logging.INFO)
+
+        self.result = True
+
+    def get_service_result(self):
+        return self.result
+
+
 class Enable(BaseService):
     """ Brings device to enable
 
@@ -414,10 +461,10 @@ class Enable(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'enable'
         self.end_state = 'enable'
-        self.service_name = 'enable'
         self.__dict__.update(kwargs)
 
     def call_service(self, target=None, command='', *args, **kwargs):
+        handle = self.get_handle(target)
         spawn = self.get_spawn(target)
         sm = self.get_sm(target)
         # override command to be enable when command is given
@@ -429,7 +476,7 @@ class Enable(BaseService):
         try:
             sm.go_to(self.start_state,
                      spawn,
-                     context=self.context)
+                     context=handle.context)
         except Exception as err:
             raise SubCommandFailure("Failed to Bring device to Enable State",
                                     err) from err
@@ -459,16 +506,16 @@ class Disable(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'disable'
         self.end_state = 'disable'
-        self.service_name = 'disable'
         self.__dict__.update(kwargs)
 
     def call_service(self, target=None, *args, **kwargs):
+        handle = self.get_handle(target)
         spawn = self.get_spawn(target)
         sm = self.get_sm(target)
         try:
             sm.go_to(self.start_state,
                      spawn,
-                     context=self.context)
+                     context=handle.context)
         except Exception as err:
             raise SubCommandFailure("Failed to Bring device to Disable State",
                                     err) from err
@@ -515,7 +562,6 @@ class Execute(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'any'
         self.end_state = 'any'
-        self.service_name = 'execute'
         self.timeout = connection.settings.EXEC_TIMEOUT
         self.__dict__.update(kwargs)
         self.utils = utils
@@ -631,7 +677,7 @@ class Execute(BaseService):
         command_output = {}
         for command in commands:
             con.log.info("+++ %s: executing command '%s' +++"
-                         % (self.connection.hostname, command))
+                         % (con.hostname, command))
             con.sendline(command)
             try:
                 dialog_match = dialog.process(
@@ -653,7 +699,7 @@ class Execute(BaseService):
                 output = self.utils.truncate_trailing_prompt(
                     sm.get_state(sm.current_state),
                     self.result,
-                    hostname=self.connection.hostname,
+                    hostname=con.hostname,
                     result_match=dialog_match,
                 )
                 output = self.extra_output_process(output)
@@ -681,7 +727,7 @@ class Execute(BaseService):
         if self.end_state != 'any':
             sm.go_to(self.end_state, con.spawn,
                      prompt_recovery=self.prompt_recovery,
-                     context=self.connection.context)
+                     context=con.context)
 
     def extra_output_process(self, output):
         # remove backspace and ansi escape sequence from output
@@ -730,7 +776,6 @@ class Configure(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'config'
         self.end_state = 'enable'
-        self.service_name = 'config'
         self.timeout = connection.settings.CONFIG_TIMEOUT
         self.commit_cmd = ''
         self.lock_retries = connection.settings.CONFIG_LOCK_RETRIES
@@ -771,18 +816,20 @@ class Configure(BaseService):
                      bulk_chunk_sleep=None,
                      *args,
                      **kwargs):
+        handle = self.get_handle(target)
         timeout = timeout or self.timeout
 
         if error_pattern is None:
-            self.error_pattern = self.connection.settings.CONFIGURE_ERROR_PATTERN
+            self.error_pattern = \
+                handle.settings.CONFIGURE_ERROR_PATTERN
         else:
             self.error_pattern = error_pattern
 
         bulk = self.bulk if bulk is None else bulk
-        bulk_chunk_lines = self.bulk_chunk_lines if bulk_chunk_lines is None \
-            else bulk_chunk_lines
-        bulk_chunk_sleep = self.bulk_chunk_sleep if bulk_chunk_sleep is None \
-            else bulk_chunk_sleep
+        bulk_chunk_lines = self.bulk_chunk_lines \
+            if bulk_chunk_lines is None else bulk_chunk_lines
+        bulk_chunk_sleep = self.bulk_chunk_sleep \
+            if bulk_chunk_sleep is None  else bulk_chunk_sleep
         if 'retries' in kwargs:
             warnings.warn('**** "retries" argument is deprecated.'
                           ' Please use "lock_retries" ****',
@@ -795,26 +842,25 @@ class Configure(BaseService):
             lock_retry_sleep = lock_retry_sleep or kwargs['retry_sleep']
         lock_retries = self.lock_retries if lock_retries is None \
             else lock_retries
-        lock_retry_sleep = self.lock_retry_sleep if lock_retry_sleep is None \
-            else lock_retry_sleep
+        lock_retry_sleep = self.lock_retry_sleep \
+            if lock_retry_sleep is None else lock_retry_sleep
         if not isinstance(reply, Dialog):
             raise SubCommandFailure('"reply" must be an instance of Dialog')
-        handle = self.get_handle(target)
         self.utils.retry_handle_state_machine_go_to(
             handle,
             self.start_state,
             lock_retries,
             lock_retry_sleep,
-            context=self.connection.context,
+            context=handle.context,
             prompt_recovery=self.prompt_recovery
         )
         self.result = ''
         if command:
             flat_cmd = self.utils.flatten_splitlines_command(command)
-            dialog = self.service_dialog(handle=handle,service_dialog=reply)
+            dialog = self.service_dialog(handle=handle, service_dialog=reply)
             sp = handle.spawn
             if bulk:
-                indicator = self.connection.settings.BULK_CONFIG_END_INDICATOR
+                indicator = handle.settings.BULK_CONFIG_END_INDICATOR
                 cmd_lst = list(chain(flat_cmd, [indicator]))
                 if bulk_chunk_lines == 0:
                     chunks = [cmd_lst]
@@ -859,7 +905,7 @@ class Configure(BaseService):
                 handle.spawn,
                 timeout=timeout,
                 prompt_recovery=self.prompt_recovery,
-                context=self.context
+                context=handle.context
             )
         except Exception as err:
             raise SubCommandFailure('Configuration failed', err) \
@@ -868,7 +914,7 @@ class Configure(BaseService):
         cmd_result = self.utils.truncate_trailing_prompt(
             handle.state_machine.get_state(handle.state_machine.current_state),
             cmd_result.match_output,
-            hostname=self.connection.hostname,
+            hostname=handle.hostname,
             result_match=cmd_result)
         self.result += cmd_result
 
@@ -876,7 +922,7 @@ class Configure(BaseService):
 class Config(Configure):
 
     def call_service(self, *args, **kwargs):
-        self.connection.log.warn('**** This service is deprecated. ' +
+        self.connection.log.warning('**** This service is deprecated. ' +
                                  'Please use "configure" service ****')
         super().call_service(*args, **kwargs)
 
@@ -911,7 +957,6 @@ class Reload(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'enable'
         self.end_state = 'enable'
-        self.service_name = 'reload'
         self.timeout = connection.settings.RELOAD_TIMEOUT
         self.dialog = Dialog(reload_statement_list)
         self.__dict__.update(kwargs)
@@ -919,6 +964,7 @@ class Reload(BaseService):
     def call_service(self,
                      reload_command='reload',
                      dialog=Dialog([]),
+                     reply=Dialog([]),
                      timeout=None,
                      return_output=False,
                      reload_creds=None,
@@ -938,11 +984,20 @@ class Reload(BaseService):
                                 prompt_recovery=self.prompt_recovery,
                                 context=self.context)
 
+        if reply:
+            if dialog:
+                con.log.warning("**** Both 'reply' and 'dialog' were provided "
+                    "to the reload service.  Ignoring 'dialog'.")
+            dialog = reply
+        elif dialog:
+            warnings.warn('**** "dialog" parameter is deprecated.  '
+                          'Use "reply" instead. ****',
+                          category=DeprecationWarning)
+
         if not isinstance(dialog, Dialog):
             raise SubCommandFailure(
                 "dialog passed must be an instance of Dialog")
 
-        dialog = dialog
         dialog += self.dialog
         custom_auth_stmt = custom_auth_statements(con.settings.LOGIN_PROMPT,
                                 con.settings.PASSWORD_PROMPT)
@@ -999,7 +1054,6 @@ class Traceroute(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'enable'
         self.end_state = 'enable'
-        self.service_name = 'traceroute'
         self.timeout = 60
         self.dialog = Dialog(trace_route_dialog_list)
         self.__dict__.update(kwargs)
@@ -1088,7 +1142,6 @@ class Ping(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'enable'
         self.end_state = 'enable'
-        self.service_name = 'ping'
         self.timeout = 60
         self.dialog = Dialog(extended_ping_dialog_list)
         # Ping error Patterns
@@ -1175,22 +1228,15 @@ class Ping(BaseService):
         if ping_context['topo'] != "":
             ping_str = ping_str + "  topo " + ping_context['topo']
 
+        handle = self.get_handle()
         spawn = self.get_spawn()
         sm = self.get_sm()
         if ping_context['extd_ping'].lower().startswith('y'):
-            if self.connection.is_ha:
-                dialog = self.service_dialog(service_dialog=self.dialog,
-                                             handle=con.active)
-            else:
-                dialog = self.service_dialog(service_dialog=self.dialog)
+            dialog = self.service_dialog(
+                handle=handle, service_dialog=self.dialog)
         else:
-            if self.connection.is_ha:
-                dialog = self.service_dialog(
-                    service_dialog=Dialog(ping_dialog_list),
-                    handle=con.active)
-            else:
-                dialog = self.service_dialog(
-                    service_dialog=Dialog(ping_dialog_list))
+            dialog = self.service_dialog(
+                handle=handle, service_dialog=Dialog(ping_dialog_list))
 
         spawn.sendline(ping_str)
         try:
@@ -1240,7 +1286,6 @@ class Copy(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'enable'
         self.end_state = 'enable'
-        self.service_name = 'copy'
         self.timeout = 100
         self.dialog = Dialog(copy_statement_list)
         self.copy_pat = CopyPatterns()
@@ -1328,16 +1373,10 @@ class Copy(BaseService):
                     copy_context['server'] = match_server
 
         timeout = copy_context['timeout'] or self.timeout
-        # get spawn for ha/nan ha handle
-        if self.connection.is_ha:
-            dialog = self.service_dialog(handle=con.active,
-                                         service_dialog=self.dialog)
-            handle = con.active
-            spawn = con.active.spawn
-        else:
-            dialog = self.service_dialog(service_dialog=self.dialog)
-            handle = con
-            spawn = con.spawn
+
+        handle = self.get_handle()
+        spawn = self.get_spawn()
+        dialog = self.service_dialog(handle=handle, service_dialog=self.dialog)
 
         dialog = reply + dialog
 
@@ -1433,12 +1472,10 @@ class GetMode(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'enable'
         self.end_state = 'enable'
-        self.service_name = 'get_mode'
         self.timeout = connection.settings.EXEC_TIMEOUT
         self.__dict__.update(kwargs)
 
     def call_service(self,
-                     target='active',
                      timeout=None,
                      utils=utils,
                      *args,
@@ -1482,7 +1519,6 @@ class GetRPState(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'enable'
         self.end_state = 'enable'
-        self.service_name = 'get_rp_state'
         self.timeout = connection.settings.EXEC_TIMEOUT
         self.__dict__.update(kwargs)
 
@@ -1493,14 +1529,16 @@ class GetRPState(BaseService):
                      *args,
                      **kwargs):
         """send the command on the right rp and return the output"""
-        handle = 'my'
-        if target == 'standby':
-            handle = 'peer'
+        handle = self.get_handle(target)
+
+        red_handle = 'my'
+        if handle.alias == self.connection.standby.alias:
+            red_handle = 'peer'
 
         try:
             self.result = utils.get_redundancy_details(self.connection,
                                                  timeout=timeout,
-                                                 who=handle)
+                                                 who=red_handle)
         except Exception as err:
             raise SubCommandFailure("get_rp_state failed", err) from err
 
@@ -1534,7 +1572,6 @@ class GetConfig(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'enable'
         self.end_state = 'enable'
-        self.service_name = 'get_config'
         self.timeout = connection.settings.EXEC_TIMEOUT
         self.__dict__.update(kwargs)
 
@@ -1573,7 +1610,6 @@ class SyncState(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'enable'
         self.end_state = 'enable'
-        self.service_name = 'sync_state'
         self.timeout = connection.settings.EXEC_TIMEOUT
         self.__dict__.update(kwargs)
 
@@ -1634,12 +1670,8 @@ class HaExecService(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'any'
         self.end_state = 'any'
-        self.service_name = 'execute'
-        self.timeout = connection.settings.EXEC_TIMEOUT
         self.__dict__.update(kwargs)
         self.dialog = Dialog(execution_statement_list)
-        self.matched_retries = connection.settings.EXECUTE_MATCHED_RETRIES
-        self.matched_retry_sleep = connection.settings.EXECUTE_MATCHED_RETRY_SLEEP
 
     def pre_service(self, *args, **kwargs):
         self.prompt_recovery = kwargs.get('prompt_recovery', False)
@@ -1660,169 +1692,18 @@ class HaExecService(BaseService):
                      **kwargs):
         """send the command on the right rp and return the output"""
         # create an alias for connection.
-        con = self.connection
-        # timeout should not be in init because we don't want it
-        # to get constructed. User may change the exec timeout and expect it
-        # to take effect.
-        timeout = timeout or self.timeout
-        if allow_state_change is None:
-            allow_state_change = con.settings.EXEC_ALLOW_STATE_CHANGE
+        handle = self.get_handle(target)
 
-        if error_pattern is None:
-            self.error_pattern = con.settings.ERROR_PATTERN
-        else:
-            self.error_pattern = error_pattern
-
-        if target == 'active':
-            handle = con.active
-        elif target == 'standby':
-            handle = con.standby
-        elif target == 'a':
-            handle = con.a
-        elif target == 'b':
-            handle = con.b
-
-        # user specified search buffer size
-        if search_size is not None:
-            handle.spawn.search_size = search_size
-        else:
-            handle.spawn.search_size = con.settings.SEARCH_SIZE
-
-        matched_retries = self.matched_retries \
-            if matched_retries is None else matched_retries
-        matched_retry_sleep = self.matched_retry_sleep \
-            if matched_retry_sleep is None else matched_retry_sleep
-
-        if not isinstance(reply, Dialog):
-            raise SubCommandFailure(
-                "dialog passed via 'reply' must be an instance of Dialog")
-
-        sm = handle.state_machine
-
-        # service_dialog overrides the default execution dialogs
-        if 'service_dialog' in kwargs:
-            service_dialog = kwargs['service_dialog']
-            if service_dialog is None:
-                service_dialog = Dialog([])
-            if not isinstance(service_dialog, Dialog):
-                raise SubCommandFailure(
-                    "dialog passed via 'service_dialog' must be an instance of Dialog")
-
-            dialog = self.service_dialog(
-                service_dialog=service_dialog + reply,
-                handle=handle,
-                matched_retries=matched_retries,
-                matched_retry_sleep=matched_retry_sleep
-            )
-        else:
-            dialog = self.dialog + self.service_dialog(
-                service_dialog=reply,
-                handle=handle,
-                matched_retries=matched_retries,
-                matched_retry_sleep=matched_retry_sleep
-            )
-
-            # add default execution statements
-            custom_auth_stmt = custom_auth_statements(con.settings.LOGIN_PROMPT,
-                                                      con.settings.PASSWORD_PROMPT)
-            if custom_auth_stmt:
-                dialog += Dialog(custom_auth_stmt)
-
-        # Add all known states to detect state changes.
-        for state in sm.states:
-            # The current state is already added by the service_dialog method
-            if state.name != sm.current_state:
-                if allow_state_change:
-                    dialog.append(Statement(
-                        pattern=state.pattern,
-                        matched_retries=matched_retries,
-                        matched_retry_sleep=matched_retry_sleep
-                    ))
-                else:
-                    dialog.append(Statement(
-                        pattern=state.pattern,
-                        action=exec_state_change_action,
-                        args={'err_state': state, 'sm': sm},
-                        matched_retries=matched_retries,
-                        matched_retry_sleep=matched_retry_sleep
-                    ))
-
-        if isinstance(command, str):
-            if len(command) == 0:
-                commands = ['']
-            else:
-                commands = command.splitlines()
-        elif isinstance(command, list):
-            commands = command
-        else:
-            raise ValueError('Command passed is not of type string or list (%s)' % type(command))
-
-        if con.settings.IGNORE_CHATTY_TERM_OUTPUT:
-            # clear buffer log messages
-            chatty_term_wait(handle.spawn, trim_buffer=True)
-
-        command_output = {}
-        for command in commands:
-            con.log.info("+++ %s: executing command '%s' +++"
-                         % (self.connection.hostname, command))
-
-            handle.spawn.sendline(command)
-            try:
-                dialog_match = dialog.process(
-                    handle.spawn,
-                    timeout=timeout,
-                    prompt_recovery=self.prompt_recovery,
-                    context=con.context
-                )
-                if dialog_match:
-                    self.result = dialog_match.match_output
-                    self.result = self.get_service_result()
-            except StateMachineError:
-                raise
-            except Exception as err:
-                raise SubCommandFailure("Command execution failed", err) from err
-
-            sm.detect_state(handle.spawn)
-
-            if self.result:
-                output = utils.truncate_trailing_prompt(
-                    sm.get_state(sm.current_state),
-                    self.result,
-                    hostname=self.connection.hostname,
-                    result_match=dialog_match,
-                )
-                output = self.extra_output_process(output)
-                output = output.replace(command, "", 1)
-                output = re.sub(r"^\r?\r\n", "", output, 1)
-                output = output.rstrip()
-
-                if command in command_output:
-                    if isinstance(command_output[command], list):
-                        command_output[command].append(output)
-                    else:
-                        command_output[command] = [command_output[command], output]
-                else:
-                    command_output[command] = output
-
-        if len(command_output) == 1:
-            self.result = list(command_output.values())[0]
-        else:
-            self.result = command_output
-
-        # revert search size to default
-        handle.spawn.search_size = con.settings.SEARCH_SIZE
-
-        if self.end_state != 'any':
-            sm.go_to(self.end_state,
-                     handle.spawn,
-                     prompt_recovery=self.prompt_recovery,
-                     context=self.connection.context)
-
-    def extra_output_process(self, output):
-        # remove backspace and ansi escape sequence from output
-        # scenario 1: it prevents correct command replacement, on linux terminals
-        # scenario 2: router with '\x1b[KSomething\x08 \x08\x08 \x08\x08 \x08\x08 \x08\x08\x1b[K'
-        return utils.remove_backspace_ansi_escape(output)
+        self.result = handle.execute(
+            command,
+            reply = reply,
+            timeout = timeout,
+            error_pattern = error_pattern,
+            search_size = search_size,
+            allow_state_change = allow_state_change,
+            matched_retries = matched_retries,
+            matched_retry_sleep = matched_retry_sleep,
+            *args, **kwargs)
 
 
 class HaConfigureService(Configure):
@@ -1861,7 +1742,7 @@ class HaConfigureService(Configure):
 class HaConfigure(HaConfigureService):
 
     def call_service(self, *args, **kwargs):
-        self.connection.log.warn('**** This service is deprecated. ' +
+        self.connection.log.warning('**** This service is deprecated. ' +
                                  'Please use "configure" service ****')
         super().call_service(*args, **kwargs)
 
@@ -1874,7 +1755,6 @@ class HAReloadService(BaseService):
         reload_command: reload command to be used. default "redundancy reload shelf"
         reload_creds: credential or list of credentials to use to respond to
                       username/password prompts.
-        target: Target RP where to execute service
         reply: Additional Dialog( i.e patterns) to be handled
         timeout: Timeout value in sec, Default Value is 60 sec
         return_output: if True, return namedtuple with result and reload output
@@ -1894,7 +1774,6 @@ class HAReloadService(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'enable'
         self.end_state = 'enable'
-        self.service_name = 'reload'
         self.timeout = connection.settings.HA_RELOAD_TIMEOUT
         self.dialog = Dialog(ha_reload_statement_list)
         self.command = 'reload'
@@ -1903,19 +1782,33 @@ class HAReloadService(BaseService):
     def call_service(self, command=None,
                      reload_command = None,
                      dialog=Dialog([]),
+                     reply=Dialog([]),
                      target='active',
                      timeout=None,
                      return_output=False,
                      reload_creds=None,
                      *args,
                      **kwargs):
+
         con = self.connection
+        if reply:
+            if dialog:
+                con.log.warning("**** Both 'reply' and 'dialog' were provided "
+                    "to the reload service.  Ignoring 'dialog'.")
+            dialog = reply
+        elif dialog:
+            warnings.warn('**** "dialog" parameter is deprecated.  '
+                          'Use "reply" instead. ****',
+                          category=DeprecationWarning)
+
         timeout = timeout or self.timeout
         if command:
-            con.log.warning("*** HA reload() service 'command' parameter \
-will be deprecated in next release. Please use 'reload_command' parameter ***")
+            con.log.warning("*** HA reload() service 'command' parameter "
+                "will be deprecated in next release. "
+                "Please use 'reload_command' parameter ***")
         if command and reload_command:
-            raise SubCommandFailure("Please use either 'command' or 'reload_command' parameter")
+            raise SubCommandFailure(
+                "Please use either 'command' or 'reload_command' parameter")
         command = command or reload_command or self.command
 
         # TODO counter value must be moved to settings
@@ -1923,24 +1816,27 @@ will be deprecated in next release. Please use 'reload_command' parameter ***")
         config_retry = 0
         fmt_str = "+++ reloading  %s  with reload_command %s and timeout is %s +++"
         con.log.debug(fmt_str % (con.hostname, command, timeout))
-        dialog = dialog
         dialog += self.dialog
         dialog = self.service_dialog(handle=con.active,
                                      service_dialog=dialog)
         custom_auth_stmt = custom_auth_statements(con.settings.LOGIN_PROMPT,
                                 con.settings.PASSWORD_PROMPT)
+
+        if reload_creds:
+            context = con.active.context.copy()
+            context.update(cred_list=reload_creds)
+            sby_context = con.standby.context.copy()
+            sby_context.update(cred_list=reload_creds)
+        else:
+            context = con.active.context
+            sby_context = con.standby.context
+
         if custom_auth_stmt:
             dialog += Dialog(custom_auth_stmt)
         con.active.state_machine.go_to('enable',
-                                       self.connection.active.spawn,
+                                       con.active.spawn,
                                        prompt_recovery=self.prompt_recovery,
-                                       context=self.context)
-
-        if reload_creds:
-            context = self.context.copy()
-            context.update(cred_list=reload_creds)
-        else:
-            context = self.context
+                                       context=context)
 
         # Issue reload command
         con.active.spawn.sendline(command)
@@ -1950,10 +1846,10 @@ will be deprecated in next release. Please use 'reload_command' parameter ***")
                            prompt_recovery=self.prompt_recovery,
                            timeout=timeout)
             con.active.state_machine.go_to('any',
-                                           con.active.spawn,
-                                           prompt_recovery=self.prompt_recovery,
-                                           timeout=con.connection_timeout,
-                                           context=self.context)
+                                       con.active.spawn,
+                                       prompt_recovery=self.prompt_recovery,
+                                       timeout=con.connection_timeout,
+                                       context=context)
 
             # Bring standby to good state.
             con.log.info('Waiting for config sync to finish')
@@ -1966,7 +1862,7 @@ will be deprecated in next release. Please use 'reload_command' parameter ***")
                     con.standby.state_machine.go_to(
                         'any',
                         con.standby.spawn,
-                        context=context,
+                        context=sby_context,
                         timeout=standby_wait_interval,
                         prompt_recovery=self.prompt_recovery,
                         dialog=con.connection_provider.get_connection_dialog()
@@ -1982,21 +1878,28 @@ will be deprecated in next release. Please use 'reload_command' parameter ***")
             raise SubCommandFailure("Reload failed : %s" % err) from err
 
         # Re-designate handles before applying config.
-        self.connection.connection_provider.designate_handles()
+        # Roles could have switched as a result of the reload.
+        con.connection_provider.designate_handles()
+
+        con.active.state_machine.go_to('enable',
+                                       con.active.spawn,
+                                       prompt_recovery=self.prompt_recovery,
+                                       context=context)
 
         # Issue init commands to disable console logging
-        exec_commands = self.connection.settings.HA_INIT_EXEC_COMMANDS
+        exec_commands = con.active.settings.HA_INIT_EXEC_COMMANDS
         for exec_command in exec_commands:
             con.execute(exec_command, prompt_recovery=self.prompt_recovery)
-        config_commands = self.connection.settings.HA_INIT_CONFIG_COMMANDS
+        config_commands = con.active.settings.HA_INIT_CONFIG_COMMANDS
         while config_retry < \
-                self.connection.settings.CONFIG_POST_RELOAD_MAX_RETRIES:
+                con.active.settings.CONFIG_POST_RELOAD_MAX_RETRIES:
             try:
-                con.configure(config_commands, timeout=60, prompt_recovery=self.prompt_recovery)
+                con.configure(config_commands, timeout=60,
+                    prompt_recovery=self.prompt_recovery)
             except Exception as err:
                 if re.search("Config mode cannot be entered",
                              str(err)):
-                    sleep(self.connection.settings.\
+                    sleep(con.active.settings.\
                         CONFIG_POST_RELOAD_RETRY_DELAY_SEC)
                     con.active.spawn.sendline()
                     config_retry += 1
@@ -2054,7 +1957,6 @@ class SwitchoverService(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'enable'
         self.end_state = 'enable'
-        self.service_name = 'switchover'
         self.timeout = connection.settings.SWITCHOVER_TIMEOUT
         self.dialog = Dialog(switchover_statement_list)
         self.command = 'redundancy force-switchover'
@@ -2062,6 +1964,7 @@ class SwitchoverService(BaseService):
 
     def call_service(self, command=None,
                      dialog=Dialog([]),
+                     reply=Dialog([]),
                      timeout=None,
                      sync_standby=True,
                      switchover_creds=None,
@@ -2069,6 +1972,16 @@ class SwitchoverService(BaseService):
                      **kwargs):
         # create an alias for connection.
         con = self.connection
+        if reply:
+            if dialog:
+                con.log.warning("**** Both 'reply' and 'dialog' were provided "
+                    "to the reload service.  Ignoring 'dialog'.")
+            dialog = reply
+        elif dialog:
+            warnings.warn('**** "dialog" parameter is deprecated.'
+                          ' Please use "reply" ****',
+                          category=DeprecationWarning)
+
         timeout = timeout or self.timeout
         command = command or self.command
         switchover_counter = con.settings.SWITCHOVER_COUNTER
@@ -2084,7 +1997,6 @@ class SwitchoverService(BaseService):
 
         # Save current active and standby handle details
         standby_start_cmd = con.standby.start
-        dialog = dialog
         dialog += self.dialog
         dialog = self.service_dialog(handle=con.active,
                                      service_dialog=dialog)
@@ -2093,11 +2005,13 @@ class SwitchoverService(BaseService):
         if custom_auth_stmt:
             dialog += Dialog(custom_auth_stmt)
 
+        # Use the standby credentials when processing because any
+        # authentication request is expected to come from the new active.
         if switchover_creds:
-            context = self.context.copy()
+            context = con.standby.context.copy()
             context.update(cred_list=switchover_creds)
         else:
-            context = self.context
+            context = con.standby.context
 
         # Issue switchover command
         con.active.spawn.sendline(command)
@@ -2149,7 +2063,7 @@ class SwitchoverService(BaseService):
             con.active.state_machine.go_to(
                 'any',
                 con.active.spawn,
-                context=self.context,
+                context=context,
                 prompt_recovery=self.prompt_recovery,
                 timeout=con.connection_timeout,
                 dialog=con.connection_provider.get_connection_dialog()
@@ -2157,7 +2071,7 @@ class SwitchoverService(BaseService):
             con.active.state_machine.go_to(
                 'enable',
                 con.active.spawn,
-                context=self.context,
+                context=context,
                 prompt_recovery=self.prompt_recovery
             )
 
@@ -2203,7 +2117,7 @@ class ResetStandbyRP(BaseService):
     Arguments:
 
         command: command to reset standby, default is"redundancy reload peer"
-        dialog: Dialog which include list of Statements for
+        reply: Dialog which include list of Statements for
                  additional dialogs prompted by standby reset command,
                  in-case it is not in the current list.
         timeout: Timeout value in sec, Default Value is 500 sec
@@ -2225,7 +2139,6 @@ class ResetStandbyRP(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'enable'
         self.end_state = 'enable'
-        self.service_name = 'reset_standby_rp'
         self.timeout = connection.settings.HA_RELOAD_TIMEOUT
         self.dialog = Dialog(standby_reset_rp_statement_list)
         self.__dict__.update(kwargs)
@@ -2262,7 +2175,7 @@ class ResetStandbyRP(BaseService):
                       "reset_command %s and timeout is %s +++"
                       % (con.hostname, command, timeout))
 
-        # Check is switchover possible?
+        # Check is it possible to reset the standby?
         rp_state = con.get_rp_state(target='standby', timeout=100)
 
         if re.search('DISABLED', rp_state):
@@ -2275,12 +2188,12 @@ class ResetStandbyRP(BaseService):
 
         dialog = self.service_dialog(handle=con.active,
                                      service_dialog=self.dialog)
-        # Issue switchover command
+        # Issue standby reset command
         con.active.spawn.sendline(command)
         try:
             dialog.process(con.active.spawn,
                            timeout=30,
-                           context=con.context)
+                           context=con.active.context)
         except TimeoutError:
             pass
         except SubCommandFailure as err:
@@ -2351,7 +2264,6 @@ class BashService(BaseService):
 
         self.start_state = "enable"
         self.end_state = "enable"
-        self.service_name = "bash_console"
         self.bash_enabled = False
         
     def pre_service(self, *args, **kwargs):
@@ -2374,6 +2286,17 @@ class BashService(BaseService):
             prompt_recovery=self.prompt_recovery
         )
 
+    def call_service(self, target=None, **kwargs):
+        handle = self.get_handle(target)
+        self.result = self.__class__.ContextMgr(
+            connection = handle,
+            enable_bash = not self.bash_enabled,
+            **kwargs)
+
+        # if bash wasn't enabled, it is now!
+        if not self.bash_enabled:
+            self.bash_enabled = True
+
     def post_service(self, *args, **kwargs):
         if 'target' in kwargs:
             handle = self.get_handle(kwargs['target'])
@@ -2385,25 +2308,15 @@ class BashService(BaseService):
             context=self.connection.context,
             prompt_recovery=self.prompt_recovery
         )
-        
-    def call_service(self, **kwargs):
-        self.result = self.__class__.ContextMgr(connection = self.connection,
-                                            enable_bash = not self.bash_enabled,
-                                                **kwargs)
-        # if bash wasn't enabled, it is now!
-        if not self.bash_enabled:
-            self.bash_enabled = True
+
 
     class ContextMgr(object):
         def __init__(self, connection,
                            enable_bash = False,
-                           target='active',
                            timeout = None):
             self.conn = connection
             # Specific platforms has its own prompt
-            self.timeout = timeout
             self.enable_bash = enable_bash
-            self.target = target
             self.timeout = timeout or connection.settings.CONSOLE_TIMEOUT
 
         def __enter__(self):
@@ -2413,16 +2326,8 @@ class BashService(BaseService):
         def __exit__(self, exc_type, exc_value, exc_tb):
             self.conn.log.debug('--- detaching console ---')
 
-            if self.conn.is_ha:
-                if self.target == 'standby':
-                    conn = self.conn.standby
-                elif self.target == 'active':
-                    conn = self.conn.active
-            else:
-                conn = self.conn
-
-            sm = conn.state_machine
-            sm.go_to('enable', conn.spawn)
+            sm = self.conn.state_machine
+            sm.go_to('enable', self.conn.spawn)
 
             # do not suppress
             return False

@@ -28,8 +28,7 @@ class TestAsaPluginConnect(unittest.TestCase):
         c = Connection(hostname='ASA',
                        start=['mock_device_cli --os asa --state asa_disable'],
                        os='asa',
-                       enable_password='cisco',
-                       password='cisco')
+                       credentials=dict(default=dict(username='cisco', password='cisco')))
         c.connect()
         v = c.execute('show version')
         self.assertEqual(v.replace('\r',''), mock_data['asa_enable']['commands']['show version'].rstrip())
@@ -38,8 +37,7 @@ class TestAsaPluginConnect(unittest.TestCase):
         c = Connection(hostname='ASA',
                        start=['mock_device_cli --os asa --state asa_disable_pri_act'],
                        os='asa',
-                       enable_password='cisco',
-                       password='cisco')
+                       credentials=dict(default=dict(username='cisco', password='cisco')))
         r = c.connect()
         self.assertEqual(r, 'ASA/pri/act>')
 
@@ -47,10 +45,8 @@ class TestAsaPluginConnect(unittest.TestCase):
         c = Connection(hostname='ASA',
                             start=['mock_device_cli --os asa --state connect_ssh'],
                             os='asa',
-                            username='cisco',
-                            tacacs_password='cisco',
-                            line_password='cisco',
-                            enable_password='cisco')
+                            credentials=dict(default=dict(username='cisco', password='cisco')))
+
         r = c.connect()
         self.assertEqual(r, 'Are you sure you want to continue connecting (yes/no)? yes\r\nPassword: cisco\r\nASA#')
 
@@ -58,10 +54,7 @@ class TestAsaPluginConnect(unittest.TestCase):
         c = Connection(hostname='ASA',
                             start=['mock_device_cli --os asa --state asa_enable_more'],
                             os='asa',
-                            username='cisco',
-                            tacacs_password='cisco',
-                            line_password='cisco',
-                            enable_password='cisco',
+                            credentials=dict(default=dict(username='cisco', password='cisco')),
                             init_exec_commands=['show version'])
         r = c.connect()
         self.assertEqual(r, 'ASA#')
@@ -71,10 +64,7 @@ class TestAsaPluginConnect(unittest.TestCase):
                             start=['mock_device_cli --os asa --state asa_reload'],
                             os='asa',
                             series='asav',
-                            username='cisco',
-                            tacacs_password='cisco',
-                            line_password='cisco',
-                            enable_password='cisco')
+                            credentials=dict(default=dict(username='cisco', password='cisco')))
         c.connect()
         c.reload()
 
@@ -84,8 +74,7 @@ class TestAsaPluginExecute(unittest.TestCase):
         cls.c = Connection(hostname='ASA',
                         start=['mock_device_cli --os asa --state asa_enable'],
                         os='asa',
-                        username='cisco',
-                        tacacs_password='cisco',
+                        credentials=dict(default=dict(username='cisco', password='cisco')),
                         init_exec_commands=[],
                         init_config_commands=[]
                         )
@@ -103,6 +92,8 @@ class TestAsaPluginExecute(unittest.TestCase):
         v = self.c.execute('show version 2')
         self.assertEqual(v.replace('\r',''), mock_data['asa_enable']['commands']['show version 2']['response'].rstrip())
 
+    def test_execute_reload_confirm(self):
+        self.c.execute("reload confirm")
 
 class TestAsaPluginLearnHostname(unittest.TestCase):
 
@@ -110,8 +101,7 @@ class TestAsaPluginLearnHostname(unittest.TestCase):
         c = Connection(hostname='ASA',
                        start=['mock_device_cli --os asa --state asa_enable --hostname "MyFirewall"'],
                        os='asa',
-                       username='cisco',
-                       tacacs_password='cisco',
+                       credentials=dict(default=dict(username='cisco', password='cisco')),
                        init_exec_commands=[],
                        init_config_commands=[],
                        learn_hostname=True

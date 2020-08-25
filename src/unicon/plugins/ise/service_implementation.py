@@ -11,7 +11,6 @@ class Execute(GenericExecute):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'shell'
         self.end_state = 'shell'
-        self.service_name = 'execute'
 
 
 class Configure(GenericConfigure):
@@ -21,4 +20,3 @@ class Configure(GenericConfigure):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'config'
         self.end_state = 'shell'
-        self.service_name = 'config'

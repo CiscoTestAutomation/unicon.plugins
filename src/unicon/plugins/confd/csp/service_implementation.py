@@ -51,7 +51,6 @@ class Reload(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'cisco_exec'
         self.end_state = 'cisco_exec'
-        self.service_name = 'reload'
         self.timeout = connection.settings.RELOAD_TIMEOUT
         self.__doc__ = self.__doc__.format(connection.settings.RELOAD_TIMEOUT)
 

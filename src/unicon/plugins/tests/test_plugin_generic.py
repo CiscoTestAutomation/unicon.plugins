@@ -849,6 +849,21 @@ class TestTransmitReceive(unittest.TestCase):
         self.assertFalse(self.d.receive(r'nopattern^', timeout=10))
         self.assertRegex(self.d.receive_buffer(), self.term_buffer_pattern)
 
+    def test_receive_buffer_without_receive(self):
+        self.d.send('term width 0\r')
+        with self.assertRaisesRegex(SubCommandFailure,
+                 r"receive_buffer should be invoked after receive call"):
+            (self.d.receive_buffer(), self.term_buffer_pattern)
+
+    def test_receive_buffer_without_receive_after_successful_receive(self):
+        self.d.send('term width 0\r')
+        self.assertTrue(self.d.receive(r'.*#'))
+        self.assertRegex(self.d.receive_buffer(), self.term_buffer_pattern)
+        self.d.send('term width 0\r')
+        with self.assertRaisesRegex(SubCommandFailure,
+                 r"receive_buffer should be invoked after receive call"):
+            (self.d.receive_buffer(), self.term_buffer_pattern)
+
 
 class TestEscapeHandler(unittest.TestCase):
 
@@ -1132,6 +1147,34 @@ class TestTacacsLoginPasswordPrompt(unittest.TestCase):
         d.connect()
         d.disconnect()
         md.stop()
+
+
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
+class TestLearnOS(unittest.TestCase):
+
+    def test_learn_os(self):
+        template_testbed = """
+        devices:
+          Router:
+            type: router
+            credentials:
+              default:
+                password: cisco
+                username: cisco
+              enable:
+                password: cisco
+                username: cisco
+            connections:
+              defaults:
+                class: unicon.Unicon
+              a:
+                command: mock_device_cli --os ios --state exec
+        """
+        t = loader.load(template_testbed)
+        d = t.devices['Router']
+        d.connect(learn_hostname=True, learn_os=True)
+        self.assertEqual(d.os, 'ios')
 
 
 if __name__ == "__main__":

@@ -37,9 +37,84 @@ class MockDeviceTcpWrapperIOSXE(MockDeviceTcpWrapper):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, device_os='iosxe', **kwargs)
+
         if 'port' in kwargs:
             kwargs.pop('port')
-        self.mockdevice = MockDeviceIOSXE(*args, **kwargs)
+
+        if 'stack' in kwargs and kwargs['stack']:
+            kwargs.pop('stack')
+            self.mockdevice = MockDeviceStackIOSXE(*args, **kwargs)
+        elif 'quad' in kwargs and kwargs['quad']:
+            kwargs.pop('quad')
+            self.mockdevice = MockDeviceQuadIOSXE(*args, **kwargs)
+        else:
+            self.mockdevice = MockDeviceIOSXE(*args, **kwargs)
+
+class MockDeviceStackIOSXE(MockDevice):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, device_os="iosxe", **kwargs)
+
+    def stack_enable(self, transport, cmd):
+        port = self.transport_handles[transport]
+
+        if cmd == 'show switch':
+            self.update_show_switch(transport)
+        if cmd == "redundancy reload shelf":
+            ports = [p for p in self.transport_ports.keys() \
+                if p != self.transport_handles[transport]]
+            if len(ports):
+                for port in ports:
+                    self.set_state(port, 'stack_rommon')
+
+    def update_show_switch(self, transport):
+        port = self.transport_handles[transport]
+        switch_no = self.transport_ports[port]['switch_no']
+        data  = 'Switch/Stack Mac Address : 5897.bd36.b380 - Local Mac Address\n'\
+                'Mac persistency wait time: Indefinite\n'\
+                '                                             H/W   Current\n'\
+                'Switch#   Role    Mac Address     Priority Version  State\n'\
+                '-------------------------------------------------------------------\n'
+
+        for i in self.transport_ports.values():
+            switch_line = '{star}{num}       {role}   5897.bd36.b380     3      V01     {state}  \n'
+            if i['switch_no'] == switch_no:
+                star = '*'
+            else:
+                star = ' '
+            switch_line = switch_line.format(star=star, num=i['switch_no'], role=i['role'], state=i['switch_state'])
+            data += switch_line
+        self.mock_data['stack_enable']['commands']['show switch'] = data
+
+
+class MockDeviceQuadIOSXE(MockDevice):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, device_os="iosxe", **kwargs)
+
+    def quad_enable(self, transport, cmd):
+        port = self.transport_handles[transport]
+        ports = [p for p in self.transport_ports.keys() if p != port]
+
+        if cmd == "redundancy force-switchover":
+            for idx, port in enumerate(ports):
+                if idx == 0:
+                    # active ics -> standby
+                    self.set_state(port, 'quad_stby_switchover')
+                elif idx == 1:
+                    # standby -> active
+                    self.set_state(port, 'quad_enable')
+                else:
+                    # standby ics -> active ics
+                    self.set_state(port, 'quad_ics_login')
+
+        if cmd == "reload":
+            for idx, port in enumerate(ports):
+                if idx == 1:
+                    # standby
+                    self.set_state(port, 'quad_stby_reload')
+                else:
+                    # standby ics / active ics
+                    self.set_state(port, 'quad_ics_reload')
 
 
 def main(args=None):

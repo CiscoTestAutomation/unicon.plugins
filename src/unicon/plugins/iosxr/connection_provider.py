@@ -4,21 +4,20 @@ import time
 
 from random import randint
 
+from unicon.eal.dialogs import Dialog
+from unicon.core.errors import TimeoutError
 from unicon.bases.routers.connection_provider \
     import BaseSingleRpConnectionProvider, BaseDualRpConnectionProvider
-from unicon.plugins.generic.statements import pre_connection_statement_list
-from unicon.plugins.iosxr.statements import authentication_statement_list
+
 from unicon.plugins.generic.statements import custom_auth_statements
-from unicon.core.errors import TimeoutError
+from unicon.plugins.generic.statements import pre_connection_statement_list
+
 from unicon.plugins.iosxr.patterns import IOSXRPatterns
 from unicon.plugins.iosxr.errors import RpNotRunningError
-from unicon.eal.dialogs import Dialog
-from unicon.bases.routers.connection_provider \
-    import BaseDualRpConnectionProvider
+from unicon.plugins.iosxr.statements import authentication_statement_list
 
 
 patterns = IOSXRPatterns()
-
 
 
 class IOSXRSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
@@ -67,10 +66,7 @@ class IOSXRDualRpConnectionProvider(BaseDualRpConnectionProvider):
         if con.init_config_commands is not None:
             self.init_config_commands = con.init_config_commands
         else:
-            hostname_command = []
-            if con.hostname != None and con.hostname != '':
-                hostname_command = ['hostname ' + con.hostname]
-            self.init_config_commands = hostname_command + con.settings.IOSXR_INIT_CONFIG_COMMANDS
+            self.init_config_commands = con.settings.IOSXR_INIT_CONFIG_COMMANDS
 
     def get_connection_dialog(self):
         con = self.connection
@@ -87,24 +83,32 @@ class IOSXRDualRpConnectionProvider(BaseDualRpConnectionProvider):
         """ Identifies the Role of each handle and designates if it is active or
             standby and bring the active RP to enable state """
         con = self.connection
-        if con.a.state_machine.current_state == 'standby_locked':
-            target_rp = 'b'
-            other_rp = 'a'
-        elif con.b.state_machine.current_state == 'standby_locked':
-            target_rp = 'a'
-            other_rp = 'b'
+        subcons = list(con._subconnections.items())
+        subcon1_alias, subcon1 = subcons[0]
+        subcon2_alias, subcon2 = subcons[1]
+        if subcon1.state_machine.current_state == 'standby_locked':
+            target_con = subcon2
+            other_con = subcon1
+            target_alias = subcon2_alias
+            other_alias = subcon1_alias
+        elif subcon2.state_machine.current_state == 'standby_locked':
+            target_con = subcon1
+            other_con = subcon2
+            target_alias = subcon1_alias
+            other_alias = subcon2_alias
         else:
             con.log.info("None of the RPs are currently in standby locked state")
-            target_rp = 'a'
-            other_rp = 'b'
-        target_handle = getattr(con, target_rp)
-        other_handle = getattr(con, other_rp)
-        target_handle.role = 'active'
-        other_handle.role = 'standby'
-        target_handle.state_machine.go_to('enable',
-                                          target_handle.spawn,
-                                          context=con.context,
-                                          timeout=con.connection_timeout,
+            target_con = subcon2
+            other_con = subcon1
+            target_alias = subcon2_alias
+            other_alias = subcon1_alias
+
+        con._set_active_alias(target_alias)
+        con._set_standby_alias(other_alias)
+        target_con.state_machine.go_to('enable',
+                                          target_con.spawn,
+                                          context=target_con.context,
+                                          timeout=target_con.connection_timeout,
                                           dialog=self.get_connection_dialog(),
                                           )
         con._handles_designated = True
@@ -112,14 +116,27 @@ class IOSXRDualRpConnectionProvider(BaseDualRpConnectionProvider):
     def connect(self):
         """ Connects, initializes and designates handle """
         con = self.connection
-        con.log.info('+++ connection to %s +++' % str(self.connection.a.spawn))
-        con.log.info('+++ connection to %s +++' % str(self.connection.b.spawn))
+
+        for subconnection in con.subconnections:
+            con.log.info('+++ connection to %s +++' % str(subconnection.spawn))
         self.establish_connection()
-        con.log.info('+++ designating handles +++')
-        self.designate_handles()
-        con.log.info('+++ initializing active handle +++')
-        self.init_active()
+
+        # The following stages invoke execute and configure services on the
+        # device, which require a connection.
         self.connection._is_connected = True
+
+        for subconnection in con.subconnections:
+            subconnection._is_connected = True
+
+        # Maintain initial state
+        if not con.mit:
+            con.log.info('+++ designating handles +++')
+            self.designate_handles()
+
+            # Run initial exec/configure commands on the active, which is
+            # supposed to disable console logging.
+            con.log.info('+++ initializing active handle +++')
+            self.init_active()
 
 
 class IOSXRVirtualConnectionProviderLaunchWaiter(object):

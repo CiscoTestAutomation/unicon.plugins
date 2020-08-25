@@ -427,3 +427,6 @@ class TestIosXECat3kReloadOutput(unittest.TestCase):
         self.assertTrue(res)
         self.assertIn(expected_output.strip('\n'),
                       '\n'.join(output.splitlines()))
+
+if __name__ == "__main__":
+    unittest.main()

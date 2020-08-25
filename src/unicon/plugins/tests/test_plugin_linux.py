@@ -196,7 +196,7 @@ class TestLinuxPluginConnect(unittest.TestCase):
         tb=loader.load(testbed)
         l = tb.devices['lnx-server']
         with self.assertRaises(UniconConnectionError) as err:
-          l.connect(connection_timeout=1)
+          l.connect(connection_timeout=0.5)
         l.disconnect()
 
   def test_connect_connectReply(self):
@@ -566,6 +566,8 @@ class TestLinuxPluginENV(unittest.TestCase):
       self.assertIn(l.settings.ENV['TERM'], term)
       lc = l.execute('echo $LC_ALL')
       self.assertIn(l.settings.ENV['LC_ALL'], lc)
+      size = l.execute('stty size')
+      self.assertEqual(size, '200 200')
 
 
 class TestLinuxPluginExecute(unittest.TestCase):

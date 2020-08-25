@@ -1,0 +1,13 @@
+Press RETURN to get started.
+
+
+
+SYSTEM CONFIGURATION IN PROCESS
+
+
+The startup configuration for this device is presently loading.
+This may take a few minutes. You will be notified upon completion.
+
+Please do not attempt to reconfigure the device until this process is complete.
+
+User Access Verification

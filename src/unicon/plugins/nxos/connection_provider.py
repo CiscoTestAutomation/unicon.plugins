@@ -37,30 +37,34 @@ class NxosDualRpConnectionProvider(GenericDualRpConnectionProvider):
 
     def designate_handles(self):
         con = self.connection
-        con._is_connected = True
-        con.a.state_machine.go_to('enable', con.a.spawn,
-                   context=con.context,
-                   prompt_recovery=self.prompt_recovery,
-                   timeout=con.connection_timeout,
+        subcons = list(con._subconnections.items())
+        subcon1_alias, subcon1 = subcons[0]
+        subcon2_alias, subcon2 = subcons[1]
+
+        subcon1.state_machine.go_to('enable', subcon1.spawn,
+                   context=subcon1.context,
+                   prompt_recovery=subcon1.prompt_recovery,
+                   timeout=subcon1.connection_timeout,
                    dialog=self.get_connection_dialog())
-        output = con.execute('show system redundancy status', target='a')
+        output = subcon1.execute('show system redundancy status')
         res = utils.output_block_extract(output, 'This supervisor')
         red_match = re.search(r'[Rr]edundancy state:\s*(\S+)', res)
         if red_match:
             if red_match.groups()[0].lower() == 'active':
-                con.a.role = 'active'
-                con.b.role = 'standby'
+                con._set_active_alias(subcon1_alias)
+                con._set_standby_alias(subcon2_alias)
             elif red_match.groups()[0].lower() == 'standby':
-                con.a.role = 'standby'
-                con.b.role = 'active'
+                con._set_active_alias(subcon2_alias)
+                con._set_standby_alias(subcon1_alias)
             else:
                 raise ConnectionError('unable to designate handles')
         con._handles_designated = True
 
 
     def assign_ha_mode(self):
-        self.connection.a.mode = 'sso'
-        self.connection.b.mode = 'sso'
+        for subconnection in self.connection.subconnections:
+            subconnection.mode = 'sso'
+
 
     def disconnect(self):
         # check whether we are on vdc

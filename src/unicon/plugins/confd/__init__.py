@@ -100,6 +100,7 @@ class ConfdServiceList:
         self.configure = confd_svc.Configure
         self.cli_style = confd_svc.CliStyle
         self.command = confd_svc.Command
+        self.expect_log = svc.ExpectLogging
 
 
 class ConfdConnection(GenericSingleRpConnection):

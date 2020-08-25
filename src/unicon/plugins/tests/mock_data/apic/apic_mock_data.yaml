@@ -25,7 +25,7 @@ apic_exec:
       new_state: apic_restart_confirm
     "configure":
       new_state: apic_config
-
+    "invalid command": "Error: Invalid argument 'invalid command '. Please check syntax in command reference guide"
 
 apic_hostname_with_escape_codes:
   prompt: "%1B[0m%1B[27m%1B[24m%1B[JAPC-0001-2001# "

@@ -51,7 +51,6 @@ class AireosReload(BaseService):
         self.start_state = 'enable'
         self.end_state = 'enable'
         self.result = None
-        self.service_name = 'reload'
         self.timeout = self.connection.settings.RELOAD_TIMEOUT
         self.dialog_reload = Dialog(reload_statements)
         # add the keyword arguments to the object
@@ -94,7 +93,6 @@ class AireosPing(BaseService):
         self.start_state = 'enable'
         self.end_state = 'enable'
         self.result = None
-        self.service_name = 'ping'
         self.timeout = 60
 
         # add the keyword arguments to the object
@@ -142,7 +140,6 @@ class AireosCopy(BaseService):
         self.start_state = 'enable'
         self.end_state = 'enable'
         self.result = None
-        self.service_name = 'copy'
         self.dialog = Dialog([
             [pr.are_you_sure,
                 lambda spawn: spawn.sendline('y'),

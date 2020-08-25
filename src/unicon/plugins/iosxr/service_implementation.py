@@ -41,7 +41,6 @@ class Configure(svc.Configure):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'config'
         self.end_state = 'enable'
-        self.service_name = 'config'
 
     def call_service(self, command=[], reply=Dialog([]),
                       timeout=None, *args, **kwargs):
@@ -67,12 +66,23 @@ class HaConfigureService(svc.HaConfigureService):
                              reply=reply + Dialog(config_commit_stmt_list),
                              target=target, timeout=timeout, *args, **kwargs)
 
+
+class HaReload(svc.HAReloadService):
+    def call_service(self, command=[], reload_command=[], reply=Dialog([]), timeout=None, *args,
+                     **kwargs):
+        if command:
+            super().call_service(command,
+                                 timeout=timeout, *args, **kwargs)
+        else:
+            super().call_service(reload_command=reload_command or "reload",
+                                 timeout=timeout, *args, **kwargs) 
+
+
 class AdminExecute(Execute):
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'admin'
         self.end_state = 'enable'
-        self.service_name = 'admin_execute'
 
 
 class AdminConfigure(Configure):
@@ -80,7 +90,6 @@ class AdminConfigure(Configure):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'admin_conf'
         self.end_state = 'enable'
-        self.service_name = 'admin_configure'
 
 
 class HAExecute(svc.HaExecService):
@@ -89,12 +98,11 @@ class HAExecute(svc.HaExecService):
         self.dialog += Dialog(execution_statement_list)
 
 
-class HaAdminExecute(HAExecute):
+class HaAdminExecute(AdminExecute):
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'admin'
         self.end_state = 'enable'
-        self.service_name = 'admin_execute'
 
 
 class HaAdminConfigure(HaConfigureService):
@@ -102,7 +110,6 @@ class HaAdminConfigure(HaConfigureService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'admin_conf'
         self.end_state = 'enable'
-        self.service_name = 'admin_configure'
 
 
 class Switchover(BaseService):
@@ -132,7 +139,6 @@ class Switchover(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'enable'
         self.end_state = 'enable'
-        self.service_name = 'switchover'
         self.timeout = connection.settings.SWITCHOVER_TIMEOUT
         self.dialog = Dialog(switchover_statement_list)
 
@@ -166,7 +172,7 @@ class Switchover(BaseService):
             self.result = dialog.process(con.active.spawn,
                            timeout=self.timeout,
                            prompt_recovery=self.prompt_recovery,
-                           context=con.context)
+                           context=con.active.context)
         except SubCommandFailure as err:
             raise SubCommandFailure("Switchover Failed %s" % str(err))
 
@@ -215,7 +221,6 @@ class AttachModuleConsole(BaseService):
 
         self.start_state = "enable"
         self.end_state = "enable"
-        self.service_name = "attach_console_module"
 
     def call_service(self, module_num, **kwargs):
         self.result = self.__class__.ContextMgr(connection = self.connection,
@@ -298,7 +303,6 @@ class AdminAttachModuleConsole(AttachModuleConsole):
 
         self.start_state = "admin"
         self.end_state = "enable"
-        self.service_name = "admin_attach_console_module"
 
     class ContextMgr(AttachModuleConsole.ContextMgr):
 
@@ -315,13 +319,9 @@ class AdminAttachModuleConsole(AttachModuleConsole):
 
         def __enter__(self):
             self.conn.log.debug('+++ attaching console +++')
-            if self.conn.is_ha:
-                conn = self.conn.active
-            else:
-                conn = self.conn
 
-            sm = conn.state_machine
-            sm.go_to('admin', conn.spawn)
+            sm = self.conn.state_machine
+            sm.go_to('admin', self.conn.spawn)
 
             # attach to console
             self.conn.sendline('attach location %s' % self.module_num)
@@ -336,8 +336,7 @@ class AdminAttachModuleConsole(AttachModuleConsole):
         def __exit__(self, exc_type, exc_val, exc_tb):
             if exc_type is not SubCommandFailure:
                 # exit from attached location
-                conn = self.conn.active if self.conn.is_ha else self.conn
-                admin = conn.state_machine.get_state('admin')
+                admin = self.conn.state_machine.get_state('admin')
                 self.conn.sendline('exit')
                 self.conn.expect(admin.pattern, timeout = self.timeout)
             return super().__exit__(exc_type, exc_val, exc_tb)
@@ -357,13 +356,8 @@ class AdminService(BashService):
         def __enter__(self):
             self.conn.log.debug('+++ attaching admin shell +++')
 
-            if self.conn.is_ha:
-                conn = self.conn.active
-            else:
-                conn = self.conn
-
-            sm = conn.state_machine
-            sm.go_to('admin', conn.spawn)
+            sm = self.conn.state_machine
+            sm.go_to('admin', self.conn.spawn)
 
             return self
 
@@ -373,33 +367,23 @@ class BashService(BashService):
     class ContextMgr(BashService.ContextMgr):
         def __init__(self, connection,
                            enable_bash = False,
-                           target = 'active',
                            timeout = None):
             # overwrite the prompt
             super().__init__(connection=connection,
                              enable_bash=enable_bash,
-                             target=target,
                              timeout=timeout)
 
         def __enter__(self):
             self.conn.log.debug('+++ attaching bash shell +++')
 
-            if self.conn.is_ha:
-                if self.target == 'standby':
-                    conn = self.conn.standby
-                if self.target == 'active':
-                    conn = self.conn.active
-            else:
-                conn = self.conn
+            sm = self.conn.state_machine
 
-            sm = conn.state_machine
-
-            if hasattr(conn, 'series') and \
-                conn.series == 'spitfire':
+            if hasattr(self.conn, 'series') and \
+                self.conn.series == 'spitfire':
                 # In case of spitfire plugin
-                sm.go_to('xr_run', conn.spawn)
+                sm.go_to('xr_run', self.conn.spawn)
             else:
-                sm.go_to('run', conn.spawn)
+                sm.go_to('run', self.conn.spawn)
 
             return self
 
@@ -417,13 +401,9 @@ class AdminBashService(BashService):
         def __enter__(self):
             self.conn.log.debug('+++ attaching bash shell +++')
 
-            if self.conn.is_ha:
-                conn = self.conn.active
-            else:
-                conn = self.conn
 
-            sm = conn.state_machine
-            sm.go_to('admin_run', conn.spawn)
+            sm = self.conn.state_machine
+            sm.go_to('admin_run', self.conn.spawn)
 
             return self
 

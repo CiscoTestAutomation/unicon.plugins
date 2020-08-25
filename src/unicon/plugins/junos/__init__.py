@@ -12,7 +12,7 @@ from unicon.bases.routers.connection import BaseSingleRpConnection
 from unicon.plugins.junos.connection_provider import JunosSingleRpConnectionProvider
 from .statemachine import JunosSingleRpStateMachine
 from .setting import JunosSettings
-from unicon.plugins.generic import ServiceList
+from unicon.plugins.generic import ServiceList, service_implementation as gsvc
 from unicon.plugins.junos import service_implementation as svc
 
 
@@ -27,6 +27,7 @@ class JunosServiceList(object):
         self.disable = svc.Disable
         self.log_user = svc.LogUser
         self.bash_console = svc.BashService
+        self.expect_log = gsvc.ExpectLogging
 
 
 class JunosSingleRpConnection(BaseSingleRpConnection):

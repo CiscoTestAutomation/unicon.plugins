@@ -38,6 +38,8 @@ asa_enable:
     "changeto context GLOBAL": "ERROR: 'GLOBAL' is not valid"
     "network-object host 5.5.50.10": |
       WARNING: Adding obj (network-object host 5.5.50.10) to grp (Dummy_50) failed; object already exists
+    "reload confirm":
+      new_state: proceed_reload_prompt
 
 asa_enable_more:
   prompt: "%N#"
@@ -157,6 +159,12 @@ asa_config_pri_act:
       new_state: asa_enable_pri_act
     "exit":
       new_state: asa_enable_pri_act
+
+proceed_reload_prompt:
+  prompt: "Proceed with reload? [confirm]"
+  commands:
+    '':
+      new_state: asa_enable
 
 proceed_reload:
   prompt: "Proceed with reload? [confirm]"

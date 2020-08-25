@@ -115,16 +115,18 @@ class TestNxosPluginBashService(unittest.TestCase):
     def test_bash_ha_standby(self):
         ha = MockDeviceTcpWrapperNXOS(port=0, state='exec,nxos_exec_standby')
         ha.start()
-        d = Connection(hostname='switch',
+        c = Connection(hostname='switch',
                         start=['telnet 127.0.0.1 '+  str(ha.ports[0]), 'telnet 127.0.0.1 '+ str(ha.ports[1]) ],
                        os='nxos', username='cisco', tacacs_password='cisco')
-        d.connect()
-        with d.bash_console(target='standby') as console:
-            console.execute('ls', target='standby')
-        self.assertIn('exit', d.standby.spawn.match.match_output)
-        self.assertIn('switch(standby)#', d.standby.spawn.match.match_output)
-        d.disconnect()
-        ha.stop()
+        try:
+            c.connect()
+            with c.bash_console(target='standby') as console:
+                console.execute('ls', target='standby')
+            self.assertIn('exit', c.standby.spawn.match.match_output)
+            self.assertIn('switch(standby)#', c.standby.spawn.match.match_output)
+            c.disconnect()
+        finally:
+            ha.stop()
 
 
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)

@@ -127,6 +127,11 @@ general_enable:
       new_state: enable_general_standby
     "reload":
       new_state: ha_reload_proceed
+    "trim":
+      "\r\r\r\r\r\ntest
+      abc\r\r\r\r\r\n
+      test trim line\r\r\r\r\n
+      test pass"
 
 
 general_config:

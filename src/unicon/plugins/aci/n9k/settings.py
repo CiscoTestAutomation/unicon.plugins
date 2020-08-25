@@ -16,3 +16,8 @@ class AciSettings(GenericSettings):
         self.HA_INIT_CONFIG_COMMANDS = []
 
         self.POST_RELOAD_WAIT = 30
+
+        self.ENV = {
+            'ROWS': 24,
+            'COLUMNS': 255
+        }

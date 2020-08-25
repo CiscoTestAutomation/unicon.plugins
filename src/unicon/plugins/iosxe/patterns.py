@@ -8,7 +8,7 @@ from unicon.plugins.generic.service_patterns import ReloadPatterns
 class IosXEPatterns(GenericPatterns):
     def __init__(self):
         super().__init__()
-        self.shell_prompt = r'^(.*?)\[(%N|[Ss]witch|[Rr]outer).*\]\$\s?$'
+        self.shell_prompt = r'^(.*?)\[(%N|[Ss]witch|[Rr]outer).*?\]\$\s?$'
         self.access_shell = \
             r'^.*Are you sure you want to continue\? \[y/n\]\s?.*$'
         self.overwrite_previous = \
