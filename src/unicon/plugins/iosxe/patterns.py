@@ -20,9 +20,9 @@ class IosXEPatterns(GenericPatterns):
         self.wish_continue = r'^.*Do you wish to continue\? \[yes\]:\s*$'
         self.want_continue = r'^.*Do you want to continue\? \[no\]:\s*$'
         self.disable_prompt = \
-            r'^(.*?)(Router|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(\(boot\))?(\(recovery-mode\))?>\s?$'
+            r'^(.*?)(Router|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(-standby)?(\(boot\))?(\(recovery-mode\))?>\s?$'
         self.enable_prompt = \
-            r'^(.*?)(Router|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(\(boot\))?(\(recovery-mode\))?#\s?$'
+            r'^(.*?)(Router|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(-standby)?(\(boot\))?(\(recovery-mode\))?#\s?$'
         self.press_enter = ReloadPatterns().press_enter
 
 class IosXEReloadPatterns(ReloadPatterns):

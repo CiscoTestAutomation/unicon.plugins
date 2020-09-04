@@ -331,6 +331,21 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
     def test_reload(self):
         self.c.reload()
 
+
+class TestIosXEDiol(unittest.TestCase):
+    @classmethod
+    def test_connection(self):
+        c = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe --state standby_exec'],
+                       os='iosxe',
+                       init_exec_commands=[],
+                       init_config_commands=[],
+                       credentials=dict(default=dict(
+                       username='cisco', password='cisco'),
+                       alt=dict(
+                       username='admin', password='lab')))
+
+        c.connect()
+
 if __name__ == "__main__":
     unittest.main()
-

@@ -181,4 +181,8 @@ general_act_reply:
   commands:
     "y":
       new_state: general_bash
-      
+
+standby_exec:
+  prompt: "Router-standby# "
+  commands:
+    "cisco": ""

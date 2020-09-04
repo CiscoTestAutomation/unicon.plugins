@@ -12,6 +12,11 @@ For example, if ``os=iosxe`` and ``series=abc``, since ``abc`` is not found in
 the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If 
 ``os=iosxe`` and ``series=cat3k``, it will use the specific plugin ``iosxe/cat3k``.
 
+.. tip::
+
+  The priority to pick up which plugin is: chassis_type > os > series > model.
+
+
 .. csv-table:: Unicon Supported Platforms
     :align: center
     :widths: 20, 20, 20, 40
