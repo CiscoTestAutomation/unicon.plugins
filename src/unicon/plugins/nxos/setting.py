@@ -13,6 +13,8 @@ class NxosSettings(GenericSettings):
             'no logging console',
             'line console',
             'exec-timeout 0',
+            'line vty',
+            'exec-timeout 0',
             'terminal width 511'
         ]
         self.SWITCHOVER_TIMEOUT = 700

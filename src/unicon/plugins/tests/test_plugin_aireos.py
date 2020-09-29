@@ -29,7 +29,7 @@ def get_dev():
     dev = Connection(hostname=box['hostname'],
                      username=box['username'],
                      tacacs_password=box['tacacs_password'],
-                     start=[box['cmd']],
+                     start=[box['cmd']], 
                      os='aireos')
     dev.connect()
     return dev
@@ -148,6 +148,12 @@ class TestAireosReboots(unittest.TestCase):
     def test_reload(self):
         self.device.reload()
         # self.assertEqual(execute_show(self.device), True)
+
+    # reload with error patterns in the mock data
+    def test_reload_with_errors(self):
+        with self.assertRaises(SubCommandFailure) as err:
+            self.device.reload("reset system forced with errors")
+        device.disconnect()
 
     def test_transfer_simconf_devshell(self):
         simconf = """

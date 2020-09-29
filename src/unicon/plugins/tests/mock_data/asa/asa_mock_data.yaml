@@ -14,6 +14,18 @@ asa_disable:
     "enable":
       new_state: asa_password
 
+asa_username:
+  prompt: "Username: "
+  commands:
+    "cisco":
+      new_state: asa_password
+
+asa_username_replication:
+  prompt: "Username: Beginning configuration replication: Sending to mate."
+  commands:
+    "":
+      new_state: asa_end_replication_message
+
 asa_password:
   prompt: "Password: "
   commands:
@@ -38,8 +50,12 @@ asa_enable:
     "changeto context GLOBAL": "ERROR: 'GLOBAL' is not valid"
     "network-object host 5.5.50.10": |
       WARNING: Adding obj (network-object host 5.5.50.10) to grp (Dummy_50) failed; object already exists
-    "reload confirm":
-      new_state: proceed_reload_prompt
+    "error reporting prompt":
+      new_state: asa_error_reporting
+    "reload":
+      new_state: asa_save_configs
+    "display replication message":
+      new_state: asa_begin_replication_message
 
 asa_enable_more:
   prompt: "%N#"
@@ -122,6 +138,11 @@ version_more:
     ' ':
       new_state: asa_enable_more
 
+asa_save_configs:
+  prompt: "admin config has been modified. Save? [Y]es/[N]o/[S]ave all/[C]ancel:"
+  commands:
+    "S":
+      new_state: proceed_reload
 
 asa_config:
   prompt: "%N(config)#"
@@ -160,17 +181,29 @@ asa_config_pri_act:
     "exit":
       new_state: asa_enable_pri_act
 
-proceed_reload_prompt:
-  prompt: "Proceed with reload? [confirm]"
+asa_error_reporting:
+  prompt: "Would you like to enable anonymous error reporting to help improve the product? [Y]es, [N]o, [A]sk later"
   commands:
-    '':
+    "A":
       new_state: asa_enable
+
+asa_begin_replication_message:
+  prompt: "foobar Beginning configuration replication: Sending to mate. "
+  commands:
+    "":
+      new_state: asa_enable
+
+asa_end_replication_message:
+  prompt: "End Configuration Replication to mate"
+  commands:
+    "":
+      new_state: asa_username
 
 proceed_reload:
   prompt: "Proceed with reload? [confirm]"
   commands:
     '':
-      new_state: asa_disable
+      new_state: asa_username
       response: |
         ***
         *** --- START GRACEFUL SHUTDOWN ---
@@ -235,10 +268,8 @@ proceed_reload:
                         Cisco Systems, Inc.
                         170 West Tasman Drive
                         San Jose, California 95134-1706
-
 asa_reload:
   prompt: "%N#"
   commands:
     "reload":
       new_state: proceed_reload
-  

@@ -21,3 +21,5 @@ class FtdPatterns(GenericPatterns):
         self.sudo_incorrect_password_pattern = r'^.*?sudo: \d+ incorrect password attempts'
 
         self.command_not_completed = r'Syntax error: The command is not completed'
+
+        self.are_you_sure = r'(.*?)Are you sure.*?\(yes\/no\)\s*$'

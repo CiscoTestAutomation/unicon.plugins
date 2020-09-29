@@ -409,11 +409,9 @@ Starting mDNS Services: ok
 Starting Management Services: 
    Web Server:    CLI:    Secure Web: Starting IPSec Profiles component: ok
 ok
-
+Warning:In SNMPV3 No Defaults Presents.
+Please use command: config snmp v3user create <username>
 
 (Cisco Controller) 
 
 Enter User Name (or 'Recover-Config' this one-time only to reset configuration to factory defaults)
-
-
- 

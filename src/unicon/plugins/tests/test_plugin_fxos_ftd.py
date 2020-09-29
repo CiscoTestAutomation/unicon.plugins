@@ -26,8 +26,7 @@ class TestFxosFtdPlugin(unittest.TestCase):
                        start=['mock_device_cli --os fxos --state fxos_connect'],
                        os='fxos',
                        series='ftd',
-                       username='cisco',
-                       tacacs_password='cisco')
+                       credentials=dict(default=dict(username='cisco', password='cisco')))
         c.connect()
         self.assertEqual(c.spawn.match.match_output, '\r\nFirepower# ')
         return c
@@ -43,15 +42,18 @@ class TestFxosFtdPlugin(unittest.TestCase):
         c = self.test_connect()
         c.execute(['scope service-profile'], allow_state_change=True)
 
+    def test_are_you_sure_stmt(self):
+        c = self.test_connect()
+        c.execute(['scope security', 'clear-user-sessions all'], allow_state_change=True)
+
     def test_console_execute(self):
         c = Connection(hostname='Firepower',
                        start=['mock_device_cli --os fxos --state chassis_exec'],
                        os='fxos',
                        series='ftd',
-                       username='cisco',
-                       tacacs_password='cisco',
-                       enable_password='cisco',
-                       line_password='cisco')
+                       credentials=dict(
+                       default=dict(username='cisco', password='cisco', line_password='cisco'),
+                       sudo=dict(password='cisco')))
         c.connect()
         c.spawn.timeout = 30
         c.switchto('ftd expert', timeout=60)
@@ -77,10 +79,9 @@ class TestFxosFtdPlugin(unittest.TestCase):
                        start=['mock_device_cli --os fxos --state fxos_exec'],
                        os='fxos',
                        series='ftd',
-                       username='cisco',
-                       tacacs_password='cisco',
-                       enable_password='cisco',
-                       line_password='cisco')
+                       credentials=dict(
+                       default=dict(username='cisco', password='cisco', line_password='cisco'),
+                       sudo=dict(password='cisco')))
         c.connect()
         for state in states:
             c.switchto(state)

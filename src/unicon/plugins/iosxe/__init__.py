@@ -40,6 +40,7 @@ class HAIosXEServiceList(HAServiceList):
         self.switchover = svc.HASwitchover
         self.ping = svc.Ping
         self.bash_console = svc.BashService
+        self.traceroute = svc.Traceroute
         self.copy = svc.Copy
         self.reset_standby_rp = svc.ResetStandbyRP
 

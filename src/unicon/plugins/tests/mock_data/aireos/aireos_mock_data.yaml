@@ -30,6 +30,14 @@ aireos_exec:
         Wireless LAN Controller config will not be saved.
 
       new_state: aireos_reset_forced
+    "reset system forced with errors":
+      response: |2
+
+        Wireless LAN Controller and Access Points could have partially
+        downloaded images and might not come up after reboot.
+        Wireless LAN Controller config will not be saved.
+
+      new_state: aireos_reset_forced_with_errors
     "grep exclude generation 'show run-config startup-commands'":
       new_state: aireos_press_any_key
     "show run-config":
@@ -107,6 +115,15 @@ aireos_reset_forced:
   commands:
     "y":
       response: file|mock_data/aireos/aireos_reload_85.txt
+      timing:
+        - 0:,0,0.005
+      new_state: aireos_login
+
+aireos_reset_forced_with_errors:
+  prompt: "Do you still want to force a reboot (y/N) "
+  commands:
+    "y":
+      response: file|mock_data/aireos/aireos_reload_with_error_patterns.txt
       timing:
         - 0:,0,0.005
       new_state: aireos_login

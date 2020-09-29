@@ -68,8 +68,9 @@ class TestFxosPluginSystemServicesExec(unittest.TestCase):
         cls.c.connect()
 
     def test_execute_error(self):
-        with self.assertRaises(SubCommandFailure) as err:
-            r = self.c.execute('commit-buffer')
+        for cmd in ['commit-buffer', 'show foo', 'show chassis inventory 1 fa']:
+            with self.assertRaises(SubCommandFailure) as err:
+                r = self.c.execute(cmd)
 
 if __name__ == "__main__":
     unittest.main()

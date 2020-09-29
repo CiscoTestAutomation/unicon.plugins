@@ -22,7 +22,8 @@ class AireosSettings(GenericSettings):
             r'^Incorrect usage.',
             r'^Incorrect input',
             r'^HELP',
-            r'^[Ii]nvalid'
+            r'^[Ii]nvalid',
+            r'^[Ww]arning'
         ]
         self.LOGIN_PROMPT = r'^.*?User:\s*$'
         self.DEFAULT_LEARNED_HOSTNAME = r'(.*?)'

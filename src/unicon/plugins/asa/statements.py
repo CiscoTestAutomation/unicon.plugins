@@ -104,3 +104,33 @@ reload_confirm_stmt = Statement(pattern=patterns.reload_confirm,
                                 args=None,
                                 loop_continue=True,
                                 continue_timer=False)
+
+error_reporting_stmt = Statement(pattern=patterns.error_reporting,
+                                action='sendline(A)',
+                                args=None,
+                                loop_continue=True,
+                                continue_timer=False)
+
+save_config_stmt = Statement(pattern=patterns.save_changes,
+                             action='sendline(S)',
+                             args=None,
+                             loop_continue=True,
+                             continue_timer=False)
+
+begin_replication_stmt = Statement(pattern=patterns.begin_config_replication,
+                             action=sendline,
+                             args=None,
+                             loop_continue=True,
+                             continue_timer=False)
+
+end_replication_stmt = Statement(pattern=patterns.end_config_replication,
+                                 action=sendline,
+                                 args=None,
+                                 loop_continue=True,
+                                 continue_timer=False)
+
+connection_statements = [bad_password_stmt, begin_replication_stmt, end_replication_stmt]
+
+execute_statements = [error_reporting_stmt, save_config_stmt, begin_replication_stmt, end_replication_stmt]
+
+reload_statements = [save_config_stmt, begin_replication_stmt, end_replication_stmt]

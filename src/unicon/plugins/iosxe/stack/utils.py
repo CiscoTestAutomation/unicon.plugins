@@ -1,7 +1,7 @@
 """ Stack utilities. """
 
 import re
-import time
+from time import sleep, time
 
 from unicon.eal.dialogs import Dialog
 from unicon.utils import Utils, AttributeDict
@@ -94,24 +94,36 @@ class StackUtils(Utils):
                                     context=connection.context)
 
 
-    def is_active_standby_ready(self, connection):
+    def is_active_standby_ready(self, connection, timeout=120, interval=30):
         """ Check whether active and standby rp are in ready state
 
         Args:
             connection (`obj`): connection object
+            timeout (`int`): timeout value, default is 120 secs
+            interval (`int`): check interval, default is 30 secs
         Returns:
             result (`bool`): True if both in ready state, else False
         """
-        active = ''
-        standby = ''
-        details = self.get_redundancy_details(connection)
-        for sw_num, info in details.items():
-            if info['role'] == 'Active':
-                active = info.get('state')
-            elif info['role'] == 'Standby':
-                standby = info.get('state')
+        active = standby = ''
+        start_time = time()
 
-        return active == 'Ready' and standby == 'Ready'
+        while (time() - start_time) < timeout:
+            details = self.get_redundancy_details(connection)
+            for sw_num, info in details.items():
+                if info['role'] == 'Active':
+                    active = info.get('state')
+                elif info['role'] == 'Standby':
+                    standby = info.get('state')
+
+            if active == 'Ready' and standby == 'Ready':
+                return True
+
+            # Not ready sleep and retry
+            connection.log.info('Sleeping for %s secs.' % interval)
+            sleep(interval)
+            continue
+
+        return False
 
 
     def is_active_ready(self, connection):
@@ -130,3 +142,59 @@ class StackUtils(Utils):
 
         return active == 'Ready'
 
+
+    def is_all_member_ready(self, connection, timeout=120, interval=30):
+        """ Check whether all rp are in ready state
+            including active, standby and members
+
+        Args:
+            connection (`obj`): connection object
+            timeout (`int`): timeout value, default is 120 secs
+            interval (`int`): check interval, default is 30 secs
+        Returns:
+            result (`bool`): True if all members are in ready state
+                             else False
+        """
+        ready = active = standby = False
+        start_time = time()
+
+        while (time() - start_time) < timeout:
+            details = self.get_redundancy_details(connection)
+            for sw_num, info in details.items():
+                state = info.get('state')
+                if state != 'Ready':
+                    ready = False
+                    break
+                if info['role'] == 'Active':
+                    active = True
+                if info['role'] == 'Standby':
+                    standby = True
+            else:
+                ready = True
+
+            if ready and active and standby:
+                return True
+            # Not ready sleep and retry
+            connection.log.info('Sleeping for %s secs.' % interval)
+            sleep(interval)
+            continue
+
+        return False
+
+
+    def get_standby_rp_sn(self, connection):
+        """ Get the standby rp switch number
+
+        Args:
+            connection (`obj`): connection object
+        Returns:
+            standby (`int`): switch number for standby
+        """
+        standby = None
+        details = self.get_redundancy_details(connection)
+        for sw_num, info in details.items():
+            role = info.get('role')
+            if role == 'Standby':
+                standby = int(sw_num)
+
+        return standby

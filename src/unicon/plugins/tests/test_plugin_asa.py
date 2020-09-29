@@ -33,6 +33,13 @@ class TestAsaPluginConnect(unittest.TestCase):
         v = c.execute('show version')
         self.assertEqual(v.replace('\r',''), mock_data['asa_enable']['commands']['show version'].rstrip())
 
+    def test_connect_from_username_replication(self):
+        c = Connection(hostname='ASA',
+                       start=['mock_device_cli --os asa --state asa_username_replication'],
+                       os='asa',
+                       credentials=dict(default=dict(username='cisco', password='cisco')))
+        c.connect()
+ 
     def test_connect_prio_state(self):
         c = Connection(hostname='ASA',
                        start=['mock_device_cli --os asa --state asa_disable_pri_act'],
@@ -59,7 +66,18 @@ class TestAsaPluginConnect(unittest.TestCase):
         r = c.connect()
         self.assertEqual(r, 'ASA#')
 
+class TestAsaPluginReload(unittest.TestCase):
+
     def test_asa_reload(self):
+        c = Connection(hostname='ASA',
+                            start=['mock_device_cli --os asa --state asa_enable'],
+                            os='asa',
+                            series='asa',
+                            credentials=dict(default=dict(username='cisco', password='cisco')))
+        c.connect()
+        c.reload()
+
+    def test_asav_reload(self):
         c = Connection(hostname='ASA',
                             start=['mock_device_cli --os asa --state asa_reload'],
                             os='asa',
@@ -88,12 +106,15 @@ class TestAsaPluginExecute(unittest.TestCase):
         with self.assertRaises(SubCommandFailure) as err:
           r = self.c.execute('network-object host 5.5.50.10')
 
+    def test_error_reporting_pattern(self):
+        self.c.execute("error reporting prompt")
+
+    def test_configuration_replication_message(self):
+        self.c.execute("display replication message")
+
     def test_show_version_looks_like_prompt(self):
         v = self.c.execute('show version 2')
         self.assertEqual(v.replace('\r',''), mock_data['asa_enable']['commands']['show version 2']['response'].rstrip())
-
-    def test_execute_reload_confirm(self):
-        self.c.execute("reload confirm")
 
 class TestAsaPluginLearnHostname(unittest.TestCase):
 

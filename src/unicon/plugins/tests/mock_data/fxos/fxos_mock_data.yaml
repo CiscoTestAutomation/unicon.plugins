@@ -140,6 +140,8 @@ fxos_exec:
       new_state: console
     "scope system":
       new_state: fxos_system
+    "scope security":
+      new_state: fxos_security
     "scope service-profile":
       new_state: fxos_service_profile
     "connect fxos":
@@ -186,12 +188,21 @@ fxos_system:
     "scope services":
       new_state: fxos_system_services
 
+fxos_security:
+  prompt: "Firepower /security # "
+  commands:
+    "top":
+      new_state: fxos_exec
+    "clear-user-sessions all": This closes all the user sessions. Are you sure? (yes/no)
+
 fxos_system_services:
   prompt: "Firepower /system/services # "
   commands:
     "create ntp-server 192.168.200.101":
       new_state: fxos_system_services_modified
     "commit-buffer": "Error: update failed"
+    "show foo": "% Invalid Command at '^' marker"
+    "show chassis inventory 1 fa": "% Ambiguous command at '^' marker"
 
 fxos_system_services_modified:
   prompt: "Firepower /system/services* # "

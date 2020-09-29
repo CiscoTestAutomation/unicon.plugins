@@ -17,5 +17,7 @@ class FxosSettings(GenericSettings):
 
         self.TERM = 'vt100'
         self.ERROR_PATTERN = [
-            r'^Error:'
+            r'^Error:',
+            r'^%\s*[Ii]nvalid [Cc]ommand',
+            r"^%\s*Ambiguous command at '\^' marker"
         ]

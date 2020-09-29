@@ -47,7 +47,6 @@ class AireosReload(BaseService):
         self.connection = connection
         self.context = context
         self.timeout_pattern = ['Timeout occurred', ]
-        self.error_pattern = [r'Invalid', r'Incorrect', r'HELP']
         self.start_state = 'enable'
         self.end_state = 'enable'
         self.result = None
@@ -60,11 +59,18 @@ class AireosReload(BaseService):
                      reload_command='reset system forced',
                      dialog=Dialog([]),
                      timeout=None,
+                     error_pattern=None,
                      **kwargs):
         con = self.connection
         timeout = timeout or self.timeout
         con.log.debug('+++ reloading  %s  with reload_command %s and timeout is %s +++'
                       % (self.connection.hostname, reload_command, timeout))
+
+        if error_pattern is None:
+            self.error_pattern = con.settings.ERROR_PATTERN
+        else:
+            self.error_pattern = error_pattern
+
 
         dialog += self.dialog_reload
         try:
@@ -72,6 +78,10 @@ class AireosReload(BaseService):
             self.result = dialog.process(con.spawn,
                                          timeout=timeout,
                                          prompt_recovery=self.prompt_recovery)
+            if self.result:
+                self.result = self.result.match_output
+                self.result = self.get_service_result()
+
             con.state_machine.go_to('any',
                                     con.spawn,
                                     context=self.context,

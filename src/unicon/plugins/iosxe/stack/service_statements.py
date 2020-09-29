@@ -66,7 +66,7 @@ dis_state = Statement(pattern=switchover_pat.disable_prompt,
                         loop_continue=False, continue_timer=False)
 press_return = Statement(pattern=switchover_pat.press_return,
                         action='sendline()', args=None,
-                        loop_continue=False, continue_timer=False)
+                        loop_continue=True, continue_timer=False)
 
 switchover_fail_pattern = '|'.join([switchover_pat.switchover_fail1,
                             switchover_pat.switchover_fail2,
@@ -92,6 +92,7 @@ reload_shelf = Statement(pattern=reload_pat.reload_entire_shelf,
 
 stack_reload_stmt_list = list(reload_statement_list)
 
+stack_reload_stmt_list.extend([en_state, dis_state])
 stack_reload_stmt_list.insert(0, press_return)
 stack_reload_stmt_list.insert(0, reload_shelf)
 

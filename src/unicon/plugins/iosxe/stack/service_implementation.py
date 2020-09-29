@@ -1,5 +1,5 @@
 """ Stack based IOS-XE service implementations. """
-from time import sleep
+from time import sleep, time
 from collections import namedtuple
 
 from unicon.eal.dialogs import Dialog
@@ -132,8 +132,17 @@ class StackSwitchover(BaseService):
             finally:
                 conn.context.pop('state')
 
-        self.connection.log.info('Sleeping for %s secs.' % self.connection.settings.STACK_SWITCHOVER_SLEEP)
-        sleep(self.connection.settings.STACK_SWITCHOVER_SLEEP)
+        # check all members are ready
+        conn.state_machine.detect_state(conn.spawn)
+
+        interval = self.connection.settings.SWITCHOVER_POSTCHECK_INTERVAL
+        if utils.is_all_member_ready(conn, timeout=timeout, interval=interval):
+            self.connection.log.info('All members are ready.')
+        else:
+            self.connection.log.info('Timeout in %s secs. '
+                'Not all members are in Ready state.' % timeout)
+            self.result = False
+            return
 
         self.connection.log.info('Disconnecting and reconnecting')
         self.connection.disconnect()
@@ -154,7 +163,7 @@ class StackReload(BaseService):
     Arguments:
         reload_command: reload command to be used. default "redundancy reload shelf"
         reply: Additional Dialog( i.e patterns) to be handled
-        timeout: Timeout value in sec, Default Value is 60 sec
+        timeout: Timeout value in sec, Default Value is 900 sec
         image_to_boot: image to boot from rommon state
         return_output: if True, return namedtuple with result and reload output
 
@@ -216,7 +225,7 @@ class StackReload(BaseService):
             raise SubCommandFailure('Error during reload', e) from e
 
         if 'state' in conn.context and conn.context.state == 'rommon':
-            # Wait for all peers to come to boot state.
+            # If manual boot enabled wait for all peers to come to boot state.
             sleep(self.connection.settings.STACK_ROMMON_SLEEP)
 
             conn.context.pop('state')
@@ -227,11 +236,36 @@ class StackReload(BaseService):
 
                 # process boot up for each subconnection
                 for subconn in self.connection.subconnections:
+                    self.connection.log.info('Processing on rp '
+                        '%s-%s' % (conn.hostname, subconn.alias))
                     utils.boot_process(subconn, timeout, self.prompt_recovery, reload_dialog)
 
             except Exception as e:
                 self.connection.log.error(e)
                 raise SubCommandFailure('Reload failed.', e) from e
+        else:
+            try:
+                # bring device to disable mode
+                conn.state_machine.go_to('any', conn.spawn, timeout=timeout,
+                                        prompt_recovery=self.prompt_recovery,
+                                        context=conn.context)
+                conn.state_machine.go_to('disable', conn.spawn, timeout=timeout,
+                                        prompt_recovery=self.prompt_recovery,
+                                        context=conn.context)
+            except Exception as e:
+                raise SubCommandFailure('Failed to bring device to disable mode.', e) from e
+
+        # check active and standby rp is ready
+        self.connection.log.info('Wait for Standby RP to be ready.')
+
+        interval = self.connection.settings.RELOAD_POSTCHECK_INTERVAL
+        if utils.is_active_standby_ready(conn, timeout=timeout, interval=interval):
+            self.connection.log.info('Active and Standby RPs are ready.')
+        else:
+            self.connection.log.info('Timeout in %s secs. '
+                'Standby RP is not in Ready state. Reload failed' % timeout)
+            self.result = False
+            return
 
         self.connection.log.info('Sleeping for %s secs.' % \
                 self.connection.settings.STACK_POST_RELOAD_SLEEP)

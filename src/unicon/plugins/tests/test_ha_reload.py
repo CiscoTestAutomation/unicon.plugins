@@ -276,6 +276,7 @@ class TestGenericReloadOutput(unittest.TestCase):
         cls.d.disconnect()
 
     def test_reload_output(self):
+        self.d.spawn.timeout = 60
         res, output = self.d.reload(return_output=True)
         self.assertTrue(res)
         self.assertIn(self.expected_output, '\n'.join(output.splitlines()))

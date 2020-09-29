@@ -108,12 +108,14 @@ class TestConfdNfvisPluginConfigure(unittest.TestCase):
 
     def test_configure_error(self):
         c = self.test_connect()
+        c.spawn.timeout = 60
         with self.assertRaisesRegex(SubCommandFailure, "sub_command failure, patterns matched in the output"):
-            r = c.configure("no bridges bridge mgmt-br")
+            r = c.configure("no bridges bridge mgmt-br", timeout=60)
 
     def test_configure_should_not_error(self):
         c = self.test_connect()
-        r = c.configure("no bridges bridge mgmt-br", error_pattern=[])
+        c.spawn.timeout = 60
+        r = c.configure("no bridges bridge mgmt-br", error_pattern=[], timeout=60)
         self.assertEqual(r['commit'], "Aborted: illegal reference 'networks network mgmt-net bridge'")
         self.assertEqual(c.state_machine.current_cli_mode, 'exec')
 
