@@ -24,6 +24,7 @@ class IosXEPatterns(GenericPatterns):
         self.enable_prompt = \
             r'^(.*?)(Router|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(-standby)?(\(boot\))?(\(recovery-mode\))?#\s?$'
         self.press_enter = ReloadPatterns().press_enter
+        self.config_prompt = r'^(.*)\(.*(con|cfg|ipsec-profile|ca-trustpoint|cs-server)\S*\)#\s?$'
 
 class IosXEReloadPatterns(ReloadPatterns):
     def __init__(self):

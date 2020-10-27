@@ -40,7 +40,9 @@ class IOSXRSettings(GenericSettings):
             r'^%\s*Failed to commit.*',
             r'^%\s*[Ii]nvalid (command|input).*',
             r'^%\s*[Ii]ncomplete (command|input).*',
-            r'^%\s*[Aa]mbiguous (command|input).*'
+            r'^%\s*[Aa]mbiguous (command|input).*',
+            r'^%\s*Unmatched +quote.*',
+            r'^%\s*Error +parsing +piping+ string\. +Quitting.*'
         ]
 
         self.EXECUTE_MATCHED_RETRIES = 1

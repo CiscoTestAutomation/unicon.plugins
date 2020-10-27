@@ -151,6 +151,21 @@ class TestJunosVsrxPluginBashService(unittest.TestCase):
         self.assertIn('root@junos_vsrx>', c.spawn.match.match_output)
 
 
+class TestConfigErrorResponse(unittest.TestCase):
+    
+    def test_connection(self):
+        c = Connection(hostname='junos_dev',
+                        start=['mock_device_cli --os junos --state exec5'],
+                        os='junos',
+                        username='root',
+                        tacacs_password='lab',
+                        init_exec_commands=[],
+                        init_config_commands=[]
+                        )
+        c.connect()
+        with self.assertRaises(Exception):
+	        c.configure('commit synchronize')
+
 
 if __name__ == "__main__":
     unittest.main()

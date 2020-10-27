@@ -105,11 +105,10 @@ class StackSwitchover(BaseService):
 
         if reply:
             dialog = reply + self.dialog
-        custom_auth_stmt = custom_auth_statements(
-                                conn.settings.LOGIN_PROMPT,
-                                conn.settings.PASSWORD_PROMPT)
-        if custom_auth_stmt:
-            dialog += Dialog(custom_auth_stmt)
+
+        # added connection dialog in case switchover ask for username/password
+        connect_dialog = self.connection.connection_provider.get_connection_dialog()
+        dialog += connect_dialog
 
         conn.sendline(switchover_cmd)
         try:
@@ -245,11 +244,11 @@ class StackReload(BaseService):
                 raise SubCommandFailure('Reload failed.', e) from e
         else:
             try:
-                # bring device to disable mode
+                # bring device to enable mode
                 conn.state_machine.go_to('any', conn.spawn, timeout=timeout,
                                         prompt_recovery=self.prompt_recovery,
                                         context=conn.context)
-                conn.state_machine.go_to('disable', conn.spawn, timeout=timeout,
+                conn.state_machine.go_to('enable', conn.spawn, timeout=timeout,
                                         prompt_recovery=self.prompt_recovery,
                                         context=conn.context)
             except Exception as e:

@@ -33,6 +33,7 @@ class JunosSettings(GenericSettings):
             r'.*error: +problem +checking +file:.*',
             r'.*error: +configuration +check-out +failed.*',
             r'.*Users +currently +editing +the +configuration:.*',
+            r'.*error: +commit +failed:.*',
         ]
 
         # Maximum number of retries for password handler

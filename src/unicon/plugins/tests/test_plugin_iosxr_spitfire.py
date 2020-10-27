@@ -446,7 +446,7 @@ class TestIosXrSpitfirePluginAttachConsoleService(unittest.TestCase):
             out = console.execute('ls')
             self.assertIn('dummy_file', out)
         ret = conn.spawn.match.match_output
-        self.assertEqual(ret,'exit\r\nlogout\r\nRP/0/RP0/CPU0:Router#')
+        self.assertIn('exit\r\nlogout\r\nRP/0/RP0/CPU0:Router#', ret)
 
     def test_attach_console_lc0(self):
         conn = Connection(hostname='Router',
@@ -460,7 +460,7 @@ class TestIosXrSpitfirePluginAttachConsoleService(unittest.TestCase):
             out = console.execute('ls')
             self.assertIn('dummy_file', out)
         ret = conn.spawn.match.match_output
-        self.assertEqual(ret,'exit\r\nlogout\r\nRP/0/RP0/CPU0:Router#')
+        self.assertIn('exit\r\nlogout\r\nRP/0/RP0/CPU0:Router#', ret)
 
 
 if __name__ == "__main__":

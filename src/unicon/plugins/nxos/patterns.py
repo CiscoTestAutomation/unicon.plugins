@@ -32,3 +32,4 @@ class NxosPatterns(GenericPatterns):
         self.delete_vdc_confirm = r'^.*Continue deleting this vdc\s?\(y\/n\)\?\s+\[no\]'
         self.shell_prompt = r'^(.*)(bash-\S+|Linux)[#\$]\s?$'
         self.guestshell_prompt = r'^(.*)\[\S+@guestshell\s+.*\][#\$]\s?$'
+        self.commit_verification = r'^(.*)Commit +Successful.*$'

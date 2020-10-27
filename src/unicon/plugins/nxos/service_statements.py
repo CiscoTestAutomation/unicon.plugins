@@ -12,6 +12,7 @@ Description:
 from time import sleep
 
 from unicon.eal.dialogs import Statement
+from unicon.plugins.nxos.patterns import NxosPatterns
 from unicon.plugins.nxos.service_patterns import ReloadPatterns
 from unicon.plugins.nxos.service_patterns import HaNxosReloadPatterns
 
@@ -148,3 +149,13 @@ ha_nxos_reload_statement_list = [save_env, reboot, secure_password,
 
 additional_connection_dialog = [enable_vdc, boot_vdc, snmp_port,
                                 admin_password, secure_password, auto_provision]
+
+# Statements for commit verification on NXOS
+pat = NxosPatterns()
+
+commit_verification_stmt = Statement(pattern=pat.commit_verification,
+                                action='sendline()',
+                                args=None, loop_continue=True,
+                                continue_timer=False)
+
+config_commit_stmt_list = [commit_verification_stmt]

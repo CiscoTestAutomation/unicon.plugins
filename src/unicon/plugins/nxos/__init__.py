@@ -38,6 +38,7 @@ class NxosServiceList(ServiceList):
         self.attach_console = svc.AttachModuleConsole
         self.bash_console = svc.BashService
         self.guestshell = svc.GuestshellService
+        self.configure = svc.Configure
 
 
 class HANxosServiceList(HAServiceList):
@@ -59,7 +60,7 @@ class HANxosServiceList(HAServiceList):
         self.bash_console = svc.BashService
         self.guestshell = svc.GuestshellService
         self.ping6 = svc.Ping6
-
+        self.configure = svc.Configure
 
 
 class NxosSingleRpConnection(BaseNxosSingleRpConnection):

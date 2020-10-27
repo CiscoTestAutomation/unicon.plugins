@@ -415,5 +415,27 @@ class TestNxosIncorrectLogin(unittest.TestCase):
         dev.disconnect()
 
 
+class TestNxosPluginConfigure(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.dev = Connection(hostname='switch',
+                        start=['mock_device_cli --os nxos --state exec'],
+                        os='nxos',
+                        username='cisco',
+                        tacacs_password='cisco',
+                        init_exec_commands=[],
+                        init_config_commands=[]
+                        )
+        cls.dev.connect()
+
+    def test_execute_configure_commit(self):
+        acl_cfg = "configure session acl6\nip access-list acl6\n"\
+            "10 permit ip 63.1.1.1/24 64.1.1.1/24\nip access-list acl5\n10 permit ip 130.1.1.1/24 140.1.1.1/24"
+
+        out = self.dev.configure(acl_cfg, commit=True)
+
+        self.assertIn('Commit Successful', out)
+
+
 if __name__ == "__main__":
     unittest.main()

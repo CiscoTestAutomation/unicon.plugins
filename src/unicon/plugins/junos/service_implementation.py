@@ -48,7 +48,7 @@ class Configure(Configure):
 
     def call_service(self, command=[], reply=Dialog([]),
                       timeout=None, *args, **kwargs):
-        self.commit_cmd = ('commit')
+        self.commit_cmd = ('commit synchronize')
         super().call_service(command,
                              reply=reply,
                              timeout=timeout, *args, **kwargs)

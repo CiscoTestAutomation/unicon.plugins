@@ -141,6 +141,8 @@ exec:
         new_state: exec17
     "prompt18":
         new_state: exec18
+    "prompt19":
+        new_state: exec19
     "ls": |
       /tmp
       /var
@@ -334,6 +336,11 @@ exec18:
       - 0:,0,0.05
   prompt: "# "
   commands: *cmds
+
+exec19:
+    prompt: "~ #"
+    commands: *cmds
+
 
 sma_prompt:
   prompt: "sma03:testuser 1] "

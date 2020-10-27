@@ -238,7 +238,8 @@ class TestLinuxPluginPrompts(unittest.TestCase):
       'prompt15',
       'prompt16',
       'prompt17',
-      'prompt18'
+      'prompt18',
+      'prompt19'
     ]
 
     @classmethod
@@ -368,7 +369,7 @@ class TestRegexPattern(unittest.TestCase):
 
     def test_prompt_pattern(self):
         patterns = LinuxPatterns().__dict__
-        known_slow_patterns = ['learn_hostname']
+        known_slow_patterns = ['learn_hostname', 'learn_os_prompt']
 
         slow_patterns = {}
 

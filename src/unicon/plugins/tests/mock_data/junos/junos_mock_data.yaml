@@ -118,3 +118,17 @@ config4:
         [edit]
     "exit":
       new_state: exec4
+
+exec5:
+  prompt: "root@junos_dev>"
+  commands:
+    "configure":
+      new_state: config_exec
+  
+config_exec:
+  prompt: "root@junos_dev#"
+  commands:
+    "commit synchronize": |
+        error: commit failed: (statements constraint check failed)
+    "exit":
+      new_state: exec5

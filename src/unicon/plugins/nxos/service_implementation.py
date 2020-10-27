@@ -21,7 +21,7 @@ from unicon.plugins.generic.service_implementation import BashService as Generic
 from unicon.core.errors import (SubCommandFailure, TimeoutError,
     UniconAuthenticationError, )
 
-from unicon.eal.dialogs import Dialog
+from unicon.eal.dialogs import Dialog, Statement
 from unicon.plugins.generic.service_implementation import \
     Copy as GenericCopy, ReloadResult
 from unicon.plugins.generic.service_implementation import \
@@ -34,6 +34,8 @@ from unicon.plugins.generic.service_implementation import \
     GetRPState as GenericGetRPState
 from unicon.plugins.generic.service_implementation import \
     SwitchoverService as GenericSwitchover
+from unicon.plugins.generic.service_implementation import \
+    Configure as GenericConfigure
 from unicon.plugins.generic.service_statements import ping6_statement_list, \
     switchover_statement_list, standby_reset_rp_statement_list
 from unicon.plugins.generic.service_statements import send_response
@@ -46,11 +48,14 @@ from .patterns import NxosPatterns
 
 from .utils import NxosUtils
 
+from .service_statements import config_commit_stmt_list
+
 import unicon.plugins.nxos
 
 patterns = NxosPatterns()
 settings = Settings()
 utils = NxosUtils()
+
 
 class NxosCopy(GenericCopy):
     """ Implements Copy service for NXOS
@@ -79,6 +84,34 @@ class NxosCopy(GenericCopy):
             elif re.match(r'.*:/*$', kwargs['dest'].strip()):
                 kwargs['dest'] = kwargs['dest'] + '/' +kwargs['dest_file']
         super().call_service(*args, **kwargs)
+
+
+class Configure(GenericConfigure):
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.start_state = 'config'
+        self.end_state = 'enable'
+
+    def call_service(self, command=[], reply=Dialog([]),
+                      timeout=None, commit=False, *args, **kwargs):
+        if commit:
+            self.commit_cmd = 'commit'
+
+            commit_verification_stmt = Statement(pattern=r'.*{hostname}#.*'.format(
+                hostname = self.context['hostname']),
+                action=None,
+                args=None, loop_continue=False,
+                continue_timer=False)
+
+            super().call_service(command,
+                                 reply=reply + Dialog([commit_verification_stmt]),
+                                 timeout=timeout, *args, **kwargs)
+
+        else:
+            super().call_service(command,
+                                 reply=reply,
+                                 timeout=timeout, *args, **kwargs)
+
 
 class Reload(GenericReload):
     """ Service to reload the device.

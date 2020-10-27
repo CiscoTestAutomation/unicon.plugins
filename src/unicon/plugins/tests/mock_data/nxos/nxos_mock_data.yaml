@@ -118,6 +118,7 @@ exec:
       new_state: src_file
     "copy  bootflash: bootflash:/test-2.cfg":
       new_state: src_file
+    "end": ""
     "ping6 2003::7010 vrf management": |
       PING6 2003::7010 (2003::7010): 56 data bytes
       64 bytes from 2003::7010: icmp_seq=0 time=0.595 ms
@@ -152,11 +153,14 @@ config:
   commands: &config_cmds
     "maint":
       new_state: config_maint
+    "configure session acl6":
+      new_state: config_session
     "no logging console": ""
     "line console": ""
     "exec-timeout 0": ""
     "terminal width 511": ""
-    'feature bash': ""
+    "feature bash": ""
+    "line vty": ""
     "end":
       new_state: exec
 
@@ -420,4 +424,27 @@ re_enter_password:
         such license is available at
         http://www.opensource.org/licenses/gpl-2.0.php and
         http://www.opensource.org/licenses/lgpl-2.1.php
+      new_state: exec
+
+
+# ======================================================
+config_session:
+  prompt: "%N(config-s)# "
+  commands:
+    "ip access-list acl6":
+      new_state: config_session_acl
+
+config_session_acl:
+  prompt: "%N(config-s-acl)# "
+  commands:
+    "10 permit ip 63.1.1.1/24 64.1.1.1/24": ""
+    "ip access-list acl5": ""
+    "10 permit ip 130.1.1.1/24 140.1.1.1/24": ""
+
+    "commit":
+      response: |
+        Verification successful...
+        Proceeding to apply configuration. This might take a while depending on amount of configuration in buffer.
+        Please avoid other configuration changes during this time.
+        Commit Successful
       new_state: exec

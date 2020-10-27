@@ -2097,9 +2097,13 @@ class SwitchoverService(BaseService):
             con.standby.spawn.sendline("\r")
             con.standby.spawn.expect(".*")
             try:
-                con.standby.state_machine.go_to('disable', con.standby.spawn, context=con.context)
-            except:
-                con.standby.state_machine.go_to('any', con.standby.spawn, context=con.context)
+                con.standby.state_machine.go_to('any',
+                                                con.standby.spawn,
+                                                context=con.standby.context,
+                                                dialog=con.connection_provider.get_connection_dialog())
+            except Exception:
+                con.log.error("Failed to bring standby rp to any state")
+                raise
 
             con.enable(target='standby')
         # Verify switchover is Successful

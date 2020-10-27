@@ -142,6 +142,16 @@ general_config:
       new_state: general_config_line
     "redundancy":
       new_state: config_general_redundancy
+    "crypto key generate rsa general-keys modulus 2048 label ca": |
+        crypto key generate rsa general-keys modulus 2048 label ca
+        % You already have RSA keys defined named ca.
+        % They will be replaced.
+
+        % The key modulus size is 2048 bits
+        % Generating 2048 bit RSA keys, keys will be non-exportable...
+        [OK] (elapsed time was 2 seconds)
+    "crypto pki server ca":
+      new_state: config_general_server
 
 general_config_line:
   prompt: "Router(config-line)#"
@@ -155,6 +165,30 @@ config_general_redundancy:
     commands:
       "main-cpu":
         new_state: config_general_redundancy_main_cpu
+      "end":
+        new_state: general_enable
+
+config_general_server:
+    prompt: Router(cs-server)#
+    commands:
+      "grant auto": |
+          grant auto
+          % The CS config is locked because it is busy or enabled. You need to shut the server off before changing its configuration.
+      "hash sha256": |
+          hash sha256
+          % The CS config is locked because it is busy or enabled. You need to shut the server off before changing its configuration.
+      "lifetime ca-certificate 3650": |
+          lifetime ca-certificate 3650
+          % The CS config is locked because it is busy or enabled. You need to shut the server off before changing its configuration.
+      "lifetime certificate 3650": |
+          lifetime certificate 3650
+          % The CS config is locked because it is busy or enabled. You need to shut the server off before changing its configuration.
+      "database archive pkcs12 password 0 cisco123": |
+          database archive pkcs12 password 0 cisco123
+          % The CS config is locked because it is busy or enabled. You need to shut the server off before changing its configuration.
+      "no shutdown": |
+          no shutdown
+          Certificate server 'no shut' event has been queued for processing.
       "end":
         new_state: general_enable
 

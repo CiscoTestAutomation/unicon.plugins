@@ -1,4 +1,5 @@
 """ Generic IOS-XE Stack Service Statements """
+import time
 from unicon.eal.dialogs import Statement
 from unicon.plugins.generic.service_statements import reload_statement_list
 from .service_patterns import StackIosXESwitchoverPatterns, StackIosXEReloadPatterns
@@ -18,6 +19,10 @@ def send_boot_cmd(spawn, context):
     cmd = "boot {}".format(context['image_to_boot']) \
         if "image_to_boot" in context else "boot"
     spawn.sendline(cmd)
+
+def stack_press_return(spawn, context):
+    time.sleep(spawn.timeout)
+    spawn.sendline()
 
 
 # switchover service statements
@@ -54,7 +59,7 @@ sw_init = Statement(pattern=switchover_pat.switchover_init,
 
 user_acc = Statement(pattern=switchover_pat.useracess,
                         action=None, args=None,
-                        loop_continue=False, continue_timer=False)
+                        loop_continue=True, continue_timer=False)
 switch_prompt = Statement(pattern=switchover_pat.rommon_prompt,
                         action=update_curr_state, args={'state': 'rommon'},
                         loop_continue=False, continue_timer=False)
@@ -65,7 +70,7 @@ dis_state = Statement(pattern=switchover_pat.disable_prompt,
                         action=update_curr_state, args={'state': 'disable'},
                         loop_continue=False, continue_timer=False)
 press_return = Statement(pattern=switchover_pat.press_return,
-                        action='sendline()', args=None,
+                        action=stack_press_return, args=None,
                         loop_continue=True, continue_timer=False)
 
 switchover_fail_pattern = '|'.join([switchover_pat.switchover_fail1,

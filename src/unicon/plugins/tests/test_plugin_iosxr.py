@@ -230,6 +230,7 @@ class TestIosXrConfigPrompts(unittest.TestCase):
         """Check that we can successfully return to an enable prompt after entering failed config on moonshine."""
         self._moonshine_conn.execute("configure terminal", allow_state_change=True)
         self._moonshine_conn.execute("test failed")
+        self._moonshine_conn.spawn.timeout = 60
         self._moonshine_conn.enable()
 
 

@@ -75,6 +75,19 @@ class TestIosXEPluginConnect(unittest.TestCase):
         c.connect()
         self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
 
+    def test_general_configure(self):
+        c = Connection(hostname='Router',
+                start=['mock_device_cli --os iosxe --state general_login'],
+                os='iosxe',
+                username='cisco',
+                tacacs_password='cisco')
+        c.connect()
+        cmd = ['crypto key generate rsa general-keys modulus 2048 label ca',
+               'crypto pki server ca', 'grant auto', 'hash sha256', 'lifetime ca-certificate 3650',
+               'lifetime certificate 3650', 'database archive pkcs12 password 0 cisco123', 'no shutdown']
+        c.configure(cmd, timeout=60, error_pattern=[], service_dialogue=None)
+        self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
+
 
 class TestIosXEPluginExecute(unittest.TestCase):
     @classmethod
