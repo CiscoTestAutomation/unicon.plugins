@@ -37,6 +37,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
     'sphinxcontrib.mockautodoc',
+    'sphinx.ext.autosectionlabel'
 ]
 
 if os.environ.get('DEVNET', None) == 'true':

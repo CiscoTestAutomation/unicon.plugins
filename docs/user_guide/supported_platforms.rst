@@ -52,6 +52,7 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
     ``iosxr``, ``moonshine``
     ``iosxr``, ``ncs5k``
     ``iosxr``, ``spitfire``
+    ``iosxr``, ``enxr``
     ``ise``
     ``linux``, , , "Generic Linux server with bash prompts"
     ``nxos``

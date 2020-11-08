@@ -200,4 +200,67 @@ timeout                 int (default in None)     timeout in sec for executing c
     
         device.switchto("xr_env")
         .... some commands that need to be run in xr_env state ....
-        device.switchto("enable") 
+        device.switchto("enable")
+
+
+EnXR
+^^^^^^^^
+
+EnXR is a device simulator based on an XR image and it is used for development.
+It is a development platform for running platform independent IOS XR code on Linux. It consists of an implementation of
+the IOS XR platform layer to enable PI code to run on Linux servers, and also tools to support the building and testing
+of code on those servers.
+
+Connectivity with the EnXR
+""""""""""""""""""""""""""
+
+To connect the pyATS with the EnXR device, you first need to pull enxr workspace in your
+ADS. EnXR pulling is clearly mentioned in the :ref:'Setting EnXR Device'
+
+Then you need to install pyATS & it is recommended to install the pyATS inside your EnXR
+workspace.
+
+
+Installing pyATS
+""""""""""""""""
+
+/auto/pyats/bin/pyats install --py-home <python3 interpreter path in your ADS> --no-git
+
+* To know the path of your python3 interpreter, you can run which python3 on your ADS.
+And the path you get, needs to put as an argument for --py-home option.
+
+
+Setting up EnXR Device
+"""""""""""""""""""
+
+To setup the EnXR device, You can follow the below steps:
+
+1. ssh <your ADS> (must be CEL7 or above)
+2. cd /nobackup/<CEC username>/
+3. mkdir enxr
+4. cd enxr
+5. acme pull -sb ios_ena -lineup xr-dev.lu -plat enxr
+6. tools/misc/xr_bld -core -plat enxr
+7. lboot -m (wait for config to load)
+8. exec
+9. conf t
+10. netconf-yang agent ssh
+11. commit
+12. end
+13. Leave terminal open and start new terminal
+14. ssh <your ADS>
+15. cd /nobackup/<CEC username>/enxr
+16. lboot -mc
+17. netconf_sshd_proxy -i 0 -o 1 -u lab
+18. IF YOU DO NOT SEE A NETCONF HELLO PACKET RESPONSE, EnXR IS NOT WORKING!!!
+
+Connecting with the EnXR
+""""""""""""""""""""""""
+Below is the example code to connect with the enxr device and execute command
+.. code-block:: python
+
+        from pyats.topology import loader
+        topo=loader.load('testbed_memory_native_enxr.yml')
+        dev=topo.devices['bgl-ads-4861']
+        dev.connect(via='cli', alias='ssh')
+        showrun=dev.ssh.execute('show run')
