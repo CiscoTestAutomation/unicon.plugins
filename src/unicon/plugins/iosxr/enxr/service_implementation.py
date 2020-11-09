@@ -3,10 +3,84 @@ __author__ = "ashok joshi <ashojosh@cisco.com>"
 
 import pexpect
 from unicon.bases.routers.services import BaseService
+<<<<<<< HEAD
 from unicon.eal.dialogs import Dialog
 
 class Execute(BaseService):
     def __init__(self, connection, context, **kwargs):
+=======
+from unicon.eal.dialogs import Dialog, Statement
+from unicon.core.errors import SubCommandFailure, TimeoutError
+from unicon.eal.dialogs import Dialog
+
+from unicon.plugins.generic.service_implementation import \
+    Configure as GenericConfigure, \
+    Execute as GenericExecute,\
+    Ping as GenericPing,\
+    HaConfigureService as GenericHAConfigure,\
+    HaExecService as GenericHAExecute,\
+    HAReloadService as GenericHAReload,\
+    SwitchoverService as GenericHASwitchover, \
+    Traceroute as GenericTraceroute, \
+    Copy as GenericCopy, \
+    ResetStandbyRP as GenericResetStandbyRP
+
+from unicon.plugins.iosxr.statements import IOSXRStatements
+
+statements = IOSXRStatements()
+
+class SshSession:
+    """Session handling for SSH connections."""
+
+    instances = {}
+
+    @classmethod
+    def get(cls, key):
+        """Retrieve or create an SSH session instance.
+        The key can be a string or a device profile.
+        Args:
+          key (str): Device name or uses the base.profile_name as key.
+        Returns:
+          SshSession
+        """
+        # accept device name or profile
+        if not isinstance(key, YSDeviceProfile):
+            dev_profile = YSDeviceProfile.get(key)
+        else:
+            dev_profile = key
+            key = dev_profile.base.profile_name
+
+        if key not in cls.instances:
+            if dev_profile.ssh.device_variant == 'cisco_enxr':
+                cls.instances[key] = SshEnxrSession(key)
+            else:
+                cls.instances[key] = SshNetmikoSession(key)
+
+        return cls.instances[key]
+
+    @classmethod
+    def destroy(cls, key):
+        """Remove the session instance from the cache.
+        The key can be a string or a device profile.
+        Args:
+          key (str): Device name or uses the base.profile_name as key.
+        """
+        if isinstance(key, YSDeviceProfile):
+            key = key.base.profile_name
+
+        if key in cls.instances:
+            session = cls.instances[key]
+            if session.connected:
+                session.disconnect()
+            del cls.instances[key]
+
+    def __init__(self, key):
+        self.key = key
+        self.dev_profile = YSDeviceProfile.get(key)
+
+class Execute(BaseService):
+    def __init__(self, connection, context, **kwargs)   :
+>>>>>>> edcc7403ef1fc3ce709728b2c86e50dc54ee2453
         super().__init__(connection, context, **kwargs)
         self.prompt_recovery = connection.prompt_recovery
         self.connected = False
@@ -16,7 +90,11 @@ class Execute(BaseService):
         # Check if connection is established
         if self.connection.is_connected:
             return
+<<<<<<< HEAD
         if self.connection.reconnect:
+=======
+        elif self.connection.reconnect:
+>>>>>>> edcc7403ef1fc3ce709728b2c86e50dc54ee2453
             self.connection.connect()
         else:
             raise ConnectionError("Connection is not established to device")
@@ -63,9 +141,16 @@ class Execute(BaseService):
                     self.ssh = p
 
         except pexpect.exceptions.TIMEOUT:
+<<<<<<< HEAD
             self.connection.log.warning('EnXR connect failed ')
         except Exception:
             self.connection.log.warning('EnXR connect failed ')
+=======
+            log.error('EnXR connect failed ')
+        except Exception:
+            log.error('EnXR connect failed ')
+            log.error(traceback.format_exc())
+>>>>>>> edcc7403ef1fc3ce709728b2c86e50dc54ee2453
         finally:
             return self.connected
 
@@ -81,7 +166,13 @@ class Execute(BaseService):
             self.result = self.ssh.before.decode('utf-8') + self.prompt
             self.connection.log.info(self.result)
         except pexpect.exceptions.TIMEOUT:
+<<<<<<< HEAD
             self.connection.log.warning('EnxR CLI failed %s\n\n%s',cmd)
+=======
+            log.error('EVxR CLI failed %s\n\n%s',
+                      (self.dev_profile.base.profile_name,
+                       cmd))
+>>>>>>> edcc7403ef1fc3ce709728b2c86e50dc54ee2453
             self.result = 'Command TIMEOUT'
 
     def send_config(self, cmd):
@@ -123,9 +214,15 @@ class Execute(BaseService):
                 self.ssh.close()
                 self.connected = False
         except Exception:
+<<<<<<< HEAD
             self.connection.log.warning('EnXR disconnect failed %s',
                       self.dev_profile.base.profile_name)
             self.connection.log.warning(traceback.format_exc())
+=======
+            log.error('EnXR disconnect failed %s',
+                      self.dev_profile.base.profile_name)
+            log.error(traceback.format_exc())
+>>>>>>> edcc7403ef1fc3ce709728b2c86e50dc54ee2453
         finally:
             return self.connected
 
