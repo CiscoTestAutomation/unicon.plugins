@@ -215,7 +215,7 @@ Connectivity with the EnXR
 """"""""""""""""""""""""""
 
 To connect the pyATS with the EnXR device, you first need to pull enxr workspace in your
-ADS. EnXR pulling is clearly mentioned in the :ref:'Setting EnXR Device'
+ADS. EnXR pulling is clearly mentioned in the :ref:'Setting up EnXR Device'
 
 Then you need to install pyATS & it is recommended to install the pyATS inside your EnXR
 workspace.
@@ -223,12 +223,35 @@ workspace.
 
 Installing pyATS
 """"""""""""""""
+1. Go to enxr workspace: cd /nobackup/<CEC username>/enxr/
+2. mkdir pyats_dir
+3. cd pyats_dir
+4. /auto/pyats/bin/pyats install --py-home <python3 interpreter path in your ADS> --no-git
 
-/auto/pyats/bin/pyats install --py-home <python3 interpreter path in your ADS> --no-git
-
-* To know the path of your python3 interpreter, you can run which python3 on your ADS.
+* To know the path of your python3 interpreter, you can run "which python3" on your ADS.
 And the path you get, needs to put as an argument for --py-home option.
 
+
+Connecting with the EnXR
+""""""""""""""""""""""""
+
+To run the script in EnXR, follow the below steps:
+
+1. cd /nobackup/<CEC username>/enxr/
+2. lboot -mc
+3. source /nobackup/<CEC username>/enxr/pyats_dir/env.sh
+4. python
+
+It will start the python3 enviornment under enxr workspace. Now you can run sample code to connect with the enxr device and
+execute exec command.
+
+.. code-block:: python
+
+        from pyats.topology import loader
+        topo=loader.load('testbed_memory_native_enxr.yml')
+        dev=topo.devices['enxr_dev']
+        dev.connect(via='cli', alias='ssh')
+        showrun=dev.ssh.execute('show run')
 
 Setting up EnXR Device
 """""""""""""""""""
@@ -254,13 +277,3 @@ To setup the EnXR device, You can follow the below steps:
 17. netconf_sshd_proxy -i 0 -o 1 -u lab
 18. IF YOU DO NOT SEE A NETCONF HELLO PACKET RESPONSE, EnXR IS NOT WORKING!!!
 
-Connecting with the EnXR
-""""""""""""""""""""""""
-Below is the example code to connect with the enxr device and execute command
-.. code-block:: python
-
-        from pyats.topology import loader
-        topo=loader.load('testbed_memory_native_enxr.yml')
-        dev=topo.devices['bgl-ads-4861']
-        dev.connect(via='cli', alias='ssh')
-        showrun=dev.ssh.execute('show run')

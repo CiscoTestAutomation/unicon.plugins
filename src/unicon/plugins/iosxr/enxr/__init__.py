@@ -11,7 +11,6 @@ from unicon.plugins.iosxr.enxr.connection_provider import IOSXREnxrSingleRpConne
 from unicon.plugins.iosxr.statemachine import IOSXRSingleRpStateMachine
 from unicon.plugins.iosxr.settings import IOSXRSettings
 
-
 class IOSXREnxrServiceList(ServiceList):
     def __init__(self):
         super().__init__()

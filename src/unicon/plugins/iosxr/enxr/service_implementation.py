@@ -3,25 +3,7 @@ __author__ = "ashok joshi <ashojosh@cisco.com>"
 
 import pexpect
 from unicon.bases.routers.services import BaseService
-from unicon.eal.dialogs import Dialog, Statement
-from unicon.core.errors import SubCommandFailure, TimeoutError
 from unicon.eal.dialogs import Dialog
-
-from unicon.plugins.generic.service_implementation import \
-    Configure as GenericConfigure, \
-    Execute as GenericExecute,\
-    Ping as GenericPing,\
-    HaConfigureService as GenericHAConfigure,\
-    HaExecService as GenericHAExecute,\
-    HAReloadService as GenericHAReload,\
-    SwitchoverService as GenericHASwitchover, \
-    Traceroute as GenericTraceroute, \
-    Copy as GenericCopy, \
-    ResetStandbyRP as GenericResetStandbyRP
-
-from unicon.plugins.iosxr.statements import IOSXRStatements
-
-statements = IOSXRStatements()
 
 class Execute(BaseService):
     def __init__(self, connection, context, **kwargs):
@@ -34,7 +16,7 @@ class Execute(BaseService):
         # Check if connection is established
         if self.connection.is_connected:
             return
-        elif self.connection.reconnect:
+        if self.connection.reconnect:
             self.connection.connect()
         else:
             raise ConnectionError("Connection is not established to device")
@@ -81,10 +63,9 @@ class Execute(BaseService):
                     self.ssh = p
 
         except pexpect.exceptions.TIMEOUT:
-            log.error('EnXR connect failed ')
+            self.connection.log.warning('EnXR connect failed ')
         except Exception:
-            log.error('EnXR connect failed ')
-            log.error(traceback.format_exc())
+            self.connection.log.warning('EnXR connect failed ')
         finally:
             return self.connected
 
@@ -100,9 +81,7 @@ class Execute(BaseService):
             self.result = self.ssh.before.decode('utf-8') + self.prompt
             self.connection.log.info(self.result)
         except pexpect.exceptions.TIMEOUT:
-            log.error('EVxR CLI failed %s\n\n%s',
-                      (self.dev_profile.base.profile_name,
-                       cmd))
+            self.connection.log.warning('EnxR CLI failed %s\n\n%s',cmd)
             self.result = 'Command TIMEOUT'
 
     def send_config(self, cmd):
@@ -144,9 +123,9 @@ class Execute(BaseService):
                 self.ssh.close()
                 self.connected = False
         except Exception:
-            log.error('EnXR disconnect failed %s',
+            self.connection.log.warning('EnXR disconnect failed %s',
                       self.dev_profile.base.profile_name)
-            log.error(traceback.format_exc())
+            self.connection.log.warning(traceback.format_exc())
         finally:
             return self.connected
 
