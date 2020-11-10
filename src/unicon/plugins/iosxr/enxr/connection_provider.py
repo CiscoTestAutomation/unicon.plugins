@@ -2,9 +2,11 @@ __author__ = "Ashok Joshi <ashojosh@cisco.com>"
 
 import traceback
 import pexpect
-from unicon.plugins.iosxr.connection_provider import IOSXRSingleRpConnectionProvider
+from unicon.plugins.iosxr.connection_provider \
+    import IOSXRSingleRpConnectionProvider
 from unicon.plugins.iosxr.enxr.settings import EnxrSettings
 from unicon import log
+
 
 class IOSXREnxrSingleRpConnectionProvider(IOSXRSingleRpConnectionProvider):
     """ Implements EnXR singleRP Connection Provider,
@@ -18,7 +20,6 @@ class IOSXREnxrSingleRpConnectionProvider(IOSXRSingleRpConnectionProvider):
         self.get_connection_dialog()
         self.spawn = None
         self.prompt = None
-
 
     @property
     def connected(self):

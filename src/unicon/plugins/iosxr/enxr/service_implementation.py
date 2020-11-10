@@ -1,9 +1,11 @@
-__copyright__ = "# Copyright (c) 2019 by cisco Systems, Inc. All rights reserved."
+__copyright__ = "# Copyright (c) 2019 by cisco Systems, Inc. " \
+                "All rights reserved."
 __author__ = "ashok joshi <ashojosh@cisco.com>"
 
-import pexpect
 from unicon.bases.routers.services import BaseService
 from unicon.eal.dialogs import Dialog
+import pexpect
+
 
 class Execute(BaseService):
     def __init__(self, connection, context, **kwargs):
@@ -26,7 +28,8 @@ class Execute(BaseService):
                                             self.connection.spawn,
                                             context=self.connection.context)
 
-    def call_service(self, cmd, dialog=Dialog([]), timeout=20, *args, **kwargs):
+    def call_service(self, cmd, dialog=Dialog([]),
+                     timeout=20, *args, **kwargs):
         self.connect()
         return self._send(cmd)
 
@@ -69,7 +72,6 @@ class Execute(BaseService):
         finally:
             return self.connected
 
-
     def _send(self, cmd):
         """Using pexpect for all commands."""
         if not cmd or not self.connected:
@@ -81,7 +83,7 @@ class Execute(BaseService):
             self.result = self.ssh.before.decode('utf-8') + self.prompt
             self.connection.log.info(self.result)
         except pexpect.exceptions.TIMEOUT:
-            self.connection.log.warning('EnxR CLI failed %s\n\n%s',cmd)
+            self.connection.log.warning('EnxR CLI failed %s\n\n%s', cmd)
             self.result = 'Command TIMEOUT'
 
     def send_config(self, cmd):
@@ -124,7 +126,7 @@ class Execute(BaseService):
                 self.connected = False
         except Exception:
             self.connection.log.warning('EnXR disconnect failed %s',
-                      self.dev_profile.base.profile_name)
+                                        self.dev_profile.base.profile_name)
             self.connection.log.warning(traceback.format_exc())
         finally:
             return self.connected
