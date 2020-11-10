@@ -1,5 +1,4 @@
 __author__ = "Ashok Joshi <ashojosh@cisco.com>"
-<<<<<<< HEAD
 
 import traceback
 import pexpect
@@ -8,18 +7,6 @@ from unicon.plugins.iosxr.enxr.settings import EnxrSettings
 from unicon import log
 
 class IOSXREnxrSingleRpConnectionProvider(IOSXRSingleRpConnectionProvider):
-=======
-from unicon.plugins.iosxr.connection_provider import IOSXRSingleRpConnectionProvider,IOSXRDualRpConnectionProvider
-from unicon.plugins.iosxr.statements import authentication_statement_list
-from unicon.eal.dialogs import Dialog
-from unicon.plugins.iosxr.enxr.settings import EnxrSettings
-from unicon import log
-import traceback
-import time
-import pexpect
-
-class EnxrSingleRpConnectionProvider(IOSXRSingleRpConnectionProvider):
->>>>>>> edcc7403ef1fc3ce709728b2c86e50dc54ee2453
     """ Implements EnXR singleRP Connection Provider,
         This class overrides the IOSXRSingleRpConnectionProvider
     """
@@ -28,13 +15,10 @@ class EnxrSingleRpConnectionProvider(IOSXRSingleRpConnectionProvider):
         super().__init__(connection)
         self.connected = False
         self.ssh = None
-<<<<<<< HEAD
         self.get_connection_dialog()
         self.spawn = None
         self.prompt = None
 
-=======
->>>>>>> edcc7403ef1fc3ce709728b2c86e50dc54ee2453
 
     @property
     def connected(self):
@@ -71,20 +55,11 @@ class EnxrSingleRpConnectionProvider(IOSXRSingleRpConnectionProvider):
             log.error('EnXR connect failed ')
             log.error(traceback.format_exc())
 
-<<<<<<< HEAD
-=======
-
->>>>>>> edcc7403ef1fc3ce709728b2c86e50dc54ee2453
     def disconnect(self):
         """Disconnect from EnXR.
         Returns:
           (bool): True if disconnect is successful
         """
-<<<<<<< HEAD
-        import pdb
-        pdb.set_trace()
-=======
->>>>>>> edcc7403ef1fc3ce709728b2c86e50dc54ee2453
         try:
             if self.connected:
                 self.ssh.close()
@@ -94,8 +69,4 @@ class EnxrSingleRpConnectionProvider(IOSXRSingleRpConnectionProvider):
                       self.dev_profile.base.profile_name)
             log.error(traceback.format_exc())
         finally:
-<<<<<<< HEAD
             return self.connected
-=======
-            return self.connected
->>>>>>> edcc7403ef1fc3ce709728b2c86e50dc54ee2453
