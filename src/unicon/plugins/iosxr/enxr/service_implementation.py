@@ -4,6 +4,7 @@ __author__ = "ashok joshi <ashojosh@cisco.com>"
 
 from unicon.bases.routers.services import BaseService
 from unicon.eal.dialogs import Dialog
+from unicon.eal.expect import Spawn
 import pexpect
 
 
@@ -11,8 +12,6 @@ class Execute(BaseService):
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
         self.prompt_recovery = connection.prompt_recovery
-        self.connected = False
-        self.ssh = None
 
     def pre_service(self, *args, **kwargs):
         # Check if connection is established
@@ -30,57 +29,33 @@ class Execute(BaseService):
 
     def call_service(self, cmd, dialog=Dialog([]),
                      timeout=20, *args, **kwargs):
-        self.connect()
-        return self._send(cmd)
+        try:
+            # self._flush_connection()
+            con = self.connection.connection_provider
+            con.ssh.sendline(cmd)
+            con.ssh.expect(con.prompt, timeout=10)
+            self.result = con.ssh.before.decode('utf-8') + con.prompt
+            self.connection.log.info(self.result)
+        except pexpect.exceptions.TIMEOUT:
+            self.connection.log.warning('EnxR CLI failed %s\n\n%s', cmd)
+            self.result = 'Command TIMEOUT'
 
     def post_service(self, *args, **kwargs):
         pass
 
-    @property
-    def connected(self):
-        """ Return True if session is connected."""
-        return self._connected
-
-    @connected.setter
-    def connected(self, is_connected):
-        self._connected = is_connected
-
-    def connect(self, **kwargs):
-        # con = self.connection
-        """Connect to EnXR.
-        Args:
-        kwargs (dict):
-            spawn (str): Spawn parameter for pexpect (default "exec").
-            prompt (str): Expect parameter for pexpect (default ":ios#").
-        Returns:
-        (bool): True if connection is successful
-        """
-        try:
-            if not self.connected:
-                self.spawn = kwargs.get('spawn', 'exec')
-                self.prompt = kwargs.get('prompt', ':ios#')
-                if not self.connected:
-                    p = pexpect.spawn(self.spawn)
-                    p.expect(self.prompt, timeout=10)
-                    self.connected = True
-                    self.ssh = p
-
-        except pexpect.exceptions.TIMEOUT:
-            self.connection.log.warning('EnXR connect failed ')
-        except Exception:
-            self.connection.log.warning('EnXR connect failed ')
-        finally:
-            return self.connected
+    def get_service_result(self):
+        return self.result
 
     def _send(self, cmd):
         """Using pexpect for all commands."""
-        if not cmd or not self.connected:
-            return
+        # if not cmd or not self.connected:
+        #     return
         try:
-            self._flush_connection()
-            self.ssh.sendline(cmd)
-            self.ssh.expect(self.prompt, timeout=10)
-            self.result = self.ssh.before.decode('utf-8') + self.prompt
+            # self._flush_connection()
+            con = self.connection.connection_provider
+            con.ssh.sendline(cmd)
+            con.ssh.expect(con.prompt, timeout=10)
+            self.result = con.ssh.before.decode('utf-8') + con.prompt
             self.connection.log.info(self.result)
         except pexpect.exceptions.TIMEOUT:
             self.connection.log.warning('EnxR CLI failed %s\n\n%s', cmd)
@@ -104,38 +79,3 @@ class Execute(BaseService):
             else:
                 cmd += '\r\nend\r\n'
         return self._send(cmd)
-
-    # def send_exec(self, cmd):
-    #     """Send any CLI exec commmand.
-    #     Args:
-    #       cmd (str): Configuration CLI command.
-    #       kwargs (dict): Optional arguments.
-    #     Returns:
-    #       (str): CLI response
-    #     """
-    #     return self._send(cmd)
-
-    def disconnect(self):
-        """Disconnect from EnXR.
-        Returns:
-          (bool): True if disconnect is successful
-        """
-        try:
-            if self.connected:
-                self.ssh.close()
-                self.connected = False
-        except Exception:
-            self.connection.log.warning('EnXR disconnect failed %s',
-                                        self.dev_profile.base.profile_name)
-            self.connection.log.warning(traceback.format_exc())
-        finally:
-            return self.connected
-
-    def _flush_connection(self):
-        """Spawn a new pexpect between send calls.
-        The NETCONF plugin on same EnXR simulator uses a proxy executable.
-        When the NETCONF proxy is used, the CLI changes do not show up in
-        the pexpect pty unless it is closed and a new one is spawned.
-        """
-        self.disconnect()
-        self.connect(spawn=self.spawn, prompt=self.prompt)

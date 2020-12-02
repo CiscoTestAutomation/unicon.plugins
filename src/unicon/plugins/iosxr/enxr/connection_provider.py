@@ -5,7 +5,6 @@ import pexpect
 from unicon.plugins.iosxr.connection_provider \
     import IOSXRSingleRpConnectionProvider
 from unicon.plugins.iosxr.enxr.settings import EnxrSettings
-from unicon import log
 
 
 class IOSXREnxrSingleRpConnectionProvider(IOSXRSingleRpConnectionProvider):
@@ -51,10 +50,10 @@ class IOSXREnxrSingleRpConnectionProvider(IOSXRSingleRpConnectionProvider):
                 self.ssh = p
             return 'Connected with %s' % (self.connection.device.name)
         except pexpect.exceptions.TIMEOUT:
-            log.error('EnXR connect failed ')
+            self.connection.log.error('EnXR connect failed ')
         except Exception:
-            log.error('EnXR connect failed ')
-            log.error(traceback.format_exc())
+            self.connection.log.error('EnXR connect failed ')
+            self.connection.log.error(traceback.format_exc())
 
     def disconnect(self):
         """Disconnect from EnXR.
@@ -66,8 +65,8 @@ class IOSXREnxrSingleRpConnectionProvider(IOSXRSingleRpConnectionProvider):
                 self.ssh.close()
                 self.connected = False
         except Exception:
-            log.error('EnXR disconnect failed %s',
+            self.connection.log.error('EnXR disconnect failed %s',
                       self.dev_profile.base.profile_name)
-            log.error(traceback.format_exc())
+            self.connection.log.error(traceback.format_exc())
         finally:
             return self.connected
