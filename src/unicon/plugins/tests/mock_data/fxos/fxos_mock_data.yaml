@@ -154,7 +154,14 @@ fxos_exec:
       new_state: connect_cimc
     "connect module 1 console":
       new_state: module_console_wait
+    "config change":
+      new_state: fxos_exec_modified
 
+fxos_exec_modified:
+    prompt: "Firepower* #"
+    commands:
+      "top":
+        new_state: fxos_exec
 
 connect_cimc:
   preface: |

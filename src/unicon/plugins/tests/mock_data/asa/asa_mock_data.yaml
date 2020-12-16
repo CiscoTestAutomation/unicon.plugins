@@ -56,6 +56,9 @@ asa_enable:
       new_state: asa_save_configs
     "display replication message":
       new_state: asa_begin_replication_message
+    "display configuration replication warning": |
+        **** WARNING ****
+        Configuration Replication is NOT performed from Standby unit to Active unit
 
 asa_enable_more:
   prompt: "%N#"

@@ -57,3 +57,6 @@ class JunosSettings(GenericSettings):
         self.ESCAPE_CHAR_PROMPT_WAIT_RETRIES = 7
         # prompt wait delay
         self.ESCAPE_CHAR_PROMPT_WAIT = 0.25
+        
+        # pattern to replace '---(more)---' or '---(more #%)---'   
+        self.MORE_REPLACE_PATTERN = r'---\(more.*\)---'

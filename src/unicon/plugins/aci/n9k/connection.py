@@ -31,6 +31,7 @@ class AciN9KServiceList(ServiceList):
         super().__init__()
         self.execute = aci_svc.Execute
         self.reload = aci_svc.Reload
+        self.configure = aci_svc.Configure
 
 
 class AciN9KConnection(GenericSingleRpConnection):

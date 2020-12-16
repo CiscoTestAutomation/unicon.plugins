@@ -12,6 +12,7 @@ from unicon.plugins.generic import service_implementation as gsvc
 
 class ApServiceList(ServiceList):
     def __init__(self):
+        super().__init__()
         self.execute = svc.Execute
         self.send = gsvc.Send
         self.sendline = gsvc.Sendline

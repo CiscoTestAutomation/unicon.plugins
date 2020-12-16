@@ -543,7 +543,14 @@ login_ssh_delay:
   prompt: "[user@host ~]$ "
   commands: *cmds
 
-
+login_passphrase:
+  preface:
+    response: |
+      Last login: Tue Dec 11 16:01:04 2018 from localhost
+  prompt: "Enter passphrase for key '/home/virl/.ssh/id_rsa': "
+  commands:
+    "cisco":
+      new_state: exec
 
 
 prompt_recovery:

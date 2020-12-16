@@ -13,6 +13,8 @@ n9k_exec:
       new_state: n9k_reload_proceed
     "acidiag touch clean;reload":
       new_state: n9k_wipe_proceed
+    "configure":
+      new_state: n9k_config
 
 n9k_wipe_proceed:
   prompt: "This command will wipe out this device, Proceed? [y/N] "
@@ -43,6 +45,12 @@ n9k_password:
   prompt: "Password: "
   commands:
     "cisco123":
+      new_state: n9k_exec
+
+n9k_config:
+  prompt: APC(config)#
+  commands:
+    "end":
       new_state: n9k_exec
 
 

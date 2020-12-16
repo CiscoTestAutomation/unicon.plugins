@@ -32,7 +32,7 @@ class GenericPatterns(UniconCorePatterns):
         self.disable_prompt = r'^(.*?)(Router|Router-stby|Router-sdby|RouterRP|RouterRP-standby|%N-standby|%N-sdby|%N-stby|(S|s)witch|s(S|s)witch\(standby\)|Controller|ios|-Slot[0-9]+|%N)(\(boot\))*>\s?$'
 
         # self.config_prompt = r'.*%N\(config.*\)#\s?$'
-        self.config_prompt = r'^(.*)\(.*(con|cfg|ipsec-profile|ca-trustpoint)\S*\)#\s?$'
+        self.config_prompt = r'^(.*)\(.*(con|cfg|ipsec-profile|ca-trustpoint|gkm-local-server)\S*\)#\s?$'
         self.rommon_prompt = r'rommon[\s\d]*>\s?$'
         # self.standby_enable_prompt = r'^(.*?)(RouterRP-standby|%N-standby|%N-sdby|%N\(standby\))#\s?$'
         # self.standby_disable_prompt = r'^(.*?)(RouterRP-standby|%N-standby|%N-sdby|%N\(standby\))>\s?$'
@@ -52,7 +52,7 @@ class GenericPatterns(UniconCorePatterns):
         self.connected = r'^(.*?)Connected.'
 
         self.enter_basic_mgmt_setup = r'Would you like to enter basic management setup\? \[yes/no\]:'
-        self.kerberos_no_realm = r'^(.*)Kerberos: No default realm defined for Kerberos!'
+        self.kerberos_no_realm = r'^(.*)Kerberos:\s*No default realm defined for Kerberos!'
 
         self.passphrase_prompt = r'^.*Enter passphrase for key .*?:\s*?'
 

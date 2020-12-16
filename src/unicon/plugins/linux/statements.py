@@ -74,6 +74,11 @@ class LinuxStatements(object):
                                        args=None,
                                        loop_continue=True,
                                        continue_timer=False)
+        self.passphrase_stmt = Statement(pattern=pat.passphrase_prompt,
+                                         action=password_handler,
+                                         args=None,
+                                         loop_continue=True,
+                                         continue_timer=False)
 
 
 linux_statements = LinuxStatements()
@@ -81,4 +86,5 @@ linux_pre_connection_statement_list = pre_connection_statement_list
 linux_auth_other_statement_list = [generic_statements.login_incorrect,
                                    linux_statements.permission_denied_stmt]
 linux_auth_username_password_statement_list = [linux_statements.username_stmt,
-                                               linux_statements.password_stmt]
+                                               linux_statements.password_stmt,
+                                               linux_statements.passphrase_stmt]

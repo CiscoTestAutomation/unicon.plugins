@@ -88,6 +88,32 @@ class TestIosXEPluginConnect(unittest.TestCase):
         c.configure(cmd, timeout=60, error_pattern=[], service_dialogue=None)
         self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
 
+    def test_general_config_ca_profile(self):
+        c = Connection(hostname='Router',
+                start=['mock_device_cli --os iosxe --state general_login'],
+                os='iosxe',
+                username='cisco',
+                tacacs_password='cisco')
+        c.connect()
+        c.configure("crypto pki profile enrollment test", timeout=60)
+        self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
+
+    def test_gkm_local_server(self):
+        c = Connection(hostname='Router',
+                start=['mock_device_cli --os iosxe --state general_login'],
+                os='iosxe',
+                username='cisco',
+                tacacs_password='cisco')
+        c.connect()
+        cmd = [
+            "crypto gkm group g1",
+            "identity number 101",
+            "server local",
+            "end",
+            "end"
+        ]
+        c.configure(cmd, timeout=60)
+        self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
 
 class TestIosXEPluginExecute(unittest.TestCase):
     @classmethod
@@ -286,7 +312,6 @@ class TestIosXEluginBashService(unittest.TestCase):
         self.assertIn('exit', c.spawn.match.match_output)
         self.assertIn('Router#', c.spawn.match.match_output)
 
-
 class TestIosXESDWANConfigure(unittest.TestCase):
     def test_config_transaction(self):
         d = Connection(hostname='Router',
@@ -351,6 +376,48 @@ class TestIosXEDiol(unittest.TestCase):
         c = Connection(hostname='Router',
                        start=['mock_device_cli --os iosxe --state standby_exec'],
                        os='iosxe',
+                       init_exec_commands=[],
+                       init_config_commands=[],
+                       credentials=dict(default=dict(
+                       username='cisco', password='cisco'),
+                       alt=dict(
+                       username='admin', password='lab')))
+
+        c.connect()
+    
+    def test_connection_diol_exec(self):
+        c = Connection(hostname='RouterRP',
+                       start=['mock_device_cli --os iosxe --state diol_exec'],
+                       os='iosxe',
+                       mit=True,
+                       init_exec_commands=[],
+                       init_config_commands=[],
+                       credentials=dict(default=dict(
+                       username='cisco', password='cisco'),
+                       alt=dict(
+                       username='admin', password='lab')))
+
+        c.connect()
+
+    def test_connection_diol_enable(self):
+        c = Connection(hostname='RouterRP',
+                       start=['mock_device_cli --os iosxe --state diol_enable'],
+                       os='iosxe',
+                       mit=True,
+                       init_exec_commands=[],
+                       init_config_commands=[],
+                       credentials=dict(default=dict(
+                       username='cisco', password='cisco'),
+                       alt=dict(
+                       username='admin', password='lab')))
+
+        c.connect()
+
+    def test_connection_diol_disable(self):
+        c = Connection(hostname='RouterRP',
+                       start=['mock_device_cli --os iosxe --state diol_disable'],
+                       os='iosxe',
+                       mit=True,
                        init_exec_commands=[],
                        init_config_commands=[],
                        credentials=dict(default=dict(

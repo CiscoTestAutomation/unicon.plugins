@@ -46,6 +46,10 @@ class TestFxosFtdPlugin(unittest.TestCase):
         c = self.test_connect()
         c.execute(['scope security', 'clear-user-sessions all'], allow_state_change=True)
 
+    def test_fxos_config_change_prompt(self):
+        c = self.test_connect()
+        c.execute(['config change', 'top'])
+
     def test_console_execute(self):
         c = Connection(hostname='Firepower',
                        start=['mock_device_cli --os fxos --state chassis_exec'],

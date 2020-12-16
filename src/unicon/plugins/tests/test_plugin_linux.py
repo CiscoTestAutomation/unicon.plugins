@@ -199,6 +199,26 @@ class TestLinuxPluginConnect(unittest.TestCase):
           l.connect(connection_timeout=0.5)
         l.disconnect()
 
+  def test_connect_passphrase(self):
+        testbed = """
+        devices:
+          lnx-server:
+            type: linux
+            os: linux
+            credentials:
+              default:
+                username: admin
+                password: cisco
+            connections:
+              defaults:
+                class: unicon.Unicon
+              cli:
+                command: mock_device_cli --os linux --state login_passphrase
+        """
+        tb=loader.load(testbed)
+        l = tb.devices['lnx-server']
+        l.connect()
+
   def test_connect_connectReply(self):
         c = Connection(hostname='linux',
                        start=['mock_device_cli --os linux --state connect_ssh'],
@@ -673,6 +693,30 @@ class TestLoginPasswordPrompts(unittest.TestCase):
         d = t.devices['linux']
         d.connect()
         d.disconnect()
+
+class TestLinuxPromptOverride(unittest.TestCase):
+    
+    def test_override_prompt(self):
+        settings = LinuxSettings()
+        prompt = 'prompt'
+        settings.PROMPT = prompt
+        c = Connection(hostname='linux',
+                       start=['mock_device_cli --os linux --state exec'],
+                       os='linux',
+                       settings=settings)
+        assert c.state_machine.states[0].pattern == prompt
+
+    def test_override_shell_prompt(self):
+        settings = LinuxSettings()
+        prompt = 'shell_prompt'
+        settings.SHELL_PROMPT = prompt
+        c = Connection(hostname='linux',
+                       start=['mock_device_cli --os linux --state exec'],
+                       os='linux',
+                       settings=settings,
+                       learn_hostname=True)
+        c.connect()
+        assert c.state_machine.states[0].pattern == prompt
 
 
 if __name__ == "__main__":

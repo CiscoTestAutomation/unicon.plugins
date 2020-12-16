@@ -5,7 +5,7 @@ from unicon.plugins.generic.patterns import GenericPatterns
 class FtdPatterns(GenericPatterns):
     def __init__(self):
         super().__init__()
-        self.chassis_prompt = r'^(.*?)[-\.\w]+#\s*$'
+        self.chassis_prompt = r'^(.*?)[-\.\w]+(\*\s)?#\s*$'
         self.chassis_scope_prompt = r'^(.*?)[-\.\w]+(\s+(/[-\w]+)+)\*?\s?#\s*$'
         self.fxos_prompt = r'^(.*?)[-\.\w]+\s?\(fxos\)#\s*$'
         self.local_mgmt_prompt = r'^(.*?)[-\.\w]+\(local-mgmt\)#\s*$'

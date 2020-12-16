@@ -3,6 +3,36 @@ Linux
 
 This section lists the services which are supported on Linux.
 
+** Prompt and Shell Prompt overriding **
+
+By default, Unicon is able to detect most variations of the bash shell prompt. However, in
+instances where another shell is being used (such as `zsh` or `fish`) it may have difficulty
+in detecting your prompt thus leaving the connection hanging. In the event this occurs you
+can override your prompt using the `PROMPT` setting in your testbed file like so:
+
+.. code-block:: yaml
+
+    devices:
+      linux_device:
+        connections:
+          cli:
+            settings:
+              PROMPT: '<your_prompt_regex>'
+
+If `learn_hostname` is set to True, Unicon will attempt to learn and store the hostname
+of you device in memory and switch the prompt to accomodate for that. It too can be overriden
+with the `SHELL_PROMPT` setting like so:
+
+.. code-block:: yaml
+
+    devices:
+      linux_device:
+        connections:
+          cli:
+            settings:
+              SHELL_PROMPT: '<your_prompt_regex>'
+
+Use `%N` in your regex to specify where the hostname should be located. 
 
 execute
 -------

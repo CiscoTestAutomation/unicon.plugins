@@ -124,6 +124,16 @@ class TestAciN9kPlugin(unittest.TestCase):
         c.settings.POST_RELOAD_WAIT = 1
         c.reload()
 
+    def test_config(self):
+        c = Connection(hostname='LEAF',
+                            start=['mock_device_cli --os aci --state n9k_login'],
+                            os='aci',
+                            series='n9k',
+                            username='admin',
+                            tacacs_password='cisco123')
+        c.connect()
+        c.configure()
+
 
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
 @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)

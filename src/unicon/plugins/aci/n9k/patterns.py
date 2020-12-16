@@ -7,3 +7,4 @@ class AciPatterns(GenericPatterns):
         super().__init__()
         self.enable_prompt = r'^(.*?)((%N)|\(none\))#'
         self.loader_prompt = r'^(.*?)loader >\s*$'
+        self.config_prompt = r'^(.*)\(.*(con|cfg|ipsec-profile|ca-trustpoint|gkm-local-server)\S*\)#'

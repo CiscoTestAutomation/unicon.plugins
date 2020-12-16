@@ -184,6 +184,7 @@ class HAReload(BaseService):
                      reload_creds=None,
                      *args, **kwargs):
         con = self.connection
+        self.context = con.active.context
         timeout = timeout or self.timeout
 
         fmt_msg = "+++ reloading  %s  " \

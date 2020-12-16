@@ -35,6 +35,9 @@ help:
 
 install_build_deps:
 	@pip install --upgrade pip setuptools wheel
+	@echo ""
+	@echo "Done."
+	@echo ""
 
 uninstall_build_deps:
 	@echo ""
@@ -52,6 +55,8 @@ docs:
 
 	@echo "Completed building docs for preview."
 	@echo ""
+	@echo "Done."
+	@echo ""
 
 
 test:
@@ -68,6 +73,8 @@ package:
 	@echo ""
 	@echo "Completed building: $@"
 	@echo ""
+	@echo "Done."
+	@echo ""
 
 develop:
 	@echo ""
@@ -80,6 +87,8 @@ develop:
 	@echo ""
 	@echo "Completed building and installing: $@"
 	@echo ""
+	@echo "Done."
+	@echo ""
 
 undevelop:
 	@echo ""
@@ -91,6 +100,8 @@ undevelop:
 
 	@echo ""
 	@echo "Completed uninstalling: $@"
+	@echo ""
+	@echo "Done."
 	@echo ""
 
 clean:

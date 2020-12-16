@@ -6,7 +6,8 @@ from unicon.eal.dialogs import Dialog
 from unicon.core.errors import SubCommandFailure
 from unicon.bases.routers.services import BaseService
 from unicon.plugins.generic import GenericUtils
-from unicon.plugins.generic.service_implementation import Execute as GenericExecute
+from unicon.plugins.generic.service_implementation import (Execute as GenericExecute,
+                                                           Configure as GenericConfigure)
 
 from .patterns import AciPatterns
 from .service_patterns import AciN9kReloadPatterns
@@ -14,6 +15,45 @@ from .service_statements import reload_statement_list
 
 utils = GenericUtils()
 reload_patterns = AciN9kReloadPatterns()
+
+
+class Configure(GenericConfigure):
+    """Service to configure device with single or list of `commands`.
+
+    Config without config_command will take device to config mode.
+    Commands Should be list, if `config_command` are more than one.
+    reply option can be passed for the interactive config command.
+
+    Arguments:
+        commands : list/single config command
+        reply: Addition Dialogs for interactive config commands.
+        timeout : Timeout value in sec, Default Value is 30 sec
+        error_pattern: list of regex to detect command errors
+        target: Target RP where to execute service, for DualRp only
+        lock_retries: retry times if config mode is locked, default is 0
+        lock_retry_sleep: sleep between retries, default is 2 sec
+        bulk: If False, send all commands in one sendline,
+              If True, send commands in chunked mode,
+              default is False
+        bulk_chunk_lines: maximum number of commands to send per chunk,
+                          default is 50,
+                          0 means to send all commands in a single chunk
+        bulk_chunk_sleep: sleep between sending command chunks,
+                          default is 0.5 sec
+
+    Returns:
+        command output on Success, raise SubCommandFailure on failure
+
+    Example:
+        .. code-block:: python
+
+              output = rtr.configure()
+              output = rtr.configure('no logging console')
+              cmd =['hostname si-tvt-7200-28-41', 'no logging console']
+              output = rtr.configure(cmd)
+    """
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
 
 
 class Execute(GenericExecute):

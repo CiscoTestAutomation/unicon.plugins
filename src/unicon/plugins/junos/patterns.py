@@ -24,16 +24,16 @@ class JunosPatterns(UniconCorePatterns):
         self.password = r'^.*[Pp]assword: ?$'
         
         # root@junos_vmx1:~ # 
-        self.shell_prompt = r'^(.*)?(%N)\:\~ *\#\s?$|^%\s*$'
+        self.shell_prompt = r'^(.*)?(%N)(-RE[01])?\:\~ *\#\s?$|^%\s*$'
 
         # root@junos_vmx1>
-        self.enable_prompt = r'^(.*?)([-\.\w]+@(%N)+>)\s*$'
+        self.enable_prompt = r'^(.*?)([-\.\w]+@(%N)+(-RE[01])?>)\s*$'
 
         # root@junos_vmx1:~ # 
-        self.disable_prompt = r'^(.*)?(%N)\:\~ *\#\s?$'
+        self.disable_prompt = r'^(.*)?(%N)(-RE[01])?\:\~ *\#\s?$'
 
         # root@junos_vmx1#
-        self.config_prompt = r'^(.*?)([-\.\w]+@(%N)+[\%\#])\s*$'
+        self.config_prompt = r'^(.*?)([-\.\w]+@(%N)+(-RE[01])?[\%\#])\s*$'
 
         # Exit with uncommitted changes? [yes,no] (yes)
         self.commit_changes_prompt = r'Exit with uncommitted changes?'

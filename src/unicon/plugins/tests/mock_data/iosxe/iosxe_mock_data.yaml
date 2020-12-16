@@ -137,6 +137,8 @@ general_enable:
 general_config:
   prompt: "Router(conf)#"
   commands:
+    "crypto pki profile enrollment test":
+      new_state: general_config_ca_profile
     "no logging console": ""
     "line console 0":
       new_state: general_config_line
@@ -152,6 +154,8 @@ general_config:
         [OK] (elapsed time was 2 seconds)
     "crypto pki server ca":
       new_state: config_general_server
+    "crypto gkm group g1":
+      new_state: iosxe_config_1
 
 general_config_line:
   prompt: "Router(config-line)#"
@@ -189,7 +193,7 @@ config_general_server:
       "no shutdown": |
           no shutdown
           Certificate server 'no shut' event has been queued for processing.
-      "end":
+      "end": 
         new_state: general_enable
 
 config_general_redundancy_main_cpu:
@@ -198,6 +202,12 @@ config_general_redundancy_main_cpu:
       "standby console enable": ""
       "end":
         new_state: general_enable
+
+general_config_ca_profile:
+  prompt: "Router(ca-profile-enroll)#"
+  commands:
+    "end":
+      new_state: general_enable
 
 general_bash:
   prompt: "[Router_RP_0:/]$"
@@ -220,3 +230,39 @@ standby_exec:
   prompt: "Router-standby# "
   commands:
     "cisco": ""
+
+iosxe_config_1:
+  prompt: Router(conf)#
+  commands: 
+    "identity number 101":
+      new_state: iosxe_config_2
+    "end": 
+      new_state: general_enable
+
+iosxe_config_2:
+  prompt: Router(config-gkm-group)#
+  commands:
+    "server local": 
+        new_state: iosxe_config_3
+    "end": 
+        new_state: iosxe_config_1
+
+iosxe_config_3:
+  prompt: Router(config-gkm-group)#
+  commands: 
+    "end":
+      new_state: iosxe_config_2
+diol_exec:
+  prompt: "RouterRP> "
+  commands:
+    "enable": ""
+
+diol_enable:
+  prompt: "RouterRP# "
+  commands:
+    "enable": ""
+
+diol_disable:
+  prompt: "RouterRP-standby> "
+  commands:
+    "enable": ""
