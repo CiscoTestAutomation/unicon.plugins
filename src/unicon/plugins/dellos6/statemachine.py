@@ -13,13 +13,11 @@ inherit IOSv implementation as basis.
 
 from unicon.statemachine import Path
 from unicon.eal.dialogs import Dialog
-
-from unicon.plugins.ios.iosv.statemachine import IosvSingleRpStateMachine
-
+from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine
 from . import statements as stmts
 
 
-class DellosSingleRpStateMachine(IosvSingleRpStateMachine):
+class DellosSingleRpStateMachine(GenericSingleRpStateMachine):
 
     def create(self):
         '''
@@ -40,6 +38,5 @@ class DellosSingleRpStateMachine(IosvSingleRpStateMachine):
         disable_to_enable = Path(disable,
                                  enable,
                                  'enable',
-                                 Dialog([stmts.login_stmt,
-                                         stmts.confirm_imaginary_platform]))
+                                 Dialog([stmts.login_stmt]))
         self.add_path(disable_to_enable)

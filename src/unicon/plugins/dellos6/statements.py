@@ -10,16 +10,19 @@ particular to this platform is located.
 '''
 from unicon.eal.dialogs import Statement
 from unicon.plugins.generic.statements import GenericStatements
-from .patterns import DellosPatterns as patterns
+from .patterns import DellosPatterns 
 
 # handlers are necessary actions to take (functions)
 # when a particular statement is met
 
 statements = GenericStatements()
-
+patterns = DellosPatterns()
 
 def login_handler(spawn, context, session):
     spawn.sendline(context['enable_password'])
+
+def send_enabler(spawn, context, session):
+    spawn.sendline('enable')
 
 
 def confirm_imaginary_handler(spawn):
@@ -33,8 +36,14 @@ login_stmt = Statement(pattern=patterns.login_prompt,
                        loop_continue=True,
                        continue_timer=False)
 
-confirm_imaginary_platform = Statement(pattern=patterns.confirm_imaginary,
-                                       action=confirm_imaginary_handler,
-                                       args=None,
-                                       loop_continue=True,
-                                       continue_timer=False)
+enable_stmt = Statement(pattern=patterns.disable_mode,
+                        action=send_enabler,
+                        args=None,
+                        loop_continue=True,
+                        continue_timer=False)
+
+# confirm_imaginary_platform = Statement(pattern=patterns.confirm_imaginary,
+#                                        action=confirm_imaginary_handler,
+#                                        args=None,
+#                                        loop_continue=True,
+#                                        continue_timer=False)
