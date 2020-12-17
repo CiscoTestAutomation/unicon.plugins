@@ -14,14 +14,14 @@ class AciApicConnectionProvider(GenericSingleRpConnectionProvider):
     """
         Connection provider class for aci connections.
     """
-    def __init__(self, *args, **kwargs):
 
+    def __init__(self, *args, **kwargs):
         """ Initializes the generic connection provider
         """
 
         warnings.warn("This plugin aci/apic wil be deprecated, it has been moved"
-            "to be a seperate plugin. Please set it in the testbed yaml file as "
-            "follows:\nos: apic", DeprecationWarning)
+                      "to be a seperate plugin. Please set it in the testbed yaml file as "
+                      "follows:\nos: apic", DeprecationWarning)
 
         super().__init__(*args, **kwargs)
 
@@ -34,8 +34,8 @@ class AciApicConnectionProvider(GenericSingleRpConnectionProvider):
         con = self.connection
         state = con.state_machine.get_state('setup')
         dialog.append(Statement(pattern=state.pattern,
-                      action=update_state,
-                      args={'con': con, 'state': state.name}))
+                                action=update_state,
+                                args={'con': con, 'state': state.name}))
         return dialog
 
     def init_handle(self):
@@ -43,7 +43,6 @@ class AciApicConnectionProvider(GenericSingleRpConnectionProvider):
         con._is_connected = True
         if con.state_machine.current_state != 'setup':
             super().init_handle()
-
 
 
 class AciApicServiceList(ServiceList):
