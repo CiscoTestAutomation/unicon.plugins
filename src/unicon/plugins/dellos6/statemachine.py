@@ -38,5 +38,5 @@ class DellosSingleRpStateMachine(GenericSingleRpStateMachine):
         disable_to_enable = Path(disable,
                                  enable,
                                  'enable',
-                                 Dialog([stmts.login_stmt]))
+                                 Dialog([stmts.password_stmt]))
         self.add_path(disable_to_enable)

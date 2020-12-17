@@ -16,3 +16,4 @@ class DellosPatterns(GenericPatterns):
         self.disable_mode = r'\w+>$'
         self.privileged_mode = r'\w+[^\(config\)]#$'
         self.config_mode = r'\w+\(config[-\w]+\)#$'
+        self.password = r'Password:'
