@@ -1,14 +1,10 @@
 '''
-Connection Statemachine
------------------------
-The connection state machine holds the details of all supported states of a 
-given platform, and handles the migration of the device from current state to
-any possible next state.
-The state machineclass provides a create method where all the device states 
-have to be created. State machine should be subclass of StateMachine class 
-from unicon.statemachine.
-Because this is an imaginary platform we invented from IOSv platform, we can
-inherit IOSv implementation as basis.
+Author: Knox Hutchinson
+Contact: https://dataknox.dev
+https://twitter.com/data_knox
+https://youtube.com/c/dataknox
+Contents largely inspired by sample Unicon repo:
+https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_example/src/unicon_plugin_example
 '''
 
 from unicon.statemachine import Path
@@ -31,7 +27,6 @@ class DellosSingleRpStateMachine(GenericSingleRpStateMachine):
         self.remove_path('rommon', 'disable')
         self.remove_state('rommon')
 
-        # modify a path by removing it, creating a new one and replacing it
         self.remove_path('disable', 'enable')
         enable = [state for state in self.states if state.name == 'enable'][0]
         disable = [state for state in self.states if state.name == 'disable'][0]

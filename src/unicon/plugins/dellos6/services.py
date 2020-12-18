@@ -1,11 +1,10 @@
 '''
-Unicon Plugin Service
----------------------
-Each method under a Unicon connection is modelled as a "service". Services must
-inherit from the BaseService class, and implement call_service() method, which
-acts as the entrypoint to when a service is called.
-After services are defined, they should be aggregated together under a 
-ServiceList class as attributes.
+Author: Knox Hutchinson
+Contact: https://dataknox.dev
+https://twitter.com/data_knox
+https://youtube.com/c/dataknox
+Contents largely inspired by sample Unicon repo:
+https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_example/src/unicon_plugin_example
 '''
 import logging
 
