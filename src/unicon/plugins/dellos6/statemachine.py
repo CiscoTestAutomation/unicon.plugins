@@ -13,7 +13,7 @@ from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine
 from . import statements as stmts
 
 
-class DellosSingleRpStateMachine(GenericSingleRpStateMachine):
+class Dellos6SingleRpStateMachine(GenericSingleRpStateMachine):
 
     def create(self):
         '''

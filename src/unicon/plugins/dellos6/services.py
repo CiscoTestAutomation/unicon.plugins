@@ -9,13 +9,13 @@ https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_e
 import logging
 
 from unicon.bases.routers.services import BaseService
-from unicon.plugins.ios.iosv.service_implementation import Execute as IosvExec
+from unicon.plugins.generic.service_implementation import Execute as GenericExec
 from unicon.plugins.ios.iosv import IosvServiceList
 
 logger = logging.getLogger(__name__)
 
 
-class Execute(IosvExec):
+class Execute(GenericExec):
     '''
     Demonstrating how to augment an existing service by updating its call
     service method
@@ -29,7 +29,7 @@ class Execute(IosvExec):
         super().call_service(*args, **kwargs)
 
 
-class DellosService(BaseService):
+class Dellos6Service(BaseService):
     '''
     demonstrating the implementation of a local, new service
     '''
@@ -39,7 +39,7 @@ class DellosService(BaseService):
         return 'Dellos' * 3
 
 
-class DellosServiceList(IosvServiceList):
+class Dellos6ServiceList(IosvServiceList):
     '''
     class aggregating all service lists for this platform
     '''
@@ -50,4 +50,4 @@ class DellosServiceList(IosvServiceList):
 
         # overwrite and add our own
         self.execute = Execute
-        self.dellos = DellosService
+        self.dellos = Dellos6Service
