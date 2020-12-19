@@ -35,16 +35,8 @@ def main(args=None):
     if args.d:
         logging.getLogger(__name__).setLevel(logging.DEBUG)
 
-    if args.state:
-        state = args.state
-    else:
-        state = 'login,console_standby'
-
-    if args.hostname:
-        hostname = args.hostname
-    else:
-        hostname = 'DellOS6'
-
+    state = args.state or 'login,console_standby'
+    hostname = args.hostname or 'DellOS6'
     md = MockDeviceDellos6(hostname=hostname, state=state)
     md.run()
 

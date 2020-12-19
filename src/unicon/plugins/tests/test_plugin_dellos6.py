@@ -1,16 +1,14 @@
 import os
-import re
 import yaml
 import unittest
 from unittest.mock import patch
 
 import unicon
 from unicon import Connection
-from unicon.core.errors import SubCommandFailure, StateMachineError
 from unicon.eal.dialogs import Dialog
 from unicon.mock.mock_device import mockdata_path
 
-with open(os.path.join(mockdata_path, 'dellos6/dellos6_mock_data.yml'), 'rb') as datafile:
+with open(os.path.join(mockdata_path, 'dellos6/dellos6_mock_data.yaml'), 'rb') as datafile:
     mock_data = yaml.safe_load(datafile.read())
 
 
@@ -42,7 +40,6 @@ class TestDellos6PluginConnect(unittest.TestCase):
                         tacacs_password='dell1111',
                         connect_reply = Dialog([[r'^(.*?)Password:']]))
         c.connect()
-        self.assertIn('terminal length 0', c.spawn.match.match_output)
         self.assertIn("^(.*?)Password:", str(c.connection_provider.get_connection_dialog()))
         c.disconnect()
 
