@@ -8,12 +8,12 @@ https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_e
 '''
 from unicon.eal.dialogs import Statement
 from unicon.plugins.generic.statements import GenericStatements
-from .patterns import DellosPatterns 
+from .patterns import Dellos6Patterns 
 from unicon.bases.routers.connection import ENABLE_CRED_NAME
 from unicon.utils import to_plaintext
 
 statements = GenericStatements()
-patterns = DellosPatterns()
+patterns = Dellos6Patterns()
 
 def login_handler(spawn, context, session):
     spawn.sendline(context['enable_password'])

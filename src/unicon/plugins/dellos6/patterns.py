@@ -11,7 +11,7 @@ import re
 from unicon.plugins.generic.patterns import GenericPatterns
 
 
-class DellosPatterns(GenericPatterns):
+class Dellos6Patterns(GenericPatterns):
     def __init__(self):
         super().__init__()
         self.login_prompt = r' *login here: *?'

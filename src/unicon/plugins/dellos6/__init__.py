@@ -7,14 +7,14 @@ Contents largely inspired by sample Unicon repo:
 https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_example/src/unicon_plugin_example
 '''
 
-from unicon.plugins.ios.iosv import IosvSingleRpConnection
+from unicon.bases.routers.connection import BaseSingleRpConnection
+from unicon.plugins.generic import GenericSingleRpConnectionProvider
+from .statemachine import Dellos6SingleRpStateMachine
+from .services import Dellos6ServiceList
+from .settings import Dellos6Settings
 
-from .statemachine import DellosSingleRpStateMachine
-from .services import DellosServiceList
-from .settings import DellosSettings
 
-
-class DellosSingleRPConnection(IosvSingleRpConnection):
+class Dellos6SingleRPConnection(BaseSingleRpConnection):
     '''DellosSingleRPConnection
 
     Dell OS6 platform support. Because our imaginary platform was inspired
@@ -23,6 +23,7 @@ class DellosSingleRPConnection(IosvSingleRpConnection):
     os = 'dellos6'
     series = None
     chassis_type = 'single_rp'
-    state_machine_class = DellosSingleRpStateMachine
-    subcommand_list = DellosServiceList
-    settings = DellosSettings()
+    state_machine_class = Dellos6SingleRpStateMachine
+    connection_provider_class = GenericSingleRpConnectionProvider
+    subcommand_list = Dellos6ServiceList
+    settings = Dellos6Settings()
