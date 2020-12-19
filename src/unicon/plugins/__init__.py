@@ -29,5 +29,6 @@ supported_os = [
     'sdwan',
     'sros',
     'apic',
-    'windows'
+    'windows',
+    'dellos6'
 ]
