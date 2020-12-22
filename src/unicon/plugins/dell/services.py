@@ -29,7 +29,7 @@ class Execute(GenericExec):
         super().call_service(*args, **kwargs)
 
 
-class Dellos6Service(BaseService):
+class DellService(BaseService):
     '''
     demonstrating the implementation of a local, new service
     '''
@@ -39,7 +39,7 @@ class Dellos6Service(BaseService):
         return 'Dellos' * 3
 
 
-class Dellos6ServiceList(IosvServiceList):
+class DellServiceList(IosvServiceList):
     '''
     class aggregating all service lists for this platform
     '''
@@ -50,4 +50,4 @@ class Dellos6ServiceList(IosvServiceList):
 
         # overwrite and add our own
         self.execute = Execute
-        self.dellos = Dellos6Service
+        self.dellos = DellService
