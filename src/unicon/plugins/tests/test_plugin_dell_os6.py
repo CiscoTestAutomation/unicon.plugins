@@ -8,7 +8,7 @@ from unicon import Connection
 from unicon.eal.dialogs import Dialog
 from unicon.mock.mock_device import mockdata_path
 
-with open(os.path.join(mockdata_path, 'dellos6/dellos6_mock_data.yaml'), 'rb') as datafile:
+with open(os.path.join(mockdata_path, 'dell_os6/dellos6_mock_data.yaml'), 'rb') as datafile:
     mock_data = yaml.safe_load(datafile.read())
 
 
