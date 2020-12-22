@@ -1,10 +1,13 @@
 July 2020
--------------
+============
+
+July 28th
+------------
 
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
 
-        ``unicon.plugins``, v20.7
+        ``unicon``, v20.7
 
 
 Install Instructions
@@ -12,7 +15,7 @@ Install Instructions
 
 .. code-block:: bash
 
-    bash$ pip install unicon.plugins
+    bash$ pip install unicon
 
 
 Upgrade Instructions
@@ -20,23 +23,13 @@ Upgrade Instructions
 
 .. code-block:: bash
 
-    bash$ pip install --upgrade unicon.plugins
+    bash$ pip install --upgrade unicon
 
 
 Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
+* Added deprecation warning for expect_log service
 
-* Fixed unittest corresponding to check connectivity enhancement
+* Fixed adapter issue to allow debug logging enable by device.connect(debug=True)
 
-* Reverted back commit_retry until getting confirmation from the user
-
-* [LINUX] Updated truncate_trailing_prompt to accept regex without regex groups
-
-* [IOSXE] Fixed IOSXE state machine enable to disable dialog issue
-
-* [IOSXR] Added configure_exclusive service to IOSXR plugin
-
-* [NXOS] Enhanced NXOS reload service added reconnect_sleep argument
-* [NXOS] Fixed incorrect login when password prompt occur before the username prompt
-
-* [APIC] Enhanced apic configure prompt pattern to support various configure prompt
+* Enhanced verify connectivity functionality

@@ -1,13 +1,13 @@
 April 2020
-=============
+============
 
 April 28th
--------------
+------------
 
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
 
-        ``unicon.plugins``, v20.4
+        ``unicon``, v20.4
 
 
 Install Instructions
@@ -15,7 +15,7 @@ Install Instructions
 
 .. code-block:: bash
 
-    bash$ pip install unicon.plugins
+    bash$ pip install unicon
 
 
 Upgrade Instructions
@@ -23,42 +23,18 @@ Upgrade Instructions
 
 .. code-block:: bash
 
-    bash$ pip install --upgrade unicon.plugins
+    bash$ pip install --upgrade unicon
 
 
 Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
+* Fixed unittests failures seen with multiprocessing on Mac-py38 environment
 
-* Enhanced aci plugin implementation to have it available under nxos plugins
+* Added `goto_enable` and `standby_goto_enable` key to generic connect service to
+  allow user to disable device behavior of going to enable state in every device
+  connect call, Default is True not to interrupt intuitive device behavior
 
-* Update prompt for latest OpenSSH.
+* Added dialog callback for credentials
 
-* Enhance IOSXR enable pattern to accomodate different preceding card/slot.
+* See also the unicon.plugins changelog.
 
-* Adding `copy` service to the HA IOSXE plugin implementation.
-
-* Supporting `reset_standby_rp` on IOSXE.
-
-* Updating XR spitfire plugin run prompts pattern.
-
-* Updating XR spitfire plugin run prompts pattern.
-
-* Updating mdcli and classiccli prompts pattern.
-
-* Fixed aci plugins unittests and added new ones for the new plugins structure.
-
-* Updating XR spitfire plugin run prompts pattern.
-
-* Add 'Incorrect input' and 'HELP' error pattern for Aireos plugin
-
-* Add nxos plugin configure error pattern for 'ERROR' and 'Invalid number'
-
-* Fixing unittest after recent user contribution on standby behavior
-
-* AireOS plugin updates:
-    * HA support for WLC
-    * Access Point (ap) as subplugin
-
-* Added SSH passphrase handler to generic plugin
-
-* Added Windows plugin

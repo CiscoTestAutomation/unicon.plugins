@@ -1,10 +1,13 @@
 September 2020
--------------
+============
+
+September 29th
+------------
 
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
 
-        ``unicon.plugins``, v20.9
+        ``unicon``, v20.9
 
 
 Install Instructions
@@ -12,7 +15,7 @@ Install Instructions
 
 .. code-block:: bash
 
-    bash$ pip install unicon.plugins
+    bash$ pip install unicon
 
 
 Upgrade Instructions
@@ -20,26 +23,13 @@ Upgrade Instructions
 
 .. code-block:: bash
 
-    bash$ pip install --upgrade unicon.plugins
+    bash$ pip install --upgrade unicon
 
 
 Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-* [IOSXE] Added Traceroute service for Ha connection
-* [IOSXE] Enhanced stack reload and switchover service
-* [IOSXE] Enhanced disable_prompt and enable_prompt regex pattern
-
-* [Junos] Updated regex to check more commit failures
-* [Junos] Fix junos configure service duplicated commit
-
-* [FXOS/FTD] Add 'Are you sure' statement - sendline(y)
-* [FXOS] Add 'Invalid Command' and 'Ambiguous command' error patterns
-
-* [Aireos] Add 'Warning' error_pattern
-* [Aireos] Add error pattern checking during reload service
-
-* [ASA] Add execute statement dialogs to execute service
-* [ASA] Added reload_statements to reload service
-
-* [NXOS] Update HA_INIT_CONFIG_COMMANDS to add 'line vty' and 'exec-timeout 0'
+* Fixed learn_hostname for ha standby device
+* Updated dialog processor default timeout to use spawn timeout instead
+* Updated general connect function to use self.connected to check connectivity
+* Updated dual_rp connection when chassis type is specified, subconnection use single_rp chassis type

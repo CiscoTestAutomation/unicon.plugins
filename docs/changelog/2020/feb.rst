@@ -2,12 +2,12 @@ February 2020
 =============
 
 February 25
--------------
+------------
 
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
 
-        ``unicon.plugins``, v20.2
+        ``unicon``, v20.2
 
 
 Install Instructions
@@ -15,7 +15,7 @@ Install Instructions
 
 .. code-block:: bash
 
-    bash$ pip install unicon.plugins
+    bash$ pip install unicon
 
 
 Upgrade Instructions
@@ -23,38 +23,28 @@ Upgrade Instructions
 
 .. code-block:: bash
 
-    bash$ pip install --upgrade unicon.plugins
+    bash$ pip install --upgrade unicon
 
 
 Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-- Added python 3.8 support.
+* Added `debug_statement` boolean argument to `Statement class` to print the statement matched pattern.
 
-- ise plugin
+* Added `STATEMENT_LOG_DEBUG` boolean argument to `Settings class` to print all the matched patterns.
 
-  - Updated prompt pattern to expect prompts ending with ``>``.
+* Add python3.8 support.
 
-- aireos plugin
+* See also the unicon.plugins changelog.
 
-  - support for Cisco Capwap Simulator as default hostname
 
-- iosxr/spitfire plugin
-
-  - Fixed a bug that was preventing switch between BMC and x86 modes.
-
-- sdwan plugin
-
-  - deprecated sdwan/iosxe plugin
-  - added os: viptela support
-
-February 18th
--------------
+January 16th
+------------
 
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
 
-        ``unicon.plugins``, v20.1.2
+        ``unicon``, v19.12.1
 
 
 Install Instructions
@@ -62,7 +52,7 @@ Install Instructions
 
 .. code-block:: bash
 
-    bash$ pip install unicon.plugins
+    bash$ pip install unicon
 
 
 Upgrade Instructions
@@ -70,41 +60,11 @@ Upgrade Instructions
 
 .. code-block:: bash
 
-    bash$ pip install --upgrade unicon.plugins
+    bash$ pip install --upgrade unicon
 
 
 Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
+- robot
 
-- Now reacting properly to ``Password OK`` prompt.
-
-February 10th
--------------
-
-.. csv-table:: Module Versions
-    :header: "Modules", "Versions"
-
-        ``unicon.plugins``, v20.1.1
-
-
-Install Instructions
-^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: bash
-
-    bash$ pip install unicon.plugins
-
-
-Upgrade Instructions
-^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: bash
-
-    bash$ pip install --upgrade unicon.plugins
-
-
-Features and Bug Fixes:
-^^^^^^^^^^^^^^^^^^^^^^^
-
-- Support devices that could have multiple enable passwords.  
-  Allow enable_password to be specified as part of a credential.
+  - fix for getting ats or pyats library
