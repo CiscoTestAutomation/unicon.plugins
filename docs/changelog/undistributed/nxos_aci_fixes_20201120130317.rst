@@ -1,0 +1,3 @@
+* NXOS ACI Plugin
+    * Removed deprecation message from nxos->aci->n9k
+    * Fixed a bug where the buffer might not be empty after connecting to the device
