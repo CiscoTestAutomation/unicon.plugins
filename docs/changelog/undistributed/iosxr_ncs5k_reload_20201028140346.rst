@@ -1,3 +1,0 @@
-* IOSXR plugin
-    * NCS5K plugin
-        - Fixed HA Reload to use correct credentials

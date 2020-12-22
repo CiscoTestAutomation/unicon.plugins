@@ -1,1 +1,0 @@
-* Fixed parse_spawn_command for ha device to get the right subconnection context
