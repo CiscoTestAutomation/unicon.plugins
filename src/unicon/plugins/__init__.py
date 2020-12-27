@@ -30,5 +30,6 @@ supported_os = [
     'sros',
     'apic',
     'windows',
-    'dell'
+    'dell',
+    'ironware'
 ]
