@@ -12,7 +12,7 @@ with open(os.path.join(mockdata_path, 'ironware/ironware_mock_data.yaml'), 'rb')
     mock_data = yaml.safe_load(datafile.read())
 
 
-class TestDellos6PluginConnect(unittest.TestCase):
+class TestIronWarePluginConnect(unittest.TestCase):
 
     def test_login_connect(self):
         c = Connection(hostname='mlx8',
@@ -43,7 +43,7 @@ class TestDellos6PluginConnect(unittest.TestCase):
         self.assertIn("^(.*?)Password:", str(c.connection_provider.get_connection_dialog()))
         c.disconnect()
 
-class TestDellos6PluginExecute(unittest.TestCase):
+class TestIronWarePluginExecute(unittest.TestCase):
 
     def test_execute_show_feature(self):
         c = Connection(hostname='mlx8',

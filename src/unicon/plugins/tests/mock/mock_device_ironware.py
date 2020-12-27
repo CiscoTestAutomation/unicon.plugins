@@ -19,7 +19,7 @@ class MockDeviceTcpWrapperIronWare(MockDeviceTcpWrapper):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, device_os='ironware', **kwargs)
-        self.mockdevice = MockDeviceDell(*args, **kwargs)
+        self.mockdevice = MockDeviceIronWare(*args, **kwargs)
 
 
 def main(args=None):
