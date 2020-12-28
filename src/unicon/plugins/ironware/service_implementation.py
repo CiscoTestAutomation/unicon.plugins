@@ -9,14 +9,15 @@ Description:
     This subpackage defines services specific to the Ironware NOS
 """
 
-__author__ = 'James Di Trapani <james@ditrapani.com.au>'
-
 from unicon.bases.routers.services import BaseService
 from unicon.plugins.generic.service_implementation import Execute as GenericExec
 from unicon.plugins.generic.service_implementation import Ping as GenericPing
 from unicon.eal.dialogs import Dialog
 from unicon.core.errors import SubCommandFailure
 from unicon.utils import AttributeDict
+
+__author__ = 'James Di Trapani <james@ditrapani.com.au>'
+
 
 class Execute(GenericExec):
     """
@@ -27,9 +28,10 @@ class Execute(GenericExec):
         # call parent
         super().call_service(*args, **kwargs)
 
+
 class MPLSPing(BaseService):
-    """ 
-        Service to issue ping across MPLS RSVP LSP on the Brocade/Ironware Platform
+    """
+        Service to issue ping across MPLS RSVP LSP on the Brocade Platform
 
         Returns:
             ping command response on Success (Not parsed)
@@ -52,7 +54,7 @@ class MPLSPing(BaseService):
         ]
 
         self.__dict__.update(kwargs)
-    
+
     def call_service(self, lsp, timeout=20, **kwargs):
         # Stringify the command in case it is an object
         ping_str = str('ping mpls rsvp lsp {lsp}'.format(lsp=lsp))
@@ -81,10 +83,8 @@ class MPLSPing(BaseService):
             raise
         except Exception as err:
             raise SubCommandFailure("MPLS Ping failed", err) from err
-        
+
         self.result = self.result.match_output
         if self.result.rfind(self.connection.hostname):
             self.result = self.result[
                 :self.result.rfind(self.connection.hostname)]
-        
-        

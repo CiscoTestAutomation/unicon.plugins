@@ -9,11 +9,11 @@ Description:
     This subpackage defines patterns for the Ironware NOS
 """
 
-__author__ = "James Di Trapani <james@ditrapani.com.au>"
-
 import re
 
 from unicon.plugins.generic.patterns import GenericPatterns
+
+__author__ = "James Di Trapani <james@ditrapani.com.au>"
 
 
 class IronWarePatterns(GenericPatterns):

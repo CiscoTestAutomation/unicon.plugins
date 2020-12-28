@@ -9,8 +9,6 @@ Description:
     Perform Unit Testing on Ironware Services
 """
 
-__author__ = "James Di Trapani <james@ditrapani.com.au>"
-
 import os
 import yaml
 import unittest
@@ -24,6 +22,8 @@ from unicon.core.errors import SubCommandFailure
 
 with open(os.path.join(mockdata_path, 'ironware/ironware_mock_data.yaml'), 'rb') as datafile:
     mock_data = yaml.safe_load(datafile.read())
+
+__author__ = "James Di Trapani <james@ditrapani.com.au>"
 
 
 class TestIronWarePluginConnect(unittest.TestCase):
@@ -73,10 +73,11 @@ class TestIronWarePluginConnect(unittest.TestCase):
                                 'password': 'pyatsRocks!'
                             }
                         },
-                        connect_reply = Dialog([[r'^(.*?)Password:']]))
+                        connect_reply=Dialog([[r'^(.*?)Password:']]))
         c.connect()
         self.assertIn("^(.*?)Password:", str(c.connection_provider.get_connection_dialog()))
         c.disconnect()
+
 
 class TestIronWarePluginExecute(unittest.TestCase):
 
@@ -94,13 +95,13 @@ class TestIronWarePluginExecute(unittest.TestCase):
                             }
                         },
                         init_exec_commands=[],
-                        init_config_commands=[]
-                        )
+                        init_config_commands=[])
         c.connect()
         cmd = 'show ip route'
         expected_response = mock_data['exec']['commands'][cmd].strip()
         ret = c.execute(cmd).replace('\r', '')
         self.assertIn(expected_response, ret)
+
 
 class TestIronWarePluginMPLSPing(unittest.TestCase):
 
@@ -118,7 +119,7 @@ class TestIronWarePluginMPLSPing(unittest.TestCase):
                                 }
                             })
         c.mpls_ping(lsp='mlx8.1_to_ces.2')
-        self.assertEqual("\n".join(c.spawn.match.match_output.splitlines()),"""ping mpls rsvp lsp mlx8.1_to_ces.2
+        self.assertEqual("\n".join(c.spawn.match.match_output.splitlines()), """ping mpls rsvp lsp mlx8.1_to_ces.2
 Send 5 96-byte MPLS Echo Requests over RSVP LSP mlx8.1_to_ces.2, timeout 5000 msec
 Type Control-c to abort
 !!!!!
@@ -142,7 +143,7 @@ mlx8#""")
             c.mpls_ping(lsp='mlx8.1_to_mlx8.4')
         except SubCommandFailure:
             pass
-        self.assertEqual("\n".join(c.spawn.match.match_output.splitlines()),"""ping mpls rsvp lsp mlx8.1_to_mlx8.4
+        self.assertEqual("\n".join(c.spawn.match.match_output.splitlines()), """ping mpls rsvp lsp mlx8.1_to_mlx8.4
 Ping fails: LSP is down
 mlx8#""")
 

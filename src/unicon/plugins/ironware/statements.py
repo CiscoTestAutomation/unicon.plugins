@@ -9,22 +9,25 @@ Description:
     Define statements specific to the Ironware NOS for use in conjunction with Dialogs
 """
 
-__author__ = "James Di Trapani <james@ditrapani.com.au>"
-
 from unicon.eal.dialogs import Statement
 from unicon.plugins.generic.statements import GenericStatements
-from .patterns import IronWarePatterns 
+from .patterns import IronWarePatterns
 from unicon.bases.routers.connection import ENABLE_CRED_NAME
 from unicon.utils import to_plaintext
+
+__author__ = "James Di Trapani <james@ditrapani.com.au>"
 
 statements = GenericStatements()
 patterns = IronWarePatterns()
 
+
 def login_handler(spawn, context, session):
     spawn.sendline(context['enable_password'])
 
+
 def send_enabler(spawn, context, session):
     spawn.sendline('enable')
+
 
 def get_enable_credential_password(context):
     credentials = context.get('credentials')
@@ -32,8 +35,8 @@ def get_enable_credential_password(context):
     login_creds = context.get('login_creds', [])
     fallback_cred = context.get('default_cred_name', "")
     if not login_creds:
-        login_creds=[fallback_cred]
-    if not isinstance (login_creds, list):
+        login_creds = [fallback_cred]
+    if not isinstance(login_creds, list):
         login_creds = [login_creds]
 
     final_credential = login_creds[-1] if login_creds else ""
@@ -52,8 +55,8 @@ def get_enable_credential_password(context):
                     enable_credential_password = candidate_enable_pw
                     break
         else:
-            raise UniconAuthenticationError('{}: Could not find an enable credential.'.\
-                format(context.get('hostname', "")))
+            raise UniconAuthenticationError('{}: Could not find an enable credential.'.
+                                            format(context.get('hostname', "")))
     return to_plaintext(enable_credential_password)
 
 
@@ -87,9 +90,7 @@ enable_stmt = Statement(pattern=patterns.disable_mode,
 
 
 password_stmt = Statement(pattern=patterns.password,
-                        action=enable_password_handler,
-                        args=None,
-                        loop_continue=True,
-                        continue_timer=False)
-
-
+                          action=enable_password_handler,
+                          args=None,
+                          loop_continue=True,
+                          continue_timer=False)
