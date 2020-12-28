@@ -1,13 +1,15 @@
 """
 Module:
-    unicon.plugins.ironware.patterns
+    unicon.plugins.ironware.service_implementation
 
 Author:
     James Di Trapani <james@ditrapani.com.au> - https://github.com/jamesditrapani
 
 Description:
-    This subpackage defines services specific to the Ironware OS
+    This subpackage defines services specific to the Ironware NOS
 """
+
+__author__ = 'James Di Trapani <james@ditrapani.com.au>'
 
 from unicon.bases.routers.services import BaseService
 from unicon.plugins.generic.service_implementation import Execute as GenericExec

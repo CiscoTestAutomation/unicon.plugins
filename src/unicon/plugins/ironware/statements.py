@@ -1,13 +1,15 @@
 """
 Module:
-    unicon.plugins.ironware
+    unicon.plugins.ironware.statements
 
 Author:
     James Di Trapani <james@ditrapani.com.au> - https://github.com/jamesditrapani
 
 Description:
-    
+    Define statements specific to the Ironware NOS for use in conjunction with Dialogs
 """
+
+__author__ = "James Di Trapani <james@ditrapani.com.au>"
 
 from unicon.eal.dialogs import Statement
 from unicon.plugins.generic.statements import GenericStatements

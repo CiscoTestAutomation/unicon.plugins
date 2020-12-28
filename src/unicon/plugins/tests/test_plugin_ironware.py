@@ -1,3 +1,16 @@
+"""
+Module:
+    unicon.plugins.tests.test_plugin_ironware
+
+Author:
+    James Di Trapani <james@ditrapani.com.au> - https://github.com/jamesditrapani
+
+Description:
+    Perform Unit Testing on Ironware Services
+"""
+
+__author__ = "James Di Trapani <james@ditrapani.com.au>"
+
 import os
 import yaml
 import unittest

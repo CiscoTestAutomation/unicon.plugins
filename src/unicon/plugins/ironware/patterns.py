@@ -6,8 +6,10 @@ Author:
     James Di Trapani <james@ditrapani.com.au> - https://github.com/jamesditrapani
 
 Description:
-    This subpackage defines patterns for the Ironware OS
+    This subpackage defines patterns for the Ironware NOS
 """
+
+__author__ = "James Di Trapani <james@ditrapani.com.au>"
 
 import re
 

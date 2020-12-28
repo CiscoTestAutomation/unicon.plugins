@@ -1,13 +1,16 @@
 """
 Module:
-    unicon.plugins.ironware
+    unicon.plugins.ironware.state_machine
 
 Author:
     James Di Trapani <james@ditrapani.com.au> - https://github.com/jamesditrapani
 
 Description:
-
+    Enables connection handle to transition into different router states, specific 
+    to the Ironware NOS.
 """
+
+__author__ = "James Di Trapani <james@ditrapani.com.au>"
 
 from unicon.statemachine import Path
 from unicon.eal.dialogs import Dialog

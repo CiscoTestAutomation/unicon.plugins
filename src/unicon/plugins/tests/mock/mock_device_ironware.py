@@ -1,4 +1,16 @@
 #!/usr/bin/env python3
+"""
+Module:
+    unicon.plugins.tests.mock.mock_device_ironware
+
+Author:
+    James Di Trapani <james@ditrapani.com.au> - https://github.com/jamesditrapani
+
+Description:
+    Subpackage providing a mock Ironware device for Unit Tests
+"""
+
+__author__ = "James Di Trapani <james@ditrapani.com.au>"
 
 import re
 import sys

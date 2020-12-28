@@ -6,8 +6,11 @@ Author:
     James Di Trapani <james@ditrapani.com.au> - https://github.com/jamesditrapani
 
 Description:
-    This subpackage implements Ironware Support
+    * Base init to define Ironware NOS Support. 
+    * Defines custom service list.
 """
+
+__author__ = 'James Di Trapani <james@ditrapani.com.au>'
 
 from unicon.bases.routers.connection import BaseSingleRpConnection
 from unicon.plugins.generic import GenericSingleRpConnectionProvider, ServiceList

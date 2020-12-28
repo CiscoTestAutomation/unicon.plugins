@@ -1,13 +1,15 @@
 """
 Module:
-    unicon.plugins.ironware
+    unicon.plugins.ironware.settings
 
 Author:
     James Di Trapani <james@ditrapani.com.au> - https://github.com/jamesditrapani
 
 Description:
-    
+    Define/Override Generic Settings specific to the Ironware NOS 
 """
+
+__author__ = "James Di Trapani <james@ditrapani.com.au>"
 
 from unicon.plugins.generic.settings import GenericSettings
 
