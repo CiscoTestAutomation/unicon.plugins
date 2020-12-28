@@ -46,7 +46,16 @@ exec:
         25      10.200.0.194/32    10.254.248.10   eth 2/2        110/37        O    40d0h  -
         26      10.200.0.196/30    10.254.248.10   eth 2/2        110/76        O    40d0h  -
         27      10.200.0.204/30    10.254.248.10   eth 2/2        110/128       O    40d0h  -
-        28      10.200.0.216/31    10.254.248.10   eth 2/2        110/39        O    40d0h  -"
+        28      10.200.0.216/31    10.254.248.10   eth 2/2        110/39        O    40d0h  -
+        29      1.1.1.1/32  10.254.251.2    eth 5/1       110/42        O    15h47m -
+                1.1.1.1/32  10.254.251.108  eth 7/1       110/42        O    15h47m -"
+    "ping mpls rsvp lsp mlx8.1_to_ces.2" : |
+      Send 5 96-byte MPLS Echo Requests over RSVP LSP mlx8.1_to_ces.2, timeout 5000 msec
+      Type Control-c to abort
+      !!!!!
+      Success rate is 100 percent (5/5), round-trip min/avg/max=0/1/3 ms
+    "ping mpls rsvp lsp mlx8.1_to_mlx8.4" : |
+      Ping fails: LSP is down
 
 
 user_access_veri:
