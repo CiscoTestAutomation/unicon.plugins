@@ -10,14 +10,12 @@ Description:
 """
 
 from unicon.eal.dialogs import Statement
-from unicon.plugins.generic.statements import GenericStatements
 from .patterns import IronWarePatterns
 from unicon.bases.routers.connection import ENABLE_CRED_NAME
 from unicon.utils import to_plaintext
 
 __author__ = "James Di Trapani <james@ditrapani.com.au>"
 
-statements = GenericStatements()
 patterns = IronWarePatterns()
 
 
