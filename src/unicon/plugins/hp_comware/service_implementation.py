@@ -10,21 +10,64 @@ https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_e
 from unicon.bases.routers.services import BaseService
 from unicon.core.errors import SubCommandFailure
 from unicon.eal.dialogs import Dialog
-from unicon.plugins.generic.service_implementation import Execute as GenericExecute
+from unicon.eal.dialogs import Statement
+from unicon.plugins.generic.service_implementation import (
+    Execute as GenericExecute,
+    Configure as GenericConfigure,
+)
 from unicon.plugins.hp_comware.service_statements import (
  save_confirm,
- file_path,
- save_overwrite)
+ sendPath,
+ send_response
+)
+from unicon.plugins.hp_comware.patterns import HPComwarePatterns
 
+from time import sleep
+
+patterns = HPComwarePatterns()
 
 
 class HPExecute(GenericExecute):
+    pass
+
+
+class HPConfigure(GenericConfigure):
+    pass
+
+
+class HPSave(GenericExecute):
 
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
-        self.dialog += Dialog([save_confirm, 
-                               file_path,
-                               save_overwrite])
+        self.dialog += Dialog([save_confirm])
+        self.error_pattern = [r'The file name is invalid\(does not end with \.cfg\)\!']
+
+    def call_service(self, file_path=None, overwrite=True):
+
+        file_path = Statement(pattern=patterns.file_save,
+                              action=sendPath, args={'path': file_path},
+                              loop_continue=True,
+                              continue_timer=False)
+        self.dialog.append(file_path)
+        if(overwrite is False):
+            self.error_pattern += [r'^.*exists, overwrite\? \[Y/N\]:']
+            save_overwrite = Statement(pattern=patterns.overwrite,
+                                       action=send_response,
+                                       args={'response': 'N'},
+                                       loop_continue=True,
+                                       continue_timer=False)
+            self.dialog.append(save_overwrite)
+        else:
+            self.error_pattern = []
+            save_overwrite = Statement(pattern=patterns.overwrite,
+                                       action=send_response,
+                                       args={'response': 'Y'},
+                                       loop_continue=True,
+                                       continue_timer=False)
+            self.dialog.append(save_overwrite)
+
+
+        super().call_service("save")
 
 
 class HPComwarePing(BaseService):

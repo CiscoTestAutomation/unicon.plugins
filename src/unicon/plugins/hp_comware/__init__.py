@@ -24,6 +24,8 @@ class HPComwareServiceList(ServiceList):
     def __init__(self):
         super().__init__()
         self.execute = svc.HPExecute
+        self.configure = svc.HPConfigure
+        self.save = svc.HPSave
         self.ping = svc.HPComwarePing
         self.traceroute = svc.HPComwareTraceroute
 

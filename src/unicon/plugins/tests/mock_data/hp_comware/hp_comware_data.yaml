@@ -58,6 +58,15 @@ save_file_name:
   commands:
       "":
         new_state: confirm_overwrite
+      "newfile.cfg":
+        response: | 
+                Validating file. Please wait...
+                Configuration is saved to device successfully.
+        new_state: exec
+      "oldfile.cfg":
+        new_state: confirm_overwrite
+
+
 
 confirm_overwrite:
   prompt: "flash:/startup.cfg exists, overwrite? [Y/N]:"

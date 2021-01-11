@@ -73,8 +73,37 @@ class TestDellPluginExecute(unittest.TestCase):
                        init_config_commands=[]
                        )
         c.connect()
-        cmd = 'save'
-        ret = c.execute(cmd).replace('\r', '')
+        ret = c.save().replace('\r', '')
+        self.assertIn(f"<{hostname}>", c.spawn.match.match_output)
+
+
+    def test_execute_save_file(self):
+        hostname = "Device"
+        c = Connection(hostname=hostname,
+                       start=[f"mock_device_cli --os hp_comware --state exec --hostname {hostname}"],
+                       os='hp_comware',
+                       username='admin',
+                       password='developer',
+                       init_exec_commands=[],
+                       init_config_commands=[]
+                       )
+        c.connect()
+        ret = c.save(file_path="newfile.cfg" ).replace('\r', '')
+        self.assertIn(f"<{hostname}>", c.spawn.match.match_output)
+
+
+    def test_execute_save_file_overwrite(self):
+        hostname = "Device"
+        c = Connection(hostname=hostname,
+                       start=[f"mock_device_cli --os hp_comware --state exec --hostname {hostname}"],
+                       os='hp_comware',
+                       username='admin',
+                       password='developer',
+                       init_exec_commands=[],
+                       init_config_commands=[]
+                       )
+        c.connect()
+        ret = c.save(file_path="oldfile.cfg", overwrite=True ).replace('\r', '')
         self.assertIn(f"<{hostname}>", c.spawn.match.match_output)
 
 

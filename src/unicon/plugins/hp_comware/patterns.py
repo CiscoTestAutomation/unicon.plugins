@@ -19,5 +19,5 @@ class HPComwarePatterns(GenericPatterns):
         self.config_mode = r'^ *\[%N(-.*)?\]$'
         self.password = r'^.* password: $'
         self.save_confirm = r'The current configuration will be written to the device\. Are you sure\? \[Y/N\]:'
-        self.file_save = r'\(To leave the existing filename unchanged, press the enter key\):'
-        self.overwrite = r'flash:/startup.cfg exists, overwrite\? \[Y/N\]:'
+        self.file_save = r'^.*\(To leave the existing filename unchanged, press the enter key\):'
+        self.overwrite = r'^.* exists, overwrite\? \[Y/N\]:'

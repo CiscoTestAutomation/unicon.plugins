@@ -20,17 +20,16 @@ def send_response(spawn, response=""):
     spawn.sendline(response)
 
 
+def sendPath(spawn, path=None):
+    sleep(0.5)
+    if path is not None:
+        spawn.sendline(path)
+    else:
+        spawn.sendline()
+
+
 save_confirm = Statement(pattern=patterns.save_confirm,
                          action=send_response, args={'response': 'Y'},
                          loop_continue=True,
                          continue_timer=False)
 
-save_overwrite = Statement(pattern=patterns.overwrite,
-                         action=send_response, args={'response': 'Y'},
-                         loop_continue=True,
-                         continue_timer=False)
-
-file_path = Statement(pattern=patterns.file_save,
-                    action='sendline()',
-                    loop_continue=True,
-                    continue_timer=False)
