@@ -14,10 +14,10 @@ from unicon.plugins.generic.patterns import GenericPatterns
 class HPComwarePatterns(GenericPatterns):
     def __init__(self):
         super().__init__()
-        self.login_prompt = r' *login as: *?'
-        self.user_exec_mode = r' *<%N>$'
-        self.config_mode = r' *\[%N(-.*)?\]$'
-        self.password = r'.* password: '
+        self.login_prompt = r'^ *login as: *$'
+        self.user_exec_mode = r'^.*<%N>$'
+        self.config_mode = r'^ *\[%N(-.*)?\]$'
+        self.password = r'^.* password: $'
         self.save_confirm = r'The current configuration will be written to the device\. Are you sure\? \[Y/N\]:'
         self.file_save = r'\(To leave the existing filename unchanged, press the enter key\):'
         self.overwrite = r'flash:/startup.cfg exists, overwrite\? \[Y/N\]:'
