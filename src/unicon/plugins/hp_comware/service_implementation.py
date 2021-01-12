@@ -95,19 +95,19 @@ class HPComwarePing(BaseService):
             raise SubCommandFailure("Protocol should be ip or ipv6")
         if('src_addr' in kwargs):
             src_addr = kwargs['src_addr']
-            source_cmd = f"-a {src_addr} "
+            source_cmd = "-a {src_addr} ".format(src_addr=src_addr)
             cmd = cmd + source_cmd
         if('count' in kwargs):
             count = kwargs['count']
-            count_cmd = f"-c {count} "
+            count_cmd = "-c {count} ".format(count=count)
             cmd = cmd + count_cmd
         if('vrf' in kwargs):
             vrf = kwargs['vrf']
-            vrf_cmd = f"-vpn-instance {vrf} "
+            vrf_cmd = "-vpn-instance {vrf} ".format(vrf=vrf)
             cmd = cmd + vrf_cmd
         if('ttl' in kwargs):
             ttl = kwargs['ttl']
-            ttl_cmd = f"-h {ttl} "
+            ttl_cmd = "-h {ttl} ".format(ttl=ttl)
             cmd = cmd + ttl_cmd
 
         cmd = cmd + addr
@@ -154,23 +154,23 @@ class HPComwareTraceroute(BaseService):
             raise SubCommandFailure("Protocol should be ip or ipv6")
         if('src_addr' in kwargs):
             src_addr = kwargs['src_addr']
-            source_cmd = f"-a {src_addr} "
+            source_cmd = "-a {src_addr} ".format(src_addr=src_addr)
             cmd = cmd + source_cmd
         if('count' in kwargs):
             count = kwargs['count']
-            count_cmd = f"-q {count} "
+            count_cmd = "-q {count} ".format(count=count)
             cmd = cmd + count_cmd
         if('vrf' in kwargs):
             vrf = kwargs['vrf']
-            vrf_cmd = f"-vpn-instance {vrf} "
+            vrf_cmd = "-vpn-instance {vrf} ".format(vrf=vrf)
             cmd = cmd + vrf_cmd
         if('min_ttl' in kwargs):
             min_ttl = kwargs['min_ttl']
-            min_ttl_cmd = f"-f {min_ttl} "
+            min_ttl_cmd = "-f {min_ttl} ".format(min_ttl=min_ttl)
             cmd = cmd + min_ttl_cmd
         if('max_ttl' in kwargs):
             max_ttl = kwargs['max_ttl']
-            max_ttl_cmd = f"-m {max_ttl} "
+            max_ttl_cmd = "-m {max_ttl} ".format(max_ttl=max_ttl)
             cmd = cmd + max_ttl_cmd
 
         cmd = cmd + addr
@@ -188,4 +188,3 @@ class HPComwareTraceroute(BaseService):
 
         if self.result.rfind(self.connection.hostname):
             self.result = self.result[:self.result.rfind(self.connection.hostname)].strip()
-

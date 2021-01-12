@@ -26,22 +26,26 @@ class TestHPComwarePluginConnect(unittest.TestCase):
     def test_exec_prompt(self):
         hostname = "Device"
         c = Connection(hostname=hostname,
-                       start=[f"mock_device_cli --os hp_comware --state exec --hostname {hostname}"],
+                       start=["mock_device_cli --os hp_comware --state exec --hostname {hostname}"\
+                              .format(hostname=hostname)],
                        os='hp_comware',
                        username='admin',
                        password='developer')
         c.connect()
-        self.assertIn(f"<{hostname}>", c.spawn.match.match_output)
+        self.assertIn("<{hostname}>".format(hostname=hostname),
+                      c.spawn.match.match_output)
 
     def test_login_connect_ssh(self):
         hostname = "Device"
         c = Connection(hostname=hostname,
-                       start=[f"mock_device_cli --os hp_comware --state connect_ssh  --hostname {hostname}"],
+                       start=["mock_device_cli --os hp_comware --state connect_ssh  --hostname {hostname}"\
+                              .format(hostname=hostname)],
                        os='hp_comware',
                        username='admin',
                        line_password='developer')
         c.connect()
-        self.assertIn(f"<{hostname}>", c.spawn.match.match_output)
+        self.assertIn("<{hostname}>".format(hostname=hostname),
+                      c.spawn.match.match_output)
 
 
 class TestDellPluginExecute(unittest.TestCase):
@@ -49,7 +53,8 @@ class TestDellPluginExecute(unittest.TestCase):
     def test_execute_show_feature(self):
         hostname = "Device"
         c = Connection(hostname=hostname,
-                       start=[f"mock_device_cli --os hp_comware --state exec --hostname {hostname}"],
+                       start=["mock_device_cli --os hp_comware --state exec --hostname {hostname}"\
+                              .format(hostname=hostname)],
                        os='hp_comware',
                        username='admin',
                        password='developer',
@@ -61,11 +66,12 @@ class TestDellPluginExecute(unittest.TestCase):
         expected_response = mock_data['exec']['commands'][cmd].strip()
         ret = c.execute(cmd).replace('\r', '')
         self.assertIn(expected_response, ret)
-    
+
     def test_execute_save(self):
         hostname = "Device"
         c = Connection(hostname=hostname,
-                       start=[f"mock_device_cli --os hp_comware --state exec --hostname {hostname}"],
+                       start=["mock_device_cli --os hp_comware --state exec --hostname {hostname}"\
+                              .format(hostname=hostname)],
                        os='hp_comware',
                        username='admin',
                        password='developer',
@@ -74,13 +80,15 @@ class TestDellPluginExecute(unittest.TestCase):
                        )
         c.connect()
         ret = c.save().replace('\r', '')
-        self.assertIn(f"<{hostname}>", c.spawn.match.match_output)
+        self.assertIn("<{hostname}>".format(hostname=hostname),
+                      c.spawn.match.match_output)
 
 
     def test_execute_save_file(self):
         hostname = "Device"
         c = Connection(hostname=hostname,
-                       start=[f"mock_device_cli --os hp_comware --state exec --hostname {hostname}"],
+                       start=["mock_device_cli --os hp_comware --state exec --hostname {hostname}"\
+                              .format(hostname=hostname)],
                        os='hp_comware',
                        username='admin',
                        password='developer',
@@ -89,13 +97,15 @@ class TestDellPluginExecute(unittest.TestCase):
                        )
         c.connect()
         ret = c.save(file_path="newfile.cfg" ).replace('\r', '')
-        self.assertIn(f"<{hostname}>", c.spawn.match.match_output)
+        self.assertIn("<{hostname}>".format(hostname=hostname),
+                      c.spawn.match.match_output)
 
 
     def test_execute_save_file_overwrite(self):
         hostname = "Device"
         c = Connection(hostname=hostname,
-                       start=[f"mock_device_cli --os hp_comware --state exec --hostname {hostname}"],
+                       start=["mock_device_cli --os hp_comware --state exec --hostname {hostname}"\
+                              .format(hostname=hostname)],
                        os='hp_comware',
                        username='admin',
                        password='developer',
@@ -104,7 +114,8 @@ class TestDellPluginExecute(unittest.TestCase):
                        )
         c.connect()
         ret = c.save(file_path="oldfile.cfg", overwrite=True ).replace('\r', '')
-        self.assertIn(f"<{hostname}>", c.spawn.match.match_output)
+        self.assertIn("<{hostname}>".format(hostname=hostname),
+                      c.spawn.match.match_output)
 
 
 if __name__ == "__main__":
