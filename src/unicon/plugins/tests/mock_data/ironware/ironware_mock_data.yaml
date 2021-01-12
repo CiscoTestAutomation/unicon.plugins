@@ -8,7 +8,7 @@ connect_ssh:
       new_state: user_access_veri
 
 exec:
-  prompt: "mlx8#"
+  prompt: "SSH@mlx8#"
   commands:
     "terminal length 0": ""
     "show ip route" : |

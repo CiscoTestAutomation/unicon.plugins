@@ -10,6 +10,7 @@ Description:
 """
 
 from unicon.bases.routers.services import BaseService
+from unicon.plugins.generic.utils import GenericUtils
 from unicon.plugins.generic.service_implementation import Execute as GenericExec
 from unicon.plugins.generic.service_implementation import Ping as GenericPing
 from unicon.eal.dialogs import Dialog
@@ -44,6 +45,7 @@ class MPLSPing(BaseService):
     """
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
+        self.utils = GenericUtils()
         self.start_state = 'enable'
         self.end_state = 'enable'
         self.dialog = Dialog([])
@@ -71,7 +73,7 @@ class MPLSPing(BaseService):
 
         spawn.sendline(ping_str)
         try:
-            self.result = dialog.process(
+            dialog_match = dialog.process(
                 spawn, context=mpls_ping_context,
                 timeout=timeout)
         except TimeoutError:
@@ -84,7 +86,11 @@ class MPLSPing(BaseService):
         except Exception as err:
             raise SubCommandFailure("MPLS Ping failed", err) from err
 
-        self.result = self.result.match_output
-        if self.result.rfind(self.connection.hostname):
-            self.result = self.result[
-                :self.result.rfind(self.connection.hostname)]
+        self.result = dialog_match.match_output
+        if self.result:
+            output = self.utils.truncate_trailing_prompt(
+                    sm.get_state(sm.current_state),
+                    self.result,
+                    hostname=con.hostname,
+                    result_match=dialog_match,
+                )

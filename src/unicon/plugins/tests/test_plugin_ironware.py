@@ -124,7 +124,7 @@ Send 5 96-byte MPLS Echo Requests over RSVP LSP mlx8.1_to_ces.2, timeout 5000 ms
 Type Control-c to abort
 !!!!!
 Success rate is 100 percent (5/5), round-trip min/avg/max=0/1/3 ms
-mlx8#""")
+SSH@mlx8#""")
 
     def test_mpls_ping_failure(self):
         c = Connection(hostname='mlx8',
@@ -145,7 +145,7 @@ mlx8#""")
             pass
         self.assertEqual("\n".join(c.spawn.match.match_output.splitlines()), """ping mpls rsvp lsp mlx8.1_to_mlx8.4
 Ping fails: LSP is down
-mlx8#""")
+SSH@mlx8#""")
 
 if __name__ == "__main__":
     unittest.main()
