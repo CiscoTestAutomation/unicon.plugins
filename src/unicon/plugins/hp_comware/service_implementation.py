@@ -76,7 +76,7 @@ class HPComwarePing(BaseService):
         self.connection = connection
         self.context = context
         self.timeout_pattern = ['Timeout occurred', ]
-        self.error_pattern = [r'Unknown host', r'Incorrect', r'HELP']
+        self.error_pattern = [r'Unknown host', r'HELP']
         self.start_state = 'enable'
         self.end_state = 'enable'
         self.result = None
@@ -85,9 +85,9 @@ class HPComwarePing(BaseService):
         # add the keyword arguments to the object
         self.__dict__.update(kwargs)
 
-    def call_service(self, addr, proto='ip', **kwargs):
+    def call_service(self, addr, proto='ip', timeout=60, count=5,  **kwargs):
         con = self.connection
-        timeout = self.timeout
+        total_timeout = timeout * count
         cmd = 'ping '
         if((proto == 'ip') or (proto == 'ipv6')):
             cmd = cmd + proto + " "
@@ -97,10 +97,15 @@ class HPComwarePing(BaseService):
             src_addr = kwargs['src_addr']
             source_cmd = "-a {src_addr} ".format(src_addr=src_addr)
             cmd = cmd + source_cmd
-        if('count' in kwargs):
-            count = kwargs['count']
+        if(isinstance(count, int)):
             count_cmd = "-c {count} ".format(count=count)
             cmd = cmd + count_cmd
+        if(isinstance(timeout, int)):
+            timeout_ms = timeout * 1000
+            if( timeout_ms > 65535):
+                raise SubCommandFailure('Timeout should be less than 65.535 s')
+            timeout_cmd = "-t {timeout_ms} ".format(timeout_ms=timeout_ms)
+            cmd = cmd + timeout_cmd
         if('vrf' in kwargs):
             vrf = kwargs['vrf']
             vrf_cmd = "-vpn-instance {vrf} ".format(vrf=vrf)
@@ -113,13 +118,17 @@ class HPComwarePing(BaseService):
         cmd = cmd + addr
         con.spawn.sendline(cmd)
 
-        # It seems we also want to return the command sent
-        # con.spawn.expect([cmd])
 
         try:
             # Wait for prompt
             state = con.state_machine.get_state('enable')
+            self.result = con.spawn.expect(state.pattern, timeout=total_timeout).match_output
+        except KeyboardInterrupt:
+            con.spawn.sendline('\x03')
+            sleep(0.5)
+            state = con.state_machine.get_state('enable')
             self.result = con.spawn.expect(state.pattern, timeout=timeout).match_output
+            raise SubCommandFailure('Execution Interrupted')
         except Exception:
             raise SubCommandFailure('Ping failed')
 
@@ -143,9 +152,9 @@ class HPComwareTraceroute(BaseService):
         # add the keyword arguments to the object
         self.__dict__.update(kwargs)
 
-    def call_service(self, addr, proto='ip', **kwargs):
+    def call_service(self, addr, proto='ip', timeout=60, probes=3, max_ttl=30, **kwargs):
         con = self.connection
-        timeout = self.timeout
+        total_timeout = timeout * probes * probes * max_ttl
         cmd = 'tracert '
         if((proto == 'ip') or (proto == 'ipv6')):
             if(proto == 'ipv6'):
@@ -156,10 +165,15 @@ class HPComwareTraceroute(BaseService):
             src_addr = kwargs['src_addr']
             source_cmd = "-a {src_addr} ".format(src_addr=src_addr)
             cmd = cmd + source_cmd
-        if('count' in kwargs):
-            count = kwargs['count']
-            count_cmd = "-q {count} ".format(count=count)
-            cmd = cmd + count_cmd
+        if(isinstance(probes,int)):
+            probes_cmd = "-q {probes} ".format(probes=probes)
+            cmd = cmd + probes_cmd
+        if(isinstance(timeout, int)):
+            timeout_ms = timeout * 1000
+            if( timeout_ms > 65535):
+                raise SubCommandFailure('Timeout should be less than 65.535 s')
+            timeout_cmd = "-w {timeout_ms} ".format(timeout_ms=timeout_ms)
+            cmd = cmd + timeout_cmd
         if('vrf' in kwargs):
             vrf = kwargs['vrf']
             vrf_cmd = "-vpn-instance {vrf} ".format(vrf=vrf)
@@ -168,21 +182,24 @@ class HPComwareTraceroute(BaseService):
             min_ttl = kwargs['min_ttl']
             min_ttl_cmd = "-f {min_ttl} ".format(min_ttl=min_ttl)
             cmd = cmd + min_ttl_cmd
-        if('max_ttl' in kwargs):
-            max_ttl = kwargs['max_ttl']
+        if(isinstance(max_ttl,int)):
             max_ttl_cmd = "-m {max_ttl} ".format(max_ttl=max_ttl)
             cmd = cmd + max_ttl_cmd
 
         cmd = cmd + addr
         con.spawn.sendline(cmd)
 
-        # It seems we also want to return the command sent
-        # con.spawn.expect([cmd])
 
         try:
             # Wait for prompt
             state = con.state_machine.get_state('enable')
+            self.result = con.spawn.expect(state.pattern, timeout=total_timeout).match_output
+        except KeyboardInterrupt:
+            con.spawn.sendline('\x03')
+            sleep(0.5)
+            state = con.state_machine.get_state('enable')
             self.result = con.spawn.expect(state.pattern, timeout=timeout).match_output
+            raise SubCommandFailure('Execution Interrupted')
         except Exception:
             raise SubCommandFailure('Traceroute failed')
 

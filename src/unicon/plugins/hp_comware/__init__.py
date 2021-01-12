@@ -7,7 +7,6 @@ Contents largely inspired by sample Unicon repo:
 https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_example/src/unicon_plugin_example
 '''
 
-from unicon.plugins.generic import GenericSingleRpConnectionProvider
 from unicon.bases.routers.connection import BaseSingleRpConnection
 from unicon.plugins.generic import ServiceList
 
