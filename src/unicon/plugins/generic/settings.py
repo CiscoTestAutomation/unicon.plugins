@@ -78,7 +78,7 @@ class GenericSettings(Settings):
         self.CONFIG_POST_RELOAD_RETRY_DELAY_SEC = 9
 
         # Default error pattern
-        self.ERROR_PATTERN=[]
+        self.ERROR_PATTERN = []
         self.CONFIGURE_ERROR_PATTERN = []
 
         # Number of times to retry for config mode by configure service.
@@ -132,7 +132,7 @@ class GenericSettings(Settings):
         self.OS_MAPPING = {
             'nxos': {
                 'os': ['Nexus Operating System'],
-                'series': {
+                'platform': {
                     'aci': ['aci'],
                     'mds': ['mds'],
                     'n5k': ['n5k'],
@@ -142,7 +142,7 @@ class GenericSettings(Settings):
             },
             'iosxe': {
                 'os': ['IOS( |-)XE Software'],
-                'series': {
+                'platform': {
                     'cat3k': ['cat3k'],
                     'cat9k': ['cat9k'],
                     'csr1000v': ['csr1000v'],
@@ -152,7 +152,7 @@ class GenericSettings(Settings):
             },
             'iosxr': {
                 'os': ['IOS XR Software'],
-                'series': {
+                'platform': {
                     'asr9k': ['asr9k'],
                     'iosxrv': ['iosxrv'],
                     'iosxrv9k': ['iosxrv9k'],
@@ -163,7 +163,7 @@ class GenericSettings(Settings):
             },
             'ios': {
                 'os': ['IOS Software'],
-                'series': {
+                'platform': {
                     'ap': ['TBD'],
                     'iol': ['TBD'],
                     'iosv': ['TBD'],
@@ -172,7 +172,7 @@ class GenericSettings(Settings):
             },
             'junos': {
                 'os': ['JUNOS Software'],
-                'series': {
+                'platform': {
                     'vsrx': ['vsrx'],
                 },
             },

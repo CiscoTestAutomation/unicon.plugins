@@ -596,8 +596,10 @@ class TestLinuxPluginExecute(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.c = Connection(hostname='linux',
-                            start=['mock_device_cli --os linux --state exec'],
-                            os='linux')
+                           start=['mock_device_cli --os linux --state exec'],
+                           os='linux',
+                           credentials={'sudo': {'password': 'sudo_password'}})
+
         cls.c.connect()
 
     def test_execute_error_pattern(self):
@@ -656,6 +658,17 @@ class TestLinuxPluginExecute(unittest.TestCase):
       # return code is 2 (last one in the mock list)
       self.c.execute('ls', error_pattern=[], check_retcode=True, valid_retcodes=[0, 2])
 
+    def test_sudo_handler(self):
+      self.c.execute('sudo')
+
+      self.c.context.credentials['sudo']['password'] = 'unknown'
+      with self.assertRaises(unicon.core.errors.SubCommandFailure):
+        self.c.execute('sudo_invalid')
+
+      self.c.context.credentials['sudo']['password'] = 'invalid'
+      with self.assertRaises(unicon.core.errors.SubCommandFailure):
+        self.c.execute('sudo_invalid')
+
 
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
 @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0)
@@ -672,7 +685,7 @@ class TestLoginPasswordPrompts(unittest.TestCase):
         c.disconnect()
 
     def test_topology_custom_user_password_prompt(self):
-        testbed = """
+        testbed = r"""
           devices:
             linux:
               type: linux
@@ -695,7 +708,7 @@ class TestLoginPasswordPrompts(unittest.TestCase):
         d.disconnect()
 
 class TestLinuxPromptOverride(unittest.TestCase):
-    
+
     def test_override_prompt(self):
         settings = LinuxSettings()
         prompt = 'prompt'

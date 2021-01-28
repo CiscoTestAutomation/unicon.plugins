@@ -9,7 +9,7 @@ from unicon.plugins.confd.settings import ConfdSettings
 
 class NsoConnection(ConfdConnection):
     os = 'nso'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     state_machine_class = ConfdStateMachine
     connection_provider_class = ConfdConnectionProvider

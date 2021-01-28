@@ -21,6 +21,7 @@ class NxosSettings(GenericSettings):
         self.SWITCHOVER_COUNTER = 50
         self.HA_RELOAD_TIMEOUT = 700
         self.RELOAD_TIMEOUT = 400
+        self.RELOAD_RECONNECT_WAIT = 60
         self.CONSOLE_TIMEOUT = 30
         self.GUESTSHELL_RETRIES = 20
         self.GUESTSHELL_RETRY_SLEEP = 5

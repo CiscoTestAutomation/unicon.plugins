@@ -12,13 +12,13 @@ logger = logging.getLogger(__name__)
 class MockDeviceDellos6(MockDevice):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, device_os='dellos6', **kwargs)
+        super().__init__(*args, device_os='dell_os6', **kwargs)
 
 
 class MockDeviceTcpWrapperDellos6(MockDeviceTcpWrapper):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, device_os='dellos6', **kwargs)
+        super().__init__(*args, device_os='dell_os6', **kwargs)
         self.mockdevice = MockDeviceDellos6(*args, **kwargs)
 
 

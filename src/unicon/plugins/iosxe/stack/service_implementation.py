@@ -110,6 +110,7 @@ class StackSwitchover(BaseService):
         connect_dialog = self.connection.connection_provider.get_connection_dialog()
         dialog += connect_dialog
 
+        conn.log.info('Processing on active rp %s-%s' % (conn.hostname, conn.alias))
         conn.sendline(switchover_cmd)
         try:
             match_object = dialog.process(conn.spawn, timeout=timeout,
@@ -214,6 +215,7 @@ class StackReload(BaseService):
 
         reload_dialog += Dialog([switch_prompt])
 
+        conn.log.info('Processing on active rp %s-%s' % (conn.hostname, conn.alias))
         conn.sendline(reload_cmd)
         try:
             reload_cmd_output = reload_dialog.process(

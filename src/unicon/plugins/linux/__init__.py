@@ -41,7 +41,7 @@ class LinuxConnection(BaseLinuxConnection):
     Connection class for Linux connections.
     """
     os = 'linux'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     # TODO Recheck this single_rp value for linux
     state_machine_class = LinuxStateMachine

@@ -1,32 +1,32 @@
 Supported Platforms
 ===================
 
-At the moment `unicon.plugins` supports the following network device types, 
-described as their OS (network operation system), series (platform series), and
-model (specific model support). 
+At the moment `unicon.plugins` supports the following network device types,
+described as their OS (network operation system), platform and
+model (specific model support).
 
 These values help Unicon load the most accurate connection plugin for the given
 network device, and corresponds to ther pyATS testbed YAML counterparts.
 
-For example, if ``os=iosxe`` and ``series=abc``, since ``abc`` is not found in 
-the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If 
-``os=iosxe`` and ``series=cat3k``, it will use the specific plugin ``iosxe/cat3k``.
+For example, if ``os=iosxe`` and ``platform=abc``, since ``abc`` is not found in
+the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
+``os=iosxe`` and ``platform=cat3k``, it will use the specific plugin ``iosxe/cat3k``.
 
 .. tip::
 
-  The priority to pick up which plugin is: chassis_type > os > series > model.
+  The priority to pick up which plugin is: chassis_type > os > platform > model.
 
 
 .. csv-table:: Unicon Supported Platforms
     :align: center
     :widths: 20, 20, 20, 40
-    :header: "os", "series", "model", "Comments"
+    :header: "os", "platform", "model", "Comments"
 
-    ``aci``, ``apic``
-    ``aci``, ``n9k``
+    ``apic``
     ``aireos``
     ``asa``
     ``asa``, ``asav``
+    ``asa``, ``fp2k``
     ``cheetah``, ``ap``
     ``cimc``
     ``confd``
@@ -59,7 +59,7 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
     ``nxos``, ``n5k``
     ``nxos``, ``n9k``
     ``nxos``, ``nxosv``
-    ``nxos``, ``aci``, ``n9k``, "Identical to os=aci, series=n9k"
+    ``nxos``, ``aci``
     ``nso``
     ``sdwan``, ``viptela``,,"Identical to os=viptela."
     ``sros``
@@ -67,10 +67,10 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
     ``vos``
     ``junos``
     ``sros``
-    ``viptela``,,,"Identical to os=sdwan, series=viptela."
+    ``viptela``,,,"Identical to os=sdwan, platform=viptela."
     ``windows``
 
-To use this table - locate your device's os/series/model information, and fill 
+To use this table - locate your device's os/platform/model information, and fill
 your pyATS testbed YAML with it:
 
 .. code-block:: yaml
@@ -91,8 +91,8 @@ your pyATS testbed YAML with it:
 
 .. tip::
 
-  in the above example, ``series`` and ``model`` is not provided, hence Unicon
-  will use the most generic ``os==iosxe`` connection implementation for my 
+  in the above example, ``platform`` and ``model`` is not provided, hence Unicon
+  will use the most generic ``os=iosxe`` connection implementation for my
   device.
 
 
@@ -105,7 +105,7 @@ Example: Single Router
     devices:
       router_hostname:
         os: iosxe
-        series: csr1000v
+        platform: csr1000v
         model: vewlc
         type: iosxe
         credentials:
@@ -134,7 +134,7 @@ Example: HA router
     devices:
       router_hostname:
         os: nxos
-        series: n9k
+        platform: n9k
         type: nxos
         credentials:
           default:
@@ -157,7 +157,7 @@ Example: HA router
 
 
 Example: Stack router
-------------------
+---------------------
 
 **Stack router has connections peer_1, peer_2, peer_3**
 
@@ -166,7 +166,7 @@ Example: Stack router
     devices:
       router_hostname:
         os: iosxe
-        series: cat3k
+        platform: cat3k
         type: iosxe
         chassis_type: stack            <<< define the chassis_type as 'stack'
         credentials:
@@ -197,7 +197,7 @@ Example: Stack router
 
 
 Example: Quad Sup router
-------------------
+------------------------
 
 **Quad Sup router has two chassis 1, 2 and 4 connections a, b, c, d**
 
@@ -206,7 +206,7 @@ Example: Quad Sup router
     devices:
       router_hostname:
         os: iosxe
-        series: cat9k
+        platform: cat9k
         type: iosxe
         chassis_type: quad             <<< define the chassis_type as 'quad'
         credentials:
@@ -283,7 +283,7 @@ pyATS testbed YAML:
 
     device1:
         os: 'ios'
-        series: 'pagent'
+        platform: 'pagent'
         type: 'router'
         credentials:
             default:

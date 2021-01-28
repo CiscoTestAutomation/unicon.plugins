@@ -27,6 +27,14 @@ apic_exec:
       new_state: apic_config
     "invalid command": "Error: Invalid argument 'invalid command '. Please check syntax in command reference guide"
 
+apic_exec_ssh:
+  prompt: APC#
+  commands:
+    <<: *exec_commands
+    "acidiag reboot":
+      new_state: apic_restart_confirm_ssh
+
+
 apic_hostname_with_escape_codes:
   prompt: "%1B[0m%1B[27m%1B[24m%1B[JAPC-0001-2001# "
   commands: *exec_commands
@@ -36,10 +44,19 @@ apic_restart_confirm:
   prompt: "This command will restart this device, Proceed? [y/N] "
   commands:
     "y":
-      response: file|mock_data/aci/apic_reboot.txt
+      response: file|mock_data/apic/apic_reboot.txt
       timing:
         - 0:,0,0.001
       new_state: apic_login
+
+
+apic_restart_confirm_ssh:
+  prompt: "This command will restart this device, Proceed? [y/N] "
+  commands:
+    "y":
+      response: Connection to 127.0.0.1 closed
+      new_state: apic_exec_ssh
+
 
 apic_login:
   prompt: "APC login: "
@@ -74,3 +91,17 @@ apic_config_tenant:
   commands: 
     "end":
       new_state: apic_exec
+
+apic_shell_connect:
+  preface: |
+    Application Policy Infrastructure Controller
+  prompt: "root@10.197.154.122's password: "
+  commands:
+    "cisco":
+      new_state: apic_shell
+
+apic_shell:
+  prompt: "[root@APC ~]# "
+  commands:
+    "pwd": |
+      /root

@@ -1,0 +1,233 @@
+c8kv_enable:
+  prompt: 'Router#'
+  commands:
+    'term length 0': ''
+    'term width 0': ''
+    'show version': |2
+      Cisco IOS XE Software, Version BLD_POLARIS_DEV_LATEST_20200803_053108
+      Cisco IOS Software [Bengaluru], Virtual XE Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Experimental Version 17.4.20200803:054658 [S2C-build-polaris_dev-119012-/nobackup/mcpre/BLD-BLD_POLARIS_DEV_LATEST_20200803_053108 218]
+      Copyright (c) 1986-2020 by Cisco Systems, Inc.
+      Compiled Mon 03-Aug-20 07:12 by mcpre
+
+
+      Cisco IOS-XE software, Copyright (c) 2005-2020 by cisco Systems, Inc.
+      All rights reserved.  Certain components of Cisco IOS-XE software are
+      licensed under the GNU General Public License ("GPL") Version 2.0.  The
+      software code licensed under GPL Version 2.0 is free software that comes
+      with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+      GPL code under the terms of GPL Version 2.0.  For more details, see the
+      documentation or "License Notice" file accompanying the IOS-XE software,
+      or the applicable URL provided on the flyer accompanying the IOS-XE
+      software.
+
+
+      ROM: IOS-XE ROMMON
+
+      Router uptime is 4 minutes
+      Uptime for this control processor is 7 minutes
+      System returned to ROM by reload
+      System image file is "boot:packages.conf"
+      Last reload reason: Reload Command
+
+
+
+      This product contains cryptographic features and is subject to United
+      States and local country laws governing import, export, transfer and
+      use. Delivery of Cisco cryptographic products does not imply
+      third-party authority to import, export, distribute or use encryption.
+      Importers, exporters, distributors and users are responsible for
+      compliance with U.S. and local country laws. By using this product you
+      agree to comply with applicable laws and regulations. If you are unable
+      to comply with U.S. and local laws, return this product immediately.
+
+      A summary of U.S. laws governing Cisco cryptographic products may be found at:
+      http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+      If you require further assistance please contact us by sending email to
+      export@cisco.com.
+
+      License Level: network-premier
+      License Type: Perpetual
+      Next reload license Level: network-premier
+
+      Addon License Level: dna-premier
+      Addon License Type: Subscription
+      Next reload addon license Level: dna-premier
+
+      The current throughput level is 10000 kbps
+
+
+      Smart Licensing Status: Registration Not Applicable/Not Applicable
+
+      cisco C8000V (VXE) processor (revision VXE) with 692293K/3075K bytes of memory.
+      Processor board ID 9IRPW025PYC
+      Router operating mode: Autonomous
+      6 Gigabit Ethernet interfaces
+      32768K bytes of non-volatile configuration memory.
+      3965960K bytes of physical memory.
+      11526144K bytes of virtual hard disk at bootflash:.
+
+      Configuration register is 0x2102
+    'reload':
+      new_state: 'c8kv_system_config_modified'
+    'config term':
+      new_state: 'c8kv_config_term'
+
+c8kv_config_term:
+  prompt: Router(config)#
+  commands:
+    'no logging console': ''
+    'line console 0': ''
+    'exec-timeout 0': ''
+    'end':
+      new_state: 'c8kv_enable'
+
+c8kv_system_config_modified:
+  prompt: 'System configuration has been modified. Save? [yes/no]:'
+  commands:
+    'n':
+      new_state: 'c8kv_reload_proceed'
+
+c8kv_reload_proceed:
+  prompt: 'Proceed with reload? [confirm]'
+  commands:
+    '':
+      new_state: 'c8kv_grub_menu'
+
+c8kv_grub_menu:
+  prompt: |2
+    Dec 22 15:14:08.814: %PMAN-5-EXITACTION: R0/0: pvp: Process manager is exiting: process exit with reload chassis code
+
+
+    *Dec 22 15:14:11.655: %IOSXEBOOT-4-FACTORY_RESET: (rp/0): This was not selected via cli. Rebooting like normal
+    [H[J[1;1H[?25l[m[H[J[1;1H[2;30HGNU GRUB  version 2.02
+
+
+    [m[4;2H+----------------------------------------------------------------------------+[5;2H|[5;79H|[6;2H|[6;79H|[7;2H|[7;79H|[8;2H|[8;79H|[9;2H|[9;79H|[10;2H|[10;79H|[11;2H|[11;79H|[12;2H|[12;79H|[13;2H|[13;79H|[14;2H|[14;79H|[15;2H|[15;79H|[16;2H|[16;79H|[17;2H+----------------------------------------------------------------------------+[m[18;2H[19;2H[m     Use the UP and DOWN arrow keys to select which entry is
+
+          highlighted.
+
+          Press <Enter> to boot the selected OS or `c' for a command-line.    [5;80H [7m[5;3H*C8000V - /vmlinux_0                                                        [m[5;78H[m[m[6;3H C8000V - packages.conf                                                     [m[6;78H[m[m[7;3H C8000V - GOLDEN IMAGE                                                      [m[7;78H[m[m[8;3H                                                                            [m[8;78H[m[m[9;3H                                                                            [m[9;78H[m[m[10;3H                                                                            [m[10;78H[m[m[11;3H                                                                            [m[11;78H[m[m[12;3H                                                                            [m[12;78H[m[m[13;3H                                                                            [m[13;78H[m[m[14;3H                                                                            [m[14;78H[m[m[15;3H                                                                            [m[15;78H[m[m[16;3H                                                                            [m[16;78H[m[16;80H [5;78H[22;1H   The highlighted entry will be executed automatically in 5s.
+  commands:
+    '':
+      new_state: 'c8kv_grub_boot_image'
+
+c8kv_grub_boot_image:
+  prompt: |2
+
+    BOOT CMD: /packages.conf rw root=/dev/ram max_loop=64 HARDWARE=virtual
+
+    console=tty0 SR_BOOT=boot:packages.conf
+
+    Calculating SHA-1 hash...done
+
+    SHA-1 hash:
+
+            calculated   dbed9e66:b1842467:49e70103:17a4aa69:fa0b2a7
+
+            expected     dbed9e66:b1842467:49e70103:17a4aa69:fa0b2a7
+
+    package header rev 3 structure detected
+
+    IOSXE image contains grub version 3.0
+
+    IOSXE version 17.4.01 detected
+
+    Calculating SHA-1 hash...done
+
+    SHA-1 hash:
+
+            calculated   6ed77a85:d39d4794:0250413f:171715d8:36381104
+
+            expected     6ed77a85:d39d4794:0250413f:171715d8:36381104
+
+    Package type:0x7531, flags:0x0
+
+    linux image, size=0x6b7e48
+
+    linux isord, size=0x2985862
+
+
+    %IOSXEBOOT-4-PART_VERIFY: (local/local): Verifying partition table for device /dev/bootflash...
+    %IOSXEBOOT-4-PART_VERIFY: (local/local): Selected MBR v4 partition layout.
+
+    *Dec 22 22:14:43.002: %IOSXEBOOT-4-BOOT_SRC: (rp/0): Checking for grub upgrade
+
+    *Dec 22 22:14:43.619: %IOSXEBOOT-4-BOOT_SRC: (rp/0): Checking grub versions 3.3 vs 3.0
+
+    *Dec 22 22:14:43.629: %IOSXEBOOT-4-BOOT_SRC: (rp/0): Bootloader upgrade not necessary.
+    Dec 22 22:15:36.777: %BOOT-5-OPMODE_LOG: R0/0: binos: System booted in AUTONOMOUS mode
+
+                  Restricted Rights Legend
+
+    Use, duplication, or disclosure by the Government is
+    subject to restrictions as set forth in subparagraph
+    (c) of the Commercial Computer Software - Restricted
+    Rights clause at FAR sec. 52.227-19 and subparagraph
+    (c) (1) (ii) of the Rights in Technical Data and Computer
+    Software clause at DFARS sec. 252.227-7013.
+
+               Cisco Systems, Inc.
+               170 West Tasman Drive
+               San Jose, California 95134-1706
+
+
+
+    Cisco IOS Software [Bengaluru], Virtual XE Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Experimental Version 17.4.20200803:054658 [S2C-build-polaris_dev-119012-/nobackup/mcpre/BLD-BLD_POLARIS_DEV_LATEST_20200803_053108 218]
+    Copyright (c) 1986-2020 by Cisco Systems, Inc.
+    Compiled Mon 03-Aug-20 07:12 by mcpre
+
+
+    This software version supports only Smart Licensing as the software licensing mechanism.
+
+
+    PLEASE READ THE FOLLOWING TERMS CAREFULLY. INSTALLING THE LICENSE OR
+    LICENSE KEY PROVIDED FOR ANY CISCO SOFTWARE PRODUCT, PRODUCT FEATURE,
+    AND/OR SUBSEQUENTLY PROVIDED SOFTWARE FEATURES (COLLECTIVELY, THE
+    "SOFTWARE"), AND/OR USING SUCH SOFTWARE CONSTITUTES YOUR FULL
+    ACCEPTANCE OF THE FOLLOWING TERMS. YOU MUST NOT PROCEED FURTHER IF YOU
+    ARE NOT WILLING TO BE BOUND BY ALL THE TERMS SET FORTH HEREIN.
+
+    Your use of the Software is subject to the Cisco End User License Agreement
+    (EULA) and any relevant supplemental terms (SEULA) found at
+    http://www.cisco.com/c/en/us/about/legal/cloud-and-software/software-terms.html.
+
+    You hereby acknowledge and agree that certain Software and/or features are
+    licensed for a particular term, that the license to such Software and/or
+    features is valid only for the applicable term and that such Software and/or
+    features may be shut down or otherwise terminated by Cisco after expiration
+    of the applicable license term (e.g., 90-day trial period). Cisco reserves
+    the right to terminate any such Software feature electronically or by any
+    other means available. While Cisco may provide alerts, it is your sole
+    responsibility to monitor your usage of any such term Software feature to
+    ensure that your systems and networks are prepared for a shutdown of the
+    Software feature.
+
+
+    setting total ilpower sumatra 31
+
+    cme_license_init_proc:Collabpro suite enabled no need for separate CME-SRST LICENSE
+
+    All TCP AO KDF Tests Pass
+    cisco C8000V (VXE) processor (revision VXE) with 692293K/3075K bytes of memory.%Throughput has been set to 10 Mbps
+
+    Processor board ID 9IRPW025PYC
+    Router operating mode: Autonomous
+    6 Gigabit Ethernet interfaces
+    32768K bytes of non-volatile configuration memory.
+    3965952K bytes of physical memory.
+    11526144K bytes of virtual hard disk at bootflash:.
+
+     WARNING: Command has been added to the configuration using a type 0 password. However, type 0 passwords will soon be deprecated. Migrate to a supported password type
+
+    Press RETURN to get started!
+  commands:
+    '':
+      new_state: 'c8kv_exec'
+
+c8kv_exec:
+  prompt: 'Router>'
+  commands:
+    'enable':
+      new_state: 'c8kv_enable'
+

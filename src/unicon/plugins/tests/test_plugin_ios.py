@@ -332,7 +332,7 @@ class TestIosPagentPluginConnect(unittest.TestCase):
         c = Connection(hostname='Router',
                             start=['mock_device_cli --os ios --state pagent_disable_without_license'],
                             os='ios',
-                            series='pagent',
+                            platform='pagent',
                             username='cisco',
                             enable_password='cisco',
                             tacacs_password='cisco',
@@ -368,6 +368,32 @@ class TestIosPluginConnectCredentials(unittest.TestCase):
         r = tb.devices.Router
         r.connect()
         self.assertEqual(r.is_connected(), True)
+
+
+class TestIosPluginConfigure(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.c = Connection(hostname='Router',
+                           start=['mock_device_cli --os ios --state exec'],
+                           os='ios',
+                           credentials=dict(default=dict(username='cisco',password='cisco')),
+                           init_exec_commands=[],
+                           init_config_commands=[],
+                           settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+                           )
+        cls.c.connect()
+
+    def test_configure_exception(self):
+        with self.assertRaises(SubCommandFailure):
+            self.c.configure('invalid command')
+
+    def test_configure_hostname(self):
+        self.c.configure('hostname R1')
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.c.disconnect()
 
 
 if __name__ == "__main__":

@@ -17,25 +17,30 @@ class TestDellos6PluginConnect(unittest.TestCase):
     def test_login_connect(self):
         c = Connection(hostname='DellOS6',
                         start=['mock_device_cli --os dellos6 --state exec'],
-                        os='dellos6',
+                        os='dell',
+                        platform='os6',
                         username='knox',
                         tacacs_password='dell1111')
         c.connect()
         self.assertIn('DellOS6#', c.spawn.match.match_output)
+        c.disconnect()
 
     def test_login_connect_ssh(self):
         c = Connection(hostname='DellOS6',
                         start=['mock_device_cli --os dellos6 --state connect_ssh'],
-                        os='dellos6',
+                        os='dell',
+                        platform='os6',
                         username='knox',
                         tacacs_password='dell1111')
         c.connect()
         self.assertIn('DellOS6#', c.spawn.match.match_output)
+        c.disconnect()
 
     def test_login_connect_connectReply(self):
         c = Connection(hostname='DellOS6',
                         start=['mock_device_cli --os dellos6 --state exec'],
-                        os='dellos6',
+                        os='dell',
+                        platform='os6',
                         username='knox',
                         tacacs_password='dell1111',
                         connect_reply = Dialog([[r'^(.*?)Password:']]))
@@ -48,17 +53,16 @@ class TestDellos6PluginExecute(unittest.TestCase):
     def test_execute_show_feature(self):
         c = Connection(hostname='DellOS6',
                         start=['mock_device_cli --os dellos6 --state exec'],
-                        os='dellos6',
+                        os='dell',
+                        platform='os6',
                         username='knox',
-                        tacacs_password='dell1111',
-                        init_exec_commands=[],
-                        init_config_commands=[]
-                        )
+                        tacacs_password='dell1111')
         c.connect()
         cmd = 'show ip interface'
         expected_response = mock_data['exec']['commands'][cmd].strip()
         ret = c.execute(cmd).replace('\r', '')
         self.assertIn(expected_response, ret)
+        c.disconnect()
 
 if __name__ == "__main__":
     unittest.main()

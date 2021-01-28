@@ -14,4 +14,6 @@ class IosSettings(GenericSettings):
             r'^%\s*[Ii]ncomplete (command|input)',
             r'^%\s*[Aa]mbiguous (command|input)'
         ]
-
+        self.CONFIGURE_ERROR_PATTERN = [
+            r'^%\s*[Ii]nvalid (command|input|number)'
+        ]

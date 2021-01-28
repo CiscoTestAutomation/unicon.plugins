@@ -23,9 +23,9 @@ class TestFxosFtdPlugin(unittest.TestCase):
 
     def test_connect(self):
         c = Connection(hostname='Firepower',
-                       start=['mock_device_cli --os fxos --state fxos_connect'],
+                       start=['mock_device_cli --os fxos --state fxos_console'],
                        os='fxos',
-                       series='ftd',
+                       platform='ftd',
                        credentials=dict(default=dict(username='cisco', password='cisco')))
         c.connect()
         self.assertEqual(c.spawn.match.match_output, '\r\nFirepower# ')
@@ -54,7 +54,7 @@ class TestFxosFtdPlugin(unittest.TestCase):
         c = Connection(hostname='Firepower',
                        start=['mock_device_cli --os fxos --state chassis_exec'],
                        os='fxos',
-                       series='ftd',
+                       platform='ftd',
                        credentials=dict(
                        default=dict(username='cisco', password='cisco', line_password='cisco'),
                        sudo=dict(password='cisco')))
@@ -82,7 +82,7 @@ class TestFxosFtdPlugin(unittest.TestCase):
         c = Connection(hostname='Firepower',
                        start=['mock_device_cli --os fxos --state fxos_exec'],
                        os='fxos',
-                       series='ftd',
+                       platform='ftd',
                        credentials=dict(
                        default=dict(username='cisco', password='cisco', line_password='cisco'),
                        sudo=dict(password='cisco')))

@@ -2,7 +2,8 @@
 # Q&D Helper script to generate the ReStructered text file for the dialogs
 # prints to stdout
 
-import os, sys
+import os
+import sys
 import unicon
 import traceback
 from unicon import Connection
@@ -26,9 +27,9 @@ def find_plugins():
                     if len(p):
                         plugin_attributes.os = p[0]
                     if len(p) > 1:
-                        plugin_attributes.series = p[1]
+                        plugin_attributes.platform = p[1]
                     else:
-                        plugin_attributes.series = None
+                        plugin_attributes.platform = None
                     if len(p) > 2:
                         plugin_attributes.model = p[2]
                     else:
@@ -94,14 +95,14 @@ Dialog Patterns
 .. note::
 
     This document is automatically generated and is intended to document
-    the default per-platform patterns used to match CLI dialogs for each 
+    the default per-platform patterns used to match CLI dialogs for each
     plugin, and the corresponding action when a pattern is matched.
 
 """)
 
     def plugin_os(p):
-        if p.series:
-            return '%s%s' % (p.os, p.series)
+        if p.platform:
+            return '%s%s' % (p.os, p.platform)
         else:
             return p.os
 
@@ -112,22 +113,22 @@ Dialog Patterns
 
         plugin_name = p.os
         _os = p.os
-        if p.series:
-            plugin_name += "/%s" % p.series
-            series = p.series
+        if p.platform:
+            plugin_name += "/%s" % p.platform
+            platform = p.platform
         else:
-            series = None
-        
+            platform = None
+
         try:
-            c = Connection(hostname='Router', start=['bash'], os=_os, series=series, log_stdout=False)
-            # c = Connection(hostname='Router', start=['bash'], os=_os, series=series)
+            c = Connection(hostname='Router', start=['bash'], os=_os, platform=platform, log_stdout=False)
+            # c = Connection(hostname='Router', start=['bash'], os=_os, platform=platform)
             c.init_service()
             c.connection_provider = c.connection_provider_class(c)
-        
-        except:
-            print('---------------- ERROR ---------------', file = sys.stderr)
+
+        except Exception:
+            print('---------------- ERROR ---------------', file=sys.stderr)
             traceback.print_exc()
-            print('--------------------------------------', file = sys.stderr)
+            print('--------------------------------------', file=sys.stderr)
 
         else:
             print('\n\n')
@@ -140,7 +141,8 @@ Dialog Patterns
 
             try:
                 print_dialogs('execute', c.execute.dialog if c.execute.dialog else Dialog([]))
-            except:
-                print('---------------- ERROR ---------------', file = sys.stderr)
+                print_dialogs('configure', c.configure.dialog if c.configure.dialog else Dialog([]))
+            except Exception:
+                print('---------------- ERROR ---------------', file=sys.stderr)
                 traceback.print_exc()
-                print('--------------------------------------', file = sys.stderr)
+                print('--------------------------------------', file=sys.stderr)

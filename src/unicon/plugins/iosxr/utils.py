@@ -16,24 +16,24 @@ class IosxrUtils(GenericUtils):
 
         show_red_out = connection.execute("show redundancy", timeout=timeout)
 
+        master = AttributeDict()
         # Redundancy information for node 0/RSP0/CPU0:
         # Node 0/RSP0/CPU0 is in ACTIVE role
         p1 = re.compile(r'[Nn]ode +(?P<master>\S+) +is +in +(?P<state>[A-Z\s]+) +role')
         m1 = p1.search(show_red_out)
         if m1:
-            master = AttributeDict()
             state = m1.groupdict().get('state', '')
             master.update({
                 'role': state.lower(),
                 'state': state
             })
 
+        peer = AttributeDict()
         # Node Redundancy Partner (0/RSP1/CPU0) is in STANDBY role
         p2 = re.compile(r'[Nn]ode +[Rr]edundancy +[Pp]artner +\((?P<peer>\S+)\) '
                         r'+is +in +(?P<state>[A-Z\s]+) +role')
         m2 = p2.search(show_red_out)
         if m2:
-            peer = AttributeDict()
             state = m2.groupdict().get('state', '')
             peer.update({
                 'role': state.lower(),
@@ -41,4 +41,3 @@ class IosxrUtils(GenericUtils):
             })
 
         return master if who == 'my' else peer
-

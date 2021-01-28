@@ -47,7 +47,7 @@ Note that in the above file, the following key values are used by Unicon
 to identify the proper plugin to use to create the underlying connection:
 
   * ``os:`` -  OS details of the device [required]
-  * ``series:`` -  platform series of the the device [optional]
+  * ``platform:`` -  platform of the the device [optional]
   * ``model:`` - platform model of the device [optional]
 
 If an equivalent unicon connection plugin is not found for a device, unicon
@@ -55,7 +55,7 @@ will use the ``generic plugin``.
 
 .. tip::
 
-    The supported OS and series information can be found here: `Supported Platforms`_.
+    The supported OS and platform information can be found here: `Supported Platforms`_.
 
 
 .. _Supported Platforms: introduction.html#supported-platforms
@@ -123,7 +123,7 @@ The following testbed YAML shows these three kinds of override:
 
   device1:
       os: 'nxos'
-      series: 'n7k'
+      platform: 'n7k'
       type: 'router'
       credentials:
           default:
@@ -174,7 +174,7 @@ you can set the ``EXEC_TIMEOUT`` and ``CONFIG_TIMEOUT`` in the testbed file:
 
   device1:
       os: 'nxos'
-      series: 'n7k'
+      platform: 'n7k'
       type: 'router'
       credentials:
           default:
@@ -194,14 +194,14 @@ you can set the ``EXEC_TIMEOUT`` and ``CONFIG_TIMEOUT`` in the testbed file:
 Example: Single NXOS
 """"""""""""""""""""
 
-Every other platform can use the same sample file by changing the os, series, model. The Moonshine platform does not require a username or password, so
+Every other platform can use the same sample file by changing the os, platform, model. The Moonshine platform does not require a username or password, so
 these are omitted (see below for an example).
 
 .. code-block:: yaml
 
   step-n7k-1:
       os: 'nxos'
-      series: 'n7k'
+      platform: 'n7k'
       type: 'router'
       credentials:
           default:
@@ -423,7 +423,7 @@ Example: Moonshine
 .. _unicon user_guide connection moonshine:
 
 Specifying a Moonshine device in the testbed file template is again very similar to the above examples,
-except Unicon looks for the `iosxr` os and `moonshine` type and series, and no username or password is
+except Unicon looks for the `iosxr` os and `moonshine` type and platform, and no username or password is
 required.
 
 .. code-block:: yaml
@@ -435,7 +435,7 @@ required.
   devices:
     moonshine-1:
       os: iosxr
-      series: moonshine
+      platform: moonshine
       type: moonshine
       credentials:
           default:
@@ -628,8 +628,8 @@ Example: ConfD
 To connect to ConfD based CLI via SSH, use the 'confd' OS type and specify the
 ssh port (if needed) under the connection details.
 
-For NSO, the 'os' needs to be specified, 'series' can be omitted.
-For CSP, ESC and NFVIS, the 'series' needs to be specified.
+For NSO, the 'os' needs to be specified, 'platform' can be omitted.
+For CSP, ESC and NFVIS, the 'platform' needs to be specified.
 
 .. code-block:: yaml
 
@@ -638,7 +638,7 @@ For CSP, ESC and NFVIS, the 'series' needs to be specified.
       ncs:
         os: confd
         type: router
-        # series: 'csp', 'esc' or 'nfvis'
+        # platform: 'csp', 'esc' or 'nfvis'
         credentials:
           default:
               username: admin
@@ -738,21 +738,23 @@ example, we are establishing connection to a *dual rp* NXOS device.
 
 Arguments:
 
-    * **hostname**: must be same as the exact hostname of the device. Do not append prompt characters like '#' or '$'
+    * **hostname**: must be same as the exact hostname of the device.
+      Do not append prompt characters like '#' or '$'
 
     * **os**: The os of the device to connect to.  This selects a unicon plugin.
 
-    * **start**: It must be a list of commands which needs to be invoked for starting a connection. Generally it will be of the format `telnet xxx xxx`. But it could take any value.
+    * **start**: It must be a list of commands which needs to be invoked for starting a connection.
+      Generally it will be of the format `telnet xxx xxx`. But it could take any value.
 
     * **credentials**: A dictionary of named credentials used to interact with the device.
 
-    * **series**: The series of the device to connect to.  This selects a
+    * **platform**: The platform of the device to connect to.  This selects a
       unicon sub-plugin under the given plugin identified with the ``os``
       argument.  *(Optional)*
 
     * **model**: The model of the device to connect to.  This selects a
       unicon sub-sub-plugin under the given plugin identified with the ``os``
-      and ``series`` arguments.  *(Optional)*
+      and ``platform`` arguments.  *(Optional)*
 
     * **connection_timeout**: Connection timeout value to connect the device.
       Default value is ``60 sec``. *(Optional)*
@@ -768,7 +770,7 @@ Arguments:
     * **learn_hostname**: Set to `True` if the actual hostname set on the device
       differs from the hostname parameter. *(Optional)*
 
-    * **learn_os**: Set to `True` if the device os is not provided, it will try to 
+    * **learn_os**: Set to `True` if the device os is not provided, it will try to
       learn the device os and redirect to the learned plugin. *(Optional)*
 
     * **prompt_recovery**: Set `True` for using prompt recovery feature. Default value is `False`.
@@ -785,7 +787,11 @@ Arguments:
       Config commands are not available on Linux and ISE plugins. Can also be
       passed in the connection block in the yaml file. *(Optional)*
 
-    * **logfile**: Filename to log all device interaction to. *(Optional)*
+    * **logfile**: Filename to log all device interaction to. By default, a file will
+      be created in /tmp based on the hostname, via (if specified) and timestamp. *(Optional)*
+
+    * **log_buffer**: Set to `True` to use a log_buffer instead of a logfile, no logfile will be created.
+      The log buffer can be accessed via connection.log_buffer attribute. *(Optional)*
 
     * **mit**: Boolean option to maintain initial state on connect. The state detected
       on connect() is maintained, no connection initialization is done and the
@@ -1224,7 +1230,7 @@ These settings attributes are supported on below plugins:
 Learn Device OS
 --------------------
 
-Unicon generic plugin now can learn the device os/series and redirect the connection to use corresponding plugins.
+Unicon generic plugin now can learn the device os/platform and redirect the connection to use corresponding plugins.
 This can be done if you pass `learn_os` argument in `device.connect(learn_os=True)`.
 
 Example:

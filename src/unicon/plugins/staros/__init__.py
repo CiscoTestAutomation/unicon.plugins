@@ -35,7 +35,7 @@ class StarosConnection(GenericSingleRpConnection):
         Connection class for staros connections.
     """
     os = 'staros'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     state_machine_class = StarosStateMachine
     connection_provider_class = StarosConnectionProvider

@@ -20,7 +20,7 @@ class TestNsoPluginConnect(unittest.TestCase):
         c = Connection(hostname='esc',
                         start=['mock_device_cli --os confd --state juniper_exec'],
                         os='confd',
-                        series='esc',
+                        platform='esc',
                         username='admin',
                         tacacs_password='admin')
         c.connect()

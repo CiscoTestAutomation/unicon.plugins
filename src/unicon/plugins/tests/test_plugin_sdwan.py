@@ -30,7 +30,7 @@ class TestSDWANPlugin(unittest.TestCase):
         c = Connection(hostname='vedge',
                             start=['mock_device_cli --os sdwan --state sdwan_exec'],
                             os='sdwan',
-                            series='viptela',
+                            platform='viptela',
                             username='admin',
                             tacacs_password='admin')
         c.connect()
@@ -41,7 +41,7 @@ class TestSDWANPlugin(unittest.TestCase):
         c = Connection(hostname='vedge',
                             start=['mock_device_cli --os sdwan --state sdwan_exec'],
                             os='sdwan',
-                            series='viptela',
+                            platform='viptela',
                             username='admin',
                             tacacs_password='admin')
         c.connect()
@@ -54,7 +54,7 @@ class TestSDWANPlugin(unittest.TestCase):
         c = Connection(hostname='vedge',
                             start=['mock_device_cli --os sdwan --state sdwan_console'],
                             os='sdwan',
-                            series='viptela',
+                            platform='viptela',
                             username='admin',
                             tacacs_password='admin')
         c.connect()
@@ -66,7 +66,7 @@ class TestSDWANPlugin(unittest.TestCase):
         c = Connection(hostname='vedge',
                             start=['mock_device_cli --os sdwan --state sdwan_exec'],
                             os='sdwan',
-                            series='viptela',
+                            platform='viptela',
                             username='admin',
                             tacacs_password='admin')
         c.connect()
@@ -80,7 +80,7 @@ class TestSDWANPlugin(unittest.TestCase):
         c = Connection(hostname='CPE101',
                             start=['mock_device_cli --os sdwan --state sdwan_exec'],
                             os='sdwan',
-                            series='viptela',
+                            platform='viptela',
                             username='admin',
                             tacacs_password='admin')
         c.connect()

@@ -11,6 +11,7 @@ from unicon.plugins.generic.statements import GenericStatements
 from .patterns import DellPatterns 
 from unicon.bases.routers.connection import ENABLE_CRED_NAME
 from unicon.utils import to_plaintext
+from unicon.core.errors import UniconAuthenticationError
 
 statements = GenericStatements()
 patterns = DellPatterns()

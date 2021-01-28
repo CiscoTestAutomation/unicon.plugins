@@ -9,7 +9,7 @@ If you are using SDWAN on Viptela platforms, specify either one of below configs
 
       sdwan1:
         os: sdwan
-        series: viptela
+        platform: viptela
         connections:
           cli:
             protocol: ssh

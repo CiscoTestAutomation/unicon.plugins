@@ -22,7 +22,7 @@ class TestNxos9kPluginReloadService(unittest.TestCase):
             hostname='N93_1',
             start=['mock_device_cli --os nxos --state login3'],
             os='nxos',
-            series='n9k',
+            platform='n9k',
             username='cisco',
             tacacs_password='cisco',
             enable_password='cisco'

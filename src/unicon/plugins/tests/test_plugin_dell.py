@@ -22,6 +22,7 @@ class TestDellPluginConnect(unittest.TestCase):
                         tacacs_password='dell1111')
         c.connect()
         self.assertIn('DellOS6#', c.spawn.match.match_output)
+        c.disconnect()
 
     def test_login_connect_ssh(self):
         c = Connection(hostname='DellOS6',
@@ -31,6 +32,7 @@ class TestDellPluginConnect(unittest.TestCase):
                         tacacs_password='dell1111')
         c.connect()
         self.assertIn('DellOS6#', c.spawn.match.match_output)
+        c.disconnect()
 
     def test_login_connect_connectReply(self):
         c = Connection(hostname='DellOS6',
@@ -59,6 +61,7 @@ class TestDellPluginExecute(unittest.TestCase):
         expected_response = mock_data['exec']['commands'][cmd].strip()
         ret = c.execute(cmd).replace('\r', '')
         self.assertIn(expected_response, ret)
+        c.disconnect()
 
 if __name__ == "__main__":
     unittest.main()

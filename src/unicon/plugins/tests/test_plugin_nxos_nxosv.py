@@ -21,7 +21,7 @@ class TestNxosNxosvPluginConnect(unittest.TestCase):
         c = Connection(hostname='switch',
                         start=['mock_device_cli --os nxos --state exec'],
                         os='nxos',
-                        series='nxosv',
+                        platform='nxosv',
                         username='cisco',
                         tacacs_password='cisco')
         c.connect()

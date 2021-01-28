@@ -15,7 +15,7 @@ from unicon.bases.routers.connection import BaseSingleRpConnection, \
 
 class BaseNxosSingleRpConnection(BaseSingleRpConnection):
     os='nxos'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
 
     def __init__(self, *args, **kwargs):
@@ -26,7 +26,7 @@ class BaseNxosSingleRpConnection(BaseSingleRpConnection):
 
 class BaseNxosDualRpConnection(BaseDualRpConnection):
     os='nxos'
-    series = None
+    platform = None
     chassis_type = 'dual_rp'
 
     def __init__(self, *args, **kwargs):

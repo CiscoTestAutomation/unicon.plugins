@@ -8,7 +8,7 @@ from unicon.plugins.nxos.nxosv.setting import NxosvSettings
 
 class NxosvSingleRpConnection(BaseNxosSingleRpConnection):
     os = 'nxos'
-    series = 'nxosv'
+    platform = 'nxosv'
     chassis_type = 'single_rp'
     state_machine_class = NxosvSingleRpStateMachine
     connection_provider_class = NxosvSingleRpConnectionProvider

@@ -28,8 +28,8 @@ class DellSingleRpStateMachine(GenericSingleRpStateMachine):
         self.remove_state('rommon')
 
         self.remove_path('disable', 'enable')
-        enable = [state for state in self.states if state.name == 'enable'][0]
-        disable = [state for state in self.states if state.name == 'disable'][0]
+        enable = self.get_state('enable')
+        disable = self.get_state('disable')
         disable_to_enable = Path(disable,
                                  enable,
                                  'enable',

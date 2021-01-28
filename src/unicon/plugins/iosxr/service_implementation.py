@@ -60,7 +60,7 @@ class ConfigureExclusive(Configure):
 
 class HaConfigureService(svc.HaConfigureService):
     def call_service(self, command=[], reply=Dialog([]), target='active',
-                      timeout=None, *args, **kwargs):
+                     timeout=None, *args, **kwargs):
         self.commit_cmd = get_commit_cmd(**kwargs)
         super().call_service(command,
                              reply=reply + Dialog(config_commit_stmt_list),
@@ -75,7 +75,7 @@ class HaReload(svc.HAReloadService):
                                  timeout=timeout, *args, **kwargs)
         else:
             super().call_service(reload_command=reload_command or "reload",
-                                 timeout=timeout, *args, **kwargs) 
+                                 timeout=timeout, *args, **kwargs)
 
 
 class AdminExecute(Execute):
@@ -260,8 +260,7 @@ class AttachModuleConsole(BaseService):
 
             # expect output until prompt again
             # wait for timeout provided by user
-            out = self.conn.expect([r'(.+)[\r\n]*%s' % self.change_prompt],
-                                   timeout = timeout)
+            out = self.conn.expect([r'(.+)[\r\n]*%s$' % self.change_prompt], timeout=timeout)
             raw = out.last_match.groups()[0].strip()
 
             # remove the echo back - best effort
@@ -378,8 +377,8 @@ class BashService(BashService):
 
             sm = self.conn.state_machine
 
-            if hasattr(self.conn, 'series') and \
-                self.conn.series == 'spitfire':
+            if hasattr(self.conn, 'platform') and \
+                self.conn.platform == 'spitfire':
                 # In case of spitfire plugin
                 sm.go_to('xr_run', self.conn.spawn)
             else:
@@ -427,6 +426,11 @@ class GetRPState(GenericGetRPState):
             rtr.get_rp_state()
             rtr.get_rp_state(target='standby')
     """
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.start_state = 'any'
+        self.end_state = 'any'
+
     def call_service(self,
                      target='active',
                      timeout=None,
@@ -435,9 +439,4 @@ class GetRPState(GenericGetRPState):
                      **kwargs):
 
         """send the command on the right rp and return the output"""
-        super().call_service(
-            target = target,
-            timeout = timeout,
-            utils = utils,
-            *args,
-            **kwargs)
+        return super().call_service(target=target, timeout=timeout, utils=utils, *args, **kwargs)
