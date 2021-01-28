@@ -104,7 +104,7 @@ class IseConnection(BaseLinuxConnection):
         Connection class for Ise connections.
     """
     os = 'ise'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     state_machine_class = IseStateMachine
     connection_provider_class = IseConnectionProvider

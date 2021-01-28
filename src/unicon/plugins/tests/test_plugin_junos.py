@@ -141,7 +141,7 @@ class TestJunosVsrxPluginBashService(unittest.TestCase):
         c = Connection(hostname='junos_vsrx',
                        start=['mock_device_cli --os junos --state exec2'],
                        os='junos',
-                       series='vsrx',
+                       platform='vsrx',
                        username='root',
                        tacacs_password='lab')
 

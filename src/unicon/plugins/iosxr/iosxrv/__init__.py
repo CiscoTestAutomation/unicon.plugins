@@ -16,7 +16,7 @@ from unicon.plugins.iosxr.iosxrv.settings import IOSXRVSettings
 
 class IOSXRVSingleRpConnection(BaseSingleRpConnection):
     os = 'iosxr'
-    series = 'iosxrv'
+    platform = 'iosxrv'
     chassis_type = 'single_rp'
     state_machine_class = IOSXRVSingleRpStateMachine
     connection_provider_class = IOSXRVSingleRpConnectionProvider
@@ -25,7 +25,7 @@ class IOSXRVSingleRpConnection(BaseSingleRpConnection):
 
 class IOSXRVDualRpConnection(BaseDualRpConnection):
     os = 'iosxr'
-    series = 'iosxrv'
+    platform = 'iosxrv'
     chassis_type = 'dual_rp'
     state_machine_class = IOSXRVDualRpStateMachine
     connection_provider_class = IOSXRVDualRpConnectionProvider

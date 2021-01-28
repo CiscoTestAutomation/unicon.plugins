@@ -34,7 +34,7 @@ class CimcConnection(GenericSingleRpConnection):
         Connection class for cimc connections.
     """
     os = 'cimc'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     state_machine_class = CimcStateMachine
     connection_provider_class = CimcConnectionProvider

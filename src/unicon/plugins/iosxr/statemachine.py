@@ -76,6 +76,7 @@ class IOSXRSingleRpStateMachine(StateMachine):
 
     @staticmethod
     def handle_failed_config(spawn):
+        spawn.read_update_buffer()
         spawn.sendline('show configuration failed')
         spawn.expect([patterns.config_prompt])
         spawn.sendline('abort')

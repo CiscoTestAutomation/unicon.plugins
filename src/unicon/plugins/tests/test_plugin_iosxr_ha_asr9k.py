@@ -27,7 +27,7 @@ class TestIOSXRPluginHAConnect(unittest.TestCase):
         devices:
           Router:
             os: iosxr
-            series: asr9k
+            platform: asr9k
             type: router
             tacacs:
                 username: admin
@@ -94,7 +94,7 @@ class TestIOSXRPluginHAConnectAdmin(unittest.TestCase):
         devices:
           Router:
             os: iosxr
-            series: asr9k
+            platform: asr9k
             type: router
             tacacs:
                 username: admin

@@ -17,9 +17,10 @@ import warnings
 from time import sleep
 
 from unicon.bases.routers.services import BaseService
-from unicon.plugins.generic.service_implementation import BashService as GenericBashService
+from unicon.plugins.generic.service_implementation import (
+    BashService as GenericBashService)
 from unicon.core.errors import (SubCommandFailure, TimeoutError,
-    UniconAuthenticationError, )
+    UniconAuthenticationError)
 
 from unicon.eal.dialogs import Dialog, Statement
 from unicon.plugins.generic.service_implementation import \
@@ -113,6 +114,20 @@ class Configure(GenericConfigure):
                                  timeout=timeout, *args, **kwargs)
 
 
+class ConfigureDual(Configure):
+
+    def call_service(self, *args, **kwargs):
+        target = kwargs.get('target', None)
+        handle = self.get_handle(target)
+        handle.context['config_dual'] = True
+        try:
+            super().call_service(*args, **kwargs)
+        except Exception:
+            raise
+        finally:
+            handle.context.pop('config_dual', None)
+
+
 class Reload(GenericReload):
     """ Service to reload the device.
 
@@ -160,10 +175,11 @@ class Reload(GenericReload):
                      config_lock_retries=None,
                      config_lock_retry_sleep=None,
                      reload_creds=None,
-                     reconnect_sleep=60,
+                     reconnect_sleep=None,
                      *args, **kwargs):
         con = self.connection
         timeout = timeout or self.timeout
+        reconnect_sleep = reconnect_sleep or con.settings.RELOAD_RECONNECT_WAIT
         config_lock_retries = config_lock_retries \
                               or con.settings.CONFIG_POST_RELOAD_MAX_RETRIES
         config_lock_retry_sleep = config_lock_retry_sleep \
@@ -1281,8 +1297,8 @@ class DeleteVdc(BaseService):
         if initial_vdc:
             self.connection.switchto(initial_vdc)
 
-class AttachModuleConsole(BaseService):
 
+class AttachModuleConsole(BaseService):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1291,17 +1307,18 @@ class AttachModuleConsole(BaseService):
         self.end_state = "enable"
 
     def call_service(self, module_num, **kwargs):
-        self.result = self.__class__.ContextMgr(connection = self.connection,
-                                                module_num = module_num,
+        self.result = self.__class__.ContextMgr(connection=self.connection,
+                                                module_num=module_num,
                                                 **kwargs)
 
     class ContextMgr(object):
-        def __init__(self, connection, 
-                           module_num, 
-                           login_name = 'root',
-                           default_escape_chars = '~,',
-                           change_prompt = 'AUT0MAT10N# ',
-                           timeout = None):
+        def __init__(self,
+                     connection,
+                     module_num,
+                     login_name='root',
+                     default_escape_chars='~,',
+                     change_prompt='AUT0MAT10N# ',
+                     timeout=None):
             self.conn = connection
             self.module_num = module_num
             self.login_name = login_name
@@ -1316,7 +1333,7 @@ class AttachModuleConsole(BaseService):
             try:
                 match = self.conn.expect([r"Escape character is "
                                           r"(?P<escape_chars>.+?)'"],
-                                          timeout = self.timeout)
+                                          timeout=self.timeout)
             except SubCommandFailure:
                 pass
             else:
@@ -1324,29 +1341,29 @@ class AttachModuleConsole(BaseService):
                 self.escape_chars = match.last_match.groupdict()['escape_chars']
 
             # slow console
-            for i in range(3):
+            for _ in range(3):
                 try:
                     self.conn.sendline('')
-                    ret = self.conn.expect([r'.*login:'], timeout = self.timeout)
+                    self.conn.expect([r'.*login:'], timeout=self.timeout)
                 except TimeoutError:
                     pass
                 except Exception:
                     # disabled for 5 minutes
                     sleep(self.conn.settings.ATTACH_CONSOLE_DISABLE_SLEEP)
                     self.conn.sendline('')
-                    self.conn.expect([r'.*login:'], timeout = self.timeout)
+                    self.conn.expect([r'.*login:'], timeout=self.timeout)
                 else:
                     break
             self.conn.sendline(self.login_name)
             self.conn.expect([r'%s@.+?:~#' % self.login_name],
-                             timeout = self.timeout)
+                             timeout=self.timeout)
 
             # change the prompt and make our life easy
             self.execute("export PS1='%s'" % self.change_prompt)
 
             return self
 
-        def execute(self, command, timeout = None):
+        def execute(self, command, timeout=None):
             # take default if not set
             timeout = timeout or self.timeout
 
@@ -1356,7 +1373,7 @@ class AttachModuleConsole(BaseService):
             # expect output until prompt again
             # wait for timeout provided by user
             out = self.conn.expect([r'(.+)[\r\n]*%s' % self.change_prompt],
-                                   timeout = timeout)
+                                   timeout=timeout)
 
             raw = out.last_match.groups()[0].strip()
 
@@ -1367,33 +1384,31 @@ class AttachModuleConsole(BaseService):
 
             return raw
 
-
         def __exit__(self, exc_type, exc_value, exc_tb):
             self.conn.log.debug('--- detaching console ---')
             # disconnect console
             self.conn.sendline('') # clear last bad command
 
             # burn the buffer
-            self.conn.expect([r'.+'], timeout = self.timeout)
+            self.conn.expect([r'.+'], timeout=self.timeout)
 
             # get out
             try:
                 self.conn.sendline('exit')
-                self.conn.expect([r'.*login:'], timeout = self.timeout)
+                self.conn.expect([r'.*login:'], timeout=self.timeout)
             except Exception:
                 sleep(self.conn.settings.ATTACH_CONSOLE_DISABLE_SLEEP)
                 self.conn.sendline('exit')
-                self.conn.expect([r'.*login:'], timeout = self.timeout)
+                self.conn.expect([r'.*login:'], timeout=self.timeout)
 
-            # reset the statemachine with execute() to exit!
-            self.conn.execute(self.escape_chars)
+            self.conn.sendline(self.escape_chars)
             # do not suppress
             return False
 
         def __getattr__(self, attr):
             if attr in ('sendline', 'send'):
                 return getattr(self.conn, attr)
-            
+
             raise AttributeError('%s object has no attribute %s'
                                  % (self.__class__.__name__, attr))
 
@@ -1401,9 +1416,7 @@ class AttachModuleConsole(BaseService):
 class BashService(GenericBashService):
 
     class ContextMgr(GenericBashService.ContextMgr):
-        def __init__(self, connection, 
-                           enable_bash = False,
-                           timeout = None):
+        def __init__(self, connection, enable_bash=False, timeout=None):
             # overwrite the prompt
             super().__init__(connection=connection,
                              enable_bash=enable_bash,

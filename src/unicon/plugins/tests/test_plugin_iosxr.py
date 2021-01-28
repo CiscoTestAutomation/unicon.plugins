@@ -7,8 +7,6 @@ Uses the mock_device.py script to test IOSXR plugin.
 
 __author__ = "Dave Wapstra <dwapstra@cisco.com>"
 
-
-import re
 import os
 import unittest
 from unittest.mock import patch
@@ -22,30 +20,19 @@ from unicon.mock.mock_device import mockdata_path
 
 
 class TestIosXrPlugin(unittest.TestCase):
-
     def test_login_connect_ssh(self):
         c = Connection(hostname='Router',
-                            start=['mock_device_cli --os iosxr --state connect_ssh'],
-                            os='iosxr',
-                            username='cisco',
-                            #password='cisco',
-                            line_password='admin',
-                            enable_password='admin',
-                            #tacacs_password='cisco'
-                            )
+                       start=['mock_device_cli --os iosxr --state connect_ssh'],
+                       os='iosxr',
+                       credentials=dict(default=dict(username='admin', password='admin')))
         c.connect()
-        self.assertEqual(c.spawn.match.match_output,'end\r\nRP/0/RP0/CPU0:Router#')
+        self.assertEqual(c.spawn.match.match_output, 'end\r\nRP/0/RP0/CPU0:Router#')
 
     def test_login_execution(self):
         c = Connection(hostname='Router',
-                            start=['mock_device_cli --os iosxr --state enable'],
-                            os='iosxr',
-                            username='cisco',
-                            #password='cisco',
-                            #line_password='cisco',
-                            enable_password='admin',
-                            #tacacs_password='cisco'
-                            )
+                       start=['mock_device_cli --os iosxr --state enable'],
+                       os='iosxr',
+                       credentials=dict(default=dict(username='admin', password='admin')))
         c.connect()
         device_output = c.execute('show version')
         with open(os.path.join(mockdata_path, 'iosxr/show_version.txt'), 'r') as outputfile:
@@ -56,35 +43,29 @@ class TestIosXrPlugin(unittest.TestCase):
 
     def test_login_ssh_password(self):
         c = Connection(hostname='Router',
-                            start=['mock_device_cli --os iosxr --state ssh_password'],
-                            os='iosxr',
-                            username='cisco',
-                            #password='cisco',
-                            line_password='admin',
-                            #enable_password='cisco',
-                            tacacs_password='admin',
-                            #password='cisco123',
-                            )
+                       start=['mock_device_cli --os iosxr --state ssh_password'],
+                       os='iosxr',
+                       credentials=dict(default=dict(username='admin', password='admin')))
         c.connect()
-        self.assertEqual(c.spawn.match.match_output,'end\r\nRP/0/RP0/CPU0:Router#')
+        self.assertEqual(c.spawn.match.match_output, 'end\r\nRP/0/RP0/CPU0:Router#')
 
     def test_log_message_before_prompt(self):
         c = Connection(hostname='R1',
-                            start=['mock_device_cli --hostname R1 --os iosxr --state enable'],
-                            os='iosxr',
-                            username='cisco',
-                            enable_password='admin',
-                            init_config_commands=[],
-                            init_exec_commands=[]
-                            )
+                       start=['mock_device_cli --hostname R1 --os iosxr --state enable'],
+                       os='iosxr',
+                       username='cisco',
+                       enable_password='admin',
+                       init_config_commands=[],
+                       init_exec_commands=[])
         c.connect()
 
         c.settings.IGNORE_CHATTY_TERM_OUTPUT = False
         c.sendline('process_restart_msg')
         r = c.execute('show telemetry | inc ACTIVE')
-        self.assertIn("""process_restart_msg
+        self.assertIn(
+            """process_restart_msg
 0/RP0/ADMIN0:Jul 7 10:07:42.979 UTC: pm[2890]: %INFRA-Process_Manager-3-PROCESS_RESTART : Process tams (IID: 0) restarted""",
-                      r.replace('\r', ''))
+            r.replace('\r', ''))
 
         c.settings.IGNORE_CHATTY_TERM_OUTPUT = True
         c.sendline('process_restart_msg')
@@ -93,28 +74,26 @@ class TestIosXrPlugin(unittest.TestCase):
 
     def test_connect_prompts(self):
         for state in [
-            'sysadmin_config',
-            'sysadmin1',
-            'sysadmin2',
-            'iosxr_config_ios',
-            'xr_vm',
-            ]:
-                c = Connection(hostname='Router',
-                               start=['mock_device_cli --os iosxr --state %s' % state],
-                               os='iosxr',
-                               enable_password='cisco',
-                               init_exec_commands=[],
-                               init_config_commands=[])
-                c.connect()
+                'sysadmin_config',
+                'sysadmin1',
+                'sysadmin2',
+                'iosxr_config_ios',
+                'xr_vm',
+        ]:
+            c = Connection(hostname='Router',
+                           start=['mock_device_cli --os iosxr --state %s' % state],
+                           os='iosxr',
+                           enable_password='cisco',
+                           init_exec_commands=[],
+                           init_config_commands=[])
+            c.connect()
 
     def test_configure_root_system_username(self):
-        c = Connection(
-            hostname='Router',
-            start=['mock_device_cli --os iosxr --state configure_root_system_username'],
-            os='iosxr',
-            username='root',
-            tacacs_password='secretpassword'
-        )
+        c = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxr --state configure_root_system_username'],
+                       os='iosxr',
+                       username='root',
+                       tacacs_password='secretpassword')
         c.connect()
 
     def test_configure_root_system_username_credential(self):
@@ -122,64 +101,61 @@ class TestIosXrPlugin(unittest.TestCase):
             hostname='Router',
             start=['mock_device_cli --os iosxr --state configure_root_system_username'],
             os='iosxr',
-            credentials=dict(default=dict(
-                username='root', password='secretpassword')),
+            credentials=dict(default=dict(username='root', password='secretpassword')),
         )
         c.connect()
 
     def test_connect_learn_hostname(self):
         c = Connection(hostname='Router',
-                        start=['mock_device_cli --os iosxr --state enable --hostname xrv-ss-test1'],
-                        os='iosxr',
-                        init_exec_commands=[],
-                        init_config_commands=[],
-                        learn_hostname=True)
+                       start=['mock_device_cli --os iosxr --state enable --hostname xrv-ss-test1'],
+                       os='iosxr',
+                       init_exec_commands=[],
+                       init_config_commands=[],
+                       learn_hostname=True)
         c.connect()
         self.assertEqual(c.hostname, 'xrv-ss-test1')
 
     def test_login_connect_connectReply(self):
         c = Connection(hostname='Router',
-                            start=['mock_device_cli --os iosxr --state connect_ssh'],
-                            os='iosxr',
-                            username='cisco',
-                            line_password='admin',
-                            enable_password='admin',
-                            connect_reply = Dialog([[r'^(.*?)Connected.']])
-                            )
+                       start=['mock_device_cli --os iosxr --state connect_ssh'],
+                       os='iosxr',
+                       username='cisco',
+                       line_password='admin',
+                       enable_password='admin',
+                       connect_reply=Dialog([[r'^(.*?)Connected.']]))
         c.connect()
-        self.assertEqual(c.spawn.match.match_output,'end\r\nRP/0/RP0/CPU0:Router#')
+        self.assertEqual(c.spawn.match.match_output, 'end\r\nRP/0/RP0/CPU0:Router#')
         self.assertIn("^(.*?)Connected.", str(c.connection_provider.get_connection_dialog()))
         c.disconnect()
 
     def test_connect_different_prompt_format(self):
-        c = Connection(hostname='KLMER02-SU1',
-            start=['mock_device_cli --os iosxr --state enable4'],
-            os='iosxr')
+        c = Connection(hostname='KLMER02-SU1', start=['mock_device_cli --os iosxr --state enable4'], os='iosxr')
 
         c.connect()
-        self.assertEqual(c.spawn.match.match_output,'end\r\nRP/B0/CB0/CPU0:KLMER02-SU1#')
+        self.assertEqual(c.spawn.match.match_output, 'end\r\nRP/B0/CB0/CPU0:KLMER02-SU1#')
         c.disconnect()
 
 
 class TestIosXRPluginExecute(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.c = Connection(hostname='Router',
-                           start=['mock_device_cli --os iosxr --state enable'],
-                           os='iosxr',
-                           )
+        cls.c = Connection(
+            hostname='Router',
+            start=['mock_device_cli --os iosxr --state enable'],
+            os='iosxr',
+        )
         cls.c.connect()
 
     def test_execute_error_pattern(self):
-        with self.assertRaises(SubCommandFailure) as err:
-            r = self.c.execute('not a real command')
+        with self.assertRaises(SubCommandFailure):
+            self.c.execute('not a real command')
 
     def test_execute_error_pattern_negative(self):
-        r = self.c.execute('not a real command partial')
+        self.c.execute('not a real command partial')
+
 
 class TestIosXrPluginPrompts(unittest.TestCase):
     """Tests for prompt handling."""
-
     def setUp(self):
         self._conn = Connection(
             hostname='Router',
@@ -202,7 +178,6 @@ class TestIosXrPluginPrompts(unittest.TestCase):
 
 class TestIosXrConfigPrompts(unittest.TestCase):
     """Tests for config prompt handling."""
-
     @classmethod
     def setUpClass(self):
         self._conn = Connection(
@@ -215,7 +190,7 @@ class TestIosXrConfigPrompts(unittest.TestCase):
             hostname='Router',
             start=['mock_device_cli --os iosxr --state moonshine_enable'],
             os='iosxr',
-            series='moonshine',
+            platform='moonshine',
         )
         self._moonshine_conn.connect()
 
@@ -235,12 +210,11 @@ class TestIosXrConfigPrompts(unittest.TestCase):
 
 
 class TestIosXrPluginAdminService(unittest.TestCase):
-
     def test_admin(self):
         conn = Connection(hostname='Router',
-                       start=['mock_device_cli --os iosxr --state enable1'],
-                       os='iosxr',
-                       enable_password='cisco')
+                          start=['mock_device_cli --os iosxr --state enable1'],
+                          os='iosxr',
+                          enable_password='cisco')
 
         with conn.admin_console() as console:
             out = console.execute('show platform')
@@ -252,12 +226,11 @@ class TestIosXrPluginAdminService(unittest.TestCase):
 
 
 class TestIosXrPluginBashService(unittest.TestCase):
-
     def test_bash(self):
         conn = Connection(hostname='Router',
-                       start=['mock_device_cli --os iosxr --state enable1'],
-                       os='iosxr',
-                       enable_password='cisco')
+                          start=['mock_device_cli --os iosxr --state enable1'],
+                          os='iosxr',
+                          enable_password='cisco')
 
         with conn.bash_console() as console:
             console.execute('cd ../common/')
@@ -270,9 +243,9 @@ class TestIosXrPluginBashService(unittest.TestCase):
 
     def test_admin_bash(self):
         conn = Connection(hostname='Router',
-                       start=['mock_device_cli --os iosxr --state enable1'],
-                       os='iosxr',
-                       enable_password='cisco')
+                          start=['mock_device_cli --os iosxr --state enable1'],
+                          os='iosxr',
+                          enable_password='cisco')
 
         with conn.admin_bash_console() as console:
             console.execute('cd cisco_support/')
@@ -312,7 +285,6 @@ class TestIosXrPluginBashService(unittest.TestCase):
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
 @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestIosXrPluginAdminConfigureService(unittest.TestCase):
-
     def test_admin_configure(self):
         conn = Connection(hostname='Router',
                           start=['mock_device_cli --os iosxr --state enable1'],
@@ -342,7 +314,8 @@ class TestIosXrPluginAdminConfigureService(unittest.TestCase):
                           enable_password='cisco')
         conn.connect()
         out = conn.admin_configure('username root\nsecret 123\ngroup cisco-support\nexit')
-        self.assertEqual('username root\r\nRP/0/0/CPU0:secret 123\r\nRP/0/0/CPU0:group cisco-support\r\n'
+        self.assertEqual(
+            'username root\r\nRP/0/0/CPU0:secret 123\r\nRP/0/0/CPU0:group cisco-support\r\n'
             'RP/0/0/CPU0:exit\r\nRP/0/0/CPU0:commit\r\nRP/0/0/CPU0:', out)
         self.assertEqual(conn.state_machine.current_state, 'enable')
         conn.disconnect()
@@ -351,8 +324,7 @@ class TestIosXrPluginAdminConfigureService(unittest.TestCase):
         md = MockDeviceTcpWrapperIOSXR(port=0, state='enable1,console_standby')
         md.start()
         conn = Connection(hostname='Router',
-                          start=['telnet 127.0.0.1 {}'.format(md.ports[0]),
-                                 'telnet 127.0.0.1 {}'.format(md.ports[1])],
+                          start=['telnet 127.0.0.1 {}'.format(md.ports[0]), 'telnet 127.0.0.1 {}'.format(md.ports[1])],
                           os='iosxr',
                           username='admin',
                           tacacs_password='admin')
@@ -367,8 +339,7 @@ class TestIosXrPluginAdminConfigureService(unittest.TestCase):
         md = MockDeviceTcpWrapperIOSXR(port=0, state='enable2,console_standby')
         md.start()
         conn = Connection(hostname='Router',
-                          start=['telnet 127.0.0.1 {}'.format(md.ports[0]),
-                                 'telnet 127.0.0.1 {}'.format(md.ports[1])],
+                          start=['telnet 127.0.0.1 {}'.format(md.ports[0]), 'telnet 127.0.0.1 {}'.format(md.ports[1])],
                           os='iosxr',
                           username='admin',
                           tacacs_password='admin')
@@ -383,7 +354,6 @@ class TestIosXrPluginAdminConfigureService(unittest.TestCase):
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
 @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestIosXrPluginAdminExecuteService(unittest.TestCase):
-
     def test_admin_execute(self):
         conn = Connection(hostname='Router',
                           start=['mock_device_cli --os iosxr --state enable1'],
@@ -410,8 +380,7 @@ class TestIosXrPluginAdminExecuteService(unittest.TestCase):
         md = MockDeviceTcpWrapperIOSXR(port=0, state='enable1,console_standby')
         md.start()
         conn = Connection(hostname='Router',
-                          start=['telnet 127.0.0.1 {}'.format(md.ports[0]),
-                                 'telnet 127.0.0.1 {}'.format(md.ports[1])],
+                          start=['telnet 127.0.0.1 {}'.format(md.ports[0]), 'telnet 127.0.0.1 {}'.format(md.ports[1])],
                           os='iosxr',
                           username='admin',
                           tacacs_password='admin')
@@ -426,8 +395,7 @@ class TestIosXrPluginAdminExecuteService(unittest.TestCase):
         md = MockDeviceTcpWrapperIOSXR(port=0, state='enable2,console_standby')
         md.start()
         conn = Connection(hostname='Router',
-                          start=['telnet 127.0.0.1 {}'.format(md.ports[0]),
-                                 'telnet 127.0.0.1 {}'.format(md.ports[1])],
+                          start=['telnet 127.0.0.1 {}'.format(md.ports[0]), 'telnet 127.0.0.1 {}'.format(md.ports[1])],
                           os='iosxr',
                           username='admin',
                           tacacs_password='admin')
@@ -438,13 +406,13 @@ class TestIosXrPluginAdminExecuteService(unittest.TestCase):
         conn.disconnect()
         md.stop()
 
-class TestIosXrPluginAttachConsoleService(unittest.TestCase):
 
+class TestIosXrPluginAttachConsoleService(unittest.TestCase):
     def test_attach_console(self):
         conn = Connection(hostname='Router',
-                       start=['mock_device_cli --os iosxr --state enable1'],
-                       os='iosxr',
-                       enable_password='cisco')
+                          start=['mock_device_cli --os iosxr --state enable1'],
+                          os='iosxr',
+                          enable_password='cisco')
 
         with conn.attach_console('0/RP0/CPU0') as console:
             out = console.execute('ls')
@@ -455,9 +423,9 @@ class TestIosXrPluginAttachConsoleService(unittest.TestCase):
 
     def test_admin_attach_console(self):
         conn = Connection(hostname='Router',
-                       start=['mock_device_cli --os iosxr --state enable1'],
-                       os='iosxr',
-                       enable_password='cisco')
+                          start=['mock_device_cli --os iosxr --state enable1'],
+                          os='iosxr',
+                          enable_password='cisco')
 
         with conn.admin_attach_console('0/RP0') as console:
             out = console.execute('pwd')
@@ -468,26 +436,26 @@ class TestIosXrPluginAttachConsoleService(unittest.TestCase):
 
     def test_admin_attach_console_error(self):
         conn = Connection(hostname='Router',
-                       start=['mock_device_cli --os iosxr --state enable1'],
-                       os='iosxr',
-                       enable_password='cisco')
-        with self.assertRaises(SubCommandFailure) as err:
+                          start=['mock_device_cli --os iosxr --state enable1'],
+                          os='iosxr',
+                          enable_password='cisco')
+        with self.assertRaises(SubCommandFailure):
             with conn.admin_attach_console('0/abc', timeout=5) as console:
-                out = console.execute('pwd', timeout=8)
+                console.execute('pwd', timeout=8)
 
 
 class TestIosxrConfigCommitCommands(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.conn = Connection(hostname='Router',
-                        start=['mock_device_cli --os iosxr --state enable'],
-                        os='iosxr')
+        cls.conn = Connection(hostname='Router', start=['mock_device_cli --os iosxr --state enable'], os='iosxr')
         cls.md1 = MockDeviceTcpWrapperIOSXR(port=0, state='login,console_standby')
         cls.md1.start()
-        cls.ha_dev = Connection(hostname='Router',
-            start=['telnet 127.0.0.1 {}'.format(cls.md1.ports[0]),
-                   'telnet 127.0.0.1 {}'.format(cls.md1.ports[1])], username='admin',
-            tacacs_password='admin', os='iosxr')
+        cls.ha_dev = Connection(
+            hostname='Router',
+            start=['telnet 127.0.0.1 {}'.format(cls.md1.ports[0]), 'telnet 127.0.0.1 {}'.format(cls.md1.ports[1])],
+            username='admin',
+            tacacs_password='admin',
+            os='iosxr')
         cls.ha_dev.connect()
         cls.conn.connect()
 
@@ -537,24 +505,23 @@ class TestIosxrConfigCommitCommands(unittest.TestCase):
 
 
 class TestIosXRPluginPing(unittest.TestCase):
-
     def test_ping_fail_no_vrf(self):
         c = Connection(hostname='Router',
-                            start=['mock_device_cli --os iosxr --state enable'],
-                            os='iosxr',
-                            username='cisco',
-                            tacacs_password='cisco',
-                            enable_password='cisco')
+                       start=['mock_device_cli --os iosxr --state enable'],
+                       os='iosxr',
+                       username='cisco',
+                       tacacs_password='cisco',
+                       enable_password='cisco')
         with self.assertRaises(SubCommandFailure):
-            r = c.ping('10.0.0.1')
+            c.ping('10.0.0.1')
 
     def test_ping_success_vrf(self):
         c = Connection(hostname='Router',
-                            start=['mock_device_cli --os iosxr --state enable'],
-                            os='iosxr',
-                            username='cisco',
-                            tacacs_password='cisco',
-                            enable_password='cisco')
+                       start=['mock_device_cli --os iosxr --state enable'],
+                       os='iosxr',
+                       username='cisco',
+                       tacacs_password='cisco',
+                       enable_password='cisco')
         r = c.ping('10.0.0.2', vrf='management')
         self.assertEqual(r.strip(), "\r\n".join("""ping vrf management
 Protocol [ip]: 
@@ -568,14 +535,12 @@ Type escape sequence to abort.
 Sending 5, 100-byte ICMP Echos to 10.0.0.2, timeout is 2 seconds:
 !!!!!
 Success rate is 100 percent (5/5), round-trip min/avg/max = 1/1/3 ms
-RP/0/RP0/CPU0:""".\
-splitlines()))
+RP/0/RP0/CPU0:""".splitlines()))  # noqa
 
 
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
 @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestIosXrPluginConfigureExclusiveService(unittest.TestCase):
-
     def test_configure_exclusive(self):
         conn = Connection(hostname='Router',
                           start=['mock_device_cli --os iosxr --state enable'],

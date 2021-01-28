@@ -33,7 +33,7 @@ class WindowsConnection(GenericSingleRpConnection):
         Connection class for windows connections.
     """
     os = 'windows'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     state_machine_class = WindowsStateMachine
     connection_provider_class = WindowsConnectionProvider

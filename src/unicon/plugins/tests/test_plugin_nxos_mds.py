@@ -21,7 +21,7 @@ class TestNxosMdsPluginConnect(unittest.TestCase):
         c = Connection(hostname='switch',
                        start=['mock_device_cli --os nxos_mds --state exec'],
                        os='nxos',
-                       series='mds',
+                       platform='mds',
                        username='cisco',
                        tacacs_password='cisco')
         c.connect()
@@ -34,7 +34,7 @@ class TestNxosMdsPluginShellexec(unittest.TestCase):
         c = Connection(hostname='switch',
                        start=['mock_device_cli --os nxos_mds --state exec'],
                        os='nxos',
-                       series='mds',
+                       platform='mds',
                        username='cisco',
                        tacacs_password='cisco')
         c.shellexec(['ls'])

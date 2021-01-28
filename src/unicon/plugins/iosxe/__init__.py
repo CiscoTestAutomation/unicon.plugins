@@ -27,6 +27,7 @@ class IosXEServiceList(ServiceList):
         self.traceroute = svc.Traceroute
         self.bash_console = svc.BashService
         self.copy = svc.Copy
+        self.reload = svc.Reload
 
 
 class HAIosXEServiceList(HAServiceList):
@@ -47,7 +48,7 @@ class HAIosXEServiceList(HAServiceList):
 
 class IosXESingleRpConnection(BaseSingleRpConnection):
     os = 'iosxe'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     state_machine_class = IosXESingleRpStateMachine
     connection_provider_class = GenericSingleRpConnectionProvider
@@ -57,7 +58,7 @@ class IosXESingleRpConnection(BaseSingleRpConnection):
 
 class IosXEDualRPConnection(GenericDualRPConnection):
     os = 'iosxe'
-    series = None
+    platform = None
     chassis_type = 'dual_rp'
     subcommand_list = HAIosXEServiceList
     state_machine_class = IosXEDualRpStateMachine

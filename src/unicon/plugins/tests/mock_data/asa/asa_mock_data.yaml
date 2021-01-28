@@ -137,7 +137,7 @@ asa_enable_more:
 
 version_more:
   prompt: "<--- More --->"
-  commands:
+  keys:
     ' ':
       new_state: asa_enable_more
 

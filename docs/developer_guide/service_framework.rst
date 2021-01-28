@@ -209,7 +209,7 @@ Make an intry in the service list and pass on the service list to Connection cla
 
   class NXOSConnection(BaseDualRpConnection):
         os = 'nxos'
-        series = None
+        platform = None
         chassis_type = 'dual_rp
         state_machine_class = IosDualRpStateMachine
         connection_provider_class = IosDualRpConnectionProvider

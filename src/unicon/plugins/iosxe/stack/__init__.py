@@ -24,7 +24,7 @@ class StackIosXEServiceList(HAServiceList):
 
 class IosXEStackRPConnection(BaseStackRpConnection):
     os = 'iosxe'
-    series = None
+    platform = None
     chassis_type = 'stack'
     subcommand_list = StackIosXEServiceList
     state_machine_class = StackIosXEStateMachine

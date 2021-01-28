@@ -28,7 +28,7 @@ class NxosServiceList(ServiceList):
         super().__init__()
         self.reload = svc.Reload
         self.ping6 = svc.Ping6
-        self.copy =svc.NxosCopy
+        self.copy = svc.NxosCopy
         self.shellexec = svc.ShellExec
         self.list_vdc = svc.ListVdc
         self.switchto = svc.SwitchVdc
@@ -39,6 +39,7 @@ class NxosServiceList(ServiceList):
         self.bash_console = svc.BashService
         self.guestshell = svc.GuestshellService
         self.configure = svc.Configure
+        self.configure_dual = svc.ConfigureDual
 
 
 class HANxosServiceList(HAServiceList):
@@ -65,7 +66,7 @@ class HANxosServiceList(HAServiceList):
 
 class NxosSingleRpConnection(BaseNxosSingleRpConnection):
     os = 'nxos'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     state_machine_class = NxosSingleRpStateMachine
     connection_provider_class = NxosSingleRpConnectionProvider
@@ -75,7 +76,7 @@ class NxosSingleRpConnection(BaseNxosSingleRpConnection):
 
 class NxosDualRPConnection(BaseNxosDualRpConnection):
     os = 'nxos'
-    series = None
+    platform = None
     chassis_type = 'dual_rp'
     state_machine_class = NxosDualRpStateMachine
     connection_provider_class = NxosDualRpConnectionProvider

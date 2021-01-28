@@ -84,6 +84,8 @@ exec:
       Active supervisor uptime:   5 days, 5 hours, 55 minutes, 9 seconds
     "config term":
       new_state: config
+    "config dual-stage":
+      new_state: config_dual
     "run bash":
       new_state: bash
     "run bash sudo su":
@@ -103,7 +105,7 @@ exec:
     "guestshell":
       new_state: guestshell
     "attach console module 1":
-      new_state: console_login
+      new_state: console_escape
     "reload":
       new_state: ha_confirm_reload
     "reload wr erase":
@@ -140,6 +142,8 @@ exec:
       Destination file is a boot image.Cannot overwrite. Check 'Show Boot'.
     "copy scp://localhost/nxos.7.0.3.I7.8.bin bootflash:///nxos.7.0.3.I7.8.bin vrf management": |
       Copying to/from this server name is not permitted
+    "attach module 1":
+      new_state: attach_module
 
 
 loader:
@@ -157,10 +161,24 @@ config:
       new_state: config_session
     "no logging console": ""
     "line console": ""
+    "line console 0": ""
     "exec-timeout 0": ""
     "terminal width 511": ""
     "feature bash": ""
     "line vty": ""
+    "end":
+      new_state: exec
+
+config_dual:
+  prompt: "%N(config-dual-stage)#"
+  commands: 
+    "feature isis": ""
+    "commit": |
+      Verification Succeeded.
+
+      Proceeding to apply configuration. This might take a while depending on amount of configuration in buffer.
+      Please avoid other configuration changes during this time.
+      Configuration committed by user 'admin' using Commit ID : 1000000001
     "end":
       new_state: exec
 
@@ -323,8 +341,14 @@ bash_nxos:
     "exit":
       new_state: exec
 
-console_login:
+console_escape:
   preface: "Escape character is ~,'"
+  prompt: ""
+  commands:
+    "":
+      new_state: console_login
+
+console_login:
   prompt: 'login:'
   commands:
     'root': 
@@ -349,6 +373,45 @@ exit_console:
   commands:
     '~,': 
       new_state: exec
+
+
+attach_module:
+  prompt: "module-1#"
+  commands:
+    "debug platform internal tah elam asic 0":
+      new_state: attach_module_elam
+    "exit":
+      new_state: exec
+    "show version": |2
+
+        Software
+
+        system:    version 7.0(3)I7(2) [build 7.0(3)I7(2)]
+      
+        system compile time:     11/22/2017 12:00:00 [01/01/1970 00:00:00]
+      
+      
+      Hardware
+      RAM 16400980 kB
+          bootflash: 0 blocks (block size 512b)
+      
+      Switch   uptime is 125 days 5 hours 34 minute(s) 25 second(s)
+
+
+attach_module_elam:
+  prompt: "module-1(TAH-elam)#"
+  commands:
+    "trigger init asic 0 slice 2 lu-a2d 1 in-select 9 out-select 1 use-src-id 25":
+      new_state: attach_module_elam_insel
+    "exit":
+      new_state: attach_module
+
+attach_module_elam_insel:
+  prompt: module-1(TAH-elam-insel9)#
+  commands:
+    "set outer ipv4 dst_ip 225.1.1.1 src_ip 11.2.1.100": ""
+    "exit":
+      new_state: attach_module_elam
 
 user_access_veri:
   preface: User Access Verification

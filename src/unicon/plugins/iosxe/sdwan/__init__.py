@@ -11,7 +11,7 @@ class SDWANServiceList(IosXEServiceList):
 
 class SDWANSingleRpConnection(IosXESingleRpConnection):
     os = 'iosxe'
-    series = 'sdwan'
+    platform = 'sdwan'
     state_machine_class = SDWANSingleRpStateMachine
     subcommand_list = SDWANServiceList
     settings = SDWANSettings()

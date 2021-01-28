@@ -9,6 +9,7 @@ This part of the document covers all the services supported by Unicon.
     what_are_services
     generic_services
     aci
+    asa_fp2k
     cimc
     confd
     ftd

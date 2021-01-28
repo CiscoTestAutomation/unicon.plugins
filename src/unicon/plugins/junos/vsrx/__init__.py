@@ -14,6 +14,6 @@ from .statemachine import JunosVsrxSingleRpStateMachine
 
 class JunosVsrxSingleRpConnection(JunosSingleRpConnection):
     os = 'junos'
-    series = 'vsrx'
+    platform = 'vsrx'
     chassis_type = 'single_rp'
     state_machine_class = JunosVsrxSingleRpStateMachine

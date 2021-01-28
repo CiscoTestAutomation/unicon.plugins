@@ -72,7 +72,7 @@ class TestAsaPluginReload(unittest.TestCase):
         c = Connection(hostname='ASA',
                             start=['mock_device_cli --os asa --state asa_enable'],
                             os='asa',
-                            series='asa',
+                            platform='asa',
                             credentials=dict(default=dict(username='cisco', password='cisco')))
         c.connect()
         c.reload()
@@ -81,7 +81,7 @@ class TestAsaPluginReload(unittest.TestCase):
         c = Connection(hostname='ASA',
                             start=['mock_device_cli --os asa --state asa_reload'],
                             os='asa',
-                            series='asav',
+                            platform='asav',
                             credentials=dict(default=dict(username='cisco', password='cisco')))
         c.connect()
         c.reload()

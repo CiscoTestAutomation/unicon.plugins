@@ -62,10 +62,84 @@ to respond to the password prompt.  Credentials are available in ``rtr.credentia
     cmd = ['sudo su root', 'uname -a', 'whoami', 'exit']
     device.shellexec(cmd, reply=Dialog([password_stmt]))
 
+
+configure dual-stage
+---------------------
+
+Service to execute commands on configure dual-stage mode.
+
+================  =======================    ====================================================
+Argument          Type                       Description
+================  =======================    ====================================================
+command           list                       list of commands to configure
+reply             Dialog                     additional dialog
+timeout           int                        timeout value for the command execution takes.
+error_pattern     list                       List of regex strings to check output for errors.
+prompt_recovery   bool (default False)       Enable/Disable prompt recovery feature
+target            str (default "active")     Target RP where to execute service, for DualRp only
+================  =======================    ====================================================
+
+
+.. code-block:: python
+
+    rtr.configure_dual(['feature isis', 'commit'])
+
+    # config dual-stage
+    # Enter configuration commands, one per line. End with CNTL/Z.
+    # R1(config-dual-stage)# feature isis
+    # R1(config-dual-stage)# commit
+    # Verification Succeeded.
+
+    # Proceeding to apply configuration. This might take a while depending on amount of configuration in buffer.
+    # Please avoid other configuration changes during this time.
+    # Configuration committed by user 'admin' using Commit ID : 1000000002
+    # R1(config-dual-stage)# end
+    # R1#
+
+
+If you want to bring device to configure dual stage, you can use the `go_to` function in state machine
+and use `'config_dual': True` as the context. The following is an example to do that.
+
+.. code-block:: python
+
+    rtr.state_machine.go_to('config', rtr.spawn, context={'config_dual': True})
+
+    # config dual-stage
+    # Enter configuration commands, one per line. End with CNTL/Z.
+    # R1(config-dual-stage)#
+
+    # execute command in configure dual stage
+    rtr.execute('no logging console')
+
+    # R1(config-dual-stage)# no logging console
+    # R1(config-dual-stage)# 
+
+
+attach
+------
+
+Service to attach to line card to execute commands in. Returns a
+router-like object to execute commands on using python context managers.
+
+====================    ======================    =================================================
+Argument                Type                      Description
+====================    ======================    =================================================
+module_num              int                       module number to attach to
+timeout                 int (default 60 sec)      timeout in sec for executing commands
+target                  standby/active            by default commands will be executed on active,
+                                                  use target=standby to execute command on standby.
+====================    ======================    =================================================
+
+.. code-block:: python
+
+    with device.attach(1) as lc_1:
+        output1 = lc_1.execute('show interface')
+
+
 attach_console
 --------------
 
-Service to attach to line card console to execute commands in. Returns a 
+Service to attach to line card console to execute commands in. Returns a
 router-like object to execute commands on using python context managers.
 
 ====================    ======================    ========================================
@@ -279,7 +353,7 @@ Most of the time simply providing the VDC name is just good enough.
     step-n7k-2-vdc1(config-console)# end
     step-n7k-2-vdc1# Out[3]: 'vdc1'
 
-You see a relatively longer output becuase everytime it switches to a new VDC,
+You see a relatively longer output because everytime it switches to a new VDC,
 the terminal is reinitialized.
 
 .. note::

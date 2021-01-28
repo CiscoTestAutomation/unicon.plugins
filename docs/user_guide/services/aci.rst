@@ -1,18 +1,18 @@
 ACI
 ===
 
-This section lists the services which are supported on Application Centric Infrastructure (ACI).
+This section lists the services which are supported for Application Centric Infrastructure (ACI).
 
   * `execute <#execute>`__
   * `configure <#configure>`__
   * `reload <#reload>`__
 
-The ACI plugin supports only APIC and N9K (in ACI mode) using the `series` option. Specify ``aci``
-as `os` option and ``apic`` or ``n9k`` as the `series` option.
+The ACI plugin supports only APIC and N9K (in ACI mode). Specify ``os=apic`` for APIC, specify
+``os=nxos`` and ``platform=aci`` for N9K.
 
 .. note::
 
-    The ``connect`` service for ACI plugin supports detection of the `setup` state of the APIC and
+    The ``connect`` service supports detection of the `setup` state of the APIC and
     `boot` state of the N9K switches in ACI mode.  If the `connect()` service finds the devices in
     `setup` or `boot` state, it is up to the user to handle the transition to the `enable` state.
 
@@ -78,3 +78,11 @@ The default reload command for ACPI is `acidiag reboot`,
 the default reload command for N9K is `reload`.
 
 The `discovery_timeout` is only supported for N9K devices.
+
+*Settings*
+
+You can adjust the following timer settings for the APIC reload service:
+
+* `POST_RELOAD_WAIT` (default: 330)         # How long to wait after the reload command has been executed
+* `RELOAD_RECONNECT_ATTEMPTS` (default: 3)  # After wait, how many times to try to connect
+* `RELOAD_TIMEOUT` (default: 420)           # Overall timeout for reload service

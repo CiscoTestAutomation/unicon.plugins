@@ -1,9 +1,8 @@
 from time import sleep
 from unicon.plugins.generic import GenericSingleRpConnection, ServiceList
-from unicon.plugins.generic import service_implementation as svc
-from unicon.eal.dialogs import Dialog, Statement
+from unicon.eal.dialogs import Dialog
 
-from ..connection import FxosConnectionProvider
+from .. import FxosConnectionProvider
 from . import service_implementation as ftd_svc
 from .statemachine import FtdStateMachine
 from .statements import FtdStatements
@@ -61,7 +60,7 @@ class FtdConnection(GenericSingleRpConnection):
         Connection class for fxos connections.
     """
     os = 'fxos'
-    series = 'ftd'
+    platform = 'ftd'
     chassis_type = 'single_rp'
     state_machine_class = FtdStateMachine
     connection_provider_class = FtdConnectionProvider

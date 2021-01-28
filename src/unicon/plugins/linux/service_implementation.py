@@ -11,8 +11,10 @@ from unicon.utils import AttributeDict
 from unicon.logs import UniconFileHandler
 from unicon import log
 
-utils = LinuxUtils()
+from .statements import linux_execution_statements
 
+
+utils = LinuxUtils()
 
 class Execute(GenericExecute):
     """ Execute Service implementation
@@ -42,6 +44,7 @@ class Execute(GenericExecute):
         # Connection object will have all the received details
         super().__init__(connection, context, **kwargs)
         self.utils = utils
+        self.dialog = Dialog(linux_execution_statements)
 
     def post_service(self, *args, **kwargs):
         if kwargs.get('check_retcode', self.connection.settings.CHECK_RETURN_CODE):

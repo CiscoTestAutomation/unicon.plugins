@@ -13,7 +13,7 @@ class TestIosXeCat3kPluginRommonBoot(unittest.TestCase):
         d = Connection(hostname='Router',
                         start=['mock_device_cli --os iosxe --state cat3k_rommon'],
                         os='iosxe',
-                        series='cat3k',
+                        platform='cat3k',
                         username='cisco',
                         tacacs_password='cisco')
         d.connect()
@@ -22,7 +22,7 @@ class TestIosXeCat3kPluginRommonBoot(unittest.TestCase):
         d = Connection(hostname='Router',
                         start=['mock_device_cli --os iosxe --state cat3k_rommon'],
                         os='iosxe',
-                        series='cat3k',
+                        platform='cat3k',
                         username='cisco',
                         tacacs_password='cisco',
                         image_to_boot='flash:rp_super_universalk9.edison.bin')

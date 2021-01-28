@@ -11,7 +11,7 @@ class IosXECsr1000vServiceList(IosXEServiceList):
 
 
 class IosXECsr1000vSingleRpConnection(IosXESingleRpConnection):
-    series = 'csr1000v'
+    platform = 'csr1000v'
     state_machine_class = IosXECsr1000vSingleRpStateMachine
     subcommand_list = IosXECsr1000vServiceList
     settings = IosXECsr1000vSettings()

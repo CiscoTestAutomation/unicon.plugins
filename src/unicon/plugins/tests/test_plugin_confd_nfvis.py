@@ -24,7 +24,7 @@ class TestConfdNfvisPluginConnect(unittest.TestCase):
           nfvis:
             os: confd
             type: router
-            series: nfvis
+            platform: nfvis
             passwords:
                 tacacs: "cisco123"
                 enable: "cisco123"
@@ -48,7 +48,7 @@ class TestConfdNfvisPluginConnect(unittest.TestCase):
         c = Connection(hostname='vbo',
                         start=['mock_device_cli --os confd --state nfvis_login --hostname nfvis'],
                         os='confd',
-                        series='nfvis',
+                        platform='nfvis',
                         username='admin',
                         line_password='cisco123',
                         tacacs_password='cisco123',
@@ -63,7 +63,7 @@ class TestConfdNfvisPluginExecute(unittest.TestCase):
         c = Connection(hostname='vbo',
                         start=['mock_device_cli --os confd --state nfvis_login --hostname vbo'],
                         os='confd',
-                        series='nfvis',
+                        platform='nfvis',
                         username='admin',
                         line_password='cisco123',
                         tacacs_password='cisco123',
@@ -93,7 +93,7 @@ class TestConfdNfvisPluginConfigure(unittest.TestCase):
         c = Connection(hostname='vbo',
                         start=['mock_device_cli --os confd --state nfvis_login --hostname vbo'],
                         os='confd',
-                        series='nfvis',
+                        platform='nfvis',
                         username='admin',
                         line_password='cisco123',
                         tacacs_password='cisco123',

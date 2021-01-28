@@ -5,6 +5,7 @@ __author__ = "Myles Dear <pyats-support@cisco.com>"
 from unicon.plugins.generic.patterns import GenericPatterns
 from unicon.plugins.generic.service_patterns import ReloadPatterns
 
+
 class IosXEPatterns(GenericPatterns):
     def __init__(self):
         super().__init__()
@@ -25,6 +26,8 @@ class IosXEPatterns(GenericPatterns):
             r'^(.*?)(Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(-standby)?(\(boot\))?(\(recovery-mode\))?#\s?$'
         self.press_enter = ReloadPatterns().press_enter
         self.config_prompt = r'^(.*)\(.*(con|cfg|ipsec-profile|ca-trustpoint|cs-server|ca-profile|gkm-local-server)\S*\)#\s?$'
+        self.are_you_sure_ywtdt = r'Are you sure you want to do this\? \[yes/no\]:\s*$'
+
 
 class IosXEReloadPatterns(ReloadPatterns):
     def __init__(self):
@@ -40,6 +43,7 @@ class IosXEReloadPatterns(ReloadPatterns):
         self.default_prompts = r'^(.*?)(Router|RouterRP|Switch|ios|switch|.*)([0-9])?(\(standby\))?(\(boot\))?(>|#)'
         self.telnet_prompt = r'^.*telnet>\s?'
         self.please_reset = r'^(.*)Please reset'
+        self.grub_prompt = r'.*Use the (UP and DOWN arrow|\^ and v) keys to select.*'
 
         # The uniclean package expects these patterns to be here.
         self.enable_prompt = IosXEPatterns().enable_prompt
