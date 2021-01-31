@@ -15,6 +15,9 @@ __author__ = "James Di Trapani <james@ditrapani.com.au>"
 from unicon.statemachine import Path
 from unicon.eal.dialogs import Dialog
 from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine
+from .patterns import IronWarePatterns
+
+patterns = IronWarePatterns()
 
 
 class IronWareSingleRpStateMachine(GenericSingleRpStateMachine):
@@ -27,6 +30,11 @@ class IronWareSingleRpStateMachine(GenericSingleRpStateMachine):
         super().create()
 
         # remove some known path
-        self.remove_path('enable', 'rommon')
-        self.remove_path('rommon', 'disable')
-        self.remove_state('rommon')
+        enable = self.get_state('enable')
+        enable.pattern = patterns.privileged_mode
+
+        disable = self.get_state('disable')
+        disable.pattern = patterns.disable_mode
+
+        config = self.get_state('config')
+        config.pattern = patterns.config_mode

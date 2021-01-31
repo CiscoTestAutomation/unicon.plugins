@@ -20,10 +20,10 @@ class IronWarePatterns(GenericPatterns):
     def __init__(self):
         super().__init__()
         # ssh@mlx8>
-        self.disable_mode = r'^(.*?)[-.\w]+@[-.\w]+>$'
+        self.disable_mode = r'^(.*?)[-\.\w]+@[-\.\w]+>$'
 
         # ssh@mlx8#
-        self.privileged_mode = r'^(.*?)[-.\w]+@[-.\w]+#$'
+        self.privileged_mode = r'^(.*?)[-\.\w]+@[-\.\w]+#$'
 
         # ssh@mlx8(config)#
-        self.config_mode = r'^(.*?)[-.\w]+@[-.\w]+\(config\)#$'
+        self.config_mode = r'^(.*?)[-\.\w]+@[-\.\w]+\(config\)#$'

@@ -26,6 +26,8 @@ with open(os.path.join(mockdata_path, 'ironware/ironware_mock_data.yaml'), 'rb')
 __author__ = "James Di Trapani <james@ditrapani.com.au>"
 
 
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0)
 class TestIronWarePluginConnect(unittest.TestCase):
 
     def test_login_connect(self):
@@ -43,6 +45,7 @@ class TestIronWarePluginConnect(unittest.TestCase):
                         })
         c.connect()
         self.assertIn('mlx8#', c.spawn.match.match_output)
+        c.disconnect()
 
     def test_login_connect_ssh(self):
         c = Connection(hostname='mlx8',
@@ -59,6 +62,7 @@ class TestIronWarePluginConnect(unittest.TestCase):
                         })
         c.connect()
         self.assertIn('mlx8#', c.spawn.match.match_output)
+        c.disconnect()
 
     def test_login_connect_connectReply(self):
         c = Connection(hostname='mlx8',
@@ -100,7 +104,8 @@ class TestIronWarePluginExecute(unittest.TestCase):
         cmd = 'show ip route'
         expected_response = mock_data['exec']['commands'][cmd].strip()
         ret = c.execute(cmd).replace('\r', '')
-        self.assertIn(expected_response, ret)
+        self.assertEqual(expected_response, ret)
+        c.disconnect()
 
 
 class TestIronWarePluginMPLSPing(unittest.TestCase):
@@ -146,6 +151,7 @@ SSH@mlx8#""")
         self.assertEqual("\n".join(c.spawn.match.match_output.splitlines()), """ping mpls rsvp lsp mlx8.1_to_mlx8.4
 Ping fails: LSP is down
 SSH@mlx8#""")
+        c.disconnect()
 
 if __name__ == "__main__":
     unittest.main()
