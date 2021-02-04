@@ -659,8 +659,10 @@ class TestConfigureService(unittest.TestCase):
 
     def test_configure_error_pattern(self):
         with self.assertRaises(SubCommandFailure):
-            r = self.d.configure('Not valid configuration',
-                                 error_pattern=[r'% Invalid command'])
+            self.d.configure('Not valid configuration',
+                             error_pattern=[r'% Invalid command'])
+        self.assertEqual(self.d.state_machine.current_state,
+                         self.d.configure.end_state)
 
     def test_configure_error_pattern2(self):
         error_pattern = [r'% Invalid command']
@@ -672,6 +674,8 @@ class TestConfigureService(unittest.TestCase):
         finally:
             self.d.settings.CONFIGURE_ERROR_PATTERN, error_pattern = \
                 error_pattern, self.d.settings.CONFIGURE_ERROR_PATTERN
+        self.assertEqual(self.d.state_machine.current_state,
+                         self.d.configure.end_state)
 
     def test_ha_config_lock_retries_succeed(self):
         self.d_ha.execute('set config lock count 2')
@@ -1157,7 +1161,9 @@ class TestLearnOS(unittest.TestCase):
         template_testbed = """
         devices:
           Router:
+            os: generic
             type: router
+            os: generic
             credentials:
               default:
                 password: cisco
@@ -1175,6 +1181,48 @@ class TestLearnOS(unittest.TestCase):
         d = t.devices['Router']
         d.connect(learn_hostname=True, learn_os=True)
         self.assertEqual(d.os, 'ios')
+        d.disconnect()
+
+    def test_learn_os_ha(self):
+        template_testbed = """
+        devices:
+          Router:
+            os: generic
+            type: router
+            credentials:
+              default:
+                password: cisco
+                username: cisco
+              enable:
+                password: cisco
+                username: cisco
+            connections:
+              defaults:
+                class: unicon.Unicon
+              a:
+                command: mock_device_cli --os ios --state exec
+              b:
+                command: mock_device_cli --os ios --state exec_standby
+        """
+        t = loader.load(template_testbed)
+        d = t.devices['Router']
+        d.connect(learn_hostname=True, learn_os=True)
+        self.assertEqual(d.os, 'ios')
+        d.disconnect()
+
+
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
+class TestSwitchTo(unittest.TestCase):
+
+    def test_switchto(self):
+        d = Connection(hostname='Router', start=['mock_device_cli --os ios --state exec'],
+                       credentials=dict(default=dict(password='cisco')))
+        d.connect()
+        d.switchto('enable')
+        d.switchto(['disable', 'config', 'enable'])
+        d.switchto(to_state='disable')
+        self.assertEqual(d.state_machine.current_state, 'disable')
 
 
 if __name__ == "__main__":

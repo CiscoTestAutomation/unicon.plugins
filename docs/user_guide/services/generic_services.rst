@@ -288,7 +288,7 @@ bulk_chunk_sleep  float (default 0.5 sec)    sleep between sending command chunk
         rtr.configure(cmd, force=True)
         rtr.configure(cmd, replace=True)
 
-For `(os='iosxe', series='sdwan')` plugin, `configure()` service issue `config-transaction`
+For `(os='iosxe', platform='sdwan')` plugin, `configure()` service issue `config-transaction`
 command in place of `'config term` and run `commit` command before moving out of config mode.
 
 ..  code-block:: python
@@ -623,6 +623,37 @@ record_hops                 Number of hops
         output = ping(addr="9.33.11.41")
         output = ping(addr="10.2.1.1", extd_ping='yes')
 
+
+switchto
+--------
+
+The `switchto` service is a helper method to switch between CLI states. This can be used to switch
+to known states in the statemachine, e.g. 'enable' or 'rommon' (if supported by the plugin).
+
+===================   ========================    ====================================================
+Argument              Type                        Description
+===================   ========================    ====================================================
+to_state              str or list                 target state(s) to switch to
+timeout               int (default 60 sec)        timeout value for the command execution takes.
+===================   ========================    ====================================================
+
+.. code-block:: python
+
+        #Example
+        --------
+
+        >>> dev.state_machine.states
+        [disable, enable, config, rommon, shell]
+        >>>
+        >>> dev.switchto('config')
+
+        %UNICON-INFO: +++ switchto: config +++
+        config term
+        R1(conf)#
+        >>>
+
+
+
 traceroute
 ----------
 
@@ -908,17 +939,17 @@ Service to switchover the device.
 Refer :ref:`prompt_recovery_label` for details on `prompt_recovery` argument.
 
 
-===============   =======================     ========================================
-Argument          Type                        Description
-===============   =======================     ========================================
-command           str                         switchover command to be issued on device.
-                                              default command is "redundancy force-switchover"
-reply             Dialog                      additional dialogs/new dialogs which are not handled by default.
-timeout           int                         timeout value in sec, Default Value is 500 sec
-sync_standby      boolean                     Flag to decide whether to wait for standby to be UP or Not. default: True
-prompt_recovery   boolean                     Enable/Disable prompt recovery feature. Default is False.
-switchover_creds  list or str ('default')     Credentials to use if device prompts for user/pw.
-===============   =======================     ========================================
+================   =======================     =========================================================================
+Argument           Type                        Description
+================   =======================     =========================================================================
+command            str                         switchover command to be issued on device.
+                                               default command is "redundancy force-switchover"
+reply              Dialog                      additional dialogs/new dialogs which are not handled by default.
+timeout            int                         timeout value in sec, Default Value is 500 sec
+sync_standby       boolean                     Flag to decide whether to wait for standby to be UP or Not. default: True
+prompt_recovery    boolean                     Enable/Disable prompt recovery feature. Default is False.
+switchover_creds   list or str ('default')     Credentials to use if device prompts for user/pw.
+================   =======================     =========================================================================
 
  return :
     * True on Success
@@ -976,7 +1007,7 @@ timeout           int           timeout value in sec, Default Value is 500 sec
 
 
 Stack RP Services
-================
+=================
 
 In addition to the common services, following are applicable only for
 *ha* platforms with *stack* RP.

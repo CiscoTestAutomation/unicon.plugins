@@ -17,14 +17,18 @@ from unicon.core.errors import UniconAuthenticationError
 from unicon.utils import Utils
 
 from unicon.plugins.generic.patterns import GenericPatterns
-from unicon.plugins.utils import (get_current_credential,
-    common_cred_username_handler, common_cred_password_handler, )
+from unicon.plugins.utils import (
+    get_current_credential,
+    common_cred_username_handler,
+    common_cred_password_handler,
+)
 
 from unicon.utils import to_plaintext
 from unicon.bases.routers.connection import ENABLE_CRED_NAME
 
 pat = GenericPatterns()
 utils = Utils()
+
 
 #############################################################
 #  Callbacks
@@ -44,7 +48,7 @@ def chatty_term_wait(spawn, trim_buffer=False):
     """ Wait a small amount of time for any chatter to cease from the device.
     """
     prev_buf_len = len(spawn.buffer)
-    for retry_number in range(
+    for _ in range(
             spawn.settings.ESCAPE_CHAR_CHATTY_TERM_WAIT_RETRIES):
 
         sleep(spawn.settings.ESCAPE_CHAR_CHATTY_TERM_WAIT)
@@ -69,9 +73,7 @@ def escape_char_callback(spawn):
     chatty_term_wait(spawn)
 
     # Device is already asking for authentication
-    if re.search(
-        r'.*(User Access Verification|sername:\s*$|assword:\s*$|login:\s*$)',
-        spawn.buffer):
+    if re.search(r'.*(User Access Verification|sername:\s*$|assword:\s*$|login:\s*$)', spawn.buffer):
         return
 
     auth_pat = ''
@@ -98,7 +100,7 @@ def escape_char_callback(spawn):
         spawn.read_update_buffer()
 
         # incremental sleep logic
-        sleep(spawn.settings.ESCAPE_CHAR_PROMPT_WAIT*(retry_number+1))
+        sleep(spawn.settings.ESCAPE_CHAR_PROMPT_WAIT * (retry_number + 1))
 
         # did we get prompt after?
         spawn.read_update_buffer()
@@ -107,6 +109,7 @@ def escape_char_callback(spawn):
         if known_buffer != len(spawn.buffer.strip()):
             # we got new stuff - assume it's the the prompt, get out
             break
+
 
 def ssh_continue_connecting(spawn):
     """ handles SSH new key prompt
@@ -150,8 +153,8 @@ def get_enable_credential_password(context):
     login_creds = context.get('login_creds', [])
     fallback_cred = context.get('default_cred_name', "")
     if not login_creds:
-        login_creds=[fallback_cred]
-    if not isinstance (login_creds, list):
+        login_creds = [fallback_cred]
+    if not isinstance(login_creds, list):
         login_creds = [login_creds]
 
     # Pick the last item in the login_creds list to select the intended
@@ -173,8 +176,8 @@ def get_enable_credential_password(context):
                     enable_credential_password = candidate_enable_pw
                     break
         else:
-            raise UniconAuthenticationError('{}: Could not find an enable credential.'.\
-                format(context.get('hostname', "")))
+            raise UniconAuthenticationError('{}: Could not find an enable credential.'.
+                                            format(context.get('hostname', "")))
     return to_plaintext(enable_credential_password)
 
 
@@ -196,10 +199,11 @@ def enable_password_handler(spawn, context, session):
 def ssh_tacacs_handler(spawn, context):
     result = False
     start_cmd = spawn.spawn_command
-    if re.search(context['username'] + r'@', start_cmd) \
-        or re.search(r'-l\s*' + context['username'], start_cmd) \
-        or re.search(context['username'] + r'@', spawn.buffer):
-        result = True
+    if context.get('username'):
+        if re.search(context['username'] + r'@', start_cmd) \
+            or re.search(r'-l\s*' + context['username'], start_cmd) \
+                or re.search(context['username'] + r'@', spawn.buffer):
+            result = True
     return result
 
 
@@ -219,8 +223,7 @@ def password_handler(spawn, context, session):
         if session.password_attempts > spawn.settings.PASSWORD_ATTEMPTS:
             raise UniconAuthenticationError('Too many password retries')
 
-        if context['username'] == spawn.last_sent.rstrip() or \
-            ssh_tacacs_handler(spawn, context):
+        if context.get('username', '') == spawn.last_sent.rstrip() or ssh_tacacs_handler(spawn, context):
             spawn.sendline(context['tacacs_password'])
         else:
             spawn.sendline(context['line_password'])
@@ -263,12 +266,32 @@ def incorrect_login_handler(spawn, context, session):
 
         # Let's give a chance for unicon to login with right credentials
         # let's give three attempts
-        if session['incorrect_login_attempts'] <=3:
+        if session['incorrect_login_attempts'] <= 3:
             session['incorrect_login_attempts'] = \
                 session['incorrect_login_attempts'] + 1
         else:
             raise UniconAuthenticationError(
                 'Login failure, either wrong username or password')
+
+
+def sudo_password_handler(spawn, context, session):
+    """ Password handler for sudo command
+    """
+    if 'sudo_attempts' not in session:
+        session['sudo_attempts'] = 1
+    else:
+        raise UniconAuthenticationError('sudo failure')
+
+    credentials = context.get('credentials')
+    if credentials:
+        try:
+            spawn.sendline(
+                to_plaintext(credentials['sudo']['password']))
+        except KeyError:
+            raise UniconAuthenticationError("No password has been defined "
+                                            "for sudo credential.")
+    else:
+        raise UniconAuthenticationError("No credentials has been defined for sudo.")
 
 
 def wait_and_enter(spawn):
@@ -288,20 +311,24 @@ def custom_auth_statements(login_pattern=None, password_pattern=None):
     stmt_list = []
     if login_pattern:
         login_stmt = Statement(pattern=login_pattern,
-                                action=login_handler,
-                                args=None,
-                                loop_continue=True,
-                                continue_timer=False)
+                               action=login_handler,
+                               args=None,
+                               loop_continue=True,
+                               continue_timer=False)
         stmt_list.append(login_stmt)
     if password_pattern:
         password_stmt = Statement(pattern=password_pattern,
-                                   action=password_handler,
-                                   args=None,
-                                   loop_continue=True,
-                                   continue_timer=False)
+                                  action=password_handler,
+                                  args=None,
+                                  loop_continue=True,
+                                  continue_timer=False)
         stmt_list.append(password_stmt)
     if stmt_list:
         return stmt_list
+
+
+def update_context(spawn, context, session, **kwargs):
+    context.update(kwargs)
 
 
 #############################################################
@@ -341,15 +368,14 @@ class GenericStatements():
                                            continue_timer=False)
 
         self.login_incorrect = Statement(pattern=pat.login_incorrect,
-                                           action=incorrect_login_handler,
-                                           args=None,
-                                           loop_continue=True,
-                                           continue_timer=False)
+                                         action=incorrect_login_handler,
+                                         args=None,
+                                         loop_continue=True,
+                                         continue_timer=False)
 
         self.disconnect_error_stmt = Statement(pattern=pat.disconnect_message,
                                                action=connection_failure_handler,
-                                               args={
-                                               'err': 'received disconnect from router'},
+                                               args={'err': 'received disconnect from router'},
                                                loop_continue=False,
                                                continue_timer=False)
         self.login_stmt = Statement(pattern=pat.username,
@@ -368,15 +394,15 @@ class GenericStatements():
                                        loop_continue=True,
                                        continue_timer=False)
         self.enable_password_stmt = Statement(pattern=pat.password,
-                                       action=enable_password_handler,
-                                       args=None,
-                                       loop_continue=True,
-                                       continue_timer=False)
+                                              action=enable_password_handler,
+                                              args=None,
+                                              loop_continue=True,
+                                              continue_timer=False)
         self.password_ok_stmt = Statement(pattern=pat.password_ok,
-                                             action=sendline,
-                                             args=None,
-                                             loop_continue=True,
-                                             continue_timer=False)
+                                          action=sendline,
+                                          args=None,
+                                          loop_continue=True,
+                                          continue_timer=False)
         self.more_prompt_stmt = Statement(pattern=pat.more_prompt,
                                           action=more_prompt_handler,
                                           args=None,
@@ -399,22 +425,22 @@ class GenericStatements():
                                      continue_timer=False)
 
         self.continue_connect_stmt = Statement(pattern=pat.continue_connect,
-                                action=ssh_continue_connecting,
-                                args=None,
-                                loop_continue=True,
-                                continue_timer=False)
+                                               action=ssh_continue_connecting,
+                                               args=None,
+                                               loop_continue=True,
+                                               continue_timer=False)
 
         self.hit_enter_stmt = Statement(pattern=pat.hit_enter,
-                                action=wait_and_enter,
-                                args=None,
-                                loop_continue=True,
-                                continue_timer=False)
+                                        action=wait_and_enter,
+                                        args=None,
+                                        loop_continue=True,
+                                        continue_timer=False)
 
         self.press_ctrlx_stmt = Statement(pattern=pat.press_ctrlx,
-                                              action=wait_and_enter,
-                                              args=None,
-                                              loop_continue=True,
-                                              continue_timer=False)
+                                          action=wait_and_enter,
+                                          args=None,
+                                          loop_continue=True,
+                                          continue_timer=False)
 
         self.init_conf_stmt = Statement(pattern=pat.setup_dialog,
                                         action='sendline(no)',
@@ -423,16 +449,16 @@ class GenericStatements():
                                         continue_timer=False)
 
         self.mgmt_setup_stmt = Statement(pattern=pat.enter_basic_mgmt_setup,
-                                        action='send(\x03)', # Ctrl-C
-                                        args=None,
-                                        loop_continue=True,
-                                        continue_timer=False)
+                                         action='send(\x03)',  # Ctrl-C
+                                         args=None,
+                                         loop_continue=True,
+                                         continue_timer=False)
 
         self.clear_kerberos_no_realm = Statement(pattern=pat.kerberos_no_realm,
-                                                  action=sendline,
-                                                  args=None,
-                                                  loop_continue=True,
-                                                  continue_timer=False)
+                                                 action=sendline,
+                                                 args=None,
+                                                 loop_continue=True,
+                                                 continue_timer=False)
 
         self.connected_stmt = Statement(pattern=pat.connected,
                                         action=sendline,
@@ -445,6 +471,13 @@ class GenericStatements():
                                          args=None,
                                          loop_continue=True,
                                          continue_timer=False)
+
+        self.sudo_stmt = Statement(pattern=pat.sudo_password_prompt,
+                                   action=sudo_password_handler,
+                                   args=None,
+                                   loop_continue=True,
+                                   continue_timer=False)
+
 
 #############################################################
 #  Statement lists
@@ -486,7 +519,7 @@ authentication_statement_list = [generic_statements.bad_password_stmt,
 
 initial_statement_list = [generic_statements.init_conf_stmt,
                           generic_statements.mgmt_setup_stmt
-                         ]
+                          ]
 
 connection_statement_list = authentication_statement_list + initial_statement_list + pre_connection_statement_list
 

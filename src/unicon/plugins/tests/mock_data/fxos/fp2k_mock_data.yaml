@@ -1,0 +1,514 @@
+
+fp2k_console:
+  preface: |
+    Trying 2.2.2.2...
+    Connected to ts.cisco.com.
+    Escape character is '^]'.
+  commands:
+    "":
+      new_state: fp2k_fxos_console_login
+
+fp2k_fxos_console_login:
+  prompt: "%N login: "
+  commands:
+    "admin":
+      new_state: fp2k_fxos_console_password
+
+
+fp2k_fxos_console_password:
+  prompt: "Password: "
+  commands:
+    "admin":
+      new_state: fp2k_fxos_console
+      response: |
+        Last login: Wed Jan  6 11:15:33 UTC 2021 from 3.3.3.3 on pts/0
+        Successful login attempts for user 'admin' : 1
+
+        Copyright 2004-2020, Cisco and/or its affiliates. All rights reserved. 
+        Cisco is a registered trademark of Cisco Systems, Inc. 
+        All other trademarks are property of their respective owners.
+
+        Cisco Firepower Extensible Operating System (FX-OS) v6.8.0 (build 347)
+        Cisco Firepower 2110 Threat Defense v6.8.0 (build 1751)
+
+
+
+        Cisco Firepower Extensible Operating System (FX-OS) Software
+        TAC support: http://www.cisco.com/tac
+        Copyright (c) 2009-2019, Cisco Systems, Inc. All rights reserved.
+
+        The copyrights to certain works contained in this software are
+        owned by other third parties and used and distributed under
+        license.
+
+        Certain components of this software are licensed under the "GNU General Public
+        License, version 3" provided with ABSOLUTELY NO WARRANTY under the terms of
+        "GNU General Public License, Version 3", available here:
+        http://www.gnu.org/licenses/gpl.html. See User Manual (''Licensing'') for
+        details.
+
+        Certain components of this software are licensed under the "GNU General Public
+        License, version 2" provided with ABSOLUTELY NO WARRANTY under the terms of
+        "GNU General Public License, version 2", available here:
+        http://www.gnu.org/licenses/old-licenses/gpl-2.0.html. See User Manual
+        (''Licensing'') for details.
+
+        Certain components of this software are licensed under the "GNU LESSER GENERAL
+        PUBLIC LICENSE, version 3" provided with ABSOLUTELY NO WARRANTY under the terms
+        of "GNU LESSER GENERAL PUBLIC LICENSE" Version 3", available here:
+        http://www.gnu.org/licenses/lgpl.html. See User Manual (''Licensing'') for
+        details.
+
+        Certain components of this software are licensed under the "GNU Lesser General
+        Public License, version 2.1" provided with ABSOLUTELY NO WARRANTY under the
+        terms of "GNU Lesser General Public License, version 2", available here:
+        http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html. See User Manual
+        (''Licensing'') for details.
+
+        Certain components of this software are licensed under the "GNU Library General
+        Public License, version 2" provided with ABSOLUTELY NO WARRANTY under the terms
+        of "GNU Library General Public License, version 2", available here:
+        http://www.gnu.org/licenses/old-licenses/lgpl-2.0.html. See User Manual
+        (''Licensing'') for details.
+
+
+
+fp2k_ftd_connect_ssh:
+  prompt: "admin@1.1.1.1's password: "
+  commands:
+    "admin":
+      new_state: fp2k_ftd_exec
+      response: |
+        Last login: Wed Jan  6 10:48:25 UTC 2021 on ttyS0
+        Successful login attempts for user 'admin' : 7
+        Last login: Wed Jan  6 10:49:08 2021 from 3.3.3.3
+
+        Copyright 2004-2020, Cisco and/or its affiliates. All rights reserved. 
+        Cisco is a registered trademark of Cisco Systems, Inc. 
+        All other trademarks are property of their respective owners.
+
+        Cisco Firepower Extensible Operating System (FX-OS) v6.8.0 (build 347)
+        Cisco Firepower 2110 Threat Defense v6.8.0 (build 1751)
+
+
+fp2k_ftd_exec:
+  prompt: "> "
+  commands: &ftd_exec_cmds
+    "system support diagnostic-cli":
+      new_state: fp2k_asa_console_enable
+    "connect fxos":
+      new_state: fp2k_fxos_exec
+    "expert":
+      new_state: fp2k_ftd_expert
+    "exit": |
+      Connection to 1.1.1.1 closed.
+    "reboot":
+      new_state: fp2k_ftd_boot_confirm
+    "show version": |
+      --------------------[ %N ]---------------------
+      Model                     : Cisco Firepower 2110 Threat Defense (77) Version 6.8.0 (Build 1751)
+      UUID                      : f3e41ab6-1f45-11eb-a882-908013e15134
+      Rules update version      : 2020-08-18-001-vrt
+      VDB version               : 338
+      ----------------------------------------------------
+
+
+fp2k_ftd_console:
+  prompt: "> "
+  keys:
+    ctrl-\]:
+      new_state: fp2k_telnet_escape
+  commands:
+    <<: *ftd_exec_cmds
+    "expert":
+      new_state: fp2k_ftd_console_expert
+    "connect fxos": |
+      You came from FXOS Service Manager. Please enter 'exit' to go back.
+    "exit":
+      new_state: fp2k_fxos_console
+    "reboot":
+      new_state: fp2k_ftd_boot_confirm
+
+
+fp2k_ftd_expert:
+  prompt: "admin@%N:~$ "
+  commands:
+    "exit":
+      new_state: fp2k_ftd_exec
+    "sudo su -":
+      new_state: fp2k_expert_sudo
+
+
+fp2k_ftd_console_expert:
+  prompt: "admin@%N:~$ "
+  commands:
+    "exit":
+      new_state: fp2k_ftd_console
+    "sudo su -":
+      new_state: fp2k_expert_console_sudo
+
+
+fp2k_expert_sudo:
+  prompt: "root@%N:~# "
+  commands: &sudo_cmds
+    "pwd": /root
+    "exit":
+      new_state: fp2k_ftd_expert
+
+
+fp2k_expert_console_sudo:
+  prompt: "root@%N:~# "
+  commands:
+    <<: *sudo_cmds
+    "exit":
+      new_state: fp2k_ftd_console_expert
+
+
+fp2k_asa_console_enable:
+  preface: |
+    Attaching to Diagnostic CLI ... Press 'Ctrl+a then d' to detach.
+    Type help or '?' for a list of available commands.
+
+  prompt: "%N# "
+  keys:
+    ctrl-ad:
+      new_state: fp2k_ftd_console
+  commands:
+    "disable":
+      new_state: fp2k_asa_console_disable
+    "exit":
+      new_state: fp2k_asa_console_disable
+    "config term":
+      new_state: fp2k_asa_console_config
+    "invalid": |
+      ERROR: % Invalid input detected at '^' marker.
+    "show version | inc Version": |
+      Model                     : Cisco Firepower 2110 Threat Defense (77) Version 6.8.0 (Build 1751)
+      Cisco Adaptive Security Appliance Software Version 99.16(1)190 
+      SSP Operating System Version 82.10(1.347i)
+    "show version": |
+      --------------------[ %N ]---------------------
+      Model                     : Cisco Firepower 2110 Threat Defense (77) Version 6.8.0 (Build 1751)
+      UUID                      : f3e41ab6-1f45-11eb-a882-908013e15134
+      Rules update version      : 2020-08-18-001-vrt
+      VDB version               : 338
+      ----------------------------------------------------
+
+      Cisco Adaptive Security Appliance Software Version 99.16(1)190 
+      SSP Operating System Version 82.10(1.347i)
+
+      Compiled on Wed 14-Oct-20 05:05 GMT by builders
+      System image file is "disk0:/mnt/boot/installables/switch/fxos-k8-fp2k-npu.82.10.1.347i.SSB"
+      Config file at boot was "startup-config"
+
+      %N up 62 days 2 hours
+
+      Hardware:   FPR-2110, 6587 MB RAM, CPU MIPS 1200 MHz, 1 CPU (6 cores)
+
+
+      1: Int: Internal-Data0/1    : address is 000f.b748.4801, irq 0
+      3: Ext: Management1/1       : address is 00fc.ba7a.0101, irq 0
+      4: Int: Internal-Data1/1    : address is 0000.0100.0001, irq 0
+      5: Int: Internal-Data1/2    : address is 0000.0300.0001, irq 0
+      6: Int: Internal-Control1/1 : address is 0000.0001.0001, irq 0
+
+      Serial Number: JAD220906JB
+      Configuration last modified by enable_1 at 07:13:15.398 UTC Fri Nov 6 2020
+
+    "show version more":
+      new_state: fp2k_asa_console_enable_more
+      response: |
+        --------------------[ KP-DE-A ]---------------------
+        Model                     : Cisco Firepower 2110 Threat Defense (77) Version 6.8.0 (Build 1751)
+        UUID                      : f3e41ab6-1f45-11eb-a882-908013e15134
+        Rules update version      : 2020-08-18-001-vrt
+        VDB version               : 338
+        ----------------------------------------------------
+
+        Cisco Adaptive Security Appliance Software Version 99.16(1)190 
+        SSP Operating System Version 82.10(1.347i)
+
+        Compiled on Wed 14-Oct-20 05:05 GMT by builders
+        System image file is "disk0:/mnt/boot/installables/switch/fxos-k8-fp2k-npu.82.10.1.347i.SSB"
+        Config file at boot was "startup-config"
+
+        KP-DE-A up 62 days 22 hours
+
+        Hardware:   FPR-2110, 6587 MB RAM, CPU MIPS 1200 MHz, 1 CPU (6 cores)
+
+
+        1: Int: Internal-Data0/1    : address is 000f.b748.4801, irq 0
+        3: Ext: Management1/1       : address is 00fc.ba7a.0101, irq 0
+        4: Int: Internal-Data1/1    : address is 0000.0100.0001, irq 0
+        5: Int: Internal-Data1/2    : address is 0000.0300.0001, irq 0
+        6: Int: Internal-Control1/1 : address is 0000.0001.0001, irq 0
+
+
+fp2k_asa_console_enable_more:
+  prompt: "<--- More --->"
+  keys:
+    ctrl-ad:
+      new_state: fp2k_ftd_exec
+    " ":
+      response: |
+        Serial Number: JAD220906JB
+        Configuration last modified by enable_1 at 07:13:15.398 UTC Fri Nov 6 2020
+      new_state: fp2k_asa_console_enable
+
+
+fp2k_asa_console_disable:
+  preface: |
+    Attaching to Diagnostic CLI ... Press 'Ctrl+a then d' to detach.
+    Type help or '?' for a list of available commands.
+  prompt: "%N> "
+  keys:
+    ctrl-ad:
+      new_state: fp2k_ftd_console
+  commands:
+    "enable":
+      new_state: fp2k_asa_enable_password
+
+
+fp2k_asa_enable_password:
+  prompt: "Password: "
+  commands:
+    "":
+      new_state: fp2k_asa_console_enable
+
+fp2k_asa_console_config:
+  preface: |
+    Attaching to Diagnostic CLI ... Press 'Ctrl+a then d' to detach.
+    Type help or '?' for a list of available commands.
+  prompt: "%N(config)#"
+  commands:
+    "end":
+      new_state: fp2k_asa_console_enable
+    "exit":
+      new_state: fp2k_asa_console_enable
+
+fp2k_fxos_exec:
+  preface: |
+    Cisco Firepower Extensible Operating System (FX-OS) Software
+    TAC support: http://www.cisco.com/tac
+    Copyright (c) 2009-2019, Cisco Systems, Inc. All rights reserved.
+
+    The copyrights to certain works contained in this software are
+    owned by other third parties and used and distributed under
+    license.
+
+    Certain components of this software are licensed under the "GNU General Public
+    License, version 3" provided with ABSOLUTELY NO WARRANTY under the terms of
+    "GNU General Public License, Version 3", available here:
+    http://www.gnu.org/licenses/gpl.html. See User Manual (''Licensing'') for
+    details.
+
+    Certain components of this software are licensed under the "GNU General Public
+    License, version 2" provided with ABSOLUTELY NO WARRANTY under the terms of
+    "GNU General Public License, version 2", available here:
+    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html. See User Manual
+    (''Licensing'') for details.
+
+    Certain components of this software are licensed under the "GNU LESSER GENERAL
+    PUBLIC LICENSE, version 3" provided with ABSOLUTELY NO WARRANTY under the terms
+    of "GNU LESSER GENERAL PUBLIC LICENSE" Version 3", available here:
+    http://www.gnu.org/licenses/lgpl.html. See User Manual (''Licensing'') for
+    details.
+
+    Certain components of this software are licensed under the "GNU Lesser General
+    Public License, version 2.1" provided with ABSOLUTELY NO WARRANTY under the
+    terms of "GNU Lesser General Public License, version 2", available here:
+    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html. See User Manual
+    (''Licensing'') for details.
+
+    Certain components of this software are licensed under the "GNU Library General
+    Public License, version 2" provided with ABSOLUTELY NO WARRANTY under the terms
+    of "GNU Library General Public License, version 2", available here:
+    http://www.gnu.org/licenses/old-licenses/lgpl-2.0.html. See User Manual
+    (''Licensing'') for details.
+
+  prompt: "%N# "
+  commands: &f2pk_fxos_exec_cmds
+    "exit":
+      new_state: fp2k_ftd_exec
+    "connect local-mgmt a":
+      new_state: fp2k_fxos_mgmt
+    "connect ftd":
+      new_state: fp2k_ftd_exec
+    "show version": |2
+        Version: 82.10(1.347i)
+        Startup-Vers: 82.10(1.347i)
+
+
+fp2k_fxos_console:
+  prompt: "%N# "
+  keys:
+    ctrl-\]:
+      new_state: fp2k_telnet_escape
+  commands:
+    <<: *f2pk_fxos_exec_cmds
+    "exit":
+      new_state: fp2k_fxos_console_login
+    "connect ftd":
+      new_state: fp2k_ftd_console
+    "connect local-mgmt":
+      new_state: fp2k_console_local_mgmt
+    "show version | inc Version": |2
+        Version: 82.10(1.347i)
+
+
+fp2k_console_local_mgmt:
+  prompt: "%N(local-mgmt)#"
+  commands:
+    "exit":
+      new_state: fp2k_fxos_console
+    "reboot":
+      new_state: fp2k_mgmt_boot_confirm
+
+fp2k_telnet_escape:
+  prompt: "telnet> "
+  commands:
+    "q": Connection closed.
+
+
+fp2k_fxos_mgmt:
+  prompt: "%N(local-mgmt)# "
+  commands:
+    "exit":
+      new_state: fp2k_fxos_exec
+    "reboot":
+      new_state: fp2k_mgmt_boot_confirm
+
+
+fp2k_ftd_exec_disable:
+  preface: &preface |
+        Last login: Wed Jan  6 10:48:25 UTC 2021 on ttyS0
+        Successful login attempts for user 'admin' : 7
+        Last login: Wed Jan  6 10:49:08 2021 from 3.3.3.3
+  prompt: "> "
+  commands:
+    "system support diagnostic-cli":
+      new_state: fp2k_asa_console_disable
+
+fp2k_ftd_exec_enable:
+  preface: *preface
+  prompt: "> "
+  commands:
+    "system support diagnostic-cli":
+      new_state: fp2k_asa_console_enable
+
+fp2k_ftd_exec_config:
+  preface: *preface
+  prompt: "> "
+  commands:
+    "system support diagnostic-cli":
+      new_state: fp2k_asa_console_config
+
+
+fp2k_asa_console_config_call_home:
+  preface: |
+    ***************************** NOTICE *****************************
+
+    Help to improve the ASA platform by enabling anonymous reporting,
+    which allows Cisco to securely receive minimal error and health
+    information from the device. To learn more about this feature,
+    please visit: http://www.cisco.com/go/smartcall
+
+    Would you like to enable anonymous error reporting to help improve
+  prompt: "the product? [Y]es, [N]o, [A]sk later: "
+  commands:
+    "n":
+      new_state: fp2k_asa_console_config
+      response: |
+        In the future, if you would like to enable this feature,
+        issue the command "call-home reporting anonymous".
+
+        Please remember to save your configuration.
+
+
+fp2k_ftd_boot_confirm:
+  preface: |
+    This command will reboot the system.  Continue?
+  prompt: "Please enter 'YES' or 'NO': "
+  commands:
+    "yes":
+      new_state: fp2k_ftd_boot
+
+fp2k_mgmt_boot_confirm:
+  preface: |
+    Before rebooting, please take a configuration backup.
+  prompt: "Do you still want to reboot? (yes/no):"
+  commands:
+    "yes":
+      new_state: fp2k_mgmt_boot
+
+fp2k_ftd_boot:
+  preface:
+    response: file|mock_data/fxos/fp2k_ftd_boot.txt
+    timing:
+      - 0:,0,0.005
+  prompt: ""
+  commands:
+    "":
+      new_state: fp2k_fxos_console_password
+    "admin":
+      new_state: fp2k_fxos_console_password
+
+fp2k_mgmt_boot:
+  preface:
+    response: file|mock_data/fxos/fp2k_mgmt_boot.txt
+    timing:
+      - 0:,0,0.005
+  prompt: ""
+  commands:
+    "":
+      new_state: fp2k_fxos_console_password
+    "admin":
+      new_state: fp2k_fxos_console_password
+
+
+# Rommon boot states
+
+fp2k_fxos_console_rommon:
+  prompt: "%N# "
+  commands:
+    "exit": ""
+    "connect ftd":
+      new_state: fp2k_ftd_console_rommon
+
+fp2k_ftd_console_rommon:
+  prompt: "> "
+  commands:
+    "reboot":
+      new_state: fp2k_mgmt_boot_rommon_confirm
+
+fp2k_mgmt_boot_rommon_confirm:
+  preface: |
+    This command will reboot the system.  Continue?
+  prompt: "Please enter 'YES' or 'NO': "
+  commands:
+    "yes":
+      new_state: fp2k_mgmt_boot_rommon
+
+fp2k_mgmt_boot_rommon:
+  preface: file|mock_data/fxos/fp2k_mgmt_rommon.txt
+  prompt: ""
+  keys:
+    ctrl-\[:
+      response: Boot interrupted.
+      new_state: fp2k_rommon
+
+fp2k_rommon:
+  prompt: "rommon 1 >"
+  commands:
+    "boot":
+      new_state: fp2k_rommon_boot
+
+fp2k_rommon_boot:
+  preface:
+    response: file|mock_data/fxos/fp2k_mgmt_rommon_boot.txt
+    timing:
+      - 0:,0,0.005
+  prompt: ""
+  commands:
+    "":
+      new_state: fp2k_fxos_console_password

@@ -31,6 +31,7 @@ help:
 	@echo "docs                  Build Sphinx documentation for this package"
 	@echo "install_build_deps    does nothing - just following pyATS pkg standard"
 	@echo "uninstall_build_deps  does nothing - just following pyATS pkg standard"
+	@echo "changelogs			 Build compiled changelog file"
 	@echo ""
 
 install_build_deps:
@@ -123,6 +124,16 @@ distribute:
 	@test -d $(DIST_DIR) || { echo "Nothing to distribute! Exiting..."; exit 1; }
 	@ssh -q $(PROD_USER) 'test -e $(PROD_PKGS)/$(PKG_NAME) || mkdir $(PROD_PKGS)/$(PKG_NAME)'
 	@scp $(DIST_DIR)/* $(PROD_USER):$(PROD_PKGS)/$(PKG_NAME)/
+	@echo ""
+	@echo "Done."
+	@echo ""
+
+changelogs:
+	@echo ""
+	@echo "--------------------------------------------------------------------"
+	@echo "Generating changelog file"
+	@echo ""
+	@python "./tools/changelog_script.py" "./docs/changelog/undistributed" --output "./docs/changelog/undistributed.rst"
 	@echo ""
 	@echo "Done."
 	@echo ""

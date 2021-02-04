@@ -20,7 +20,7 @@ class IosvServiceList(IosServiceList):
 
 class IosvSingleRpConnection(IosSingleRpConnection):
     os = 'ios'
-    series = 'iosv'
+    platform = 'iosv'
     chassis_type = 'single_rp'
     state_machine_class = IosvSingleRpStateMachine
     subcommand_list = IosvServiceList

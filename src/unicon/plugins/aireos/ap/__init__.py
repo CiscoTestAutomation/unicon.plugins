@@ -8,7 +8,7 @@ from .statemachine import AireosAPStateMachine
 
 class AireosAPConnection(GenericSingleRpConnection):
     os = 'aireos'
-    series = 'ap'
+    platform = 'ap'
     chassis_type = 'single_rp'
     state_machine_class = AireosAPStateMachine
     connection_provider_class = GenericSingleRpConnectionProvider

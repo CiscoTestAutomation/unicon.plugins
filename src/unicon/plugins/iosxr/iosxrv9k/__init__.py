@@ -8,7 +8,7 @@ from unicon.bases.routers.connection import BaseSingleRpConnection
 
 class IOSXRV9KSingleRpConnection(BaseSingleRpConnection):
     os = 'iosxr'
-    series = 'iosxrv9k'
+    platform = 'iosxrv9k'
     chassis_type = 'single_rp'
     state_machine_class = IOSXRSingleRpStateMachine
     connection_provider_class = IOSXRV9KSingleRpConnectionProvider

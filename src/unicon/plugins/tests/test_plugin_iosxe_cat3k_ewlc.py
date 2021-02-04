@@ -18,7 +18,7 @@ class TestIosXECat3kEwlcCopy(unittest.TestCase):
         cls.d = Connection(hostname='Router',
                            start=['mock_device_cli --os iosxe --state ewlc_enable'],
                            os='iosxe',
-                           series='cat3k',
+                           platform='cat3k',
                            model='ewlc',
                            username='cisco',
                            tacacs_password='cisco')
@@ -52,7 +52,7 @@ class TestIosXECat3kEwlcConfigure(unittest.TestCase):
         cls.d = Connection(hostname='Router',
                            start=['mock_device_cli --os iosxe --state ewlc_enable'],
                            os='iosxe',
-                           series='cat3k',
+                           platform='cat3k',
                            model='ewlc',
                            username='cisco',
                            tacacs_password='cisco')
@@ -67,6 +67,7 @@ class TestIosXECat3kEwlcConfigure(unittest.TestCase):
     def test_config_with_prompt(self):
         self.d.configure("wlan shutdown")
 
+
 class TestIosXECat3kEwlcStandbyReload(unittest.TestCase):
 
     @classmethod
@@ -74,7 +75,7 @@ class TestIosXECat3kEwlcStandbyReload(unittest.TestCase):
         cls.d = Connection(hostname='Router',
                            start=['mock_device_cli --os iosxe --state ewlc_enable'],
                            os='iosxe',
-                           series='cat3k',
+                           platform='cat3k',
                            model='ewlc',
                            username='cisco',
                            tacacs_password='cisco')
@@ -90,7 +91,7 @@ class TestIosXeCat3kEwlcPluginRecoveryMode(unittest.TestCase):
         d = Connection(hostname='Router',
                         start=['mock_device_cli --os iosxe --state ewlc_exec_recovery_mode'],
                         os='iosxe',
-                        series='cat3k',
+                        platform='cat3k',
                         init_config_commands=[])
         d.connect()
 

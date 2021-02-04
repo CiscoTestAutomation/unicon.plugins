@@ -247,7 +247,7 @@ CLI Proxy examples
         csp:
             type: nfvi
             os: confd
-            series: csp
+            platform: csp
             credentials:
                 default:
                     username: admin

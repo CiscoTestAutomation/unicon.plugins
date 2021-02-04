@@ -3,15 +3,13 @@ Unittests for IOSXE/Quad plugin
 
 """
 
-import re
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 from pyats.topology import loader
 
 import unicon
 from unicon import Connection
-from unicon.core.errors import SubCommandFailure
 from unicon.plugins.tests.mock.mock_device_iosxe import MockDeviceTcpWrapperIOSXE
 
 
@@ -20,11 +18,12 @@ from unicon.plugins.tests.mock.mock_device_iosxe import MockDeviceTcpWrapperIOSX
 class TestIosXEQuadConnect(unittest.TestCase):
 
     def test_quad_connect(self):
-        md = MockDeviceTcpWrapperIOSXE(port=0, quad=True,
-                state='quad_login,quad_ics_login,quad_stby_login,quad_ics_login')
+        md = MockDeviceTcpWrapperIOSXE(port=0,
+                                       quad=True,
+                                       state='quad_login,quad_ics_login,quad_stby_login,quad_ics_login')
         md.start()
         d = Connection(hostname='Router',
-                       start = ['telnet 127.0.0.1 ' + str(i) for i in md.ports[:]],
+                       start=['telnet 127.0.0.1 ' + str(i) for i in md.ports[:]],
                        os='iosxe',
                        chassis_type='quad',
                        username='cisco',
@@ -37,10 +36,10 @@ class TestIosXEQuadConnect(unittest.TestCase):
 
     def test_quad_connect2(self):
         d = Connection(hostname='Router',
-                       start = ['mock_device_cli --os iosxe --state quad_login',
-                                'mock_device_cli --os iosxe --state quad_ics_login',
-                                'mock_device_cli --os iosxe --state quad_stby_login',
-                                'mock_device_cli --os iosxe --state quad_ics_login',],
+                       start=['mock_device_cli --os iosxe --state quad_login',
+                              'mock_device_cli --os iosxe --state quad_ics_login',
+                              'mock_device_cli --os iosxe --state quad_stby_login',
+                              'mock_device_cli --os iosxe --state quad_ics_login'],
                        os='iosxe',
                        chassis_type='quad',
                        username='cisco',
@@ -49,10 +48,12 @@ class TestIosXEQuadConnect(unittest.TestCase):
         d.connect()
         d.execute('term width 0')
         self.assertEqual(d.spawn.match.match_output, 'term width 0\r\nRouter#')
+        d.disconnect()
 
     def test_quad_connect3(self):
-        md = MockDeviceTcpWrapperIOSXE(port=0, quad=True,
-                state='quad_login,quad_ics_login,quad_stby_login,quad_ics_login')
+        md = MockDeviceTcpWrapperIOSXE(port=0,
+                                       quad=True,
+                                       state='quad_login,quad_ics_login,quad_stby_login,quad_ics_login')
         md.start()
         testbed = '''
             devices:
@@ -108,10 +109,10 @@ class TestIosXEQuadDisableEnable(unittest.TestCase):
 
     def test_disable_enable(self):
         d = Connection(hostname='Router',
-                       start = ['mock_device_cli --os iosxe --state quad_login',
-                                'mock_device_cli --os iosxe --state quad_ics_login',
-                                'mock_device_cli --os iosxe --state quad_stby_login',
-                                'mock_device_cli --os iosxe --state quad_ics_login',],
+                       start=['mock_device_cli --os iosxe --state quad_login',
+                              'mock_device_cli --os iosxe --state quad_ics_login',
+                              'mock_device_cli --os iosxe --state quad_stby_login',
+                              'mock_device_cli --os iosxe --state quad_ics_login'],
                        os='iosxe',
                        chassis_type='quad',
                        username='cisco',
@@ -131,15 +132,17 @@ class TestIosXEQuadDisableEnable(unittest.TestCase):
         d.enable(target='standby')
         self.assertEqual(d.standby.spawn.match.match_output, 'cisco\r\nRouter-stby#')
 
+        d.disconnect()
+
 
 class TestIosXEQuadGetRPState(unittest.TestCase):
 
     def test_get_rp_state(self):
         d = Connection(hostname='Router',
-                       start = ['mock_device_cli --os iosxe --state quad_login',
-                                'mock_device_cli --os iosxe --state quad_ics_login',
-                                'mock_device_cli --os iosxe --state quad_stby_login',
-                                'mock_device_cli --os iosxe --state quad_ics_login',],
+                       start=['mock_device_cli --os iosxe --state quad_login',
+                              'mock_device_cli --os iosxe --state quad_ics_login',
+                              'mock_device_cli --os iosxe --state quad_stby_login',
+                              'mock_device_cli --os iosxe --state quad_ics_login'],
                        os='iosxe',
                        chassis_type='quad',
                        username='cisco',
@@ -156,6 +159,8 @@ class TestIosXEQuadGetRPState(unittest.TestCase):
         r = d.get_rp_state(target='b')
         self.assertEqual(r, 'IN_CHASSIS_STANDBY')
 
+        d.disconnect()
+
 
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
 @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0)
@@ -163,21 +168,23 @@ class TestIosXEQuadSwitchover(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.md = MockDeviceTcpWrapperIOSXE(port=0, quad=True,
-                state='quad_login,quad_ics_login,quad_stby_login,quad_ics_login')
+        cls.md = MockDeviceTcpWrapperIOSXE(port=0,
+                                           quad=True,
+                                           state='quad_login,quad_ics_login,quad_stby_login,quad_ics_login')
         cls.md.start()
 
         cls.d = Connection(hostname='Router',
-                    start = ['telnet 127.0.0.1 ' + str(i) for i in cls.md.ports[:]],
-                    os='iosxe',
-                    chassis_type='quad',
-                    username='cisco',
-                    tacacs_password='cisco',
-                    enable_password='cisco')
+                           start=['telnet 127.0.0.1 ' + str(i) for i in cls.md.ports[:]],
+                           os='iosxe',
+                           chassis_type='quad',
+                           username='cisco',
+                           tacacs_password='cisco',
+                           enable_password='cisco')
         cls.d.connect()
 
     @classmethod
     def tearDownClass(cls):
+        cls.d.disconnect()
         cls.md.stop()
 
     def test_reload(self):
@@ -190,21 +197,23 @@ class TestIosXEQuadReload(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.md = MockDeviceTcpWrapperIOSXE(port=0, quad=True,
-                state='quad_login,quad_ics_login,quad_stby_login,quad_ics_login')
+        cls.md = MockDeviceTcpWrapperIOSXE(port=0,
+                                           quad=True,
+                                           state='quad_login,quad_ics_login,quad_stby_login,quad_ics_login')
         cls.md.start()
 
         cls.d = Connection(hostname='Router',
-                    start = ['telnet 127.0.0.1 ' + str(i) for i in cls.md.ports[:]],
-                    os='iosxe',
-                    chassis_type='quad',
-                    username='cisco',
-                    tacacs_password='cisco',
-                    enable_password='cisco')
+                           start=['telnet 127.0.0.1 ' + str(i) for i in cls.md.ports[:]],
+                           os='iosxe',
+                           chassis_type='quad',
+                           username='cisco',
+                           tacacs_password='cisco',
+                           enable_password='cisco')
         cls.d.connect()
 
     @classmethod
     def tearDownClass(cls):
+        cls.d.disconnect()
         cls.md.stop()
 
     def test_reload(self):

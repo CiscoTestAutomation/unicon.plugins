@@ -30,16 +30,16 @@ verified by its developers, the next version of Unicon release will incorporate
 your plugin.
 
 Under this repository, Unicon follows a hierarchical directory structure for writing
-plugins, which is distributed based on the OS, series, model of the platform 
-which the plugin implements. Any new OS implementations will contribute to a 
-new sub-directory under ``unicon.plugins/plugins`` and its series/model will go under that
+plugins, which is distributed based on the OS, platform, model of the platform
+which the plugin implements. Any new OS implementations will contribute to a
+new sub-directory under ``unicon.plugins/plugins`` and its platform/model will go under that.
 
 .. image:: images/plugins.jpg
 
 Unicon also has a generic plugin which implements the common behaviour seen across
 various platform. For any unknown or not implemented os, unicon loads
-generic plugin and uses its `Connection` , also generic platform will be used as
-a reference/starting point for new platform implementation
+generic plugin and uses its `Connection`, also generic platform will be used as
+a reference/starting point for new platform implementation.
 
 **Recommendations** :
 
@@ -66,11 +66,11 @@ plugin separately.
 There are few major steps involved in creating your own plugin package:
 
     1. create the plugin module content following the instructions on this page
-       on how to create a plugin. 
+       on how to create a plugin.
 
-       .. note:: 
+       .. note::
 
-           make sure the ``__init__.py`` of your top-level package imports 
+           make sure the ``__init__.py`` of your top-level package imports
            and/or contains the implemented ``Connection`` plugin class.
 
     2. create the plugin package by writing a ``setup.py`` setup script. There
@@ -86,7 +86,7 @@ There are few major steps involved in creating your own plugin package:
             )
 
        and replace ``<platform_name>`` with your platform's string name, and
-       ``<module_name>`` being the name of plugin module you developed. 
+       ``<module_name>`` being the name of plugin module you developed.
 
        .. note::
 
@@ -109,12 +109,12 @@ There are few major steps involved in creating your own plugin package:
             )
 
 And voila! Once your plugin is installed (either via ``pip install`` or
-``python setup.py develop`` for development mode), it will be loaded 
+``python setup.py develop`` for development mode), it will be loaded
 automatically by Unicon.
 
 .. _Writing a Setup Script: https://docs.python.org/3/distutils/setupscript.html
 
-For more details, follow the detailed Unicon plugin example 
+For more details, follow the detailed Unicon plugin example
 presented at https://github.com/CiscoDevNet/pyats-plugin-examples.
 
 Implementing a New Platform
@@ -145,7 +145,7 @@ should satisfy the following conditions
 
     * It should be subclass (direct or indirect) of ``Connection``, ``BaseSingleRpConnection`` or ``BaseDualRpConnection``
 
-    * ``Connection`` follows class hierarchy which is aligned/derived according to the os, series and model
+    * ``Connection`` follows class hierarchy which is aligned/derived according to the os, platform and model
 
     * Based the chassis type, there should be a separate definition of the class
 
@@ -155,7 +155,7 @@ The ``Connection`` class takes the following mandatory parameters
 Parameter                 Description
 ========================= ========================================
 os                        OS for which the implementation is intended
-series                    Platform series of this implementation
+platform                  Platform of this implementation
 model                     Model which this implementation supports
 chassis_type              Hardware chassis type single_rp, dual_rp or stack
 connection_provider_class Class which implements actual step for connecting to a device
@@ -171,7 +171,7 @@ settings                  Settings to be used for this connection
     # Example Connection class Nxos single Rp connection
     class NxosSingleRpConnection(BaseSingleRpConnection):
       os = 'nxos'
-      series = None
+      platform = None
       chassis_type = 'single_rp'
       state_machine_class = NxosSingleRpStateMachine
       connection_provider_class = NxosSingleRpConnectionProvider
@@ -181,14 +181,14 @@ settings                  Settings to be used for this connection
     # Example Connection class Nxos Dual Rp connection
     class NxosDualRPConnection(BaseDualRpConnection):
       os = 'nxos'
-      series = None
+      platform = None
       chassis_type = 'dual_rp'
       state_machine_class = NxosDualRpStateMachine
       connection_provider_class = NxosDualRpConnectionProvider
       subcommand_list = HANxosServiceList
       settings = NxosSettings()
 
-Base Connection (e.g `BaseSingleRpConnection<unicon.bases.routers.connection.BaseSingleRpConnection>` 
+Base Connection (e.g `BaseSingleRpConnection<unicon.bases.routers.connection.BaseSingleRpConnection>`
 and `BaseDualRpConnection<unicon.bases.routers.connection.BaseDualRpConnection>`) classes of
 unicon defines the workflow of ``Connection`` and it satisfies all common needs of
 router connection, the user may not need to override any of the methods unless there is

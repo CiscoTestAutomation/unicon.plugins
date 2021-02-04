@@ -13,7 +13,7 @@ class ASAServiceList(ServiceList):
 
 class ASAConnection(BaseSingleRpConnection):
     os = 'asa'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     state_machine_class = ASAStateMachine
     connection_provider_class = ASAConnectionProvider

@@ -1109,3 +1109,5 @@ switchover_statement_list = [save_config, build_config, prompt_switchover,
 execution_statement_list = [generic_statements.confirm_prompt_y_n_stmt,
                             generic_statements.confirm_prompt_stmt,
                             generic_statements.yes_no_stmt]
+
+configure_statement_list = []

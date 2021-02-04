@@ -137,8 +137,12 @@ general_enable:
 general_config:
   prompt: "Router(conf)#"
   commands:
+    "end":
+      new_state: general_enable
     "crypto pki profile enrollment test":
       new_state: general_config_ca_profile
+    "crypto pki trustpoint test":
+      new_state: general_config_crypto_trustpoint
     "no logging console": ""
     "line console 0":
       new_state: general_config_line
@@ -225,6 +229,21 @@ general_act_reply:
   commands:
     "y":
       new_state: general_bash
+
+general_config_crypto_trustpoint:
+  prompt: "%N(ca-trustpoint)#"
+  commands:
+    "no crypto pki trustpoint test":
+      new_state: are_you_sure_ywtdt
+      response: |
+        % Removing an enrolled trustpoint will destroy all certificates
+        received from the related Certificate Authority.
+
+are_you_sure_ywtdt:
+  prompt: "Are you sure you want to do this? [yes/no]: "
+  commands:
+   "yes":
+     new_state: general_config
 
 standby_exec:
   prompt: "Router-standby# "

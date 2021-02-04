@@ -29,7 +29,7 @@ class TestConfdCspPlugin(unittest.TestCase):
           csp-2100:
             os: confd
             type: router
-            series: csp
+            platform: csp
             passwords:
                 tacacs: "admin"
                 enable: "admin"
@@ -54,7 +54,7 @@ class TestConfdCspPlugin(unittest.TestCase):
           csp:
             os: confd
             type: router
-            series: csp
+            platform: csp
             alias: uut
             passwords:
                 tacacs: "admin"
@@ -78,7 +78,7 @@ class TestConfdCspPlugin(unittest.TestCase):
         c = Connection(hostname='csp-2100',
                         start=['mock_device_cli --os confd --state csp_login'],
                         os='confd',
-                        series='csp',
+                        platform='csp',
                         username='admin',
                         tacacs_password='admin',
                         enable_password ='admin')
@@ -100,7 +100,7 @@ class TestConfdCspPlugin(unittest.TestCase):
         c2 = Connection(hostname='csp-2100',
                         start=['connect host'],
                         os='confd',
-                        series='csp',
+                        platform='csp',
                         username='admin',
                         tacacs_password='cisco',
                         enable_password ='cisco',
@@ -115,7 +115,7 @@ class TestConfdCspPlugin(unittest.TestCase):
         c = Connection(hostname='csp-2100',
                         start=['mock_device_cli --os confd --state csp_enable'],
                         os='confd',
-                        series='csp',
+                        platform='csp',
                         username='admin',
                         tacacs_password='cisco',
                         enable_password ='cisco',

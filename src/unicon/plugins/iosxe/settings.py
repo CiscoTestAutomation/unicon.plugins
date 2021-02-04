@@ -17,6 +17,9 @@ class IosXESettings(GenericSettings):
             r'^%\s*[Ii]ncomplete (command|input)',
             r'^%\s*[Aa]mbiguous (command|input)'
         ]
+        self.CONFIGURE_ERROR_PATTERN = [
+            r'^%\s*[Ii]nvalid (command|input|number)'
+        ]
 
         self.EXECUTE_MATCHED_RETRIES = 1
         self.EXECUTE_MATCHED_RETRY_SLEEP = 0.1

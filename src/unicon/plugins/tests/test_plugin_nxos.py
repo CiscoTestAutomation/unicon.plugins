@@ -24,45 +24,52 @@ with open(os.path.join(mockdata_path, 'nxos/nxos_mock_data.yaml'), 'rb') as data
     mock_data = yaml.safe_load(datafile.read())
 
 
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestNxosPluginConnect(unittest.TestCase):
 
     def test_login_connect(self):
         c = Connection(hostname='switch',
-                        start=['mock_device_cli --os nxos --state exec'],
-                        os='nxos',
-                        username='cisco',
-                        tacacs_password='cisco')
+                       start=['mock_device_cli --os nxos --state exec'],
+                       os='nxos',
+                       username='cisco',
+                       tacacs_password='cisco')
         c.connect()
         assert c.spawn.match.match_output == 'end\r\nswitch# '
+        c.disconnect()
 
     def test_login_kerberos(self):
         c = Connection(hostname='switch',
-                        start=['mock_device_cli --os nxos --state username_kerberos'],
-                        os='nxos',
-                        username='cisco',
-                        tacacs_password='cisco')
+                       start=['mock_device_cli --os nxos --state username_kerberos'],
+                       os='nxos',
+                       username='cisco',
+                       tacacs_password='cisco')
         c.connect()
         assert c.spawn.match.match_output == 'end\r\nswitch# '
+        c.disconnect()
 
     def test_login_connect_connectReply(self):
         c = Connection(hostname='switch',
-                        start=['mock_device_cli --os nxos --state exec'],
-                        os='nxos',
-                        username='cisco',
-                        tacacs_password='cisco',
-                        connect_reply = Dialog([[r'^(.*?)Password:']]))
+                       start=['mock_device_cli --os nxos --state exec'],
+                       os='nxos',
+                       username='cisco',
+                       tacacs_password='cisco',
+                       connect_reply=Dialog([[r'^(.*?)Password:']]))
         c.connect()
         self.assertIn("^(.*?)Password:", str(c.connection_provider.get_connection_dialog()))
         c.disconnect()
 
+
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestNxosPluginShellexec(unittest.TestCase):
 
     def test_shellexec(self):
         c = Connection(hostname='switch',
-                        start=['mock_device_cli --os nxos --state exec'],
-                        os='nxos',
-                        username='cisco',
-                        tacacs_password='cisco')
+                       start=['mock_device_cli --os nxos --state exec'],
+                       os='nxos',
+                       username='cisco',
+                       tacacs_password='cisco')
 
         output = c.shellexec(['sudo yum list installed | grep n9000'])
         assert output == "\r\n".join("""\
@@ -72,20 +79,27 @@ bfd.lib32_n9000                         1.0.0-r0                       installed
 bash-4.2$""".splitlines())
 
         assert c.spawn.match.match_output == 'exit\r\nswitch# '
+        c.disconnect()
 
+
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestNxosN3KPluginShellexec(unittest.TestCase):
 
     def test_shellexec_n3k(self):
         c = Connection(hostname='switch',
-                        start=['mock_device_cli --os nxos --state exec_n3k'],
-                        os='nxos',
-                        series='n3k',
-                        username='cisco',
-                        tacacs_password='cisco')
+                       start=['mock_device_cli --os nxos --state exec_n3k'],
+                       os='nxos',
+                       platform='n3k',
+                       username='cisco',
+                       tacacs_password='cisco')
         c.shellexec(['ls'])
         assert c.spawn.match.match_output == 'exit\r\nswitch# '
+        c.disconnect()
 
 
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0)
 class TestNxosPluginBashService(unittest.TestCase):
 
     def test_bash(self):
@@ -99,24 +113,27 @@ class TestNxosPluginBashService(unittest.TestCase):
             console.execute('ls')
         self.assertIn('exit', c.spawn.match.match_output)
         self.assertIn('switch#', c.spawn.match.match_output)
+        c.disconnect()
 
     def test_bash_ha(self):
         c = Connection(hostname='switch',
-                        start=['mock_device_cli --os nxos --state exec',
-                               'mock_device_cli --os nxos --state exec'],
-                        os='nxos',
-                        username='cisco',
-                        tacacs_password='cisco')
+                       start=['mock_device_cli --os nxos --state exec',
+                              'mock_device_cli --os nxos --state exec'],
+                       os='nxos',
+                       username='cisco',
+                       tacacs_password='cisco')
+        c.connect()
         with c.bash_console() as console:
             console.execute('ls')
         self.assertIn('exit', c.active.spawn.match.match_output)
         self.assertIn('switch#', c.active.spawn.match.match_output)
+        c.disconnect()
 
     def test_bash_ha_standby(self):
         ha = MockDeviceTcpWrapperNXOS(port=0, state='exec,nxos_exec_standby')
         ha.start()
         c = Connection(hostname='switch',
-                        start=['telnet 127.0.0.1 '+  str(ha.ports[0]), 'telnet 127.0.0.1 '+ str(ha.ports[1]) ],
+                       start=['telnet 127.0.0.1 ' + str(ha.ports[0]), 'telnet 127.0.0.1 ' + str(ha.ports[1])],
                        os='nxos', username='cisco', tacacs_password='cisco')
         try:
             c.connect()
@@ -145,6 +162,7 @@ class TestNxosPluginGuestshellService(unittest.TestCase):
         self.assertEqual('/home/admin', output)
         self.assertIn('exit', c.spawn.match.match_output)
         self.assertIn('switch#', c.spawn.match.match_output)
+        c.disconnect()
 
     def test_guestshell_enable(self):
         c = Connection(hostname='switch',
@@ -161,6 +179,7 @@ class TestNxosPluginGuestshellService(unittest.TestCase):
         # Attempt to activate again - guestshell is already active
         with c.guestshell(enable_guestshell=True, retries=5) as gs:
             gs.execute('pwd')
+        c.disconnect()
 
     def test_guestshell_retries_exceeded_enable(self):
         c = Connection(hostname='switch',
@@ -174,6 +193,7 @@ class TestNxosPluginGuestshellService(unittest.TestCase):
                 gs.execute("pwd")
         self.assertEqual("Failed to enable guestshell after 2 tries",
                          str(err.exception))
+        c.disconnect()
 
     def test_guestshell_retries_exceeded_activate(self):
         c = Connection(hostname='switch',
@@ -187,6 +207,7 @@ class TestNxosPluginGuestshellService(unittest.TestCase):
                 gs.execute("pwd")
         self.assertEqual("Guestshell failed to become activated after 3 tries",
                          str(err.exception))
+        c.disconnect()
 
     def test_ha_guestshell_basic(self):
         ha = MockDeviceTcpWrapperNXOS(port=0, state='exec,nxos_exec_standby', hostname='switch')
@@ -209,6 +230,8 @@ class TestNxosPluginGuestshellService(unittest.TestCase):
             ha.stop()
 
 
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestNxosPluginAttachConsoleService(unittest.TestCase):
 
     def test_shell(self):
@@ -220,23 +243,52 @@ class TestNxosPluginAttachConsoleService(unittest.TestCase):
 
         with c.attach_console(1) as console:
             console.execute('ls')
+        self.assertEqual(c.state_machine.current_state, 'enable')
+        c.disconnect()
 
 
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
+class TestNxosPluginAttachModule(unittest.TestCase):
+
+    def test_attach_module(self):
+        c = Connection(hostname='switch',
+                       start=['mock_device_cli --os nxos --state exec'],
+                       os='nxos',
+                       credentials=dict(
+                           default=dict(
+                               username='cisco',
+                               password='cisco')
+                       ),
+                       init_exec_commands=[],
+                       init_config_commands=[]
+                       )
+
+        with c.attach(1) as m:
+            m.execute('debug platform internal tah elam asic 0', allow_state_change=True)
+            m.execute('trigger init asic 0 slice 2 lu-a2d 1 in-select 9 out-select 1 use-src-id 25', allow_state_change=True)
+            m.execute('set outer ipv4 dst_ip 225.1.1.1 src_ip 11.2.1.100')
+        self.assertEqual(c.state_machine.current_state, 'enable')
+        c.disconnect()
+
+
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestNxosPluginPing6Service(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
         cls.d = Connection(hostname='switch',
-                            start=['mock_device_cli --os nxos --state exec'],
-                            os='nxos',
-                            username='cisco',
-                            tacacs_password='cisco')
+                           start=['mock_device_cli --os nxos --state exec'],
+                           os='nxos',
+                           username='cisco',
+                           tacacs_password='cisco')
         cls.d.connect()
         cls.ha = MockDeviceTcpWrapperNXOS(port=0, state='exec,nxos_exec_standby')
         cls.ha.start()
         cls.ha_device = Connection(hostname='switch',
-                                    start=['telnet 127.0.0.1 '+  str(cls.ha.ports[0]), 'telnet 127.0.0.1 '+ str(cls.ha.ports[1]) ],
-                                    os='nxos', username='cisco', tacacs_password='cisco')
+                                   start=['telnet 127.0.0.1 ' + str(cls.ha.ports[0]), 'telnet 127.0.0.1 ' + str(cls.ha.ports[1])],
+                                   os='nxos', username='cisco', tacacs_password='cisco')
         cls.ha_device.connect()
 
     @classmethod
@@ -266,18 +318,23 @@ class TestNxosPluginPing6Service(unittest.TestCase):
         self.assertTrue(result)
 
 
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestNxosPluginExecute(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.c = Connection(hostname='switch',
-                        start=['mock_device_cli --os nxos --state exec'],
-                        os='nxos',
-                        username='cisco',
-                        tacacs_password='cisco',
-                        init_exec_commands=[],
-                        init_config_commands=[]
-                        )
+                           start=['mock_device_cli --os nxos --state exec'],
+                           os='nxos',
+                           username='cisco',
+                           tacacs_password='cisco',
+                           init_exec_commands=[],
+                           init_config_commands=[])
         cls.c.connect()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.c.disconnect()
 
     def test_execute_show_feature(self):
         cmd = 'show feature'
@@ -286,11 +343,11 @@ class TestNxosPluginExecute(unittest.TestCase):
         self.assertEqual(r, expected_response)
 
     def test_execute_error_pattern(self):
-        with self.assertRaises(SubCommandFailure) as err:
-          r = self.c.execute('not a real command')
+        with self.assertRaises(SubCommandFailure):
+            self.c.execute('not a real command')
 
     def test_execute_error_pattern_negative(self):
-        r = self.c.execute('not a real command partial')
+        self.c.execute('not a real command partial')
 
     def test_execute_copy_not_allowed(self):
         with self.assertRaises(SubCommandFailure):
@@ -305,13 +362,12 @@ class TestNxosCrash(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.c = Connection(hostname='switch',
-                        start=['mock_device_cli --os nxos --state exec'],
-                        os='nxos',
-                        username='cisco',
-                        tacacs_password='cisco',
-                        init_exec_commands=[],
-                        init_config_commands=[]
-                        )
+                           start=['mock_device_cli --os nxos --state exec'],
+                           os='nxos',
+                           username='cisco',
+                           tacacs_password='cisco',
+                           init_exec_commands=[],
+                           init_config_commands=[])
         cls.c.connect()
 
     @classmethod
@@ -323,7 +379,7 @@ class TestNxosCrash(unittest.TestCase):
 
     def test_execute_crash(self):
         self.c.enable()
-        with self.assertRaises(StateMachineError) as e1:
+        with self.assertRaises(StateMachineError):
             self.c.execute('crash command')
         self.assertEqual(self.c.state_machine.current_state, 'loader')
 
@@ -419,6 +475,27 @@ class TestNxosPluginConfigure(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.dev = Connection(hostname='switch',
+                             start=['mock_device_cli --os nxos --state exec'],
+                             os='nxos',
+                             username='cisco',
+                             tacacs_password='cisco',
+                             init_exec_commands=[],
+                             init_config_commands=[])
+        cls.dev.connect()
+
+    def test_execute_configure_commit(self):
+        acl_cfg = "configure session acl6\nip access-list acl6\n"\
+            "10 permit ip 63.1.1.1/24 64.1.1.1/24\nip access-list acl5\n10 permit ip 130.1.1.1/24 140.1.1.1/24"
+
+        out = self.dev.configure(acl_cfg, commit=True)
+        self.assertIn('Commit Successful', out)
+        self.dev.disconnect()
+
+
+class TestNxosConfigureDual(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.dev = Connection(hostname='switch',
                         start=['mock_device_cli --os nxos --state exec'],
                         os='nxos',
                         username='cisco',
@@ -428,13 +505,17 @@ class TestNxosPluginConfigure(unittest.TestCase):
                         )
         cls.dev.connect()
 
-    def test_execute_configure_commit(self):
-        acl_cfg = "configure session acl6\nip access-list acl6\n"\
-            "10 permit ip 63.1.1.1/24 64.1.1.1/24\nip access-list acl5\n10 permit ip 130.1.1.1/24 140.1.1.1/24"
+    def test_configure_dual(self):
+        out = self.dev.configure_dual(['feature isis', 'commit'])
+        self.assertIn('Verification Succeeded.', out)
 
-        out = self.dev.configure(acl_cfg, commit=True)
+        # test on normal configure
+        config = self.dev.configure('no logging console')
+        self.assertIn('no logging console', config)
 
-        self.assertIn('Commit Successful', out)
+    @classmethod
+    def tearDownClass(cls):
+        cls.dev.disconnect()
 
 
 if __name__ == "__main__":

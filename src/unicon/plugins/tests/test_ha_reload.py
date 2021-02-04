@@ -139,6 +139,7 @@ class TestHANXOSReloadConsoleInterchange(unittest.TestCase):
     def test_reload_console_interchange(self):
         reason = None
         self.d.settings.POST_HA_RELOAD_CONFIG_SYNC_WAIT = 0
+        self.d.settings.RELOAD_RECONNECT_WAIT = 1
         try:
             self.d.reload(reload_command='reload')
             result = True
@@ -170,6 +171,7 @@ class TestNXOSReloadAdminSetup(unittest.TestCase):
     def test_reload_repeat_poap_prompt(self):
         reason = None
         self.d.settings.POST_HA_RELOAD_CONFIG_SYNC_WAIT = 0
+        self.d.settings.RELOAD_RECONNECT_WAIT = 1
         try:
             self.d.reload(reload_command='reload wr erase')
             result = True
@@ -201,6 +203,7 @@ class TestNXOSReloadDialog(unittest.TestCase):
     def test_ha_reload_dialog_param(self):
         reason = None
         self.d.settings.POST_HA_RELOAD_CONFIG_SYNC_WAIT = 0
+        self.d.settings.RELOAD_RECONNECT_WAIT = 1
         dia = Dialog([
             [r'Do you want to proceed with reset operation\? \(y\/n\)\?  \[n\]',
              'sendline(y)', None, True, False]])
@@ -244,6 +247,7 @@ class TestHANXOSReloadConfigLock(unittest.TestCase):
         self.d.settings.POST_HA_RELOAD_CONFIG_SYNC_WAIT = 0
         self.d.settings.CONFIG_POST_RELOAD_MAX_RETRIES = 5
         self.d.settings.CONFIG_POST_RELOAD_RETRY_DELAY_SEC = 2
+        self.d.settings.RELOAD_RECONNECT_WAIT = 1
         self.d.execute('reset counter 8')
         try:
             self.d.reload('reload')
@@ -277,7 +281,7 @@ class TestGenericReloadOutput(unittest.TestCase):
 
     def test_reload_output(self):
         self.d.spawn.timeout = 60
-        res, output = self.d.reload(return_output=True)
+        res, output = self.d.reload(return_output=True, target_standby_state='STANDBY')
         self.assertTrue(res)
         self.assertIn(self.expected_output, '\n'.join(output.splitlines()))
 
@@ -346,6 +350,7 @@ class TestIosxrHAReloadOutput(unittest.TestCase):
         res, output = self.ha_device.reload(return_output=True,
                                             reload_command='reload',
                                             prompt_recovery=True,
+                                            target_standby_state='STANDBY',
                                             timeout=30)
         self.assertTrue(res)
         self.assertIn(self.expected_output, '\n'.join(output.splitlines()))
@@ -416,7 +421,7 @@ class TestIosXECat3kReloadOutput(unittest.TestCase):
             hostname='Router',
             start=['mock_device_cli --os iosxe --state cat3k_exec'],
             os='iosxe',
-            series='cat3k',
+            platform='cat3k',
             line_password='lab',
             enable_password='lab'
         )

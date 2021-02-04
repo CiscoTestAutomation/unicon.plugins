@@ -351,16 +351,28 @@ sma_prompt_1:
   commands: *cmds
 
 sudo_password:
-  prompt: "Password: "
+  prompt: "[sudo] password for cisco: "
   commands:
-    "cisco":
+    "sudo_password":
       new_state: sudo
 
 sudo:
   prompt: "Linux# "
   commands:
+    "sudo_invalid":
+        new_state: sudo_invalid
     "exit":
       new_state: exec
+
+sudo_invalid:
+  prompt: "[sudo] password for cisco: "
+  commands:
+    "unknown":
+      response: "cisco is not in the sudoers file.  This incident will be reported."
+      new_state: sudo
+    "invalid": "Sorry, try again."
+    "sudo":
+      new_state: sudo_password
 
 hit_enter:
   prompt: "Hit Enter to proceed: "
@@ -433,7 +445,7 @@ ios_r1_telnet:
      
   prompt: "Password:"
   commands:
-    "cisco":
+    "cisco1":
       new_state: ios_r1_exec
 
 ios_r1_exec:
@@ -447,7 +459,7 @@ ios_r1_exec:
 ios_r1_password:
   prompt: "Password:"
   commands:
-    "cisco":
+    "cisco11":
       new_state: ios_r1_enable
 
 ios_r1_enable:
@@ -469,7 +481,7 @@ ios_r2_telnet:
      
   prompt: "Password:"
   commands:
-    "cisco":
+    "cisco2":
       new_state: ios_r2_exec
 
 ios_r2_exec:
@@ -481,7 +493,7 @@ ios_r2_exec:
 ios_r2_password:
   prompt: "Password:"
   commands:
-    "cisco":
+    "cisco22":
       new_state: ios_r2_enable
 
 ios_r2_enable:
@@ -498,7 +510,7 @@ ios_sw3_telnet:
      
   prompt: "Password:"
   commands:
-    "cisco":
+    "cisco3":
       new_state: ios_sw3_exec
 
 ios_sw3_exec:
@@ -507,8 +519,19 @@ ios_sw3_exec:
     "enable":
       new_state: ios_sw3_enable
 
+ios_sw3_password:
+  prompt: "Password:"
+  commands:
+    "cisco33":
+      new_state: ios_sw03_enable
+
 ios_sw3_enable:
   prompt: "Sw03#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": ""
+
 
 exec_ps1:
   prompt: "Linux$ "

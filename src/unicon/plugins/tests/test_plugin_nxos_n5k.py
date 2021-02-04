@@ -18,7 +18,7 @@ class TestNxosN5kPluginConnect(unittest.TestCase):
         c = Connection(hostname='switch',
                         start=['mock_device_cli --os nxos --state n5k_exec'],
                         os='nxos',
-                        series='n5k',
+                        platform='n5k',
                         username='admin',
                         tacacs_password='lab')
         c.connect()
@@ -34,7 +34,7 @@ class TestNxosN5kPluginReloadService(unittest.TestCase):
             hostname='',
             start=['mock_device_cli --os nxos --state n5k_exec'],
             os='nxos',
-            series='n5k',
+            platform='n5k',
             username='admin',
             tacacs_password='lab',
         )
@@ -47,7 +47,7 @@ class TestNxosN5kPluginReloadService(unittest.TestCase):
             hostname='',
             start=['mock_device_cli --os nxos --state n5k_exec'],
             os='nxos',
-            series='n5k',
+            platform='n5k',
             credentials=dict(default=dict(
                 username='admin', password='lab')),
         )
@@ -60,7 +60,7 @@ class TestNxosN5kPluginReloadService(unittest.TestCase):
             hostname='',
             start=['mock_device_cli --os nxos --state n5k_exec'],
             os='nxos',
-            series='n5k',
+            platform='n5k',
             credentials=dict(default=dict(
                 username='admin', password='lab'),
                 alt=dict(

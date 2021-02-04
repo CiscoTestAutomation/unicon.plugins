@@ -57,3 +57,5 @@ class GenericPatterns(UniconCorePatterns):
         self.passphrase_prompt = r'^.*Enter passphrase for key .*?:\s*?'
 
         self.learn_os_prompt = r'^(.*?([>\$~%]|[^#\s]#|~ #|~/|^admin:|^#)\s?(\x1b\S+)?)$|(^.*This \(D\)RP Node is not ready or active for login \/configuration.*)'
+
+        self.sudo_password_prompt = r'^.*\[sudo\] password for .*?:\s*?'

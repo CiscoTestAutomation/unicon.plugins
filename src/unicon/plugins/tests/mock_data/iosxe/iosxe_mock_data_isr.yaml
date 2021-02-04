@@ -251,7 +251,7 @@ traceroute_timeout_isr:
 traceroute_probe_isr:
   prompt: "Probe count [3]: "
   commands:
-    "":
+    "30":
       new_state: traceroute_mittl_isr
 
 traceroute_mittl_isr:
