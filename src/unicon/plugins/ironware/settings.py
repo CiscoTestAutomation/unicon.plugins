@@ -20,6 +20,5 @@ class IronWareSettings(GenericSettings):
         # inherit any parent settings
         super().__init__()
         self.CONNECTION_TIMEOUT = 60*5
-        self.ESCAPE_CHAR_CALLBACK_PRE_SENDLINE_PAUSE_SEC = 1
         self.HA_INIT_EXEC_COMMANDS = ['terminal length 0']
         self.HA_INIT_CONFIG_COMMANDS = []

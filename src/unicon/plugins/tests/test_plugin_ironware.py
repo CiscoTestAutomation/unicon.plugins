@@ -83,6 +83,8 @@ class TestIronWarePluginConnect(unittest.TestCase):
         c.disconnect()
 
 
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0)
 class TestIronWarePluginExecute(unittest.TestCase):
 
     def test_execute_show_feature(self):
@@ -108,6 +110,8 @@ class TestIronWarePluginExecute(unittest.TestCase):
         c.disconnect()
 
 
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0)
 class TestIronWarePluginMPLSPing(unittest.TestCase):
 
     def test_mpls_ping_success(self):
