@@ -31,5 +31,6 @@ supported_os = [
     'apic',
     'windows',
     'dell',
-    'hp_comware'
+    'hp_comware',
+    'ironware'
 ]
