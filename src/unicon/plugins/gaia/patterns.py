@@ -1,0 +1,37 @@
+'''
+Author: Sam Johnson
+Contact: samuel.johnson@gmail.com
+https://github.com/TestingBytes
+
+Contents largely inspired by sample Unicon repo:
+https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_example/src/unicon_plugin_example
+
+Description:
+    This subpackage defines patterns for Check Point Gaia OS
+'''
+
+from unicon.plugins.generic.patterns import GenericPatterns
+
+class GaiaPatterns(GenericPatterns):
+    def __init__(self):
+        super().__init__()
+        
+        # This system is for authorized use only.
+        # login: admin
+        # Password:
+        self.login_prompt = r'login: *?'
+        self.password_prompt = r'Password: '
+        
+        # Last login: Tue Mar 23 22:11:15 on ttyS0
+        # gw-a>
+        self.clish_prompt = r'.*> '
+        
+        # gw-a> expert
+        # Enter expert password:
+        self.expert_password_prompt = r'Enter expert password:'
+        
+        # Warning! All configurations should be done through clish
+        # You are in expert mode now.
+        # [Expert@gw-a:0]#
+        self.expert_prompt = r'\[\w+\@.*\]\#'
+        

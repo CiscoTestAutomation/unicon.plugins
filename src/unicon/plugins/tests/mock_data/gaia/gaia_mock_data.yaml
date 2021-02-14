@@ -1,0 +1,23 @@
+login:
+  prompt: "login: "
+  commands: 
+    "gaia-user":
+      new_state: password
+
+password:
+  prompt: "Password: "
+  commands:
+    "gaia-password":
+      new_state: shell
+
+shell:
+  prompt: "gaia-gw> "
+  commands: 
+      "set clienv rows 0": ""
+      "show version all" : &SV |
+        Product version Check Point Gaia R80.40
+        OS build 294
+        OS kernel version 3.10.0-957.21.3cpx86_64
+        OS edition 64-bit
+
+      new_state: shell
