@@ -161,6 +161,7 @@ config:
       new_state: config_session
     "no logging console": ""
     "line console": ""
+    "line vty": ""
     "line console 0": ""
     "exec-timeout 0": ""
     "terminal width 511": ""
@@ -246,6 +247,7 @@ config2:
   commands:
     "no logging console": ""
     "line console": ""
+    "line vty": ""
     "exec-timeout 0": ""
     "terminal width 511": ""
     'feature bash': ""
@@ -297,6 +299,7 @@ config3:
   commands:
     "no logging console": ""
     "line console": ""
+    "line vty": ""
     "exec-timeout 0": ""
     "terminal width 511": ""
     'feature bash': ""
@@ -321,6 +324,7 @@ config_n3k:
   commands:
     "no logging console": ""
     "line console": ""
+    "line vty": ""
     "exec-timeout 0": ""
     "terminal width 511": ""
     "end":
@@ -511,3 +515,22 @@ config_session_acl:
         Please avoid other configuration changes during this time.
         Commit Successful
       new_state: exec
+
+
+config_dual_commit:
+  prompt: "%N(config-dual-stage)#"
+  commands:
+    "end":
+      new_state: config_dual_commit_confirm
+
+config_dual_commit_confirm:
+    prompt: "Uncommitted changes found, commit them before exiting (yes/no/cancel)? [cancel] "
+    commands:
+      "yes":
+        new_state: exec
+      "no":
+        new_state: exec
+      "cancel":
+        new_state: exec
+      "":
+        new_state: exec

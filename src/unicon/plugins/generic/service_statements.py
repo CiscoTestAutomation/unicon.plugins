@@ -28,7 +28,6 @@ from unicon.utils import to_plaintext
 
 generic_statements = GenericStatements()
 
-
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 #           Service handlers
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
@@ -1098,9 +1097,8 @@ switchover_statement_list = [save_config, build_config, prompt_switchover,
                              switchover_fail3, switchover_fail4,
                              press_enter, login_stmt, password_stmt,
                              generic_statements.password_ok_stmt,
-                            ]
-
-
+                             generic_statements.syslog_msg_stmt
+                             ]
 
 ############################################################
 # Generic Execution statement list
@@ -1108,6 +1106,7 @@ switchover_statement_list = [save_config, build_config, prompt_switchover,
 
 execution_statement_list = [generic_statements.confirm_prompt_y_n_stmt,
                             generic_statements.confirm_prompt_stmt,
-                            generic_statements.yes_no_stmt]
+                            generic_statements.yes_no_stmt,
+                            generic_statements.syslog_msg_stmt]
 
-configure_statement_list = []
+configure_statement_list = [generic_statements.syslog_msg_stmt]

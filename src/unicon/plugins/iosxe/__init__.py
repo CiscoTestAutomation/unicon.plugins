@@ -13,7 +13,6 @@ from unicon.plugins.generic import GenericSingleRpConnectionProvider,\
     GenericDualRPConnection
 from unicon.plugins.iosxe.settings import IosXESettings
 
-from unicon.plugins.generic.service_implementation import Reload
 from unicon.plugins.iosxe import service_implementation as svc
 
 
@@ -28,6 +27,7 @@ class IosXEServiceList(ServiceList):
         self.bash_console = svc.BashService
         self.copy = svc.Copy
         self.reload = svc.Reload
+        self.rommon = svc.Rommon
 
 
 class HAIosXEServiceList(HAServiceList):

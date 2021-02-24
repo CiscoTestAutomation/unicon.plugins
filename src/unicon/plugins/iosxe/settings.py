@@ -23,3 +23,8 @@ class IosXESettings(GenericSettings):
 
         self.EXECUTE_MATCHED_RETRIES = 1
         self.EXECUTE_MATCHED_RETRY_SLEEP = 0.1
+
+        self.CONFIG_LOCK_RETRY_SLEEP = 30
+        self.CONFIG_LOCK_RETRIES = 10
+
+        self.BOOT_TIMEOUT = 420

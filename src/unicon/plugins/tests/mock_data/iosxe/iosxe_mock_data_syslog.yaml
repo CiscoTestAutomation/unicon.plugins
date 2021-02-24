@@ -1,0 +1,74 @@
+
+connect_syslog:
+  preface:
+    timing:
+      - 0:,0.05,0.02
+    response: |
+      *Jan 29 08:17:01.416: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:01.749: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:01.750: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:01.751: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:01.753: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:01.753: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:01.792: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:01.792: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:01.792: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:02.751: %IM-5-IOX_INST_NOTICE: Switch 1 R0/0: ioxman: IOX SER
+
+      *Jan 29 08:17:04.196: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:04.196: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      Username: 
+
+      *Jan 29 08:17:04.196: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:06.393: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:06.816: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:06.816: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:11.416: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:11.416: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:11.416: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:14.196: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:14.196: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:14.196: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:15.519: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:15.520: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:15.520: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:15.520: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:15.526: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:15.528: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:15.531: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:16.030: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+      *Jan 29 08:17:16.183: %SELINUX-3-MISMATCH: Switch 1 R0/0: audispd: type=AVC
+
+  prompt: ""
+  commands:
+    "":
+      new_state: general_login

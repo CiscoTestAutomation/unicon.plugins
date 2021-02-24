@@ -55,6 +55,14 @@ Alternatively, you can pass an empty list when executing a command to avoid erro
 
     >>> c.execute('show command error', error_pattern=[])
 
+You can also append a pattern to the existing patterns defined in the settings when executing a command
+(e.g. to add an error pattern for a specific command to execute).
+
+.. code-block:: python
+
+    >>> c.execute('show command error', append_error_pattern=['^specific error pattern'])
+
+
 **EOF Exception handling**
 
 If device connection is closed/terminated unexpectedly during service calling, we can reconnect
@@ -148,24 +156,25 @@ If you want to pass a multiline string as a single command, you should pass
 a list where the list item as a multiline string, see example below.
 
 
-===================   ========================    ====================================================
-Argument              Type                        Description
-===================   ========================    ====================================================
-timeout               int (default 60 sec)        timeout value for the command execution takes.
-reply                 Dialog                      additional dialog
-command               str                         command to execute on device handle
-target                standby/active              by default commands will be executed on active,
-                                                  use target=standby to execute command on standby.
-prompt_recovery       bool (default False)        Enable/Disable prompt recovery feature
-error_pattern         list                        List of regex strings to check output for errors.
-search_size           int (default 8K bytes)      maximum size in bytes to search at the
-                                                  end of the buffer
-allow_state_change    bool (default False)        By default, end state should be same as start state.
-                                                  If True, end state can be any valid state.
-service_dialog        Dialog                      service_dialog overrides the execute service
-                                                  dialog.
-matched_retries       int (default 1)             retry times if statement pattern is matched
-matched_retry_sleep   float (default 0.05 sec)    sleep between matched_retries
+====================   ========================    ====================================================
+Argument               Type                        Description
+====================   ========================    ====================================================
+timeout                int (default 60 sec)        timeout value for the command execution takes.
+reply                  Dialog                      additional dialog
+command                str                         command to execute on device handle
+target                 standby/active              by default commands will be executed on active,
+                                                   use target=standby to execute command on standby.
+prompt_recovery        bool (default False)        Enable/Disable prompt recovery feature
+error_pattern          list                        List of regex strings to check output for errors.
+append_error_pattern   list                        List of regex strings append to error_pattern.
+search_size            int (default 8K bytes)      maximum size in bytes to search at the
+                                                   end of the buffer
+allow_state_change     bool (default False)        By default, end state should be same as start state.
+                                                   If True, end state can be any valid state.
+service_dialog         Dialog                      service_dialog overrides the execute service
+                                                   dialog.
+matched_retries        int (default 1)             retry times if statement pattern is matched
+matched_retry_sleep    float (default 0.05 sec)    sleep between matched_retries
 ===================   ========================    ====================================================
 
 By default, device start state should be same as end state. For example, if we
@@ -252,23 +261,24 @@ is specified as standby. Use `prompt_recovery` argument for using
 on prompt_recovery feature.
 
 
-================  =======================    ========================================
-Argument          Type                       Description
-================  =======================    ========================================
-timeout           int (default 60 sec)       timeout value for the command execution takes.
-error_pattern     list                       List of regex strings to check output for errors.
-reply             Dialog                     additional dialog
-command           list                       list of commands to configure
-prompt_recovery   bool (default False)       Enable/Disable prompt recovery feature
-force             bool (default False)       For XR, run commit force at end of config.
-replace           bool (default False)       For XR, run commit replace at end of config.
-lock_retries      int (default 0)            retry times if config mode is locked
-lock_retry_sleep  int (default 2 sec)        sleep between lock_retries
-target            str (default "active")     Target RP where to execute service, for DualRp only
-bulk              bool (default False)       If False, send all commands in one sendline. If True, send commands in chunked mode
-bulk_chunk_lines  int (default 50)           maximum number of commands to send per chunk, 0 means to send all commands in a single chunk
-bulk_chunk_sleep  float (default 0.5 sec)    sleep between sending command chunks
-================  =======================    ========================================
+====================  =======================    ========================================
+Argument              Type                       Description
+====================  =======================    ========================================
+timeout               int (default 60 sec)       timeout value for the command execution takes.
+error_pattern         list                       List of regex strings to check output for errors.
+append_error_pattern  list                        List of regex strings append to error_pattern.
+reply                 Dialog                     additional dialog
+command               list                       list of commands to configure
+prompt_recovery       bool (default False)       Enable/Disable prompt recovery feature
+force                 bool (default False)       For XR, run commit force at end of config.
+replace               bool (default False)       For XR, run commit replace at end of config.
+lock_retries          int (default 0)            retry times if config mode is locked
+lock_retry_sleep      int (default 2 sec)        sleep between lock_retries
+target                str (default "active")     Target RP where to execute service, for DualRp only
+bulk                  bool (default False)       If False, send all commands in one sendline. If True, send commands in chunked mode
+bulk_chunk_lines      int (default 50)           maximum number of commands to send per chunk, 0 means to send all commands in a single chunk
+bulk_chunk_sleep      float (default 0.5 sec)    sleep between sending command chunks
+====================  =======================    ========================================
 
 
 

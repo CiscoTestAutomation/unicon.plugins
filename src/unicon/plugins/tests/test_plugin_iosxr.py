@@ -79,6 +79,7 @@ class TestIosXrPlugin(unittest.TestCase):
                 'sysadmin2',
                 'iosxr_config_ios',
                 'xr_vm',
+                'xr_vm2'
         ]:
             c = Connection(hostname='Router',
                            start=['mock_device_cli --os iosxr --state %s' % state],

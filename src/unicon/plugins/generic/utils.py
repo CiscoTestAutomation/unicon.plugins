@@ -42,53 +42,6 @@ class GenericUtils(Utils):
             show_red_out[show_red_out.find("=") + 1:].strip()
         return redundancy_details
 
-    def retry_state_machine_go_to(self,
-                                  state_machine,
-                                  to_state,
-                                  spawn,
-                                  retries,
-                                  retry_sleep,
-                                  context=AttributeDict(),
-                                  dialog=None,
-                                  timeout=None,
-                                  hop_wise=False,
-                                  prompt_recovery=False):
-        for index in range(retries + 1):
-            try:
-                state_machine.go_to(to_state,
-                                    spawn,
-                                    context=context,
-                                    dialog=dialog,
-                                    timeout=timeout,
-                                    hop_wise=hop_wise,
-                                    prompt_recovery=prompt_recovery)
-                break
-            except Exception as err:
-                if index == retries:
-                    raise SubCommandFailure(err, spawn.buffer)
-                time.sleep(retry_sleep)
-
-    def retry_handle_state_machine_go_to(self,
-                                         handle,
-                                         to_state,
-                                         retries,
-                                         retry_sleep,
-                                         context=AttributeDict(),
-                                         dialog=None,
-                                         timeout=None,
-                                         hop_wise=False,
-                                         prompt_recovery=False):
-        self.retry_state_machine_go_to(handle.state_machine,
-                                       to_state,
-                                       handle.spawn,
-                                       retries,
-                                       retry_sleep,
-                                       context=context,
-                                       dialog=dialog,
-                                       timeout=timeout,
-                                       hop_wise=hop_wise,
-                                       prompt_recovery=prompt_recovery)
-
     def flatten_splitlines_command(self, command):
         if isinstance(command, str):
             for item in command.splitlines():

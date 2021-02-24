@@ -61,6 +61,9 @@ class GenericSettings(Settings):
         # (wait time: 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75 == total wait: 7.0s)
         self.ESCAPE_CHAR_PROMPT_WAIT_RETRIES = 7
 
+        # syslog message handling timers
+        self.SYSLOG_WAIT = 1
+
         # pattern to replace "more" string
         # command to continue for more_prompt_stmt
         # when changing MORE_REPLACE_PATTERN, please also change unicon/patterns.py more_prompt
@@ -82,8 +85,11 @@ class GenericSettings(Settings):
         self.CONFIGURE_ERROR_PATTERN = []
 
         # Number of times to retry for config mode by configure service.
-        self.CONFIG_LOCK_RETRIES = 0
-        self.CONFIG_LOCK_RETRY_SLEEP = 2
+        self.CONFIG_LOCK_RETRIES = 3
+        self.CONFIG_LOCK_RETRY_SLEEP = 10
+
+        # Clear line command
+        self.CLEAR_LINE_CMD = '\x01\x0b'  # Ctr-A Ctrl-K
 
         # for bulk configure
         self.BULK_CONFIG = False

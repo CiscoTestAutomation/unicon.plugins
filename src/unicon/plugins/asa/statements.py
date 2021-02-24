@@ -94,8 +94,7 @@ bad_password_stmt = Statement(pattern=patterns.bad_passwords,
 
 disconnect_error_stmt = Statement(pattern=patterns.disconnect_message,
                                   action=connection_failure_handler,
-                                  args={
-                                  'err': 'received disconnect from router'},
+                                  args=None,
                                   loop_continue=False,
                                   continue_timer=False)
 

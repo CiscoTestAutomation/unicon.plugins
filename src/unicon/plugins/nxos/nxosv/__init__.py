@@ -3,10 +3,11 @@ __author__ = "Myles Dear <mdear@cisco.com>"
 from .statemachine import NxosvSingleRpStateMachine
 from .connection_provider import NxosvSingleRpConnectionProvider
 from unicon.plugins.nxos import NxosServiceList
-from unicon.plugins.nxos import BaseNxosSingleRpConnection
+from unicon.plugins.nxos import NxosSingleRpConnection
 from unicon.plugins.nxos.nxosv.setting import NxosvSettings
 
-class NxosvSingleRpConnection(BaseNxosSingleRpConnection):
+
+class NxosvSingleRpConnection(NxosSingleRpConnection):
     os = 'nxos'
     platform = 'nxosv'
     chassis_type = 'single_rp'

@@ -23,6 +23,9 @@ from unicon.mock.mock_device import mockdata_path
 with open(os.path.join(mockdata_path, 'nxos/nxos_mock_data.yaml'), 'rb') as datafile:
     mock_data = yaml.safe_load(datafile.read())
 
+unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
+unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC = 0.2
+
 
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
 @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
@@ -60,8 +63,6 @@ class TestNxosPluginConnect(unittest.TestCase):
         c.disconnect()
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestNxosPluginShellexec(unittest.TestCase):
 
     def test_shellexec(self):
@@ -146,8 +147,6 @@ class TestNxosPluginBashService(unittest.TestCase):
             ha.stop()
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestNxosPluginGuestshellService(unittest.TestCase):
 
     def test_guestshell_basic(self):
@@ -247,9 +246,27 @@ class TestNxosPluginAttachConsoleService(unittest.TestCase):
         c.disconnect()
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestNxosPluginAttachModule(unittest.TestCase):
+
+    def test_attach_module(self):
+        c = Connection(hostname='switch',
+                       start=['mock_device_cli --os nxos --state exec'],
+                       os='nxos',
+                       credentials=dict(
+                           default=dict(
+                               username='cisco',
+                               password='cisco')
+                       ),
+                       init_exec_commands=[],
+                       init_config_commands=[]
+                       )
+
+        with c.attach(1) as m:
+            m.execute('debug platform internal tah elam asic 0', allow_state_change=True)
+            m.execute('trigger init asic 0 slice 2 lu-a2d 1 in-select 9 out-select 1 use-src-id 25', allow_state_change=True)
+            m.execute('set outer ipv4 dst_ip 225.1.1.1 src_ip 11.2.1.100')
+        self.assertEqual(c.state_machine.current_state, 'enable')
+        c.disconnect()
 
     def test_attach_module(self):
         c = Connection(hostname='switch',
@@ -384,8 +401,6 @@ class TestNxosCrash(unittest.TestCase):
         self.assertEqual(self.c.state_machine.current_state, 'loader')
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestNxosPluginReloadService(unittest.TestCase):
 
     def test_reload_config_lock_retries_succeed_with_default(self):
@@ -399,6 +414,8 @@ class TestNxosPluginReloadService(unittest.TestCase):
         )
         dev.connect()
         dev.start = ['mock_device_cli --os nxos --state reconnect_login']
+        dev.settings.RELOAD_RECONNECT_WAIT = 1
+        dev.settings.CONFIG_LOCK_RETRY_SLEEP = 1
         dev.reload()
         dev.configure('no logging console')
         dev.disconnect()
@@ -413,6 +430,8 @@ class TestNxosPluginReloadService(unittest.TestCase):
             enable_password='cisco',
         )
         dev.connect()
+        dev.settings.RELOAD_RECONNECT_WAIT = 1
+        dev.settings.CONFIG_LOCK_RETRY_SLEEP = 1
         dev.start = ['mock_device_cli --os nxos --state reconnect_login']
         dev.reload(config_lock_retries=2, config_lock_retry_sleep=1)
         dev.configure('no logging console')
@@ -428,13 +447,14 @@ class TestNxosPluginReloadService(unittest.TestCase):
             enable_password='cisco',
         )
         dev.connect()
+        dev.settings.RELOAD_RECONNECT_WAIT = 1
+        dev.settings.CONFIG_LOCK_RETRY_SLEEP = 1
+        dev.settings.CONFIG_LOCK_RETRIES = 1
         dev.start = ['mock_device_cli --os nxos --state reconnect_login']
         with self.assertRaises(ConnectionError):
             dev.reload(config_lock_retries=1, config_lock_retry_sleep=1)
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestNxosPluginMaintenanceMode(unittest.TestCase):
 
     def test_maint_mode(self):
@@ -491,6 +511,42 @@ class TestNxosPluginConfigure(unittest.TestCase):
         self.assertIn('Commit Successful', out)
         self.dev.disconnect()
 
+    def test_config_locked(self):
+        c = Connection(hostname='RouterRP',
+                       start=['mock_device_cli --os nxos --state exec'],
+                       os='nxos',
+                       mit=True,
+                       init_exec_commands=[],
+                       init_config_commands=[],
+                       settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+                       log_buffer=True
+                       )
+        c.connect()
+
+        c.execute('set config lock count 2')
+        c.settings.CONFIG_LOCK_RETRIES = 0
+        c.settings.CONFIG_LOCK_RETRY_SLEEP = 0
+
+        with self.assertRaises(StateMachineError):
+            c.configure('')
+
+        c.execute('set config lock count 2')
+        with self.assertRaises(StateMachineError):
+            c.configure('', lock_retries=1, lock_retry_sleep=1)
+
+        c.execute('set config lock count 3')
+        c.settings.CONFIG_LOCK_RETRIES = 1
+        c.settings.CONFIG_LOCK_RETRY_SLEEP = 1
+        with self.assertRaises(StateMachineError):
+            c.configure('')
+
+        c.execute('set config lock count 3')
+        c.settings.CONFIG_LOCK_RETRIES = 5
+        c.settings.CONFIG_LOCK_RETRY_SLEEP = 1
+        c.configure('')
+
+        c.disconnect()
+
 
 class TestNxosConfigureDual(unittest.TestCase):
     @classmethod
@@ -506,12 +562,24 @@ class TestNxosConfigureDual(unittest.TestCase):
         cls.dev.connect()
 
     def test_configure_dual(self):
-        out = self.dev.configure_dual(['feature isis', 'commit'])
+        out = self.dev.configure_dual(['feature isis'])
         self.assertIn('Verification Succeeded.', out)
 
         # test on normal configure
         config = self.dev.configure('no logging console')
         self.assertIn('no logging console', config)
+
+    def test_connect_config_dual(self):
+        dev = Connection(hostname='switch',
+                         start=['mock_device_cli --os nxos --state config_dual_commit'],
+                         os='nxos',
+                         username='cisco',
+                         tacacs_password='cisco',
+                         init_exec_commands=[],
+                         init_config_commands=[]
+                         )
+        dev.connect()
+        self.assertEqual(dev.state_machine.current_state, 'enable')
 
     @classmethod
     def tearDownClass(cls):

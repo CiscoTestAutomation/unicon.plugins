@@ -280,7 +280,6 @@ class TestIosPluginExecute(unittest.TestCase):
         with self.assertRaises(SubCommandFailure) as err:
             r = self.c.execute('not a real command')
 
-
     def test_execute_error_pattern_negative(self):
         r = self.c.execute('not a real command partial')
 

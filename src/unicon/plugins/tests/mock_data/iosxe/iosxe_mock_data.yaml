@@ -285,3 +285,116 @@ diol_disable:
   prompt: "RouterRP-standby> "
   commands:
     "enable": ""
+
+
+
+config_with_msgs:
+  prompt: "%N(config)#"
+  commands:
+    "msg":
+       new_state:
+          config_msg
+
+config_with_msgs2:
+  prompt: "%N(config)#"
+  commands:
+    "msg":
+       new_state:
+          config_msg2
+
+
+config_msg:
+  preface:
+    timing:
+    - 0:,0,0.5
+    response: |
+      Router(config)#*Jan 27 20:09:17.549: %SEC_LOGIN-5-LOGIN_SUCCESS: Login Success [user: user1] [Source: LOCAL] [localport: 0] at 20:09:17 UTC Wed Jan 27 2021
+      *Jan 27 20:09:18.103: %SYS-5-LOG_CONFIG_CHANGE: Console logging disabled
+      *Jan 27 20:09:18.341: %SYS-5-LOG_CONFIG_CHANGE: Console logging: level debugging, xml disabled, filtering disabled, discriminator (nosel)
+  prompt: "*Jan 27 20:09:18.839: %SYS-5-CONFIG_I: Configured from console by user1 on console"
+  commands:
+    "":
+      new_state: general_config
+
+
+config_msg2:
+  preface:
+    timing:
+    - 0:,0,0.5
+    response: |
+      Router(config)#*Jan 27 20:09:17.549: %SEC_LOGIN-5-LOGIN_SUCCESS: Login Success [user: user1] [Source: LOCAL] [localport: 0] at 20:09:17 UTC Wed Jan 27 2021
+      *Jan 27 20:09:18.103: %SYS-5-LOG_CONFIG_CHANGE: Console logging disabled
+      *Jan 27 20:09:18.341: %SYS-5-LOG_CONFIG_CHANGE: Console logging: level debugging, xml disabled, filtering disabled, discriminator (nosel)
+      *Jan 27 20:09:18.839: %SYS-5-CONFIG_I: Configured from console by user1 on console
+  prompt: "%N(config)#"
+  commands:
+    "end":
+      new_state: general_enable
+
+
+enable_with_msgs:
+  prompt: "%N#"
+  commands:
+    "msg":
+      new_state: enable_msg
+
+enable_msg:
+  preface: |
+    Router#*Jan 27 20:09:17.549: %SEC_LOGIN-5-LOGIN_SUCCESS: Login Success [user: user1] [Source: LOCAL] [localport: 0] at 20:09:17 UTC Wed Jan 27 2021
+    *Jan 27 20:09:18.103: %SYS-5-LOG_CONFIG_CHANGE: Console logging disabled
+    *Jan 27 20:09:18.341: %SYS-5-LOG_CONFIG_CHANGE: Console logging: level debugging, xml disabled, filtering disabled, discriminator (nosel)
+  prompt: "*Jan 27 20:09:18.839: %SYS-5-CONFIG_I: Configured from console by user1 on console"
+  commands:
+    "":
+      new_state: general_enable
+
+
+disable_to_enable_with_msg:
+  prompt: "Switch>"
+  commands:
+    "enable":
+      new_state: enable_password_with_msg
+
+enable_password_with_msg:
+  preface: "Password: "
+  prompt: "*Feb  8 21:51:23.628: %SELINUX-3-MISMATCH: Switch"
+  commands:
+    "": "% Access denied"
+    "cisco":
+      new_state: general_enable
+
+
+slow_config_mode:
+  prompt: "%N#"
+  commands:
+    "config term":
+      response: ""
+      timing:
+        - 0:,4,0
+      new_state: general_config
+
+
+
+# Console server
+
+ts_login:
+  preface: |
+    Connected to localhost
+    Escape character is '^]'.
+    
+  prompt: "Username: "
+  commands:
+    "ts_user":
+      new_state: ts_password
+
+ts_password:
+  prompt: "Password: "
+  commands:
+    "ts_pw":
+      new_state: console_wait_login
+
+console_wait_login:
+  prompt: ""
+  commands:
+    "":
+      new_state: general_login

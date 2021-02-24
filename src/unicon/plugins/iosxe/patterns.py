@@ -25,7 +25,7 @@ class IosXEPatterns(GenericPatterns):
         self.enable_prompt = \
             r'^(.*?)(Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(-standby)?(\(boot\))?(\(recovery-mode\))?#\s?$'
         self.press_enter = ReloadPatterns().press_enter
-        self.config_prompt = r'^(.*)\(.*(con|cfg|ipsec-profile|ca-trustpoint|cs-server|ca-profile|gkm-local-server)\S*\)#\s?$'
+        self.config_prompt = r'^(.*)\(.*(con|cfg|ipsec-profile|ca-trustpoint|cs-server|ca-profile|gkm-local-server|cloud)\S*\)#\s?$'
         self.are_you_sure_ywtdt = r'Are you sure you want to do this\? \[yes/no\]:\s*$'
 
 

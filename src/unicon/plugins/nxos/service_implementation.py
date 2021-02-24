@@ -116,12 +116,16 @@ class Configure(GenericConfigure):
 
 class ConfigureDual(Configure):
 
-    def call_service(self, *args, **kwargs):
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.commit_cmd = 'commit'
+
+    def pre_service(self, *args, **kwargs):
         target = kwargs.get('target', None)
         handle = self.get_handle(target)
         handle.context['config_dual'] = True
         try:
-            super().call_service(*args, **kwargs)
+            super().pre_service(*args, **kwargs)
         except Exception:
             raise
         finally:
@@ -236,17 +240,17 @@ class Reload(GenericReload):
         # During initialization after reload, hostname may temporarily be "switch".
         # When initialization finishes, hostname will be back to original hostname.
         con.learn_hostname = False
-        config_lock_retries_ori = con.configure.lock_retries
+        config_lock_retries_ori = con.settings.CONFIG_LOCK_RETRIES
         con.configure.lock_retries = config_lock_retries
-        config_lock_retry_sleep_ori = con.configure.lock_retry_sleep
+        config_lock_retry_sleep_ori = con.settings.CONFIG_LOCK_RETRY_SLEEP
         con.configure.lock_retry_sleep = config_lock_retry_sleep
 
         try:
             con.connect()
         finally:
             con.learn_hostname = learn_hostname_ori
-            con.configure.lock_retries = config_lock_retries_ori
-            con.configure.lock_retry_sleep = config_lock_retry_sleep_ori
+            con.settings.CONFIG_LOCK_RETRIES = config_lock_retries_ori
+            con.settings.CONFIG_LOCK_RETRY_SLEEP = config_lock_retry_sleep_ori
 
         con.log.debug("+++ Reload Completed Successfully +++")
         self.result = True
@@ -618,17 +622,17 @@ class HANxosReloadService(GenericHAReload):
         # During initialization after reload, hostname may temporarily be "switch".
         # When initialization finishes, hostname will be back to original hostname.
         con.learn_hostname = False
-        config_lock_retries_ori = con.configure.lock_retries
+        config_lock_retries_ori = con.settings.CONFIG_LOCK_RETRIES
         con.configure.lock_retries = config_lock_retries
-        config_lock_retry_sleep_ori = con.configure.lock_retry_sleep
+        config_lock_retry_sleep_ori = con.settings.CONFIG_LOCK_RETRY_SLEEP
         con.configure.lock_retry_sleep = config_lock_retry_sleep
 
         try:
             con.connect()
         finally:
             con.learn_hostname = learn_hostname_ori
-            con.configure.lock_retries = config_lock_retries_ori
-            con.configure.lock_retry_sleep = config_lock_retry_sleep_ori
+            con.settings.CONFIG_LOCK_RETRIES = config_lock_retries_ori
+            con.settings.CONFIG_LOCK_RETRY_SLEEP = config_lock_retry_sleep_ori
 
         con.log.debug("+++ Reload Completed Successfully +++")
         self.result = True

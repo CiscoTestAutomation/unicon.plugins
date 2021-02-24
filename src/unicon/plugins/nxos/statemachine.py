@@ -1,5 +1,6 @@
+from unicon.eal.dialogs import Dialog, Statement
 from unicon.plugins.generic.statements import default_statement_list
-from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine
+from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine, config_transition
 from unicon.plugins.generic.statemachine import GenericDualRpStateMachine
 from unicon.plugins.nxos.patterns import NxosPatterns
 from unicon.statemachine import State, Path
@@ -11,9 +12,11 @@ patterns = NxosPatterns()
 def attach_module(state_machine, spawn, context):
     spawn.sendline('attach module %s' % context.get('_module_num', '1'))
 
+
 def send_config_cmd(state_machine, spawn, context):
-    cmd = 'config dual-stage' if context.get('config_dual') else 'config term'
-    spawn.sendline(cmd)
+    state_machine.config_command = 'config dual-stage' if context.get('config_dual') else 'config term'
+    config_transition(state_machine, spawn, context)
+
 
 class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
 
@@ -28,7 +31,11 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         module_elam_insel = State('module_elam_insel', patterns.module_elam_insel_prompt)
 
         enable_to_config = Path(enable, config, send_config_cmd, None)
-        config_to_enable = Path(config, enable, 'end', None)
+        config_to_enable = Path(config, enable, 'end', Dialog([
+            Statement(pattern=patterns.commit_changes_prompt,
+                      action='sendline(no)',
+                      loop_continue=True)
+        ]))
 
         enable_to_shell = Path(enable, shell, 'run bash', None)
         shell_to_enable = Path(shell, enable, 'exit', None)

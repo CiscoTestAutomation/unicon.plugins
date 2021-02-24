@@ -1173,6 +1173,9 @@ iosxr_config_ios:
 xr_vm:
   prompt: "[xr-vm_node0_RP1_CPU0:~]$"
   commands: *enable_cmds
+xr_vm2:
+  prompt: "[node0_RP1_CPU0:~]$"
+  commands: *enable_cmds
 host:
   prompt: "[host:~]$"
   commands: *enable_cmds

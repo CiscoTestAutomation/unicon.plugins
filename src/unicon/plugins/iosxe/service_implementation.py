@@ -196,3 +196,16 @@ class Reload(GenericReload):
             return_output=return_output,
             reload_creds=reload_creds,
             *args, **kwargs)
+
+
+class Rommon(GenericExecute):
+    """ Brings device to the Rommon prompt and executes commands specified
+    """
+    def __init__(self, connection, context, **kwargs):
+        # Connection object will have all the received details
+        super().__init__(connection, context, **kwargs)
+        self.start_state = 'rommon'
+        self.end_state = 'rommon'
+        self.service_name = 'rommon'
+        self.timeout = 600
+        self.__dict__.update(kwargs)

@@ -10,6 +10,11 @@ utils = NxosUtils()
 
 class NxosSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # in case device is on a vdc, this should be updated.
+        self.connection.current_vdc = None
+
     def get_connection_dialog(self):
         dialog = super().get_connection_dialog()
         dialog += Dialog(additional_connection_dialog)
@@ -25,6 +30,11 @@ class NxosSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
 
 
 class NxosDualRpConnectionProvider(GenericDualRpConnectionProvider):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # in case device is on a vdc, this should be updated.
+        self.connection.current_vdc = None
 
     def unlock_standby(self):
         """not required on this platform"""

@@ -36,3 +36,4 @@ class NxosPatterns(GenericPatterns):
         self.module_prompt = r'^(.*?)module-\d+#\s*?$'
         self.module_elam_prompt = r'^(.*?)module-\d+(\(\w+-elam\))?#\s*?$'
         self.module_elam_insel_prompt = r'^(.*?)module-\d+(\(\w+-elam-insel\d+\))?#\s*?$'
+        self.commit_changes_prompt = r'Uncommitted changes found, commit them before exiting \(yes/no/cancel\)\? \[cancel\]\s*$'

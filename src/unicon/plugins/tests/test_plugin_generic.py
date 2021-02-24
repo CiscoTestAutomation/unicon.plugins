@@ -527,6 +527,13 @@ class TestGenericServices(unittest.TestCase):
         with self.assertRaises(SubCommandFailure):
             self.ha_device.execute('unkown command', error_pattern=['^% '])
 
+    def test_append_error_pattern(self):
+        with self.assertRaises(SubCommandFailure):
+            self.d.execute('unkown command', append_error_pattern=['unkown command'])
+
+        with self.assertRaises(SubCommandFailure):
+            self.ha_device.execute('unkown command', append_error_pattern=['unkown command'])
+
     def test_multi_thread_execute(self):
         commands = ['show version'] * 3
         with ThreadPoolExecutor(max_workers=3) as executor:
@@ -572,6 +579,8 @@ class TestConfigureService(unittest.TestCase):
             username='cisco',
             tacacs_password='cisco',
             enable_password='cisco',
+            mit=True,
+            log_buffer=True
         )
         cls.d.connect()
 
@@ -585,6 +594,7 @@ class TestConfigureService(unittest.TestCase):
             username='cisco',
             tacacs_password='cisco',
             enable_password='cisco',
+            log_buffer=True
         )
         cls.d_ha.connect()
 
@@ -647,14 +657,16 @@ class TestConfigureService(unittest.TestCase):
         self.d_ha.configure.bulk = False
 
     def test_config_lock_retries_succeed(self):
-        self.d.execute('set config lock count 2')
+        self.d.settings.CONFIG_LOCK_RETRY_SLEEP = 1
+        self.d.execute('set config lock count 1')
         self.d.configure('no logging console',
                          lock_retries=2, lock_retry_sleep=1)
         self.d.configure('no logging console')
 
     def test_config_lock_retries_fail(self):
+        self.d.settings.CONFIG_LOCK_RETRY_SLEEP = 1
         self.d.execute('set config lock count 3')
-        with self.assertRaises(SubCommandFailure):
+        with self.assertRaises(StateMachineError):
             self.d.configure('no logging console', lock_retries=2)
 
     def test_configure_error_pattern(self):
@@ -663,6 +675,11 @@ class TestConfigureService(unittest.TestCase):
                              error_pattern=[r'% Invalid command'])
         self.assertEqual(self.d.state_machine.current_state,
                          self.d.configure.end_state)
+
+    def test_configure_append_error_pattern(self):
+        with self.assertRaises(SubCommandFailure):
+            self.d.configure('Not valid configuration',
+                             append_error_pattern=[r'Not valid configuration'])
 
     def test_configure_error_pattern2(self):
         error_pattern = [r'% Invalid command']
@@ -679,17 +696,35 @@ class TestConfigureService(unittest.TestCase):
 
     def test_ha_config_lock_retries_succeed(self):
         self.d_ha.execute('set config lock count 2')
+        self.d_ha.settings.CONFIG_LOCK_RETRY_SLEEP = 1
         self.d_ha.configure('no logging console',
                             lock_retries=2, lock_retry_sleep=1)
         self.d_ha.configure('no logging console')
 
     def test_ha_config_lock_retries_fail(self):
         self.d_ha.execute('set config lock count 3')
-        with self.assertRaises(SubCommandFailure):
+        self.d_ha.settings.CONFIG_LOCK_RETRY_SLEEP = 1
+        with self.assertRaises(StateMachineError):
             self.d_ha.configure('no logging console', lock_retries=2)
 
     def test_configure_ca_trustpoint(self):
         self.d.configure(['crypto pki trustpoint KEYPAIR', 'rsakeypair SSHKEYS'])
+
+    def test_configure_commit_cmd_attribute(self):
+        c = Connection(
+            hostname='Router',
+            start=['mock_device_cli --os ios --state enable'],
+            os='ios',
+            username='cisco',
+            tacacs_password='cisco',
+            enable_password='cisco',
+            service_attributes=dict(configure=dict(commit_cmd="mycommit cmd")),
+            mit=True,
+            log_buffer=True
+        )
+        c.connect()
+        self.assertEqual(c.configure.commit_cmd, 'mycommit cmd')
+        c.disconnect()
 
     @classmethod
     @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
@@ -698,6 +733,7 @@ class TestConfigureService(unittest.TestCase):
         cls.d.disconnect()
         cls.d_ha.disconnect()
         cls.ha.stop()
+
 
 class TestExecuteService(unittest.TestCase):
 
@@ -1189,6 +1225,7 @@ class TestLearnOS(unittest.TestCase):
           Router:
             os: generic
             type: router
+            os: generic
             credentials:
               default:
                 password: cisco
