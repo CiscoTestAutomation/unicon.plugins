@@ -13,6 +13,7 @@ class MockDeviceNXOS(MockDevice):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, device_os="nxos",  **kwargs)
+        self.config_lock_counter = 0
 
     def ha_confirm_reload(self, transport, cmd):
         if 'prompt' in self.transport_ports[self.transport_handles[transport]]:
@@ -25,6 +26,20 @@ class MockDeviceNXOS(MockDevice):
                 prompt = self.mock_data['ha_standby_console']['prompt']
                 self.get_other_transport(transport).write(prompt.encode())
                 return True
+
+    def exec(self, transport, cmd):
+        if 'set config lock count' in cmd:
+            self.config_lock_counter = int(cmd.split()[-1])
+            return True
+        elif cmd == 'config term':
+            if self.config_lock_counter > 0:
+                self.mock_data['exec']['commands']['config term'] \
+                    = "Configuration mode locked exclusively by user 'unknown' process '13' from terminal '0'. Please try later."
+                self.config_lock_counter -= 1
+            else:
+                self.mock_data['exec']['commands']['config term'] \
+                    = {'new_state': 'config'}
+
 
 
 class MockDeviceTcpWrapperNXOS(MockDeviceTcpWrapper):

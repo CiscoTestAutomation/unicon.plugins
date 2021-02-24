@@ -170,3 +170,36 @@ class Reload(BaseService):
 
         con.log.info("+++ Reload completed +++")
 
+
+class AttachModuleConsole(BaseService):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.start_state = "enable"
+        self.end_state = "enable"
+
+    def call_service(self, **kwargs):
+        self.result = self.__class__.ContextMgr(connection=self.connection,
+                                                **kwargs)
+
+    class ContextMgr(object):
+        def __init__(self,
+                     connection):
+            self.conn = connection
+
+        def __enter__(self):
+            self.conn.log.debug('+++ attaching console +++')
+            self.conn.state_machine.go_to('module', self.conn.spawn)
+            return self
+
+        def __exit__(self, exc_type, exc_value, exc_tb):
+            self.conn.log.debug('--- detaching console ---')
+            self.conn.state_machine.go_to('enable', self.conn.spawn)
+            return False
+
+        def __getattr__(self, attr):
+            if attr in ('execute', 'send', 'sendline', 'expect'):
+                return getattr(self.conn, attr)
+
+            raise AttributeError('%s object has no attribute %s'
+                                 % (self.__class__.__name__, attr))

@@ -12,11 +12,26 @@ c9k_password:
     prompt: "Password: "
     commands:
       "cisco":
+        new_state: c9k_disable
+
+c9k_disable:
+    prompt: "%N>"
+    commands:
+      "enable":
+        new_state: c9k_enable_password
+
+c9k_enable_password:
+    prompt: "Password: "
+    commands:
+      "cisco":
         new_state: c9k_enable
 
+
 c9k_enable:
-    prompt: "switch1#"
+    prompt: "%N#"
     commands:
+      "config term":
+        new_state: c9k_config
       "term length 0": ""
       "term width 0": ""
       "reload":
@@ -44,7 +59,7 @@ c9k_enable:
           ROM: IOS-XE ROMMON
           BOOTLDR: System Bootstrap, Version 16.9.1r [FC2], RELEASE SOFTWARE (P)
 
-          switch1 uptime is 9 minutes
+          %N uptime is 9 minutes
           Uptime for this control processor is 12 minutes
           System returned to ROM by day0 configured with SVL requiring reboot
           System image file is "flash:packages.conf"
@@ -127,6 +142,26 @@ c9k_enable:
         new_state:
           log_message
 
+
+c9k_config:
+    prompt: "%N(config)#"
+    commands:
+      "no logging console": ""
+      "line console 0":
+        new_state: c9k_config_line
+      "end":
+        new_state: c9k_enable
+
+c9k_config_line:
+  prompt: "%N(config-line)#"
+  commands:
+    "exec-timeout 0": ""
+    "exit":
+      new_state: c9k_config
+    "end":
+      new_state: c9k_enable
+
+
 log_message:
   preface: |
     *Feb 22 01:31:30.836: %SEC_LOGIN-5-LOGIN_SUCCESS: Login Success [user: admin] [Source: UNKNOWN] [localport: 0] at 01:31:30 UTC Fri Feb 22 2019
@@ -158,7 +193,7 @@ c9k_password2:
       new_state: c9k_enable2
 
 c9k_enable2:
-  prompt: "switch1#"
+  prompt: "%N#"
   commands:
     "term length 0": ""
     "term width 0": ""
@@ -189,7 +224,7 @@ c9k_show_ver:
       ROM: IOS-XE ROMMON
       BOOTLDR: System Bootstrap, Version 16.12.1r[FC1], RELEASE SOFTWARE (P)
 
-      switch1 uptime is 14 minutes
+      %N uptime is 14 minutes
       Uptime for this control processor is 17 minutes
       System returned to ROM by Reload command
       System image file is "flash:packages.conf"
@@ -271,7 +306,7 @@ c9k_show_ver:
 
       Configuration register is 0x102
 
-      switch1#
+      %N#
       *Oct  8 00:02:44.304: %SEC_LOGIN-5-LOGIN_SUCCESS: Login Success [user: admin] [Source: LOCAL] [localport: 0] at 00:02:44 UTC Tue Oct 8 2019
   prompt: ""
   commands:
@@ -593,7 +628,7 @@ c9k_exec:
           ROM: IOS-XE ROMMON
           BOOTLDR: System Bootstrap, Version 16.9.1r [FC2], RELEASE SOFTWARE (P)
 
-          switch1 uptime is 9 minutes
+          %N uptime is 9 minutes
           Uptime for this control processor is 12 minutes
           System returned to ROM by day0 configured with SVL requiring reboot
           System image file is "flash:packages.conf"
@@ -702,7 +737,7 @@ enable_c9k:
       ROM: IOS-XE ROMMON
       BOOTLDR: System Bootstrap, Version 16.9.1r [FC2], RELEASE SOFTWARE (P)
 
-      switch1 uptime is 9 minutes
+      %N uptime is 9 minutes
       Uptime for this control processor is 12 minutes
       System returned to ROM by day0 configured with SVL requiring reboot
       System image file is "flash:packages.conf"

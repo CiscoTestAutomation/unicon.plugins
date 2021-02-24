@@ -24,6 +24,8 @@ with open(os.path.join(mockdata_path, 'junos/junos_mock_data.yaml'), 'rb') as da
     mock_data = yaml.safe_load(datafile.read())
 
 
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestJunosPluginConnect(unittest.TestCase):
 
     def test_login_connect(self):
@@ -35,6 +37,7 @@ class TestJunosPluginConnect(unittest.TestCase):
         c.connect()
         self.assertIn('set cli screen-width 0', c.spawn.match.match_output)
         self.assertIn('root@junos_vmx2>', c.spawn.match.match_output)
+        c.disconnect()
 
     def test_login_connect_ssh(self):
         c = Connection(hostname='junos_vmx2',
@@ -45,6 +48,7 @@ class TestJunosPluginConnect(unittest.TestCase):
         c.connect()
         self.assertIn('set cli screen-width 0', c.spawn.match.match_output)
         self.assertIn('root@junos_vmx2>', c.spawn.match.match_output)
+        c.disconnect()
 
     def test_login_connect_connectReply(self):
         c = Connection(hostname='junos_vmx2',
@@ -58,6 +62,9 @@ class TestJunosPluginConnect(unittest.TestCase):
         self.assertIn("^(.*?)Password:", str(c.connection_provider.get_connection_dialog()))
         c.disconnect()
 
+
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestJunosPluginExecute(unittest.TestCase):
 
     def test_execute_show_feature(self):
@@ -74,8 +81,11 @@ class TestJunosPluginExecute(unittest.TestCase):
         expected_response = mock_data['exec']['commands'][cmd].strip()
         ret = c.execute(cmd).replace('\r', '')
         self.assertIn(expected_response, ret)
+        c.disconnect()
 
 
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestJunosPluginConfigure(unittest.TestCase):
 
     def test_configure_commit(self):
@@ -92,6 +102,7 @@ class TestJunosPluginConfigure(unittest.TestCase):
         expected_response = mock_data['config']['commands'][cmd].strip()
         ret = c.configure(cmd).replace('\r', '')
         self.assertIn(expected_response, ret)
+        c.disconnect()
 
     def test_configure_commit_on_failure(self):
         c = Connection(hostname='junos_dev',
@@ -105,7 +116,8 @@ class TestJunosPluginConfigure(unittest.TestCase):
         c.connect()
         with self.assertRaises(SubCommandFailure):
             c.configure('commit')
-    
+        c.disconnect()
+
     def test_configure_commit_on_failure_1(self):
         c = Connection(hostname='junos_dev',
                         start=['mock_device_cli --os junos --state exec4'],
@@ -118,8 +130,22 @@ class TestJunosPluginConfigure(unittest.TestCase):
         c.connect()
         with self.assertRaises(SubCommandFailure):
             c.configure('commit')
+        c.disconnect()
+
+    def test_configure_commit_cmd(self):
+        c = Connection(hostname='junos_vmx2',
+                       start=['mock_device_cli --os junos --state exec'],
+                       os='junos',
+                       mit=True)
+        c.connect()
+        c.configure.commit_cmd = ""
+        c.configure("something")
+        self.assertNotIn('commit', c.spawn.match.match_output)
+        c.disconnect()
 
 
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestJunosPluginBashService(unittest.TestCase):
 
     def test_bash(self):
@@ -133,8 +159,11 @@ class TestJunosPluginBashService(unittest.TestCase):
             console.execute('ls')
         self.assertIn('cli', c.spawn.match.match_output)
         self.assertIn('root@junos_vmx2>', c.spawn.match.match_output)
+        c.disconnect()
 
 
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestJunosVsrxPluginBashService(unittest.TestCase):
 
     def test_bash(self):
@@ -149,10 +178,13 @@ class TestJunosVsrxPluginBashService(unittest.TestCase):
             console.execute('ls')
         self.assertIn('exit', c.spawn.match.match_output)
         self.assertIn('root@junos_vsrx>', c.spawn.match.match_output)
+        c.disconnect()
 
 
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestConfigErrorResponse(unittest.TestCase):
-    
+
     def test_connection(self):
         c = Connection(hostname='junos_dev',
                         start=['mock_device_cli --os junos --state exec5'],
@@ -164,7 +196,8 @@ class TestConfigErrorResponse(unittest.TestCase):
                         )
         c.connect()
         with self.assertRaises(Exception):
-	        c.configure('commit synchronize')
+            c.configure('commit synchronize')
+        c.disconnect()
 
 
 if __name__ == "__main__":

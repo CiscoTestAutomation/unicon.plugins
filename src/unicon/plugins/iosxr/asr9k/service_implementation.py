@@ -58,7 +58,6 @@ class Reload(BaseService):
                      reload_creds=None,
                      *args, **kwargs):
         con = self.connection
-        import pdb; pdb.set_trace()
         timeout = timeout or self.timeout
 
         fmt_msg = "+++ reloading  %s  " \

@@ -258,7 +258,9 @@ class TestAireOsPlugin(unittest.TestCase):
         self.c.execute("show command with more")
 
     def test_execute_error_pattern(self):
-        for cmd in ['transfer upload start', 'show foo', 'debug lwapp', 'config time ntp delete foo', 'config time ntp delete 2']:
+        for cmd in ['transfer upload start', 'show foo', 'debug lwapp', 'config time ntp delete foo',
+                    'config time ntp delete 2', 'config wlan enable 20', 'config wlan security web-auth captive-bypass enable 10',
+                    'config wlan error', 'config wlan interface 511 all-interfaces', 'config wlan create 511 Company-guest Company-guest']:
             with self.assertRaises(SubCommandFailure) as err:
                 r = self.c.execute(cmd)
 

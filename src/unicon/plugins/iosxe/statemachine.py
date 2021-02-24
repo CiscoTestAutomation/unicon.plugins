@@ -2,7 +2,7 @@
 
 __author__ = "Myles Dear <pyats-support@cisco.com>"
 
-from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine
+from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine, config_transition
 from unicon.plugins.generic.statements import (connection_statement_list,
                                                default_statement_list)
 from unicon.plugins.generic.service_statements import reload_statement_list
@@ -45,12 +45,15 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         config = State('config', patterns.config_prompt)
         shell = State('shell', patterns.shell_prompt)
 
-        disable_to_enable = Path(disable, enable, 'enable',
-                                 Dialog([statements.enable_password_stmt, statements.bad_password_stmt]))
+        disable_to_enable = Path(disable, enable, 'enable', Dialog([
+            statements.enable_password_stmt,
+            statements.bad_password_stmt,
+            statements.syslog_stripper_stmt
+        ]))
         enable_to_disable = Path(enable, disable, 'disable', None)
 
-        enable_to_config = Path(enable, config, self.config_command, None)
-        config_to_enable = Path(config, enable, 'end', None)
+        enable_to_config = Path(enable, config, config_transition, Dialog([statements.syslog_msg_stmt]))
+        config_to_enable = Path(config, enable, 'end', Dialog([statements.syslog_msg_stmt]))
 
         self.add_state(disable)
         self.add_state(enable)
@@ -61,10 +64,9 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         self.add_path(enable_to_config)
         self.add_path(config_to_enable)
 
-
         rommon = State('rommon', patterns.rommon_prompt)
         enable_to_rommon = Path(enable, rommon, 'reload',
-            Dialog(reload_statement_list))
+            Dialog(connection_statement_list + reload_statement_list))
         rommon_to_disable = \
             Path(rommon, disable, '\r', Dialog(
                 connection_statement_list + boot_from_rommon_statement_list))
@@ -85,6 +87,8 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
 
 
 class IosXEDualRpStateMachine(StateMachine):
+    config_command = 'config term'
+
     def create(self):
         # States
         disable = State('disable', patterns.disable_prompt)
@@ -95,17 +99,20 @@ class IosXEDualRpStateMachine(StateMachine):
         shell = State('shell', patterns.shell_prompt)
 
         # Paths
-        disable_to_enable = Path(disable, enable, 'enable',
-                                 Dialog([statements.enable_password_stmt, statements.bad_password_stmt]))
+        disable_to_enable = Path(disable, enable, 'enable', Dialog([
+            statements.enable_password_stmt,
+            statements.bad_password_stmt,
+            statements.syslog_stripper_stmt
+        ]))
 
-        enable_to_disable = Path(enable, disable, 'disable', None)
+        enable_to_disable = Path(enable, disable, 'disable', Dialog([statements.syslog_msg_stmt]))
 
-        enable_to_config = Path(enable, config, 'config term', None)
+        enable_to_config = Path(enable, config, config_transition, Dialog([statements.syslog_msg_stmt]))
 
-        config_to_enable = Path(config, enable, 'end', None)
+        config_to_enable = Path(config, enable, 'end', Dialog([statements.syslog_msg_stmt]))
 
-        enable_to_rommon = Path(enable, rommon, 'reload',
-            Dialog(reload_statement_list))
+        enable_to_rommon = Path(enable, rommon, 'reload', Dialog(
+            connection_statement_list + reload_statement_list))
 
         rommon_to_disable = \
             Path(rommon, disable, '\r', Dialog(

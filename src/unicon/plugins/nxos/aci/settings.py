@@ -2,10 +2,10 @@
 
 __author__ = "dwapstra"
 
-from unicon.plugins.generic.settings import GenericSettings
+from ..setting import NxosSettings
 
 
-class AciSettings(GenericSettings):
+class AciSettings(NxosSettings):
     """" Generic platform settings """
     def __init__(self):
         """ initialize

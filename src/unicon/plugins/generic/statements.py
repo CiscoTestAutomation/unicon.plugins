@@ -11,6 +11,7 @@ Description:
 """
 import re
 from time import sleep
+from datetime import datetime, timedelta
 from unicon.eal.dialogs import Statement
 from unicon.eal.helpers import sendline
 from unicon.core.errors import UniconAuthenticationError
@@ -37,11 +38,52 @@ utils = Utils()
 def connection_refused_handler(spawn):
     """ handles connection refused scenarios
     """
-    raise Exception('Connection refused to device %s' % (str(spawn),))
+    raise Exception('Connection refused to device %s' % (str(spawn)))
 
 
-def connection_failure_handler(spawn, err):
-    raise Exception(err)
+def connection_failure_handler(spawn):
+    raise Exception('received disconnect from router %s' % (str(spawn)))
+
+
+def syslog_stripper(spawn):
+    """Strip syslog from spawn buffer"""
+    spawn.buffer = re.sub(pat.syslog_message_pattern, '', spawn.buffer, flags=re.M).strip()
+
+
+def buffer_settled(spawn, wait_time):
+    """Wait up to wait_time for the buffer to settle.
+
+    If the buffer is growing, return False immediately,
+    if the buffer did not grow during wait_time,
+    return True.
+    """
+    wait_time = timedelta(seconds=wait_time)
+    start_time = current_time = datetime.now()
+    prev_buf_len = len(spawn.buffer)
+    while (current_time - start_time) < wait_time:
+        spawn.read_update_buffer()
+        cur_buf_len = len(spawn.buffer)
+
+        if cur_buf_len > prev_buf_len:
+            return False
+
+        current_time = datetime.now()
+    return True
+
+
+def syslog_wait_send_return(spawn):
+    """Handle syslog messages observed in the buffer.
+
+    If a syslog messsage was seen, this handler is executed.
+    Read the buffer, if its growing, return.
+
+    If the buffer is not growing, read updates up to wait_time
+    and check if in that period the buffer stayed the same.
+    If so, the last message was a syslog message and we want
+    to send a return to get back the prompt.
+    """
+    if buffer_settled(spawn, spawn.settings.SYSLOG_WAIT):
+        spawn.sendline()
 
 
 def chatty_term_wait(spawn, trim_buffer=False):
@@ -228,6 +270,19 @@ def password_handler(spawn, context, session):
         else:
             spawn.sendline(context['line_password'])
 
+    cred_actions = context.get('cred_action', {}).get(credential, {})
+    if cred_actions:
+        post_action = cred_actions.get('post', '')
+        action = re.match(r'(send|sendline)\((.*)\)', post_action)
+        if action:
+            method = action.group(1)
+            args = action.group(2)
+            spawn.log.info('Executing post credential command: {}'.format(post_action))
+            getattr(spawn, method)(args)
+    elif credential and getattr(spawn.settings, 'SENDLINE_AFTER_CRED', None) == credential:
+        spawn.log.info("Sending return after credential '{}'".format(credential))
+        spawn.sendline()
+
 
 def passphrase_handler(spawn, context, session):
     """ Handles SSH passphrase prompt """
@@ -351,7 +406,7 @@ class GenericStatements():
                                           loop_continue=True,
                                           continue_timer=False)
         self.press_return_stmt = Statement(pattern=pat.press_return,
-                                           action=sendline, args=None,
+                                           action=wait_and_enter, args=None,
                                            loop_continue=True,
                                            continue_timer=False)
         self.connection_refused_stmt = \
@@ -375,7 +430,7 @@ class GenericStatements():
 
         self.disconnect_error_stmt = Statement(pattern=pat.disconnect_message,
                                                action=connection_failure_handler,
-                                               args={'err': 'received disconnect from router'},
+                                               args=None,
                                                loop_continue=False,
                                                continue_timer=False)
         self.login_stmt = Statement(pattern=pat.username,
@@ -478,6 +533,20 @@ class GenericStatements():
                                    loop_continue=True,
                                    continue_timer=False)
 
+        self.syslog_msg_stmt = Statement(pattern=pat.syslog_message_pattern,
+                                         action=syslog_wait_send_return,
+                                         args=None,
+                                         loop_continue=True,
+                                         trim_buffer=False,
+                                         continue_timer=True)
+
+        self.syslog_stripper_stmt = Statement(pattern=pat.syslog_message_pattern,
+                                              action=syslog_stripper,
+                                              args=None,
+                                              loop_continue=True,
+                                              trim_buffer=False,
+                                              continue_timer=True)
+
 
 #############################################################
 #  Statement lists
@@ -497,6 +566,7 @@ pre_connection_statement_list = [generic_statements.escape_char_stmt,
                                  generic_statements.hit_enter_stmt,
                                  generic_statements.press_ctrlx_stmt,
                                  generic_statements.connected_stmt,
+                                 generic_statements.syslog_msg_stmt
                                  ]
 
 #############################################################
@@ -521,11 +591,14 @@ initial_statement_list = [generic_statements.init_conf_stmt,
                           generic_statements.mgmt_setup_stmt
                           ]
 
-connection_statement_list = authentication_statement_list + initial_statement_list + pre_connection_statement_list
-
+connection_statement_list = \
+    authentication_statement_list + \
+    initial_statement_list + \
+    pre_connection_statement_list
 
 ############################################################
 # Default pattern Statement
 #############################################################
 
 default_statement_list = [generic_statements.more_prompt_stmt]
+

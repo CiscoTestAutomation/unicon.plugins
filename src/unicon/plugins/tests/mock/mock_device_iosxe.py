@@ -13,6 +13,7 @@ class MockDeviceIOSXE(MockDevice):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, device_os="iosxe", **kwargs)
+        self.config_lock_counter = 0
 
     def enable_asr(self, transport, cmd):
         if cmd == "redundancy force-switchover":
@@ -32,6 +33,20 @@ class MockDeviceIOSXE(MockDevice):
                     self.state_change_switchover(
                           transport, 'cat9k_ha_active_console', 'cat9k_ha_standby_console')
                  return True
+
+    def general_enable(self, transport, cmd):
+        if 'set config lock count' in cmd:
+            self.config_lock_counter = int(cmd.split()[-1])
+            return True
+        elif cmd == 'config term':
+            if self.config_lock_counter > 0:
+                self.mock_data['general_enable']['commands']['config term'] \
+                    = "Configuration mode is locked by process '484' user 'NETCONF' from terminal '64'. Please try later."
+                self.config_lock_counter -= 1
+            else:
+                self.mock_data['general_enable']['commands']['config term'] \
+                    = {'new_state': 'general_config'}
+
 
 class MockDeviceTcpWrapperIOSXE(MockDeviceTcpWrapper):
 
@@ -124,7 +139,7 @@ def main(args=None):
         parser = argparse.ArgumentParser()
         parser.add_argument('--state', help='initial state')
         parser.add_argument('--ha', action='store_true', help='HA mode')
-        parser.add_argument('--hostname', help='Device hostname (default: Router')
+        parser.add_argument('--hostname', help='Device hostname (default: Switch')
         parser.add_argument('-d', action='store_true', help='Debug')
         args = parser.parse_args()
 
@@ -140,7 +155,7 @@ def main(args=None):
     if args.hostname:
         hostname = args.hostname
     else:
-        hostname = 'Router'
+        hostname = 'Switch'
 
     if args.ha:
         md = MockDeviceTcpWrapperIOSXE(hostname=hostname, state=state)

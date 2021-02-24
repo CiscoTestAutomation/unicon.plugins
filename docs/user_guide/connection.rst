@@ -767,6 +767,11 @@ Arguments:
     * **login_creds**: A single credential name or a list of credentials for
       authenticating against the device.  Default value is ``default``. *(Optional)*
 
+    * **cred_action**: A dictionary with credential names and post password action statement.
+      This allows the user to specify e.g. `sendline` to be sent after a credential password.
+      The typical use case is a terminal server connection where a return will get a response
+      from the device. *(Optional)*
+
     * **learn_hostname**: Set to `True` if the actual hostname set on the device
       differs from the hostname parameter. *(Optional)*
 
@@ -854,15 +859,31 @@ For *Single RP* connection, `start` will be a list with only one element.
       * The hostname of the device does not contain the characters :
         #, whitespace characters.
 
+
+.. note::
+
+    Passive hostname learning is enabled by default and will
+    give a warning if the device hostname does not match the learned
+    hostname. The learned hostname is only used if `learn_hostname=True`.
+
+    A timeout may occur if the prompt pattern uses the hostname,
+    the timeout error includes the hostname and a hint to check
+    the hostname if a mismatch was detected.
+
+
 .. note::
 
     When using the Linux plugin, it is recommended to use ``learn_hostname=True``.
-    With the default prompt pattern for the Linux plugin there is a risk of false prompt matching if the output contains one of the prompt characters `> # % ~ $` at the end of a line.
+    With the default prompt pattern for the Linux plugin there is a risk of false prompt
+    matching if the output contains one of the prompt characters `> # % ~ $` at the end of a line.
 
 
 **Disconnecting**
 
-To disconnect a session, you can call the `disconnect()` method from a Unicon connection. This will terminate the subprocess that is handling the device connection. By default, Unicon waits about 10 seconds after the process is terminated before returning from the method. This is to prevent connection issues on rapid connect/disconnect sequences.
+To disconnect a session, you can call the `disconnect()` method from a Unicon connection.
+This will terminate the subprocess that is handling the device connection. By default,
+Unicon waits about 10 seconds after the process is terminated before returning from the method.
+This is to prevent connection issues on rapid connect/disconnect sequences.
 
 To change the default timers used when disconnecting, you can change the `GRACEFUL_DISCONNECT_WAIT_SEC` and
 `POST_DISCONNECT_WAIT_SEC` settings on the Settings object.
@@ -876,7 +897,7 @@ To change the default timers used when disconnecting, you can change the `GRACEF
 .. _unicon_extend_settings_attributes:
 
 Extend Settings Attributes
-"""""""""""""""""""""""""""""
+""""""""""""""""""""""""""
 
 It is possible to extend list settings attributes of the connection like ``ERROR_PATTERN``
 and ``CONFIGURE_ERROR_PATTERN`` by using ``overwrite_settings=False`` argument.
@@ -1046,6 +1067,61 @@ In Python
                        },
                        login_creds = ['termserv', 'default'],
                      )
+
+
+Post credential action
+""""""""""""""""""""""
+
+In certain cases, e.g. when using a serial console server, an action is needed to get a response
+from the device connected to the serial port. There are two ways to configure this action.
+The first one is using a setting, the second one is using a post credential action.
+The post credential action takes precedence over the setting.
+
+Example credentials for a device.
+
+.. code-block:: yaml
+
+      my_device:
+          type: router
+          credentials:
+              default:
+                  username: admin
+                  password: Cisc0123
+              terminal_server:
+                  username: tsuser
+                  password: tspw
+
+
+Setting the credential action via `settings` in python.
+
+.. code-block:: python
+
+    # Name of the credential after which a "sendline()" should be executed
+    dev.settings.SENDLINE_AFTER_CRED = 'terminal_server'
+
+
+Settings can also be specified for the connection in the topology file as shown below.
+
+.. code-block:: yaml
+
+    connections:
+      cli:
+        settings:
+          SENDLINE_AFTER_CRED: terminal_server
+
+
+The post credential action supports ``send`` and ``sendline``, you can specify a string to be sent,
+e.g. `send( )` to send a space or `send(\\x03)` to send Ctrl-C. Quotes should not be specified.
+
+.. code-block:: yaml
+
+    connections:
+      cli:
+        login_creds: [terminal_server, default]
+        arguments:
+          cred_action:
+            terminal_server:
+              post: sendline()
 
 
 

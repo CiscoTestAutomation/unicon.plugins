@@ -152,21 +152,21 @@ class TestAciSSH(unittest.TestCase):
         cls.apic_md_ssh.stop()
 
     def test_apic_ssh(self):
-        a = self.tb.devices.APC
-        a.connect()
-        a.disconnect()
-        a.connect()
-        self.assertEqual(a.connected, True)
-        a.destroy()
+        con = self.tb.devices.APC
+        con.connect()
+        con.disconnect()
+        con.connect()
+        self.assertEqual(con.connected, True)
+        con.destroy()
 
     def test_reload_ssh(self):
-        a = self.tb.devices.APC
-        a.destroy()
-        a.connect()
-        a.settings.RELOAD_TIMEOUT = 3
-        a.settings.POST_RELOAD_WAIT = 1
-        a.reload()
-        a.destroy()
+        con = self.tb.devices.APC
+        con.destroy()
+        con.connect()
+        con.settings.RELOAD_TIMEOUT = 3
+        con.settings.POST_RELOAD_WAIT = 1
+        con.reload()
+        con.destroy()
 
 
 if __name__ == "__main__":

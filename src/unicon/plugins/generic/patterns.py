@@ -59,3 +59,7 @@ class GenericPatterns(UniconCorePatterns):
         self.learn_os_prompt = r'^(.*?([>\$~%]|[^#\s]#|~ #|~/|^admin:|^#)\s?(\x1b\S+)?)$|(^.*This \(D\)RP Node is not ready or active for login \/configuration.*)'
 
         self.sudo_password_prompt = r'^.*\[sudo\] password for .*?:\s*?'
+
+        self.syslog_message_pattern = r'^.*?%\w+-\d+-\w+:.*$'
+
+        self.config_locked = r'Configuration (mode )?(is )?locked|Config mode cannot be entered'

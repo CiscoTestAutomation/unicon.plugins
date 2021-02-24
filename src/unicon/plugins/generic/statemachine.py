@@ -11,17 +11,68 @@ Description:
     by majority of the platforms. It should also be used as starting
     point by further sub classing it.
 """
+
+from time import sleep
+
+from unicon.core.errors import StateMachineError, TimeoutError as UniconTimeoutError
 from unicon.plugins.generic.statements import GenericStatements
 from unicon.plugins.generic.patterns import GenericPatterns
 
 from unicon.statemachine import State, Path, StateMachine
-from unicon.eal.dialogs import Dialog
+from unicon.eal.dialogs import Dialog, Statement
 
 from .statements import (authentication_statement_list,
-                         default_statement_list)
+                         default_statement_list,
+                         update_context)
 
 patterns = GenericPatterns()
 statements = GenericStatements()
+
+
+def config_transition(statemachine, spawn, context):
+    # Config may be locked, retry until max attempts or config state reached
+    wait_time = spawn.settings.CONFIG_LOCK_RETRY_SLEEP
+    max_attempts = spawn.settings.CONFIG_LOCK_RETRIES
+    dialog = Dialog([Statement(pattern=patterns.config_locked,
+                               action=update_context,
+                               args={'config_locked': True},
+                               loop_continue=False,
+                               trim_buffer=True),
+                     Statement(pattern=statemachine.get_state('enable').pattern,
+                               action=update_context,
+                               args={'config_locked': False},
+                               loop_continue=False,
+                               trim_buffer=False),
+                     Statement(pattern=statemachine.get_state('config').pattern,
+                               action=update_context,
+                               args={'config_locked': False},
+                               loop_continue=False,
+                               trim_buffer=False)
+                     ])
+
+    for attempts in range(max_attempts + 1):
+        spawn.sendline(statemachine.config_command)
+        try:
+            dialog.process(spawn, timeout=spawn.settings.CONFIG_TIMEOUT, context=context)
+        except UniconTimeoutError:
+            pass
+        if context.get('config_locked'):
+            if attempts < max_attempts:
+                spawn.log.warning('*** Config lock detected, waiting {} seconds. Retry attempt {}/{} ***'.format(
+                    wait_time, attempts + 1, max_attempts))
+                sleep(wait_time)
+        else:
+            statemachine.detect_state(spawn)
+            if statemachine.current_state == 'config':
+                return
+            else:
+                spawn.log.warning("Could not enter config mode, sending clear line command and trying again..")
+                spawn.send(spawn.settings.CLEAR_LINE_CMD)
+
+    if context.get('config_locked'):
+        raise StateMachineError('Config locked, unable to configure device')
+    else:
+        raise StateMachineError('Unable to transition to config mode')
 
 
 #############################################################
@@ -29,6 +80,7 @@ statements = GenericStatements()
 #############################################################
 
 class GenericSingleRpStateMachine(StateMachine):
+    config_command = 'config term'
 
     """
         Defines Generic StateMachine for singleRP
@@ -53,13 +105,14 @@ class GenericSingleRpStateMachine(StateMachine):
         # Path Definition
         ##########################################################
 
-        enable_to_disable = Path(enable, disable, 'disable', None)
-        enable_to_config = Path(enable, config, 'config term', None)
+        enable_to_disable = Path(enable, disable, 'disable', Dialog([statements.syslog_msg_stmt]))
         enable_to_rommon = Path(enable, rommon, 'reload', None)
+        enable_to_config = Path(enable, config, config_transition, Dialog([statements.syslog_msg_stmt]))
         disable_to_enable = Path(disable, enable, 'enable',
                                  Dialog([statements.enable_password_stmt,
-                                         statements.bad_password_stmt]))
-        config_to_enable = Path(config, enable, 'end', None)
+                                         statements.bad_password_stmt,
+                                         statements.syslog_stripper_stmt]))
+        config_to_enable = Path(config, enable, 'end', Dialog([statements.syslog_msg_stmt]))
         rommon_to_disable = Path(rommon, disable, 'boot',
                                  Dialog(authentication_statement_list))
 

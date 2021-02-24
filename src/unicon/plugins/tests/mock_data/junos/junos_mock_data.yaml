@@ -25,6 +25,8 @@ exec:
 config:
   prompt: "root@junos_vmx2#"
   commands:
+    "commit synchronize": "dont know what the response is"
+    "something": ""
     "commit": |
         commit complete
 

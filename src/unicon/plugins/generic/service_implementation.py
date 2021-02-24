@@ -584,6 +584,7 @@ class Execute(BaseService):
                      reply=Dialog([]),
                      timeout=None,
                      error_pattern=None,
+                     append_error_pattern=None,
                      search_size=None,
                      allow_state_change=None,
                      matched_retries=None,
@@ -600,6 +601,11 @@ class Execute(BaseService):
             self.error_pattern = con.settings.ERROR_PATTERN
         else:
             self.error_pattern = error_pattern
+
+        if append_error_pattern:
+            if not isinstance(append_error_pattern, list):
+                raise ValueError('append_error_pattern should be a list')
+            self.error_pattern += append_error_pattern
 
         # user specified search buffer size
         if search_size is not None:
@@ -787,8 +793,6 @@ class Configure(BaseService):
         self.timeout = connection.settings.CONFIG_TIMEOUT
         self.dialog = Dialog(configure_statement_list)
         self.commit_cmd = ''
-        self.lock_retries = connection.settings.CONFIG_LOCK_RETRIES
-        self.lock_retry_sleep = connection.settings.CONFIG_LOCK_RETRY_SLEEP
         self.bulk = connection.settings.BULK_CONFIG
         self.bulk_chunk_lines = connection.settings.BULK_CONFIG_CHUNK_LINES
         self.bulk_chunk_sleep = connection.settings.BULK_CONFIG_CHUNK_SLEEP
@@ -809,6 +813,14 @@ class Configure(BaseService):
     def pre_service(self, *args, **kwargs):
         self.prompt_recovery = kwargs.get('prompt_recovery', False)
 
+        # Backward compatibility with old config lock implementation
+        con = self.connection
+        settings = con.settings
+        settings.CONFIG_LOCK_RETRIES = kwargs.get('lock_retries', settings.CONFIG_LOCK_RETRIES)
+        settings.CONFIG_LOCK_RETRY_SLEEP = kwargs.get('lock_retry_sleep', settings.CONFIG_LOCK_RETRY_SLEEP)
+
+        super().pre_service(*args, **kwargs)
+
     def post_service(self, *args, **kwargs):
         pass
 
@@ -817,9 +829,8 @@ class Configure(BaseService):
                      reply=Dialog([]),
                      timeout=None,
                      error_pattern=None,
+                     append_error_pattern=None,
                      target=None,
-                     lock_retries=None,
-                     lock_retry_sleep=None,
                      bulk=None,
                      bulk_chunk_lines=None,
                      bulk_chunk_sleep=None,
@@ -834,35 +845,19 @@ class Configure(BaseService):
         else:
             self.error_pattern = error_pattern
 
+        if append_error_pattern:
+            if not isinstance(append_error_pattern, list):
+                raise ValueError('append_error_pattern should be a list')
+            self.error_pattern += append_error_pattern
+
         bulk = self.bulk if bulk is None else bulk
         bulk_chunk_lines = self.bulk_chunk_lines \
             if bulk_chunk_lines is None else bulk_chunk_lines
         bulk_chunk_sleep = self.bulk_chunk_sleep \
             if bulk_chunk_sleep is None else bulk_chunk_sleep
-        if 'retries' in kwargs:
-            warnings.warn('**** "retries" argument is deprecated.'
-                          ' Please use "lock_retries" ****',
-                          category=DeprecationWarning)
-            lock_retries = lock_retries or kwargs['retries']
-        if 'retry_sleep' in kwargs:
-            warnings.warn('**** "retry_sleep" argument is deprecated.'
-                          ' Please use "lock_retry_sleep" ****',
-                          category=DeprecationWarning)
-            lock_retry_sleep = lock_retry_sleep or kwargs['retry_sleep']
-        lock_retries = self.lock_retries if lock_retries is None \
-            else lock_retries
-        lock_retry_sleep = self.lock_retry_sleep \
-            if lock_retry_sleep is None else lock_retry_sleep
         if not isinstance(reply, Dialog):
             raise SubCommandFailure('"reply" must be an instance of Dialog')
-        self.utils.retry_handle_state_machine_go_to(
-            handle,
-            self.start_state,
-            lock_retries,
-            lock_retry_sleep,
-            context=handle.context,
-            prompt_recovery=self.prompt_recovery
-        )
+
         self.result = ''
         if command:
             flat_cmd = self.utils.flatten_splitlines_command(command)
@@ -1836,7 +1831,6 @@ class HAReloadService(BaseService):
 
         # TODO counter value must be moved to settings
         counter = 0
-        config_retry = 0
         fmt_str = "+++ reloading  %s  with reload_command %s and timeout is %s +++"
         con.log.debug(fmt_str % (con.hostname, command, timeout))
         dialog += self.dialog
@@ -1912,19 +1906,21 @@ class HAReloadService(BaseService):
         for exec_command in exec_commands:
             con.execute(exec_command, prompt_recovery=self.prompt_recovery)
         config_commands = con.active.settings.HA_INIT_CONFIG_COMMANDS
-        while config_retry < con.active.settings.CONFIG_POST_RELOAD_MAX_RETRIES:
-            try:
-                con.configure(config_commands,
-                              target='active',
-                              timeout=60,
-                              prompt_recovery=self.prompt_recovery)
-            except Exception as err:
-                if re.search("Config mode cannot be entered", str(err)):
-                    sleep(con.active.settings.CONFIG_POST_RELOAD_RETRY_DELAY_SEC)
-                    con.active.spawn.sendline()
-                    config_retry += 1
-            else:
-                config_retry = 21
+
+        config_lock_retries_ori = con.settings.CONFIG_LOCK_RETRIES
+        config_lock_retry_sleep_ori = con.settings.CONFIG_LOCK_RETRY_SLEEP
+        con.active.settings.CONFIG_LOCK_RETRY_SLEEP = con.active.settings.CONFIG_POST_RELOAD_RETRY_DELAY_SEC
+        con.active.settings.CONFIG_LOCK_RETRIES = con.active.settings.CONFIG_POST_RELOAD_MAX_RETRIES
+
+        try:
+            con.configure(config_commands,
+                          target='active',
+                          prompt_recovery=self.prompt_recovery)
+        except Exception:
+            raise
+        finally:
+            con.settings.CONFIG_LOCK_RETRIES = config_lock_retries_ori
+            con.settings.CONFIG_LOCK_RETRY_SLEEP = config_lock_retry_sleep_ori
 
         # best effort for 'STANDBY HOT', consider argument for mandatory/ignore
         while counter < 31:
@@ -2105,7 +2101,8 @@ class SwitchoverService(BaseService):
             config_retry = 0
             while config_retry < 20:
                 try:
-                    con.configure(config_commands, timeout=60, prompt_recovery=self.prompt_recovery)
+                    con.configure(config_commands,
+                                  prompt_recovery=self.prompt_recovery)
                 except Exception as err:
                     if re.search("Config mode cannot be entered",
                                  str(err)):

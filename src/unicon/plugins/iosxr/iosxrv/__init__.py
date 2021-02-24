@@ -5,8 +5,8 @@ from unicon.bases.routers.connection import BaseDualRpConnection
 
 from unicon.plugins.iosxr.iosxrv.statemachine import IOSXRVSingleRpStateMachine
 from unicon.plugins.iosxr.iosxrv.statemachine import IOSXRVDualRpStateMachine
-from unicon.plugins.iosxr.__init__ import IOSXRServiceList
-from unicon.plugins.iosxr.__init__ import IOSXRHAServiceList
+from unicon.plugins.iosxr import IOSXRServiceList
+from unicon.plugins.iosxr import IOSXRHAServiceList
 
 from unicon.plugins.iosxr.iosxrv.connection_provider \
     import IOSXRVSingleRpConnectionProvider

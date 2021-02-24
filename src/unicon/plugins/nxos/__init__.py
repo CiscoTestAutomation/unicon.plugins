@@ -8,8 +8,8 @@ Authors:
 Description:
     This subpackage implements NXOS
 """
-from .bases import BaseNxosDualRpConnection
-from .bases import BaseNxosSingleRpConnection
+from unicon.bases.routers.connection import (BaseSingleRpConnection,
+   BaseDualRpConnection)
 
 from .connection_provider import NxosSingleRpConnectionProvider
 from .connection_provider import NxosDualRpConnectionProvider
@@ -64,7 +64,7 @@ class HANxosServiceList(HAServiceList):
         self.configure = svc.Configure
 
 
-class NxosSingleRpConnection(BaseNxosSingleRpConnection):
+class NxosSingleRpConnection(BaseSingleRpConnection):
     os = 'nxos'
     platform = None
     chassis_type = 'single_rp'
@@ -74,7 +74,7 @@ class NxosSingleRpConnection(BaseNxosSingleRpConnection):
     settings = NxosSettings()
 
 
-class NxosDualRPConnection(BaseNxosDualRpConnection):
+class NxosDualRPConnection(BaseDualRpConnection):
     os = 'nxos'
     platform = None
     chassis_type = 'dual_rp'

@@ -14,7 +14,7 @@ class AireosSettings(GenericSettings):
         ]
         self.RELOAD_TIMEOUT = 400
         self.ERROR_PATTERN = [
-            r'^(%\s*)?Error',
+            r'^(%\s*)?(Error|ERROR)',
             r'syntax error',
             r'Aborted',
             r'result false',
@@ -23,7 +23,11 @@ class AireosSettings(GenericSettings):
             r'^Incorrect input',
             r'^HELP',
             r'^[Ii]nvalid',
-            r'^[Ww]arning'
+            r'^[Ww]arning',
+            r'WLAN Identifier is invalid',
+            r'^Request failed',
+            r'^[Rr]equest [Ff]ailed',
+            r'^(.*?) already in use'
         ]
         self.LOGIN_PROMPT = r'^.*?User:\s*$'
         self.DEFAULT_LEARNED_HOSTNAME = r'(.*?)'
