@@ -29,6 +29,7 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
     ``asa``, ``fp2k``
     ``cheetah``, ``ap``
     ``cimc``
+    ``comware``
     ``confd``
     ``confd``, ``esc``
     ``confd``, ``nfvis``
@@ -52,6 +53,7 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
     ``iosxr``, ``moonshine``
     ``iosxr``, ``ncs5k``
     ``iosxr``, ``spitfire``
+    ``ironware``
     ``ise``
     ``linux``, , , "Generic Linux server with bash prompts"
     ``nxos``
