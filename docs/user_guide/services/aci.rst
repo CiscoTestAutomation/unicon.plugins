@@ -17,7 +17,7 @@ The ACI plugin supports only APIC and N9K (in ACI mode). Specify ``os=apic`` for
     `setup` or `boot` state, it is up to the user to handle the transition to the `enable` state.
 
 
-The following generic services are also avaiable:
+The following generic services are also available:
 
   * `send`_
   * `sendline`_

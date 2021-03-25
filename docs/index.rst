@@ -10,7 +10,7 @@ underlying session (eg, telnet, ssh), Unicon provides:
 - multi-vendor support through an agnostic API interface
 - seamless handling of CLI modes (eg, enable, configure, admin-configure mode)
 - rejected commands, command error detections
-- value-add statful services (specific to the platform)
+- value-add stateful services (specific to the platform)
 
 and is extensible: platform supports and services are implemented via 
 open-source plugins.

@@ -24,15 +24,15 @@ Before start coding pre_service, let us go through __init__ of BaseService Class
 
   * *context* : Context info from user (more details we can get it from connection class)
 
-  * *timeout_pattern* : Will have list of timeout patterrns, I would like to match in device response after service execution.
+  * *timeout_pattern* : Will have list of timeout patterns, I would like to match in device response after service execution.
 
-  * *error_pattern*  : Will have list of error patterrns, I would like to match in device response after service execution.
+  * *error_pattern*  : Will have list of error patterns, I would like to match in device response after service execution.
 
   * *start_state* : Which state, device should be in before executing the service.
 
   * *end_state* : Which state, device should be after executing the service.
 
-  * *result* : result attribute will have return response from device after service execution. Which will be used to evalute the service result.
+  * *result* : result attribute will have return response from device after service execution. Which will be used to evaluate the service result.
 
 .. code-block:: python
 
@@ -194,7 +194,7 @@ input, Use **'Dialog'** (list of Statements) which are expected to prompt.
 
 How to attach a service to connection object
 --------------------------------------------
-Make an intry in the service list and pass on the service list to Connection class.
+Make an entry in the service list and pass on the service list to Connection class.
 
 .. code-block:: python
 

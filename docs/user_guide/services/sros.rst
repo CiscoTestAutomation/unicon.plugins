@@ -44,7 +44,7 @@ returns the current cli-engine set for this device connection.
 execute
 -------
 
-Similar to generic "execute" service, this api runs aribitrary commands on the
+Similar to generic "execute" service, this api runs arbitrary commands on the
 target device, which yields output, and returns to prompt.
 
 This API will issue the provided command on **current** active CLI engine, 

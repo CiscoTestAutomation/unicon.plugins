@@ -8,7 +8,7 @@ enable_prompt = prompt + '#'
 disable_prompt = prompt + '>'
 
 # callback to send password, we still need this callback 
-# becuase shorthand notation is for handling trivial payloads.
+# because shorthand notation is for handling trivial payloads.
 # this function does little more than that.
 def send_passwd(spawn, session, enablepw, loginpw):
     if 'flag' not in session:

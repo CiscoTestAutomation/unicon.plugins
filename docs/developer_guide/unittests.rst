@@ -99,7 +99,7 @@ Running the mock device:
 **High Availability (HA) mock device**
 
 To create a High Availability (HA) mock device that simulates multiple RPs
-or a stack of devices, you need to specifiy the '--ha' option with multiple 
+or a stack of devices, you need to specify the '--ha' option with multiple 
 states specified using the '--state' option, separated by a comma, for 
 example:
 

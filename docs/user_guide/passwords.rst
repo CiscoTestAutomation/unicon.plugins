@@ -174,7 +174,7 @@ The following response pattern generates a bad password exception:
 Environment variables
 ---------------------
 
-You can use the enviroment variable syntax in the topology file so you don't
+You can use the environment variable syntax in the topology file so you don't
 have to store passwords on the filesystem.
 
 .. code-block:: yaml

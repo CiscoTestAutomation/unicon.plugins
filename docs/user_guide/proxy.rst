@@ -153,7 +153,7 @@ CLI proxy with Unicon standalone Connections
 
 The *CLI Proxy* feature can also be used when using Unicon in standalone mode.
 Proxy connections can be specified via the `proxy_connections` argument of the
-Connnection class.
+Connection class.
 
 The `proxy_connections` argument expects a list of ``Connection`` objects with the
 start parameter containing the command to be executed to connect to the

@@ -150,7 +150,7 @@ login_name              str                       name to login with, default: r
 default_escape_chars    str                       default escape char, default: ~,
 change_prompt           str                       new prompt to change to for ez automation
 timeout                 int (default 60 sec)      timeout in sec for executing commands
-prompt                  str                       bash prompt (defaut: bash-\d.\d# )
+prompt                  str                       bash prompt (default: bash-\d.\d# )
 ====================    ======================    ========================================
 
 .. code-block:: python
@@ -353,7 +353,7 @@ Most of the time simply providing the VDC name is just good enough.
     step-n7k-2-vdc1(config-console)# end
     step-n7k-2-vdc1# Out[3]: 'vdc1'
 
-You see a relatively longer output because everytime it switches to a new VDC,
+You see a relatively longer output because every time it switches to a new VDC,
 the terminal is reinitialized.
 
 .. note::
@@ -365,7 +365,7 @@ switchback
 -----------
 
 It is just the opposite of `switchto`. It is used to return to the *default*
-VDC. This sevice takes no mandatory arguments.
+VDC. This service takes no mandatory arguments.
 
 ==========   ======================    =============================
 Argument     Type                      Description
