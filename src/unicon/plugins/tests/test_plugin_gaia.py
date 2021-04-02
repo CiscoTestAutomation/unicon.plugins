@@ -43,5 +43,17 @@ class TestGaiaPlugin(unittest.TestCase):
 
         self.c.disconnect()
 
+    def test_ping(self):
+        response = self.c.execute('ping 192.168.1.1')
+        self.assertIn("PING 192.168.1.1 (192.168.1.1) 56(84) bytes of data.", response)
+
+        self.c.disconnect()
+
+    def test_traceroute(self):
+        response = self.c.execute('traceroute 192.168.1.1')
+        self.assertIn("traceroute to 192.168.1.1 (192.168.1.1), 30 hops max, 40 byte packets", response)
+
+        self.c.disconnect()
+
 if __name__ == "__main__":
     unittest.main()

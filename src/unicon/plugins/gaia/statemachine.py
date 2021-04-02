@@ -22,9 +22,10 @@ class GaiaStateMachine(StateMachine):
         statemachine class's create() method is its entrypoint. This showcases
         how to setup a statemachine in Unicon. 
         '''
+        
+        # Note: the checkpoint shell 'clish' is implemented as 'enable'
+        # Expert mode is not a currently supported state.
 
         clish = State("enable", patterns.clish_prompt)
-        self.add_state(clish)
-
-        # TODO Implement Expert / Clish states. 
-        # Current implementation treats "clish" as state "enable" and expert is not supported.
+        
+        self.add_state(clish)     

@@ -10,10 +10,10 @@ https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_e
 from unicon.plugins.generic.connection_provider import GenericSingleRpConnectionProvider
 from unicon.plugins.generic import GenericSingleRpConnection, ServiceList
 from unicon.plugins.generic import service_implementation as svc
-from unicon.plugins.linux import service_implementation as lnx_svc
+from unicon.plugins.linux import service_implementation as linux_svc
 from unicon.plugins.gaia import service_implementation as gaia_svc
-from .statemachine import GaiaStateMachine
-from .settings import GaiaSettings
+from unicon.plugins.gaia.statemachine import GaiaStateMachine
+from unicon.plugins.gaia.settings import GaiaSettings
 
 class GaiaConnectionProvider(GenericSingleRpConnectionProvider):
     pass
@@ -21,18 +21,19 @@ class GaiaConnectionProvider(GenericSingleRpConnectionProvider):
 class GaiaServiceList(ServiceList):
     """ gaia services """
     def __init__(self):
-        #super().__init__()
+        # super().__init__()
         
         self.execute = gaia_svc.GaiaExecute
         self.sendline = svc.Sendline
-        self.ping = lnx_svc.Ping
+        self.ping = linux_svc.Ping
         self.traceroute = gaia_svc.GaiaTraceroute
 
 class GaiaConnection(GenericSingleRpConnection):
     '''GaiaosSingleRPConnection
 
-    Gaia platform support. 
+    Check Point Gaia platform support. 
     '''
+
     os = 'gaia'
     platform = None
     chassis_type = 'single_rp'

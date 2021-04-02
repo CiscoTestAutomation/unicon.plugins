@@ -6,18 +6,14 @@ https://github.com/TestingBytes
 Contents largely inspired by sample Unicon repo:
 https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_example/src/unicon_plugin_example
 '''
-# TODO - Implement ping and traceroute services
-
-import re
-import ipaddress
-
 from unicon.core.errors import SubCommandFailure
-from unicon.bases.routers.services import BaseService
-from unicon.eal.dialogs import Dialog, Statement
+from unicon.bases.routers.services import BaseService, Statement
 
 from unicon.plugins.generic.service_implementation import Execute as GenericExecute
+
 class GaiaExecute(GenericExecute):
     pass
+
 class GaiaTraceroute(BaseService):
 
     def __init__(self, connection, context, **kwargs):
