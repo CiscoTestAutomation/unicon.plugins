@@ -14,6 +14,8 @@ This part of the document covers all the services supported by Unicon.
     confd
     ftd
     fxos
+    fxos_fp4k
+    fxos_fp9k
     iosxr
     junos
     linux

@@ -81,15 +81,30 @@ class GenericSettings(Settings):
         self.CONFIG_POST_RELOAD_RETRY_DELAY_SEC = 9
 
         # Default error pattern
-        self.ERROR_PATTERN = []
-        self.CONFIGURE_ERROR_PATTERN = []
+        self.ERROR_PATTERN = [r"% Invalid command at",
+                              r"% Invalid input detected at",
+                              r"% String is invalid, 'all' is not an allowed string at",
+                              r"Incomplete command",
+                              r'% Unrecognized host or address.',
+                              r'Error: Could not open file .*',
+                              r'Unable to deactivate Capture.',
+                              ]
+        self.CONFIGURE_ERROR_PATTERN = [r"overlaps with",
+                                        r"% Class-map .* is being used",
+                                        r'% ?Insertion failed .*',
+                                        r'%Failed to add ace to access-list'
+                                        r'Insufficient bandwidth .*',
+                                        r'BGP is already running; AS is .*',
+                                        r'% Failed to commit one or more configuration items.*',
+                                        r'% Configuring IP routing on a LAN subinterface is only allowed if that '
+                                        r'subinterface is already configured as part of an IEEE 802.10, IEEE 802.1Q, '
+                                        r'or ISL vLAN.',
+                                        r'% OSPF: Please enable segment-routing globally'
+                                        ]
 
         # Number of times to retry for config mode by configure service.
         self.CONFIG_LOCK_RETRIES = 3
         self.CONFIG_LOCK_RETRY_SLEEP = 10
-
-        # Clear line command
-        self.CLEAR_LINE_CMD = '\x01\x0b'  # Ctr-A Ctrl-K
 
         # for bulk configure
         self.BULK_CONFIG = False

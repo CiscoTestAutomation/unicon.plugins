@@ -16,13 +16,14 @@ class TestNxosN5kPluginConnect(unittest.TestCase):
 
     def test_login_connect(self):
         c = Connection(hostname='switch',
-                        start=['mock_device_cli --os nxos --state n5k_exec'],
-                        os='nxos',
-                        platform='n5k',
-                        username='admin',
-                        tacacs_password='lab')
+                       start=['mock_device_cli --os nxos --state n5k_exec'],
+                       os='nxos',
+                       platform='n5k',
+                       credentials=dict(default=dict(username='cisco',
+                                        password='cisco')),
+                       mit=True)
         c.connect()
-        assert c.spawn.match.match_output == 'end\r\nswitch# '
+        assert c.spawn.match.match_output == 'switch# '
 
 
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
@@ -35,10 +36,12 @@ class TestNxosN5kPluginReloadService(unittest.TestCase):
             start=['mock_device_cli --os nxos --state n5k_exec'],
             os='nxos',
             platform='n5k',
-            username='admin',
-            tacacs_password='lab',
+            credentials=dict(default=dict(username='admin',
+                            password='lab')),
+            mit=True
         )
         dev.connect()
+        dev.settings.RELOAD_RECONNECT_WAIT = 1
         dev.reload()
         dev.disconnect()
 
@@ -50,8 +53,10 @@ class TestNxosN5kPluginReloadService(unittest.TestCase):
             platform='n5k',
             credentials=dict(default=dict(
                 username='admin', password='lab')),
+            mit=True
         )
         dev.connect()
+        dev.settings.RELOAD_RECONNECT_WAIT = 1
         dev.reload()
         dev.disconnect()
 
@@ -65,8 +70,10 @@ class TestNxosN5kPluginReloadService(unittest.TestCase):
                 username='admin', password='lab'),
                 alt=dict(
                 username='admin', password='lab2')),
+            mit=True
         )
         dev.connect()
+        dev.settings.RELOAD_RECONNECT_WAIT = 1
         dev.reload(reload_command="reload2", reload_creds='alt')
         dev.disconnect()
 

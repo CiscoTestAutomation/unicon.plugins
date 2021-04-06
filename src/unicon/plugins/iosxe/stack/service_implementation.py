@@ -114,19 +114,19 @@ class StackSwitchover(BaseService):
         conn.sendline(switchover_cmd)
         try:
             match_object = dialog.process(conn.spawn, timeout=timeout,
-                            prompt_recovery=self.prompt_recovery,
-                            context=conn.context)
+                                          prompt_recovery=self.prompt_recovery,
+                                          context=conn.context)
         except Exception as e:
             raise SubCommandFailure('Error during switchover ', e) from e
 
-        # try boot up original active rp with current active system 
+        # try boot up original active rp with current active system
         # image, if it moved to rommon state.
         if 'state' in conn.context and conn.context.state == 'rommon':
             try:
                 conn.state_machine.detect_state(conn.spawn)
                 conn.state_machine.go_to('enable', conn.spawn, timeout=timeout,
-                            prompt_recovery=self.prompt_recovery,
-                            context=conn.context, dialog=Dialog([switch_prompt]))
+                                         prompt_recovery=self.prompt_recovery,
+                                         context=conn.context, dialog=Dialog([switch_prompt]))
             except Exception as e:
                 self.connection.log.warning('Fail to bring up original active rp from rommon state.', e)
             finally:

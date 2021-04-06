@@ -56,6 +56,7 @@ class TestNxosAciPlugin(unittest.TestCase):
                        platform='aci',
                        tacacs_password='cisco123')
         c.connect()
+        c.settings.POST_RELOAD_WAIT = 1
         c.reload()
         c.disconnect()
 

@@ -63,26 +63,27 @@ to respond to the password prompt.  Credentials are available in ``rtr.credentia
     device.shellexec(cmd, reply=Dialog([password_stmt]))
 
 
-configure dual-stage
----------------------
+configure
+---------
 
-Service to execute commands on configure dual-stage mode.
+Service to execute commands on configuration mode.
 
-================  =======================    ====================================================
-Argument          Type                       Description
-================  =======================    ====================================================
-command           list                       list of commands to configure
-reply             Dialog                     additional dialog
-timeout           int                        timeout value for the command execution takes.
-error_pattern     list                       List of regex strings to check output for errors.
-prompt_recovery   bool (default False)       Enable/Disable prompt recovery feature
-target            str (default "active")     Target RP where to execute service, for DualRp only
-================  =======================    ====================================================
+================  ========================    ====================================================
+Argument          Type                        Description
+================  ========================    ====================================================
+command           list                        list of commands to configure
+reply             Dialog                      additional dialog
+timeout           int                         timeout value for the command execution takes.
+error_pattern     list                        List of regex strings to check output for errors.
+prompt_recovery   bool (default False)        Enable/Disable prompt recovery feature
+target            str (default "active")      Target RP where to execute service, for DualRp only
+mode              str (default: "default")    Mode to configure ("default" or "dual")
+================  ========================    ====================================================
 
 
 .. code-block:: python
 
-    rtr.configure_dual(['feature isis', 'commit'])
+    rtr.configure(['feature isis', 'commit'], mode="dual")
 
     # config dual-stage
     # Enter configuration commands, one per line. End with CNTL/Z.

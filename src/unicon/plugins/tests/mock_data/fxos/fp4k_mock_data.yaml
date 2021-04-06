@@ -1,0 +1,637 @@
+
+fp4k_console:
+  preface: |
+    Escape character is '^]'.
+  prompt: ""
+  commands:
+    "":
+      new_state: fp4k_console_login
+
+fp4k_console_login:
+  prompt: "%N login: "
+  commands:
+    "admin":
+      new_state: fp4k_console_password
+
+fp4k_console_password:
+  prompt: "Password: "
+  commands:
+    "admin":
+      new_state: fp4k_console_fxos
+
+fp4k_console_fxos:
+  prompt: "%N# "
+  commands:
+    "connect adapter 1/1/1":
+      new_state: fp4k_console_adapter
+    "connect cimc 1/1":
+      new_state: fp4k_console_cimc
+    "connect fxos":
+      new_state: fp4k_console_fxos_switch
+    "connect local-mgmt":
+      new_state: fp4k_console_local_mgmt
+    "connect module 1 console":
+      new_state: fp4k_console_module_console_connect
+    "connect module 1 telnet":
+      new_state: fp4k_console_module_telnet
+    "show version | inc Version": |2
+          Version: 2.7(1.104)
+    "scope system":
+      new_state: fp4k_console_fxos_scope
+
+
+fp4k_console_fxos_asa:
+  prompt: "%N# "
+  commands:
+    "show version | inc Version": |2
+        Version: 2.7(1.72)
+    "connect module 1 console":
+      new_state: fp4k_console_module_console_asa_disable
+    "connect module 1 telnet":
+      new_state: fp4k_console_module_telnet_asa
+
+fp4k_console_fxos_asa_username:
+  prompt: "%N# "
+  commands:
+    "show version | inc Version": |2
+        Version: 2.7(1.72)
+    "connect module 1 console":
+      new_state: fp4k_console_module_asa_enable_username
+    "connect module 1 telnet":
+      new_state: fp4k_console_module_asa_enable_username
+
+
+fp4k_console_module_telnet_asa:
+  preface: |
+    Type exit or Ctrl-] followed by . to quit.
+  prompt: "Firepower-module1>"
+  commands:
+    "connect asa":
+      new_state: fp4k_console_module_telnet_asa_disable
+    "exit":
+      new_state: fp4k_console_fxos_asa
+
+fp4k_console_module_telnet_asa_disable:
+  preface: |
+    Connecting to asa(asa) console... hit Ctrl + A + D  to return to bootCLI
+  prompt: "%N#"
+  keys:
+    ctrl-ad:
+      new_state: fp4k_console_module_telnet_asa
+  commands:
+    "enable":
+      new_state: fp4k_console_module_telnet_asa_enable_password
+    "exit":
+      new_state: fp4k_console_module_telnet_asa_disable
+
+fp4k_console_module_telnet_asa_enable_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: fp4k_console_module_telnet_asa_enable
+
+fp4k_console_module_telnet_asa_enable:
+  prompt: "%N#"
+  keys:
+    ctrl-ad:
+      new_state: fp4k_console_module_telnet_asa
+  commands:
+    "config term":
+      new_state: fp4k_console_module_telnet_asa_config
+    "exit":
+      new_state: fp4k_console_module_telnet_asa_disable
+
+fp4k_console_module_telnet_asa_config:
+  prompt: "%N(config)#"
+  keys:
+    ctrl-ad:
+      new_state: fp4k_console_module_telnet_asa
+  commands:
+    "end":
+      new_state: fp4k_console_module_telnet_asa_enable
+
+
+fp4k_console_module_console_asa_disable:
+  preface: |
+    Telnet escape character is '~'.
+    Trying 127.5.1.1...
+    Connected to 127.5.1.1.
+    Escape character is '~'.
+
+    CISCO Serial Over LAN:
+    Close Network Connection to Exit
+
+  prompt: "%N> "
+  commands:
+    "enable":
+      new_state: fp4k_console_module_asa_enable_password
+
+
+fp4k_console_module_console_asa_disable_user_pass:
+  preface: |
+    Telnet escape character is '~'.
+    Trying 127.5.1.1...
+    Connected to 127.5.1.1.
+    Escape character is '~'.
+
+    CISCO Serial Over LAN:
+    Close Network Connection to Exit
+
+  prompt: "%N> "
+  commands:
+    "enable":
+      new_state: fp4k_console_module_asa_enable_username
+
+
+fp4k_console_module_asa_enable_username:
+  prompt: "Username: "
+  commands:
+    "admin":
+      new_state: fp4k_console_module_asa_enable_password
+
+fp4k_console_module_asa_enable_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: fp4k_console_module_console_asa_enable
+
+fp4k_console_module_console_asa_enable:
+  prompt: "%N# "
+  keys:
+    ctrl-ad:
+      new_state: fp4k_console_module_console_asa
+  commands:
+    "show version | inc Version": |
+      Cisco Adaptive Security Appliance Software Version 9.12(1)
+      Firepower Extensible Operating System Version 2.7(1.83)
+      Device Manager Version 7.12(1)
+
+fp4k_console_fxos_scope:
+  prompt: "%N /system #"
+  commands:
+    "top":
+      new_state: fp4k_console_fxos
+
+
+fp4k_console_cimc:
+  preface: |
+    Trying 127.5.1.1...
+    Connected to 127.5.1.1.
+    Escape character is '^]'.
+
+    CIMC Debug Firmware Utility Shell [ support ]
+  prompt: "[ help ]# "
+  commands:
+    "exit":
+      response: Connection closed by foreign host.
+      new_state: fp4k_console_fxos
+
+
+fp4k_console_local_mgmt:
+  prompt: "%N(local-mgmt)# "
+  commands:
+    "reboot":
+      response: |
+        Warning: This command causes an ungraceful reboot and causes 
+        service interruption and potential loss of configuration in database!
+        Before rebooting, please make a configuration backup.
+        Alternatively, perform a graceful reboot in scope chassis.
+      new_state:
+        fp4k_console_local_mgmt_reboot_confirm
+    "exit":
+      new_state: fp4k_console_fxos
+
+
+fp4k_console_local_mgmt_reboot_confirm:
+  prompt: "Do you still want to reboot? (yes/no):"
+  commands:
+    "yes":
+      new_state: fp4k_console_local_mgmt_reboot_login
+
+
+fp4k_console_local_mgmt_reboot_login:
+  preface:
+    response: file|mock_data/fxos/fp4k_mgmt_boot.txt
+    timing:
+      - 0:,0,0.005
+  prompt: "%N login: "
+  commands:
+    "admin":
+      new_state: fp4k_console_password
+
+
+fp4k_console_adapter:
+  prompt: "adapter 1/1/1 # "
+  commands:
+    "exit":
+      new_state: fp4k_console_fxos
+    "connect":
+      new_state: fp4k_console_adapter_shell
+
+fp4k_console_adapter_shell:
+  prompt: "adapter 1/1/1 (top):1# "
+  commands:
+    "attach-fls":
+      new_state: fp4k_console_adapter_shell_fls
+    "attach-mcp":
+      new_state: fp4k_console_adapter_shell_mcp
+    "exit":
+      new_state: fp4k_console_adapter
+
+fp4k_console_adapter_shell_fls:
+  prompt: "adapter 1/1/1 (fls):2# "
+  commands:
+    "exit":
+      new_state: fp4k_console_adapter_shell
+
+fp4k_console_adapter_shell_mcp:
+  prompt: "adapter 1/1/1 (mcp):1# "
+  commands:
+    "exit":
+      new_state: fp4k_console_adapter_shell
+
+
+fp4k_console_fxos_switch:
+  preface: |
+    Cisco Firepower Extensible Operating System (FX-OS) Software
+    TAC support: http://www.cisco.com/tac
+    Copyright (c) 2002-2020, Cisco Systems, Inc. All rights reserved.
+  prompt: "%N(fxos)# "
+  commands:
+    "exit":
+      new_state: fp4k_console_fxos
+
+
+fp4k_console_module_console_connect:
+  preface: |
+    Telnet escape character is '~'.
+    Trying 127.5.1.1...
+    Connected to 127.5.1.1.
+    Escape character is '~'.
+
+    CISCO Serial Over LAN:
+    Close Network Connection to Exit
+  prompt: ""
+  commands:
+    "":
+      new_state: fp4k_console_module_console
+
+fp4k_console_module_console_asa:
+  prompt: "Firepower-module1> "
+  keys:
+    "~":
+      new_state: fp4k_console_escape_telnet
+  commands:
+    "connect asa":
+      new_state: fp4k_console_module_telnet_asa_disable
+
+
+fp4k_console_module_console_asa_password:
+  preface: |
+    Telnet escape character is '~'.
+    Trying 127.5.1.1...
+    Connected to 127.5.1.1.
+    Escape character is '~'.
+
+    CISCO Serial Over LAN:
+    Close Network Connection to Exit
+  prompt: ""
+  commands:
+    "":
+      new_state: fp4k_console_module_console_asa_enable_password
+
+
+fp4k_console_module_console:
+  prompt: "Firepower-module1> "
+  keys:
+    "~":
+      new_state: fp4k_console_escape_telnet
+  commands:
+    "connect ftd":
+      response: Connecting to ftd(ftd) console... enter exit to return to bootCLI
+      new_state: fp4k_console_module_console_ftd
+    "connect asa": asa is not running.
+
+fp4k_console_module_console_ftd:
+  prompt: "> "
+  keys:
+    ctrl-\].:
+      new_state: fp4k_console_module_console
+  commands:
+    ".": ""
+    "exit":
+      response: Disconnected from ftd(ftd) console!
+      new_state: fp4k_console_module_console
+    "system support diagnostic-cli":
+      new_state: fp4k_console_module_console_ftd_disable
+    "expert":
+      response: |
+        **************************************************************
+        NOTICE - Shell access will be deprecated in future releases
+                and will be replaced with a separate expert mode CLI.
+        **************************************************************
+      new_state: fp4k_console_module_console_ftd_expert
+
+
+fp4k_console_module_console_ftd_disable:
+  prompt: "%N>"
+  keys:
+    "ctrl-ad":
+      new_state: fp4k_console_module_console_ftd
+  commands:
+    "enable":
+      new_state: fp4k_console_module_console_ftd_enable_password
+
+fp4k_console_module_console_ftd_enable_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+     new_state: fp4k_console_module_console_ftd_enable
+
+fp4k_console_module_console_ftd_enable:
+  prompt: "%N#"
+  keys:
+    "ctrl-ad":
+      new_state: fp4k_console_module_console_ftd
+  commands:
+    "show version | inc Version": |
+      Cisco Adaptive Security Appliance Software Version 99.16(1)222
+    "disable":
+      new_state: fp4k_console_module_console_ftd_disable
+    "exit":
+      new_state: fp4k_console_module_console_ftd_disable
+    "config term":
+      new_state: fp4k_console_module_console_ftd_config
+
+
+fp4k_console_module_console_ftd_config:
+  prompt: "%N(config)#"
+  keys:
+    "ctrl-ad":
+      new_state: fp4k_console_module_console_ftd
+  commands:
+    "end":
+      new_state: fp4k_console_module_console_ftd_enable
+
+
+fp4k_console_module_console_ftd_expert:
+  prompt: "admin@QW-ftp:/opt/cisco/csp/applications$ "
+  commands:
+    "exit":
+      response: logout
+      new_state: fp4k_console_module_console_ftd
+    "sudo su -":
+      new_state: fp4k_console_module_console_ftd_expert_root_password
+
+
+fp4k_console_module_console_ftd_expert_root_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: fp4k_console_module_console_ftd_expert_root
+
+
+fp4k_console_module_console_ftd_expert_root:
+  prompt: "root@QW-ftp:~# "
+  commands:
+    "exit":
+      new_state: fp4k_console_module_console_ftd_expert
+
+
+
+fp4k_console_escape_telnet:
+  prompt: "telnet> "
+  commands:
+    "q":
+      new_state: fp4k_console_fxos
+
+
+fp4k_console_module_telnet:
+  preface: |
+    Type exit or Ctrl-] followed by . to quit.
+    Last login: Thu Jan 14 09:42:57 UTC 2021 from 10.61.245.163 on pts/0
+
+    Copyright 2004-2019, Cisco and/or its affiliates. All rights reserved. 
+    Cisco is a registered trademark of Cisco Systems, Inc. 
+    All other trademarks are property of their respective owners.
+
+    Cisco Fire Linux OS v6.5.0 (build 4)
+    Cisco Firepower 4145 Threat Defense v6.5.0 (build 115)
+  prompt: "Firepower-module1>"
+  commands:
+    "exit":
+      new_state: fp4k_console_fxos
+
+
+
+fp4k_ssh_fxos:
+  prompt: "%N#"
+  commands:
+    "show version | inc Version": |2
+          Version: 2.7(1.104)
+    "connect local-mgmt":
+      new_state: fp4k_ssh_fxos_local_mgmt
+
+fp4k_ssh_fxos_local_mgmt:
+  prompt: "%N(local-mgmt)# "
+  commands:
+    "reboot":
+      reponse: |
+        Warning: This command causes an ungraceful reboot and causes
+        service interruption and potential loss of configuration in database!
+        Before rebooting, please make a configuration backup.
+        Alternatively, perform a graceful reboot in scope chassis.
+      new_state: fp4k_ssh_fxos_local_mgmt_reboot_confirm
+
+fp4k_ssh_fxos_local_mgmt_reboot_confirm:
+  prompt: "Do you still want to reboot? (yes/no):"
+  commands:
+    "yes":
+      response: |
+        nohup: ignoring input and appending output to 'nohup.out'
+
+        Broadcast message from root@FXOS (Fri Feb 19 13:22:18 2021):
+        All shells being terminated due to system /sbin/reboot
+        Connection to 1.1.1.1 closed.
+      new_state:
+        conn_closed
+
+conn_closed:
+  prompt: ""
+
+
+fp4k_ssh_connect:
+  prompt: "Password: "
+  commands:
+    "admin":
+      new_state: fp4k_last_login_ftd
+
+fp4k_last_login_ftd:
+  preface: |
+    Last login: Thu Jan 14 09:35:20 UTC 2021 from 10.61.245.163 on pts/0
+
+    Copyright 2004-2019, Cisco and/or its affiliates. All rights reserved. 
+    Cisco is a registered trademark of Cisco Systems, Inc. 
+    All other trademarks are property of their respective owners.
+
+    Cisco Fire Linux OS v6.5.0 (build 4)
+    Cisco Firepower 4145 Threat Defense v6.5.0 (build 115)
+
+  prompt: "> "
+  keys:
+    ctrl-\].: ""
+  commands:
+    "system support diagnostic-cli":
+      new_state: "fp4k_asa_disable"
+
+
+fp4k_ftd:
+  prompt: "> "
+  keys:
+    ctrl-\].: ""
+  commands:
+    "expert":
+      new_state: fp4k_ftd_expert
+    "system support diagnostic-cli":
+      new_state: "fp4k_asa_disable"
+
+fp4k_ftd_expert:
+  preface: |
+    **************************************************************
+    NOTICE - Shell access will be deprecated in future releases
+            and will be replaced with a separate expert mode CLI.
+    **************************************************************
+  prompt: "admin@QW-ftp:~$ "
+  commands:
+    "sudo su -":
+      new_state: fp4k_ftd_expert_sudo_password
+    "exit":
+      response: logout
+      new_state: fp4k_ftd
+
+fp4k_ftd_expert_sudo_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: fp4k_ftd_expert_sudo
+
+
+fp4k_ftd_expert_sudo:
+  prompt: "root@QW-ftp:~# "
+  commands:
+    "exit":
+      response: logout
+      new_state: fp4k_ftd_expert
+
+
+fp4k_asa_disable:
+  preface: |
+    Attaching to Diagnostic CLI ... Press 'Ctrl+a then d' to detach.
+    Type help or '?' for a list of available commands.
+  prompt: "%N> "
+  keys:
+    ctrl-ad:
+      response: Console connection detached.
+      new_state: fp4k_ftd
+  commands:
+    "exit":
+      response: Console connection detached.
+      new_state: fp4k_ftd
+    "enable":
+      new_state: fp4k_asa_enable_password
+
+
+fp4k_asa_enable_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: fp4k_asa_enable
+
+
+fp4k_asa_enable:
+  prompt: "%N# "
+  keys:
+    ctrl-ad:
+      response: Console connection detached.
+      new_state: fp4k_ftd
+  commands:
+    "show version | inc Version": |2
+      Cisco Adaptive Security Appliance Software Version 9.6(4)8
+      Device Manager Version 7.6(2)
+    "config term":
+      new_state: fp4k_asa_config
+    "disable":
+      new_state: fp4k_asa_disable
+    "exit":
+      new_state: fp4k_asa_disable
+
+
+fp4k_asa_config:
+  prompt: "%N(config)# "
+  keys:
+    ctrl-ad:
+      response: Console connection detached.
+      new_state: fp4k_ftd
+  commands:
+    "end":
+      new_state: fp4k_asa_enable
+
+
+
+
+# Rommon boot states
+
+fp4k_fxos_console_rommon:
+  prompt: "%N# "
+  commands:
+    "exit": ""
+    "show version | inc Version": |2
+          Version: 2.7(1.104)
+    "connect local-mgmt":
+      new_state: fp4k_console_local_mgmt_rommon
+
+fp4k_console_local_mgmt_rommon:
+  prompt: "%N(local-mgmt)# "
+  commands:
+    "reboot":
+      response: |
+        Warning: This command causes an ungraceful reboot and causes 
+        service interruption and potential loss of configuration in database!
+        Before rebooting, please make a configuration backup.
+        Alternatively, perform a graceful reboot in scope chassis.
+      new_state:
+        fp4k_console_local_mgmt_reboot_rommon_confirm
+    "exit":
+      new_state: fp4k_console_fxos
+
+fp4k_console_local_mgmt_reboot_rommon_confirm:
+  preface: |
+    This command will reboot the system.  Continue?
+  prompt: "Do you still want to reboot? (yes/no):"
+  commands:
+    "yes":
+      new_state: fp4k_console_mgmt_boot_rommon
+
+fp4k_console_mgmt_boot_rommon:
+  preface: file|mock_data/fxos/fp4k_mgmt_rommon.txt
+  prompt: ""
+  keys:
+    ctrl-\[:
+      response: Boot interrupted.
+      new_state: fp4k_rommon
+
+fp4k_rommon:
+  prompt: "rommon 1 >"
+  commands:
+    "boot":
+      new_state: fp4k_rommon_boot
+
+fp4k_rommon_boot:
+  preface:
+    response: file|mock_data/fxos/fp4k_mgmt_rommon_boot.txt
+    timing:
+      - 0:,0,0.005
+  prompt: ""
+  commands:
+    "":
+      new_state: fp4k_console_password

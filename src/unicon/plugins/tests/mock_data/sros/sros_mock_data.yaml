@@ -14,7 +14,7 @@ password:
       new_state: mdcli_execute
 
 mdcli_execute:
-  prompt: "[]\r\nA:grpc@COTKON04XR2# "
+  prompt: "[]\r\nA:grpc@%N# "
   commands:
     "show version": |
       TiMOS-C-19.10.R1 cpm/hops64 Nokia 7950 XRS Copyright (c) 2000-2019 Nokia.
@@ -48,7 +48,7 @@ mdcli_execute:
       new_state: classiccli_execute
 
 mdcli_execute_show:
-  prompt: "[show]\r\nA:grpc@COTKON04XR2# "
+  prompt: "[show]\r\nA:grpc@%N# "
   commands:
     "version": |
       TiMOS-C-19.10.R1 cpm/hops64 Nokia 7950 XRS Copyright (c) 2000-2019 Nokia.
@@ -74,7 +74,7 @@ mdcli_execute_show:
       new_state: mdcli_execute
 
 mdcli_configure_global:
-  prompt: "[gl:configure]\r\nA:grpc@COTKON04XR2# "
+  prompt: "[gl:configure]\r\nA:grpc@%N# "
   keys:
     "ctrl-z":
       new_state: mdcli_execute
@@ -87,7 +87,7 @@ mdcli_configure_global:
     "commit": ""
 
 mdcli_configure_private:
-  prompt: "[pr:configure]\r\nA:grpc@COTKON04XR2# "
+  prompt: "[pr:configure]\r\nA:grpc@%N# "
   keys:
     "ctrl-z":
       new_state: mdcli_configure_private_discard_uncommitted
@@ -120,7 +120,7 @@ mdcli_configure_private_discard_uncommitted:
       new_state: mdcli_execute
 
 classiccli_execute:
-  prompt: "A:COTKON04XR2# "
+  prompt: "A:%N# "
   commands:
     "show version": |
       TiMOS-C-19.10.R1 cpm/hops64 Nokia 7950 XRS Copyright (c) 2000-2019 Nokia.

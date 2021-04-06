@@ -496,9 +496,9 @@ commit_prompt:
       new_state: config
 
 commit_replace:
-  prompt: "This commit will replace or remove the entire running configuration. This\n
-operation can be service affecting.\n
-Do you wish to proceed? [no]:"
+  preface: "This commit will replace or remove the entire running configuration. This\n
+operation can be service affecting.\n"
+  prompt: "Do you wish to proceed? [no]:"
   commands:
     "yes":
       new_state: config

@@ -4,6 +4,8 @@ import re
 
 from unicon.eal.dialogs import Statement, Dialog
 from unicon.plugins.generic.statements import generic_statements, chatty_term_wait
+from unicon.plugins.generic.service_statements import connection_closed
+
 from unicon.utils import to_plaintext
 from unicon.core.errors import UniconAuthenticationError
 
@@ -24,6 +26,12 @@ def clear_command_line(spawn, context, session):
     spawn.sendline("%s%s\r" % (CTRL_A, CTRL_K))
 
 
+def enable_username_handler(spawn, context, session):
+    credentials = context.get('credentials')
+    enable_username = to_plaintext(credentials.get('enable', {}).get('username', ''))
+    spawn.sendline(enable_username)
+
+
 # Overriding the generic enable password handler, since the password for ASA can be empty
 def enable_password_handler(spawn, context, session):
     if 'password_attempts' not in session:
@@ -40,13 +48,16 @@ def enable_password_handler(spawn, context, session):
 
 def boot_wait(spawn, timeout=600):
     def count(spawn, context, session):
-        m = re.findall(patterns.boot_wait_msg, spawn.buffer, re.M)
+        m = re.findall(spawn.settings.BOOT_WAIT_PATTERN, spawn.buffer, re.M)
         session['matches'] = session.get('matches', len(m)) + len(m)
         matches = session['matches']
         if matches >= spawn.settings.BOOT_WAIT_PATTERN_COUNT:
             raise ValueError
 
-    wait_dialog = Dialog([Statement(patterns.boot_wait_msg, action=count, loop_continue=True, continue_timer=True)])
+    wait_dialog = Dialog([Statement(spawn.settings.BOOT_WAIT_PATTERN,
+                                    action=count,
+                                    loop_continue=True,
+                                    continue_timer=True)])
     while True:
         try:
             wait_dialog.process(spawn, timeout=timeout)
@@ -98,6 +109,12 @@ class FxosStatements(object):
                                                loop_continue=True,
                                                continue_timer=False)
 
+        self.enable_username_stmt = Statement(patterns.username,
+                                              action=enable_username_handler,
+                                              args=None,
+                                              loop_continue=True,
+                                              continue_timer=False)
+
         self.enable_password_stmt = Statement(patterns.password,
                                               action=enable_password_handler,
                                               args=None,
@@ -123,13 +140,9 @@ default_statement_list = [
 reload_statements = [
     fxos_statements.fxos_mgmt_reboot_stmt,
     fxos_statements.ftd_reboot_confirm_stmt,
-    Statement(patterns.restarting_system, loop_continue=False)
-]
-
-reload_statements_vty = [
-    fxos_statements.fxos_mgmt_reboot_stmt,
-    fxos_statements.ftd_reboot_confirm_stmt,
-    Statement(patterns.reboot_requested, loop_continue=False)
+    Statement(patterns.restarting_system, loop_continue=False),
+    Statement(patterns.reboot_requested, loop_continue=False),
+    connection_closed
 ]
 
 boot_to_rommon_statements = [

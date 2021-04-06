@@ -24,6 +24,9 @@ class MockDeviceFxos(MockDevice):
             self.command_handler(transport, cmd)
             sys.exit()
 
+    def conn_closed(self, transport, cmd):
+        sys.exit()
+
 
 def main(args=None):
     logging.basicConfig(stream=sys.stderr, level=logging.INFO,

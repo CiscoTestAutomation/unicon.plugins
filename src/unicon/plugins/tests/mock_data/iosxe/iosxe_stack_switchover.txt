@@ -1,11 +1,12 @@
-redundancy force-switchover
 
-System configuration has been modified. Save? [yes/no]: yes
-Building configuration...
-[OK]Proceed with switchover to standby RP? [confirm]
     Manual Swact = enabled
 
 Chassis 2 reloading, reason - Non participant detected
+
+Router>
+
+
+
 reload fp action requested
 rp processes exit with reload switch code
 

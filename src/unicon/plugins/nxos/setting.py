@@ -34,6 +34,7 @@ class NxosSettings(GenericSettings):
             r'^.*?Copying to/from this server name is not permitted'
         ]
         self.CONFIGURE_ERROR_PATTERN = [
+            r'^%\s*[Ii]nvalid (command|input|number)',
             r'^%\s*[Cc]an not open.*',
             r'^%\s*[Nn]ot supported.*',
             r'^%\s*[Ff]ail.*',

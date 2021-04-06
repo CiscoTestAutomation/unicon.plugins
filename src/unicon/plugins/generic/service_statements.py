@@ -9,6 +9,7 @@ Description:
     Module for defining all Services Statement, handlers(callback) and Statement
     list for service dialog would be defined here.
 """
+
 from time import sleep
 
 from unicon.eal.dialogs import Statement
@@ -18,7 +19,7 @@ from unicon.plugins.generic.service_patterns import ReloadPatterns, \
     PingPatterns, TraceroutePatterns, CopyPatterns, HaReloadPatterns, \
     SwitchoverPatterns, ResetStandbyPatterns
 
-from .statements import GenericStatements
+from .statements import GenericStatements, chatty_term_wait, update_context
 
 from unicon.plugins.utils import (get_current_credential,
     common_cred_username_handler, common_cred_password_handler, )
@@ -34,7 +35,7 @@ generic_statements = GenericStatements()
 
 
 def send_response(spawn, response=""):
-    sleep(0.5)
+    chatty_term_wait(spawn)
     spawn.sendline(response)
 
 
@@ -187,6 +188,7 @@ def switchover_failure(error):
 def reset_failure(error):
     raise SubCommandFailure("reset_standby_rp Failed with error %s" % error)
 
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 # Reload  Statements
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
@@ -279,6 +281,12 @@ password_stmt = Statement(pattern=pat.password,
                           args=None,
                           loop_continue=False,
                           continue_timer=False)
+
+connection_closed = Statement(pattern=pat.connection_closed,
+                              action=update_context,
+                              args={'console': False},
+                              loop_continue=False,
+                              continue_timer=False)
 
 reload_statement_list = [save_env, confirm_reset, reload_confirm,
                          reload_confirm_ios, press_enter, useracess,

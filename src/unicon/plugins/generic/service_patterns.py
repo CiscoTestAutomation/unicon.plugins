@@ -27,6 +27,7 @@ class ReloadPatterns(UniconCorePatterns):
         self.reload_confirm_ios = r'^.*Proceed( with reload)?\?\s*\[confirm\]'
         self.reload_confirm = r'^.*Reload node\s*\?\s*\[no,yes\]\s?$'
         self.reload_confirm_nxos = r'^(.*)This command will reboot the system.\s*\(y\/n\)\?\s*\[n\]\s?$'
+        self.connection_closed = r'^(.*?)Connection .*? closed'
 
 # Traceroute patterns
 class TraceroutePatterns(object):

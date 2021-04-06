@@ -10,4 +10,3 @@ class IosXECat3kSettings(IosXESettings):
         self.RELOAD_TIMEOUT = 600
         self.CONNECTION_TIMEOUT = 600  # Big timeout to handle transition rommon->enable
         self.STATE_TRANSITION_TIMEOUT = 30
-        self.MAX_ALLOWABLE_CONSECUTIVE_BOOT_ATTEMPTS = 3

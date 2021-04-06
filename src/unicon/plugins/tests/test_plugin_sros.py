@@ -14,14 +14,14 @@ class TestSrosPlugin(unittest.TestCase):
         self.joined = lambda string: '\n'.join(string.splitlines())
         self.con = Connection(
             os='sros',
-            hostname='COTKON04XR2',
+            hostname='Router',
             start=['mock_device_cli --os sros --state connect_ssh'],
             credentials={'default': {'username': 'grpc', 'password': 'nokia'}}
         )
         self.con.connect()
 
     def test_connect(self):
-        self.assertIn('COTKON04XR2#', self.con.spawn.match.match_output)
+        self.assertIn('Router#', self.con.spawn.match.match_output)
 
     def test_mdcli_execute(self):
         cmd = 'show router interface coreloop'
@@ -91,5 +91,18 @@ class TestSrosPlugin(unittest.TestCase):
         self.assertIn(self.joined(expect), self.joined(output))
 
 
+class TestLearnHostname(unittest.TestCase):
+
+    def test_connect_learn_hostname(self):
+        con = Connection(
+            os='sros',
+            hostname='CR1-LOC-1',
+            start=['mock_device_cli --os sros --state classiccli_execute --hostname CR1-LOC-1'],
+            credentials={'default': {'username': 'grpc', 'password': 'nokia'}},
+            learn_hostname=True
+        )
+        con.connect()
+
+
 if __name__ == '__main__':
-    unittest.main()
+     unittest.main()

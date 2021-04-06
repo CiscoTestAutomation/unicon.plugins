@@ -30,7 +30,11 @@ class FxosSettings(GenericSettings):
 
         self.RELOAD_WAIT = 420
         self.RELOAD_RECONNECT_ATTEMPTS = 3
+        self.POST_RELOAD_WAIT = 60
 
         self.BOOT_TIMEOUT = 600
+
+        # What pattern to wait for after system restart
+        self.BOOT_WAIT_PATTERN = r'^.*User enable_1 logged in to'
         # How many times the boot_wait_msg should occur to determine boot has finished
-        self.BOOT_WAIT_PATTERN_COUNT = 4
+        self.BOOT_WAIT_PATTERN_COUNT = 1

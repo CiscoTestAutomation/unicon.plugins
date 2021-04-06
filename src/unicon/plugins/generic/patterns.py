@@ -60,6 +60,6 @@ class GenericPatterns(UniconCorePatterns):
 
         self.sudo_password_prompt = r'^.*\[sudo\] password for .*?:\s*?'
 
-        self.syslog_message_pattern = r'^.*?%\w+-\d+-\w+:.*$'
+        self.syslog_message_pattern = r'^.*?%\w+(-\w+)?-\d+-\w+.*$'
 
         self.config_locked = r'Configuration (mode )?(is )?locked|Config mode cannot be entered'

@@ -17,7 +17,7 @@ from unicon.plugins.generic.statements import GenericStatements
 from unicon.plugins.generic import GenericUtils
 
 from .statements import (
-    FxosStatements, reload_statements, reload_statements_vty,
+    FxosStatements, reload_statements,
     login_statements, boot_wait)
 from .patterns import FxosPatterns
 
@@ -56,29 +56,40 @@ class Switchto(GenericSwitchto):
             raise Exception('Invalid switchto to_state type: %s' % repr(to_state))
 
         for to_state in to_state_list:
-            m1 = re.match(r'module\s+(\d+)\s+console', to_state)
-            m2 = re.match(r'cimc\s+(\S+)', to_state)
-            m3 = re.match(r'fxos scope (.*)', to_state)
+            m1 = re.match(r'module(\s+(\d+))?(\s+(console|telnet))?', to_state)
+            m2 = re.match(r'cimc(\s+(\S+))?', to_state)
+            m3 = re.match(r'fxos[ _]scope ?(.*)', to_state)
+            m4 = re.match(r'adapter(\s+(\S+))?', to_state)
             if m1:
-                mod = m1.group(1)
+                mod = m1.group(2) or 1
+                con_type = m1.group(4) or 'console'
                 self.context._module = mod
-                to_state = 'module_console'
+                self.context._mod_con_type = con_type
+                to_state = 'module'
             elif m2:
-                mod = m2.group(1)
+                mod = m2.group(2) or '1/1'
                 self.context._cimc_module = mod
                 to_state = 'cimc'
-                con.state_machine.go_to('chassis', con.spawn,
+                con.state_machine.go_to('fxos', con.spawn,
                                         context=self.context,
                                         hop_wise=True,
                                         timeout=timeout)
             elif m3:
                 scope = m3.group(1)
-                self.context._scope = scope
-                to_state = 'fxos_scope'
-                con.state_machine.go_to('fxos', con.spawn,
-                                        context=self.context,
-                                        hop_wise=True,
-                                        timeout=timeout)
+                if not scope:
+                    con.log.warning('No scope specified, ignoring switchto')
+                    continue
+                else:
+                    self.context._scope = scope
+                    to_state = 'fxos_scope'
+                    con.state_machine.go_to('fxos', con.spawn,
+                                            context=self.context,
+                                            hop_wise=True,
+                                            timeout=timeout)
+            elif m4:
+                mod = m4.group(2) or '1/1'
+                self.context._adapter_module = mod
+                to_state = 'adapter'
             else:
                 to_state = to_state.replace(' ', '_')
 
@@ -86,7 +97,7 @@ class Switchto(GenericSwitchto):
             if to_state not in valid_states:
                 con.log.warning(
                     '%s is not a valid state, ignoring switchto' % to_state)
-                return
+                continue
 
             con.state_machine.go_to(to_state,
                                     con.spawn,
@@ -119,7 +130,7 @@ class FTD(FxosExecute):
 
 class FireOS(FTD):
     def call_service(self, *args, **kwargs):
-        self.connection.log.warning('**** This service is deprecated. ' +
+        self.connection.log.warning('**** "fireos" service is deprecated. ' +
                                     'Please use "ftd" service ****')
         super().call_service(*args, **kwargs)
 
@@ -172,7 +183,7 @@ class Disable(FxosExecute):
         self.start_state = 'disable'
         self.end_state = 'disable'
         self.service_name = 'disable'
-        self.timeout = 300
+        self.timeout = 60
         self.__dict__.update(kwargs)
 
 
@@ -185,7 +196,7 @@ class Enable(FxosExecute):
         self.start_state = 'enable'
         self.end_state = 'enable'
         self.service_name = 'enable'
-        self.timeout = 600
+        self.timeout = 60
         self.__dict__.update(kwargs)
 
 
@@ -227,6 +238,7 @@ class Reload(BaseService):
         lb = UniconStreamHandler(self.log_buffer)
         lb.setFormatter(logging.Formatter(fmt=UNICON_LOG_FORMAT))
         self.connection.log.addHandler(lb)
+        self.dialog = Dialog(reload_statements)
         self.__dict__.update(kwargs)
 
     def pre_service(self, *args, **kwargs):
@@ -247,7 +259,7 @@ class Reload(BaseService):
         console = con.context.get('console', False)
 
         if console:
-            dialog = reply + Dialog(reload_statements)
+            dialog = reply + self.dialog
             con.spawn.sendline(reload_command)
             try:
                 con.log.info('Rebooting system..')
@@ -260,6 +272,9 @@ class Reload(BaseService):
                 con.log.info('Waiting for boot to finish..')
                 # Wait until boot is done
                 boot_wait(con.spawn, timeout=timeout or self.timeout)
+
+                con.log.info('Reload done, waiting %s seconds' % con.settings.POST_RELOAD_WAIT)
+                time.sleep(con.settings.POST_RELOAD_WAIT)
 
                 dialog = Dialog(login_statements + [Statement(fxos_patterns.fxos_prompt)])
 
@@ -276,7 +291,7 @@ class Reload(BaseService):
                 raise SubCommandFailure("Reload failed %s" % err)
         else:
             con.log.debug('Did not detect a console session, will try to reconnect...')
-            dialog = reply + Dialog(reload_statements_vty)
+            dialog = reply + self.dialog
             con.spawn.sendline(reload_command)
             self.result = dialog.process(con.spawn,
                                          timeout=timeout or self.timeout,

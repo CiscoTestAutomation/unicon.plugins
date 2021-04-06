@@ -27,8 +27,6 @@ unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
 unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC = 0.2
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestNxosPluginConnect(unittest.TestCase):
 
     def test_login_connect(self):
@@ -99,8 +97,6 @@ class TestNxosN3KPluginShellexec(unittest.TestCase):
         c.disconnect()
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0)
 class TestNxosPluginBashService(unittest.TestCase):
 
     def test_bash(self):
@@ -229,8 +225,6 @@ class TestNxosPluginGuestshellService(unittest.TestCase):
             ha.stop()
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestNxosPluginAttachConsoleService(unittest.TestCase):
 
     def test_shell(self):
@@ -289,8 +283,6 @@ class TestNxosPluginAttachModule(unittest.TestCase):
         c.disconnect()
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestNxosPluginPing6Service(unittest.TestCase):
 
     @classmethod
@@ -335,8 +327,6 @@ class TestNxosPluginPing6Service(unittest.TestCase):
         self.assertTrue(result)
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestNxosPluginExecute(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -552,18 +542,34 @@ class TestNxosConfigureDual(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.dev = Connection(hostname='switch',
-                        start=['mock_device_cli --os nxos --state exec'],
-                        os='nxos',
-                        username='cisco',
-                        tacacs_password='cisco',
-                        init_exec_commands=[],
-                        init_config_commands=[]
-                        )
+                             start=['mock_device_cli --os nxos --state exec'],
+                             os='nxos',
+                             username='cisco',
+                             tacacs_password='cisco',
+                             init_exec_commands=[],
+                             init_config_commands=[])
         cls.dev.connect()
 
     def test_configure_dual(self):
         out = self.dev.configure_dual(['feature isis'])
         self.assertIn('Verification Succeeded.', out)
+
+        # test on normal configure
+        config = self.dev.configure('no logging console')
+        self.assertIn('no logging console', config)
+
+    def test_configure_dual_mode(self):
+        out = self.dev.configure(['feature isis'], mode='dual')
+        self.assertIn('Verification Succeeded.', out)
+        # test on normal configure
+        config = self.dev.configure('no logging console')
+        self.assertIn('no logging console', config)
+
+    def test_configure_dual_mode_attribute(self):
+        self.dev.configure.mode = 'dual'
+        out = self.dev.configure(['feature isis'])
+        self.assertIn('Verification Succeeded.', out)
+        self.dev.configure.mode = 'default'
 
         # test on normal configure
         config = self.dev.configure('no logging console')
@@ -585,6 +591,29 @@ class TestNxosConfigureDual(unittest.TestCase):
     def tearDownClass(cls):
         cls.dev.disconnect()
 
+
+class TestNxosPluginSwitchtoVdc(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.c = Connection(hostname='N77',
+                           start=['mock_device_cli --os nxos --state exec --hostname N77'],
+                           os='nxos',
+                           credentials=dict(default=dict(username='cisco', password='cisco')),
+                           log_buffer=True)
+        cls.c.connect()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.c.disconnect()
+
+    def test_switchto_vdc_switchback(self):
+        self.c.switchto('N77_3')
+        self.c.switchback()
+
+    def test_switchto_new_vdc_switchback(self):
+        self.c.switchto('N77_4')
+        self.c.switchback()
 
 if __name__ == "__main__":
     unittest.main()

@@ -156,7 +156,10 @@ class FxosStateMachine(StateMachine):
         enable_to_disable = Path(enable, disable, 'disable', None)
         enable_to_config = Path(enable, config, 'config term', Dialog([fxos_statements.config_call_home_stmt]))
 
-        disable_to_enable = Path(disable, enable, 'enable', Dialog([fxos_statements.enable_password_stmt]))
+        disable_to_enable = Path(disable, enable, 'enable', Dialog([
+            fxos_statements.enable_username_stmt,
+            fxos_statements.enable_password_stmt
+        ]))
 
         config_to_enable = Path(config, enable, 'end', None)
 
@@ -220,7 +223,7 @@ class FxosStateMachine(StateMachine):
 
         self.add_default_statements(default_statement_list)
 
-    def detect_state(self, spawn):
+    def detect_state(self, spawn, context=AttributeDict()):
         """ Detect the device state and glean the actual state if multiple matches are found.
         """
         state_matches = []
@@ -241,7 +244,7 @@ class FxosStateMachine(StateMachine):
             self.update_cur_state(state_matches[0].name)
         else:
             spawn.sendline()
-            super().go_to('any', spawn)
+            super().go_to('any', spawn, context)
 
     def glean_state(self, spawn, possible_states):
         """ Try to figure out the state by sending commands and verifying the matches against known output.
