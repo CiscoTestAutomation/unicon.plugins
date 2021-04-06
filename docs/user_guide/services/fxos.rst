@@ -2,6 +2,7 @@ FXOS
 ====
 
 This section lists the services which are supported with Firepower Extensible Operating System (FXOS) Unicon plugin.
+This plugin supports Firepower 2000 series.
 
   * `execute <#execute>`__
   * `ftd <#execute>`__
@@ -68,6 +69,18 @@ switchto
 
 The `switchto` service is a helper method to switch between CLI states. This can be used to switch
 to more specific states than e.g. the ``fxos`` method.
+
+The following states are supported:
+
+* `fireos`
+* `ftd`
+* `fxos`
+* `fxos mgmt`
+* `expert`
+* `sudo`
+* `disable`
+* `enable`
+* `rommon`
 
 ===================   ========================    ====================================================
 Argument              Type                        Description

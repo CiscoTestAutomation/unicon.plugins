@@ -59,6 +59,7 @@ asa_enable:
     "display configuration replication warning": |
         **** WARNING ****
         Configuration Replication is NOT performed from Standby unit to Active unit
+    "no object-group network TEST_NETWORK": "Removing object-group (TEST_NETWORK) failed; it does not exist"
 
 asa_enable_more:
   prompt: "%N#"

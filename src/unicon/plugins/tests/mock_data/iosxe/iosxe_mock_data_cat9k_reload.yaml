@@ -79,7 +79,10 @@ cat9k_boot_to_rommon:
 cat9k_rommon:
     prompt: "switch:"
     commands:
+      "unlock flash:": ""
       "boot":
+        new_state: cat9k_rommon_boot
+      "boot tftp://1.1.1.1/latest.bin":
         new_state: cat9k_rommon_boot
 
 cat9k_rommon_boot:

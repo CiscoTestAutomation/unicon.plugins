@@ -54,7 +54,6 @@ class IOSXRV9KSingleRpConnectionProvider(
          after bringing to enable state
         """
         con = self.connection
-        con._is_connected = True
         con.state_machine.go_to('enable',
                                 self.connection.spawn,
                                 context=self.connection.context,

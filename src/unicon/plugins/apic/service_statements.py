@@ -1,7 +1,7 @@
 __author__ = "dwapstra"
 
 from unicon.eal.dialogs import Statement
-from unicon.plugins.generic.statements import update_context
+from unicon.plugins.generic.service_statements import connection_closed
 
 from .service_patterns import ApicReloadPatterns
 
@@ -33,11 +33,6 @@ class ApicReloadStatements(object):
                                loop_continue=False,
                                continue_timer=False)
 
-        self.connection_closed = Statement(pattern=pat.connection_closed,
-                                           action=update_context,
-                                           args={'console': False},
-                                           loop_continue=False,
-                                           continue_timer=False)
 
 
 apic_stmts = ApicReloadStatements()
@@ -46,5 +41,5 @@ reload_statement_list = [apic_stmts.factory_reset,
                          apic_stmts.restart_proceed,
                          apic_stmts.press_any_key,  # loop_continue=False
                          apic_stmts.login,  # loop_continue=False
-                         apic_stmts.connection_closed  # loop_continue=False
+                         connection_closed  # loop_continue=False
                         ]

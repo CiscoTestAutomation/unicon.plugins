@@ -151,10 +151,13 @@ class TestIosXrSpitfirePluginSvcs(unittest.TestCase):
         cls.c.connect()
 
     def test_execute(self):
+        self.c.enable()
         self.c.execute("bash", allow_state_change=True)
         self.assertEqual(self.c.spawn.match.match_output, 'bash\r\n[ios:/misc/scratch]$')
 
     def test_execute_2(self):
+        self.c.enable()
+        self.c.execute("bash", allow_state_change=True)
         self.c.execute("ls", allow_state_change=True)
         self.assertEqual(
             self.c.spawn.match.match_output, 'ls\r\nakrhegde_15888571384782863_mppinband_rtr1.log  '
@@ -401,7 +404,7 @@ class TestIosXrSpitfirePluginAttachConsoleService(unittest.TestCase):
                           mit=True)
 
         conn.connect()
-        with conn.attach_console('0/RP0/CPU0') as console:
+        with conn.attach('0/RP0/CPU0') as console:
             out = console.execute('ls')
             self.assertIn('dummy_file', out)
         ret = conn.spawn.match.match_output
@@ -415,7 +418,7 @@ class TestIosXrSpitfirePluginAttachConsoleService(unittest.TestCase):
                           mit=True)
 
         conn.connect()
-        with conn.attach_console('0/0/CPU0') as console:
+        with conn.attach('0/0/CPU0') as console:
             out = console.execute('ls')
             self.assertIn('dummy_file', out)
         ret = conn.spawn.match.match_output

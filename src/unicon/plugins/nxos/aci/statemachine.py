@@ -2,40 +2,27 @@
 
 __author__ = "dwapstra"
 
-import re
+from unicon.statemachine import State, Path
 
-from unicon.core.errors import SubCommandFailure, StateMachineError
-from unicon.plugins.generic.statements import GenericStatements
-from unicon.plugins.generic.statemachine import default_statement_list
-from unicon.statemachine import State, Path, StateMachine
-from unicon.eal.dialogs import Dialog, Statement
-
+from ..statemachine import NxosSingleRpStateMachine
 from .patterns import AciPatterns
 
 patterns = AciPatterns()
-statements = GenericStatements()
 
 
-
-class AciStateMachine(StateMachine):
-
-    def __init__(self, hostname=None):
-        super().__init__(hostname)
+class AciStateMachine(NxosSingleRpStateMachine):
 
     def create(self):
-        enable = State('enable', patterns.enable_prompt)
-        self.add_state(enable)
-
+        super().create()
+        enable = self.get_state('enable')
+        enable.pattern = patterns.enable_prompt
         boot = State('boot', patterns.loader_prompt)
+        module = self.get_state('module')
+
+        self.remove_path(enable, module)
+
+        enable_to_module = Path(enable, module, 'vsh_lc', None)
+
         self.add_state(boot)
 
-        config = State('config', patterns.config_prompt)
-        self.add_state(config)
-
-        enable_to_config = Path(enable, config, 'configure', None)
-        self.add_path(enable_to_config)
-
-        config_to_enable = Path(config, enable, 'end', None)
-        self.add_path(config_to_enable)
-
-        self.add_default_statements(default_statement_list)
+        self.add_path(enable_to_module)

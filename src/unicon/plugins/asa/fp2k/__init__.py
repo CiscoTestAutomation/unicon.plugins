@@ -21,7 +21,6 @@ class AsaFp2kConnectionProvider(GenericSingleRpConnectionProvider):
 
     def init_handle(self):
         con = self.connection
-        con._is_connected = True
         con.state_machine.detect_state(con.spawn)
         self.execute_init_commands()
         self.connection.settings.MORE_CONTINUE = ' '

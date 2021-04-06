@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from ..service_statements import boot_image
 from unicon.plugins.iosxe.statemachine import IosXESingleRpStateMachine
 from unicon.statemachine import State, Path
 from unicon.eal.dialogs import Dialog
@@ -14,9 +15,9 @@ from .statements import (
 patterns = IosXECat9kPatterns()
 
 
-def boot_from_rommon(statemachinen, spawn, context):
+def boot_from_rommon(statemachine, spawn, context):
     context['boot_start_time'] = datetime.now()
-    spawn.sendline('boot')
+    boot_image(spawn, context, None)
 
 
 class IosXECat9kSingleRpStateMachine(IosXESingleRpStateMachine):

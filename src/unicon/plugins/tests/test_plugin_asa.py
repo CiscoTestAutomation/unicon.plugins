@@ -99,7 +99,8 @@ class TestAsaPluginExecute(unittest.TestCase):
         cls.c.connect()
 
     def test_execute_error_pattern(self):
-        for cmd in ['changeto context GLOBAL', 'network-object host 5.5.50.10', 'display configuration replication warning']:
+        for cmd in ['changeto context GLOBAL', 'network-object host 5.5.50.10', 'display configuration replication warning',
+                    'no object-group network TEST_NETWORK']:
             with self.assertRaises(SubCommandFailure) as err:
                 r = self.c.execute(cmd)
 

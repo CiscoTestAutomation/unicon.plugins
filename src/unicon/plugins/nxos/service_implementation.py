@@ -92,11 +92,28 @@ class Configure(GenericConfigure):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'config'
         self.end_state = 'enable'
+        self.mode = 'default'
+        self.valid_transition_commands = ['end', 'exit']
+
+    def pre_service(self, *args, **kwargs):
+        target = kwargs.get('target', None)
+        handle = self.get_handle(target)
+        mode = kwargs.get('mode') or self.mode
+        if mode == 'dual':
+            self.commit_cmd = 'commit'
+            handle.context['config_dual'] = True
+        try:
+            super().pre_service(*args, **kwargs)
+        except Exception:
+            raise
+        finally:
+            handle.context.pop('config_dual', None)
 
     def call_service(self, command=[], reply=Dialog([]),
-                      timeout=None, commit=False, *args, **kwargs):
+                     timeout=None, commit=False, *args, **kwargs):
         if commit:
             self.commit_cmd = 'commit'
+            self.valid_transition_commands = ['end', 'exit', 'commit', 'abort']
 
             commit_verification_stmt = Statement(pattern=r'.*{hostname}#.*'.format(
                 hostname = self.context['hostname']),
@@ -113,6 +130,10 @@ class Configure(GenericConfigure):
                                  reply=reply,
                                  timeout=timeout, *args, **kwargs)
 
+    def post_service(self, *args, **kwargs):
+        self.commit_cmd = ''
+        super().post_service(*args, **kwargs)
+
 
 class ConfigureDual(Configure):
 
@@ -121,6 +142,10 @@ class ConfigureDual(Configure):
         self.commit_cmd = 'commit'
 
     def pre_service(self, *args, **kwargs):
+        warnings.warn(message = "service 'configure_dual' "
+            "is now deprecated and replaced by configure(mode='dual').",
+            category = DeprecationWarning)
+
         target = kwargs.get('target', None)
         handle = self.get_handle(target)
         handle.context['config_dual'] = True
@@ -1168,20 +1193,20 @@ class SwitchVdc(BaseService):
 
         # prepare the dialog to be used.
         command_dialog = Dialog([
-            [patterns.secure_password, send_response, {'response': "yes"}, True,
-             True],
-            [patterns.admin_password, send_response, {'response': vdc_passwd},
-             True, True],
-            [patterns.setup_dialog, send_response, {'response': "no"}, True,
-             True],
+            [patterns.secure_password, send_response, {'response': "yes"}, True, True],
+            [patterns.admin_password, send_response, {'response': vdc_passwd}, True, True],
+            [patterns.setup_dialog, send_response, {'response': "no"}, True, True],
         ])
         # append the dialog which user has provided.
         command_dialog += dialog
+        dialog = self.service_dialog(service_dialog=command_dialog)
 
         try:
-            con.execute(command, reply=command_dialog,
-                                    timeout=timeout)
-        except Exception as err:
+            con.sendline(command)
+            self.result = dialog.process(con.spawn,
+                                         context=self.context,
+                                         timeout=timeout)
+        except Exception:
             # this means there was some problem during the switching. Hence
             # rollback all the changes to the state machine
             if con.is_ha:
@@ -1214,18 +1239,24 @@ class SwitchbackVdc(BaseService):
         self.end_state = 'enable'
 
     def call_service(self, timeout=10, command="switchback", dialog=Dialog()):
+        con = self.connection
         # this service should be called only if we are on the VDC
-        if self.connection.current_vdc:
-            hostname = self.connection.hostname
-            if self.connection.is_ha:
-                self.connection.active.state_machine.hostname = hostname
-                self.connection.standby.state_machine.hostname = hostname
+        if con.current_vdc:
+            hostname = con.hostname
+            if con.is_ha:
+                con.active.state_machine.hostname = hostname
+                con.standby.state_machine.hostname = hostname
             else:
-                self.connection.state_machine.hostname = hostname
-            self.connection.execute(command, timeout=timeout, reply=dialog)
-            self.connection.current_vdc = None
+                con.state_machine.hostname = hostname
+            con.current_vdc = None
+            con.sendline(command)
+            dialog = self.service_dialog(service_dialog=dialog)
+            dialog.process(con.spawn,
+                           context=self.context,
+                           prompt_recovery=self.prompt_recovery,
+                           timeout=self.timeout)
         else:
-            self.connection.log.info("already on default vdc")
+            con.log.info("already on default vdc")
 
 
 class CreateVdc(BaseService):

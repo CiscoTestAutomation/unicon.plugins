@@ -7,6 +7,7 @@ from unicon.plugins.generic.statements import connection_statement_list
 from unicon.plugins.generic.service_statements import (
     save_env, confirm_reset, reload_confirm, reload_confirm_ios)
 
+from ..service_statements import boot_image
 from .patterns import IosXECat9kPatterns
 
 patterns = IosXECat9kPatterns()
@@ -66,7 +67,7 @@ boot_timeout_stmt = Statement(
 
 boot_from_rommon_stmt = Statement(
     pattern=patterns.rommon_prompt,
-    action='sendline(boot)',
+    action=boot_image,
     args=None,
     loop_continue=True,
     continue_timer=False)

@@ -25,5 +25,6 @@ class ASASettings(GenericSettings):
         self.ERROR_PATTERN = [
             r'^ERROR:',
             r'^WARNING:',
-            r'\*{1,} WARNING \*{1,}'
+            r'\*{1,} WARNING \*{1,}',
+            r'^Removing.*?failed.*?$'
         ]

@@ -16,6 +16,24 @@ class Reload(XEReload):
         super().__init__(connection, context, **kwargs)
         self.dialog = Dialog(reload_statement_list + [boot_from_rommon_stmt])
 
+    def pre_service(self, *args, **kwargs):
+        if "image_to_boot" in kwargs:
+            self.start_state = 'rommon'
+        else:
+            self.start_state = 'enable'
+
+        super().pre_service(*args, **kwargs)
+
+    def call_service(self, *args, **kwargs):
+        if "image_to_boot" in kwargs:
+            self.context["image_to_boot"] = kwargs["image_to_boot"]
+            reload_command = "boot {}".format(
+                self.context['image_to_boot']).strip()
+            super().call_service(reload_command, *args, **kwargs)
+            self.context.pop("image_to_boot", None)
+        else:
+            super().call_service(*args, **kwargs)
+
 
 class Rommon(XERommon):
     """ Brings device to the Rommon prompt and executes commands specified

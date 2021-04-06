@@ -14,7 +14,7 @@ Description:
 
 from time import sleep
 
-from unicon.core.errors import StateMachineError, TimeoutError as UniconTimeoutError
+from unicon.core.errors import StateMachineError
 from unicon.plugins.generic.statements import GenericStatements
 from unicon.plugins.generic.patterns import GenericPatterns
 
@@ -22,8 +22,7 @@ from unicon.statemachine import State, Path, StateMachine
 from unicon.eal.dialogs import Dialog, Statement
 
 from .statements import (authentication_statement_list,
-                         default_statement_list,
-                         update_context)
+                         default_statement_list)
 
 patterns = GenericPatterns()
 statements = GenericStatements()
@@ -33,46 +32,28 @@ def config_transition(statemachine, spawn, context):
     # Config may be locked, retry until max attempts or config state reached
     wait_time = spawn.settings.CONFIG_LOCK_RETRY_SLEEP
     max_attempts = spawn.settings.CONFIG_LOCK_RETRIES
-    dialog = Dialog([Statement(pattern=patterns.config_locked,
-                               action=update_context,
-                               args={'config_locked': True},
+    dialog = Dialog([Statement(pattern=statemachine.get_state('enable').pattern,
                                loop_continue=False,
                                trim_buffer=True),
-                     Statement(pattern=statemachine.get_state('enable').pattern,
-                               action=update_context,
-                               args={'config_locked': False},
-                               loop_continue=False,
-                               trim_buffer=False),
                      Statement(pattern=statemachine.get_state('config').pattern,
-                               action=update_context,
-                               args={'config_locked': False},
                                loop_continue=False,
                                trim_buffer=False)
                      ])
 
-    for attempts in range(max_attempts + 1):
+    for attempt in range(max_attempts + 1):
         spawn.sendline(statemachine.config_command)
-        try:
-            dialog.process(spawn, timeout=spawn.settings.CONFIG_TIMEOUT, context=context)
-        except UniconTimeoutError:
-            pass
-        if context.get('config_locked'):
-            if attempts < max_attempts:
-                spawn.log.warning('*** Config lock detected, waiting {} seconds. Retry attempt {}/{} ***'.format(
-                    wait_time, attempts + 1, max_attempts))
-                sleep(wait_time)
-        else:
-            statemachine.detect_state(spawn)
-            if statemachine.current_state == 'config':
-                return
-            else:
-                spawn.log.warning("Could not enter config mode, sending clear line command and trying again..")
-                spawn.send(spawn.settings.CLEAR_LINE_CMD)
+        dialog.process(spawn, timeout=spawn.settings.CONFIG_TIMEOUT, context=context)
 
-    if context.get('config_locked'):
-        raise StateMachineError('Config locked, unable to configure device')
-    else:
-        raise StateMachineError('Unable to transition to config mode')
+        statemachine.detect_state(spawn)
+        if statemachine.current_state == 'config':
+            return
+
+        if attempt < max_attempts:
+            spawn.log.warning('*** Could not enter config mode, waiting {} seconds. Retry attempt {}/{} ***'.format(
+                              wait_time, attempt + 1, max_attempts))
+            sleep(wait_time)
+
+    raise StateMachineError('Unable to transition to config mode')
 
 
 #############################################################

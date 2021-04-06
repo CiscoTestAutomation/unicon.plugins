@@ -22,10 +22,11 @@ class TestNxosMdsPluginConnect(unittest.TestCase):
                        start=['mock_device_cli --os nxos_mds --state exec'],
                        os='nxos',
                        platform='mds',
-                       username='cisco',
-                       tacacs_password='cisco')
+                       credentials=dict(default=dict(username='cisco',
+                                        password='cisco')),
+                       mit=True)
         c.connect()
-        assert c.spawn.match.match_output == 'end\r\nswitch#'
+        assert c.spawn.match.match_output == 'switch#'
 
 
 class TestNxosMdsPluginShellexec(unittest.TestCase):
@@ -35,8 +36,9 @@ class TestNxosMdsPluginShellexec(unittest.TestCase):
                        start=['mock_device_cli --os nxos_mds --state exec'],
                        os='nxos',
                        platform='mds',
-                       username='cisco',
-                       tacacs_password='cisco')
+                       credentials=dict(default=dict(username='cisco',
+                                        password='cisco')),
+                       mit=True)
         c.shellexec(['ls'])
         assert c.spawn.match.match_output == 'exit\r\nswitch#'
 

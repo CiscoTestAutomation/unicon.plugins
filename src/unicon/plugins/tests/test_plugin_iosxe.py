@@ -200,7 +200,6 @@ class TestIosXEPluginExecute(unittest.TestCase):
             os='iosxe',
             settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
             credentials=dict(default=dict(username='cisco', password='cisco')),
-            connection_timeout=3,
             mit=True
         )
         try:
@@ -601,7 +600,6 @@ class TestIosXEConfigure(unittest.TestCase):
             os='iosxe',
             settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
             credentials=dict(default=dict(username='cisco', password='cisco')),
-            connection_timeout=3,
             mit=True
         )
         try:
@@ -621,7 +619,6 @@ class TestIosXEConfigure(unittest.TestCase):
             os='iosxe',
             settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
             credentials=dict(default=dict(username='cisco', password='cisco')),
-            connection_timeout=3,
             mit=True
         )
         try:
@@ -678,9 +675,32 @@ class TestIosXEConfigure(unittest.TestCase):
                        log_buffer=True
                        )
         c.connect()
-        c.settings.CONFIG_TIMEOUT=3
         c.configure(['no logging console'])
         c.disconnect()
+
+    def test_slow_config_lock(self):
+        md = MockDeviceTcpWrapperIOSXE(port=0, state='config_locked')
+        md.start()
+
+        c = Connection(
+            hostname='Router',
+            start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
+            os='iosxe',
+            mit=True,
+            log_buffer=True,
+            settings=dict(POST_DISCONNECT_WAIT_SEC=0,
+                          GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+        )
+        try:
+            c.connect()
+            c.settings.CONFIG_TIMEOUT=5
+            c.settings.CONFIG_LOCK_RETRY_SLEEP=3
+            c.configure(['no logging console'])
+        finally:
+            c.disconnect()
+            md.stop()
+
+
 
 
 if __name__ == "__main__":

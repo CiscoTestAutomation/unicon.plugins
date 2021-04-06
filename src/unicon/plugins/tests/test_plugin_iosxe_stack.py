@@ -15,8 +15,10 @@ from unicon.core.errors import SubCommandFailure
 from unicon.plugins.tests.mock.mock_device_iosxe import MockDeviceTcpWrapperIOSXE
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0)
+unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
+unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC = 0
+
+
 class TestIosXEStackConnect(unittest.TestCase):
 
     def test_stack_connect(self):
@@ -171,8 +173,6 @@ class TestIosXEStackGetRPState(unittest.TestCase):
         self.assertEqual(r, 'MEMBER')
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0)
 class TestIosXEStackSwitchover(unittest.TestCase):
 
     @classmethod
@@ -183,15 +183,18 @@ class TestIosXEStackSwitchover(unittest.TestCase):
                        chassis_type='stack',
                        username='cisco',
                        tacacs_password='cisco',
-                       enable_password='cisco')
+                       enable_password='cisco',
+                       log_buffer=True)
         cls.c.connect()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.c.disconnect()
 
     def test_reload(self):
         self.c.switchover()
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0)
 class TestIosXEStackReload(unittest.TestCase):
 
     def test_reload(self):
@@ -208,7 +211,31 @@ class TestIosXEStackReload(unittest.TestCase):
         self.assertTrue(d.active.alias == 'peer_1')
 
         d.reload()
+        d.disconnect()
         md.stop()
+
+
+class TestIosXEluginBashService(unittest.TestCase):
+
+    def test_bash(self):
+        md = MockDeviceTcpWrapperIOSXE(port=0, state='stack_enable' + ',stack_enable'*4, stack=True)
+        md.start()
+        try:
+            d = Connection(hostname='Router',
+                        start = ['telnet 127.0.0.1 ' + str(i) for i in md.ports[:]],
+                        os='iosxe',
+                        chassis_type='stack',
+                        username='cisco',
+                        tacacs_password='cisco',
+                        enable_password='cisco')
+            d.connect()
+            with d.bash_console() as console:
+                console.execute('df /bootflash/')
+            self.assertIn('exit', d.spawn.match.match_output)
+            self.assertIn('Router#', d.spawn.match.match_output)
+            d.disconnect()
+        finally:
+            md.stop()
 
 
 if __name__ == "__main__":

@@ -21,7 +21,6 @@ class FxosConnectionProvider(GenericSingleRpConnectionProvider):
 
     def init_handle(self):
         con = self.connection
-        con._is_connected = True
         self.execute_init_commands()
         self.connection.settings.MORE_CONTINUE = ' '
 

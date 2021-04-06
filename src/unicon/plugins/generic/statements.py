@@ -87,29 +87,23 @@ def syslog_wait_send_return(spawn):
 
 
 def chatty_term_wait(spawn, trim_buffer=False):
-    """ Wait a small amount of time for any chatter to cease from the device.
+    """ Wait some time for any chatter to cease from the device.
     """
-    prev_buf_len = len(spawn.buffer)
-    for _ in range(
+    for retry_number in range(
             spawn.settings.ESCAPE_CHAR_CHATTY_TERM_WAIT_RETRIES):
 
-        sleep(spawn.settings.ESCAPE_CHAR_CHATTY_TERM_WAIT)
-
-        spawn.read_update_buffer()
-
-        cur_buf_len = len(spawn.buffer)
-
-        if prev_buf_len == cur_buf_len:
+        if buffer_settled(spawn, spawn.settings.ESCAPE_CHAR_CHATTY_TERM_WAIT):
             break
         else:
-            prev_buf_len = cur_buf_len
-            if trim_buffer:
-                spawn.trim_buffer()
+            sleep(spawn.settings.ESCAPE_CHAR_CHATTY_TERM_WAIT * (retry_number + 1))
+
+    if trim_buffer:
+        spawn.trim_buffer()
 
 
 def escape_char_callback(spawn):
-    """ Wait a small amount of time for terminal chatter to cease before
-    attempting to obtain prompt, do not attempt to obtain prompt if login message is seen.
+    """ Wait some time for terminal chatter to cease before attempting to obtain prompt,
+    do not attempt to obtain prompt if login message is seen.
     """
 
     chatty_term_wait(spawn)

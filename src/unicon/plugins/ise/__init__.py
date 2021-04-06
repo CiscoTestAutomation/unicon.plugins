@@ -117,4 +117,3 @@ class IseConnection(BaseLinuxConnection):
         """
         self.spawn.sendline('exit')
         self.spawn.close()
-        self._is_connected = False

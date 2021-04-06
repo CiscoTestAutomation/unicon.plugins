@@ -16,7 +16,6 @@ class VosConnectionProvider(GenericSingleRpConnectionProvider):
 
     def init_handle(self):
         con = self.connection
-        con._is_connected = True
         con.connection_timeout = 300
         con.state_machine.go_to('shell',
                                 self.connection.spawn,

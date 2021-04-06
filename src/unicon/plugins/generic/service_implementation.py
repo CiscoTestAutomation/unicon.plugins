@@ -44,8 +44,8 @@ utils = GenericUtils()
 ReloadResult = collections.namedtuple('ReloadResult', ['result', 'output'])
 
 
-def exec_state_change_action(spawn, err_state, sm):
-    msg = "Expected device to reach at '{}' state, but landed on '{}' state."\
+def invalid_state_change_action(spawn, err_state, sm):
+    msg = "Expected device to reach '{}' state, but landed on '{}' state."\
           .format(sm.current_state, err_state.name)
     # Update device current state with unexpected state.
     sm.update_cur_state(err_state)
@@ -662,7 +662,7 @@ class Execute(BaseService):
                 else:
                     dialog.append(Statement(
                         pattern=state.pattern,
-                        action=exec_state_change_action,
+                        action=invalid_state_change_action,
                         args={'err_state': state, 'sm': sm},
                         matched_retries=matched_retries,
                         matched_retry_sleep=matched_retry_sleep
@@ -703,7 +703,7 @@ class Execute(BaseService):
                 if dialog_match:
                     self.result = dialog_match.match_output
                     self.result = self.get_service_result()
-                sm.detect_state(con.spawn)
+                sm.detect_state(con.spawn, con.context)
             except StateMachineError:
                 raise
             except Exception as err:
@@ -796,6 +796,7 @@ class Configure(BaseService):
         self.bulk = connection.settings.BULK_CONFIG
         self.bulk_chunk_lines = connection.settings.BULK_CONFIG_CHUNK_LINES
         self.bulk_chunk_sleep = connection.settings.BULK_CONFIG_CHUNK_SLEEP
+        self.valid_transition_commands = ['end', 'exit']
         self.__dict__.update(kwargs)
 
         class ConfigUtils(GenericUtils):
@@ -811,6 +812,27 @@ class Configure(BaseService):
         self.utils = ConfigUtils()
 
     def pre_service(self, *args, **kwargs):
+        sm = self.get_sm()
+
+        from_state = sm.get_state(sm.current_state)
+        if from_state.name != self.start_state:
+            # Allow state change to enable if user provided 'end' or 'exit' command
+            # Otherwise raise an exception
+            def config_state_change(spawn):
+                last_cmd = spawn.last_sent.strip()
+                if last_cmd not in self.valid_transition_commands:
+                    invalid_state_change_action(
+                        spawn, err_state=from_state, sm=sm)
+                else:
+                    sm.update_cur_state(from_state)
+
+            from_state_stmt = Statement(pattern=from_state.pattern,
+                                        action=config_state_change,
+                                        args=None,
+                                        loop_continue=False)
+
+            self.dialog += Dialog([from_state_stmt])
+
         self.prompt_recovery = kwargs.get('prompt_recovery', False)
 
         # Backward compatibility with old config lock implementation
@@ -897,6 +919,7 @@ class Configure(BaseService):
                     sp.sendline(cmd)
                     self.update_hostname_if_needed([cmd])
                     self.process_dialog_on_handle(handle, dialog, timeout)
+
         handle.state_machine.go_to(
             self.end_state,
             handle.spawn,
@@ -999,11 +1022,6 @@ class Reload(BaseService):
         con.log.debug(fmt_msg % (self.connection.hostname,
                                  reload_command,
                                  timeout))
-
-        con.state_machine.go_to(self.end_state,
-                                con.spawn,
-                                prompt_recovery=self.prompt_recovery,
-                                context=self.context)
 
         if reply:
             if dialog:
@@ -2407,6 +2425,7 @@ class AttachModuleService(BaseService):
             self.target = target
             self.context = context
             self.timeout = timeout or connection.settings.CONSOLE_TIMEOUT
+            self.context._module_num = module_num
 
         def __enter__(self):
             if self.conn.is_ha:

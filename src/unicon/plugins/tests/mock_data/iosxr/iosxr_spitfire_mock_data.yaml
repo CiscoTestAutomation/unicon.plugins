@@ -116,7 +116,6 @@ spitfire_enable:
 
           export PS1='#'
           [node0_RP0_CPU0:~]$export PS1='#'
-          #
 
     "attach location 0/0/CPU0":
       new_state:  spitfire_attach_console
@@ -127,7 +126,6 @@ spitfire_enable:
 
           export PS1='#'
           [node0_0_CPU0:~]$export PS1='#'
-          #
 
 
 spitfire_confirm_switchover:
@@ -251,10 +249,9 @@ spitfire_attach_console:
   prompt: "#"
   commands:
     "exit":
-      response: 
+      response:
         - |2
           logout
       new_state: spitfire_enable
     "ls": |
         dummy_file dummy_file2
-          

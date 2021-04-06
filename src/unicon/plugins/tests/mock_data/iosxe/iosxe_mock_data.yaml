@@ -135,7 +135,7 @@ general_enable:
 
 
 general_config:
-  prompt: "Router(conf)#"
+  prompt: "%N(conf)#"
   commands:
     "end":
       new_state: general_enable
@@ -373,6 +373,25 @@ slow_config_mode:
         - 0:,4,0
       new_state: general_config
 
+
+config_locked:
+  prompt: "%N#"
+  commands:
+    "config term":
+      response: |
+        Config mode cannot be entered during Standby initialization or when switch is in recovery mode
+      timing:
+      - 0:,0,0.1,0.002
+      new_state: config_locked1
+
+config_locked1:
+  prompt: "%N#"
+  commands:
+    "config term":
+      new_state: general_config
+      response: ""
+      timing:
+        - 0:,3,0
 
 
 # Console server

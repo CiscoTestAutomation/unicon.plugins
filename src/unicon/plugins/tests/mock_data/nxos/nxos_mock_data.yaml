@@ -144,6 +144,107 @@ exec:
       Copying to/from this server name is not permitted
     "attach module 1":
       new_state: attach_module
+    "show vdc": |
+      Switchwide mode is f2e f3
+
+      vdc_id  vdc_name                          state               mac                 type        lc
+      ------  --------                          -----               ----------          ---------   ------
+      1       N77_1                             active              00:ab:cd:ef:18:41   Ethernet    f3
+      2       N77_3                             active              00:ab:cd:ef:18:42   Ethernet    f2e f3
+      3       N77_4                             active              00:ab:cd:ef:18:43   Ethernet    f2e f3
+
+
+    "switchto vdc N77_3":
+      new_state: vdc2_exec
+
+    "switchto vdc N77_4":
+      new_state: vdc3_password_standard
+
+vdc3_password_standard:
+  preface: |
+
+
+              ---- System Admin Account Setup ----
+
+
+  prompt: "Do you want to enforce secure password standard (yes/no) [y]:"
+  commands:
+    "yes":
+      new_state: vdc3_enter_password
+
+vdc3_enter_password:
+  prompt: 'Enter the password for "admin":'
+  commands:
+    'cisco':
+      new_state: vdc3_confirm_password
+
+vdc3_confirm_password:
+  prompt: 'Confirm the password for "admin":'
+  commands:
+    'cisco':
+      new_state: vdc3_exec
+
+vdc3_exec:
+  prompt: "%N-N77_4# "
+  commands:
+    <<: *exec_cmds
+    "switchback":
+      new_state: exec
+    "config term":
+      new_state: vdc3_config
+
+vdc3_config:
+  prompt: "%N-N77_4(config)# "
+  commands:
+    "no logging console": ""
+    "line console":
+      new_state: vdc3_config_console
+
+vdc3_config_console:
+  prompt: "%N-N77_4(config-console)# "
+  commands:
+    "exec-timeout 0": ""
+    "line vty":
+      new_state: vdc3_config_line
+
+vdc3_config_line:
+  prompt: "%N-N77_4(config-line)# "
+  commands:
+    "exec-timeout 0": ""
+    "terminal width 511": ""
+    "end":
+      new_state: vdc3_exec
+
+vdc2_exec:
+  prompt: "%N-N77_3# "
+  commands:
+    <<: *exec_cmds
+    "switchback":
+      new_state: exec
+    "config term":
+      new_state: vdc2_config
+
+vdc2_config:
+  prompt: "%N-N77_3(config)# "
+  commands:
+    "no logging console": ""
+    "line console":
+      new_state: vdc2_config_console
+
+vdc2_config_console:
+  prompt: "%N-N77_3(config-console)# "
+  commands:
+    "exec-timeout 0": ""
+    "line vty":
+      new_state: vdc2_config_line
+
+vdc2_config_line:
+  prompt: "%N-N77_3(config-line)# "
+  commands:
+    "exec-timeout 0": ""
+    "terminal width 511": ""
+    "end":
+      new_state: vdc2_exec
 
 
 loader:
@@ -160,8 +261,9 @@ config:
     "configure session acl6":
       new_state: config_session
     "no logging console": ""
-    "line console": ""
     "line vty": ""
+    "line console":
+      new_state: config_line
     "line console 0": ""
     "exec-timeout 0": ""
     "terminal width 511": ""
@@ -169,10 +271,26 @@ config:
     "line vty": ""
     "end":
       new_state: exec
+    "exit":
+      new_state: exec
+    "exitt":
+      new_state: exec
+
+config_line:
+  prompt: "%N(config-line)#"
+  commands:
+    "exec-timeout 0": ""
+    "terminal width 511": ""
+    "line vty": ""
+    "exit":
+      new_state: config
+    "end":
+      new_state: exec
+
 
 config_dual:
   prompt: "%N(config-dual-stage)#"
-  commands: 
+  commands:
     "feature isis": ""
     "commit": |
       Verification Succeeded.

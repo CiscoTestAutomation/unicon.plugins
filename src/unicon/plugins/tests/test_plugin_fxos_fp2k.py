@@ -56,6 +56,7 @@ class TestFireOSPlugin(unittest.TestCase):
 
     def test_reload_console(self):
         self.c1.connect()
+        self.c1.settings.POST_RELOAD_WAIT = 1
         self.c1.reload()
         self.c1.disconnect()
 
@@ -63,6 +64,7 @@ class TestFireOSPlugin(unittest.TestCase):
         self.c2.connect()
         self.c2.context['console'] = False
         self.c2.settings.RELOAD_WAIT = 3
+        self.c1.settings.POST_RELOAD_WAIT = 1
         self.c2.reload()
         self.c2.disconnect()
 

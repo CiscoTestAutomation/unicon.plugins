@@ -22,13 +22,13 @@ logger = logging.getLogger(__name__)
 class MockDeviceHPComware(MockDevice):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, device_os='hp_comware', **kwargs)
+        super().__init__(*args, device_os='comware', **kwargs)
 
 
 class MockDeviceTcpWrapperHPComware(MockDeviceTcpWrapper):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, device_os='hp_comware', **kwargs)
+        super().__init__(*args, device_os='comware', **kwargs)
         self.mockdevice = MockDeviceHPComware(*args, **kwargs)
 
 

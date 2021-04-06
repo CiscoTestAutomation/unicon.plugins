@@ -16,8 +16,7 @@ class WindowsConnectionProvider(GenericSingleRpConnectionProvider):
     """
 
     def init_handle(self):
-        con = self.connection
-        con._is_connected = True
+        pass
 
 
 class WindowsServiceList(ServiceList):

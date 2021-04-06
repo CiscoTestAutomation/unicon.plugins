@@ -19,6 +19,10 @@ from unicon.eal.dialogs import Dialog
 from unicon.mock.mock_device import mockdata_path
 
 
+unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
+unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC = 0.2
+
+
 class TestIosXrPlugin(unittest.TestCase):
     def test_login_connect_ssh(self):
         c = Connection(hostname='Router',
@@ -65,7 +69,7 @@ class TestIosXrPlugin(unittest.TestCase):
         self.assertIn(
             """process_restart_msg
 0/RP0/ADMIN0:Jul 7 10:07:42.979 UTC: pm[2890]: %INFRA-Process_Manager-3-PROCESS_RESTART : Process tams (IID: 0) restarted""",
-            r.replace('\r', ''))
+            r.replace('\r', '').replace('\n\n', '\n'))
 
         c.settings.IGNORE_CHATTY_TERM_OUTPUT = True
         c.sendline('process_restart_msg')
@@ -329,12 +333,14 @@ class TestIosXrPluginAdminConfigureService(unittest.TestCase):
                           os='iosxr',
                           username='admin',
                           tacacs_password='admin')
-        conn.connect()
-        out = conn.admin_configure('show configuration')
-        self.assertIn('% No configuration changes found.', out)
-        self.assertEqual(conn.active.state_machine.current_state, 'enable')
-        conn.disconnect()
-        md.stop()
+        try:
+            conn.connect()
+            out = conn.admin_configure('show configuration')
+            self.assertIn('% No configuration changes found.', out)
+            self.assertEqual(conn.active.state_machine.current_state, 'enable')
+            conn.disconnect()
+        finally:
+            md.stop()
 
     def test_ha_admin_configure2(self):
         md = MockDeviceTcpWrapperIOSXR(port=0, state='enable2,console_standby')
@@ -344,12 +350,14 @@ class TestIosXrPluginAdminConfigureService(unittest.TestCase):
                           os='iosxr',
                           username='admin',
                           tacacs_password='admin')
-        conn.connect()
-        out = conn.admin_configure('show configuration')
-        self.assertIn('% No configuration changes found2.', out)
-        self.assertEqual(conn.active.state_machine.current_state, 'enable')
-        conn.disconnect()
-        md.stop()
+        try:
+            conn.connect()
+            out = conn.admin_configure('show configuration')
+            self.assertIn('% No configuration changes found2.', out)
+            self.assertEqual(conn.active.state_machine.current_state, 'enable')
+            conn.disconnect()
+        finally:
+            md.stop()
 
 
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
@@ -448,11 +456,12 @@ class TestIosXrPluginAttachConsoleService(unittest.TestCase):
 class TestIosxrConfigCommitCommands(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.conn = Connection(hostname='Router', start=['mock_device_cli --os iosxr --state enable'], os='iosxr')
+        cls.md = MockDeviceTcpWrapperIOSXR(port=0, state='enable')
+        cls.md.start()
         cls.md1 = MockDeviceTcpWrapperIOSXR(port=0, state='login,console_standby')
         cls.md1.start()
-        cls.ha_dev = Connection(
-            hostname='Router',
+        cls.conn = Connection(hostname='Router', start=['telnet 127.0.0.1 {}'.format(cls.md.ports[0])], os='iosxr')
+        cls.ha_dev = Connection(hostname='Router',
             start=['telnet 127.0.0.1 {}'.format(cls.md1.ports[0]), 'telnet 127.0.0.1 {}'.format(cls.md1.ports[1])],
             username='admin',
             tacacs_password='admin',
@@ -461,12 +470,11 @@ class TestIosxrConfigCommitCommands(unittest.TestCase):
         cls.conn.connect()
 
     @classmethod
-    @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-    @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
     def tearDownClass(cls):
         cls.conn.disconnect()
         cls.ha_dev.disconnect()
         cls.md1.stop()
+        cls.md.stop()
 
     def test_config_commit(self):
         self.conn.configure('no logging console')
