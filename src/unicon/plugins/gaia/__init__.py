@@ -16,23 +16,33 @@ from unicon.plugins.gaia.statemachine import GaiaStateMachine
 from unicon.plugins.gaia.settings import GaiaSettings
 
 class GaiaConnectionProvider(GenericSingleRpConnectionProvider):
-    pass
+    
+    def init_handle(self): 
+        con = self.connection
+        if self.connection.goto_enable:
+            con.state_machine.go_to('clish',
+                                    self.connection.spawn,
+                                    context=self.connection.context,
+                                    prompt_recovery=self.prompt_recovery,
+                                    timeout=self.connection.connection_timeout)
+        self.execute_init_commands()
+        
 
 class GaiaServiceList(ServiceList):
     """ gaia services """
     def __init__(self):
-        # super().__init__()
+        super().__init__()
         
         self.execute = gaia_svc.GaiaExecute
         self.sendline = svc.Sendline
         self.ping = linux_svc.Ping
         self.traceroute = gaia_svc.GaiaTraceroute
+        self.switchto = gaia_svc.GaiaSwitchTo
 
 class GaiaConnection(GenericSingleRpConnection):
-    '''GaiaosSingleRPConnection
-
-    Check Point Gaia platform support. 
-    '''
+    """
+    Connection class for Gaia OS connections
+    """
 
     os = 'gaia'
     platform = None

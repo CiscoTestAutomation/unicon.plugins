@@ -10,11 +10,9 @@ https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_e
 '''
 
 import os
-import yaml
 import unittest
-from unittest.mock import patch
+import yaml
 
-import unicon
 from unicon import Connection
 from unicon.mock.mock_device import mockdata_path
 
@@ -29,7 +27,15 @@ class TestGaiaPlugin(unittest.TestCase):
         cls.c = Connection(hostname='gaia-gw',
                         start=['mock_device_cli --os gaia --state login'],
                         os='gaia',
-                        credentials={'default': {'username':'gaia-user', 'password':'gaia-password'}}
+                        credentials={
+                            'default': {
+                                'username': 'gaia-user', 
+                                'password': 'gaia-password'
+                                },
+                            'expert': {
+                                'password': 'gaia-expert-pass'
+                                }
+                            }
                         )
 
         cls.c.connect()
@@ -41,19 +47,23 @@ class TestGaiaPlugin(unittest.TestCase):
         # check hostname
         self.assertIn("gaia-gw", self.c.hostname)
 
-        self.c.disconnect()
-
     def test_ping(self):
         response = self.c.execute('ping 192.168.1.1')
         self.assertIn("PING 192.168.1.1 (192.168.1.1) 56(84) bytes of data.", response)
-
-        self.c.disconnect()
 
     def test_traceroute(self):
         response = self.c.execute('traceroute 192.168.1.1')
         self.assertIn("traceroute to 192.168.1.1 (192.168.1.1), 30 hops max, 40 byte packets", response)
 
-        self.c.disconnect()
+    def test_state_transitions(self):
+        sm = self.c.state_machine
+        self.assertIn("clish", sm.current_state)
+
+        self.c.switchto('expert')
+        self.assertIn("expert", sm.current_state)
+
+        self.c.switchto('clish')
+        self.assertIn("clish", sm.current_state)
 
 if __name__ == "__main__":
     unittest.main()

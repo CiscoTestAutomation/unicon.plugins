@@ -8,9 +8,9 @@ password:
   prompt: "Password: "
   commands:
     "gaia-password":
-      new_state: shell
+      new_state: clish
 
-shell:
+clish:
   prompt: "gaia-gw> "
   commands: 
       "set clienv rows 0": ""
@@ -36,3 +36,17 @@ shell:
           traceroute to 192.168.1.1 (192.168.1.1), 30 hops max, 40 byte packets
           1  10.1.1.1 (10.1.1.1)  13.508 ms  21.951 ms  130.937 ms
           2  192.168.1.1 (192.168.1.1)  58.791 ms  57.351 ms  64.980 ms
+      "expert":
+        new_state: expert_password
+
+expert_password:
+  prompt: "Enter expert password:"
+  commands: 
+    "gaia-expert-pass":
+      new_state: expert
+
+expert:
+  prompt: "[Expert@%N:0]# "
+  commands:
+    "exit":
+      new_state: clish
