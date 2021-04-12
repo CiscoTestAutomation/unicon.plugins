@@ -20,7 +20,7 @@ can override your prompt using the `PROMPT` setting in your testbed file like so
               PROMPT: '<your_prompt_regex>'
 
 If `learn_hostname` is set to True, Unicon will attempt to learn and store the hostname
-of you device in memory and switch the prompt to accomodate for that. It too can be overriden
+of you device in memory and switch the prompt to accommodate for that. It too can be overridden 
 with the `SHELL_PROMPT` setting like so:
 
 .. code-block:: yaml

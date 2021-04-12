@@ -34,7 +34,7 @@ reply             Dialog                    (optional)  additional dialog
 lines             int (default 100)         (optional)  number of lines to capture when paging
 ===============   ======================    =====================================================
 
-Tehe `execute` service returns the output of the command in string format
+The `execute` service returns the output of the command in string format
 or it raises an exception. You can expect a SubCommandFailure
 error in case anything goes wrong.
 
@@ -44,7 +44,7 @@ The execute service will response to the following prompts automatically:
   * options: q=quit, n=next, p=prev, b=begin, e=end (lines 61 - 80 of 207554) :
 
 The response to the first prompt will be to send a space. For the second prompt, 
-paging will be done by sending `n` automtically for up to 100 lines by default.
+paging will be done by sending `n` automatically for up to 100 lines by default.
 If you want to capture more lines, specify the `lines` option.
 
 The paging prompts will be stripped from the output.

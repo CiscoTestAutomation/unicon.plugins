@@ -5,7 +5,7 @@ This section lists the services which are supported on Cisco Integrated Manageme
 
   * `execute <#execute>`__
 
-The following generic services are also avaiable:
+The following generic services are also available:
 
   * `send`_
   * `sendline`_

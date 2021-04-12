@@ -10,7 +10,7 @@ such services which are applicable on both HA and Non-HA platform.
 There could be cases when a particular platform supports more services
 than listed below or there could be some omissions as well. In that case
 please refer to the platform specific service documentations. For example
-NXOS supports `vdc` handling APIs which are not relevant on other platfroms
+NXOS supports `vdc` handling APIs which are not relevant on other platforms
 line XR or IOS etc. Also in case of linux we only have `execute` service.
 
 .. _controlled_settings:
@@ -139,7 +139,7 @@ Refer :ref:`prompt_recovery_label`  for details on prompt_recovery feature.
 
 .. note::
 
-    Not all platforms allow command exection on the standby RP as it
+    Not all platforms allow command execution on the standby RP as it
     may not be possible to unlock the standby RP.
     Please check before using this option.
 
@@ -374,8 +374,8 @@ return :
 
 expect
 ------
-Match a list of patterns against the buffer . If target is passed as standby,
-patterns  matchs against the buffer on standby spawn channel.
+Match a list of patterns against the buffer. If target is passed as standby,
+patterns matches against the buffer on standby spawn channel.
 
 ===========   ===========    ========================================
 Argument      Type                      Description
@@ -515,7 +515,7 @@ Return `True`, if file handler updated with new filename.
         Example ::
 
           rtr.log_file(filename='/some/path/uut.log')
-          rtr.log_file() # Returns currect FileHandler filename
+          rtr.log_file() # Returns current FileHandler filename
 
 
 enable

@@ -374,9 +374,9 @@ looks for `linux` block in the device details and os has to be mentioned as `lin
 
 **Connection to Linux with additional SSH options:**
 
-If you want to linux connection to take aditional ssh options, then it better
+If you want the linux connection to take additional ssh options, then it's better
 to use `command` key. Unicon will take the value of `command` and spawns.
-Commond key should be the complete command to be spawned
+Command value should be the complete command to be spawned.
 
 .. code-block:: yaml
 
@@ -1140,7 +1140,7 @@ In unicon standalone mode:
 
 .. code-block:: python
 
-    dev = Connnection(hostname=uut_hostname,
+    dev = Connection(hostname=uut_hostname,
                        start=[uut_start_cmd],
                        logfile='user-provided-file')
 
@@ -1152,7 +1152,7 @@ With pyATS:
 
 Log level of device output and service messages is `INFO`.
 
-To disable unicon device conneciton logging, we can set logger level above `logging.INFO`.
+To disable unicon device connection logging, we can set logger level above `logging.INFO`.
 
 .. code-block:: python
 
@@ -1166,7 +1166,7 @@ To enable debug logs, use below:
     import logging
     uut.log.setLevel(logging.DEBUG)
 
-Debug log now intergrate with pyATS testbed yaml file. You can enable it 
+Debug log now integrates with pyATS testbed yaml file. You can enable it 
 by define the `debug: True` in the yaml file:
 
 .. code-block:: python
@@ -1184,7 +1184,7 @@ In unicon standalone mode:
 
 .. code-block:: python
 
-    dev = Connnection(hostname=uut_hostname,
+    dev = Connection(hostname=uut_hostname,
                        start=[uut_start_cmd],
                        log_stdout=False)
 
@@ -1216,7 +1216,7 @@ To use `prompt_recovery` feature in unicon, use it in the following way:
     device = Connection(hostname='R2', start=['telnet localhost 15000'], prompt_recovery=True)
     device.connect()
 
-If user wish to enable `prompt_recovery` after creating Device Connection object, it can be done in the following way:
+If user wishes to enable `prompt_recovery` after creating Device Connection object, it can be done in the following way:
 
 .. code-block:: python
 

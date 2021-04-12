@@ -7,7 +7,7 @@ This section lists the services which are supported on Starent OS (staros).
   * `configure <#configure>`__
   * `monitor <#monitor>`__
 
-The following generic services are also avaiable:
+The following generic services are also available:
 
   * `send <generic_services.html#send>`__
   * `sendline <generic_services.html#sendline>`__
@@ -148,7 +148,7 @@ monitor.get_buffer
 ~~~~~~~~~~~~~~~~~~
 
 To get the output that has been buffered by the monitor service, you can use the `monitor.get_buffer`
-method. This will return all output from the start of the monitor command until the momment of execution
+method. This will return all output from the start of the monitor command until the moment of execution
 of this service.
 
 =====================   ======================    ===================================================

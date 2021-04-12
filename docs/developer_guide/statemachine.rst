@@ -1,7 +1,7 @@
 State Machine
 =============
 
-Statemachine is a major buliding block of a connection object. It enables the
+Statemachine is a major building block of a connection object. It enables the
 connection handle to smoothly traverse across different *router states*.
 This is how it fits into overall scheme of things.
 
@@ -33,8 +33,8 @@ Structure
 
 The *statemachine* consists of following two things:
 
-* **States**: Individual states represnting one of the router modes.
-* **Paths**: Migration paths beween the states.
+* **States**: Individual states representing one of the router modes.
+* **Paths**: Migration paths between the states.
 
 Following is the block diagram for the same.
 
@@ -45,7 +45,7 @@ State
 
 As said in the previous section, it depicts one of the router modes. We identify
 a router mode using the prompt pattern. For example this is how we can define
-the enable state and diable state.
+the enable state and disable state.
 
 .. code-block:: python
    :linenos:
@@ -78,7 +78,7 @@ another. It requires the following arguments.
 * **from_state**: state object from which migration will start. (mandatory)
 * **to_state**: state object to which migration will end. (mandatory)
 * **command**: command required to initiate the migration. (mandatory)
-* **dialog**: dialog object for negotiating any interaction becuase of *command* (optional)
+* **dialog**: dialog object for negotiating any interaction because of *command* (optional)
 
 Continuing from the previous example, lets add a few ``Path``.
 
@@ -116,7 +116,7 @@ Statemachine
 -------------
 
 To create a *statemachine* class, we need to subclass from ``StateMachine``,
-which is the base class. This base class has all the relevent instrumentation
+which is the base class. This base class has all the relevant instrumentation
 required for creating shortest paths between any two given states. It uses all
 the ``Path`` instances to make way from any given state to any state. It
 provides APIs required for state migration, which we shall see shortly.

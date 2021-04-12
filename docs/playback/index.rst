@@ -1,7 +1,7 @@
 Playback
 ========
 
-Demo and devices,  dont mix together. In the middle of a demo, the
+Demos and devices, don't mix together. In the middle of a demo, the
 device will react differently than expected just for the sake of it.
 
 `Unicon.playback` records all interaction with any device and can be

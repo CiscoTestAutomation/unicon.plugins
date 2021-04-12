@@ -117,13 +117,13 @@ automatically detect CLI state changes. You can use 'config', 'exit', 'end' and 
 commands to switch CLI state or CLI style, this will be detected automatically.
 
 When you execute a command using the 'execute' service, the CLI style that is active before
-exection will be restored at the end of the execution. This means that you cannot use
+execution will be restored at the end of the execution. This means that you cannot use
 the `execute` service to switch styles, use the `cli_style` service for to change CLI style.
-Executing the commmand `switch cli` by itself will raise an exception and point to cli_style.
+Executing the command `switch cli` by itself will raise an exception and point to cli_style.
 You *can* use the 'switch cli' command as part of a series of commands to be executed.
 
 The commands to execute can be specified as a single command, a newline separated list of 
-commands or a list of commands.
+commands, or a list of commands.
 
 .. code-block:: python
 
