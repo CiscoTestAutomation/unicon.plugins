@@ -14,19 +14,60 @@ from unicon.plugins.linux import service_implementation as linux_svc
 from unicon.plugins.gaia import service_implementation as gaia_svc
 from unicon.plugins.gaia.statemachine import GaiaStateMachine
 from unicon.plugins.gaia.settings import GaiaSettings
-
+from time import sleep
 class GaiaConnectionProvider(GenericSingleRpConnectionProvider):
     
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # used for tracking the initial state - it impacts the commands used for state changes
+        self.initial_state = ''
+
     def init_handle(self): 
         con = self.connection
+
+        self.initial_state = con.state_machine.current_state
+
+        # The state machine path commands are different depending on the initial state.
+        # If the default shell is configured to be 'expert' mode the path commands are:
+        #   'clish' for expert -> clish 
+        #   'exit' for clish -> expert
+        
+        # If the initial state is determined to be 'expert' mode, the commands are updated
+        # and the switchto service is used to put the gateway into clish mode.
+
+        if self.initial_state == 'expert':
+            # clish->expert
+            con.state_machine.paths[0].command = 'exit'
+
+            #expert->clish
+            con.state_machine.paths[1].command = 'clish'
+
+            # switch to clish if in expert on connect
+            con.switchto('clish')
+
         if self.connection.goto_enable:
             con.state_machine.go_to('clish',
                                     self.connection.spawn,
                                     context=self.connection.context,
                                     prompt_recovery=self.prompt_recovery,
                                     timeout=self.connection.connection_timeout)
+
         self.execute_init_commands()
-        
+
+    def disconnect(self):
+        """ Logout and disconnect from the device
+        """
+
+        con = self.connection
+        if con.connected:
+            con.log.info('disconnecting...')
+            con.switchto(self.initial_state)
+            con.sendline('exit')
+            sleep(2)
+            con.log.info('closing connection...')
+            con.spawn.close()
 
 class GaiaServiceList(ServiceList):
     """ gaia services """

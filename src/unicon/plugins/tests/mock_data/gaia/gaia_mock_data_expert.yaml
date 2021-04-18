@@ -1,18 +1,18 @@
-# Gaia device that is configured to login to clish mode
+# Gaia device that is configured to login to expert mode
 
-login:
+exp_login:
   prompt: "login: "
   commands: 
     "gaia-user":
-      new_state: password
+      new_state: exp_password
 
-password:
+exp_password:
   prompt: "Password: "
   commands:
     "gaia-password":
-      new_state: clish
+      new_state: exp_expert
 
-clish:
+exp_clish:
   prompt: "gaia-gw> "
   commands: 
       "set clienv rows 0": ""
@@ -38,17 +38,11 @@ clish:
           traceroute to 192.168.1.1 (192.168.1.1), 30 hops max, 40 byte packets
           1  10.1.1.1 (10.1.1.1)  13.508 ms  21.951 ms  130.937 ms
           2  192.168.1.1 (192.168.1.1)  58.791 ms  57.351 ms  64.980 ms
-      "expert":
-        new_state: expert_password
+      "exit":
+        new_state: exp_expert
 
-expert_password:
-  prompt: "Enter expert password:"
-  commands: 
-    "gaia-expert-pass":
-      new_state: expert
-
-expert:
+exp_expert:
   prompt: "[Expert@%N:0]# "
   commands:
-    "exit":
-      new_state: clish
+    "clish":
+      new_state: exp_clish
