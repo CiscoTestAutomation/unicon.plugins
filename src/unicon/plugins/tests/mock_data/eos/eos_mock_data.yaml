@@ -64,7 +64,7 @@ enable:
 
       4093313024 bytes total (3192283136 bytes free)
 
-    "config t":
+    "config term":
       new_state: config
 
 config:

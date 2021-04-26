@@ -23,7 +23,7 @@ with open(os.path.join(mockdata_path, 'eos/eos_mock_data.yaml'), 'rb') as datafi
 class TestEOSPluginConnect(unittest.TestCase):
 
     def test_exec_prompt(self):
-        hostname = "Device"
+        hostname = "Switch"
         c = Connection(hostname=hostname,
                        start=["mock_device_cli --os eos --state exec --hostname {hostname}"\
                               .format(hostname=hostname)],
@@ -31,14 +31,13 @@ class TestEOSPluginConnect(unittest.TestCase):
                        username='admin',
                        password='admin')
         c.connect()
-        self.assertIn("<{hostname}>".format(hostname=hostname),
+        self.assertIn("{hostname}".format(hostname=hostname),
                       c.spawn.match.match_output)
-
 
 class TestEOSPluginExecute(unittest.TestCase):
 
     def test_execute_show_feature(self):
-        hostname = "Device"
+        hostname = "Switch"
         c = Connection(hostname=hostname,
                        start=["mock_device_cli --os eos --state exec --hostname {hostname}"\
                               .format(hostname=hostname)],
