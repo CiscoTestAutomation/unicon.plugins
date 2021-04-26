@@ -22,7 +22,7 @@ class Execute(GenericExec):
     '''
     def call_service(self, *args, **kwargs):
         # custom... code here
-        logger.info('execute service called')
+        #logger.info('execute service called')
 
         # call parent
         super().call_service(*args, **kwargs)
@@ -32,7 +32,7 @@ class EOSService(BaseService):
     demonstrating the implementation of a local, new service
     '''
     def call_service(self, *args,**kwargs):
-        logger.info('imaginary service called!')
+        #logger.info('imaginary service called!')
         return 'EOS' * 3
 
 class EOSServiceList(IosvServiceList):
