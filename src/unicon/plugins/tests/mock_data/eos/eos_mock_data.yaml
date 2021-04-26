@@ -11,7 +11,7 @@ password:
       new_state: exec
 
 exec:
-  prompt: "Router>"
+  prompt: "%N>"
   commands:
     "term length 0": ""
     "term width 0": ""
@@ -35,7 +35,7 @@ exec:
 
 
 enable:
-  prompt: "Router#"
+  prompt: "%N#"
   commands:
     "term length 0": ""
     "term width 0": ""
@@ -68,7 +68,7 @@ enable:
       new_state: config
 
 config:
-  prompt: "Router(config)#"
+  prompt: "%N(config)#"
   commands:
     "end":
       new_state: enable
