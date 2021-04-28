@@ -115,7 +115,3 @@ Press RETURN to get started.
 
 
 
-
-Router>enable
-Password: 
-Router#

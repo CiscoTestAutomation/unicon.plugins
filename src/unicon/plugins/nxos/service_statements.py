@@ -117,6 +117,12 @@ system_up = Statement(pattern=pat.system_up,
                       loop_continue=True,
                       continue_timer=False)
 
+skip_poap = Statement(pattern=pat.skip_poap,
+                      action=send_response,
+                      args={'response': 'yes'},
+                      loop_continue=True,
+                      continue_timer=True)
+
 # TODO finalise on this step
 loader_prompt = None
 rommon_prompt = None
@@ -136,7 +142,8 @@ nxos_reload_statement_list = [save_env, confirm_reset, reload_confirm_nxos,
                               confirm_config, setup_dialog,
                               auto_install_dialog, module_reload,
                               save_module_cfg, secure_passwd_std,
-                              admin_password, auto_provision, enable_vdc]
+                              admin_password, auto_provision, enable_vdc,
+                              skip_poap]
 
 # reload statement list for nxos dual-rp
 ha_nxos_reload_statement_list = [save_env, reboot, secure_password,
@@ -145,7 +152,8 @@ ha_nxos_reload_statement_list = [save_env, reboot, secure_password,
                                  setup_dialog, config_byte, enable_vdc,
                                  snmp_port, boot_vdc, login_notready,
                                  redundant, login_stmt, password_stmt,
-                                 system_up, run_init, useracess1]
+                                 system_up, run_init, useracess1,
+                                 skip_poap]
 
 additional_connection_dialog = [enable_vdc, boot_vdc, snmp_port,
                                 admin_password, secure_password, auto_provision]
@@ -159,3 +167,15 @@ commit_verification_stmt = Statement(pattern=pat.commit_verification,
                                 continue_timer=False)
 
 config_commit_stmt_list = [commit_verification_stmt]
+
+# Statements for execute service on NXOS
+pat = NxosPatterns()
+
+
+nxos_module_reload_stmt = Statement(pattern=pat.nxos_module_reload,
+                      action='sendline(y)',
+                      args=None,
+                      loop_continue=True,
+                      continue_timer=False)
+
+execute_stmt_list = [nxos_module_reload_stmt]

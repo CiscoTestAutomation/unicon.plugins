@@ -14,6 +14,7 @@ class MockDeviceIOSXE(MockDevice):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, device_os="iosxe", **kwargs)
         self.config_lock_counter = 0
+        self.files_on_flash = []
 
     def enable_asr(self, transport, cmd):
         if cmd == "redundancy force-switchover":
@@ -46,6 +47,23 @@ class MockDeviceIOSXE(MockDevice):
             else:
                 self.mock_data['general_enable']['commands']['config term'] \
                     = {'new_state': 'general_config'}
+        elif re.match(r'show tech.*\| redirect', cmd):
+            filename = re.sub(r'show tech.*\| redirect', '', cmd).strip()
+            self.files_on_flash.append(filename)
+            return True
+        elif cmd == 'dir':
+            lines = ['   52429131    Apr 05 08:53:17 2021  ' + f for f in self.files_on_flash]
+            self._write('\n'.join(lines), transport)
+            self._write('\n\n', transport)
+            return True
+        elif re.match(r'delete \S+', cmd):
+            m = re.match(r'delete (\S+)', cmd)
+            filename = m.group(1)
+            self.files_on_flash.remove(filename)
+            return True
+        elif re.match(r'copy flash:\S+ scp:\S+', cmd):
+            self.set_state(self.transport_handles[transport], 'scp_password')
+            return True
 
 
 class MockDeviceTcpWrapperIOSXE(MockDeviceTcpWrapper):

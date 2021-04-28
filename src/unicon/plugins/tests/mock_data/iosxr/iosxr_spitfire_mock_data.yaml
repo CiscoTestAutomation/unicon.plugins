@@ -185,6 +185,45 @@ spitfire_config:
     "session-timeout 0": ""
     "line default": ""
     "commit": ""
+    "test failed":
+      new_state:
+        spitfire_failed_config
+
+
+spitfire_failed_config:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "end":
+      response: "Uncommitted changes found, commit them before exiting(yes/no/cancel)? [cancel]:"
+      new_state: spitfire_failed_config_uncommitted
+
+spitfire_failed_config_uncommitted:
+  prompt: ""
+  commands:
+    "yes":
+      response: "% Failed to commit one or more configuration items during a pseudo-atomic operation. All changes made have been reverted. Please issue 'show configuration failed [inheritance]' from this session to view the errors"
+      new_state: spitfire_failed_config_show
+
+spitfire_failed_config_show:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "show configuration failed": |2
+      Fri Aug  3 15:34:40.336 UTC
+      !! SEMANTIC ERRORS: This configuration was rejected by
+      !! the system due to semantic errors. The individual
+      !! errors with each failed configuration command can be
+      !! found below.
+
+
+      test failed
+      !!% Invalid config
+       !
+      !
+      end
+
+    "abort":
+      new_state: spitfire_enable
+
 
 spitfire_console_standby:
   preface: "\r\nThis (D)RP Node is not ready or active for login /configuration\r\n"

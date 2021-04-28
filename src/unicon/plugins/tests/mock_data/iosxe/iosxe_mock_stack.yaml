@@ -276,7 +276,7 @@ switchover_prompt2:
       timing:
         - 0:6,0,0.02
         - 6:,1,0.005
-      new_state: stack_enable
+      new_state: stack_login
 
 
 reload_prompt:

@@ -152,6 +152,16 @@ exec:
       1       N77_1                             active              00:ab:cd:ef:18:41   Ethernet    f3
       2       N77_3                             active              00:ab:cd:ef:18:42   Ethernet    f2e f3
       3       N77_4                             active              00:ab:cd:ef:18:43   Ethernet    f2e f3
+    "system mode maintenance | command failed": |
+      Generating before_maintenance snapshot before going into maintenance mode
+
+      Starting to apply commands...
+
+      Applying : router bgp 64999
+      CMD '    router bgp 64999
+      ' had failure '500'
+
+      'system mode maintenance' command failed...aborting
 
 
     "switchto vdc N77_3":
@@ -159,6 +169,8 @@ exec:
 
     "switchto vdc N77_4":
       new_state: vdc3_password_standard
+    "reload module 1":
+      new_state: module_reload
 
 vdc3_password_standard:
   preface: |
@@ -287,6 +299,12 @@ config_line:
     "end":
       new_state: exec
 
+module_reload:
+  prompt: "This command will reload module 1. Proceed[y/n]?  [n]"
+  commands:
+    "y":
+      response: "reloading module 1 ..."
+      new_state: exec
 
 config_dual:
   prompt: "%N(config-dual-stage)#"
@@ -354,6 +372,8 @@ exec2:
       new_state: config2
     "reload":
       new_state: confirm_reload
+    "reload skip_poap":
+      new_state: confirm_reload3
     "show feature": |
       Feature Name          Instance  State
       --------------------  --------  --------
@@ -652,3 +672,10 @@ config_dual_commit_confirm:
         new_state: exec
       "":
         new_state: exec
+
+
+scp_password:
+  prompt: "Password for test@127.0.0.1: "
+  commands:
+    "test":
+      new_state: exec

@@ -12,6 +12,7 @@ Description:
     point by further sub classing it.
 """
 
+import re
 from time import sleep
 
 from unicon.core.errors import StateMachineError
@@ -28,6 +29,16 @@ patterns = GenericPatterns()
 statements = GenericStatements()
 
 
+def config_service_prompt_handler(spawn, config_pattern):
+    """ Check if we need to send the sevice config prompt command.
+    """
+    spawn.read_update_buffer()
+    if re.search(config_pattern, spawn.buffer):
+        return
+    else:
+        spawn.sendline(spawn.settings.SERVICE_PROMPT_CONFIG_CMD)
+
+
 def config_transition(statemachine, spawn, context):
     # Config may be locked, retry until max attempts or config state reached
     wait_time = spawn.settings.CONFIG_LOCK_RETRY_SLEEP
@@ -37,6 +48,11 @@ def config_transition(statemachine, spawn, context):
                                trim_buffer=True),
                      Statement(pattern=statemachine.get_state('config').pattern,
                                loop_continue=False,
+                               trim_buffer=False),
+                     Statement(pattern=patterns.config_start,
+                               action=config_service_prompt_handler,
+                               args={'config_pattern': statemachine.get_state('config').pattern},
+                               loop_continue=True,
                                trim_buffer=False)
                      ])
 

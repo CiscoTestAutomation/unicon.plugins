@@ -286,6 +286,24 @@ class TestIosXrPluginBashService(unittest.TestCase):
         self.assertIn('exit', ret)
         self.assertIn('Router#', ret)
 
+    def test_run_prompt_rsp(self):
+        conn = Connection(hostname='R1',
+                          start=['mock_device_cli --os iosxr --state enable_bash_run_prompt_rsp --hostname R1'],
+                          os='iosxr',
+                          enable_password='cisco')
+
+        with conn.bash_console():
+            pass
+
+    def test_run_prompt_rp(self):
+        conn = Connection(hostname='R2',
+                          start=['mock_device_cli --os iosxr --state enable_bash_run_prompt_rp --hostname R2'],
+                          os='iosxr',
+                          enable_password='cisco')
+
+        with conn.bash_console():
+            pass
+
 
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
 @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)

@@ -11,9 +11,10 @@ class IOSXRPatterns(GenericPatterns):
         self.enable_prompt = r'^(.*?)RP/\w+(/\S+)?/\S+\d+:(%N|ios|xr)\s?#\s?$'
 
         # [xr-vm_node0_RP1_CPU0:~]$
+        # [xr-vm_node0_RSP1_CPU0:~]$
         # [node0_RP1_CPU0:~]$
         # #  << this is a prompt, not a comment
-        self.run_prompt = r'^(.*?)(?:\[(xr-vm_)?node\d_(?:RP[01]|[\d+])_CPU\d:(.*?)\]\s?\$\s?|[\r\n]+\s?#\s?)$'
+        self.run_prompt = r'^(.*?)(?:\[(xr-vm_)?node\d_(?:RS?P[01]|[\d+])_CPU\d:(.*?)\]\s?\$\s?|[\r\n]+\s?#\s?)$'
 
         # don't use hostname match in config prompt - hostname may be truncated
         # see CSCve48115 and CSCve51502

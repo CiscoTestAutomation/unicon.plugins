@@ -83,8 +83,8 @@ Sample usage:
 
 **Printing matched patterns**
 
-If you want to print the dialog statements matched patterns during the run
-, you can specify the `STATEMENT_LOG_DEBUG` option to True.
+If you want to print the dialog statements matched patterns during the run,
+you need to set the log level to logging.DEBUG or connect with debug=True.
 
 Default value is False.
 
@@ -96,7 +96,12 @@ Default value is False.
     >>> uut = tb.devices['uut']
     >>>
     >>> uut.connect()
-    >>> uut.settings.STATEMENT_LOG_DEBUG=True
+    >>> uut.log.setLevel(logging.DEBUG)
+
+Alternative:
+
+    >>> uut.connect(debug=True)
+
 
 **Environment variables**
 

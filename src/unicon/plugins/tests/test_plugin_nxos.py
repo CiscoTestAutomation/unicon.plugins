@@ -350,8 +350,9 @@ class TestNxosPluginExecute(unittest.TestCase):
         self.assertEqual(r, expected_response)
 
     def test_execute_error_pattern(self):
-        with self.assertRaises(SubCommandFailure):
-            self.c.execute('not a real command')
+        for cmd in ['not a real command', 'system mode maintenance | command failed']:
+          with self.assertRaises(SubCommandFailure):
+              self.c.execute(cmd)
 
     def test_execute_error_pattern_negative(self):
         self.c.execute('not a real command partial')
@@ -363,6 +364,8 @@ class TestNxosPluginExecute(unittest.TestCase):
         with self.assertRaises(SubCommandFailure):
             self.c.execute('copy scp://localhost/nxos.7.0.3.I7.8.bin bootflash:///nxos.7.0.3.I7.8.bin vrf management')
 
+    def test_module_reload(self):
+        self.c.execute('reload module 1')
 
 class TestNxosCrash(unittest.TestCase):
 
@@ -444,6 +447,20 @@ class TestNxosPluginReloadService(unittest.TestCase):
         with self.assertRaises(ConnectionError):
             dev.reload(config_lock_retries=1, config_lock_retry_sleep=1)
 
+    def test_reload_skip_poap(self):
+        dev = Connection(
+            hostname='N93_1',
+            start=['mock_device_cli --os nxos --state login2'],
+            os='nxos',
+            username='cisco',
+            tacacs_password='cisco',
+            enable_password='cisco',
+        )
+        dev.connect()
+        dev.settings.RELOAD_RECONNECT_WAIT = 1
+        dev.reload(reload_command='reload skip_poap')
+        dev.configure('no logging console')
+        dev.disconnect()
 
 class TestNxosPluginMaintenanceMode(unittest.TestCase):
 

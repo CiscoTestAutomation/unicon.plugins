@@ -11,6 +11,7 @@ class IosXEStackSettings(IosXESettings):
         self.STACK_SWITCHOVER_TIMEOUT = 600
         # Switchover postcheck interval
         self.SWITCHOVER_POSTCHECK_INTERVAL = 30
+        self.POST_SWITCHOVER_SLEEP = 90
 
         # Secs to sleep before reconnect device
         self.STACK_POST_RELOAD_SLEEP = 30

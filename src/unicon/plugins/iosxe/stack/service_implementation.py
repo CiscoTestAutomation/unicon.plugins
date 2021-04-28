@@ -123,7 +123,7 @@ class StackSwitchover(BaseService):
         # image, if it moved to rommon state.
         if 'state' in conn.context and conn.context.state == 'rommon':
             try:
-                conn.state_machine.detect_state(conn.spawn)
+                conn.state_machine.detect_state(conn.spawn, context=conn.context)
                 conn.state_machine.go_to('enable', conn.spawn, timeout=timeout,
                                          prompt_recovery=self.prompt_recovery,
                                          context=conn.context, dialog=Dialog([switch_prompt]))
@@ -132,8 +132,13 @@ class StackSwitchover(BaseService):
             finally:
                 conn.context.pop('state')
 
+        # To ensure the stack is ready to accept the login
+        self.connection.log.info('Sleeping for %s secs.' % \
+                                 self.connection.settings.POST_SWITCHOVER_SLEEP)
+        sleep(self.connection.settings.POST_SWITCHOVER_SLEEP)
+
         # check all members are ready
-        conn.state_machine.detect_state(conn.spawn)
+        conn.state_machine.detect_state(conn.spawn, context=conn.context)
 
         interval = self.connection.settings.SWITCHOVER_POSTCHECK_INTERVAL
         if utils.is_all_member_ready(conn, timeout=timeout, interval=interval):

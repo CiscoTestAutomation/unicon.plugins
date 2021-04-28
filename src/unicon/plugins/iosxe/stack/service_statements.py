@@ -90,6 +90,11 @@ press_return = Statement(pattern=switchover_pat.press_return,
                          loop_continue=False,
                          continue_timer=False)
 
+found_return = Statement(pattern=switchover_pat.press_return,
+                         args=None,
+                         loop_continue=False,
+                         continue_timer=False)
+
 switchover_fail_pattern = '|'.join([switchover_pat.switchover_fail1,
                                     switchover_pat.switchover_fail2,
                                     switchover_pat.switchover_fail3,
@@ -103,7 +108,7 @@ switchover_fail = Statement(pattern=switchover_fail_pattern,
 stack_switchover_stmt_list = [save_config, proceed_sw, commit_changes,
                               term_state, gen_rsh_key, auto_pro, secure_passwd,
                               build_config, sw_init, user_acc, switch_prompt,
-                              press_return, switchover_fail]
+                              found_return, switchover_fail]
 
 # reload service statements
 reload_pat = StackIosXEReloadPatterns()

@@ -40,6 +40,7 @@ class NxosServiceList(ServiceList):
         self.guestshell = svc.GuestshellService
         self.configure = svc.Configure
         self.configure_dual = svc.ConfigureDual
+        self.execute = svc.NxosExecute
 
 
 class HANxosServiceList(HAServiceList):

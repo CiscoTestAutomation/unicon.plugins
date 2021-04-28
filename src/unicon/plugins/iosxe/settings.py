@@ -15,10 +15,13 @@ class IosXESettings(GenericSettings):
         self.ERROR_PATTERN = [
             r'^%\s*[Ii]nvalid (command|input)',
             r'^%\s*[Ii]ncomplete (command|input)',
-            r'^%\s*[Aa]mbiguous (command|input)'
+            r'^%\s*[Aa]mbiguous (command|input)',
+            r'% Bad IP address or host name',
+            r'% Unknown command or computer name, or unable to find computer address'
         ]
         self.CONFIGURE_ERROR_PATTERN = [
-            r'^%\s*[Ii]nvalid (command|input|number)'
+            r'^%\s*[Ii]nvalid (command|input|number)',
+            r'routing table \S+ does not exist'
         ]
 
         self.EXECUTE_MATCHED_RETRIES = 1

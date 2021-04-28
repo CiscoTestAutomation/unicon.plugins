@@ -31,7 +31,8 @@ class NxosSettings(GenericSettings):
             r'^%\s*[Ii]ncomplete (command|input)',
             r'^%\s*[Aa]mbiguous (command|input)',
             r'^.*?Overwriting/deleting this image is not allowed',
-            r'^.*?Copying to/from this server name is not permitted'
+            r'^.*?Copying to/from this server name is not permitted',
+            r'^.*?command failed\.*aborting'
         ]
         self.CONFIGURE_ERROR_PATTERN = [
             r'^%\s*[Ii]nvalid (command|input|number)',

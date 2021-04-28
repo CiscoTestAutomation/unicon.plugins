@@ -70,7 +70,7 @@ class SpitfireSingleRpStateMachine(IOSXRSingleRpStateMachine):
            [patterns.commit_changes_prompt, 'sendline(yes)', None, True, False],
            [patterns.commit_replace_prompt, 'sendline(yes)', None, True, False],
            [patterns.configuration_failed_message,
-           'sendline(show configuration failed)', None, True, False]
+            self.handle_failed_config, None, True, False]
            ])
 
         xr_to_bmc = Path(xr, bmc, switch_console, login_dialog)

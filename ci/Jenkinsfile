@@ -1,0 +1,123 @@
+def project = 'unicon.plugins'
+
+pipeline {
+    agent {
+        label 'linux'
+    }
+    options {
+        timeout(time: 2, unit: 'HOURS')
+    }
+    stages {
+
+        stage('Clone repos') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/dev']], extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'unicon']], userRemoteConfigs: [[credentialsId: 'e8a7354a-c71a-42cb-83ee-49ab5ad40085', url: 'https://wwwin-github.cisco.com/pyATS/unicon.git']]])
+                script {
+                    sh """
+                    ls -l
+                    cd unicon
+                    git remote -v
+                    """
+                }
+            }
+        }
+
+        stage('Checkout branches') {
+            when { not { changeRequest() } }
+            steps {
+                script {
+                    sh """
+                    cd unicon
+                    # checkout same branch on unicon, if it exists
+                    git checkout ${BRANCH_NAME} || true
+                    """
+                }
+            }
+        }
+
+        stage('Checkout branches (PR)') {
+            when {
+                changeRequest()
+            }
+            steps {
+                script {
+                    sh """
+                    cd unicon
+                    # checkout same branch on unicon, if it exists
+                    git checkout origin/${CHANGE_BRANCH} || true
+                    git status
+                    """
+                }
+            }
+        }
+
+        stage("Setup dev environment") {
+            steps {
+                sh """
+                    export PIP_DOWNLOAD_CACHE=/scratch/pip_download_cache
+                    rm -rf /scratch/unicon-dev
+                    cd /scratch
+                    /usr/bin/python3.6 -m venv unicon-dev
+                    . /scratch/unicon-dev/bin/activate
+                    pip install --upgrade pip
+                    pip3 install wheel asyncssh cryptography==3.3.1 pytest pytest-xdist
+                    pip3 install -i http://pyats-pypi.cisco.com/simple --trusted-host pyats-pypi.cisco.com cisco-distutils ats[full]
+                    cd $WORKSPACE/unicon
+                    make develop
+                    cd ..
+                    make develop
+                """
+            }
+        }
+
+        stage("Unicon compileAll") {
+            steps {
+                sh """
+                . /scratch/unicon-dev/bin/activate
+                cd unicon
+                compileAll --path=src --exclude '*demo*'
+                """
+            }
+        }
+
+        stage("Unicon plugins compileAll") {
+            steps {
+                sh """
+                . /scratch/unicon-dev/bin/activate
+                compileAll --path=src --exclude '*demo*'
+                """
+            }
+        }
+
+        stage("Unicon tests") {
+            steps {
+                sh """
+                . /scratch/unicon-dev/bin/activate
+                cd unicon
+                cd tests
+                if ! py.test -v -n auto --junitxml=pytest-unicon.xml .; then
+                    py.test --last-failed -s -v .
+                fi
+                """
+            }
+        }
+
+        stage("Unicon plugin tests") {
+            steps {
+                sh """
+                . /scratch/unicon-dev/bin/activate
+                cd tests
+                if ! py.test -v -n auto --junitxml=pytest-unicon-plugins.xml .; then
+                    py.test --last-failed -s -v .
+                fi
+                """
+            }
+        }
+
+    }
+    post {
+        cleanup {
+            cleanWs()
+        }
+    }
+}
