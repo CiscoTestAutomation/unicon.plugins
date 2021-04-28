@@ -22,9 +22,10 @@ import unicon.plugins
 
 patch.TEST_PREFIX = ('test', 'setUp', 'tearDown')
 
+unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
+unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC = 0.2
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
+
 class TestIosXrSpitfirePluginDevice(unittest.TestCase):
 
     @classmethod
@@ -64,8 +65,6 @@ class TestIosXrSpitfirePluginDevice(unittest.TestCase):
         self.md.stop()
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestIosXrSpitfirePlugin(unittest.TestCase):
 
     @classmethod
@@ -95,8 +94,6 @@ class TestIosXrSpitfirePlugin(unittest.TestCase):
         self.c.disconnect()
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestIosXrSpitfirePluginPrompts(unittest.TestCase):
 
     @classmethod
@@ -137,8 +134,6 @@ class TestIosXrSpitfirePluginPrompts(unittest.TestCase):
         self.c.disconnect()
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestIosXrSpitfirePluginSvcs(unittest.TestCase):
 
     @classmethod
@@ -168,8 +163,6 @@ class TestIosXrSpitfirePluginSvcs(unittest.TestCase):
         self.c.disconnect()
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestIosXrSpitfireHAConnect(unittest.TestCase):
 
     def setUp(self):
@@ -222,8 +215,6 @@ class TestIosXrSpitfireHAConnect(unittest.TestCase):
         self.md.stop()
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestIosXrSpitfirePluginConnectReply(unittest.TestCase):
 
     @classmethod
@@ -246,8 +237,6 @@ class TestIosXrSpitfirePluginConnectReply(unittest.TestCase):
 
 
 @patch.object(unicon.plugins.iosxr.spitfire.settings.SpitfireSettings, 'CONFIG_LOCK_TIMEOUT', 5)
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestIosXrSpitfirePluginConnectConfigLock(unittest.TestCase):
 
     def test_configlocktimeout(self):
@@ -354,8 +343,6 @@ class TestIosXrSpitfirePluginConnectConfigLock(unittest.TestCase):
         self.md.stop()
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestIosXrSpitfirePluginSwitchTo(unittest.TestCase):
 
     @classmethod
@@ -392,8 +379,6 @@ class TestIosXrSpitfirePluginSwitchTo(unittest.TestCase):
         self.c.disconnect()
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestIosXrSpitfirePluginAttachConsoleService(unittest.TestCase):
 
     def test_attach_console_rp0(self):
@@ -423,6 +408,31 @@ class TestIosXrSpitfirePluginAttachConsoleService(unittest.TestCase):
             self.assertIn('dummy_file', out)
         ret = conn.spawn.match.match_output
         self.assertIn('exit\r\nlogout\r\nRP/0/RP0/CPU0:Router#', ret)
+
+
+class TestIosXrSpitfireConfigure(unittest.TestCase):
+    """Tests for config prompt handling."""
+    @classmethod
+    def setUpClass(self):
+        self._conn = Connection(
+            hostname='Router',
+            start=['mock_device_cli --os iosxr --platform spitfire --state spitfire_enable'],
+            os='iosxr',
+            platform='spitfire'
+        )
+        self._conn.connect()
+
+    @classmethod
+    def tearDownClass(self):
+        self._conn.disconnect()
+
+    @classmethod
+    def test_failed_config(self):
+        """Check that we can successfully return to an enable prompt after entering failed config."""
+        self._conn.execute("configure terminal", allow_state_change=True)
+        self._conn.execute("test failed")
+        self._conn.spawn.timeout = 60
+        self._conn.enable()
 
 
 if __name__ == "__main__":

@@ -74,7 +74,7 @@ general_exec:
 
 general_enable:
   prompt: "Router#"
-  commands:
+  commands: &gen_enable_cmds
     "term length 0": ""
     "term width 0": ""
     "show version": *SV
@@ -132,7 +132,7 @@ general_enable:
       abc\r\r\r\r\r\n
       test trim line\r\r\r\r\n
       test pass"
-
+    "badcommand": "% Bad IP address or host name% Unknown command or computer name, or unable to find computer address"
 
 general_config:
   prompt: "%N(conf)#"
@@ -160,6 +160,7 @@ general_config:
       new_state: config_general_server
     "crypto gkm group g1":
       new_state: iosxe_config_1
+    "ntp server vrf foo 1.2.3.4": "% IP  routing table foo does not exist"
 
 general_config_line:
   prompt: "Router(config-line)#"
@@ -400,7 +401,7 @@ ts_login:
   preface: |
     Connected to localhost
     Escape character is '^]'.
-    
+
   prompt: "Username: "
   commands:
     "ts_user":
@@ -417,3 +418,32 @@ console_wait_login:
   commands:
     "":
       new_state: general_login
+
+
+scp_password:
+  prompt: "Password for test@127.0.0.1: "
+  commands:
+    "test":
+      new_state: general_enable
+
+
+enable_no_service_prompt_config:
+  prompt: "%N#"
+  commands:
+    <<: *gen_enable_cmds
+    "config term":
+      new_state:
+        config_no_prompt
+    "configure terminal":
+      new_state:
+        config_no_prompt
+
+config_no_prompt:
+  preface: "Enter configuration commands, one per line. End with CNTL/Z."
+  prompt: ""
+  keys:
+    ctrl-z:
+      new_state: enable_no_service_prompt_config
+  commands:
+    "service prompt config":
+      new_state: general_config

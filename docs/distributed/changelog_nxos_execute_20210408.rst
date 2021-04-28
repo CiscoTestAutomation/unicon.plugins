@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
-                                      New                                       
+                            Features
 --------------------------------------------------------------------------------
 
-* IOSXE/CAT9K
-    * Support `rommon()` and `reload()` services
+* NXOS
+ * Add execute statement list for Execute service

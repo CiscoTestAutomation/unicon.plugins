@@ -40,6 +40,8 @@ class GenericSettings(Settings):
             'stty rows 200'
         ]
 
+        self.SERVICE_PROMPT_CONFIG_CMD = 'service prompt config'
+
         self.SWITCHOVER_COUNTER = 50
         self.SWITCHOVER_TIMEOUT = 500
         self.HA_RELOAD_TIMEOUT = 500

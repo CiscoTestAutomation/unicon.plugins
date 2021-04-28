@@ -24,6 +24,8 @@ from unicon.core.errors import (SubCommandFailure, TimeoutError,
 
 from unicon.eal.dialogs import Dialog, Statement
 from unicon.plugins.generic.service_implementation import \
+    Execute as GenericExecute
+from unicon.plugins.generic.service_implementation import \
     Copy as GenericCopy, ReloadResult
 from unicon.plugins.generic.service_implementation import \
     HAReloadService as GenericHAReload
@@ -41,7 +43,7 @@ from unicon.plugins.generic.service_statements import ping6_statement_list, \
     switchover_statement_list, standby_reset_rp_statement_list
 from unicon.plugins.generic.service_statements import send_response
 from unicon.plugins.nxos.service_statements import nxos_reload_statement_list, \
-    ha_nxos_reload_statement_list
+    ha_nxos_reload_statement_list, execute_stmt_list
 from unicon.settings import Settings
 from unicon.utils import (AttributeDict, pyats_credentials_available,
     to_plaintext)
@@ -871,6 +873,31 @@ class ResetStandbyRP(BaseService):
         con.log.warning("reset_standby_rp is not supported on NXOS")
         return
 
+
+class NxosExecute(GenericExecute):
+    """ Service to execute commands on nxos.
+
+    Arguments:
+        command: List of command to execute on nxos
+        dialog: Dialog which include list of Statements for
+                additional dialogs prompted by command executed,
+                in-case it is not in the current list.
+        timeout: Timeout value in sec for executing command on shell.
+
+    Returns:
+        string: console output on success
+
+    Raises:
+        SubCommandFailure: on failure.
+
+    Example:
+        .. code-block:: python
+
+            dev.execute(cmd)
+    """
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.dialog += Dialog(execute_stmt_list)
 
 class ShellExec(BaseService):
     """ Service to execute commands on shell.
