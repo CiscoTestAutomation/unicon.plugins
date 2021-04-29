@@ -104,5 +104,17 @@ class TestLearnHostname(unittest.TestCase):
         con.connect()
 
 
+class TestSrOsConnect(unittest.TestCase):
+
+    def test_connect(self):
+        con = Connection(
+            os='sros',
+            hostname='cc-site-r1',
+            start=['mock_device_cli --os sros --state classiccli_execute --hostname cc-site-r1'],
+            credentials={'default': {'username': 'cisco', 'password': 'cisco'}}
+        )
+        con.connect()
+
+
 if __name__ == '__main__':
      unittest.main()
