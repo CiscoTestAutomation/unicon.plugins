@@ -184,8 +184,9 @@ class TestIosXEPluginExecute(unittest.TestCase):
         cls.c.disconnect()
 
     def test_execute_error_pattern(self):
+      for cmd in ['not a real command', 'badcommand']:
         with self.assertRaises(SubCommandFailure) as err:
-            r = self.c.execute('not a real command')
+            r = self.c.execute(cmd)
 
     def test_execute_error_pattern_negative(self):
         r = self.c.execute('not a real command partial')
@@ -590,6 +591,19 @@ class TestIosXEConfigure(unittest.TestCase):
         c.configure(['crypto pki trustpoint test', 'no crypto pki trustpoint test'])
         c.disconnect()
 
+    def test_configure_error_pattern(self):
+        c = Connection(hostname='RouterRP',
+                       start=['mock_device_cli --os iosxe --state general_enable'],
+                       os='iosxe',
+                       init_exec_commands=[],
+                       settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+                       log_buffer=True
+                       )
+        c.connect()
+        for cmd in ['ntp server vrf foo 1.2.3.4']:
+          with self.assertRaises(SubCommandFailure) as err:
+              r = c.configure(cmd)
+        c.disconnect()
     def test_configure_with_msgs(self):
         md = MockDeviceTcpWrapperIOSXE(port=0, state='config_with_msgs')
         md.start()
@@ -700,7 +714,19 @@ class TestIosXEConfigure(unittest.TestCase):
             c.disconnect()
             md.stop()
 
-
+    def test_config_no_service_prompt_config(self):
+        c = Connection(hostname='Switch',
+                       start=['mock_device_cli --os iosxe --state enable_no_service_prompt_config'],
+                       os='iosxe',
+                       mit=True,
+                       init_exec_commands=[],
+                       init_config_commands=[],
+                       settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+                       log_buffer=True
+                       )
+        c.connect()
+        c.configure(['no logging console'])
+        c.disconnect()
 
 
 if __name__ == "__main__":

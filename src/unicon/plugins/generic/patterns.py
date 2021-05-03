@@ -63,3 +63,5 @@ class GenericPatterns(UniconCorePatterns):
         self.syslog_message_pattern = r'^.*?%\w+(-\w+)?-\d+-\w+.*$'
 
         self.config_locked = r'Configuration (mode )?(is )?locked|Config mode cannot be entered'
+
+        self.config_start = r'Enter configuration commands, one per line\.\s+End with CNTL/Z\.\s*$'

@@ -1,4 +1,4 @@
-__version__ = '21.3'
+__version__ = '21.4'
 
 supported_chassis = [
     'single_rp',
@@ -32,5 +32,6 @@ supported_os = [
     'windows',
     'dell',
     'comware',
-    'ironware'
+    'ironware',
+    'eos'
 ]

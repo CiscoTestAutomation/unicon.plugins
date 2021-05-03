@@ -1181,6 +1181,78 @@ host:
   commands: *enable_cmds
 
 
+# Enable/config prompts for RP vs RSP
+
+enable_bash_run_prompt_rp:
+  prompt: "RP/0/RP/CPU0:%N#"
+  commands:
+    "terminal length 0": ""
+    "terminal width 0": ""
+    "configure terminal":
+      new_state: config_bash_run_prompt_rp
+    "run":
+      new_state: bash_console_prompt_rp
+
+config_bash_run_prompt_rp:
+  prompt: "RP/0/RP/CPU0:%N(config)#"
+  commands:
+    "end":
+      new_state: enable_bash_run_prompt_rp
+    "exit":
+      new_state: enable_bash_run_prompt_rp
+    "no logging console": ""
+    "logging console disable": ""
+    "line console": ""
+    "exec-timeout 0 0": ""
+    "absolute-timeout 0": ""
+    "session-timeout 0": ""
+    "line default": ""
+    "commit": ""
+
+bash_console_prompt_rp:
+  prompt: "[xr-vm_node0_RP0_CPU0:~]$"
+  commands:
+    "pwd": |
+      disk0:
+    "exit":
+      new_state: enable_bash_run_prompt_rp
+
+
+enable_bash_run_prompt_rsp:
+  prompt: "RP/0/RSP/CPU0:%N#"
+  commands:
+    "terminal length 0": ""
+    "terminal width 0": ""
+    "configure terminal":
+      new_state: config_bash_run_prompt_rsp
+    "run":
+      new_state: bash_console_prompt_rsp
+
+config_bash_run_prompt_rsp:
+  prompt: "RP/0/RSP/CPU0:%N(config)#"
+  commands:
+    "end":
+      new_state: enable_bash_run_prompt_rsp
+    "exit":
+      new_state: enable_bash_run_prompt_rsp
+    "no logging console": ""
+    "logging console disable": ""
+    "line console": ""
+    "exec-timeout 0 0": ""
+    "absolute-timeout 0": ""
+    "session-timeout 0": ""
+    "line default": ""
+    "commit": ""
+
+bash_console_prompt_rsp:
+  prompt: "[xr-vm_node0_RSP0_CPU0:~]$"
+  commands:
+    "pwd": |
+      disk0:
+    "exit":
+      new_state: enable_bash_run_prompt_rsp
+
+
 ping_proto:
   prompt: "Protocol [ipv4]: "
   commands:

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import re
 import sys
 import logging
 import argparse
@@ -12,8 +13,9 @@ logger = logging.getLogger(__name__)
 class MockDeviceNXOS(MockDevice):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, device_os="nxos",  **kwargs)
+        super().__init__(*args, device_os="nxos", **kwargs)
         self.config_lock_counter = 0
+        self.files_on_flash = []
 
     def ha_confirm_reload(self, transport, cmd):
         if 'prompt' in self.transport_ports[self.transport_handles[transport]]:
@@ -39,7 +41,29 @@ class MockDeviceNXOS(MockDevice):
             else:
                 self.mock_data['exec']['commands']['config term'] \
                     = {'new_state': 'config'}
-
+        # 'show tech > bootflash:R1_show_tech_20210405T112036168.txt'
+        elif re.match(r'show tech.*>', cmd):
+            filename = re.sub(r'show tech.*>', '', cmd).strip()
+            self.files_on_flash.append(filename)
+            return True
+        elif cmd == 'dir':
+            lines = ['   52429131    Apr 05 08:53:17 2021  ' + f for f in self.files_on_flash]
+            self._write('\n'.join(lines), transport)
+            self._write('\n\n', transport)
+            return True
+        elif re.match(r'tar create \S+ gz-compress \S+', cmd):
+            m = re.match(r'tar create (\S+) gz-compress \S+', cmd)
+            filename = m.group(1) + '.tar.gz'
+            self.files_on_flash.append(filename)
+            return True
+        elif re.match(r'delete \S+', cmd):
+            m = re.match(r'delete (\S+)', cmd)
+            filename = m.group(1)
+            self.files_on_flash.remove(filename)
+            return True
+        elif re.match(r'copy bootflash:\S+ scp:\S+ vrf \S+', cmd):
+            self.set_state(self.transport_handles[transport], 'scp_password')
+            return True
 
 
 class MockDeviceTcpWrapperNXOS(MockDeviceTcpWrapper):

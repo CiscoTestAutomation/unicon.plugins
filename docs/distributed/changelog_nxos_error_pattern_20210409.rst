@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
-                                      Fix                                       
+                            Features
 --------------------------------------------------------------------------------
 
-* NXOS/ACI
-    * Inherit services from NXOS plugin
+* NXOS
+ * Add add error_pattern for "command failed...aborting"
 

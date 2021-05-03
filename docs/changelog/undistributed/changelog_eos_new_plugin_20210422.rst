@@ -1,7 +1,5 @@
 --------------------------------------------------------------------------------
-                                      Fix                                       
+                            Features 
 --------------------------------------------------------------------------------
-
-* IOSXR/Moonshine
-    * Updated shell prompt pattern
-
+ 
+* New plugin 'eos' for Arista EOS platform

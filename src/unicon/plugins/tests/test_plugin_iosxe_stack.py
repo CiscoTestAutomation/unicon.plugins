@@ -178,20 +178,25 @@ class TestIosXEStackSwitchover(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.c = Connection(hostname='Router',
-                       start = ['mock_device_cli --os iosxe --state stack_login']*5,
-                       os='iosxe',
-                       chassis_type='stack',
-                       username='cisco',
-                       tacacs_password='cisco',
-                       enable_password='cisco',
-                       log_buffer=True)
+                           start = ['mock_device_cli --os iosxe --state stack_login']*5,
+                           os='iosxe',
+                           chassis_type='stack',
+                           credentials=dict(default=dict(username='cisco', password='cisco')),
+                           log_buffer=True)
         cls.c.connect()
+        cls.c.settings.POST_SWITCHOVER_SLEEP = 1
 
     @classmethod
     def tearDownClass(cls):
         cls.c.disconnect()
 
-    def test_reload(self):
+    def test_switchover(self):
+        self.c.active.context.state = None
+        self.c.switchover()
+
+    def test_switchover_context(self):
+        # explicitly set the context.state to hit the codepath with context
+        self.c.active.context.state = 'rommon'
         self.c.switchover()
 
 
