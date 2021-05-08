@@ -15,6 +15,7 @@ import yaml
 
 from unicon import Connection
 from unicon.mock.mock_device import mockdata_path
+from unicon.core.errors import SubCommandFailure
 
 with open(os.path.join(mockdata_path, 'gaia/gaia_mock_data.yaml'), 'rb') as datafile:
     mock_data = yaml.safe_load(datafile.read())
@@ -44,6 +45,7 @@ class TestGaiaPluginClish(unittest.TestCase):
         cls.c.connect()
 
     def test_execute(self):
+        self.c.switchto('clish')
         response = self.c.execute('show version all')
         self.assertIn("Product version", response)
 
@@ -51,11 +53,11 @@ class TestGaiaPluginClish(unittest.TestCase):
         self.assertIn("gaia-gw", self.c.hostname)
 
     def test_ping(self):
-        response = self.c.execute('ping 192.168.1.1')
+        response = self.c.ping('192.168.1.1')
         self.assertIn("PING 192.168.1.1 (192.168.1.1) 56(84) bytes of data.", response)
 
     def test_traceroute(self):
-        response = self.c.execute('traceroute 192.168.1.1')
+        response = self.c.traceroute('192.168.1.1')
         self.assertIn("traceroute to 192.168.1.1 (192.168.1.1), 30 hops max, 40 byte packets", response)
 
     def test_state_transitions(self):
@@ -68,6 +70,16 @@ class TestGaiaPluginClish(unittest.TestCase):
         self.c.switchto('clish')
         self.assertIn("clish", sm.current_state)
 
+    def test_error_patterns(self):
+        
+        self.c.switchto('clish')
+        with self.assertRaises(SubCommandFailure):
+            self.c.execute('asdf')
+    
+        self.c.switchto('expert')
+        with self.assertRaises(SubCommandFailure):       
+            self.c.execute('asdf')
+        
 class TestGaiaPluginExpert(unittest.TestCase):
     """ Tests Gaia device configured to login to expert mode
     """
@@ -99,11 +111,11 @@ class TestGaiaPluginExpert(unittest.TestCase):
         self.assertIn("gaia-gw", self.c.hostname)
 
     def test_ping(self):
-        response = self.c.execute('ping 192.168.1.1')
+        response = self.c.ping('192.168.1.1')
         self.assertIn("PING 192.168.1.1 (192.168.1.1) 56(84) bytes of data.", response)
 
     def test_traceroute(self):
-        response = self.c.execute('traceroute 192.168.1.1')
+        response = self.c.traceroute('192.168.1.1')
         self.assertIn("traceroute to 192.168.1.1 (192.168.1.1), 30 hops max, 40 byte packets", response)
 
     def test_state_transitions(self):

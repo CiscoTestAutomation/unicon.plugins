@@ -33,6 +33,9 @@ class GaiaStateMachine(GenericSingleRpStateMachine):
         self.add_state(clish)
         self.add_state(expert)
 
+        # Assume inital state is 'clish'. If 'expert' is detected by GaiaConnectionProvider.init_handle
+        # these Path commands will be changed at runtime.
+ 
         clish_to_expert = Path(clish, expert, 'expert', Dialog([statements.expert_password_stmt]))
         expert_to_clish = Path(expert, clish, 'exit', None)
 

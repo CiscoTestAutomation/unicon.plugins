@@ -38,11 +38,11 @@ class GaiaConnectionProvider(GenericSingleRpConnectionProvider):
         # and the switchto service is used to put the gateway into clish mode.
 
         if self.initial_state == 'expert':
-            # clish->expert
-            con.state_machine.paths[0].command = 'exit'
+            path = con.state_machine.get_path('clish','expert')
+            path.command = 'exit'
 
-            #expert->clish
-            con.state_machine.paths[1].command = 'clish'
+            path = con.state_machine.get_path('expert','clish')
+            path.command = 'clish'
 
             # switch to clish if in expert on connect
             con.switchto('clish')
