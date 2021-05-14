@@ -19,9 +19,8 @@ class GaiaSettings(GenericSettings):
         self.ESCAPE_CHAR_CALLBACK_PRE_SENDLINE_PAUSE_SEC = 1
         self.HA_INIT_EXEC_COMMANDS = ['set clienv rows 0']
         self.HA_INIT_CONFIG_COMMANDS = []
-        
-        print(f"init self.ERROR_PATTERN: {self.ERROR_PATTERN}")
-        self.ERROR_PATTERN =[
+
+        self.ERROR_PATTERN = [
             r'^.*?command not found.*$',
-            r'^.*?[Ii]nvalid command.*$' 
+            r'^.*?[Ii]nvalid command.*$'
         ]

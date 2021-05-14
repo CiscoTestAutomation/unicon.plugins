@@ -15,33 +15,37 @@ from unicon.plugins.gaia import service_implementation as gaia_svc
 from unicon.plugins.gaia.statemachine import GaiaStateMachine
 from unicon.plugins.gaia.settings import GaiaSettings
 from time import sleep
+
+
 class GaiaConnectionProvider(GenericSingleRpConnectionProvider):
-    
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # used for tracking the initial state - it impacts the commands used for state changes
+        # used for tracking the initial state - it impacts the commands used
+        # for state changes
         self.initial_state = ''
 
-    def init_handle(self): 
+    def init_handle(self):
         con = self.connection
 
         self.initial_state = con.state_machine.current_state
 
-        # The state machine path commands are different depending on the initial state.
-        # If the default shell is configured to be 'expert' mode the path commands are:
-        #   'clish' for expert -> clish 
+        # The state machine path commands are different depending on the
+        # initial state. If the default shell is configured to be 'expert'
+        # mode the path commands are:
+        #   'clish' for expert -> clish
         #   'exit' for clish -> expert
-        
-        # If the initial state is determined to be 'expert' mode, the commands are updated
-        # and the switchto service is used to put the gateway into clish mode.
+
+        # If the initial state is determined to be 'expert' mode, the
+        # commands are updated and the switchto service is used to put
+        # the gateway into clish mode.
 
         if self.initial_state == 'expert':
-            path = con.state_machine.get_path('clish','expert')
+            path = con.state_machine.get_path('clish', 'expert')
             path.command = 'exit'
 
-            path = con.state_machine.get_path('expert','clish')
+            path = con.state_machine.get_path('expert', 'clish')
             path.command = 'clish'
 
             # switch to clish if in expert on connect
@@ -69,16 +73,18 @@ class GaiaConnectionProvider(GenericSingleRpConnectionProvider):
             con.log.info('closing connection...')
             con.spawn.close()
 
+
 class GaiaServiceList(ServiceList):
     """ gaia services """
     def __init__(self):
         super().__init__()
-        
+
         self.execute = gaia_svc.GaiaExecute
         self.sendline = svc.Sendline
         self.ping = linux_svc.Ping
         self.traceroute = gaia_svc.GaiaTraceroute
         self.switchto = gaia_svc.GaiaSwitchTo
+
 
 class GaiaConnection(GenericSingleRpConnection):
     """

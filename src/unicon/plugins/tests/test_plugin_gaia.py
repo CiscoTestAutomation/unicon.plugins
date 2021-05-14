@@ -12,6 +12,7 @@ https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_e
 import os
 import unittest
 import yaml
+import re
 
 from unicon import Connection
 from unicon.mock.mock_device import mockdata_path
@@ -27,27 +28,30 @@ class TestGaiaPluginClish(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        
-        cls.c = Connection(hostname='gaia-gw',
-                        start=['mock_device_cli --os gaia --state login'],
-                        os='gaia',
-                        credentials={
-                            'default': {
-                                'username': 'gaia-user', 
-                                'password': 'gaia-password'
-                                },
-                            'expert': {
-                                'password': 'gaia-expert-pass'
-                                }
-                            }
-                        )
+
+        cls.c = Connection(
+            hostname='gaia-gw',
+            start=['mock_device_cli --os gaia --state login'],
+            os='gaia',
+            credentials={
+                'default': {
+                    'username': 'gaia-user',
+                    'password': 'gaia-password'
+                    },
+                'expert': {
+                    'password': 'gaia-expert-pass'
+                    }
+                }
+            )
 
         cls.c.connect()
 
     def test_execute(self):
         self.c.switchto('clish')
         response = self.c.execute('show version all')
-        self.assertIn("Product version", response)
+        response = re.sub(r"\r\n", "\n", response)
+        mock_data_response = mock_data['clish']['commands']['show version all']['response'].strip()
+        self.assertEqual(response, mock_data_response)
 
         # check hostname
         self.assertIn("gaia-gw", self.c.hostname)
@@ -71,35 +75,37 @@ class TestGaiaPluginClish(unittest.TestCase):
         self.assertIn("clish", sm.current_state)
 
     def test_error_patterns(self):
-        
+
         self.c.switchto('clish')
         with self.assertRaises(SubCommandFailure):
             self.c.execute('asdf')
-    
+
         self.c.switchto('expert')
-        with self.assertRaises(SubCommandFailure):       
+        with self.assertRaises(SubCommandFailure):
             self.c.execute('asdf')
-        
+
+
 class TestGaiaPluginExpert(unittest.TestCase):
     """ Tests Gaia device configured to login to expert mode
     """
 
     @classmethod
     def setUpClass(cls):
-        
-        cls.c = Connection(hostname='gaia-gw',
-                        start=['mock_device_cli --os gaia --state exp_login'],
-                        os='gaia',
-                        credentials={
-                            'default': {
-                                'username': 'gaia-user', 
-                                'password': 'gaia-password'
-                                }
-                            }
-                        )
+
+        cls.c = Connection(
+            hostname='gaia-gw',
+            start=['mock_device_cli --os gaia --state exp_login'],
+            os='gaia',
+            credentials={
+                'default': {
+                    'username': 'gaia-user',
+                    'password': 'gaia-password'
+                    }
+                }
+            )
 
         cls.c.connect()
-        
+
         # state should automatically change to clish on connect
         assert cls.c.state_machine.current_state == 'clish'
 
@@ -127,6 +133,7 @@ class TestGaiaPluginExpert(unittest.TestCase):
 
         self.c.switchto('clish')
         self.assertIn("clish", sm.current_state)
+
 
 if __name__ == "__main__":
     unittest.main()
