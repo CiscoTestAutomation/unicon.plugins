@@ -33,5 +33,6 @@ supported_os = [
     'dell',
     'comware',
     'ironware',
-    'eos'
+    'eos',
+    'gaia'
 ]
