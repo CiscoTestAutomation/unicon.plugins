@@ -40,6 +40,8 @@ mdcli_execute:
       new_state: mdcli_configure_private
     "configure global":
       new_state: mdcli_configure_global
+    "environment console length 512": ""
+    "environment console width 512": ""
   keys:
     'ctrl-z': ""
     "//":
@@ -144,6 +146,8 @@ classiccli_execute:
       response: |
         MINOR: CLI Modification of the configuration is not allowed - 'model-driven' management interface configuration mode active
     "commit": ""
+    "environment no more": ""
+    "environment no saved-ind-prompt": ""
   keys:
     "ctrl-z": ""
     "//":

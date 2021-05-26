@@ -17,7 +17,7 @@ class EOSSingleRPConnection(BaseSingleRpConnection):
     Support for Arista EOS platform
     '''
     os = 'eos'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     state_machine_class = EOSSingleRpStateMachine
     subcommand_list = EOSServiceList

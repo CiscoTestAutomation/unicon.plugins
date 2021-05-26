@@ -506,6 +506,7 @@ operation can be service affecting.\n"
 failed_config:
   prompt: "RP/0/RP0/CPU0:Router(config)#"
   commands:
+    "commit": ""
     "end":
       response: "Uncommitted changes found, commit them before exiting(yes/no/cancel)? [cancel]:"
       new_state: failed_config_uncommitted

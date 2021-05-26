@@ -41,4 +41,5 @@ class NxosSettings(GenericSettings):
             r'^%\s*[Ff]ail.*',
             r'^%\s*[Aa]bort.*'
             r'^%\s*[Ee](RROR|rror).*',
+            r'^%\s*Ambiguous command'
         ]

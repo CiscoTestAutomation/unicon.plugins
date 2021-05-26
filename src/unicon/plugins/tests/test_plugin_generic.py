@@ -18,6 +18,7 @@ from pyats.datastructures import AttrDict
 import unicon
 from unicon import Connection
 from unicon.eal.dialogs import Dialog
+from unicon.plugins.utils import sanitize
 from unicon.plugins.tests.mock.mock_device_ios import MockDeviceTcpWrapperIOS
 from unicon.mock.mock_device import MockDevice, MockDeviceTcpWrapper
 from unicon.plugins.generic.statements import login_handler, password_handler, passphrase_handler
@@ -30,7 +31,8 @@ from unicon.core.errors import (SubCommandFailure, StateMachineError,
 
 
 unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC=0
-unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC=0
+unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC=0.2
+
 
 class TestPasswordHandler(unittest.TestCase):
 
@@ -940,10 +942,36 @@ class TestEscapeHandler(unittest.TestCase):
                        os='ios', line_password="cisco",
                        username='cisco',
                        tacacs_password='cisco',
-                       enable_password='cisco')
+                       enable_password='cisco',
+                       settings={'ESCAPE_CHAR_CHATTY_TERM_WAIT': 3,
+                                 'ESCAPE_CHAR_PROMPT_WAIT': 3})
         r = c.connect()
-        last_lines = "\n".join(r.splitlines()[-4:])
-        self.assertEqual(last_lines, '\nUser Access Verification\nPassword: cisco\nRouter>')
+        first_lines = '\n'.join(r.splitlines()[0:21])
+        # Need to sanitize strings because due to the timing and stripping of log messages
+        # in the connect return string, sometimes empty lines can be inserted into the output
+        # at different places
+        self.assertEqual(sanitize(first_lines.replace('\r', '')), sanitize("""\
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+
+#######################
+#          #    ######
+#         # #   #     #
+#        #   #  #     #
+#       #     # ######
+#       ####### #     #
+#       #     # #     #
+####### #     # ######
+#######################
+
+User Access Verification
+
+Password: cisco
+Router>
+enable
+Password: cisco
+Router#"""))
 
     def test_escape_handler_username(self):
         c = Connection(hostname='Router',
@@ -951,10 +979,39 @@ class TestEscapeHandler(unittest.TestCase):
                        os='ios', line_password="cisco",
                        username='cisco',
                        tacacs_password='cisco',
-                       enable_password='cisco')
+                       enable_password='cisco',
+                       settings={'ESCAPE_CHAR_CHATTY_TERM_WAIT': 3,
+                                 'ESCAPE_CHAR_PROMPT_WAIT': 3})
         r = c.connect()
-        last_lines = "\n".join(r.splitlines()[-4:])
-        self.assertEqual(last_lines, '#######################\nusername: cisco\nPassword: cisco\nRouter>')
+        first_lines = '\n'.join(r.splitlines()[0:24])
+        # Need to sanitize strings because due to the timing and stripping of log messages
+        # in the connect return string, sometimes empty lines can be inserted into the output
+        # at different places
+        self.assertEqual(sanitize(first_lines.replace('\r', '')), sanitize("""\
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+
+#######################
+#          #    ######
+#         # #   #     #
+#        #   #  #     #
+#       #     # ######
+#       ####### #     #
+#       #     # #     #
+####### #     # ######
+#######################
+
+username: cisco
+Password: cisco
+Router>
+enable
+Password: cisco
+Router#
+term length 0
+Router#
+term width 0
+Router#"""))
 
     def test_escape_handler_password(self):
         c = Connection(hostname='Router',
@@ -962,13 +1019,28 @@ class TestEscapeHandler(unittest.TestCase):
                        os='ios', line_password="cisco",
                        username='cisco',
                        tacacs_password='cisco',
-                       enable_password='cisco')
+                       enable_password='cisco',
+                       settings={'ESCAPE_CHAR_CHATTY_TERM_WAIT': 3,
+                                 'ESCAPE_CHAR_PROMPT_WAIT': 3})
         r = c.connect()
-        expected_pattern = re.compile(
-            ".*" + re.escape("Escape character is '^]'.\r\npassword: cisco\r\nRouter>"),
-            re.DOTALL)
-        self.assertRegex(r, expected_pattern)
+        first_lines = '\n'.join(r.splitlines()[0:13])
+        # Need to sanitize strings because due to the timing and stripping of log messages
+        # in the connect return string, sometimes empty lines can be inserted into the output
+        # at different places
+        self.assertEqual(sanitize(first_lines.replace('\r', '')), sanitize("""\
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
 
+password: cisco
+Router>
+enable
+Password: cisco
+Router#
+term length 0
+Router#
+term width 0
+Router#"""))
 
     def tearDown(self):
         if self.old_term_setting:

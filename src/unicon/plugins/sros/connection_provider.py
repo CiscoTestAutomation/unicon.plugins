@@ -31,3 +31,25 @@ class SrosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
                         + sros_auth_other_statement_list
                         + custom_user_pw_stmt
                         + sros_auth_username_password_statement_list)
+
+    def set_init_commands(self):
+        con = self.connection
+
+        self.init_exec_commands = []
+        self.init_config_commands = []
+
+        if con.init_exec_commands is not None:
+            self.init_exec_commands = con.init_exec_commands
+        else:
+            if con.state_machine.current_state == 'mdcli':
+                self.init_exec_commands = con.settings.MD_INIT_EXEC_COMMANDS
+            elif con.state_machine.current_state == 'classiccli':
+                self.init_exec_commands = con.settings.CLASSIC_INIT_EXEC_COMMANDS
+
+        if con.init_config_commands is not None:
+            self.init_config_commands = con.init_config_commands
+        else:
+            if con.state_machine.current_state == 'mdcli':
+                self.init_config_commands = con.settings.MD_INIT_CONFIG_COMMANDS
+            elif con.state_machine.current_state == 'classiccli':
+                self.init_config_commands = con.settings.CLASSIC_INIT_CONFIG_COMMANDS

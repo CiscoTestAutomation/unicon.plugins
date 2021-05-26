@@ -144,6 +144,7 @@ class TestAciSSH(unittest.TestCase):
                     protocol: ssh
                     ip: 127.0.0.1
                     port: {apic_ssh}
+                    ssh_options: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
         """.format(apic_ssh=cls.apic_md_ssh.ports[0], )
         cls.tb = loader.load(cls.testbed)
 

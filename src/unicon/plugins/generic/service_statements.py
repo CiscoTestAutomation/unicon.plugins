@@ -295,6 +295,8 @@ reload_statement_list = [save_env, confirm_reset, reload_confirm,
                          secure_passwd_std, admin_password, auto_provision,
                          login_stmt, password_stmt,
                          generic_statements.password_ok_stmt,
+                         generic_statements.enable_secret_stmt,
+                         generic_statements.enter_your_selection_stmt
                         ]
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#

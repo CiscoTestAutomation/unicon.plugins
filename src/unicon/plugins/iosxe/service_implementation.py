@@ -172,6 +172,10 @@ class Reload(GenericReload):
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
 
+    def pre_service(self, *args, **kwargs):
+        self.context.pop('boot_prompt_count', None)
+        return super().pre_service(*args, **kwargs)
+
     def call_service(self,
                      reload_command='reload',
                      dialog=Dialog([]),

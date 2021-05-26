@@ -23,7 +23,7 @@ from unicon.statemachine import State, Path, StateMachine
 from unicon.eal.dialogs import Dialog, Statement
 
 from .statements import (authentication_statement_list,
-                         default_statement_list)
+                         default_statement_list, buffer_settled)
 
 patterns = GenericPatterns()
 statements = GenericStatements()
@@ -32,11 +32,17 @@ statements = GenericStatements()
 def config_service_prompt_handler(spawn, config_pattern):
     """ Check if we need to send the sevice config prompt command.
     """
-    spawn.read_update_buffer()
-    if re.search(config_pattern, spawn.buffer):
-        return
-    else:
-        spawn.sendline(spawn.settings.SERVICE_PROMPT_CONFIG_CMD)
+    if hasattr(spawn.settings, 'SERVICE_PROMPT_CONFIG_CMD') and spawn.settings.SERVICE_PROMPT_CONFIG_CMD:
+        # if the config prompt is seen, return
+        if re.search(config_pattern, spawn.buffer):
+            return
+        else:
+            # if no buffer changes for a few seconds, check again
+            if buffer_settled(spawn, spawn.settings.CONFIG_PROMPT_WAIT):
+                if re.search(config_pattern, spawn.buffer):
+                    return
+                else:
+                    spawn.sendline(spawn.settings.SERVICE_PROMPT_CONFIG_CMD)
 
 
 def config_transition(statemachine, spawn, context):

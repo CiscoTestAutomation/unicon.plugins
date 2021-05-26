@@ -98,7 +98,11 @@ class SrosExecute(BaseService):
                             'mdcli': 'mdcli_execute'}
 
     def pre_service(self, *args, **kwargs):
-        pass
+        if not self.connection.is_connected:
+            if self.connection.reconnect:
+                self.connection.connect()
+            else:
+                raise ConnectionError("Connection is not established to device")
 
     def post_service(self, *args, **kwargs):
         pass
@@ -106,8 +110,11 @@ class SrosExecute(BaseService):
     def call_service(self, *args, **kwargs):
         handle = self.get_handle()
         state = handle.state_machine.current_state
-        execute = getattr(self.connection, self.execute_map[state])
-        self.result = execute(*args, **kwargs)
+        if state in self.execute_map:
+            execute = getattr(self.connection, self.execute_map[state])
+            self.result = execute(*args, **kwargs)
+        else:
+            raise ConnectionError("Unknown state '{}', unable to execute".format(state))
 
 
 class SrosConfigure(BaseService):

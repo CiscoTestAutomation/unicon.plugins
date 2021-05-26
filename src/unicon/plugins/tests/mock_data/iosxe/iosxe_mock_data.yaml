@@ -1,3 +1,4 @@
+
 general_login:
   prompt: "Username: "
   commands:
@@ -11,7 +12,7 @@ general_password:
       new_state: general_exec
 
 general_exec:
-  prompt: "Router>"
+  prompt: "%N>"
   commands:
     "term length 0": ""
     "term width 0": ""
@@ -69,11 +70,17 @@ general_exec:
 
 
     "enable":
+      new_state: enable_password
+
+
+enable_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
       new_state: general_enable
 
-
 general_enable:
-  prompt: "Router#"
+  prompt: "%N#"
   commands: &gen_enable_cmds
     "term length 0": ""
     "term width 0": ""
@@ -447,3 +454,92 @@ config_no_prompt:
   commands:
     "service prompt config":
       new_state: general_config
+
+
+
+initial_config_dialog:
+  preface:
+    timing:
+      - 0:,0,0.01
+    response: |2
+      
+      
+      
+             --- System Configuration Dialog ---
+
+  prompt: "\nWould you like to enter the initial configuration dialog? [yes/no]: "
+  commands:
+    "no":
+      new_state: enter_enable_secret
+      response: |2
+          
+          The enable secret is a password used to protect
+          access to privileged EXEC and configuration modes.
+          This password, after entered, becomes encrypted in
+          the configuration.
+          -------------------------------------------------
+          secret should be of minimum 10 characters with
+          at least 1 upper case, 1 lower case, 1 digit and
+          should not contain [cisco]
+          -------------------------------------------------
+
+enter_enable_secret:
+  prompt: "  Enter enable secret: "
+  commands:
+    "": "Please enter a secret"
+    "badpw":
+      response: "%Password validation failed"
+    "Secret12345":
+      new_state: confirm_enable_secret
+
+confirm_enable_secret:
+  prompt: "  Confirm enable secret: "
+  commands:
+    "": "Please enter a secret"
+    "Secret12345":
+      response: |2
+
+        The following configuration command script was created:
+
+        enable secret 9 $9$gCGcm2IWBJOT5U$p6jqb1plxOJpr3yYwa/3fUSfpQjM.RgfcunyUXhqfRA
+        !
+        end
+
+
+        [0] Go to the IOS command prompt without saving this config.
+        [1] Return back to the setup without saving this config.
+        [2] Save this configuration to nvram and exit.
+
+      new_state: enter_selection
+
+enter_selection:
+  prompt: "Enter your selection [2]: "
+  commands:
+    "":
+      new_state: press_return
+      response: |
+        Building configuration...
+        [OK]
+        Use the enabled mode 'configure' command to modify this configuration.
+
+
+press_return:
+  preface: "\n\nPress RETURN to get started!\n\n"
+  prompt: ""
+  commands:
+    "":
+      new_state: enable_secret_exec
+
+
+enable_secret_exec:
+  prompt: "%N>"
+  commands:
+    "enable":
+      new_state: enable_secret_password
+
+
+enable_secret_password:
+  prompt: "Password: "
+  commands:
+    "Secret12345":
+      new_state: general_enable

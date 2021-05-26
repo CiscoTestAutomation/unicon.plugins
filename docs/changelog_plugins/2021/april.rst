@@ -14,6 +14,7 @@ Install Instructions
 ^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
+
     bash$ pip install unicon.plugins
     bash$ pip install unicon
 
@@ -21,6 +22,7 @@ Upgrade Instructions
 ^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
+
     bash$ pip install --upgrade unicon.plugins
     bash$ pip install --upgrade unicon
 
@@ -32,27 +34,33 @@ Features and Bug Fixes:
 --------------------------------------------------------------------------------
 
 * AIREOS PLUGIN
-    * Add Error_Pattern For ^[Rr]Equest [Ff]Ailed And R'^(.*?) Already In Use'
-    * Add Error_Pattern For R'Wlan Identifier Is Invalid' And R'^Request Failed'
+    * Add error_pattern for `^[Rr]Equest [Ff]Ailed And R'^(.*?) Already In Use`
+    * Add error_pattern For `Wlan Identifier Is Invalid` and `^Request Failed`
 
 * NXOS/ACI
-    * Inherit Services From Nxos Plugin
+    * Inherit services from nxos plugin
 
 * GENERIC PLUGIN
-    * Add Syslog Message Handler To Connect, Execute And Configure Services
+    * Add syslog message handler to `connect`, `execute` and `configure` services
 
 * IOSXE/CAT9K
-    * Support `Rommon()` And `Reload()` Services
+    * Support `rommon()` and `reload()` services
+
+* IOSXE
+    * New exec error_pattern to match '% Bad IP address or host name% Unknown command or computer name, or unable to find computer address'
+    * New configure error_pattern to match '% IP  routing table <name> does not exist'
 
 * GENERIC EXECUTE AND CONFIGURE SERVICES
-    * Added `Append_Error_Pattern` Argument
+    * Added `append_error_pattern` argument
 
 * NXOS
-    * Added `Skip_Poap` Statement For Reload Service
+    * Added `skip_poap` statement for reload service
+    * Add execute statement list for `execute` service
+    * Add add error_pattern for "command failed...aborting"
 
 * NXOS PLUGIN
-    * Add Dialog To Handle Commit Confirm Message
-    * Use 'Commit' As Default Commit Command For Configure_Dual Service
+    * Add dialog to handle commit confirm message
+    * Use 'commit' as default commit command for `configure_dual` service
 
 
 --------------------------------------------------------------------------------
@@ -60,34 +68,35 @@ Features and Bug Fixes:
 --------------------------------------------------------------------------------
 
 * NXOS/ACI
-    * Attach_Console Service For Nxos/Aci Plugin
+    * attach_console service for NXOS/ACI plugin
 
 * IOSXR
-    * Updated `Run_Prompt` Pattern To Accept More Variety
+    * Updated `run_prompt` pattern to accept more variety
 
 * IOSXR/SPITFIRE
-    * Fixed Failed Config Handling When Transitioning From Config To Enable State
+    * Fixed failed config handling when transitioning from config to enable state
 
 * IOSXR/MOONSHINE
-    * Updated Shell Prompt Pattern
+    * Updated shell prompt pattern
 
 * AIREOS PLUGIN
-    * Changed Error_Pattern '^(%\S*)?Error' To '^(%\S*)?(Error|Error)' So It Is Case Insensitive
+    * Changed error_pattern `^(%\S*)?Error` To `^(%\S*)?(Error|error)` so it's case insensitive
+
 
 * JUNOS PLUGIN
-    * Update Configure Service, Allow Commit_Cmd Override
+    * Update `configure` service to allow `commit_cmd` override
 
 * IOSXE
-    * Updated Config Prompt Pattern To Include "Cloud"
+    * Updated config prompt pattern to include "cloud"
 
 * IOSXE/CSR1000V
-    * Use Iosxe Config Prompt Pattern
+    * Use IOSXE config prompt pattern
 
 * GENERAL
-    * Use Plugin Specific Config Prompt For Config State Transition
-    * Enable 'Service Prompt Config' If We Detect No Prompt On Config Transition
+    * Use plugin specific config prompt for config state transition
+    * Enable 'service prompt config' if we detect no prompt on config transition
 
 * SETUP.PY
-    * Update Version Check To Allow Users To Build Local Versions
+    * Update version check to allow users to build local versions
 
 

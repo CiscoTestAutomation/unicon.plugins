@@ -27,7 +27,7 @@ class IosXEPatterns(GenericPatterns):
         self.press_enter = ReloadPatterns().press_enter
         self.config_prompt = r'^(.*)\(.*(con|cfg|ipsec-profile|ca-trustpoint|cs-server|ca-profile|gkm-local-server|cloud)\S*\)#\s?$'
         self.are_you_sure_ywtdt = r'Are you sure you want to do this\? \[yes/no\]:\s*$'
-
+        self.do_you_want_to = r'^.*Do you want to remove the above files\? \[y\/n]\s*$'
 
 class IosXEReloadPatterns(ReloadPatterns):
     def __init__(self):

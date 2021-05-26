@@ -104,5 +104,48 @@ class TestLearnHostname(unittest.TestCase):
         con.connect()
 
 
+class TestConnect(unittest.TestCase):
+
+    def test_execute_before_connect(self):
+        con = Connection(
+            os='sros',
+            hostname='Router',
+            start=['mock_device_cli --os sros --state connect_ssh'],
+            credentials={'default': {'username': 'grpc', 'password': 'nokia'}}
+        )
+        con.execute('show version')
+
+
+class TestInitCommands(unittest.TestCase):
+
+    def test_connect_classiccli_init_commands(self):
+        con = Connection(
+            os='sros',
+            hostname='CR1-LOC-1',
+            start=['mock_device_cli --os sros --state classiccli_execute --hostname CR1-LOC-1'],
+            learn_hostname=True,
+            settings=dict(DEFAULT_CLI_ENGINE='classiccli'),
+            log_buffer=True
+        )
+        con.connect()
+        for cmd in ["executing command 'environment no more'",
+                    "executing command 'environment no saved-ind-prompt'"]:
+            self.assertTrue(cmd in con.log_buffer)
+
+    def test_connect_mdcli_init_commands(self):
+        con = Connection(
+            os='sros',
+            hostname='CR1-LOC-1',
+            start=['mock_device_cli --os sros --state mdcli_execute --hostname CR1-LOC-1'],
+            learn_hostname=True,
+            settings=dict(DEFAULT_CLI_ENGINE='mdcli'),
+            log_buffer=True
+        )
+        con.connect()
+        for cmd in ["executing command 'environment console length 512'",
+                    "executing command 'environment console width 512'"]:
+            self.assertTrue(cmd in con.log_buffer)
+
+
 if __name__ == '__main__':
-     unittest.main()
+    unittest.main()

@@ -1281,12 +1281,12 @@ In pyATS testbed yaml file, this can be set in the following way:
             ip: x.x.x.x
             port: 2042
             prompts:
-                login: r'USERNAME:\s?$'
-                password: r'PASSWORD:\s$'
+                login: "USERNAME:\s*$"
+                password: "PASSWORD:\s*$"
 
 
 The login and password patterns are also applicable for login/password prompts displayed during
-`reload()`, `switchover()` and `execute()` services. It is possible to override the login and
+`reload()`, `switchover()` services. It is possible to override the login and
 password dialogs and other default dialogs in the execute service by specifying the
 `service_dialog` option in the execute statement. See `execute service`_.
 

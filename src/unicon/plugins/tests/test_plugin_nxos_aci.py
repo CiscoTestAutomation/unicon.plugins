@@ -111,6 +111,7 @@ class TestNxosAciSSH(unittest.TestCase):
                     protocol: ssh
                     ip: 127.0.0.1
                     port: {n9k_ssh}
+                    ssh_options: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
         """.format(n9k_ssh=cls.aci_n9k_md_ssh.ports[0])
         cls.tb = loader.load(cls.testbed)
 
