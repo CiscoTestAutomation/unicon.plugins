@@ -306,3 +306,22 @@ as part of the credential block.
                 username: cisco
                 password: secret
                 passphrase: secret phrase
+
+
+SSH Options
+-----------
+
+You can specify additional SSH options (such as identity/key files) using the
+`ssh_options` key as part of the connection block:
+
+.. code-block:: yaml
+    devices:
+      my_device:
+        type: router
+        os: ios
+        connections:
+            vty:
+                protocol: ssh
+                ip: 10.64.70.11
+                port: 2042
+                ssh_options: "-i /path/to/id_rsa -o UserKnownHostsFile /dev/null"
