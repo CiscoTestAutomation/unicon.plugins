@@ -45,7 +45,8 @@ class IOSXRSettings(GenericSettings):
             r'^%\s*Error +parsing +piping+ string\. +Quitting.*'
         ]
         self.CONFIGURE_ERROR_PATTERN = [
-            r'^%\s*[Ii]nvalid (command|input|number)'
+            r'^%\s*[Ii]nvalid (command|input|number)',
+            r'^%\s*Failed to commit.*'
         ]
 
         self.EXECUTE_MATCHED_RETRIES = 1

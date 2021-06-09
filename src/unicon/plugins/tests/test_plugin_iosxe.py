@@ -11,80 +11,76 @@ import re
 import unittest
 from unittest.mock import patch
 
+from pyats.topology import loader
+
 import unicon
 from unicon import Connection
 from unicon.eal.dialogs import Dialog, Statement
-from unicon.core.errors import SubCommandFailure, StateMachineError
+from unicon.core.errors import SubCommandFailure, StateMachineError, UniconAuthenticationError, ConnectionError as UniconConnectionError
 from unicon.plugins.tests.mock.mock_device_iosxe import MockDeviceTcpWrapperIOSXE
+
+unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
+unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC = 0.2
 
 
 class TestIosXEPluginConnect(unittest.TestCase):
 
     def test_asr_login_connect(self):
         c = Connection(hostname='Router',
-                start=['mock_device_cli --os iosxe --state asr_login'],
+                start=['mock_device_cli --os iosxe --state asr_login --hostname Router'],
                 os='iosxe',
-                username='cisco',
-                tacacs_password='cisco',
+                credentials=dict(default=dict(username='cisco', password='cisco')),
                 log_buffer=True)
         c.connect()
         self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
 
     def test_isr_login_connect(self):
         c = Connection(hostname='Router',
-                start=['mock_device_cli --os iosxe --state isr_login'],
-                os='iosxe',
-                username='cisco',
-                tacacs_password='cisco',
-                enable_password='cisco')
+                       start=['mock_device_cli --os iosxe --state isr_login --hostname Router'],
+                       os='iosxe',
+                       credentials=dict(default=dict(username='cisco', password='cisco')))
         c.connect()
         self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
 
     def test_edison_login_connect(self):
         c = Connection(hostname='Router',
-                start=['mock_device_cli --os iosxe --state cat3k_login'],
-                os='iosxe',
-                platform='cat3k',
-                username='cisco',
-                tacacs_password='cisco')
+                       start=['mock_device_cli --os iosxe --state cat3k_login --hostname Router'],
+                       os='iosxe',
+                       platform='cat3k',
+                       credentials=dict(default=dict(username='cisco', password='cisco')))
         c.connect()
         self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
 
-
     def test_edison_login_connect_password_ok(self):
         c = Connection(hostname='Router',
-                start=['mock_device_cli --os iosxe --state cat3k_login'],
-                os='iosxe',
-                platform='cat3k',
-                username='cisco',
-                tacacs_password='cisco1')
+                       start=['mock_device_cli --os iosxe --state cat3k_login --hostname Router'],
+                       os='iosxe',
+                       platform='cat3k',
+                       credentials=dict(default=dict(username='cisco', password='cisco')))
         c.connect()
         self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
 
     def test_general_login_connect(self):
         c = Connection(hostname='Router',
-                start=['mock_device_cli --os iosxe --state general_login'],
-                os='iosxe',
-                username='cisco',
-                tacacs_password='cisco')
+                       start=['mock_device_cli --os iosxe --state general_login --hostname Router'],
+                       os='iosxe',
+                       credentials=dict(default=dict(username='cisco', password='cisco')))
         c.connect()
         self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
 
     def test_general_login_connect_syslog(self):
         c = Connection(hostname='Router',
-                start=['mock_device_cli --os iosxe --state connect_syslog'],
-                os='iosxe',
-                username='cisco',
-                tacacs_password='cisco')
+                       start=['mock_device_cli --os iosxe --state connect_syslog --hostname Router'],
+                       os='iosxe',
+                       credentials=dict(default=dict(username='cisco', password='cisco')))
         c.connect()
         self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
 
     def test_general_configure(self):
         c = Connection(hostname='Router',
-                start=['mock_device_cli --os iosxe --state general_login'],
-                os='iosxe',
-                username='cisco',
-                tacacs_password='cisco')
+                       start=['mock_device_cli --os iosxe --state general_login --hostname Router'],
+                       os='iosxe',
+                       credentials=dict(default=dict(username='cisco', password='cisco')))
         c.connect()
         cmd = ['crypto key generate rsa general-keys modulus 2048 label ca',
                'crypto pki server ca', 'grant auto', 'hash sha256', 'lifetime ca-certificate 3650',
@@ -94,20 +90,18 @@ class TestIosXEPluginConnect(unittest.TestCase):
 
     def test_general_config_ca_profile(self):
         c = Connection(hostname='Router',
-                start=['mock_device_cli --os iosxe --state general_login'],
-                os='iosxe',
-                username='cisco',
-                tacacs_password='cisco')
+                       start=['mock_device_cli --os iosxe --state general_login --hostname Router'],
+                       os='iosxe',
+                       credentials=dict(default=dict(username='cisco', password='cisco')))
         c.connect()
         c.configure("crypto pki profile enrollment test", timeout=60)
         self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
 
     def test_gkm_local_server(self):
         c = Connection(hostname='Router',
-                start=['mock_device_cli --os iosxe --state general_login'],
-                os='iosxe',
-                username='cisco',
-                tacacs_password='cisco')
+                       start=['mock_device_cli --os iosxe --state general_login --hostname Router'],
+                       os='iosxe',
+                       credentials=dict(default=dict(username='cisco', password='cisco')))
         c.connect()
         cmd = [
             "crypto gkm group g1",
@@ -127,9 +121,7 @@ class TestIosXEPluginConnect(unittest.TestCase):
             hostname='Router',
             start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
             os='iosxe',
-            settings=dict(POST_DISCONNECT_WAIT_SEC=0,
-                          GRACEFUL_DISCONNECT_WAIT_SEC=0.2,
-                          SENDLINE_AFTER_CRED='ts'),
+            settings=dict(SENDLINE_AFTER_CRED='ts'),
             credentials=dict(default=dict(username='cisco', password='cisco'),
                              ts=dict(username='ts_user', password='ts_pw')),
             login_creds=['ts', 'default'],
@@ -149,8 +141,6 @@ class TestIosXEPluginConnect(unittest.TestCase):
             hostname='Router',
             start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
             os='iosxe',
-            settings=dict(POST_DISCONNECT_WAIT_SEC=0,
-                          GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
             credentials=dict(default=dict(username='cisco', password='cisco'),
                              ts=dict(username='ts_user', password='ts_pw')),
             login_creds=['ts', 'default'],
@@ -171,10 +161,7 @@ class TestIosXEPluginExecute(unittest.TestCase):
         cls.c = Connection(hostname='switch',
                            start=['mock_device_cli --os iosxe --state isr_exec'],
                            os='iosxe',
-                           username='cisco',
-                           tacacs_password='cisco',
-                           enable_password='cisco',
-                           settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+                           credentials=dict(default=dict(username='cisco', password='cisco')),
                            log_buffer=True
                            )
         cls.c.connect()
@@ -191,6 +178,10 @@ class TestIosXEPluginExecute(unittest.TestCase):
     def test_execute_error_pattern_negative(self):
         r = self.c.execute('not a real command partial')
 
+    def test_execute_stmt_list(self):
+      for cmd in ['install remove inactive']:
+        r = self.c.execute(cmd)
+
     def test_execute_with_msgs(self):
         md = MockDeviceTcpWrapperIOSXE(port=0, state='enable_with_msgs')
         md.start()
@@ -199,7 +190,6 @@ class TestIosXEPluginExecute(unittest.TestCase):
             hostname='Router',
             start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
             os='iosxe',
-            settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
             credentials=dict(default=dict(username='cisco', password='cisco')),
             mit=True
         )
@@ -217,10 +207,7 @@ class TestIosXEPluginDisableEnable(unittest.TestCase):
         c = Connection(hostname='Router',
                        start=['mock_device_cli --os iosxe --state isr_exec'],
                        os='iosxe',
-                       username='cisco',
-                       tacacs_password='cisco',
-                       enable_password='cisco',
-                       settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+                       credentials=dict(default=dict(username='cisco', password='cisco')),
                        log_buffer=True
                        )
 
@@ -243,7 +230,6 @@ class TestIosXEPluginDisableEnable(unittest.TestCase):
                        start=['mock_device_cli --os iosxe --state disable_to_enable_with_msg'],
                        os='iosxe',
                        credentials=dict(default=dict(password='cisco')),
-                       settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
                        log_buffer=True
                        )
         c.connect()
@@ -257,10 +243,7 @@ class TestIosXEPluginPing(unittest.TestCase):
         cls.c = Connection(hostname='Router',
                            start=['mock_device_cli --os iosxe --state isr_exec'],
                            os='iosxe',
-                           username='cisco',
-                           tacacs_password='cisco',
-                           enable_password='cisco',
-                           settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+                           credentials=dict(default=dict(username='cisco', password='cisco')),
                            log_buffer=True
                            )
         cls.c.connect()
@@ -326,10 +309,7 @@ class TestIosxePlugingTraceroute(unittest.TestCase):
         cls.c = Connection(hostname='Router',
                            start=['mock_device_cli --os iosxe --state isr_exec'],
                            os='iosxe',
-                           username='cisco',
-                           tacacs_password='cisco',
-                           enable_password='cisco',
-                           settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+                           credentials=dict(default=dict(username='cisco', password='cisco')),
                            log_buffer=True
                            )
         cls.c.connect()
@@ -389,10 +369,7 @@ class TestIosXEluginBashService(unittest.TestCase):
         c = Connection(hostname='Router',
                        start=['mock_device_cli --os iosxe --state isr_exec'],
                        os='iosxe',
-                       username='cisco',
-                       tacacs_password='cisco',
-                       enable_password='cisco',
-                       settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+                       credentials=dict(default=dict(username='cisco', password='cisco')),
                        log_buffer=True
                        )
         with c.bash_console() as console:
@@ -405,10 +382,7 @@ class TestIosXEluginBashService(unittest.TestCase):
         c = Connection(hostname='Router',
                        start=['mock_device_cli --os iosxe --state asr_exec'],
                        os='iosxe',
-                       username='cisco',
-                       tacacs_password='cisco',
-                       enable_password='cisco',
-                       settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+                       credentials=dict(default=dict(username='cisco', password='cisco')),
                        log_buffer=True
                        )
         with c.bash_console() as console:
@@ -423,10 +397,7 @@ class TestIosXESDWANConfigure(unittest.TestCase):
         d = Connection(hostname='Router',
                        start=['mock_device_cli --os iosxe --state sdwan_enable'],
                        os='iosxe', platform='sdwan',
-                       username='cisco',
-                       tacacs_password='cisco',
-                       enable_password='cisco',
-                       settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+                       credentials=dict(default=dict(username='cisco', password='cisco')),
                        log_buffer=True
                        )
 
@@ -438,10 +409,7 @@ class TestIosXESDWANConfigure(unittest.TestCase):
         d = Connection(hostname='Router',
                        start=['mock_device_cli --os iosxe --state sdwan_enable'],
                        os='sdwan', platform='iosxe',
-                       username='cisco',
-                       tacacs_password='cisco',
-                       enable_password='cisco',
-                       settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+                       credentials=dict(default=dict(username='cisco', password='cisco')),
                        log_buffer=True
                        )
 
@@ -462,7 +430,6 @@ class TestIosXEC8KvPluginReload(unittest.TestCase):
                 username='cisco', password='cisco'),
                 alt=dict(
                 username='admin', password='lab')),
-            settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
             log_buffer=True
             )
         cls.c.connect()
@@ -488,7 +455,6 @@ class TestIosXECat3kPluginReload(unittest.TestCase):
                 username='cisco', password='cisco'),
                 alt=dict(
                 username='admin', password='lab')),
-            settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
             log_buffer=True
             )
 
@@ -513,7 +479,6 @@ class TestIosXEDiol(unittest.TestCase):
                        username='cisco', password='cisco'),
                        alt=dict(
                        username='admin', password='lab')),
-                       settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
                        log_buffer=True
                        )
 
@@ -531,7 +496,6 @@ class TestIosXEDiol(unittest.TestCase):
                        username='cisco', password='cisco'),
                        alt=dict(
                        username='admin', password='lab')),
-                       settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
                        log_buffer=True
                        )
 
@@ -549,7 +513,6 @@ class TestIosXEDiol(unittest.TestCase):
                        username='cisco', password='cisco'),
                        alt=dict(
                        username='admin', password='lab')),
-                       settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
                        log_buffer=True
                        )
 
@@ -567,7 +530,6 @@ class TestIosXEDiol(unittest.TestCase):
                        username='cisco', password='cisco'),
                        alt=dict(
                        username='admin', password='lab')),
-                       settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
                        log_buffer=True
                        )
 
@@ -584,7 +546,6 @@ class TestIosXEConfigure(unittest.TestCase):
                        mit=True,
                        init_exec_commands=[],
                        init_config_commands=[],
-                       settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
                        log_buffer=True
                        )
         c.connect()
@@ -596,7 +557,6 @@ class TestIosXEConfigure(unittest.TestCase):
                        start=['mock_device_cli --os iosxe --state general_enable'],
                        os='iosxe',
                        init_exec_commands=[],
-                       settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
                        log_buffer=True
                        )
         c.connect()
@@ -612,7 +572,6 @@ class TestIosXEConfigure(unittest.TestCase):
             hostname='Router',
             start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
             os='iosxe',
-            settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
             credentials=dict(default=dict(username='cisco', password='cisco')),
             mit=True
         )
@@ -631,7 +590,6 @@ class TestIosXEConfigure(unittest.TestCase):
             hostname='Router',
             start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
             os='iosxe',
-            settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
             credentials=dict(default=dict(username='cisco', password='cisco')),
             mit=True
         )
@@ -649,7 +607,6 @@ class TestIosXEConfigure(unittest.TestCase):
                        mit=True,
                        init_exec_commands=[],
                        init_config_commands=[],
-                       settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
                        log_buffer=True
                        )
         c.connect()
@@ -685,7 +642,6 @@ class TestIosXEConfigure(unittest.TestCase):
                        mit=True,
                        init_exec_commands=[],
                        init_config_commands=[],
-                       settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
                        log_buffer=True
                        )
         c.connect()
@@ -702,8 +658,6 @@ class TestIosXEConfigure(unittest.TestCase):
             os='iosxe',
             mit=True,
             log_buffer=True,
-            settings=dict(POST_DISCONNECT_WAIT_SEC=0,
-                          GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
         )
         try:
             c.connect()
@@ -721,12 +675,79 @@ class TestIosXEConfigure(unittest.TestCase):
                        mit=True,
                        init_exec_commands=[],
                        init_config_commands=[],
-                       settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
                        log_buffer=True
                        )
         c.connect()
         c.configure(['no logging console'])
         c.disconnect()
+
+
+class TestIosXEEnableSecret(unittest.TestCase):
+
+    def test_enable_secret(self):
+        c = Connection(hostname='R1',
+                       start=['mock_device_cli --os iosxe --state initial_config_dialog --hostname R1'],
+                       os='iosxe',
+                       init_exec_commands=[],
+                       init_config_commands=[],
+                       credentials=dict(default=dict(password='Secret12345')),
+                       log_buffer=True
+                       )
+        c.connect()
+        c.configure(['no logging console'])
+        c.disconnect()
+
+    def test_bad_enable_secret(self):
+        c = Connection(hostname='R1',
+                       start=['mock_device_cli --os iosxe --state initial_config_dialog --hostname R1'],
+                       os='iosxe',
+                       init_exec_commands=[],
+                       init_config_commands=[],
+                       credentials=dict(default=dict(password='badpw')),
+                       log_buffer=True
+                       )
+        with self.assertRaisesRegex(UniconConnectionError, 'failed to connect to R1'):
+            c.connect()
+        c.disconnect()
+
+    def test_enable_secret_topology_legacy(self):
+        tb = loader.load("""
+        devices:
+          R1:
+            os: iosxe
+            passwords:
+                enable: Secret12345
+            connections:
+              cli:
+                command: mock_device_cli --os iosxe --state initial_config_dialog --hostname R1
+                arguments:
+                  log_buffer: True
+                  init_exec_commands: []
+                  init_config_commands: []
+        """)
+        dev = tb.devices.R1
+        dev.connect()
+        dev.disconnect()
+
+    def test_enable_secret_topology(self):
+        tb = loader.load("""
+        devices:
+          R1:
+            os: iosxe
+            credentials:
+              default:
+                password: Secret12345
+            connections:
+              cli:
+                command: mock_device_cli --os iosxe --state initial_config_dialog --hostname R1
+                arguments:
+                  log_buffer: True
+                  init_exec_commands: []
+                  init_config_commands: []
+        """)
+        dev = tb.devices.R1
+        dev.connect()
+        dev.disconnect()
 
 
 if __name__ == "__main__":

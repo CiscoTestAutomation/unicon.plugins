@@ -564,7 +564,7 @@ class TestLinuxPluginTERM(unittest.TestCase):
       # echo $TERM is matched as a prompt pattern depending on timing
       l.state_machine.get_state('shell').pattern = r'^(.*?([>~%]|[^#\s]#))\s?$'
       term = l.execute('echo $TERM')
-      self.assertEqual(term, os.environ['TERM'])
+      self.assertEqual(term, os.environ.get('TERM', 'dumb'))
 
 class TestLinuxPluginENV(unittest.TestCase):
 

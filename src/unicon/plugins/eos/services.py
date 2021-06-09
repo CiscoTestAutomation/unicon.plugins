@@ -8,7 +8,6 @@ https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_e
 
 import logging
 
-from unicon.bases.routers.services import BaseService
 from unicon.plugins.generic.service_implementation import Execute as GenericExec
 from unicon.plugins.ios.iosv import IosvServiceList
 
@@ -27,14 +26,6 @@ class Execute(GenericExec):
         # call parent
         super().call_service(*args, **kwargs)
 
-class EOSService(BaseService):
-    '''
-    demonstrating the implementation of a local, new service
-    '''
-    def call_service(self, *args,**kwargs):
-        #logger.info('imaginary service called!')
-        return 'EOS' * 3
-
 class EOSServiceList(IosvServiceList):
     '''
     class aggregating all service lists for this platform
@@ -46,4 +37,3 @@ class EOSServiceList(IosvServiceList):
 
         # overwrite and add our own
         self.execute = Execute
-        self.EOS = EOSService

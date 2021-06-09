@@ -530,6 +530,40 @@ class TestIosxrConfigCommitCommands(unittest.TestCase):
         self.assertEqual(self.conn.configure.commit_cmd, 'commit force')
         self.assertEqual(self.ha_dev.configure.commit_cmd, 'commit force')
 
+class TestIosxrConfigure(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.md = MockDeviceTcpWrapperIOSXR(port=0, state='enable')
+        cls.md.start()
+        cls.md1 = MockDeviceTcpWrapperIOSXR(port=0, state='login,console_standby')
+        cls.md1.start()
+        cls.conn = Connection(
+            hostname='Router',
+            start=['telnet 127.0.0.1 {}'.format(cls.md.ports[0])],
+            os='iosxr')
+        cls.ha_dev = Connection(
+            hostname='Router',
+            start=['telnet 127.0.0.1 {}'.format(cls.md1.ports[0]), 'telnet 127.0.0.1 {}'.format(cls.md1.ports[1])],
+            username='admin',
+            tacacs_password='admin',
+            os='iosxr')
+        cls.ha_dev.connect()
+        cls.conn.connect()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.conn.disconnect()
+        cls.ha_dev.disconnect()
+        cls.md1.stop()
+        cls.md.stop()
+
+    def test_configure_error_pattern(self):
+        with self.assertRaises(SubCommandFailure):
+            self.conn.configure('test failed')
+        with self.assertRaises(SubCommandFailure):
+            self.ha_dev.configure('test failed')
+
 
 class TestIosXRPluginPing(unittest.TestCase):
     def test_ping_fail_no_vrf(self):

@@ -30,4 +30,4 @@ class SpitfirePatterns(IOSXRPatterns):
         self.password_prompt = \
             r'^.*[Pp]assword:\s*?$'
 
-        self.xr_module_prompt = r'(.*?)^#\s*$'
+        self.xr_module_prompt = r'(?m)(.*?)^#\s*$'

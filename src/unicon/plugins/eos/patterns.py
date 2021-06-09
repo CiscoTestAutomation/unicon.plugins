@@ -14,6 +14,6 @@ class EOSPatterns(GenericPatterns):
     def __init__(self):
         super().__init__()
         self.login_prompt = r'^ *login: *?'
-        self.disable_mode = r'\w+>$'
-        self.privileged_mode = r'\w+[^\(config\)]#$'
+        self.disable_mode = r'^(.*?)\w+>$'
+        self.privileged_mode = r'^(.*?)\w+[^\(config\)]#$'
         self.password = r'Password:'

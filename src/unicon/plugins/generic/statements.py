@@ -447,6 +447,11 @@ class GenericStatements():
                                               args=None,
                                               loop_continue=True,
                                               continue_timer=False)
+        self.enable_secret_stmt = Statement(pattern=pat.enable_secret,
+                                            action=enable_password_handler,
+                                            args=None,
+                                            loop_continue=True,
+                                            continue_timer=False)
         self.password_ok_stmt = Statement(pattern=pat.password_ok,
                                           action=sendline,
                                           args=None,
@@ -541,6 +546,12 @@ class GenericStatements():
                                               trim_buffer=False,
                                               continue_timer=True)
 
+        self.enter_your_selection_stmt = Statement(pattern=pat.enter_your_selection_2,
+                                                   action='sendline()',
+                                                   args=None,
+                                                   loop_continue=True,
+                                                   continue_timer=True)
+
 
 #############################################################
 #  Statement lists
@@ -574,7 +585,8 @@ authentication_statement_list = [generic_statements.bad_password_stmt,
                                  generic_statements.password_stmt,
                                  generic_statements.clear_kerberos_no_realm,
                                  generic_statements.password_ok_stmt,
-                                 generic_statements.passphrase_stmt
+                                 generic_statements.passphrase_stmt,
+                                 generic_statements.enable_secret_stmt
                                  ]
 
 #############################################################
@@ -582,7 +594,8 @@ authentication_statement_list = [generic_statements.bad_password_stmt,
 #############################################################
 
 initial_statement_list = [generic_statements.init_conf_stmt,
-                          generic_statements.mgmt_setup_stmt
+                          generic_statements.mgmt_setup_stmt,
+                          generic_statements.enter_your_selection_stmt
                           ]
 
 connection_statement_list = \
@@ -595,4 +608,3 @@ connection_statement_list = \
 #############################################################
 
 default_statement_list = [generic_statements.more_prompt_stmt]
-

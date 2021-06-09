@@ -34,3 +34,6 @@ class IosXESettings(GenericSettings):
 
         self.FIND_BOOT_IMAGE = True
         self.MAX_BOOT_ATTEMPTS = 3
+
+        self.SERVICE_PROMPT_CONFIG_CMD = 'service prompt config'
+        self.CONFIG_PROMPT_WAIT = 2

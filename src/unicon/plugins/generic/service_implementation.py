@@ -920,13 +920,21 @@ class Configure(BaseService):
                     self.update_hostname_if_needed([cmd])
                     self.process_dialog_on_handle(handle, dialog, timeout)
 
-        handle.state_machine.go_to(
+        # store config_result so it can be returned to the user later
+        config_result = self.result
+        output = handle.state_machine.go_to(
             self.end_state,
             handle.spawn,
             prompt_recovery=self.prompt_recovery,
             timeout=timeout,
             context=self.context
         )
+        # set self.result, this is used by get_server_result to check for errors
+        self.result = output
+        # check for errors in the transition to the end_state
+        self.get_service_result()
+        # return the config_result to the user via self.result
+        self.result = config_result
 
     def process_dialog_on_handle(self, handle, dialog, timeout):
         try:

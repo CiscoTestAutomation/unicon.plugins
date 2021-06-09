@@ -75,6 +75,10 @@ press_enter = Statement(pattern=patterns.press_enter,
                         loop_continue=True,
                         continue_timer=False)
 
+do_you_want_to = Statement(pattern=patterns.do_you_want_to,
+                        action='sendline(y)',
+                        loop_continue=True,
+                        continue_timer=False)
 
 configure_statement_list = [
     are_you_sure,
@@ -88,5 +92,6 @@ execute_statement_list = [
     overwrite_previous,
     delete_filename,
     confirm,
-    want_continue
+    want_continue,
+    do_you_want_to
 ]

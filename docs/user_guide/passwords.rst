@@ -288,3 +288,21 @@ nxos password logic
 
 The ``switchto`` service accepts a ``vdc_cred`` argument that identifies a
 named credential to use to authenticate against the VDC.
+
+SSH passphrase
+--------------
+
+You can specify the ``passphrase`` that will be used to respond to the `Enter passphrase for key` prompt
+as part of the credential block.
+
+.. code-block:: yaml
+
+    devices:
+      my_device:
+        type: router
+        os: ios
+        credentials:
+            default:
+                username: cisco
+                password: secret
+                passphrase: secret phrase

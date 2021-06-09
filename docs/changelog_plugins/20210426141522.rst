@@ -1,6 +1,5 @@
 --------------------------------------------------------------------------------
-                            Features
+                                New
 --------------------------------------------------------------------------------
-
-* NXOS
- * Add execute statement list for Execute service
+* IOSXE
+    * Added execute statement for 'Do you want to remove the above files?'
