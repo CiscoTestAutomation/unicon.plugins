@@ -315,6 +315,7 @@ You can specify additional SSH options (such as identity/key files) using the
 `ssh_options` key as part of the connection block:
 
 .. code-block:: yaml
+
     devices:
       my_device:
         type: router
