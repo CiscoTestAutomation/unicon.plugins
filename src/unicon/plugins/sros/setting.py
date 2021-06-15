@@ -22,3 +22,5 @@ class SrosSettings(GenericSettings):
             'environment no saved-ind-prompt'
         ]
         self.CLASSIC_INIT_CONFIG_COMMANDS = []
+
+        self.DEFAULT_LEARNED_HOSTNAME = r'([^@# \t\n\r\f\v]+)'

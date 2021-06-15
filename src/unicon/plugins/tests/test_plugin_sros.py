@@ -96,12 +96,13 @@ class TestLearnHostname(unittest.TestCase):
     def test_connect_learn_hostname(self):
         con = Connection(
             os='sros',
-            hostname='CR1-LOC-1',
+            hostname='R1',
             start=['mock_device_cli --os sros --state classiccli_execute --hostname CR1-LOC-1'],
             credentials={'default': {'username': 'grpc', 'password': 'nokia'}},
             learn_hostname=True
         )
         con.connect()
+        self.assertEqual(con.hostname, 'CR1-LOC-1')
 
 
 class TestConnect(unittest.TestCase):
