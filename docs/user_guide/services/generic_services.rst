@@ -180,7 +180,7 @@ service_dialog         Dialog                      service_dialog overrides the 
                                                    dialog.
 matched_retries        int (default 1)             retry times if statement pattern is matched
 matched_retry_sleep    float (default 0.05 sec)    sleep between matched_retries
-===================   ========================    ====================================================
+====================   ========================    ====================================================
 
 By default, device start state should be same as end state. For example, if we
 use `execute()` service when device is at enable state then after running the command,

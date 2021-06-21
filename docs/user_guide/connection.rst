@@ -1042,6 +1042,7 @@ basis, as documented in :ref:`topology_credential_password_modeling`.
                       ip: 10.64.70.11
                       port: 2042
                       login_creds: [termserv, default]
+                      ssh_options: "-v -i /path/to/identityfile"
 
     """)
     dev = tb.devices.my_device
