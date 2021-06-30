@@ -33,3 +33,4 @@ jobs:
         make develop
         cd tests
         python -m unittest discover -b -v 2> /dev/null
+      shell: bash
