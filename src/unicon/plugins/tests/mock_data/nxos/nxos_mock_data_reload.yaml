@@ -84,6 +84,29 @@ confirm_reload3:
     "y":
       new_state: skip_poap
 
+
+confirm_reload4:
+  prompt: "This command will reboot the system. (y/n)?  [n]"
+  commands:
+    "y":
+      new_state: skip_poap2
+
+skip_poap2:
+  preface: |2
+      Waiting for system online status before starting POAP ...
+      Waiting for system online status before starting POAP ...
+      Waiting for system online status before starting POAP ...
+      2021 Mar 26 21:59:21 switch %$ VDC-1 %$ %DEVICE_TEST-2-ASICMEM_FAIL: Module 1 has failed test AsicMemoryTest 1 times on device ASIC Memory due to error General Failure
+      2021 Mar 26 21:59:21 switch %$ VDC-1 %$ %DEVICE_TEST-SLOT1-2-ASICMEM_FAIL: Module 1 has failed test AsicMemoryTest 1 times on device ASIC Memory due to error General Failure
+      2021 Mar 26 21:59:32 switch %$ VDC-1 %$ %ASCII-CFG-2-CONF_CONTROL: System ready
+      Starting Auto Provisioning ...
+      Done
+  prompt: "Abort Power On Auto Provisioning [yes - continue with normal setup, skip - bypass password and basic configuration, no - continue with Power On Auto Provisioning] (yes/skip/no)[no]:"
+  commands: 
+      "y": 
+          new_state: reconnect_login
+          response: Disabling POAP.......Disabling POAP 
+
 skip_poap:
   preface: |2
     CISCO MODULE

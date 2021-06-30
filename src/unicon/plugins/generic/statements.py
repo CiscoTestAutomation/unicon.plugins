@@ -71,7 +71,7 @@ def buffer_settled(spawn, wait_time):
     return True
 
 
-def syslog_wait_send_return(spawn):
+def syslog_wait_send_return(spawn, session):
     """Handle syslog messages observed in the buffer.
 
     If a syslog messsage was seen, this handler is executed.
@@ -82,8 +82,11 @@ def syslog_wait_send_return(spawn):
     If so, the last message was a syslog message and we want
     to send a return to get back the prompt.
     """
-    if buffer_settled(spawn, spawn.settings.SYSLOG_WAIT):
-        spawn.sendline()
+    buffer_len = session.get('buffer_len', 0)
+    if len(spawn.buffer) == buffer_len:
+        if buffer_settled(spawn, spawn.settings.SYSLOG_WAIT):
+            spawn.sendline()
+    session['buffer_len'] = len(spawn.buffer)
 
 
 def chatty_term_wait(spawn, trim_buffer=False):
@@ -551,6 +554,7 @@ class GenericStatements():
                                                    args=None,
                                                    loop_continue=True,
                                                    continue_timer=True)
+
 
 
 #############################################################

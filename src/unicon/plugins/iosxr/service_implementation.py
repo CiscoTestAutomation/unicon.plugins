@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from unicon.plugins.generic import service_implementation as svc
 from unicon.bases.routers.services import BaseService
 from unicon.core.errors import SubCommandFailure
-from unicon.eal.dialogs import Dialog
+from unicon.eal.dialogs import Dialog, Statement
 from unicon.plugins.generic.service_implementation import BashService
 from unicon.plugins.generic.service_implementation import GetRPState as GenericGetRPState
 
@@ -43,7 +43,7 @@ class Configure(svc.Configure):
         self.end_state = 'enable'
 
     def call_service(self, command=[], reply=Dialog([]),
-                      timeout=None, *args, **kwargs):
+                     timeout=None, *args, **kwargs):
         self.commit_cmd = get_commit_cmd(**kwargs)
         super().call_service(command,
                              reply=reply + Dialog(config_commit_stmt_list),
@@ -65,6 +65,12 @@ class HaConfigureService(svc.HaConfigureService):
         super().call_service(command,
                              reply=reply + Dialog(config_commit_stmt_list),
                              target=target, timeout=timeout, *args, **kwargs)
+
+
+class Reload(svc.Reload):
+
+    def call_service(self, reload_command='reload', *args, **kwargs):
+        super().call_service(reload_command, *args, **kwargs)
 
 
 class HaReload(svc.HAReloadService):
@@ -308,7 +314,7 @@ class AdminAttachModuleConsole(AttachModuleConsole):
         def __init__(self, connection,
                            module_num,
                            login_name = 'root',
-                           change_prompt = '\~(.+)?\]\$',
+                           change_prompt = r'\~(.+)?\]\$',
                            timeout = None):
             self.conn = connection
             self.module_num = module_num

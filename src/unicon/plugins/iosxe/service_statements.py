@@ -76,16 +76,22 @@ press_enter = Statement(pattern=patterns.press_enter,
                         continue_timer=False)
 
 do_you_want_to = Statement(pattern=patterns.do_you_want_to,
-                        action='sendline(y)',
-                        loop_continue=True,
-                        continue_timer=False)
+                           action='sendline(y)',
+                           loop_continue=True,
+                           continue_timer=False)
+
+proceed_confirm_stmt = Statement(pattern=patterns.proceed_confirm,
+                                 action='sendline(yes)',
+                                 loop_continue=True,
+                                 continue_timer=False)
 
 configure_statement_list = [
     are_you_sure,
     wish_continue,
     confirm,
     want_continue,
-    are_you_sure_ywtdt
+    are_you_sure_ywtdt,
+    proceed_confirm_stmt
 ]
 
 execute_statement_list = [

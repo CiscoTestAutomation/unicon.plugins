@@ -3,10 +3,13 @@ import re
 from unicon.plugins.generic import GenericSingleRpConnectionProvider
 from unicon.plugins.generic import GenericDualRpConnectionProvider
 from unicon.plugins.nxos.service_statements import additional_connection_dialog
-from unicon.eal.dialogs import Dialog
+from unicon.eal.dialogs import Dialog, Statement
 from unicon.plugins.nxos.utils import NxosUtils
+from unicon.plugins.generic.statements import more_prompt_handler
+from unicon.plugins.generic.patterns import GenericPatterns
 
 utils = NxosUtils()
+generic_patterns = GenericPatterns()
 
 
 class NxosSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
@@ -20,11 +23,20 @@ class NxosSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
         super().establish_connection()
         con = self.connection
         m = con.spawn.match.last_match
+
+        dialog = Dialog([
+            Statement(pattern=generic_patterns.more_prompt,
+                      action=more_prompt_handler,
+                      loop_continue=True,
+                      trim_buffer=False),
+            Statement(pattern=r'.+#\s*$')
+        ])
+
         hostname = m.groupdict()['hostname00']
         if hostname and '-' in hostname:
             con.log.info('We may be on a VDC, checking')
             con.sendline('show vdc')
-            con.expect(r'.+#\s*$')
+            dialog.process(con.spawn)
             vdc_info = con.spawn.match.match_output
             m = re.search(r'^1', vdc_info, re.MULTILINE)
             if m:
@@ -47,14 +59,6 @@ class NxosSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
         dialog = super().get_connection_dialog()
         dialog += Dialog(additional_connection_dialog)
         return dialog
-
-    def disconnect(self):
-        # check whether we are on vdc
-        if self.connection.current_vdc:
-            self.connection.log.info("device is on VDC, switching back before disconnecting")
-            self.connection.switchback()
-
-        super().disconnect()
 
 
 class NxosDualRpConnectionProvider(GenericDualRpConnectionProvider):
@@ -102,12 +106,3 @@ class NxosDualRpConnectionProvider(GenericDualRpConnectionProvider):
     def assign_ha_mode(self):
         for subconnection in self.connection.subconnections:
             subconnection.mode = 'sso'
-
-
-    def disconnect(self):
-        # check whether we are on vdc
-        if self.connection.current_vdc:
-            self.connection.log.info("device is on VDC, switching back before disconnecting")
-            self.connection.switchback()
-        super().disconnect()
-

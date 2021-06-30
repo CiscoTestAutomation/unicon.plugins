@@ -13,9 +13,8 @@
       * <Description>
       
 # Examples
-
 * Module
-	  * Modified Class:
-      	* Changed variable.
+	* Modified Class:
+    	* Changed variable.
         * Updated some value to some value
         

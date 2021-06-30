@@ -361,14 +361,17 @@ class TestNxosReloadOutput(unittest.TestCase):
     def setUpClass(cls):
         cls.d = Connection(
             hostname='R1',
-            start=['mock_device_cli --os nxos --state exec -generic_main'],
+            start=['mock_device_cli --os nxos --state exec2 -generic_main'],
             os='nxos', enable_password='cisco',
-            username='admin',
-            tacacs_password='lab'
+            credentials=dict(default=dict(
+                username='cisco',
+                password='cisco'
+            ))
         )
         md = unicon.mock.mock_device.MockDevice(device_os='nxos', state='exec')
-        cls.expected_output = md.mock_data['ha_active_console']['preface']
+        cls.expected_output = md.mock_data['login_after_reload']['preface']
         cls.d.connect()
+        cls.d.settings.POST_RELOAD_WAIT = 1
 
     @classmethod
     @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
@@ -379,7 +382,7 @@ class TestNxosReloadOutput(unittest.TestCase):
     def test_nxos_reload_output(self):
         res, output = self.d.reload(return_output=True)
         self.assertTrue(res)
-        self.assertIn(self.expected_output,'\n'.join(output.splitlines()))
+        self.assertTrue(self.expected_output in output.replace('\r', ''))
 
 
 class TestHANxosReloadOutput(unittest.TestCase):

@@ -417,6 +417,19 @@ class TestIosXESDWANConfigure(unittest.TestCase):
         d.configure('no logging console')
         d.disconnect()
 
+    def test_config_transaction_sdwan_iosxe_confirm(self):
+        d = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe --state sdwan_enable2'],
+                       os='iosxe', platform='sdwan',
+                       credentials=dict(default=dict(username='cisco', password='cisco')),
+                       log_buffer=True,
+                       mit=True
+                       )
+
+        d.connect()
+        d.configure('no logging console')
+        d.disconnect()
+
 
 class TestIosXEC8KvPluginReload(unittest.TestCase):
     @classmethod
@@ -573,7 +586,7 @@ class TestIosXEConfigure(unittest.TestCase):
             start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
             os='iosxe',
             credentials=dict(default=dict(username='cisco', password='cisco')),
-            mit=True
+            mit=True,
         )
         try:
             c.connect()
