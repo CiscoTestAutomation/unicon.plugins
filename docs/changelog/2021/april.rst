@@ -40,3 +40,8 @@ Features and Bug Fixes:
     * Modified SimpleDialogProcessor:
       * log statement debugs via debug log level
       * Removed STATEMENT_LOG_DEBUG settings, use connect(debug=True) instead
+* NXOS service statments
+    * Added new statment to handle multiple call for abort provisiong
+    * Added new pattern to nxos reload patterns
+
+        

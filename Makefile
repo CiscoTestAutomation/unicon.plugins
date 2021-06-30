@@ -7,7 +7,7 @@ PROD_USER     = pyadm@pyats-ci
 PROD_PKGS     = /auto/pyats/packages
 STAGING_PKGS  = /auto/pyats/staging/packages
 STAGING_EXT_PKGS  = /auto/pyats/staging/packages_external
-PYTHON        = python
+PYTHON        = python3
 TESTCMD       = runAll --path=tests/
 BUILD_CMD     = $(PYTHON) setup.py bdist_wheel --dist-dir=$(DIST_DIR)
 PYPIREPO      = pypitest
@@ -56,7 +56,7 @@ docs:
 	@echo "Building $(PKG_NAME) documentation for preview: $@"
 	@echo ""
 
-	python docs/gen_dialogs_rst.py > docs/user_guide/services/service_dialogs.rst
+	python3 docs/gen_dialogs_rst.py > docs/user_guide/services/service_dialogs.rst
 	sphinx-build -b html -c docs -d ./__build__/documentation/doctrees docs/ ./__build__/documentation/html
 
 	@echo "Completed building docs for preview."
@@ -160,8 +160,8 @@ changelogs:
 	@echo "--------------------------------------------------------------------"
 	@echo "Generating changelog file"
 	@echo ""
-	@python -c "from ciscodistutils.make_changelog import main; main('./docs/changelog/undistributed', './docs/changelog/undistributed.rst')"
-	@python -c "from ciscodistutils.make_changelog import main; main('./docs/changelog_plugins/undistributed', './docs/changelog_plugins/undistributed.rst')"
+	@python3 -c "from ciscodistutils.make_changelog import main; main('./docs/changelog/undistributed', './docs/changelog/undistributed.rst')"
+	@python3 -c "from ciscodistutils.make_changelog import main; main('./docs/changelog_plugins/undistributed', './docs/changelog_plugins/undistributed.rst')"
 	@echo ""
 	@echo "Done."
 	@echo ""

@@ -45,6 +45,8 @@ class GenericSettings(Settings):
         self.HA_RELOAD_TIMEOUT = 500
         self.RELOAD_TIMEOUT = 300
         self.RELOAD_WAIT = 240
+        self.POST_RELOAD_WAIT = 60
+        self.RELOAD_RECONNECT_ATTEMPTS = 3
         self.CONSOLE_TIMEOUT = 60
 
         # When connecting to a device via telnet, how long (in seconds)

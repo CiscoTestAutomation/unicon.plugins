@@ -3,6 +3,7 @@ __author__ = "Syed Raza <syedraza@cisco.com>"
 from unicon.statemachine import StateMachine
 from unicon.plugins.iosxr.patterns import IOSXRPatterns
 from unicon.plugins.iosxr.statements import IOSXRStatements
+from unicon.plugins.generic.statemachine import config_transition
 from unicon.statemachine import State, Path
 from unicon.eal.dialogs import Statement, Dialog
 
@@ -17,9 +18,15 @@ class IOSXRSingleRpStateMachine(StateMachine):
 
     # Make it easy for subclasses to pick these up.
     default_commands = default_commands
+    config_command = 'configure terminal'
 
     def __init__(self, hostname=None):
         super().__init__(hostname)
+        self.config_transition_statement_list = [
+            Statement(pattern=patterns.proceed_config_mode,
+                      action='sendline(no)',
+                      loop_continue=True)
+        ]
 
     def create(self):
         enable = State('enable', patterns.enable_prompt)
@@ -47,7 +54,7 @@ class IOSXRSingleRpStateMachine(StateMachine):
            ])
 
         enable_to_exclusive = Path(enable, exclusive, 'configure exclusive', None)
-        enable_to_config = Path(enable, config, 'configure terminal', None)
+        enable_to_config = Path(enable, config, config_transition, None)
         enable_to_run = Path(enable, run, 'run', None)
         enable_to_admin = Path(enable, admin, 'admin', None)
         admin_to_admin_conf = Path(admin, admin_conf, 'config', None)

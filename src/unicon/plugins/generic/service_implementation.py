@@ -12,6 +12,7 @@ Description:
 
 """
 
+import io
 import os
 import re
 import copy
@@ -20,6 +21,7 @@ import collections
 import ipaddress
 from itertools import chain
 import warnings
+from datetime import datetime, timedelta
 
 from time import sleep
 
@@ -28,7 +30,8 @@ from unicon.core.errors import SubCommandFailure, StateMachineError, \
     CopyBadNetworkError, TimeoutError
 from unicon.eal.dialogs import Dialog
 from unicon.eal.dialogs import Statement
-from unicon.plugins.generic.statements import chatty_term_wait, custom_auth_statements
+from unicon.plugins.generic.statements import (
+    chatty_term_wait, custom_auth_statements, buffer_settled)
 from unicon.plugins.generic.service_statements import reload_statement_list, \
     ping_dialog_list, extended_ping_dialog_list, copy_statement_list, \
     ha_reload_statement_list, switchover_statement_list, \
@@ -36,6 +39,7 @@ from unicon.plugins.generic.service_statements import reload_statement_list, \
 from unicon.plugins.generic.service_patterns import CopyPatterns
 from unicon.utils import AttributeDict, to_plaintext
 from unicon import logs
+from unicon.logs import UniconStreamHandler, UNICON_LOG_FORMAT
 
 from unicon.plugins.generic.utils import GenericUtils
 from .service_statements import execution_statement_list, configure_statement_list
@@ -985,9 +989,9 @@ class Reload(BaseService):
         reload_command: reload command to be issued. default is "reload"
         reload_creds: credential or list of credentials to use to respond to
                       username/password prompts.
-        dialog: Dialog which include list of Statements for
-                additional dialogs prompted by reload command, in-case
-                it is not in the current list.
+        reply: Dialog which include list of Statements for
+               additional dialogs prompted by reload command, in-case
+               it is not in the current list.
         timeout: Timeout value in sec, Default Value is 300 sec
         return_output: If True, return a namedtuple with result and output
                 result is True if reload is successful.
@@ -1011,6 +1015,10 @@ class Reload(BaseService):
         self.end_state = 'enable'
         self.timeout = connection.settings.RELOAD_TIMEOUT
         self.dialog = Dialog(reload_statement_list)
+        self.log_buffer = io.StringIO()
+        lb = UniconStreamHandler(self.log_buffer)
+        lb.setFormatter(logging.Formatter(fmt=UNICON_LOG_FORMAT))
+        self.connection.log.addHandler(lb)
         self.__dict__.update(kwargs)
 
     def call_service(self,
@@ -1024,12 +1032,14 @@ class Reload(BaseService):
         con = self.connection
         timeout = timeout or self.timeout
 
+        # Clear log buffer
+        self.log_buffer.seek(0)
+        self.log_buffer.truncate()
+
         fmt_msg = "+++ reloading  %s  " \
-                  " with reload_command %s " \
-                  "and timeout is %s +++"
-        con.log.debug(fmt_msg % (self.connection.hostname,
-                                 reload_command,
-                                 timeout))
+                  " with reload_command  '%s'  " \
+                  "and timeout is %s seconds +++"
+        con.log.info(fmt_msg % (self.connection.hostname, reload_command, timeout))
 
         if reply:
             if dialog:
@@ -1045,7 +1055,7 @@ class Reload(BaseService):
             raise SubCommandFailure(
                 "dialog passed must be an instance of Dialog")
 
-        dialog += self.dialog
+        dialog += self.service_dialog(service_dialog=self.dialog)
         custom_auth_stmt = custom_auth_statements(con.settings.LOGIN_PROMPT, con.settings.PASSWORD_PROMPT)
         if custom_auth_stmt:
             dialog += Dialog(custom_auth_stmt)
@@ -1056,31 +1066,66 @@ class Reload(BaseService):
         else:
             context = self.context
 
+        start_time = current_time = datetime.now()
+        timeout_time = timedelta(seconds=self.timeout)
         con.spawn.sendline(reload_command)
         try:
-            reload_output = dialog.process(con.spawn,
-                                           timeout=timeout,
-                                           prompt_recovery=self.prompt_recovery,
-                                           context=context)
-            con.state_machine.go_to(
-                'any',
-                con.spawn,
-                context=self.context,
-                prompt_recovery=self.prompt_recovery,
-                timeout=con.connection_timeout,
-                dialog=con.connection_provider.get_connection_dialog()
-            )
-            con.state_machine.go_to('enable',
-                                    con.spawn,
-                                    prompt_recovery=self.prompt_recovery,
-                                    context=self.context)
-        except Exception as err:
-            raise SubCommandFailure("Reload failed %s" % err) from err
-        con.state_machine.get_state(self.end_state)
-        self.result = True
-        if return_output:
-            self.result = ReloadResult(self.result, reload_output.match_output.replace(reload_command, '', 1))
+            try:
+                dialog.process(con.spawn,
+                               timeout=timeout,
+                               prompt_recovery=self.prompt_recovery,
+                               context=context)
+            except TimeoutError:
+                con.log.error('Reload timed out')
 
+            if not con.connected:
+                con.disconnect()
+                for x in range(con.settings.RELOAD_RECONNECT_ATTEMPTS):
+                    con.log.info('Waiting for {} seconds'.format(con.settings.RELOAD_WAIT / (x + 1)))
+                    sleep(con.settings.RELOAD_WAIT / (x + 1))
+                    try:
+                        con.log.info('Trying to connect... attempt #{}'.format(x + 1))
+                        con.connect()
+                    except Exception:
+                        con.log.warning('Connection to {} failed'.format(con.hostname))
+                        self.result = False
+                    if con.is_connected:
+                        self.result = True
+                        break
+            else:
+                con.log.info('Waiting for boot messages to settle for {} seconds'.format(
+                    con.settings.POST_RELOAD_WAIT
+                ))
+                wait_time = timedelta(seconds=con.settings.POST_RELOAD_WAIT)
+                settle_time = current_time = datetime.now()
+                while (current_time - settle_time) < wait_time:
+                    if buffer_settled(con.spawn, con.settings.POST_RELOAD_WAIT):
+                        con.log.info('Buffer settled, accessing device..')
+                        break
+                    current_time = datetime.now()
+                    if (current_time - start_time) > timeout_time:
+                        con.log.info('Time out, trying to acces device..')
+                        break
+
+                con.context = context
+                con.connection_provider.connect()
+                self.result = True
+
+        except Exception as err:
+            raise SubCommandFailure("Reload of device {} failed {}".format(con.hostname, err))
+
+        self.log_buffer.seek(0)
+        reload_output = self.log_buffer.read()
+        # clear buffer
+        self.log_buffer.truncate()
+
+        if return_output:
+            self.result = ReloadResult(self.result, reload_output)
+
+        if self.result:
+            con.log.info('--- Reload of device {} completed ---'.format(con.hostname))
+        else:
+            con.log.info('--- Reload of device {} failed ---'.format(con.hostname))
 
 class Traceroute(BaseService):
     """ Service to issue traceroute response request to another network from device.
@@ -1858,7 +1903,7 @@ class HAReloadService(BaseService):
         # TODO counter value must be moved to settings
         counter = 0
         fmt_str = "+++ reloading  %s  with reload_command %s and timeout is %s +++"
-        con.log.debug(fmt_str % (con.hostname, command, timeout))
+        con.log.info(fmt_str % (con.hostname, command, timeout))
         dialog += self.dialog
         dialog = self.service_dialog(handle=con.active,
                                      service_dialog=dialog)
@@ -1921,6 +1966,7 @@ class HAReloadService(BaseService):
         # Re-designate handles before applying config.
         # Roles could have switched as a result of the reload.
         con.connection_provider.designate_handles()
+        con.connection_provider.unlock_standby()
 
         con.active.state_machine.go_to('enable',
                                        con.active.spawn,
@@ -2124,19 +2170,7 @@ class SwitchoverService(BaseService):
             for command in exec_commands:
                 con.execute(command, prompt_recovery=self.prompt_recovery)
             config_commands = self.connection.settings.HA_INIT_CONFIG_COMMANDS
-            config_retry = 0
-            while config_retry < 20:
-                try:
-                    con.configure(config_commands,
-                                  prompt_recovery=self.prompt_recovery)
-                except Exception as err:
-                    if re.search("Config mode cannot be entered",
-                                 str(err)):
-                        sleep(9)
-                        con.active.spawn.sendline()
-                        config_retry += 1
-                else:
-                    config_retry = 21
+            con.configure(config_commands, prompt_recovery=self.prompt_recovery)
 
             # Clear Standby buffer
             con.standby.spawn.sendline("\r")
@@ -2538,4 +2572,3 @@ class Switchto(BaseService):
 
     def post_service(self, *args, **kwargs):
         pass
-
