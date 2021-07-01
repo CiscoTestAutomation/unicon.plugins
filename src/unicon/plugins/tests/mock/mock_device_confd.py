@@ -31,8 +31,6 @@ class MockDeviceNso(MockDevice):
 
 
 def main(args=None):
-    logging.basicConfig(stream=sys.stderr, level=logging.INFO,
-                        format="%(asctime)s [%(levelname)8s]:  %(message)s")
     if not args:
         parser = argparse.ArgumentParser()
         parser.add_argument('--state', help='initial state')

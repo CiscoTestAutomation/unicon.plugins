@@ -32,5 +32,5 @@ jobs:
       run: |
         make develop
         cd tests
-        python -m unittest discover -b -v 2> /dev/null
-      shell: bash
+        python -m unittest discover -b -v
+
