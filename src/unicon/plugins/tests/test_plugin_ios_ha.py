@@ -25,11 +25,10 @@ class TestIosPluginHAConnect(unittest.TestCase):
           Router:
             os: ios
             type: router
-            tacacs:
-                username: cisco
-            passwords:
-                tacacs: cisco
-                enable: cisco
+            credentials:
+                default:
+                    username: cisco
+                    password: cisco
             connections:
               defaults:
                 class: unicon.Unicon
