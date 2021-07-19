@@ -55,7 +55,9 @@ uni.log
 # Files resulting from a git meld merge
 *.orig
 
-
 # ignore auto generate docs
 docs/user_guide/services/service_dialogs.rst
 
+# .vscode
+.vscode
+.history
