@@ -4,8 +4,10 @@ BUILD_DIR     = $(shell pwd)/__build__
 DIST_DIR      = $(BUILD_DIR)/dist
 SOURCEDIR     = .
 PROD_USER     = pyadm@pyats-ci
-PROD_PKGS     = /auto/pyats/packages/cisco-shared
-PYTHON        = python
+PROD_PKGS     = /auto/pyats/packages
+STAGING_PKGS  = /auto/pyats/staging/packages
+STAGING_EXT_PKGS  = /auto/pyats/staging/packages_external
+PYTHON        = python3
 TESTCMD       = runAll --path=tests/
 BUILD_CMD     = $(PYTHON) setup.py bdist_wheel --dist-dir=$(DIST_DIR)
 PYPIREPO      = pypitest
@@ -17,23 +19,30 @@ DEPENDENCIES = robotframework pyyaml dill coverage Sphinx \
 
 
 .PHONY: clean package distribute develop undevelop help devnet\
-        docs test install_build_deps uninstall_build_deps
+        docs test install_build_deps uninstall_build_deps distribute_staging\
+        distribute_staging_external
 
 help:
 	@echo "Please use 'make <target>' where <target> is one of"
 	@echo ""
-	@echo "package               Build the package"
-	@echo "test                  Test the package"
-	@echo "distribute            Distribute the package to internal Cisco PyPi server"
-	@echo "clean                 Remove build artifacts"
-	@echo "develop               Build and install development package"
-	@echo "undevelop             Uninstall development package"
-	@echo "docs                  Build Sphinx documentation for this package"
-	@echo "install_build_deps    does nothing - just following pyATS pkg standard"
-	@echo "uninstall_build_deps  does nothing - just following pyATS pkg standard"
+	@echo "package                        Build the package"
+	@echo "test                           Test the package"
+	@echo "distribute                     Distribute the package to internal Cisco PyPi server"
+	@echo "distribute_staging             Distribute build pkgs to staging area"
+	@echo "distribute_staging_external    Distribute build pkgs to external staging area"
+	@echo "clean                          Remove build artifacts"
+	@echo "develop                        Build and install development package"
+	@echo "undevelop                      Uninstall development package"
+	@echo "docs                           Build Sphinx documentation for this package"
+	@echo "install_build_deps             does nothing - just following pyATS pkg standard"
+	@echo "uninstall_build_deps           does nothing - just following pyATS pkg standard"
+	@echo "changelogs			          Build compiled changelog file"
 	@echo ""
 
 install_build_deps:
+	@pip install --upgrade pip setuptools wheel
+	@echo ""
+	@echo "Done."
 	@echo ""
 
 uninstall_build_deps:
@@ -47,10 +56,12 @@ docs:
 	@echo "Building $(PKG_NAME) documentation for preview: $@"
 	@echo ""
 
-	python docs/gen_dialogs_rst.py > docs/user_guide/services/service_dialogs.rst
+	python3 docs/gen_dialogs_rst.py > docs/user_guide/services/service_dialogs.rst
 	sphinx-build -b html -c docs -d ./__build__/documentation/doctrees docs/ ./__build__/documentation/html
 
 	@echo "Completed building docs for preview."
+	@echo ""
+	@echo "Done."
 	@echo ""
 
 
@@ -68,6 +79,8 @@ package:
 	@echo ""
 	@echo "Completed building: $@"
 	@echo ""
+	@echo "Done."
+	@echo ""
 
 develop:
 	@echo ""
@@ -80,6 +93,8 @@ develop:
 	@echo ""
 	@echo "Completed building and installing: $@"
 	@echo ""
+	@echo "Done."
+	@echo ""
 
 undevelop:
 	@echo ""
@@ -91,6 +106,8 @@ undevelop:
 
 	@echo ""
 	@echo "Completed uninstalling: $@"
+	@echo ""
+	@echo "Done."
 	@echo ""
 
 clean:
@@ -112,6 +129,39 @@ distribute:
 	@test -d $(DIST_DIR) || { echo "Nothing to distribute! Exiting..."; exit 1; }
 	@ssh -q $(PROD_USER) 'test -e $(PROD_PKGS)/$(PKG_NAME) || mkdir $(PROD_PKGS)/$(PKG_NAME)'
 	@scp $(DIST_DIR)/* $(PROD_USER):$(PROD_PKGS)/$(PKG_NAME)/
+	@echo ""
+	@echo "Done."
+	@echo ""
+
+distribute_staging:
+	@echo ""
+	@echo "--------------------------------------------------------------------"
+	@echo "Copying all distributable to $(STAGING_PKGS)"
+	@test -d $(DIST_DIR) || { echo "Nothing to distribute! Exiting..."; exit 1; }
+	@ssh -q $(PROD_USER) 'test -e $(STAGING_PKGS)/$(PKG_NAME) || mkdir $(STAGING_PKGS)/$(PKG_NAME)'
+	@scp $(DIST_DIR)/* $(PROD_USER):$(STAGING_PKGS)/$(PKG_NAME)/
+	@echo ""
+	@echo "Done."
+	@echo ""
+
+distribute_staging_external:
+	@echo ""
+	@echo "--------------------------------------------------------------------"
+	@echo "Copying all distributable to $(STAGING_EXT_PKGS)"
+	@test -d $(DIST_DIR) || { echo "Nothing to distribute! Exiting..."; exit 1; }
+	@ssh -q $(PROD_USER) 'test -e $(STAGING_EXT_PKGS)/$(PKG_NAME) || mkdir $(STAGING_EXT_PKGS)/$(PKG_NAME)'
+	@scp $(DIST_DIR)/* $(PROD_USER):$(STAGING_EXT_PKGS)/$(PKG_NAME)/
+	@echo ""
+	@echo "Done."
+	@echo ""
+
+changelogs:
+	@echo ""
+	@echo "--------------------------------------------------------------------"
+	@echo "Generating changelog file"
+	@echo ""
+	@python3 -c "from ciscodistutils.make_changelog import main; main('./docs/changelog/undistributed', './docs/changelog/undistributed.rst')"
+	@python3 -c "from ciscodistutils.make_changelog import main; main('./docs/changelog_plugins/undistributed', './docs/changelog_plugins/undistributed.rst')"
 	@echo ""
 	@echo "Done."
 	@echo ""

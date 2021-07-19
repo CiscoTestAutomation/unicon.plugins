@@ -43,6 +43,15 @@ cat3k_password:
   commands:
     "cisco":
       new_state: cat3k_exec
+    "cisco1":
+      response: Password OK
+      new_state: cat3k_password_ok_prompt
+
+cat3k_password_ok_prompt:
+  prompt: ""
+  commands:
+    "":
+      new_state: cat3k_exec
 
 cat3k_exec:
   prompt: "Router>"

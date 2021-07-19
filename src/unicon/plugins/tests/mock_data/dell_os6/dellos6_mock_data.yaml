@@ -1,0 +1,37 @@
+connect_ssh:
+  preface: |
+    The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
+    RSA key fingerprint is a1:07:ac:9b:8c:c2:db:c5:4c:dc:70:b5:09:2a:a5:b1.
+  prompt: "Are you sure you want to continue connecting (yes/no)? "
+  commands:
+    "yes":
+      new_state: user_access_veri
+
+exec:
+  prompt: "DellOS6#"
+  commands:
+    "show ip interface" : |
+      "Default Gateway................................ 0.0.0.0
+      L3 MAC Address................................. F8B1.5683.8734
+
+      Routing Interfaces:
+
+      Interface    State   IP Address      IP Mask         Method
+      ----------   -----   --------------- --------------- -------
+      Vl1          Down    0.0.0.0         0.0.0.0         DHCP
+      Vl20         Up      10.10.21.70     255.255.255.0   DHCP"
+
+
+user_access_veri:
+  preface: User Access Verification
+  prompt: "login: "
+  commands:
+    "knox":
+      new_state: user_password
+
+user_password:
+  prompt: "Password: "
+  commands:
+    "dell1111":
+      new_state: exec
+

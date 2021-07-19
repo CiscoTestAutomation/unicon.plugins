@@ -25,7 +25,6 @@ class Switchto(BaseService):
     def __init__(self, connection, context, **kwargs):
         # Connection object will have all the received details
         super().__init__(connection, context, **kwargs)
-        self.service_name = 'switchto'
         self.timeout = connection.settings.EXEC_TIMEOUT
         self.context = context
 

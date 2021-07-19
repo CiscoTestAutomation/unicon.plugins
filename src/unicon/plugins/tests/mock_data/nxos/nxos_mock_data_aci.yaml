@@ -1,0 +1,79 @@
+
+n9k_connect:
+  preface: Escape character is '^]'.
+  prompt: ""
+  commands:
+    "":
+      new_state: n9k_exec
+
+n9k_exec:
+  prompt: "%N#"
+  commands:
+    "reload":
+      new_state: n9k_reload_proceed
+    "acidiag touch clean;reload":
+      new_state: n9k_wipe_proceed
+    "attach console module 1":
+      new_state: console_escape
+    "attach module 1":
+      new_state: attach_module
+    "vsh_lc":
+      new_state: vsh
+
+
+vsh:
+  prompt: "module-1# "
+  commands:
+    "exit":
+      new_state: n9k_exec
+
+n9k_wipe_proceed:
+  prompt: "This command will wipe out this device, Proceed? [y/N] "
+  commands:
+    "y" :
+      new_state: n9k_reload_proceed
+
+n9k_reload_proceed:
+  prompt: "This command will reload the chassis, Proceed (y/n)? [n]: "
+  commands:
+    "y":
+      response: file|mock_data/nxos/nxos_aci_reload.txt
+      timing:
+        - 0:,0,0.005
+      new_state: n9k_login
+
+n9k_login:
+  preface: |
+    Launching getty with console speed:9600
+
+    User Access Verification
+  prompt: "%N login: "
+  commands:
+    "admin":
+      new_state: n9k_password
+
+n9k_password:
+  prompt: "Password: "
+  commands:
+    "cisco123":
+      new_state: n9k_exec
+
+
+# (none) login: admin
+# ********************************************************************************
+#      Fabric discovery in progress, show commands are not fully functional
+#      Logout and Login after discovery to continue to use show commands.
+# ********************************************************************************
+# (none)# 
+# 2018-09-04T10:31:19: %UNICON-INFO: Waiting up to 480 seconds for discovery to finish
+# [  120.258036] t2usd_tor (6603) Ran 4117 msecs in last 5020 msecs
+# [  125.337748] t2usd_tor (6603) Ran 4939 msecs in last 5004 msecs
+# [  150.923929] t2usd_tor (6603) Ran 5324 msecs in last 5472 msecs
+# [  156.225099] t2usd_tor (6603) Ran 5222 msecs in last 5228 msecs
+# [  161.946676] t2usd_tor (6603) Ran 5646 msecs in last 5648 msecs
+
+# Broadcast message from root@%N (Tue Sep  4 00:26:21 2018):
+
+# This switch is now part of the ACI fabric. Please re-login with the right credentials.
+
+

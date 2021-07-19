@@ -188,6 +188,56 @@ class TestNxosCopyService(unittest.TestCase):
                         vrf='dnsvrf', user='dnsuser', password='dnspwd')
 
 
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
+class TestIosXeCopyService(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.d = Connection(hostname='Router',
+                           start=['mock_device_cli --os iosxe --state enable_isr'],
+                           os='iosxe')
+        cls.d.connect()
+        cls.md = mock_device.MockDevice(device_os='iosxe', state='enable_isr')
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.d.disconnect()
+
+    def test_to_tftp(self):
+        output = self.d.copy(
+            source='tftp:',
+            dest='bootflash:',
+            source_file='test',
+            dest_file='test2',
+            server='10.1.6.243',
+            vrf='Mgmt-intf',
+        )
+        output = '\n'.join(output.splitlines())
+        expected_output = \
+            self.md.mock_data['copy_to_tftp_dest_filename_overwrite']\
+            ['commands']['y']['response']
+        expected_output = '\n'.join(expected_output.splitlines())
+        self.assertIn(expected_output, output)
+
+    def test_from_tftp(self):
+        output = self.d.copy(
+            source='bootflash:',
+            dest='tftp:',
+            source_file='test2',
+            dest_file='test',
+            server='10.1.6.243',
+            vrf='Mgmt-intf',
+        )
+        output = '\n'.join(output.splitlines())
+        expected_output = \
+            self.md.mock_data['copy_from_tftp_dest_filename']\
+            ['commands']['test']['response']
+        expected_output = '\n'.join(expected_output.splitlines())
+        self.assertIn(expected_output, output)
+
+
+
 class TestMaxAttempts(unittest.TestCase):
     def setUp(self):
         self.md = MockDeviceTcpWrapperIOS(port=0, state='enable')

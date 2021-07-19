@@ -1,0 +1,443 @@
+Router#
+redundancy force-Routerover
+
+System configuration has been modified. Save? [yes/no]: no
+Proceed with Routerover to standby RP? [confirm]
+    Manual Swact = enabled
+Jul  6 22:27:26.843: %PMAN-3-RELOAD_RP: R1/0: pvp: Reloading: RP Routerover initiated. This RP will be reloaded
+Jul  6 22:27:42.217: %PMAN-3-RELOAD_RP: C9/0: Reloading: RP will be reloaded
+Jul  6 22:27:42.294: %PMAN-3-RELOAD_RP: C6/0: Reloading: RP will be reloaded
+Jul  6 22:27:42.307: %PMAN-3-RELOAD_RP: C3/0: Reloading: RP will be reloaded
+Jul  6 22:27:42.223: %PMAN-3-RELOAD_RP: C7/0: Reloading: RP will be reloaded
+Jul  6 22:27:42.223: %PMAN-3-RELOAD_RP: C10/0: Reloading: RP will be reloaded
+Jul  6 22:27:42.329: %PMAN-3-RELOAD_RP: C5/0: Reloading: RP will be reloaded
+Jul  6 22:27:42.321: %PMAN-3-RELOAD_RP: C2/0: Reloading: RP will be reloaded
+Jul  6 22:27:42.318: %PMAN-3-RELOAD_RP: C4/0: Reloading: RP will be reloaded
+Jul  6 22:27:42.340: %PMAN-3-RELOA1/0: Reloading: RP will be reloaded
+Jul  6 22:27:42.314: %PMAN-3-RELOAD_RP: C8/0: Reloading: RP will be reloaded
+
+
+
+Initializing Hardware......
+
+System Bootstrap, Version 17.3.1r[FC2], RELEASE SOFTWARE (P)
+Compiled Wed 04/29/2020 12:55:25.08 by rel
+
+Current ROMMON image : Primary
+Last reset cause     : SoftwareResetTrig
+C9400-SUP-1XL-Y platform with 16777216 Kbytes of main memory
+
+Preparing to autoboot. [Press Ctrl-C to interrupt]  0
+boot: attempting to boot from [flash:cat9k_iosxe.BLD_POLARIS_DEV_LATEST_20200701_053046_2.SSA.bin]
+boot: reading file cat9k_iosxe.BLD_POLARIS_DEV_LATEST_20200701_053046_2.SSA.bin
+############################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################
+
+
+
+*Jul 06 22:30:46.260: %IOSXEBOOT-4-SMART_LOG: (local/local): Mon Jul 6 22:30:46 Universal 2020 INFO: Starting SMART daemon
+
+              Restricted Rights Legend
+
+Use, duplication, or disclosure by the Government is
+subject to restrictions as set forth in subparagraph
+(c) of the Commercial Computer Software - Restricted
+Rights clause at FAR sec. 52.227-19 and subparagraph
+(c) (1) (ii) of the Rights in Technical Data and Computer
+Software clause at DFARS sec. 252.227-7013.
+
+           Cisco Systems, Inc.
+           170 West Tasman Drive
+           San Jose, California 95134-1706
+
+
+
+Cisco IOS Software [Amsterdam], Catalyst L3 Router Software (CAT9K_IOSXE), Experimental Version 17.4.20200701:054524 [S2C-build-polaris_dev-116847-/nobackup/mcpre/BLD-BLD_POLARIS_DEV_LATEST_20200701_053046 269]
+Copyright (c) 1986-2020 by Cisco Systems, Inc.
+Compiled Wed 01-Jul-20 07:31 by mcpre
+
+
+This software version supports only Smart Licensing as the software licensing mechanism.
+
+
+PLEASE READ THE FOLLOWING TERMS CAREFULLY. INSTALLING THE LICENSE OR
+LICENSE KEY PROVIDED FOR ANY CISCO SOFTWARE PRODUCT, PRODUCT FEATURE,
+AND/OR SUBSEQUENTLY PROVIDED SOFTWARE FEATURES (COLLECTIVELY, THE
+"SOFTWARE"), AND/OR USING SUCH SOFTWARE CONSTITUTES YOUR FULL
+ACCEPTANCE OF THE FOLLOWING TERMS. YOU MUST NOT PROCEED FURTHER IF YOU
+ARE NOT WILLING TO BE BOUND BY ALL THE TERMS SET FORTH HEREIN.
+
+Your use of the Software is subject to the Cisco End User License Agreement
+(EULA) and any relevant supplemental terms (SEULA) found at
+http://www.cisco.com/c/en/us/about/legal/cloud-and-software/software-terms.html.
+
+You hereby acknowledge and agree that certain Software and/or features are
+licensed for a particular term, that the license to such Software and/or
+features is valid only for the applicable term and that such Software and/or
+features may be shut down or otherwise terminated by Cisco after expiration
+of the applicable license term (e.g., 90-day trial period). Cisco reserves
+the right to terminate any such Software feature electronically or by any
+other means available. While Cisco may provide alerts, it is your sole
+responsibility to monitor your usage of any such term Software feature to
+ensure that your systems and networks are prepared for a shutdown of the
+Software feature.
+
+
+
+FIPS key on Standby is not configured.
+If Active is  FIPS configured, please make sure to configure FIPS on Standby also.
+Else Router is in non-standard operating mode.
+
+All TCP AO KDF Tests Pass
+
+ERROR: Unable to read RMI INTERFACE '-1'
+
+ERROR: Unable to read RMI IPv6 Local '-1'
+cisco K8730L (X86) processor (revision V01) with 1851747K/6147K bytes of memory.
+Processor board ID ABS3248Y2SK
+32768K bytes of non-volatile configuration memory.
+16002516K bytes of physical memory.
+10444800K bytes of Bootflash at bootflash:.
+1638400K bytes of Crash Files at crashinfo:.
+234430023K bytes of SATA hard disk at disk0:.
+
+Base Ethernet MAC Address          : 11:cc:2l:84:9u:k1
+Motherboard Assembly Number        : 29CLN
+Motherboard Serial Number          : ABS114400CL
+Model Revision Number              : V02
+Motherboard Revision Number        : 4
+Model Number                       : K8730L
+System Serial Number               : ABS3248Y2SK
+
+Router#
+Router#
+Router#
+Router#
+
+2020-07-06 18:33:11,206: %UNICON-INFO: +++ Router: get_rp_state +++
+
+2020-07-06 18:33:11,207: %UNICON-INFO: +++ Router: execute +++
+
+2020-07-06 18:33:11,208: %UNICON-INFO: +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = in progress to standby cold-config
+    Manual Swact = disabled (peer unit not yet in terminal standby state)
+Router#
+
+2020-07-06 18:33:11,849: %UNICON-INFO: +++ Router: execute +++
+
+2020-07-06 18:33:11,850: %UNICON-INFO: +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = sso
+Router#
+
+Router#
+Router#
+
+2020-07-06 18:33:21,450: %UNICON-INFO: +++ Router: get_rp_state +++
+
+2020-07-06 18:33:21,450: %UNICON-INFO: +++ Router: execute +++
+
+2020-07-06 18:33:21,451: %UNICON-INFO: +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = in progress to standby cold-config
+    Manual Swact = disabled (peer unit not yet in terminal standby state)
+Router#
+
+2020-07-06 18:33:22,088: %UNICON-INFO: +++ Router: execute +++
+
+2020-07-06 18:33:22,088: %UNICON-INFO: +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = sso
+Router#
+
+Router#
+Router#
+
+2020-07-06 18:33:31,657: %UNICON-INFO: +++ Router: get_rp_state +++
+
+2020-07-06 18:33:31,657: %UNICON-INFO: +++ Router: execute +++
+
+2020-07-06 18:33:31,658: %UNICON-INFO: +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = in progress to standby cold-config
+    Manual Swact = disabled (peer unit not yet in terminal standby state)
+Router#
+
+2020-07-06 18:33:32,116: %UNICON-INFO: +++ Router: execute +++
+
+2020-07-06 18:33:32,116: %UNICON-INFO: +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = sso
+Router#
+
+Router#
+Router#
+
+2020-07-06 18:33:41,707: %UNICON-INFO: +++ Router: get_rp_state +++
+
+2020-07-06 18:33:41,707: %UNICON-INFO: +++ Router: execute +++
+
+2020-07-06 18:33:41,709: %UNICON-INFO: +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = in progress to standby cold-config
+    Manual Swact = disabled (peer unit not yet in terminal standby state)
+Router#
+
+2020-07-06 18:33:42,367: %UNICON-INFO: +++ Router: execute +++
+
+2020-07-06 18:33:42,367: %UNICON-INFO: +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = sso
+Router#
+
+Router#
+Router#
+
+2020-07-06 18:33:51,956: %UNICON-INFO: +++ Router: get_rp_state +++
+
+2020-07-06 18:33:51,956: %UNICON-INFO: +++ Router: execute +++
+
+2020-07-06 18:33:51,957: %UNICON-INFO: +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = in progress to standby cold-config
+    Manual Swact = disabled (peer unit not yet in terminal standby state)
+Router#
+
+2020-07-06 18:33:52,596: %UNICON-INFO: +++ Router: execute +++
+
+2020-07-06 18:33:52,597: %UNICON-INFO: +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = sso
+Router#
+
+Router#
+Router#
+
+2020-07-06 18:34:02,186: %UNICON-INFO: +++ Router: get_rp_state +++
+
+2020-07-06 18:34:02,186: %UNICON-INFO: +++ Router: execute +++
+
+2020-07-06 18:34:02,187: %UNICON-INFO: +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = in progress to standby cold-config
+    Manual Swact = disabled (peer unit not yet in terminal standby state)
+Router#
+
+2020-07-06 18:34:02,634: %UNICON-INFO: +++ Router: execute +++
+
+2020-07-06 18:34:02,635: %UNICON-INFO: +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = sso
+Router#
+
+Router#
+Router#
+
+2020-07-06 18:34:12,233: %UNICON-INFO: +++ Router: get_rp_state +++
+
+2020-07-06 18:34:12,233: %UNICON-INFO: +++ Router: execute +++
+
+2020-07-06 18:34:12,234: %UNICON-INFO: +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = in progress to standby cold-config
+    Manual Swact = disabled (peer unit not yet in terminal standby state)
+Router#
+
+2020-07-06 18:34:12,886: %UNICON-INFO: +++ Router: execute +++
+
+2020-07-06 18:34:12,887: %UNICON-INFO: +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = sso
+Router#
+
+Router#
+Router#
+
+2020-07-06 18:34:22,463: %UNICON-INFO: +++ Router: get_rp_state +++
+
+2020-07-06 18:34:22,463: %UNICON-INFO: +++ Router: execute +++
+
+2020-07-06 18:34:22,464: %UNICON-INFO: +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = in progress to standby cold-config
+    Manual Swact = disabled (peer unit not yet in terminal standby state)
+Router#
+
+2020-07-06 18:34:23,138: %UNICON-INFO: +++ Router: execute +++
+
+2020-07-06 18:34:23,139: %UNICON-INFO: +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = sso
+Router#
+
+Router#
+Router#
+
+2020-07-06 18:34:32,924: %UNICON-INFO: +++ Router: get_rp_state +++
+
+2020-07-06 18:34:32,925: %UNICON-INFO: +++ Router: execute +++
+
+2020-07-06 18:34:32,926: %UNICON-INFO: +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = in progress to standby cold-filesys
+    Manual Swact = disabled (peer unit not yet in terminal standby state)
+Router#
+
+2020-07-06 18:34:33,396: %UNICON-INFO: +++ Router: execute +++
+
+2020-07-06 18:34:33,397: %UNICON-INFO: +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = sso
+Router#
+
+Router#
+Router#
+
+2020-07-06 18:34:43,168: %UNICON-INFO: +++ Router: get_rp_state +++
+
+2020-07-06 18:34:43,169: %UNICON-INFO: +++ Router: execute +++
+
+2020-07-06 18:34:43,170: %UNICON-INFO: +++ Router: executing command 'show redundancy sta |  in peer' +++
+show redundancy sta |  in peer
+     peer state = 8  -STANDBY HOT
+Router#
+
+2020-07-06 18:34:43,591: %UNICON-INFO: +++ Router: execute +++
+
+2020-07-06 18:34:43,592: %UNICON-INFO: +++ Router: executing command 'show redundancy sta | inc Redundancy State' +++
+show redundancy sta | inc Redundancy State
+Redundancy State              = sso
+Router#
+
+Router#
+Router#
+
+2020-07-06 18:34:46,229: %UNICON-INFO: +++ Router: execute +++
+
+2020-07-06 18:34:46,230: %UNICON-INFO: +++ Router: executing command 'term length 0' +++
+term length 0
+Router#
+
+2020-07-06 18:34:46,552: %UNICON-INFO: +++ Router: execute +++
+
+2020-07-06 18:34:46,553: %UNICON-INFO: +++ Router: executing command 'term width 0' +++
+term width 0
+Router#
+
+2020-07-06 18:34:46,858: %UNICON-INFO: +++ Router: execute +++
+
+2020-07-06 18:34:46,859: %UNICON-INFO: +++ Router: executing command 'show version' +++
+show version
+Cisco IOS XE Software, Version BLD_POLARIS_DEV_LATEST_20200701_053046_2
+Cisco IOS Software [Amsterdam], Catalyst L3 Router Software (CAT9K_IOSXE), Experimental Version 17.4.20200701:054524 [S2C-build-polaris_dev-116847-/nobackup/mcpre/BLD-BLD_POLARIS_DEV_LATEST_20200701_053046 269]
+Copyright (c) 1986-2020 by Cisco Systems, Inc.
+Compiled Wed 01-Jul-20 07:31 by mcpre
+
+
+Cisco IOS-XE software, Copyright (c) 2005-2020 by cisco Systems, Inc.
+All rights reserved.  Certain components of Cisco IOS-XE software are
+licensed under the GNU General Public License ("GPL") Version 2.0.  The
+software code licensed under GPL Version 2.0 is free software that comes
+with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+GPL code under the terms of GPL Version 2.0.  For more details, see the
+documentation or "License Notice" file accompanying the IOS-XE software,
+or the applicable URL provided on the flyer accompanying the IOS-XE
+software.
+
+
+ROM: IOS-XE ROMMON
+BOOTLDR: System Bootstrap, Version 17.3.1r[FC2], RELEASE SOFTWARE (P)
+
+Router uptime is 2 days, 2 hours, 21 minutes
+Uptime for this control processor is 11 minutes
+System returned to ROM by SSO Routerover
+System image file is "flash:cat9k_iosxe.BLD_POLARIS_DEV_LATEST_20200701_053046_2.SSA.bin"
+Last reload reason: Force Failover
+
+
+
+This product contains cryptographic features and is subject to United
+States and local country laws governing import, export, transfer and
+use. Delivery of Cisco cryptographic products does not imply
+third-party authority to import, export, distribute or use encryption.
+Importers, exporters, distributors and users are responsible for
+compliance with U.S. and local country laws. By using this product you
+agree to comply with applicable laws and regulations. If you are unable
+to comply with U.S. and local laws, return this product immediately.
+
+A summary of U.S. laws governing Cisco cryptographic products may be found at:
+http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+If you require further assistance please contact us by sending email to
+export@cisco.com.
+
+
+Technology Package License Information:
+
+------------------------------------------------------------------------------
+Technology-package                                     Technology-package
+Current                        Type                       Next reboot
+------------------------------------------------------------------------------
+network-advantage   	Smart License                 	 network-advantage
+dna-advantage       	Subscription Smart License    	 dna-advantage
+AIR License Level: AIR DNA Advantage
+Next reload AIR license Level: AIR DNA Advantage
+
+
+Smart Licensing Status: Registration Not Applicable/Not Applicable
+
+cisco K8730L (X86) processor (revision V01) with 1851747K/6147K bytes of memory.
+Processor board ID ABS3248Y2SK
+2 Virtual Ethernet interfaces
+336 Gigabit Ethernet interfaces
+64 Ten Gigabit Ethernet interfaces
+4 TwentyFive Gigabit Ethernet interfaces
+4 Forty Gigabit Ethernet interfaces
+32768K bytes of non-volatile configuration memory.
+16002516K bytes of physical memory.
+10444800K bytes of Bootflash at bootflash:.
+1638400K bytes of Crash Files at crashinfo:.
+234430023K bytes of SATA hard disk at disk0:.
+1638400K bytes of Crash Files at crashinfo-1-1:.
+10444800K bytes of Bootflash at bootflash-1-1:.
+234430023K bytes of SATA hard disk at disk0-1-1:.
+
+Base Ethernet MAC Address          : 11:cc:2l:84:9u:k1
+Motherboard Assembly Number        : 29CLN
+Motherboard Serial Number          : ABS114400CL
+Model Revision Number              : V02
+Motherboard Revision Number        : 4
+Model Number                       : K8730L
+System Serial Number               : ABS3248Y2SK
+
+Router#
+
+2020-07-06 18:34:51,188: %UNICON-INFO: +++ Router: config +++
+config term
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#no logging console
+Router(config)#line console 0
+Router(config-line)#exec-timeout 0
+Router(config-line)#end
+Router#
+
+ WARNING: Command has been added to the configuration using a type 0 password. However, type 0 passwords will soon be deprecated. Migrate to a supported password type
+
+
+Press RETURN to get started!
+
+
+
+User Access Verification
+
+Username: admin1
+Password:
+
+Router-stby>
+
+2020-07-06 18:35:02,913: %UNICON-INFO: +++ Router: enable +++
+enable
+Router-stby#
+
+2020-07-06 18:35:03,117: %UNICON-INFO: Routerover is Successful
+True

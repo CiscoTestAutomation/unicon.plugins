@@ -30,15 +30,27 @@ class IOSXRSettings(GenericSettings):
 
         self.RELOAD_TIMEOUT = 400
         self.RELOAD_WAIT = 60
+        # number of retries to reconnect after reloading
+        self.RELOAD_RECONNECT_ATTEMPTS = 3
 
         self.STANDBY_STATE_REGEX = r'Backup node .* is (.*)'
         self.STANDBY_EXPECTED_STATE = ['ready', 'NSR-ready']
         self.STANDBY_STATE_INTERVAL = 15
         self.ERROR_PATTERN = [
-            r'^%\s*[Ii]nvalid (command|input)',
-            r'^%\s*[Ii]ncomplete (command|input)',
-            r'^%\s*[Aa]mbiguous (command|input)'
+            r'^%\s*Failed to commit.*',
+            r'^%\s*[Ii]nvalid (command|input).*',
+            r'^%\s*[Ii]ncomplete (command|input).*',
+            r'^%\s*[Aa]mbiguous (command|input).*',
+            r'^%\s*Unmatched +quote.*',
+            r'^%\s*Error +parsing +piping+ string\. +Quitting.*'
+        ]
+        self.CONFIGURE_ERROR_PATTERN = [
+            r'^%\s*[Ii]nvalid (command|input|number)',
+            r'^%\s*Failed to commit.*'
         ]
 
         self.EXECUTE_MATCHED_RETRIES = 1
         self.EXECUTE_MATCHED_RETRY_SLEEP = 0.1
+
+        self.CONFIG_LOCK_RETRIES = 5
+        self.CONFIG_LOCK_RETRY_SLEEP = 30

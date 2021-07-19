@@ -42,7 +42,6 @@ class Reload(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'enable'
         self.end_state = 'enable'
-        self.service_name = 'reload'
         self.timeout = connection.settings.RELOAD_TIMEOUT
         self.dialog = Dialog(reload_statement_list)
         self.dialog.append(boot_reached)
@@ -74,6 +73,7 @@ class Reload(BaseService):
                 prompt_recovery=self.prompt_recovery)
             con.state_machine.go_to(['disable', 'enable'], con.spawn,
                                     context=context,
+                                    timeout=con.connection_timeout,
                                     prompt_recovery=self.prompt_recovery)
         except Exception as err:
             raise SubCommandFailure("Reload failed : {}".format(err))
@@ -135,7 +135,6 @@ class Shell(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'shell'
         self.end_state = 'enable'
-        self.service_name = 'shellexec'
         self.timeout = connection.settings.EXEC_TIMEOUT
         self.transition_timeout = connection.settings.STATE_TRANSITION_TIMEOUT
         self.shell_enable = False
@@ -205,7 +204,6 @@ class Rommon(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'rommon'
         self.end_state = 'rommon'
-        self.service_name = 'rommon'
         self.local_end_state = None
         self.timeout = connection.settings.EXEC_TIMEOUT
 

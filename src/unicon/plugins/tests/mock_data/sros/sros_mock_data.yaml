@@ -1,0 +1,156 @@
+connect_ssh:
+  preface: |
+    The authenticity of host '10.1.1.11 (10.1.1.11)' can't be established.
+    RSA key fingerprint is SHA256:P/qy6JmBo6zhNK1M0zEYRW7bc2EsFdA6CJrZCb8qkiA.
+  prompt: "Are you sure you want to continue connecting (yes/no)? "
+  commands:
+    "yes":
+      new_state: password
+
+password:
+  prompt: "grpc@10.1.1.11's password: "
+  commands:
+    "nokia":
+      new_state: mdcli_execute
+
+mdcli_execute:
+  prompt: "[]\r\nA:grpc@%N# "
+  commands:
+    "show version": |
+      TiMOS-C-19.10.R1 cpm/hops64 Nokia 7950 XRS Copyright (c) 2000-2019 Nokia.
+      All rights reserved. All use subject to applicable license agreements.
+      Built on Wed Oct 30 21:21:34 PDT 2019 by builder in /builds/c/1910B/R1/panos/main
+    "show router interface coreloop": |
+
+      ===============================================================================
+      Interface Table (Router: Base)
+      ===============================================================================
+      Interface-Name                   Adm       Opr(v4/v6)  Mode    Port/SapId
+         IP-Address                                                  PfxState
+      -------------------------------------------------------------------------------
+      coreloop                         Up        Up/Down     Network loopback
+         1.1.1.1/32                                                n/a
+      -------------------------------------------------------------------------------
+      Interfaces : 1
+      ===============================================================================
+    "show":
+      new_state: mdcli_execute_show
+    "exit": ""
+    "configure private":
+      new_state: mdcli_configure_private
+    "configure global":
+      new_state: mdcli_configure_global
+    "environment console length 512": ""
+    "environment console width 512": ""
+  keys:
+    'ctrl-z': ""
+    "//":
+      response: |
+        INFO: CLI #2051: Switching to the classic CLI engine
+      new_state: classiccli_execute
+
+mdcli_execute_show:
+  prompt: "[show]\r\nA:grpc@%N# "
+  commands:
+    "version": |
+      TiMOS-C-19.10.R1 cpm/hops64 Nokia 7950 XRS Copyright (c) 2000-2019 Nokia.
+      All rights reserved. All use subject to applicable license agreements.
+      Built on Wed Oct 30 21:21:34 PDT 2019 by builder in /builds/c/1910B/R1/panos/main
+    "router interface coreloop": |
+
+      ===============================================================================
+      Interface Table (Router: Base)
+      ===============================================================================
+      Interface-Name                   Adm       Opr(v4/v6)  Mode    Port/SapId
+         IP-Address                                                  PfxState
+      -------------------------------------------------------------------------------
+      coreloop                         Up        Up/Down     Network loopback
+         1.1.1.1/32                                                n/a
+      -------------------------------------------------------------------------------
+      Interfaces : 1
+      ===============================================================================
+    "exit":
+      new_state: mdcli_execute
+  keys:
+    "ctrl-z":
+      new_state: mdcli_execute
+
+mdcli_configure_global:
+  prompt: "[gl:configure]\r\nA:grpc@%N# "
+  keys:
+    "ctrl-z":
+      new_state: mdcli_execute
+  commands:
+    "exit":
+      new_state: mdcli_execute
+    "router interface coreloop ipv4 primary address 1.1.1.1 prefix-length 32": |
+
+      *
+    "commit": ""
+
+mdcli_configure_private:
+  prompt: "[pr:configure]\r\nA:grpc@%N# "
+  keys:
+    "ctrl-z":
+      new_state: mdcli_configure_private_discard_uncommitted
+  commands:
+    "exit":
+      new_state: mdcli_configure_private_discard_uncommitted
+    "router interface coreloop ipv4 primary address 2.2.2.2 prefix-length 32": |
+
+      *
+    "commit": |
+      MINOR: COMMON #238: configure router "Base" interface "coreloop" ipv4 primary - Configuration change failed validation - Duplicate address - already on interface "To-TOROON6311W-BE30"
+
+      *
+
+mdcli_configure_private_discard_uncommitted:
+  preface: |
+    INFO: CLI #2071: Uncommitted changes are present in the candidate configuration. Exiting private configuration mode will discard those changes.
+
+  prompt: "Discard uncommitted changes? [y,n] "
+  commands:
+    "n":
+      response: |
+
+        *
+      new_state: mdcli_configure_private
+
+    "y":
+      response: |
+        WARNING: CLI #2073: Exiting private configuration mode - uncommitted changes are discarded
+      new_state: mdcli_execute
+
+classiccli_execute:
+  prompt: "A:%N# "
+  commands:
+    "show version": |
+      TiMOS-C-19.10.R1 cpm/hops64 Nokia 7950 XRS Copyright (c) 2000-2019 Nokia.
+      All rights reserved. All use subject to applicable license agreements.
+      Built on Wed Oct 30 21:21:34 PDT 2019 by builder in /builds/c/1910B/R1/panos/main
+    "show router interface coreloop": |
+
+      ===============================================================================
+      Interface Table (Router: Base)
+      ===============================================================================
+      Interface-Name                   Adm       Opr(v4/v6)  Mode    Port/SapId
+         IP-Address                                                  PfxState
+      -------------------------------------------------------------------------------
+      coreloop                         Up        Up/Down     Network loopback
+         2.2.2.2/32                                                n/a
+      -------------------------------------------------------------------------------
+      Interfaces : 1
+      ===============================================================================
+    "exit": ""
+    "configure router interface coreloop address 111.1.1.1 255.255.255.255":
+      response: |
+        MINOR: CLI Modification of the configuration is not allowed - 'model-driven' management interface configuration mode active
+    "commit": ""
+    "environment no more": ""
+    "environment no saved-ind-prompt": ""
+  keys:
+    "ctrl-z": ""
+    "//":
+      response: |
+        INFO: CLI #2052: Switching to the MD-CLI engine
+      new_state: mdcli_execute

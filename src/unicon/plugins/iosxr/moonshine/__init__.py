@@ -2,13 +2,13 @@ __author__ = "Isobel Ormiston <iormisto@cisco.com>"
 
 from unicon.plugins.iosxr.moonshine.settings import MoonshineSettings
 from unicon.plugins.iosxr.moonshine.statemachine import MoonshineSingleRpStateMachine, MoonshineDualRpStateMachine
-from unicon.plugins.iosxr.__init__ import IOSXRServiceList, IOSXRHAServiceList, IOSXRSingleRpConnection, IOSXRDualRpConnection
+from unicon.plugins.iosxr import IOSXRServiceList, IOSXRHAServiceList, IOSXRSingleRpConnection, IOSXRDualRpConnection
 from unicon.plugins.iosxr.moonshine.connection_provider import MoonshineSingleRpConnectionProvider, MoonshineDualRpConnectionProvider
 from unicon.plugins.iosxr.moonshine.pty_backend import MoonshineSpawn
 
 class MoonshineSingleRpConnection(IOSXRSingleRpConnection):
     os = 'iosxr'
-    series = 'moonshine'
+    platform = 'moonshine'
     chassis_type = 'single_rp'    
     state_machine_class = MoonshineSingleRpStateMachine
     connection_provider_class = MoonshineSingleRpConnectionProvider
@@ -21,9 +21,10 @@ class MoonshineSingleRpConnection(IOSXRSingleRpConnection):
 
         # Spawn a connection to the device
         self.spawn = MoonshineSpawn(self.parse_spawn_command(self.start[0]),
+                                    target='{}'.format(self.hostname),
+                                    hostname=self.hostname,
                                     settings=self.settings,
-                                    log=self.log,
-                                    logfile=self.logfile)
+                                    logger=self.log)
 
         # Instantiate connection provider
         self.connection_provider = self.connection_provider_class(self)
@@ -31,7 +32,7 @@ class MoonshineSingleRpConnection(IOSXRSingleRpConnection):
 
 class MoonshineDualRpConnection(IOSXRDualRpConnection):
     os = 'iosxr'
-    series = 'moonshine'
+    platform = 'moonshine'
     chassis_type = 'dual_rp'
     state_machine_class = MoonshineDualRpStateMachine
     connection_provider_class = MoonshineDualRpConnectionProvider
@@ -45,13 +46,15 @@ class MoonshineDualRpConnection(IOSXRDualRpConnection):
 
         # Spawn each handle
         self.a.spawn = MoonshineSpawn(self.parse_spawn_command(self.a.start),
+                                      target='{}.a'.format(self.hostname),
+                                      hostname=self.hostname,
                                       settings=self.settings,
-                                      log=self.log,
-                                      logfile=self.logfile)
+                                      logger=self.log)
         self.b.spawn = MoonshineSpawn(self.parse_spawn_command(self.b.start),
+                                      target='{}.b'.format(self.hostname),
+                                      hostname=self.hostname,
                                       settings=self.settings,
-                                      log=self.log,
-                                      logfile=self.logfile)
+                                      logger=self.log)
 
         # Instantiate connection provider
         self.connection_provider = self.connection_provider_class(self)

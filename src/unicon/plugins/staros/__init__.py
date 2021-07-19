@@ -23,11 +23,11 @@ class StarosServiceList(ServiceList):
         self.send = svc.Send
         self.sendline = svc.Sendline
         self.expect = svc.Expect
-        self.expect_log = svc.ExpectLogging
         self.log_user = svc.LogUser
         self.command = staros_svc.Command
         self.execute = svc.Execute
         self.configure = staros_svc.Configure
+        self.monitor = staros_svc.Monitor
 
 
 class StarosConnection(GenericSingleRpConnection):
@@ -35,7 +35,7 @@ class StarosConnection(GenericSingleRpConnection):
         Connection class for staros connections.
     """
     os = 'staros'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     state_machine_class = StarosStateMachine
     connection_provider_class = StarosConnectionProvider

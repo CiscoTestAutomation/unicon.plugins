@@ -11,6 +11,7 @@ from unicon.plugins.generic.service_statements import (save_env,
     secure_passwd_std, admin_password,
     auto_provision, login_stmt,
     send_response, password_handler)
+from unicon.plugins.iosxr.service_statements import confirm_module_reload_stmt
 
 from .service_patterns import Ncs5kReloadPatterns
 
@@ -58,6 +59,7 @@ reload_statement_list = [save_env,
                          login_stmt,
                          password_stmt,
                          press_enter,
+                         confirm_module_reload_stmt,
                          config_completed, # loop_continue=False
                         ]
 

@@ -14,7 +14,7 @@ from .statemachine import NxosMdsDualRpStateMachine
 
 class NxosMdsSingleRpConnection(NxosSingleRpConnection):
     os = 'nxos'
-    series = 'mds'
+    platform = 'mds'
     chassis_type = 'single_rp'
     state_machine_class = NxosMdsSingleRpStateMachine
     connection_provider_class = NxosSingleRpConnectionProvider
@@ -24,7 +24,7 @@ class NxosMdsSingleRpConnection(NxosSingleRpConnection):
 
 class NxosMdsDualRPConnection(NxosDualRPConnection):
     os = 'nxos'
-    series = 'mds'
+    platform = 'mds'
     chassis_type = 'dual_rp'
     state_machine_class = NxosMdsDualRpStateMachine
     connection_provider_class = NxosDualRpConnectionProvider

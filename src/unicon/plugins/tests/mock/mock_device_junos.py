@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import re
 import sys
@@ -33,7 +33,7 @@ def main(args=None):
         args = parser.parse_args()
 
     if args.d:
-        logging.getLogger().setLevel(logging.DEBUG)
+        logging.getLogger(__name__).setLevel(logging.DEBUG)
 
     if args.state:
         state = args.state

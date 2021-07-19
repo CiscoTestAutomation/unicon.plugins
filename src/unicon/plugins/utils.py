@@ -10,6 +10,7 @@ Description:
     Module for defining utilities used across various plugins.
 """
 
+import re
 from unicon.utils import to_plaintext
 from unicon.core.errors import (UniconAuthenticationError,
     CredentialsExhaustedError, )
@@ -84,8 +85,12 @@ def get_current_credential(context, session):
     return current_credential
 
 
-def invalidate_current_credential(session):
-    """ The current credential is no longer to be used. """
+def invalidate_current_credential(context, session):
+    """ The current credential is no longer to be used.
+    Save aside the previous credential name in the context so it outlives
+    the session.
+    """
+    context['previous_credential'] = session['current_credential']
     session['current_credential'] = None
 
 
@@ -116,4 +121,25 @@ def common_cred_password_handler(spawn, context, session, credential,
         raise UniconAuthenticationError("No password found "
             "for credential {}.".format(credential))
     if not reuse_current_credential:
-        invalidate_current_credential(session=session)
+        invalidate_current_credential(context=context, session=session)
+
+
+def slugify(text):
+    """ Simple slugify
+
+    Returns string stripped of special chars, replaced with _
+    """
+    text = text.lower()
+    pattern = re.compile(r'[^a-z0-9]+')
+    text = re.sub(pattern, '_', text)
+    text = re.sub(r'_{2,}', '_', text).strip('_')
+    return text
+
+
+def sanitize(s):
+    """ Remove escape codes and non ASCII characters from output
+    """
+    ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
+    s = ansi_escape.sub('', s)
+    mpa = dict.fromkeys(range(32))
+    return s.translate(mpa).strip().replace(' ', '')

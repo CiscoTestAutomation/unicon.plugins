@@ -35,6 +35,11 @@ class TestCimcPlugin(unittest.TestCase):
         c.execute('unmap testmap')
         self.assertEqual(c.spawn.match.match_output.splitlines()[-1], 'Compute-Node-1 /vmedia # ')
 
+    # Verify that device prompt/hostname isn't returned by execute
+    def test_prompt_stripping(self):
+        c = self.test_connect()
+        output = c.execute('show foo')
+        self.assertEqual(output, 'This is some output')
 
 if __name__ == "__main__":
     unittest.main()

@@ -20,6 +20,8 @@ aireos_exec:
       new_state: aireos_config
     "devshell shell":
       new_state: aireos_devshell
+    "restart":
+      new_state: aireos_would_you_like_to_save
     "reset system forced":
       response: |2
 
@@ -28,6 +30,14 @@ aireos_exec:
         Wireless LAN Controller config will not be saved.
 
       new_state: aireos_reset_forced
+    "reset system forced with errors":
+      response: |2
+
+        Wireless LAN Controller and Access Points could have partially
+        downloaded images and might not come up after reboot.
+        Wireless LAN Controller config will not be saved.
+
+      new_state: aireos_reset_forced_with_errors
     "grep exclude generation 'show run-config startup-commands'":
       new_state: aireos_press_any_key
     "show run-config":
@@ -36,28 +46,39 @@ aireos_exec:
       new_state: aireos_show_command_with_more
     "save config":
       new_state: aireos_confirm_save
+    "redundancy force-switchover":
+      new_state: aireos_switchover
     "transfer upload start": "% Error: Config file transfer failed - Unknown error - refer to log"
     "show foo": "Incorrect usage.  Use the '?' or <TAB> key to list commands."
     "debug lwapp": "This command has been deprecated! Please use 'debug capwap' instead."
+    "config time ntp delete foo": "Incorrect input! Use 'config time ntp delete <index>'"
+    "config time ntp delete 2": "Error! Server Index is invalid"
     "show memory statistics": |2
       
-    System Memory Statistics:
-      Total System Memory............: 33158025216 bytes (30.88 GB)
-      Used System Memory.............: 3555262464 bytes (3.31 GB)
-      Free System Memory.............: 29602762752 bytes (27.56 GB)
-      Effective Free Memory..........: 29323431936 bytes (27.30 GB)
-      Bytes allocated from RTOS......: 828815680 bytes (790.47 MB)
-      Chunks Free....................: 87 bytes 
-      Number of mmapped regions......: 28
-      Total space in mmapped regions.: 929271808 bytes (886.28 MB)
-      Total allocated space..........: 764280224 bytes (728.92 MB)
-      Total non-inuse space..........: 64535456 bytes (61.55 MB)
-      Top-most releasable space......: 92064 bytes (89.90 KB)
-      Total allocated (incl mmap)....: 1758087488 bytes (1.63 GB)
-      Total used (incl mmap).........: 1693552032 bytes (1.57 GB)
+      System Memory Statistics:
+        Total System Memory............: 33158025216 bytes (30.88 GB)
+        Used System Memory.............: 3555262464 bytes (3.31 GB)
+        Free System Memory.............: 29602762752 bytes (27.56 GB)
+        Effective Free Memory..........: 29323431936 bytes (27.30 GB)
+        Bytes allocated from RTOS......: 828815680 bytes (790.47 MB)
+        Chunks Free....................: 87 bytes 
+        Number of mmapped regions......: 28
+        Total space in mmapped regions.: 929271808 bytes (886.28 MB)
+        Total allocated space..........: 764280224 bytes (728.92 MB)
+        Total non-inuse space..........: 64535456 bytes (61.55 MB)
+        Top-most releasable space......: 92064 bytes (89.90 KB)
+        Total allocated (incl mmap)....: 1758087488 bytes (1.63 GB)
+        Total used (incl mmap).........: 1693552032 bytes (1.57 GB)
+    "config wlan enable 20": "Request failed for WLAN 20 - WLAN Identifier is invalid."
+    "config wlan security web-auth captive-bypass enable 10": "WLAN Identifier is invalid."
+    "config wlan error": "ERROR: Unable to determine the current AKM state for WLAN ID 2"
+    "config wlan interface 511 all-interfaces": "Request failed - Wlan is in enabled state."
+    "config wlan create 511 Company-guest Company-guest": "WLAN Identifier or Profile Name already in use."
 
-
-
+aireos_exec_standby:
+  prompt: "(%N-Standby) >"
+  commands:
+    "": ""
 
 aireos_confirm_save:
   prompt: Are you sure you want to save? (y/n)
@@ -65,12 +86,17 @@ aireos_confirm_save:
     "y":
       new_state: aireos_exec
 
+aireos_would_you_like_to_save:
+  prompt: "Would you like to save them now? (y/N)"
+  commands:
+    "y":
+      new_state: aireos_restart
+
 aireos_show_command_with_more:
   prompt: " --More-- "
   commands:
     " ":
       new_state: aireos_exec
-
 
 aireos_press_any_key:
   prompt: Press any key to continue..
@@ -93,6 +119,31 @@ aireos_reset_forced:
   commands:
     "y":
       response: file|mock_data/aireos/aireos_reload_85.txt
+      timing:
+        - 0:,0,0.005
+      new_state: aireos_login
+
+aireos_reset_forced_with_errors:
+  prompt: "Do you still want to force a reboot (y/N) "
+  commands:
+    "y":
+      response: file|mock_data/aireos/aireos_reload_with_error_patterns.txt
+      timing:
+        - 0:,0,0.005
+      new_state: aireos_login
+
+aireos_restart:
+  prompt: "Are you sure you would like to reset the system? (y/N) "
+  commands:
+    "y":
+      response: file|mock_data/aireos/aireos_restart.txt
+      new_state: aireos_login
+
+aireos_switchover:
+  prompt: "This will reload the active unit and force a switch of activity. Are you sure? (y/N)"
+  commands:
+    "y":
+      response: file|mock_data/aireos/aireos_force_switchover.txt
       timing:
         - 0:,0,0.005
       new_state: aireos_login

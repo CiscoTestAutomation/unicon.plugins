@@ -11,8 +11,10 @@ from unicon.utils import AttributeDict
 from unicon.logs import UniconFileHandler
 from unicon import log
 
-utils = LinuxUtils()
+from .statements import linux_execution_statements
 
+
+utils = LinuxUtils()
 
 class Execute(GenericExecute):
     """ Execute Service implementation
@@ -42,6 +44,7 @@ class Execute(GenericExecute):
         # Connection object will have all the received details
         super().__init__(connection, context, **kwargs)
         self.utils = utils
+        self.dialog = Dialog(linux_execution_statements)
 
     def post_service(self, *args, **kwargs):
         if kwargs.get('check_retcode', self.connection.settings.CHECK_RETURN_CODE):
@@ -51,34 +54,25 @@ class Execute(GenericExecute):
             sm = con.state_machine
             timeout = kwargs.get('timeout') or self.timeout
 
-            loggers = [l for l in self.connection.log.handlers if not isinstance(l, UniconFileHandler)]
-            for logger in loggers:
-                logger.setLevel(self.connection.log.level + 10)
-
             dialog = self.service_dialog()
             con.sendline('echo $?')
             try:
-                dialog_match = dialog.process(
-                    con.spawn,
-                    timeout=timeout,
-                    prompt_recovery=self.prompt_recovery,
-                    context=con.context
-                )
-                if dialog_match:
-                    ret_code = dialog_match.match_output.replace('echo $?', '').lstrip()
+                match = con.expect(r'\r\n\d+', timeout=timeout)
+                if match:
+                    ret_code = match.match_output.replace('echo $?', '').lstrip()
                     ret_code = re.match(r'^(\d+)', ret_code)
                     if ret_code:
                         ret_code = ret_code.group(1)
                         if int(ret_code) not in valid_retcodes:
                             raise SubCommandFailure('Invalid return code: %s' % ret_code)
-                sm.detect_state(con.spawn)
-            except StateMachineError:
-                raise
+                dialog.process(
+                    con.spawn,
+                    timeout=timeout,
+                    prompt_recovery=self.prompt_recovery,
+                    context=con.context
+                )
             except Exception as err:
                 raise SubCommandFailure("Command execution failed", err) from err
-            finally:
-                for logger in loggers:
-                    logger.setLevel(logger.level - 10)
 
 
 class Ping(BaseService):
@@ -156,7 +150,6 @@ class Ping(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'shell'
         self.end_state = 'shell'
-        self.service_name = 'ping'
         self.timeout = 60
         # Ping error Patterns
         self.default_error_pattern = ['[123456789]+0*% packet loss']
@@ -195,7 +188,7 @@ class Ping(BaseService):
 
         # Read input values passed
         # Convert to string in case users passes non-string types
-        for key in kwargs:
+        for key in kwargs.copy():
             if key in self._ping_option_long_to_short:
                 new_key = self._ping_option_long_to_short[key]
                 kwargs[new_key] = kwargs[key]

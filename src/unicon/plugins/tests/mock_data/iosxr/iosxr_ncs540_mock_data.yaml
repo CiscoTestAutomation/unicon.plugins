@@ -1,0 +1,33 @@
+
+ncs540_enable:
+  prompt: "RP/0/RP0/CPU0:%N#"
+  commands:
+    "terminal length 0": ""
+    "terminal width 0": ""
+    "reload":
+      new_state: ncs540_reload_proceed
+    "configure terminal":
+      new_state: ncs540_config
+    "config term":
+      new_state: ncs540_config
+
+ncs540_config:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "end":
+      new_state: ncs540_enable
+
+ncs540_reload_proceed:
+  prompt: "Proceed with reload?  [confirm]"
+  commands:
+    "":
+      response: file|mock_data/iosxr/iosxr_ncs540_reload.txt
+      new_state: ncs540__press_return
+      timing:
+        - 0:,1,0.005
+
+ncs540__press_return:
+  prompt: ""
+  commands:
+    "":
+      new_state: ncs540_enable

@@ -20,9 +20,9 @@ class TestNxos9kPluginReloadService(unittest.TestCase):
     def setUpClass(cls):
         cls.dev = Connection(
             hostname='N93_1',
-            start=['mock_device_cli --os nxos --state login3'],
+            start=['mock_device_cli --os nxos --state login3 --hostname N93_1'],
             os='nxos',
-            series='n9k',
+            platform='n9k',
             username='cisco',
             tacacs_password='cisco',
             enable_password='cisco'

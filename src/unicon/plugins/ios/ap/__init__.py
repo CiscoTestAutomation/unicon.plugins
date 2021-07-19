@@ -17,7 +17,7 @@ class ApServiceList(ServiceList):
 
 class ApSingleRpConnection(BaseSingleRpConnection):
     os = 'ios'
-    series = 'ap'
+    platform = 'ap'
     chassis_type = 'single_rp'
     state_machine_class = GenericSingleRpStateMachine
     connection_provider_class = GenericSingleRpConnectionProvider

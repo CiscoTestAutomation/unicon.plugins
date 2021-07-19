@@ -141,10 +141,10 @@ class TestLinuxPluginConnect(unittest.TestCase):
         tb=loader.load(testbed)
         l = tb.devices['agent-lab11-pm']
         with self.assertRaises(UniconConnectionError):
-            l.connect(connection_timeout=20, expect_log=True)
+            l.connect(connection_timeout=20)
         l.destroy()
         l.connect(login_creds=['default'])
-        self.assertEqual(l.spawn.match.match_output, 'stty rows 200\r\nroot@agent-lab11-pm:~# ')
+        self.assertEqual(l.is_connected(), True)
         l.disconnect()
 
   def test_connect_for_login_incorrect(self):
@@ -178,7 +178,7 @@ class TestLinuxPluginConnect(unittest.TestCase):
         tb=loader.load(testbed)
         l = tb.devices['lnx-server']
         l.connect(connection_timeout=20)
-        self.assertEqual(l.spawn.match.match_output, 'stty rows 200\r\n[user@host ~]$ ')
+        self.assertEqual(l.is_connected(), True)
         l.disconnect()
 
   def test_connect_timeout_error(self):
@@ -196,8 +196,28 @@ class TestLinuxPluginConnect(unittest.TestCase):
         tb=loader.load(testbed)
         l = tb.devices['lnx-server']
         with self.assertRaises(UniconConnectionError) as err:
-          l.connect(connection_timeout=1)
+          l.connect(connection_timeout=0.5)
         l.disconnect()
+
+  def test_connect_passphrase(self):
+        testbed = """
+        devices:
+          lnx-server:
+            type: linux
+            os: linux
+            credentials:
+              default:
+                username: admin
+                password: cisco
+            connections:
+              defaults:
+                class: unicon.Unicon
+              cli:
+                command: mock_device_cli --os linux --state login_passphrase
+        """
+        tb=loader.load(testbed)
+        l = tb.devices['lnx-server']
+        l.connect()
 
   def test_connect_connectReply(self):
         c = Connection(hostname='linux',
@@ -208,6 +228,15 @@ class TestLinuxPluginConnect(unittest.TestCase):
                        connect_reply = Dialog([[r'^(.*?)Password:']]))
         c.connect()
         self.assertIn("^(.*?)Password:", str(c.connection_provider.get_connection_dialog()))
+        c.disconnect()
+
+  def test_connect_admin_prompt(self):
+        c = Connection(hostname='linux',
+                       start=['mock_device_cli --os linux --state linux_password4'],
+                       os='linux',
+                       username='admin',
+                       password='cisco')
+        c.connect()
         c.disconnect()
 
 class TestLinuxPluginPrompts(unittest.TestCase):
@@ -225,7 +254,12 @@ class TestLinuxPluginPrompts(unittest.TestCase):
       'prompt11',
       'prompt12',
       'prompt13',
-      'prompt14'
+      'prompt14',
+      'prompt15',
+      'prompt16',
+      'prompt17',
+      'prompt18',
+      'prompt19'
     ]
 
     @classmethod
@@ -234,7 +268,6 @@ class TestLinuxPluginPrompts(unittest.TestCase):
                             start=['mock_device_cli --os linux --state exec'],
                             os='linux')
         cls.c.connect()
-        # cls.c.expect_log(enable=True)
 
 
     def test_connect(self):
@@ -269,8 +302,10 @@ class TestLearnHostname(unittest.TestCase):
           'exec12': 'host',
           'exec13': 'host',
           'exec14': 'rally',
+          'exec15': LinuxSettings().DEFAULT_LEARNED_HOSTNAME,
           'sma_prompt' : 'sma03',
           'sma_prompt_1' : 'pod-esa01',
+          'exec18': LinuxSettings().DEFAULT_LEARNED_HOSTNAME,
         }
 
         for state in states:
@@ -295,12 +330,14 @@ class TestLearnHostname(unittest.TestCase):
           c.connect(learn_hostname=True)
           self.assertEqual(c.learned_hostname, states[state])
 
-          x = c.execute('xml')
-          self.assertEqual(x.replace('\r', ''), mock_data['exec']['commands']['xml']['response'].strip())
-          x = c.execute('banner1')
-          self.assertEqual(x.replace('\r', ''), mock_data['exec']['commands']['banner1']['response'].strip())
-          x = c.execute('banner2')
-          self.assertEqual(x.replace('\r', ''), mock_data['exec']['commands']['banner2']['response'].strip())
+          # only check for supported prompts
+          if states[state] != LinuxSettings().DEFAULT_LEARNED_HOSTNAME:
+            x = c.execute('xml')
+            self.assertEqual(x.replace('\r', ''), mock_data['exec']['commands']['xml']['response'].strip())
+            x = c.execute('banner1')
+            self.assertEqual(x.replace('\r', ''), mock_data['exec']['commands']['banner1']['response'].strip())
+            x = c.execute('banner2')
+            self.assertEqual(x.replace('\r', ''), mock_data['exec']['commands']['banner2']['response'].strip())
 
     def test_connect_disconnect_without_learn_hostname(self):
         testbed = """
@@ -352,7 +389,7 @@ class TestRegexPattern(unittest.TestCase):
 
     def test_prompt_pattern(self):
         patterns = LinuxPatterns().__dict__
-        known_slow_patterns = ['learn_hostname']
+        known_slow_patterns = ['learn_hostname', 'learn_os_prompt']
 
         slow_patterns = {}
 
@@ -527,7 +564,7 @@ class TestLinuxPluginTERM(unittest.TestCase):
       # echo $TERM is matched as a prompt pattern depending on timing
       l.state_machine.get_state('shell').pattern = r'^(.*?([>~%]|[^#\s]#))\s?$'
       term = l.execute('echo $TERM')
-      self.assertEqual(term, os.environ['TERM'])
+      self.assertEqual(term, os.environ.get('TERM', 'dumb'))
 
 class TestLinuxPluginENV(unittest.TestCase):
 
@@ -547,9 +584,11 @@ class TestLinuxPluginENV(unittest.TestCase):
       l = tb.devices.lnx
       l.connect()
       term = l.execute('echo $TERM')
-      self.assertEqual(term, l.settings.ENV['TERM'])
+      self.assertIn(l.settings.ENV['TERM'], term)
       lc = l.execute('echo $LC_ALL')
-      self.assertEqual(lc, l.settings.ENV['LC_ALL'])
+      self.assertIn(l.settings.ENV['LC_ALL'], lc)
+      size = l.execute('stty size')
+      self.assertEqual(size, '200 200')
 
 
 class TestLinuxPluginExecute(unittest.TestCase):
@@ -557,8 +596,10 @@ class TestLinuxPluginExecute(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.c = Connection(hostname='linux',
-                            start=['mock_device_cli --os linux --state exec'],
-                            os='linux')
+                           start=['mock_device_cli --os linux --state exec'],
+                           os='linux',
+                           credentials={'sudo': {'password': 'sudo_password'}})
+
         cls.c.connect()
 
     def test_execute_error_pattern(self):
@@ -617,6 +658,17 @@ class TestLinuxPluginExecute(unittest.TestCase):
       # return code is 2 (last one in the mock list)
       self.c.execute('ls', error_pattern=[], check_retcode=True, valid_retcodes=[0, 2])
 
+    def test_sudo_handler(self):
+      self.c.execute('sudo')
+
+      self.c.context.credentials['sudo']['password'] = 'unknown'
+      with self.assertRaises(unicon.core.errors.SubCommandFailure):
+        self.c.execute('sudo_invalid')
+
+      self.c.context.credentials['sudo']['password'] = 'invalid'
+      with self.assertRaises(unicon.core.errors.SubCommandFailure):
+        self.c.execute('sudo_invalid')
+
 
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
 @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0)
@@ -633,7 +685,7 @@ class TestLoginPasswordPrompts(unittest.TestCase):
         c.disconnect()
 
     def test_topology_custom_user_password_prompt(self):
-        testbed = """
+        testbed = r"""
           devices:
             linux:
               type: linux
@@ -654,6 +706,30 @@ class TestLoginPasswordPrompts(unittest.TestCase):
         d = t.devices['linux']
         d.connect()
         d.disconnect()
+
+class TestLinuxPromptOverride(unittest.TestCase):
+
+    def test_override_prompt(self):
+        settings = LinuxSettings()
+        prompt = 'prompt'
+        settings.PROMPT = prompt
+        c = Connection(hostname='linux',
+                       start=['mock_device_cli --os linux --state exec'],
+                       os='linux',
+                       settings=settings)
+        assert c.state_machine.states[0].pattern == prompt
+
+    def test_override_shell_prompt(self):
+        settings = LinuxSettings()
+        prompt = 'shell_prompt'
+        settings.SHELL_PROMPT = prompt
+        c = Connection(hostname='linux',
+                       start=['mock_device_cli --os linux --state exec'],
+                       os='linux',
+                       settings=settings,
+                       learn_hostname=True)
+        c.connect()
+        assert c.state_machine.states[0].pattern == prompt
 
 
 if __name__ == "__main__":

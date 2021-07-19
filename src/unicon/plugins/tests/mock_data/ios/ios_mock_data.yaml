@@ -9,6 +9,9 @@ ios_setup:
 
 ios_setup_mgmt:
   prompt: "Would you like to enter basic management setup? [yes/no]: "
+  keys:
+    "ctrl-c":
+      new_state: enable
   commands:
     "no":
       new_state: enable
@@ -27,10 +30,16 @@ connect_ssh:
   preface: |
     The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
     RSA key fingerprint is a1:07:ac:9b:8c:c2:db:c5:4c:dc:70:b5:09:2a:a5:b1.
-  prompt: "Are you sure you want to continue connecting (yes/no)? "
+  prompt: "Are you sure you want to continue connecting (yes/no/[fingerprint])? "
   commands:
     "yes":
       new_state: login
+
+connect_ssh_passphrase:
+  prompt: "Enter passphrase for key '/home/admin/.ssh/id_rsa': "
+  commands:
+    "this is a secret":
+      new_state: enable
 
 login:
   prompt: "Username: "
@@ -279,6 +288,10 @@ enable:
       new_state: ping_proto_ios_vrf 
     "sh redundancy stat | inc my state":
         my state = 13 -ACTIVE
+    "show redundancy sta |  in my": |
+             my state = 13 -ACTIVE 
+    "show redundancy sta |  in peer": |
+           peer state = 8  -STANDBY HOT 
 
     "sh redundancy state": |2
              my state = 13 -ACTIVE 
@@ -435,6 +448,8 @@ config:
       new_state: enable
     "end":
       new_state: enable
+    "crypto pki trustpoint KEYPAIR":
+      new_state: config_ca_trustpoint
 
 
 config_line:
@@ -525,6 +540,19 @@ password_retries:
   commands:
     "cisco": ""
 
+# Special login state to handle differing enable password
+login_enable:
+  prompt: "Username: "
+  commands:
+    "admin":
+      new_state: password_enable
+
+password_enable:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: console_test_enable
+
 console_test_enable:
   preface: *CC
   prompt: "%N> "
@@ -537,6 +565,9 @@ check_enable_passwd:
   commands:
     "enpasswd":
       new_state: enable
+    "enpasswd2":
+      response: "Invalid password."
+      new_state: console_test_enable
 
 ts_login:
   prompt: "login: "
@@ -549,3 +580,12 @@ ts_password:
   commands:
     "lab":
       new_state: exec
+
+config_ca_trustpoint:
+  prompt: "%N(ca-trustpoint)#"
+  commands:
+    "rsakeypair SSHKEYS": ""
+    "exit":
+      new_state: config
+    "end":
+      new_state: enable

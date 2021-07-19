@@ -45,6 +45,8 @@ class GenericSettings(Settings):
         self.HA_RELOAD_TIMEOUT = 500
         self.RELOAD_TIMEOUT = 300
         self.RELOAD_WAIT = 240
+        self.POST_RELOAD_WAIT = 60
+        self.RELOAD_RECONNECT_ATTEMPTS = 3
         self.CONSOLE_TIMEOUT = 60
 
         # When connecting to a device via telnet, how long (in seconds)
@@ -60,6 +62,9 @@ class GenericSettings(Settings):
         # prompt wait retries
         # (wait time: 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75 == total wait: 7.0s)
         self.ESCAPE_CHAR_PROMPT_WAIT_RETRIES = 7
+
+        # syslog message handling timers
+        self.SYSLOG_WAIT = 1
 
         # pattern to replace "more" string
         # command to continue for more_prompt_stmt
@@ -78,12 +83,30 @@ class GenericSettings(Settings):
         self.CONFIG_POST_RELOAD_RETRY_DELAY_SEC = 9
 
         # Default error pattern
-        self.ERROR_PATTERN=[]
-        self.CONFIGURE_ERROR_PATTERN = []
+        self.ERROR_PATTERN = [r"% Invalid command at",
+                              r"% Invalid input detected at",
+                              r"% String is invalid, 'all' is not an allowed string at",
+                              r"Incomplete command",
+                              r'% Unrecognized host or address.',
+                              r'Error: Could not open file .*',
+                              r'Unable to deactivate Capture.',
+                              ]
+        self.CONFIGURE_ERROR_PATTERN = [r"overlaps with",
+                                        r"% Class-map .* is being used",
+                                        r'% ?Insertion failed .*',
+                                        r'%Failed to add ace to access-list'
+                                        r'Insufficient bandwidth .*',
+                                        r'BGP is already running; AS is .*',
+                                        r'% Failed to commit one or more configuration items.*',
+                                        r'% Configuring IP routing on a LAN subinterface is only allowed if that '
+                                        r'subinterface is already configured as part of an IEEE 802.10, IEEE 802.1Q, '
+                                        r'or ISL vLAN.',
+                                        r'% OSPF: Please enable segment-routing globally'
+                                        ]
 
         # Number of times to retry for config mode by configure service.
-        self.CONFIG_LOCK_RETRIES = 0
-        self.CONFIG_LOCK_RETRY_SLEEP = 2
+        self.CONFIG_LOCK_RETRIES = 3
+        self.CONFIG_LOCK_RETRY_SLEEP = 10
 
         # for bulk configure
         self.BULK_CONFIG = False
@@ -123,6 +146,108 @@ class GenericSettings(Settings):
                               'Unknown protocol -',
                               'bad context', 'Failed to resolve',
                               '(U|u)nknown (H|h)ost']
+
+        self.LEARN_OS_COMMANDS = [
+            'show version',
+            'uname',
+        ]
+
+        self.OS_MAPPING = {
+            'nxos': {
+                'os': ['Nexus Operating System'],
+                'platform': {
+                    'aci': ['aci'],
+                    'mds': ['mds'],
+                    'n5k': ['n5k'],
+                    'n9k': ['n9k'],
+                    'nxosv': ['nxosv'],
+                },
+            },
+            'iosxe': {
+                'os': ['IOS( |-)XE Software'],
+                'platform': {
+                    'cat3k': ['cat3k'],
+                    'cat9k': ['cat9k'],
+                    'csr1000v': ['csr1000v'],
+                    'sdwan': ['sdwan'],
+                    'nxosv': ['nxosv'],
+                },
+            },
+            'iosxr': {
+                'os': ['IOS XR Software'],
+                'platform': {
+                    'asr9k': ['asr9k'],
+                    'iosxrv': ['iosxrv'],
+                    'iosxrv9k': ['iosxrv9k'],
+                    'moonshine': ['moonshine'],
+                    'ncs5k': ['ncs5k'],
+                    'spitfire': ['spitfire'],
+                },
+            },
+            'ios': {
+                'os': ['IOS Software'],
+                'platform': {
+                    'ap': ['TBD'],
+                    'iol': ['TBD'],
+                    'iosv': ['TBD'],
+                    'pagent': ['TBD'],
+                },
+            },
+            'junos': {
+                'os': ['JUNOS Software'],
+                'platform': {
+                    'vsrx': ['vsrx'],
+                },
+            },
+            'linux': {
+                'os': ['Linux'],
+            },
+            'aireos': {
+                'os': ['aireos'],
+            },
+            'cheetah': {
+                'os': ['cheetah'],
+            },
+            'ise': {
+                'os': ['ise'],
+            },
+            'asa': {
+                'os': ['asa'],
+            },
+            'nso': {
+                'os': ['nso'],
+            },
+            'confd': {
+                'os': ['confd'],
+            },
+            'vos': {
+                'os': ['vos'],
+            },
+            'cimc': {
+                'os': ['cimc'],
+            },
+            'fxos': {
+                'os': ['fxos'],
+            },
+            'staros': {
+                'os': ['staros'],
+            },
+            'aci': {
+                'os': ['aci'],
+            },
+            'sdwan': {
+                'os': ['sdwan'],
+            },
+            'sros': {
+                'os': ['sros'],
+            },
+            'apic': {
+                'os': ['apic'],
+            },
+            'windows': {
+                'os': ['windows'],
+            },
+        }
 
 #TODO
 #take addtional dialogs for all service

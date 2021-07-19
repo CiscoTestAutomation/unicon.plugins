@@ -12,7 +12,7 @@ class ASAvServiceList(ServiceList):
 
 class ASAvConnection(BaseSingleRpConnection):
     os = 'asa'
-    series = 'asav'
+    platform = 'asav'
     chassis_type = 'single_rp'
     state_machine_class = ASAStateMachine
     connection_provider_class = ASAConnectionProvider

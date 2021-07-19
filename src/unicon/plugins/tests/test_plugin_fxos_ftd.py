@@ -23,11 +23,10 @@ class TestFxosFtdPlugin(unittest.TestCase):
 
     def test_connect(self):
         c = Connection(hostname='Firepower',
-                       start=['mock_device_cli --os fxos --state fxos_connect'],
+                       start=['mock_device_cli --os fxos --state fxos_console'],
                        os='fxos',
-                       series='ftd',
-                       username='cisco',
-                       tacacs_password='cisco')
+                       platform='ftd',
+                       credentials=dict(default=dict(username='cisco', password='cisco')))
         c.connect()
         self.assertEqual(c.spawn.match.match_output, '\r\nFirepower# ')
         return c
@@ -43,17 +42,25 @@ class TestFxosFtdPlugin(unittest.TestCase):
         c = self.test_connect()
         c.execute(['scope service-profile'], allow_state_change=True)
 
+    def test_are_you_sure_stmt(self):
+        c = self.test_connect()
+        c.execute(['scope security', 'clear-user-sessions all'], allow_state_change=True)
+
+    def test_fxos_config_change_prompt(self):
+        c = self.test_connect()
+        c.execute(['config change', 'top'])
+
     def test_console_execute(self):
         c = Connection(hostname='Firepower',
                        start=['mock_device_cli --os fxos --state chassis_exec'],
                        os='fxos',
-                       series='ftd',
-                       username='cisco',
-                       tacacs_password='cisco',
-                       enable_password='cisco',
-                       line_password='cisco')
+                       platform='ftd',
+                       credentials=dict(
+                       default=dict(username='cisco', password='cisco', line_password='cisco'),
+                       sudo=dict(password='cisco')))
         c.connect()
-        c.switchto('ftd expert')
+        c.spawn.timeout = 30
+        c.switchto('ftd expert', timeout=60)
         c.execute(['sudo su -'],
                   reply=Dialog([password_stmt, escape_char_stmt]),
                   allow_state_change=True)
@@ -75,11 +82,10 @@ class TestFxosFtdPlugin(unittest.TestCase):
         c = Connection(hostname='Firepower',
                        start=['mock_device_cli --os fxos --state fxos_exec'],
                        os='fxos',
-                       series='ftd',
-                       username='cisco',
-                       tacacs_password='cisco',
-                       enable_password='cisco',
-                       line_password='cisco')
+                       platform='ftd',
+                       credentials=dict(
+                       default=dict(username='cisco', password='cisco', line_password='cisco'),
+                       sudo=dict(password='cisco')))
         c.connect()
         for state in states:
             c.switchto(state)

@@ -7,5 +7,4 @@ class ASAReload(Reload):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'enable'
         self.end_state = 'enable'
-        self.service_name = 'reload'
         self.dialog = Dialog(asa_reload_stmt_list)

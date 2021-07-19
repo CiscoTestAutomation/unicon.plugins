@@ -71,7 +71,6 @@ class ConfdConnectionProvider(GenericSingleRpConnectionProvider):
         """ Executes the init commands on the device
         """
         con = self.connection
-        con._is_connected = True
 
         con.state_machine.detect_state(con.spawn)
         if con.state_machine.current_cli_style == 'cisco':
@@ -95,12 +94,12 @@ class ConfdServiceList:
         self.send = svc.Send
         self.sendline = svc.Sendline
         self.expect = svc.Expect
-        self.expect_log = svc.ExpectLogging
         self.log_user = svc.LogUser
         self.execute = confd_svc.Execute
         self.configure = confd_svc.Configure
         self.cli_style = confd_svc.CliStyle
         self.command = confd_svc.Command
+        self.expect_log = svc.ExpectLogging
 
 
 class ConfdConnection(GenericSingleRpConnection):
@@ -108,7 +107,7 @@ class ConfdConnection(GenericSingleRpConnection):
         Connection class for ConfD connections.
     """
     os = 'confd'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     state_machine_class = ConfdStateMachine
     connection_provider_class = ConfdConnectionProvider

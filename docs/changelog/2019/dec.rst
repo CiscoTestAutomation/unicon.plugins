@@ -7,7 +7,7 @@ December 17th
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
 
-        ``unicon.plugins``, v19.12
+        ``unicon``, v19.12
 
 
 Install Instructions
@@ -15,7 +15,7 @@ Install Instructions
 
 .. code-block:: bash
 
-    bash$ pip install unicon.plugins
+    bash$ pip install unicon
 
 
 Upgrade Instructions
@@ -23,11 +23,14 @@ Upgrade Instructions
 
 .. code-block:: bash
 
-    bash$ pip install --upgrade unicon.plugins
+    bash$ pip install --upgrade unicon
 
 
 Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
+- core
+
+  - enhance Connection logfile to handle special characters in hostname and alias
 
 - generic plugin
 

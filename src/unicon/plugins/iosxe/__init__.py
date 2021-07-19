@@ -13,7 +13,6 @@ from unicon.plugins.generic import GenericSingleRpConnectionProvider,\
     GenericDualRPConnection
 from unicon.plugins.iosxe.settings import IosXESettings
 
-from unicon.plugins.generic.service_implementation import Reload
 from unicon.plugins.iosxe import service_implementation as svc
 
 
@@ -26,6 +25,9 @@ class IosXEServiceList(ServiceList):
         self.ping = svc.Ping
         self.traceroute = svc.Traceroute
         self.bash_console = svc.BashService
+        self.copy = svc.Copy
+        self.reload = svc.Reload
+        self.rommon = svc.Rommon
 
 
 class HAIosXEServiceList(HAServiceList):
@@ -39,11 +41,14 @@ class HAIosXEServiceList(HAServiceList):
         self.switchover = svc.HASwitchover
         self.ping = svc.Ping
         self.bash_console = svc.BashService
+        self.traceroute = svc.Traceroute
+        self.copy = svc.Copy
+        self.reset_standby_rp = svc.ResetStandbyRP
 
 
 class IosXESingleRpConnection(BaseSingleRpConnection):
     os = 'iosxe'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     state_machine_class = IosXESingleRpStateMachine
     connection_provider_class = GenericSingleRpConnectionProvider
@@ -53,7 +58,7 @@ class IosXESingleRpConnection(BaseSingleRpConnection):
 
 class IosXEDualRPConnection(GenericDualRPConnection):
     os = 'iosxe'
-    series = None
+    platform = None
     chassis_type = 'dual_rp'
     subcommand_list = HAIosXEServiceList
     state_machine_class = IosXEDualRpStateMachine

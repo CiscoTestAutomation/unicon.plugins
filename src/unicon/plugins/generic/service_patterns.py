@@ -27,6 +27,9 @@ class ReloadPatterns(UniconCorePatterns):
         self.reload_confirm_ios = r'^.*Proceed( with reload)?\?\s*\[confirm\]'
         self.reload_confirm = r'^.*Reload node\s*\?\s*\[no,yes\]\s?$'
         self.reload_confirm_nxos = r'^(.*)This command will reboot the system.\s*\(y\/n\)\?\s*\[n\]\s?$'
+        self.connection_closed = r'^(.*?)Connection.*? closed'
+        self.press_return = r'Press RETURN to get started.*'
+
 
 # Traceroute patterns
 class TraceroutePatterns(object):
@@ -152,7 +155,7 @@ class CopyPatterns():
                                   r'|Not |too big|exceeds|detected|[Nn]o route to host' \
                                   r'|image is not allowed|Could not resolve|No such'
         self.copy_retry_message = r'fail|[Tt]imed out|Error|Problem|NOT|Failed|Bad|bogus|lose|abort|Not |too big|exceeds|detected'
-        self.copy_continue = r'Are you sure you want to continue connecting (yes/no)?'
+        self.copy_continue = r'Are you sure you want to continue connecting ((yes/no)|\((yes/no(/\[fingerprint\])?)?\))?'
         self.copy_other = r'^.*\[yes\/no\]\s*\?*\s*$'
         self.remote_param ='ftp:|tftp:|http:|rcp:|scp:'
         self.remote_in_dest = r'(ftp:|sftp:|tftp:|http:|rcp:|scp:)/*$'
@@ -196,3 +199,5 @@ class ResetStandbyPatterns:
         self.reset_abort = r'Peer reload not performed'
         self.reload_proceed1 = r'System is running in SIMPLEX mode, reload anyway\?\s*\[confirm\]'
 
+
+reload_patterns = ReloadPatterns()

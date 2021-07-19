@@ -1,10 +1,10 @@
-
-__version__ = '19.12'
+__version__ = '21.6'
 
 supported_chassis = [
     'single_rp',
     'dual_rp',
     'stack',
+    'quad',
 ]
 
 supported_os = [
@@ -27,4 +27,12 @@ supported_os = [
     'staros',
     'aci',
     'sdwan',
+    'sros',
+    'apic',
+    'windows',
+    'dell',
+    'comware',
+    'ironware',
+    'eos',
+    'gaia'
 ]

@@ -1,0 +1,18 @@
+
+[9;1H Directory of C:\Users\Administrator                                            
+
+[11;1H03/21/2018  09:50 AM    <DIR>          .                                        
+[12;1H03/21/2018  09:50 AM    <DIR>          ..                                       
+[13;1H03/20/2018  09:25 AM    <DIR>          Contacts                                 
+[14;1H03/20/2018  09:25 AM    <DIR>          Desktop                                  
+[15;1H03/20/2018  09:25 AM    <DIR>          Documents                                
+[16;1H03/20/2018  09:25 AM    <DIR>          Downloads                                
+[17;1H03/20/2018  09:25 AM    <DIR>          Favorites                                
+[18;1H03/20/2018  09:25 AM    <DIR>          Links                                    
+[19;1H03/20/2018  09:25 AM    <DIR>          Music                                    
+[20;1H03/20/2018  09:25 AM    <DIR>          Pictures                                 
+[21;1H03/20/2018  09:25 AM    <DIR>          Saved Games                              
+[22;1H03/20/2018  09:25 AM    <DIR>          Searches                                 
+[23;1H03/20/2018  09:25 AM    <DIR>          Videos                                   
+[24;1H              13 Dir(s)   9,954,390,016 bytes free                              
+

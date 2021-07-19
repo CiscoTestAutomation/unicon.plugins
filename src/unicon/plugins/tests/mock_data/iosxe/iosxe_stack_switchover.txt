@@ -1,0 +1,117 @@
+
+    Manual Swact = enabled
+
+Chassis 2 reloading, reason - Non participant detected
+
+Router>
+
+
+
+reload fp action requested
+rp processes exit with reload switch code
+
+
+watchdog: watchdog0: watchdog did not stop!
+reboot: Restarting system
+
+
+
+Booting...(use SKIP_POST)Up 1000 Mbps Full duplex (port  0) (SGMII)
+
+The system is not configured to boot automatically.  The
+following command will finish loading the operating system
+software:
+
+    boot
+
+
+switch: boot
+Reading full image into memory.............................................................................................................................................................................................................................................................................................................................................................................................................................................................................done
+Bundle Image
+--------------------------------------
+Kernel Address    : 0x53778818
+Kernel Size       : 0x438410/4424720
+Initramfs Address : 0x53bb0c28
+Initramfs Size    : 0x1abc00f/28033039
+Compression Format: mzip
+
+Bootable image at @ ram:0x53778818
+Bootable image segment 0 address range [0x81100000, 0x81da5280] is in range [0x80180000, 0x90000000].
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+File "tftp://10.1.7.250/auto/nostgAuto/USERS/ranautiy/nirmagup/IOSXE/cat3k_caa-universalk9.BLD_V1612_THROTTLE_LATEST_20200403_053502_V16_12_3_6.SSA.bin" uncompressed and installed, entry point: 0x81895bf0
+Loading Linux kernel with entry point 0x81895bf0 ...
+Bootloader: Done loading app on core_mask: 0xf
+
+### Launching Linux Kernel (flags = 0x5)
+
+Linux version 4.9.187 (xelinux@sjc-xelinux2) (gcc version 5.3.0 (GCC) ) #1 SMP Wed Dec 11 09:25:00 PST 2019
+CVMSEG size: 2 cache lines (256 bytes)
+Cavium Inc. SDK-5.1.0
+bootconsole [early0] enabled
+CPU0 revision is: 000d900a (Cavium Octeon II)
+Checking for the multiply/shift bug... no.
+Checking for the daddiu bug... no.
+%IOSXEBOOT-c34ad91569d0f862504bc287a15afe2e-new_cksum: (rp/0): 4
+%IOSXEBOOT-c34ad91569d0f862504bc287a15afe2e-saved_cksum: (rp/0): 4
+
+Final tar file: mcu_ucode_bundle_6_2_0.tar
+
+Waiting for 120 seconds for other switches to boot
+####Switch is in STRAGGLER mode, waiting for active Switch to boot
+Active Switch has booted up, starting discovery phase
+
+Switch number is 2
+All switches in the stack have been discovered. Accelerating discovery
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Router console is now available
+
+
+
+
+
+Press RETURN to get started.
+
+
+
+
+
+

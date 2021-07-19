@@ -11,8 +11,13 @@ staros_exec:
   commands:
     "terminal length 0": ""
     "terminal width 512": ""
+    "no timestamps": ""
     "conf":
       new_state: staros_config
+    "fail": |
+      Failure: Unknown command
+    "monitor subscriber next-call":
+      new_state: staros_monitor
 
 staros_config:
   prompt: "[local]host_name(config)# "
@@ -30,3 +35,192 @@ test_state:
     commands:
       "end":
         new_state: staros_exec
+
+staros_monitor:
+  preface: &monitor_options |2
+    Monday November 25 14:12:58 UTC 2019
+
+
+    Waiting for next call to connect...
+
+    C - Control Events  (ON )      11 - PPP         (ON )  21 - L2TP        (ON )
+    D - Data Events     (ON )      12 - A11         (ON )  22 - L2TPMGR     (OFF)
+    E - EventID Info    (ON )      13 - RADIUS Auth (ON )  23 - L2TP Data   (OFF)
+    I - Inbound Events  (ON )      14 - RADIUS Acct (ON )  24 - GTPC        (ON )
+    O - Outbound Events (ON )      15 - Mobile IPv4 (ON )  25 - TACACS  (ON )
+    S - Sender Info     (OFF)      16 - A11MGR      (OFF)  26 - GTPU        (OFF)
+    T - Timestamps      (ON )      17 - SESSMGR     (ON )  27 - GTPP        (ON )
+    X - PDU Hexdump     (OFF)      18 - A10         (OFF)  28 - DHCP        (ON )
+    A - PDU Hex/Ascii   (OFF)      19 - User L3     (OFF)  29 - CDR         (ON )
+    +/- Verbosity Level (  1)      31 - Radius COA  (ON )  30 - DHCPV6      (ON )
+    L - Limit Context   (OFF)      32 - MIP Tunnel  (ON )  53 - SCCP        (OFF)
+    M - Match Newcalls  (ON )      33 - L3 Tunnel   (OFF)  54 - TCAP        (OFF)
+    R - RADIUS Dict: (no-override) 34 - CSS Data    (OFF)  55 - MAP         (ON )
+    G - GTPP Dict: (no-override)   35 - CSS Signal  (OFF)  56 - RANAP       (OFF)
+    Y - Multi-Call Trace (OFF)     36 - EC Diameter (ON )  57 - GMM         (ON )
+    H - Display ethernet (OFF)     37 - SIP (IMS)   (OFF)  58 - GPRS-NS     (OFF)
+    U - Mon Display     (ON )      40 - IPSec IKEv2 (OFF)  59 - BSSGP       (OFF)
+    V - PCAP Hexdump    NONE      41 - IPSG RADIUS (ON )  60 - CAP         (ON )
+                                  42 - ROHC        (OFF)  64 - LLC         (OFF)
+                                  43 - WiMAX R6    (ON )  65 - SNDCP       (OFF)
+                                  44 - WiMAX Data  (OFF)  66 - BSSAP+      (OFF)
+                                  45 - SRP         (OFF)  67 - SMS         (OFF)
+                                                        68 - OpenFlow(ON )
+                                  46 - BCMCS SERV AUTH(OFF)
+                                  47 - RSVP        (ON )
+                                  48 - Mobile IPv6 (ON )  69 - X2AP        (ON )
+                                                        77 - ICAP/UIDH   (ON )
+                                  50 - STUN (IMS)  (OFF)  78 - Micro-Tunnel(ON )
+                                  51 - SCTP        (OFF)                   
+                                  72 - HNBAP       (ON )  79 - ALCAP       (ON )
+                                  73 - RUA         (ON )  80 - SSL         (ON )
+                                  74 - EGTPC       (ON )
+                                  75 - App Specific Diameter  (OFF)
+                                  81 - S1-AP       (ON )  82 - NAS         (ON )
+                                  83 - LDAP        (ON )  84 - SGS         (ON )
+                                  85 - AAL2        (ON )  86 - S102         (ON )
+                                  87 - PPPOE  (ON )
+                                  88 - RTP(IMS)    (OFF)  89 - RTCP(IMS)   (OFF)
+                                  91 - NPDB(IMS)  (OFF)
+                                  92 - SABP  (ON )
+                                  94 - SLS   (ON )
+                                  96 - SBc-AP  (ON )
+                                  97 - M3AP    (ON )
+                                  49 - PFCP    (ON )
+                                  76 - NSH    (ON )
+        
+  prompt: "  (Q)uit,   <ESC> Prev Menu,   <SPACE> Pause,   <ENTER> Re-Display Options"
+  commands:
+    "": *monitor_options
+  keys: &monitor_keys
+    "R":
+      new_state: staros_monitor_radius
+    "G":
+      new_state: staros_monitor_gtpp
+    "q":
+      new_state: staros_exec
+    "Q":
+      new_state: staros_exec
+    "11":
+      response:
+        - "*** PPP (OFF) ***"
+        - "*** PPP (ON) ***"
+      response_type: circular
+      new_state: staros_call_finish
+    "L":
+      response:
+        - '*** Display Events only from context "local" ***'
+        - '*** Display Events from ALL contexts ***'
+      response_type: circular
+      new_state: staros_monitor_limit_context
+    "75":
+      response: |2
+        1 - DIABASE (OFF)
+        2 - DIAMETER Gy (OFF)
+        3 - DIAMETER Gx/Ty/Gxx (OFF)
+        4 - DIAMETER Gq/Rx/Tx (OFF)
+        5 - DIAMETER Cx (OFF)
+        6 - DIAMETER Sh (OFF)
+        7 - DIAMETER Rf (OFF)
+        8 - DIAMETER EAP/STa/S6a/S6d/S6b/S13/SWm/SGd (OFF)
+        9 - DIAMETER HDD (OFF)
+        
+          (B)egin Protocol Decoding  (Q)uit,   <ESC> Prev Menu,   <ENTER> Re-Display Options
+          Select: 
+      new_state: staros_monitor_app_specific_diameter
+    "+":
+      new_state: staros_monitor_verbosity_level
+
+staros_monitor_verbosity_level:
+  preface: |
+    *** Verbosity Level (  2) ***
+  prompt: ""
+  keys:
+    <<: *monitor_keys
+    "+":
+      response: |
+        *** Verbosity Level (  3) ***
+
+staros_monitor_app_specific_diameter:
+  prompt: ""
+  keys:
+    "1":
+      response:
+      - |
+        1 - DIABASE (ON)
+        2 - DIAMETER Gy (OFF)
+        3 - DIAMETER Gx/Ty/Gxx (OFF)
+        4 - DIAMETER Gq/Rx/Tx (OFF)
+        5 - DIAMETER Cx (OFF)
+        6 - DIAMETER Sh (OFF)
+        7 - DIAMETER Rf (OFF)
+        8 - DIAMETER EAP/STa/S6a/S6d/S6b/S13/SWm/SGd (OFF)
+        9 - DIAMETER HDD (OFF)
+        
+          (B)egin Protocol Decoding  (Q)uit,   <ESC> Prev Menu,   <ENTER> Re-Display Options
+          Select: 
+      - |
+        1 - DIABASE (OFF)
+        2 - DIAMETER Gy (OFF)
+        3 - DIAMETER Gx/Ty/Gxx (OFF)
+        4 - DIAMETER Gq/Rx/Tx (OFF)
+        5 - DIAMETER Cx (OFF)
+        6 - DIAMETER Sh (OFF)
+        7 - DIAMETER Rf (OFF)
+        8 - DIAMETER EAP/STa/S6a/S6d/S6b/S13/SWm/SGd (OFF)
+        9 - DIAMETER HDD (OFF)
+        
+          (B)egin Protocol Decoding  (Q)uit,   <ESC> Prev Menu,   <ENTER> Re-Display Options
+          Select: 
+      response_type: circular
+    "b":
+      new_state: staros_monitor
+    "B":
+      new_state: staros_monitor
+    "Q":
+      new_state: staros_exec
+
+
+staros_monitor_limit_context:
+  prompt: ""
+  keys: *monitor_keys
+
+staros_monitor_radius:
+  preface: "*** RADIUS Dictionary custom1 ***"
+  prompt: ""
+  keys:
+    <<: *monitor_keys
+    "R":
+      response:
+      - "*** RADIUS Dictionary custom10 ***"
+      - "*** RADIUS Dictionary custom11 ***"
+      - "*** RADIUS Dictionary custom12 ***"
+      - "*** RADIUS Dictionary custom13 ***"
+      - "*** RADIUS Dictionary custom14 ***"
+      - "*** RADIUS Dictionary custom15 ***"
+
+staros_monitor_gtpp:
+  preface: "*** GTPP Dictionary custom1 ***"
+  prompt: ""
+  keys:
+    <<: *monitor_keys
+    "G":
+      response:
+      - "*** GTPP Dictionary custom10 ***"
+      - "*** GTPP Dictionary custom11 ***"
+      - "*** GTPP Dictionary custom12 ***"
+      - "*** GTPP Dictionary custom13 ***"
+      - "*** GTPP Dictionary custom14 ***"
+      - "*** GTPP Dictionary custom15 ***"
+
+staros_call_finish:
+  preface:
+      response: |2
+        ***
+        *** Call Finished - Waiting to trace next matching call
+        ***
+      timing:
+        - 0:,5
+  prompt: ""
+  keys:
+    <<: *monitor_keys

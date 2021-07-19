@@ -1,0 +1,545 @@
+
+general_login:
+  prompt: "Username: "
+  commands:
+    "cisco":
+      new_state: general_password
+
+general_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: general_exec
+
+general_exec:
+  prompt: "%N>"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": &SV |2
+      Cisco IOS Software, IOS-XE Software (X86_64_LINUX_IOSD-ADVENTERPRISEK9-M), Experimental Version 15.2(20110615:055721) [mcp_dev-BLD-BLD_MCP_DEV_LATEST_20110615_044519-ios 143]
+      Copyright (c) 1986-2011 by Cisco Systems, Inc.
+      Compiled Wed 15-Jun-11 08:54 by mcpre
+
+
+      Cisco IOS-XE software, Copyright (c) 2005-2011 by cisco Systems, Inc.
+      All rights reserved.  Certain components of Cisco IOS-XE software are
+      licensed under the GNU General Public License ("GPL") Version 2.0.  The
+      software code licensed under GPL Version 2.0 is free software that comes
+      with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+      GPL code under the terms of GPL Version 2.0.  For more details, see the
+      documentation or "License Notice" file accompanying the IOS-XE software,
+      or the applicable URL provided on the flyer accompanying the IOS-XE
+      software.
+
+
+      ROM: IOS-XE ROMMON
+      ROM: Cisco IOS Software, IOS-XE Software (X86_64_LINUX_IOSD-ADVENTERPRISEK9-M), Experimental Version 15.2(20110615:055721) [mcp_dev-BLD-BLD_MCP_DEV_LATEST_20110615_044519-ios 143]
+
+      issu-asr-lns uptime is 1 hour, 16 minutes
+      Uptime for this control processor is 1 hour, 17 minutes
+      System returned to ROM by reload
+      System image file is "harddisk:/general_image.issu-asr-lns"
+      Last reload reason: Reload Command
+
+
+
+      This product contains cryptographic features and is subject to United
+      States and local country laws governing import, export, transfer and
+      use. Delivery of Cisco cryptographic products does not imply
+      third-party authority to import, export, distribute or use encryption.
+      Importers, exporters, distributors and users are responsible for
+      compliance with U.S. and local country laws. By using this product you
+      agree to comply with applicable laws and regulations. If you are unable
+      to comply with U.S. and local laws, return this product immediately.
+
+      A summary of U.S. laws governing Cisco cryptographic products may be found at:
+      http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+      If you require further assistance please contact us by sending email to
+      export@cisco.com.
+
+      cisco ASR1006 (RP2) processor with 4254354K/6147K bytes of memory.
+      3 ATM interfaces
+      32768K bytes of non-volatile configuration memory.
+      8388608K bytes of physical memory.
+      1826815K bytes of eUSB flash at bootflash:.
+      78085207K bytes of SATA hard disk at harddisk:.
+
+      Configuration register is 0x1
+
+
+    "enable":
+      new_state: enable_password
+
+
+enable_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: general_enable
+
+general_enable:
+  prompt: "%N#"
+  commands: &gen_enable_cmds
+    "term length 0": ""
+    "term width 0": ""
+    "show version": *SV
+
+    "disable":
+      new_state: general_exec
+    "enable": ""
+
+    "show version | inc System image file is": |2
+      System image file is "harddisk:/general_image.issu-asr-lns"
+    "dir /all /recursive harddisk:/general_image.issu-asr-lns": |2
+      Directory of harddisk:/general_image.issu-asr-lns
+
+      Directory of harddisk:/
+
+         21  -rw-   439612520  Mar 22 2017 00:16:56 +00:00  general_image.issu-asr-lns
+      78704144384 bytes total (72496394240 bytes free)
+   
+
+    "config term":
+      new_state: general_config
+
+    "request platform software system shell":
+      new_state: general_act_reply
+
+    "show redundancy sta |  in peer": |2
+           peer state = 8  -STANDBY HOT 
+    "show redundancy sta | inc Redundancy State": |2
+      Redundancy State              = sso
+    "sh redundancy stat | inc my state": |2
+             my state = 13 -ACTIVE 
+    "sh redundancy state": |2
+             my state = 13 -ACTIVE 
+           peer state = 8  -STANDBY HOT 
+                 Mode = Duplex
+                 Unit = Primary
+              Unit ID = 48
+
+      Redundancy Mode (Operational) = sso
+      Redundancy Mode (Configured)  = sso
+      Redundancy State              = sso
+           Maintenance Mode = Disabled
+          Manual Swact = enabled
+       Communications = Up
+
+         client count = 84
+       client_notification_TMR = 30000 milliseconds
+                 RF debug mask = 0x0   
+    "redundancy force-switchover":
+      new_state: enable_general_standby
+    "reload":
+      new_state: ha_reload_proceed
+    "trim":
+      "\r\r\r\r\r\ntest
+      abc\r\r\r\r\r\n
+      test trim line\r\r\r\r\n
+      test pass"
+    "badcommand": "% Bad IP address or host name% Unknown command or computer name, or unable to find computer address"
+
+general_config:
+  prompt: "%N(conf)#"
+  commands:
+    "end":
+      new_state: general_enable
+    "crypto pki profile enrollment test":
+      new_state: general_config_ca_profile
+    "crypto pki trustpoint test":
+      new_state: general_config_crypto_trustpoint
+    "no logging console": ""
+    "line console 0":
+      new_state: general_config_line
+    "redundancy":
+      new_state: config_general_redundancy
+    "crypto key generate rsa general-keys modulus 2048 label ca": |
+        crypto key generate rsa general-keys modulus 2048 label ca
+        % You already have RSA keys defined named ca.
+        % They will be replaced.
+
+        % The key modulus size is 2048 bits
+        % Generating 2048 bit RSA keys, keys will be non-exportable...
+        [OK] (elapsed time was 2 seconds)
+    "crypto pki server ca":
+      new_state: config_general_server
+    "crypto gkm group g1":
+      new_state: iosxe_config_1
+    "ntp server vrf foo 1.2.3.4": "% IP  routing table foo does not exist"
+
+general_config_line:
+  prompt: "Router(config-line)#"
+  commands:
+    "exec-timeout 0": ""
+    "end":
+      new_state: general_enable
+
+config_general_redundancy:
+    prompt: Router(config-red)#
+    commands:
+      "main-cpu":
+        new_state: config_general_redundancy_main_cpu
+      "end":
+        new_state: general_enable
+
+config_general_server:
+    prompt: Router(cs-server)#
+    commands:
+      "grant auto": |
+          grant auto
+          % The CS config is locked because it is busy or enabled. You need to shut the server off before changing its configuration.
+      "hash sha256": |
+          hash sha256
+          % The CS config is locked because it is busy or enabled. You need to shut the server off before changing its configuration.
+      "lifetime ca-certificate 3650": |
+          lifetime ca-certificate 3650
+          % The CS config is locked because it is busy or enabled. You need to shut the server off before changing its configuration.
+      "lifetime certificate 3650": |
+          lifetime certificate 3650
+          % The CS config is locked because it is busy or enabled. You need to shut the server off before changing its configuration.
+      "database archive pkcs12 password 0 cisco123": |
+          database archive pkcs12 password 0 cisco123
+          % The CS config is locked because it is busy or enabled. You need to shut the server off before changing its configuration.
+      "no shutdown": |
+          no shutdown
+          Certificate server 'no shut' event has been queued for processing.
+      "end": 
+        new_state: general_enable
+
+config_general_redundancy_main_cpu:
+    prompt: Router(config-r-mc)#
+    commands:
+      "standby console enable": ""
+      "end":
+        new_state: general_enable
+
+general_config_ca_profile:
+  prompt: "Router(ca-profile-enroll)#"
+  commands:
+    "end":
+      new_state: general_enable
+
+general_bash:
+  prompt: "[Router_RP_0:/]$"
+  commands:
+    "df /bootflash/": |
+      Filesystem     1K-blocks    Used Available Use% Mounted on
+      /dev/sda1        5974888 3569476   2101900  63% /bootflash
+    "stty cols 200": ""
+    "stty rows 200": ""
+    "exit":
+      new_state: general_enable
+
+general_act_reply:
+  prompt: "Are you sure you want to continue? [y/n] "
+  commands:
+    "y":
+      new_state: general_bash
+
+general_config_crypto_trustpoint:
+  prompt: "%N(ca-trustpoint)#"
+  commands:
+    "no crypto pki trustpoint test":
+      new_state: are_you_sure_ywtdt
+      response: |
+        % Removing an enrolled trustpoint will destroy all certificates
+        received from the related Certificate Authority.
+
+are_you_sure_ywtdt:
+  prompt: "Are you sure you want to do this? [yes/no]: "
+  commands:
+   "yes":
+     new_state: general_config
+
+standby_exec:
+  prompt: "Router-standby# "
+  commands:
+    "cisco": ""
+
+iosxe_config_1:
+  prompt: Router(conf)#
+  commands: 
+    "identity number 101":
+      new_state: iosxe_config_2
+    "end": 
+      new_state: general_enable
+
+iosxe_config_2:
+  prompt: Router(config-gkm-group)#
+  commands:
+    "server local": 
+        new_state: iosxe_config_3
+    "end": 
+        new_state: iosxe_config_1
+
+iosxe_config_3:
+  prompt: Router(config-gkm-group)#
+  commands: 
+    "end":
+      new_state: iosxe_config_2
+diol_exec:
+  prompt: "RouterRP> "
+  commands:
+    "enable": ""
+
+diol_enable:
+  prompt: "RouterRP# "
+  commands:
+    "enable": ""
+
+diol_disable:
+  prompt: "RouterRP-standby> "
+  commands:
+    "enable": ""
+
+
+
+config_with_msgs:
+  prompt: "%N(config)#"
+  commands:
+    "msg":
+       new_state:
+          config_msg
+
+config_with_msgs2:
+  prompt: "%N(config)#"
+  commands:
+    "msg":
+       new_state:
+          config_msg2
+
+
+config_msg:
+  preface:
+    timing:
+    - 0:,0,0.5
+    response: |
+      Router(config)#*Jan 27 20:09:17.549: %SEC_LOGIN-5-LOGIN_SUCCESS: Login Success [user: user1] [Source: LOCAL] [localport: 0] at 20:09:17 UTC Wed Jan 27 2021
+      *Jan 27 20:09:18.103: %SYS-5-LOG_CONFIG_CHANGE: Console logging disabled
+      *Jan 27 20:09:18.341: %SYS-5-LOG_CONFIG_CHANGE: Console logging: level debugging, xml disabled, filtering disabled, discriminator (nosel)
+  prompt: "*Jan 27 20:09:18.839: %SYS-5-CONFIG_I: Configured from console by user1 on console"
+  commands:
+    "":
+      new_state: general_config
+
+
+config_msg2:
+  preface:
+    timing:
+    - 0:,0,0.5
+    response: |
+      Router(config)#*Jan 27 20:09:17.549: %SEC_LOGIN-5-LOGIN_SUCCESS: Login Success [user: user1] [Source: LOCAL] [localport: 0] at 20:09:17 UTC Wed Jan 27 2021
+      *Jan 27 20:09:18.103: %SYS-5-LOG_CONFIG_CHANGE: Console logging disabled
+      *Jan 27 20:09:18.341: %SYS-5-LOG_CONFIG_CHANGE: Console logging: level debugging, xml disabled, filtering disabled, discriminator (nosel)
+      *Jan 27 20:09:18.839: %SYS-5-CONFIG_I: Configured from console by user1 on console
+  prompt: "%N(config)#"
+  commands:
+    "end":
+      new_state: general_enable
+
+
+enable_with_msgs:
+  prompt: "%N#"
+  commands:
+    "msg":
+      new_state: enable_msg
+
+enable_msg:
+  preface: |
+    Router#*Jan 27 20:09:17.549: %SEC_LOGIN-5-LOGIN_SUCCESS: Login Success [user: user1] [Source: LOCAL] [localport: 0] at 20:09:17 UTC Wed Jan 27 2021
+    *Jan 27 20:09:18.103: %SYS-5-LOG_CONFIG_CHANGE: Console logging disabled
+    *Jan 27 20:09:18.341: %SYS-5-LOG_CONFIG_CHANGE: Console logging: level debugging, xml disabled, filtering disabled, discriminator (nosel)
+  prompt: "*Jan 27 20:09:18.839: %SYS-5-CONFIG_I: Configured from console by user1 on console"
+  commands:
+    "":
+      new_state: general_enable
+
+
+disable_to_enable_with_msg:
+  prompt: "Switch>"
+  commands:
+    "enable":
+      new_state: enable_password_with_msg
+
+enable_password_with_msg:
+  preface: "Password: "
+  prompt: "*Feb  8 21:51:23.628: %SELINUX-3-MISMATCH: Switch"
+  commands:
+    "": "% Access denied"
+    "cisco":
+      new_state: general_enable
+
+
+slow_config_mode:
+  prompt: "%N#"
+  commands:
+    "config term":
+      response: ""
+      timing:
+        - 0:,4,0
+      new_state: general_config
+
+
+config_locked:
+  prompt: "%N#"
+  commands:
+    "config term":
+      response: |
+        Config mode cannot be entered during Standby initialization or when switch is in recovery mode
+      timing:
+      - 0:,0,0.1,0.002
+      new_state: config_locked1
+
+config_locked1:
+  prompt: "%N#"
+  commands:
+    "config term":
+      new_state: general_config
+      response: ""
+      timing:
+        - 0:,3,0
+
+
+# Console server
+
+ts_login:
+  preface: |
+    Connected to localhost
+    Escape character is '^]'.
+
+  prompt: "Username: "
+  commands:
+    "ts_user":
+      new_state: ts_password
+
+ts_password:
+  prompt: "Password: "
+  commands:
+    "ts_pw":
+      new_state: console_wait_login
+
+console_wait_login:
+  prompt: ""
+  commands:
+    "":
+      new_state: general_login
+
+
+scp_password:
+  prompt: "Password for test@127.0.0.1: "
+  commands:
+    "test":
+      new_state: general_enable
+
+
+enable_no_service_prompt_config:
+  prompt: "%N#"
+  commands:
+    <<: *gen_enable_cmds
+    "config term":
+      new_state:
+        config_no_prompt
+    "configure terminal":
+      new_state:
+        config_no_prompt
+
+config_no_prompt:
+  preface: "Enter configuration commands, one per line. End with CNTL/Z."
+  prompt: ""
+  keys:
+    ctrl-z:
+      new_state: enable_no_service_prompt_config
+  commands:
+    "service prompt config":
+      new_state: general_config
+
+
+
+initial_config_dialog:
+  preface:
+    timing:
+      - 0:,0,0.01
+    response: |2
+      
+      
+      
+             --- System Configuration Dialog ---
+
+  prompt: "\nWould you like to enter the initial configuration dialog? [yes/no]: "
+  commands:
+    "no":
+      new_state: enter_enable_secret
+      response: |2
+          
+          The enable secret is a password used to protect
+          access to privileged EXEC and configuration modes.
+          This password, after entered, becomes encrypted in
+          the configuration.
+          -------------------------------------------------
+          secret should be of minimum 10 characters with
+          at least 1 upper case, 1 lower case, 1 digit and
+          should not contain [cisco]
+          -------------------------------------------------
+
+enter_enable_secret:
+  prompt: "  Enter enable secret: "
+  commands:
+    "": "Please enter a secret"
+    "badpw":
+      response: "%Password validation failed"
+    "Secret12345":
+      new_state: confirm_enable_secret
+
+confirm_enable_secret:
+  prompt: "  Confirm enable secret: "
+  commands:
+    "": "Please enter a secret"
+    "Secret12345":
+      response: |2
+
+        The following configuration command script was created:
+
+        enable secret 9 $9$gCGcm2IWBJOT5U$p6jqb1plxOJpr3yYwa/3fUSfpQjM.RgfcunyUXhqfRA
+        !
+        end
+
+
+        [0] Go to the IOS command prompt without saving this config.
+        [1] Return back to the setup without saving this config.
+        [2] Save this configuration to nvram and exit.
+
+      new_state: enter_selection
+
+enter_selection:
+  prompt: "Enter your selection [2]: "
+  commands:
+    "":
+      new_state: press_return
+      response: |
+        Building configuration...
+        [OK]
+        Use the enabled mode 'configure' command to modify this configuration.
+
+
+press_return:
+  preface: "\n\nPress RETURN to get started!\n\n"
+  prompt: ""
+  commands:
+    "":
+      new_state: enable_secret_exec
+
+
+enable_secret_exec:
+  prompt: "%N>"
+  commands:
+    "enable":
+      new_state: enable_secret_password
+
+
+enable_secret_password:
+  prompt: "Password: "
+  commands:
+    "Secret12345":
+      new_state: general_enable

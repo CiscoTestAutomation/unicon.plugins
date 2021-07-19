@@ -9,6 +9,7 @@ Description:
     Module for defining all Services Statement, handlers(callback) and Statement
     list for service dialog would be defined here.
 """
+
 from time import sleep
 
 from unicon.eal.dialogs import Statement
@@ -18,16 +19,15 @@ from unicon.plugins.generic.service_patterns import ReloadPatterns, \
     PingPatterns, TraceroutePatterns, CopyPatterns, HaReloadPatterns, \
     SwitchoverPatterns, ResetStandbyPatterns
 
-from .statements import GenericStatements
+from .statements import GenericStatements, chatty_term_wait, update_context, wait_and_enter
+from .service_patterns import reload_patterns
 
 from unicon.plugins.utils import (get_current_credential,
     common_cred_username_handler, common_cred_password_handler, )
 
-from unicon.utils import to_plaintext
 
 
 generic_statements = GenericStatements()
-
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 #           Service handlers
@@ -35,7 +35,7 @@ generic_statements = GenericStatements()
 
 
 def send_response(spawn, response=""):
-    sleep(0.5)
+    chatty_term_wait(spawn)
     spawn.sendline(response)
 
 
@@ -157,21 +157,21 @@ def copy_error_handler(context, retry=False):
 
 
 def copy_partition_handler(spawn, context):
-    if context['partition'] is "0":
+    if context['partition'] == "0":
         spawn.sendline()
     else:
         spawn.sendline(context[partition])
 
 
 def copy_dest_handler(spawn, context):
-    if context['dest_file'] is "":
+    if context['dest_file'] == "":
         spawn.sendline()
     else:
         spawn.sendline(context['dest_file'])
 
 
 def copy_dest_directory_handler(spawn, context):
-    if context['dest_directory'] is '':
+    if context['dest_directory'] == '':
         spawn.sendline()
     else:
         spawn.sendline(context['dest_directory'])
@@ -182,111 +182,139 @@ def handle_poap_prompt(spawn, session):
         session.poap_flag = True
         spawn.sendline('y')
 
+
 def switchover_failure(error):
     raise SubCommandFailure("Switchover Failed with error %s" % error)
 
+
 def reset_failure(error):
     raise SubCommandFailure("reset_standby_rp Failed with error %s" % error)
+
+
+def connection_closed_handler(spawn):
+    spawn.close()
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 # Reload  Statements
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 
-pat = ReloadPatterns()
 
-save_env = Statement(pattern=pat.savenv,
+save_env = Statement(pattern=reload_patterns.savenv,
                      action=send_response, args={'response': 'n'},
                      loop_continue=True,
                      continue_timer=False)
 
-confirm_reset = Statement(pattern=pat.confirm_reset,
+confirm_reset = Statement(pattern=reload_patterns.confirm_reset,
                           action=send_response, args={'response': 'y'},
                           loop_continue=True,
                           continue_timer=False)
 
-reload_confirm = Statement(pattern=pat.reload_confirm,
+reload_confirm = Statement(pattern=reload_patterns.reload_confirm,
                            action=send_response, args={'response': 'yes'},
                            loop_continue=True,
                            continue_timer=False)
 
-reload_confirm_ios = Statement(pattern=pat.reload_confirm_ios,
+reload_confirm_ios = Statement(pattern=reload_patterns.reload_confirm_ios,
                                action=send_response, args={'response': ''},
                                loop_continue=True,
                                continue_timer=False)
 
-useracess = Statement(pattern=pat.useracess,
+useracess = Statement(pattern=reload_patterns.useracess,
                       action=None, args=None,
                       loop_continue=True,
                       continue_timer=False)
 
-press_enter = Statement(pattern=pat.press_enter,
-                        action=send_response, args={'response': ''},
+press_enter = Statement(pattern=reload_patterns.press_enter,
+                        action=wait_and_enter,
                         loop_continue=False,
                         continue_timer=False)
 
-confirm_config = Statement(pattern=pat.confirm_config,
+press_return = Statement(pattern=reload_patterns.press_return,
+                         action=wait_and_enter,
+                         loop_continue=False,
+                         continue_timer=False)
+
+confirm_config = Statement(pattern=reload_patterns.confirm_config,
                            action=send_response, args={'response': ''},
                            loop_continue=True,
                            continue_timer=False)
 
-setup_dialog = Statement(pattern=pat.setup_dialog,
+setup_dialog = Statement(pattern=reload_patterns.setup_dialog,
                          action=send_response, args={'response': 'n'},
                          loop_continue=True,
                          continue_timer=False)
 
-auto_install_dialog = Statement(pattern=pat.autoinstall_dialog,
+auto_install_dialog = Statement(pattern=reload_patterns.autoinstall_dialog,
                                 action=send_response, args={'response': 'y'},
                                 loop_continue=True,
                                 continue_timer=False)
 
-module_reload = Statement(pattern=pat.module_reload,
+module_reload = Statement(pattern=reload_patterns.module_reload,
                           action=send_response, args={'response': 'n'},
                           loop_continue=True,
                           continue_timer=False)
 
-save_module_cfg = Statement(pattern=pat.save_module_cfg,
+save_module_cfg = Statement(pattern=reload_patterns.save_module_cfg,
                             action=send_response, args={'response': 'n'},
                             loop_continue=True,
                             continue_timer=False)
 
-reboot_confirm = Statement(pattern=pat.reboot_confirm,
+reboot_confirm = Statement(pattern=reload_patterns.reboot_confirm,
                            action=send_response, args={'response': 'y'},
                            loop_continue=True,
                            continue_timer=False)
 
-secure_passwd_std = Statement(pattern=pat.secure_passwd_std,
+secure_passwd_std = Statement(pattern=reload_patterns.secure_passwd_std,
                               action=send_response, args={'response': 'n'},
                               loop_continue=True,
                               continue_timer=False)
 
-admin_password = Statement(pattern=pat.admin_password,
+admin_password = Statement(pattern=reload_patterns.admin_password,
                            action=send_admin_password, args=None,
                            loop_continue=True,
                            continue_timer=False)
 
-auto_provision = Statement(pattern=pat.auto_provision,
+auto_provision = Statement(pattern=reload_patterns.auto_provision,
                            action=handle_poap_prompt, args=None,
                            loop_continue=True,
                            continue_timer=False)
 
-login_stmt = Statement(pattern=pat.username,
+login_stmt = Statement(pattern=reload_patterns.username,
                        action=login_handler,
                        args=None,
                        loop_continue=True,
                        continue_timer=False)
 
-password_stmt = Statement(pattern=pat.password,
+password_stmt = Statement(pattern=reload_patterns.password,
                           action=password_handler,
                           args=None,
                           loop_continue=False,
                           continue_timer=False)
 
+connection_closed = Statement(pattern=reload_patterns.connection_closed,
+                              action=update_context,
+                              args={'console': False},
+                              loop_continue=False,
+                              continue_timer=False)
+
+connection_closed_stmt = Statement(pattern=reload_patterns.connection_closed,
+                                   action=connection_closed_handler,
+                                   args=None,
+                                   loop_continue=False,
+                                   continue_timer=False)
+
 reload_statement_list = [save_env, confirm_reset, reload_confirm,
-                         reload_confirm_ios, press_enter, useracess,
+                         reload_confirm_ios, useracess,
                          confirm_config, setup_dialog, auto_install_dialog,
                          module_reload, save_module_cfg, reboot_confirm,
                          secure_passwd_std, admin_password, auto_provision,
-                         login_stmt, password_stmt]
+                         generic_statements.password_ok_stmt, login_stmt,
+                         generic_statements.enable_secret_stmt,
+                         generic_statements.enter_your_selection_stmt,
+                         # Below statements have loop_continue=False
+                         password_stmt, press_enter, press_return,
+                         connection_closed_stmt
+                         ]
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 # Ping Statements
@@ -987,7 +1015,9 @@ ha_reload_statement_list = [save_env, sso_ready, press_enter,
                             reload_this_shelf, useracess, config_byte,
                             setup_dialog, auto_install_dialog,
                             login_notready, redundant, default_prompts,
-                            auto_provision, login_stmt, password_stmt]
+                            auto_provision, login_stmt, password_stmt,
+                            generic_statements.password_ok_stmt,
+                           ]
 
 #############################################################################
 # Reset Standby  Command  Statement
@@ -1092,10 +1122,10 @@ switchover_statement_list = [save_config, build_config, prompt_switchover,
                              switchover_init, switchover_reason,
                              switchover_fail1, switchover_fail2,
                              switchover_fail3, switchover_fail4,
-                             press_enter, login_stmt, password_stmt
+                             press_enter, login_stmt, password_stmt,
+                             generic_statements.password_ok_stmt,
+                             generic_statements.syslog_msg_stmt
                              ]
-
-
 
 ############################################################
 # Generic Execution statement list
@@ -1103,4 +1133,7 @@ switchover_statement_list = [save_config, build_config, prompt_switchover,
 
 execution_statement_list = [generic_statements.confirm_prompt_y_n_stmt,
                             generic_statements.confirm_prompt_stmt,
-                            generic_statements.yes_no_stmt]
+                            generic_statements.yes_no_stmt,
+                            generic_statements.syslog_msg_stmt]
+
+configure_statement_list = [generic_statements.syslog_msg_stmt]

@@ -57,9 +57,11 @@ class ServiceList:
         self.ping = svc.Ping
         self.traceroute = svc.Traceroute
         self.copy = svc.Copy
-        self.expect_log = svc.ExpectLogging
         self.log_user = svc.LogUser
         self.log_file = svc.LogFile
+        self.expect_log = svc.ExpectLogging
+        self.attach = svc.AttachModuleService
+        self.switchto = svc.Switchto
 
 
 class HAServiceList(ServiceList):
@@ -82,7 +84,7 @@ class HAServiceList(ServiceList):
 class GenericSingleRpConnection(BaseSingleRpConnection):
     """ Defines Generic Connection class for singleRP """
     os = 'generic'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     state_machine_class = GenericSingleRpStateMachine
     connection_provider_class = GenericSingleRpConnectionProvider
@@ -94,7 +96,7 @@ class GenericDualRPConnection(BaseDualRpConnection):
 
     """ Defines Generic Connection class for DualRP """
     os = 'generic'
-    series = None
+    platform = None
     chassis_type = 'dual_rp'
     state_machine_class = GenericDualRpStateMachine
     connection_provider_class = GenericDualRpConnectionProvider

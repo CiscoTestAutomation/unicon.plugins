@@ -32,7 +32,7 @@ class GenericPatterns(UniconCorePatterns):
         self.disable_prompt = r'^(.*?)(Router|Router-stby|Router-sdby|RouterRP|RouterRP-standby|%N-standby|%N-sdby|%N-stby|(S|s)witch|s(S|s)witch\(standby\)|Controller|ios|-Slot[0-9]+|%N)(\(boot\))*>\s?$'
 
         # self.config_prompt = r'.*%N\(config.*\)#\s?$'
-        self.config_prompt = r'^(.*)\(.*(con|cfg|ipsec-profile)\S*\)#\s?$'
+        self.config_prompt = r'^(.*)\(.*(con|cfg|ipsec-profile|ca-trustpoint|gkm-local-server)\S*\)#\s?$'
         self.rommon_prompt = r'rommon[\s\d]*>\s?$'
         # self.standby_enable_prompt = r'^(.*?)(RouterRP-standby|%N-standby|%N-sdby|%N\(standby\))#\s?$'
         # self.standby_disable_prompt = r'^(.*?)(RouterRP-standby|%N-standby|%N-sdby|%N\(standby\))>\s?$'
@@ -42,7 +42,7 @@ class GenericPatterns(UniconCorePatterns):
         self.disconnect_message = r'Received disconnect from .*:'
         self.password_ok = r'Password OK\s*$'
 
-        self.continue_connect = r'Are you sure you want to continue connecting \(yes/no\)'
+        self.continue_connect = r'Are you sure you want to continue connecting \(yes/no(/\[fingerprint\])?\)'
 
         self.cisco_commit_changes_prompt = r'Uncommitted changes found, commit them\? \[yes/no/CANCEL\]'
         self.juniper_commit_changes_prompt = r'Discard changes and continue\? \[yes,no\]'
@@ -52,4 +52,20 @@ class GenericPatterns(UniconCorePatterns):
         self.connected = r'^(.*?)Connected.'
 
         self.enter_basic_mgmt_setup = r'Would you like to enter basic management setup\? \[yes/no\]:'
-        self.kerberos_no_realm = r'^(.*)Kerberos: No default realm defined for Kerberos!'
+        self.kerberos_no_realm = r'^(.*)Kerberos:\s*No default realm defined for Kerberos!'
+
+        self.passphrase_prompt = r'^.*Enter passphrase for key .*?:\s*?'
+
+        self.learn_os_prompt = r'^(.*?([>\$~%]|[^#\s]#|~ #|~/|^admin:|^#)\s?(\x1b\S+)?)$|(^.*This \(D\)RP Node is not ready or active for login \/configuration.*)'
+
+        self.sudo_password_prompt = r'^.*\[sudo\] password for .*?:\s*?'
+
+        self.syslog_message_pattern = r'^.*?%\w+(-\w+)?-\d+-\w+.*$'
+
+        self.config_locked = r'Configuration (mode )?(is )?locked|Config mode cannot be entered'
+
+        self.config_start = r'Enter configuration commands, one per line\.\s+End with CNTL/Z\.\s*$'
+
+        self.enable_secret = r'^.*?(Enter|Confirm) enable secret:\s*$'
+
+        self.enter_your_selection_2 = r'^.*?Enter your selection \[2]:\s*$'

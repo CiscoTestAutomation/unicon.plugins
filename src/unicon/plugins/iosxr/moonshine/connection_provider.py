@@ -37,7 +37,6 @@ class MoonshineSingleRpConnectionProvider(IOSXRSingleRpConnectionProvider):
         """ Executes the init commands on the device after bringing
             it to enable state """
         con = self.connection
-        con._is_connected = True
         con.state_machine.go_to('enable',
                                 self.connection.spawn,
                                 context=self.connection.context,

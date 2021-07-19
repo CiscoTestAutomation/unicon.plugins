@@ -30,10 +30,10 @@ class LinuxServiceList:
         self.receive = svc.ReceiveService
         self.receive_buffer = svc.ReceiveBufferService
         self.expect = svc.Expect
-        self.expect_log = svc.ExpectLogging
         self.log_user = svc.LogUser
         self.execute = lnx_svc.Execute
         self.ping = lnx_svc.Ping
+        self.expect_log = svc.ExpectLogging
 
 
 class LinuxConnection(BaseLinuxConnection):
@@ -41,7 +41,7 @@ class LinuxConnection(BaseLinuxConnection):
     Connection class for Linux connections.
     """
     os = 'linux'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     # TODO Recheck this single_rp value for linux
     state_machine_class = LinuxStateMachine

@@ -7,7 +7,7 @@ import unicon
 from unicon import Connection
 from pyats.topology import loader
 from unicon.eal.dialogs import Statement
-
+from unicon.plugins.iosxe.service_implementation import Copy
 
 from unicon.plugins.tests.mock.mock_device_iosxe import MockDeviceTcpWrapperIOSXE
 
@@ -75,7 +75,34 @@ class TestIosXEPluginHAConnect(unittest.TestCase):
         r.switchover()
         r.disconnect()
 
+    def test_copy(self):
+        tb = loader.load(self.testbed)
+        dev = tb.devices.Router
+        dev.connect()
+        self.assertEqual(isinstance(dev.copy, Copy), True)
+        dev.disconnect()
 
+
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0)
+class TestIosXEPluginSwitchoverWithStandbyCredentials(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.c = Connection(
+            hostname='Router',
+            start=['mock_device_cli --os iosxe --state c9k_login3'],
+            os='iosxe',
+            credentials=dict(
+                default=dict(
+                    username='admin', password='cisco'),
+                enable=dict(
+                    username='admin', password='cisco'),
+                disable=dict(
+                    username='admin', password='cisco')))
+        cls.c.connect()
+
+    def test_switchover(self):
+        self.c.execute('redundancy force-switchover')
 
 if __name__ == "__main__":
     unittest.main()

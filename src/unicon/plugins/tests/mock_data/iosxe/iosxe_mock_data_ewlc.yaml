@@ -111,6 +111,8 @@ ewlc_enable:
       new_state: ewlc_copy_tftp_flash_remote
     "copy  tftp: flash:  vrf Mgmt-vrf":
       new_state: ewlc_copy_tftp_flash_vrf_remote
+    "redundancy reload peer":
+      response: file|mock_data/iosxe/iosxe_reset_standby.txt
 
 ewlc_config:
   prompt: "Router(config)#"
@@ -118,6 +120,18 @@ ewlc_config:
     "no logging console": ""
     "line console 0":
       new_state: ewlc_config_line
+    "wlan shutdown":
+      new_state: ewlc_wlan_shutdown_confirm
+      response: |2
+        Warning! All WLANs will be disabled.
+    "end":
+      new_state: ewlc_enable
+
+ewlc_wlan_shutdown_confirm:
+    prompt: "Are you sure you want to continue? (y/n)[y]"
+    commands:
+        "y":
+          new_state: ewlc_config
 
 ewlc_config_line:
   prompt: "Router(config-line)#"
@@ -167,3 +181,85 @@ ewlc_copy_tftp_flash_vrf_dest_file:
       response: |
         Copy via vrf in progress...
         613363720 bytes copied in 268.106 secs (2287766 bytes/sec)
+
+# ========Recovery mode=========
+ewlc_exec_recovery_mode:
+  prompt: "Router(recovery-mode)> "
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": &show |2
+      '''
+      Cisco IOS XE Software, Version BLD_V173_THROTTLE_LATEST_20200525_074127_2
+      Cisco IOS Software [Amsterdam], C9800-CL Software (C9800-CL-K9_IOSXE), Experimental Version 17.3.20200525:075120 [S2C-build-v173_throttle-1194-/nobackup/mcpre/BLD-BLD_V173_THROTTLE_LATEST_20200525_074127 166]
+      Copyright (c) 1986-2020 by Cisco Systems, Inc.
+      Compiled Mon 25-May-20 07:02 by mcpre
+
+
+      Cisco IOS-XE software, Copyright (c) 2005-2020 by cisco Systems, Inc.
+      All rights reserved.  Certain components of Cisco IOS-XE software are
+      licensed under the GNU General Public License ("GPL") Version 2.0.  The
+      software code licensed under GPL Version 2.0 is free software that comes
+      with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+      GPL code under the terms of GPL Version 2.0.  For more details, see the
+      documentation or "License Notice" file accompanying the IOS-XE software,
+      or the applicable URL provided on the flyer accompanying the IOS-XE
+      software.
+
+
+      ROM: IOS-XE ROMMON
+
+      vidya-ewlc uptime is 2 days, 4 hours, 29 minutes
+      Uptime for this control processor is 1 day, 55 minutes
+      System returned to ROM by SSO Switchover
+      System restarted at 12:23:15 IST Thu May 28 2020
+      System image file is "bootflash:C9800-CL-universalk9.BLD_V173_THROTTLE_LATEST_20200525_074127_2.SSA.bin"
+      Last reload reason: Reload reason not captured
+
+
+
+      This product contains cryptographic features and is subject to United
+      States and local country laws governing import, export, transfer and
+      use. Delivery of Cisco cryptographic products does not imply
+      third-party authority to import, export, distribute or use encryption.
+      Importers, exporters, distributors and users are responsible for
+      compliance with U.S. and local country laws. By using this product you
+      agree to comply with applicable laws and regulations. If you are unable
+      to comply with U.S. and local laws, return this product immediately.
+
+      A summary of U.S. laws governing Cisco cryptographic products may be found at:
+      http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+      If you require further assistance please contact us by sending email to
+      export@cisco.com.
+
+      AIR License Level: AIR DNA Advantage
+      Next reload AIR license Level: AIR DNA Advantage
+
+      Smart Licensing Status: UNREGISTERED/EVAL MODE
+
+      cisco C9800-CL (VXE) processor (revision VXE) with 12364137K/3075K bytes of memory.
+      Processor board ID 9QJ0NRWISBJ
+      Router operating mode: Autonomous
+      5 Virtual Ethernet interfaces
+      1 Gigabit Ethernet interface
+      32768K bytes of non-volatile configuration memory.
+      16363784K bytes of physical memory.
+      6201343K bytes of virtual hard disk at bootflash:.
+      6201343K bytes of virtual hard disk at bootflash-2:.
+      Installation mode is BUNDLE 
+
+
+      Configuration register is 0x2102
+      '''
+    "enable":
+      new_state: ewlc_enable_recovery_mode
+
+ewlc_enable_recovery_mode:
+  prompt: "Router(recovery-mode)#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": *show
+    "disable":
+      new_state: ewlc_exec_recovery_mode

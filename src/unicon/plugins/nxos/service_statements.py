@@ -11,22 +11,21 @@ Description:
 """
 from time import sleep
 
-from unicon.plugins.nxos.service_patterns import HaNxosReloadPatterns
-from unicon.plugins.nxos.service_patterns import ReloadPatterns
 from unicon.eal.dialogs import Statement
+from unicon.plugins.nxos.patterns import NxosPatterns
+from unicon.plugins.nxos.service_patterns import ReloadPatterns
+from unicon.plugins.nxos.service_patterns import HaNxosReloadPatterns
 
-# from unicon.core.errors import SubCommandFailure
 from unicon.plugins.generic.service_statements import send_response,\
-    login_handler, password_handler
+    login_handler, password_handler, connection_closed_stmt
 from unicon.plugins.generic.service_statements import save_env,\
-    auto_provision, reload_proceed, auto_install_dialog, \
+    reload_proceed, auto_install_dialog, \
     setup_dialog, config_byte, login_notready, redundant, confirm_reset,\
     press_enter, confirm_config, module_reload, save_module_cfg,\
     secure_passwd_std
 
 from unicon.plugins.utils import (get_current_credential,
     common_cred_username_handler, common_cred_password_handler, )
-
 
 
 def run_level():
@@ -69,12 +68,6 @@ admin_password = Statement(pattern=pat.admin_password,
                            args=None,
                            loop_continue=True,
                            continue_timer=False)
-
-nxos_default_prompts = Statement(pattern=pat.nxos_default_prompts,
-                                 action=None,
-                                 args=None,
-                                 loop_continue=False,
-                                 continue_timer=False)
 
 enable_vdc = Statement(pattern=pat.enable_vdc,
                        action=send_response,
@@ -124,6 +117,12 @@ system_up = Statement(pattern=pat.system_up,
                       loop_continue=True,
                       continue_timer=False)
 
+skip_poap = Statement(pattern=pat.skip_poap,
+                      action=send_response,
+                      args={'response': 'yes'},
+                      loop_continue=True,
+                      continue_timer=True)
+
 # TODO finalise on this step
 loader_prompt = None
 rommon_prompt = None
@@ -136,24 +135,53 @@ reload_confirm_nxos = Statement(pattern=pat.reload_confirm_nxos,
                                 loop_continue=True,
                                 continue_timer=False)
 
+auto_provision_nxos = Statement(pattern=pat.auto_provision_nxos,
+                                action=send_response,
+                                args={'response': 'y'},
+                                loop_continue=True,
+                                continue_timer=False)
+
 # reload statement list for nxos single-rp
 
 nxos_reload_statement_list = [save_env, confirm_reset, reload_confirm_nxos,
                               press_enter, login_stmt, password_stmt,
-                              confirm_config, setup_dialog, 
+                              confirm_config, setup_dialog,
                               auto_install_dialog, module_reload,
                               save_module_cfg, secure_passwd_std,
-                              admin_password, auto_provision, enable_vdc]
+                              admin_password, auto_provision_nxos, enable_vdc,
+                              skip_poap, connection_closed_stmt]
 
 # reload statement list for nxos dual-rp
 ha_nxos_reload_statement_list = [save_env, reboot, secure_password,
-                                 auto_provision, reload_proceed,
+                                 auto_provision_nxos, reload_proceed,
                                  auto_install_dialog, admin_password,
                                  setup_dialog, config_byte, enable_vdc,
                                  snmp_port, boot_vdc, login_notready,
-                                 redundant,  nxos_default_prompts,
-                                 login_stmt, password_stmt, system_up,
-                                 run_init, useracess1]
+                                 redundant, login_stmt, password_stmt,
+                                 system_up, run_init, useracess1,
+                                 skip_poap]
 
 additional_connection_dialog = [enable_vdc, boot_vdc, snmp_port,
-                                admin_password, secure_password, auto_provision]
+                                admin_password, secure_password, auto_provision_nxos]
+
+# Statements for commit verification on NXOS
+pat = NxosPatterns()
+
+commit_verification_stmt = Statement(pattern=pat.commit_verification,
+                                     action='sendline()',
+                                     args=None, loop_continue=True,
+                                     continue_timer=False)
+
+config_commit_stmt_list = [commit_verification_stmt]
+
+# Statements for execute service on NXOS
+pat = NxosPatterns()
+
+
+nxos_module_reload_stmt = Statement(pattern=pat.nxos_module_reload,
+                                    action='sendline(y)',
+                                    args=None,
+                                    loop_continue=True,
+                                    continue_timer=False)
+
+execute_stmt_list = [nxos_module_reload_stmt]

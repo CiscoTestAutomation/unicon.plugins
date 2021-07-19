@@ -1,0 +1,124 @@
+pagent_disable_without_license:
+    prompt: "%N>"
+    commands:
+        enable:
+            response: |4
+
+                Invalid pagent license configured
+                Machine ID: 1704652448
+
+                Please obtain a license key from the following Web page:
+
+                For Cisco customers:
+                Please contact your Cisco sponsor for the tool to obtain the license key
+
+                For Cisco employees:
+                http://wwwin-pagent.cisco.com/protected-cgi/get_key.cgi
+
+
+            new_state: prompt_for_pagent_key
+
+prompt_for_pagent_key:
+    prompt: "Please enter pagent license key: "
+    commands:
+        '899573834241':
+            response: |4
+
+                Verifying pagent license key "899573834241" ...
+                 pagent license key "899573834241" is valid
+                 Configuring pagent security ...
+
+
+                 [OK] done
+
+            new_state: pagent_disable
+
+pagent_disable:
+    prompt: "%N>"
+    commands:
+        "enable":
+            new_state: enable
+
+pagent_exec:
+    prompt: "%N#"
+    "show version": &SV |4
+        Cisco IOS Software, C3900 Software (C3900-TPGEN_UNIVERSALK9-M), Experimental Version 15.2(20120817:095748) [yosharma-pagent_v50_0 109]
+        Copyright (c) 1986-2012 by Cisco Systems, Inc.
+        Compiled Fri 17-Aug-12 16:39 by yosharma
+
+        ROM: System Bootstrap, Version 15.0(1r)M8, RELEASE SOFTWARE (fc1)
+
+        lisp20-39b uptime is 42 minutes
+        System returned to ROM by reload at 20:52:03 UTC Thu Dec 19 2019
+        System image file is "flash0:/pagent2.bin.lisp20-39b"
+        Last reload type: Normal Reload
+        Last reload reason: Reload Command
+
+
+
+        This product contains cryptographic features and is subject to United
+        States and local country laws governing import, export, transfer and
+        use. Delivery of Cisco cryptographic products does not imply
+        third-party authority to import, export, distribute or use encryption.
+        Importers, exporters, distributors and users are responsible for
+        compliance with U.S. and local country laws. By using this product you
+        agree to comply with applicable laws and regulations. If you are unable
+        to comply with U.S. and local laws, return this product immediately.
+
+        A summary of U.S. laws governing Cisco cryptographic products may be found at:
+        http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+        If you require further assistance please contact us by sending email to
+        export@cisco.com.
+
+        Cisco CISCO3945-CHASSIS (revision 1.0) with C3900-SPE150/K9 with 1835264K/261888K bytes of memory.
+        Processor board ID FTX1512AMWX
+        4 FastEthernet interfaces
+        5 Gigabit Ethernet interfaces
+        1 terminal line
+        4 Channelized (E1 or T1)/PRI ports
+        1 Virtual Private Network (VPN) Module
+        DRAM configuration is 72 bits wide with parity enabled.
+        255K bytes of non-volatile configuration memory.
+        2048256K bytes of ATA System CompactFlash 0 (Read/Write)
+
+
+        License Info:
+
+        License UDI:
+
+        -------------------------------------------------
+        Device#   PID           SN
+        -------------------------------------------------
+        *0        C3900-SPE150/K9       FOC15090T1F     
+
+
+
+        Technology Package License Information for Module:'c3900' 
+
+        ----------------------------------------------------------------
+        Technology    Technology-package          Technology-package
+                      Current       Type          Next reboot  
+        -----------------------------------------------------------------
+        ipbase        ipbasek9      Permanent     ipbasek9
+        security      securityk9    Permanent     securityk9
+        uc            uck9          Evaluation    uck9
+        data          datak9        Evaluation    datak9
+
+        Configuration register is 0x2002
+
+    "config term":
+      new_state: pagent_config
+
+pagent_config:
+    prompt: "%N(config)#"
+    commands:
+        "line console 0":
+          new_state: pagent_config_line
+
+pagent_config_line:
+    prompt: "%N(config-line)#"
+    commands:
+        "exec-timeout 0": ""
+        "end":
+            new_state: pagent_exec

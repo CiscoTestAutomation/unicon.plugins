@@ -1,0 +1,853 @@
+c9k_login: 
+  preface: |2
+    
+    User Access Verification
+        
+  prompt: "Username: "
+  commands:
+    "admin":
+      new_state: c9k_password
+
+c9k_password:
+    prompt: "Password: "
+    commands:
+      "cisco":
+        new_state: c9k_disable
+
+c9k_disable:
+    prompt: "%N>"
+    commands:
+      "enable":
+        new_state: c9k_enable_password
+
+c9k_enable_password:
+    prompt: "Password: "
+    commands:
+      "cisco":
+        new_state: c9k_enable
+
+
+c9k_enable:
+    prompt: "%N#"
+    commands:
+      "config term":
+        new_state: c9k_config
+      "term length 0": ""
+      "term width 0": ""
+      "reload":
+        new_state: cat9k_ha_reload_proceed
+      "show version" :
+        response: |
+          Cisco IOS XE Software, Version 16.09.02
+          Cisco IOS Software [Fuji], Catalyst L3 Switch Software (CAT9K_IOSXE), Version 16.9.2, RELEASE SOFTWARE (fc4)
+          Technical Support: http://www.cisco.com/techsupport
+          Copyright (c) 1986-2018 by Cisco Systems, Inc.
+          Compiled Mon 05-Nov-18 19:32 by mcpre
+
+
+          Cisco IOS-XE software, Copyright (c) 2005-2018 by cisco Systems, Inc.
+          All rights reserved.  Certain components of Cisco IOS-XE software are
+          licensed under the GNU General Public License ("GPL") Version 2.0.  The
+          software code licensed under GPL Version 2.0 is free software that comes
+          with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+          GPL code under the terms of GPL Version 2.0.  For more details, see the
+          documentation or "License Notice" file accompanying the IOS-XE software,
+          or the applicable URL provided on the flyer accompanying the IOS-XE
+          software.
+
+
+          ROM: IOS-XE ROMMON
+          BOOTLDR: System Bootstrap, Version 16.9.1r [FC2], RELEASE SOFTWARE (P)
+
+          %N uptime is 9 minutes
+          Uptime for this control processor is 12 minutes
+          System returned to ROM by day0 configured with SVL requiring reboot
+          System image file is "flash:packages.conf"
+          Last reload reason: day0 configured with SVL requiring reboot
+
+
+
+          This product contains cryptographic features and is subject to United
+          States and local country laws governing import, export, transfer and
+          use. Delivery of Cisco cryptographic products does not imply
+          third-party authority to import, export, distribute or use encryption.
+          Importers, exporters, distributors and users are responsible for
+          compliance with U.S. and local country laws. By using this product you
+          agree to comply with applicable laws and regulations. If you are unable
+          to comply with U.S. and local laws, return this product immediately.
+
+          A summary of U.S. laws governing Cisco cryptographic products may be found at:
+          http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+          If you require further assistance please contact us by sending email to
+          export@cisco.com.
+
+
+          Technology Package License Information: 
+
+          ------------------------------------------------------------------------------
+          Technology-package                                     Technology-package
+          Current                        Type                       Next reboot  
+          ------------------------------------------------------------------------------
+          network-advantage       Smart License                    network-advantage   
+          dna-advantage           Subscription Smart License       dna-advantage                 
+
+
+          Smart Licensing Status: UNREGISTERED/EVAL EXPIRED
+
+          cisco C9500-40X (X86) processor with 1417929K/6147K bytes of memory.
+          Processor board ID FCW12345678
+          1 Virtual Ethernet interface
+          96 Ten Gigabit Ethernet interfaces
+          4 Forty Gigabit Ethernet interfaces
+          2048K bytes of non-volatile configuration memory.
+          16777216K bytes of physical memory.
+          1638400K bytes of Crash Files at crashinfo:.
+          1638400K bytes of Crash Files at crashinfo-2:.
+          11264000K bytes of Flash at flash:.
+          11264000K bytes of Flash at flash-2:.
+          0K bytes of WebUI ODM Files at webui:.
+
+          Base Ethernet MAC Address          : 00:aa:6e:be:ee:ff
+          Motherboard Assembly Number        : 73-18140-03
+          Motherboard Serial Number          : FOC12345678
+          Model Revision Number              : D0
+          Motherboard Revision Number        : B0
+          Model Number                       : C9500-40X
+          System Serial Number               : FCW212345678
+
+
+          Switch Ports Model              SW Version        SW Image              Mode   
+          ------ ----- -----              ----------        ----------            ----   
+          *    1 50    C9500-40X          16.9.2            CAT9K_IOSXE           INSTALL
+               2 50    C9500-40X          16.9.2            CAT9K_IOSXE           INSTALL
+
+
+          Switch 02
+          ---------
+          Switch uptime                      : 12 minutes 
+
+          Base Ethernet MAC Address          : 00:3c:10:be:ee:ff
+          Motherboard Assembly Number        : 73-18140-03
+          Motherboard Serial Number          : FOC12345678
+          Model Revision Number              : B0
+          Motherboard Revision Number        : A0
+          Model Number                       : C9500-40X
+          System Serial Number               : FCW12345678
+
+          Configuration register is 0x102
+
+        timing:
+          - 0:,0,0.002
+        new_state:
+          log_message
+
+
+c9k_config:
+    prompt: "%N(config)#"
+    commands:
+      "no logging console": ""
+      "line console 0":
+        new_state: c9k_config_line
+      "end":
+        new_state: c9k_enable
+
+c9k_config_line:
+  prompt: "%N(config-line)#"
+  commands:
+    "exec-timeout 0": ""
+    "exit":
+      new_state: c9k_config
+    "end":
+      new_state: c9k_enable
+
+
+log_message:
+  preface: |
+    *Feb 22 01:31:30.836: %SEC_LOGIN-5-LOGIN_SUCCESS: Login Success [user: admin] [Source: UNKNOWN] [localport: 0] at 01:31:30 UTC Fri Feb 22 2019
+  prompt: ""
+  commands:
+    "":
+      new_state: c9k_enable
+
+
+c9k_login2:
+  preface: |
+    Connected to 172.27.216.109.
+
+    Escape character is '^]'.
+
+
+
+    User Access Verification
+
+  prompt: "Username: "
+  commands:
+    "admin":
+      new_state: c9k_password2
+
+c9k_password2:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: c9k_enable2
+
+c9k_enable2:
+  prompt: "%N#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": 
+      new_state: c9k_show_ver
+
+
+c9k_show_ver:
+  preface: |
+      Cisco IOS XE Software, Version 16.12.01
+      Cisco IOS Software [Gibraltar], Catalyst L3 Switch Software (CAT9K_IOSXE), Version 16.12.1, RELEASE SOFTWARE (fc4)
+      Technical Support: http://www.cisco.com/techsupport
+      Copyright (c) 1986-2019 by Cisco Systems, Inc.
+      Compiled Tue 30-Jul-19 19:26 by mcpre
+
+
+      Cisco IOS-XE software, Copyright (c) 2005-2019 by cisco Systems, Inc.
+      All rights reserved.  Certain components of Cisco IOS-XE software are
+      licensed under the GNU General Public License ("GPL") Version 2.0.  The
+      software code licensed under GPL Version 2.0 is free software that comes
+      with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+      GPL code under the terms of GPL Version 2.0.  For more details, see the
+      documentation or "License Notice" file accompanying the IOS-XE software,
+      or the applicable URL provided on the flyer accompanying the IOS-XE
+      software.
+
+
+      ROM: IOS-XE ROMMON
+      BOOTLDR: System Bootstrap, Version 16.12.1r[FC1], RELEASE SOFTWARE (P)
+
+      %N uptime is 14 minutes
+      Uptime for this control processor is 17 minutes
+      System returned to ROM by Reload command
+      System image file is "flash:packages.conf"
+      Last reload reason: Reload command
+
+
+
+      This product contains cryptographic features and is subject to United
+      States and local country laws governing import, export, transfer and
+      use. Delivery of Cisco cryptographic products does not imply
+      third-party authority to import, export, distribute or use encryption.
+      Importers, exporters, distributors and users are responsible for
+      compliance with U.S. and local country laws. By using this product you
+      agree to comply with applicable laws and regulations. If you are unable
+      to comply with U.S. and local laws, return this product immediately.
+
+      A summary of U.S. laws governing Cisco cryptographic products may be found at:
+      http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+      If you require further assistance please contact us by sending email to
+      export@cisco.com.
+
+
+      Technology Package License Information: 
+
+      ------------------------------------------------------------------------------
+      Technology-package                                     Technology-package
+      Current                        Type                       Next reboot  
+      ------------------------------------------------------------------------------
+      network-advantage   	Smart License                 	 network-advantage   
+      dna-advantage       	Subscription Smart License    	 dna-advantage                 
+      AIR License Level: AIR DNA Advantage
+      Next reload AIR license Level: AIR DNA Advantage
+
+
+      Smart Licensing Status: UNREGISTERED/EVAL EXPIRED
+
+      cisco C9500-40X (X86) processor with 1344464K/6147K bytes of memory.
+      Processor board ID FCW2228A4DV
+      1 Virtual Ethernet interface
+      96 Ten Gigabit Ethernet interfaces
+      4 Forty Gigabit Ethernet interfaces
+      2048K bytes of non-volatile configuration memory.
+      16777216K bytes of physical memory.
+      1638400K bytes of Crash Files at crashinfo:.
+      1638400K bytes of Crash Files at crashinfo-2:.
+      11264000K bytes of Flash at flash:.
+      11264000K bytes of Flash at flash-2:.
+      3911744K bytes of USB Flash at usbflash0-2:.
+      0K bytes of WebUI ODM Files at webui:.
+
+      Base Ethernet MAC Address          : 00:aa:6e:f2:65:80
+      Motherboard Assembly Number        : 73-18140-03
+      Motherboard Serial Number          : FOC22274MNX
+      Model Revision Number              : D0
+      Motherboard Revision Number        : B0
+      Model Number                       : C9500-40X
+      System Serial Number               : FCW2228A4DV
+
+
+      Switch Ports Model              SW Version        SW Image              Mode   
+      ------ ----- -----              ----------        ----------            ----   
+      *    1 50    C9500-40X          16.12.1           CAT9K_IOSXE           INSTALL
+          2 50    C9500-40X          16.12.1           CAT9K_IOSXE           INSTALL
+
+
+      Switch 02
+      ---------
+      Switch uptime                      : 17 minutes 
+
+      Base Ethernet MAC Address          : 00:3c:10:52:93:80
+      Motherboard Assembly Number        : 73-18140-03
+      Motherboard Serial Number          : FOC21506XUG
+      Model Revision Number              : B0
+      Motherboard Revision Number        : A0
+      Model Number                       : C9500-40X
+      System Serial Number               : FCW2152A00A
+      Last reload reason                 : Reload command
+
+      Configuration register is 0x102
+
+      %N#
+      *Oct  8 00:02:44.304: %SEC_LOGIN-5-LOGIN_SUCCESS: Login Success [user: admin] [Source: LOCAL] [localport: 0] at 00:02:44 UTC Tue Oct 8 2019
+  prompt: ""
+  commands:
+      "":
+        new_state: c9k_enable
+
+# ================================
+c9k_login3:
+  prompt: "Username: "
+  commands:
+    "admin":
+      new_state: c9k_password3
+
+c9k_password3:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: c9k_exec2
+
+c9k_exec2:
+  prompt: "Router>"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": |2
+      Cisco IOS XE Software, Version 16.12.03a
+      Cisco IOS Software [Gibraltar], Catalyst L3 Switch Software (CAT9K_IOSXE), Version 16.12.3a, RELEASE SOFTWARE (fc1)
+      Technical Support: http://www.cisco.com/techsupport
+      Copyright (c) 1986-2020 by Cisco Systems, Inc.
+      Compiled Tue 28-Apr-20 09:37 by mcpre
+
+
+      Cisco IOS-XE software, Copyright (c) 2005-2020 by cisco Systems, Inc.
+      All rights reserved.  Certain components of Cisco IOS-XE software are
+      licensed under the GNU General Public License ("GPL") Version 2.0.  The
+      software code licensed under GPL Version 2.0 is free software that comes
+      with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+      GPL code under the terms of GPL Version 2.0.  For more details, see the
+      documentation or "License Notice" file accompanying the IOS-XE software,
+      or the applicable URL provided on the flyer accompanying the IOS-XE
+      software.
+
+
+      ROM: IOS-XE ROMMON
+      BOOTLDR: System Bootstrap, Version 16.12.2r, RELEASE SOFTWARE (P)
+
+      SecG-A3-9410HA uptime is 6 hours, 56 minutes
+      Uptime for this control processor is 4 minutes
+      System returned to ROM by redundancy force-switchover at 11:18:20 PDT Thu May 14 2020
+      System restarted at 11:21:33 PDT Thu May 14 2020
+      System image file is "bootflash:packages.conf"
+      Last reload reason: redundancy force-switchover
+
+
+
+      This product contains cryptographic features and is subject to United
+      States and local country laws governing import, export, transfer and
+      use. Delivery of Cisco cryptographic products does not imply
+      third-party authority to import, export, distribute or use encryption.
+      Importers, exporters, distributors and users are responsible for
+      compliance with U.S. and local country laws. By using this product you
+      agree to comply with applicable laws and regulations. If you are unable
+      to comply with U.S. and local laws, return this product immediately.
+
+      A summary of U.S. laws governing Cisco cryptographic products may be found at:
+      http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+      If you require further assistance please contact us by sending email to
+      export@cisco.com.
+
+
+      Technology Package License Information:
+
+      ------------------------------------------------------------------------------
+      Technology-package                                     Technology-package
+      Current                        Type                       Next reboot
+      ------------------------------------------------------------------------------
+      network-advantage     Smart License                    network-advantage
+      dna-advantage         Subscription Smart License       dna-advantage
+      AIR License Level: AIR DNA Advantage
+      Next reload AIR license Level: AIR DNA Advantage
+
+
+      Smart Licensing Status: UNREGISTERED/EVAL MODE
+
+      cisco C9410R (X86) processor (revision V01) with 1867991K/6147K bytes of memory.
+      Processor board ID FXS2248Q2SG
+      5 Virtual Ethernet interfaces
+      336 Gigabit Ethernet interfaces
+      64 Ten Gigabit Ethernet interfaces
+      4 TwentyFive Gigabit Ethernet interfaces
+      4 Forty Gigabit Ethernet interfaces
+      32768K bytes of non-volatile configuration memory.
+      16010152K bytes of physical memory.
+      10444800K bytes of Bootflash at bootflash:.
+      1638400K bytes of Crash Files at crashinfo:.
+      234430023K bytes of SATA hard disk at disk0:.
+      0K bytes of WebUI ODM Files at webui:.
+      10444800K bytes of Bootflash at bootflash-1-0:.
+      1638400K bytes of Crash Files at crashinfo-1-0:.
+      234430023K bytes of SATA hard disk at disk0-1-0:.
+
+      Base Ethernet MAC Address          : 70:sa:1a:06:8l:c0
+      Motherboard Assembly Number        : 18CTBFB
+      Motherboard Serial Number          : FXS22454400ET
+      Model Revision Number              : V02
+      Motherboard Revision Number        : 4
+      Model Number                       : C9410R2
+      System Serial Number               : FXS2248Q1022SG
+
+      Configuration register is 0x102
+
+    "enable":
+      new_state: enable_c9k2
+
+enable_c9k2:
+  prompt: "Router#"
+  commands:
+    "term length 0": ""
+    "redundancy force-switchover":
+      new_state: switchover
+    "term width 0": ""
+    "show version": |2
+      Cisco IOS XE Software, Version 16.12.03a
+      Cisco IOS Software [Gibraltar], Catalyst L3 Switch Software (CAT9K_IOSXE), Version 16.12.3a, RELEASE SOFTWARE (fc1)
+      Technical Support: http://www.cisco.com/techsupport
+      Copyright (c) 1986-2020 by Cisco Systems, Inc.
+      Compiled Tue 28-Apr-20 09:37 by mcpre
+
+
+      Cisco IOS-XE software, Copyright (c) 2005-2020 by cisco Systems, Inc.
+      All rights reserved.  Certain components of Cisco IOS-XE software are
+      licensed under the GNU General Public License ("GPL") Version 2.0.  The
+      software code licensed under GPL Version 2.0 is free software that comes
+      with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+      GPL code under the terms of GPL Version 2.0.  For more details, see the
+      documentation or "License Notice" file accompanying the IOS-XE software,
+      or the applicable URL provided on the flyer accompanying the IOS-XE
+      software.
+
+
+      ROM: IOS-XE ROMMON
+      BOOTLDR: System Bootstrap, Version 16.12.2r, RELEASE SOFTWARE (P)
+
+      SecG-A3-9410HA uptime is 6 hours, 56 minutes
+      Uptime for this control processor is 4 minutes
+      System returned to ROM by redundancy force-switchover at 11:18:20 PDT Thu May 14 2020
+      System restarted at 11:21:33 PDT Thu May 14 2020
+      System image file is "bootflash:packages.conf"
+      Last reload reason: redundancy force-switchover
+
+
+
+      This product contains cryptographic features and is subject to United
+      States and local country laws governing import, export, transfer and
+      use. Delivery of Cisco cryptographic products does not imply
+      third-party authority to import, export, distribute or use encryption.
+      Importers, exporters, distributors and users are responsible for
+      compliance with U.S. and local country laws. By using this product you
+      agree to comply with applicable laws and regulations. If you are unable
+      to comply with U.S. and local laws, return this product immediately.
+
+      A summary of U.S. laws governing Cisco cryptographic products may be found at:
+      http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+      If you require further assistance please contact us by sending email to
+      export@cisco.com.
+
+
+      Technology Package License Information:
+
+      ------------------------------------------------------------------------------
+      Technology-package                                     Technology-package
+      Current                        Type                       Next reboot
+      ------------------------------------------------------------------------------
+      network-advantage     Smart License                    network-advantage
+      dna-advantage         Subscription Smart License       dna-advantage
+      AIR License Level: AIR DNA Advantage
+      Next reload AIR license Level: AIR DNA Advantage
+
+
+      Smart Licensing Status: UNREGISTERED/EVAL MODE
+
+      cisco C9410R (X86) processor (revision V01) with 1867991K/6147K bytes of memory.
+      Processor board ID FXS2248Q2SG
+      5 Virtual Ethernet interfaces
+      336 Gigabit Ethernet interfaces
+      64 Ten Gigabit Ethernet interfaces
+      4 TwentyFive Gigabit Ethernet interfaces
+      4 Forty Gigabit Ethernet interfaces
+      32768K bytes of non-volatile configuration memory.
+      16010152K bytes of physical memory.
+      10444800K bytes of Bootflash at bootflash:.
+      1638400K bytes of Crash Files at crashinfo:.
+      234430023K bytes of SATA hard disk at disk0:.
+      0K bytes of WebUI ODM Files at webui:.
+      10444800K bytes of Bootflash at bootflash-1-0:.
+      1638400K bytes of Crash Files at crashinfo-1-0:.
+      234430023K bytes of SATA hard disk at disk0-1-0:.
+
+      Base Ethernet MAC Address          : 70:sa:1a:06:8l:c0
+      Motherboard Assembly Number        : 18CTBFB
+      Motherboard Serial Number          : FXS22454400ET
+      Model Revision Number              : V02
+      Motherboard Revision Number        : 4
+      Model Number                       : C9410R2
+      System Serial Number               : FXS2248Q1022SG
+
+      Configuration register is 0x102
+    "disable":
+      new_state: c9k_exec2
+    "enable": ""
+    "config term":
+      new_state: config_c9k2
+    "show redundancy sta |  in peer": |2
+           peer state = 8  -STANDBY HOT 
+    "show redundancy sta | inc Redundancy State": |2
+      Redundancy State              = sso
+    "sh redundancy stat | inc my state": |2
+             my state = 13 -ACTIVE 
+    "sh redundancy state": |2
+             my state = 13 -ACTIVE 
+           peer state = 8  -STANDBY HOT 
+                 Mode = Duplex
+                 Unit = Primary
+              Unit ID = 48
+
+      Redundancy Mode (Operational) = sso
+      Redundancy Mode (Configured)  = sso
+      Redundancy State              = sso
+           Maintenance Mode = Disabled
+          Manual Swact = enabled
+       Communications = Up
+
+         client count = 84
+       client_notification_TMR = 30000 milliseconds
+                 RF debug mask = 0x0
+    "execute":
+      commands:
+        "redundancy force-switchover":
+          response: file|mock_data/iosxe/c9k_redundancy_switchover.txt
+
+config_c9k2:
+  prompt: "Router(conf)#"
+  commands:
+    "no logging console": ""
+    "line console 0":
+      new_state: config_line_c9k2
+    "redundancy":
+      new_state: config_c9k_redundancy2
+
+config_line_c9k2:
+  prompt: "Router(config-line)#"
+  commands:
+    "exec-timeout 0": ""
+    "end":
+      new_state: enable_c9k2
+
+config_c9k_redundancy2:
+    prompt: Router(config-red)#
+    commands:
+      "main-cpu":
+        new_state: config_c9k_redundancy_main_cpu2
+      "end":
+        new_state: enable_c9k2
+
+config_c9k_redundancy_main_cpu2:
+    prompt: Router(config-r-mc)#
+    commands:
+      "standby console enable": ""
+      "end":
+        new_state: enable_c9k2
+
+switchover:
+  prompt: "Proceed with switchover to standby RP? [confirm]"
+  commands:
+    "":
+      response: file|mock_data/iosxe/c9k_redundancy_switchover.txt
+      new_state: enable_c9k2
+
+
+# ========================
+c9k_login4:
+  prompt: "Username: "
+  commands:
+    "cisco":
+      new_state: c9k_password4
+
+c9k_password4:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: c9k_exec
+
+c9k_exec:
+  prompt: "Router>"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": |2
+          Cisco IOS XE Software, Version 16.09.02
+          Cisco IOS Software [Fuji], Catalyst L3 Switch Software (c9k_IOSXE), Version 16.9.2, RELEASE SOFTWARE (fc4)
+          Technical Support: http://www.cisco.com/techsupport
+          Copyright (c) 1986-2018 by Cisco Systems, Inc.
+          Compiled Mon 05-Nov-18 19:32 by mcpre
+
+
+          Cisco IOS-XE software, Copyright (c) 2005-2018 by cisco Systems, Inc.
+          All rights reserved.  Certain components of Cisco IOS-XE software are
+          licensed under the GNU General Public License ("GPL") Version 2.0.  The
+          software code licensed under GPL Version 2.0 is free software that comes
+          with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+          GPL code under the terms of GPL Version 2.0.  For more details, see the
+          documentation or "License Notice" file accompanying the IOS-XE software,
+          or the applicable URL provided on the flyer accompanying the IOS-XE
+          software.
+
+
+          ROM: IOS-XE ROMMON
+          BOOTLDR: System Bootstrap, Version 16.9.1r [FC2], RELEASE SOFTWARE (P)
+
+          %N uptime is 9 minutes
+          Uptime for this control processor is 12 minutes
+          System returned to ROM by day0 configured with SVL requiring reboot
+          System image file is "flash:packages.conf"
+          Last reload reason: day0 configured with SVL requiring reboot
+
+
+
+          This product contains cryptographic features and is subject to United
+          States and local country laws governing import, export, transfer and
+          use. Delivery of Cisco cryptographic products does not imply
+          third-party authority to import, export, distribute or use encryption.
+          Importers, exporters, distributors and users are responsible for
+          compliance with U.S. and local country laws. By using this product you
+          agree to comply with applicable laws and regulations. If you are unable
+          to comply with U.S. and local laws, return this product immediately.
+
+          A summary of U.S. laws governing Cisco cryptographic products may be found at:
+          http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+          If you require further assistance please contact us by sending email to
+          export@cisco.com.
+
+
+          Technology Package License Information: 
+
+          ------------------------------------------------------------------------------
+          Technology-package                                     Technology-package
+          Current                        Type                       Next reboot  
+          ------------------------------------------------------------------------------
+          network-advantage       Smart License                    network-advantage   
+          dna-advantage           Subscription Smart License       dna-advantage                 
+
+
+          Smart Licensing Status: UNREGISTERED/EVAL EXPIRED
+
+          cisco C9500-40X (X86) processor with 1417929K/6147K bytes of memory.
+          Processor board ID FCW12345678
+          1 Virtual Ethernet interface
+          96 Ten Gigabit Ethernet interfaces
+          4 Forty Gigabit Ethernet interfaces
+          2048K bytes of non-volatile configuration memory.
+          16777216K bytes of physical memory.
+          1638400K bytes of Crash Files at crashinfo:.
+          1638400K bytes of Crash Files at crashinfo-2:.
+          11264000K bytes of Flash at flash:.
+          11264000K bytes of Flash at flash-2:.
+          0K bytes of WebUI ODM Files at webui:.
+
+          Base Ethernet MAC Address          : 00:aa:6e:be:ee:ff
+          Motherboard Assembly Number        : 73-18140-03
+          Motherboard Serial Number          : FOC12345678
+          Model Revision Number              : D0
+          Motherboard Revision Number        : B0
+          Model Number                       : C9500-40X
+          System Serial Number               : FCW212345678
+
+
+          Switch Ports Model              SW Version        SW Image              Mode   
+          ------ ----- -----              ----------        ----------            ----   
+          *    1 50    C9500-40X          16.9.2            c9k_IOSXE           INSTALL
+               2 50    C9500-40X          16.9.2            c9k_IOSXE           INSTALL
+
+
+          Switch 02
+          ---------
+          Switch uptime                      : 12 minutes 
+
+          Base Ethernet MAC Address          : 00:3c:10:be:ee:ff
+          Motherboard Assembly Number        : 73-18140-03
+          Motherboard Serial Number          : FOC12345678
+          Model Revision Number              : B0
+          Motherboard Revision Number        : A0
+          Model Number                       : C9500-40X
+          System Serial Number               : FCW12345678
+
+          Configuration register is 0x102
+
+
+    "enable":
+      new_state: enable_c9k
+
+enable_c9k:
+  prompt: "Router#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": |2
+      Cisco IOS XE Software, Version 16.09.02
+      Cisco IOS Software [Fuji], Catalyst L3 Switch Software (c9k_IOSXE), Version 16.9.2, RELEASE SOFTWARE (fc4)
+      Technical Support: http://www.cisco.com/techsupport
+      Copyright (c) 1986-2018 by Cisco Systems, Inc.
+      Compiled Mon 05-Nov-18 19:32 by mcpre
+
+
+      Cisco IOS-XE software, Copyright (c) 2005-2018 by cisco Systems, Inc.
+      All rights reserved.  Certain components of Cisco IOS-XE software are
+      licensed under the GNU General Public License ("GPL") Version 2.0.  The
+      software code licensed under GPL Version 2.0 is free software that comes
+      with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+      GPL code under the terms of GPL Version 2.0.  For more details, see the
+      documentation or "License Notice" file accompanying the IOS-XE software,
+      or the applicable URL provided on the flyer accompanying the IOS-XE
+      software.
+
+
+      ROM: IOS-XE ROMMON
+      BOOTLDR: System Bootstrap, Version 16.9.1r [FC2], RELEASE SOFTWARE (P)
+
+      %N uptime is 9 minutes
+      Uptime for this control processor is 12 minutes
+      System returned to ROM by day0 configured with SVL requiring reboot
+      System image file is "flash:packages.conf"
+      Last reload reason: day0 configured with SVL requiring reboot
+
+
+
+      This product contains cryptographic features and is subject to United
+      States and local country laws governing import, export, transfer and
+      use. Delivery of Cisco cryptographic products does not imply
+      third-party authority to import, export, distribute or use encryption.
+      Importers, exporters, distributors and users are responsible for
+      compliance with U.S. and local country laws. By using this product you
+      agree to comply with applicable laws and regulations. If you are unable
+      to comply with U.S. and local laws, return this product immediately.
+
+      A summary of U.S. laws governing Cisco cryptographic products may be found at:
+      http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+      If you require further assistance please contact us by sending email to
+      export@cisco.com.
+
+
+      Technology Package License Information: 
+
+      ------------------------------------------------------------------------------
+      Technology-package                                     Technology-package
+      Current                        Type                       Next reboot  
+      ------------------------------------------------------------------------------
+      network-advantage       Smart License                    network-advantage   
+      dna-advantage           Subscription Smart License       dna-advantage                 
+
+
+      Smart Licensing Status: UNREGISTERED/EVAL EXPIRED
+
+      cisco C9500-40X (X86) processor with 1417929K/6147K bytes of memory.
+      Processor board ID FCW12345678
+      1 Virtual Ethernet interface
+      96 Ten Gigabit Ethernet interfaces
+      4 Forty Gigabit Ethernet interfaces
+      2048K bytes of non-volatile configuration memory.
+      16777216K bytes of physical memory.
+      1638400K bytes of Crash Files at crashinfo:.
+      1638400K bytes of Crash Files at crashinfo-2:.
+      11264000K bytes of Flash at flash:.
+      11264000K bytes of Flash at flash-2:.
+      0K bytes of WebUI ODM Files at webui:.
+
+      Base Ethernet MAC Address          : 00:aa:6e:be:ee:ff
+      Motherboard Assembly Number        : 73-18140-03
+      Motherboard Serial Number          : FOC12345678
+      Model Revision Number              : D0
+      Motherboard Revision Number        : B0
+      Model Number                       : C9500-40X
+      System Serial Number               : FCW212345678
+
+
+      Switch Ports Model              SW Version        SW Image              Mode   
+      ------ ----- -----              ----------        ----------            ----   
+      *    1 50    C9500-40X          16.9.2            c9k_IOSXE           INSTALL
+          2 50    C9500-40X          16.9.2            c9k_IOSXE           INSTALL
+
+
+      Switch 02
+      ---------
+      Switch uptime                      : 12 minutes 
+
+      Base Ethernet MAC Address          : 00:3c:10:be:ee:ff
+      Motherboard Assembly Number        : 73-18140-03
+      Motherboard Serial Number          : FOC12345678
+      Model Revision Number              : B0
+      Motherboard Revision Number        : A0
+      Model Number                       : C9500-40X
+      System Serial Number               : FCW12345678
+
+      Configuration register is 0x102
+
+    "config term":
+      new_state: config_c9k
+
+    "disable":
+      new_state: c9k_exec
+    "reload":
+      new_state: c9k_system_config_change
+
+config_c9k:
+  prompt: "Router(config)#"
+  commands:
+    "no logging console": ""
+    "line console 0":
+      new_state: config_line_c9k
+
+config_line_c9k:
+  prompt: "Router(config-line)#"
+  commands:
+    "exec-timeout 0": ""
+    "end":
+      new_state: enable_c9k
+
+c9k_system_config_change:
+  prompt: "System configuration has been modified. Save? [yes/no]:"
+  commands:
+    "n":
+      new_state: c9k_reload_proceed
+
+c9k_reload_proceed:
+  prompt: "Proceed with reload? [confirm]"
+  commands:
+    "":
+      response: file|mock_data/iosxe/cat9k_reload_logs.txt
+      timing:
+        - 0:,0,0.005
+      new_state: c9k_login4

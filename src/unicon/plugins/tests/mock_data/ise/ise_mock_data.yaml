@@ -1,0 +1,17 @@
+
+ise_resume_session:
+    preface: |4
+            Following disconnected ssh sessions are available to resume.
+        [1] 875.User-Friday_Jan_17_08:26:00_2020
+        [2] 25035.User-Friday_Jan_17_08:22:48_2020
+        [3] 23881.User-Friday_Jan_17_08:22:21_2020
+        [4] 19982.User-Friday_Jan_17_08:04:58_2020
+    prompt: "Enter session number to resume or press <Enter> to start a new one:"
+    commands:
+      "":
+        response: "Last failed login on Wed Jan 15 10:43:10 2020 from 1.1.1.1"
+        new_state: ise_exec
+
+
+ise_exec:
+    prompt: dc-ise-1/User>

@@ -7,7 +7,7 @@ import termios
 import logging
 import argparse
 
-from unicon.mock.mock_device import MockDevice, wait_key
+from unicon.mock.mock_device import MockDevice, MockDeviceTcpWrapper, wait_key
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +60,16 @@ class MockDeviceAireos(MockDevice):
                 self.command_handler(sys.stdout, cmd)
 
 
+class MockDeviceTcpWrapperAireos(MockDeviceTcpWrapper):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, device_os='aireos', **kwargs)
+        if 'port' in kwargs:
+            kwargs.pop('port')
+        self.mockdevice = MockDeviceAireos(*args, **kwargs)
+
+
+
 def main(args=None):
     logging.basicConfig(stream=sys.stderr, level=logging.INFO,
                         format="%(asctime)s [%(levelname)8s]:  %(message)s")
@@ -71,7 +81,7 @@ def main(args=None):
         args = parser.parse_args()
 
     if args.d:
-        logging.getLogger().setLevel(logging.DEBUG)
+        logging.getLogger(__name__).setLevel(logging.DEBUG)
 
     if args.state:
         state = args.state
@@ -83,8 +93,12 @@ def main(args=None):
     else:
         hostname = 'Cisco Capwap Simulator'
 
-    md = MockDeviceAireos(hostname=hostname, state=state)
-    md.run()
+    if args.ha:
+        md = MockDeviceTcpWrapperAireos(hostname=hostname, state=state)
+        md.run()
+    else:
+        md = MockDeviceAireos(hostname=hostname, state=state)
+        md.run()
 
 
 if __name__ == "__main__":

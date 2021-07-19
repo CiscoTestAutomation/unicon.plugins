@@ -107,6 +107,25 @@ spitfire_enable:
 
     "redundancy switchover":
       new_state:  spitfire_confirm_switchover
+    "attach location 0/RP0/CPU0":
+      new_state:  spitfire_attach_console
+      response: 
+        - |2
+          RP/0/RP0/CPU0:ios#attach location 0/RP0/CPU0
+          Sun Mar  1 18:49:07.320 UTC
+
+          export PS1='#'
+          [node0_RP0_CPU0:~]$export PS1='#'
+
+    "attach location 0/0/CPU0":
+      new_state:  spitfire_attach_console
+      response: 
+        - |2
+          RP/0/RP0/CPU0:ios#attach location 0/0/CPU0
+          Sun Mar  1 18:49:07.320 UTC
+
+          export PS1='#'
+          [node0_0_CPU0:~]$export PS1='#'
 
 
 spitfire_confirm_switchover:
@@ -133,6 +152,8 @@ spitfire_xr_bash:
       new_state: spitfire_enable
     "xrenv":
       new_state: spitfire_xr_env
+    "ls": |
+      akrhegde_15888571384782863_mppinband_rtr1.log  akrhegde_15888589016873305_mppinband_rtr1.log  asic-err-logs-backup  clihistory
 
 spitfire_xr_run:
   prompt: "[node0_RP0_CPU0:~]$"
@@ -164,6 +185,45 @@ spitfire_config:
     "session-timeout 0": ""
     "line default": ""
     "commit": ""
+    "test failed":
+      new_state:
+        spitfire_failed_config
+
+
+spitfire_failed_config:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "end":
+      response: "Uncommitted changes found, commit them before exiting(yes/no/cancel)? [cancel]:"
+      new_state: spitfire_failed_config_uncommitted
+
+spitfire_failed_config_uncommitted:
+  prompt: ""
+  commands:
+    "yes":
+      response: "% Failed to commit one or more configuration items during a pseudo-atomic operation. All changes made have been reverted. Please issue 'show configuration failed [inheritance]' from this session to view the errors"
+      new_state: spitfire_failed_config_show
+
+spitfire_failed_config_show:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "show configuration failed": |2
+      Fri Aug  3 15:34:40.336 UTC
+      !! SEMANTIC ERRORS: This configuration was rejected by
+      !! the system due to semantic errors. The individual
+      !! errors with each failed configuration command can be
+      !! found below.
+
+
+      test failed
+      !!% Invalid config
+       !
+      !
+      end
+
+    "abort":
+      new_state: spitfire_enable
+
 
 spitfire_console_standby:
   preface: "\r\nThis (D)RP Node is not ready or active for login /configuration\r\n"
@@ -224,3 +284,13 @@ spitfire_enable_ztp_lock:
         - |2
           Thu Sep 19 14:50:51.247 UTC
 
+spitfire_attach_console:
+  prompt: "#"
+  commands:
+    "exit":
+      response:
+        - |2
+          logout
+      new_state: spitfire_enable
+    "ls": |
+        dummy_file dummy_file2

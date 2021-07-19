@@ -2,6 +2,7 @@ cat9k_ha_reload_proceed:
   prompt: "Proceed with reload? [confirm]"
   commands:
     "":
+      new_state: cat9k_ha_active_console
 
 cat9k_ha_active_console: &BL
   preface: file|mock_data/iosxe/cat9k_reload_logs.txt
@@ -17,3 +18,79 @@ cat9k_ha_standby_console:
       new_state: asr_exec
 
 
+# Rommon boot
+
+cat9k_enable_reload_to_rommon:
+  prompt: "switch1#"
+  commands:
+    "show boot": |
+      ---------------------------
+      Switch 1
+      ---------------------------
+      Current Boot Variables:
+      BOOT variable = flash:cat9k_iosxe.2019-06-21_17.21_sdcunha.SSA.bin;
+
+      Boot Variables on next reload:
+      BOOT variable = flash:cat9k_iosxe.2019-06-21_17.21_sdcunha.SSA.bin;
+      Manual Boot = no
+      Enable Break = yes
+      Boot Mode = DEVICE
+      iPXE Timeout = 0
+    "reload":
+      new_state: cat9k_boot_to_rommon
+
+
+
+cat9k_enable_reload_to_rommon_break:
+  prompt: "switch1#"
+  commands:
+    "show boot": |
+      ---------------------------
+      Switch 1
+      ---------------------------
+      Current Boot Variables:
+      BOOT variable = flash:cat9k_iosxe.2019-06-21_17.21_sdcunha.SSA.bin;
+
+      Boot Variables on next reload:
+      BOOT variable = flash:cat9k_iosxe.2019-06-21_17.21_sdcunha.SSA.bin;
+      Manual Boot = no
+      Enable Break = no
+      Boot Mode = DEVICE
+      iPXE Timeout = 0
+    "config term":
+      new_state: cat9k_enable_reload_to_rommon_break_config
+    "reload":
+      new_state: cat9k_boot_to_rommon
+
+cat9k_enable_reload_to_rommon_break_config:
+  prompt: "%N(config)#"
+  commands:
+    "boot enable-break": ""
+    "end":
+      new_state: cat9k_enable_reload_to_rommon_break
+
+cat9k_boot_to_rommon:
+  prompt: ""
+  preface: file|mock_data/iosxe/c9k_boot_rommon.txt
+  keys:
+    ctrl-c:
+      new_state: cat9k_rommon
+
+cat9k_rommon:
+    prompt: "switch:"
+    commands:
+      "unlock flash:": ""
+      "boot":
+        new_state: cat9k_rommon_boot
+      "boot tftp://1.1.1.1/latest.bin":
+        new_state: cat9k_rommon_boot
+
+cat9k_rommon_boot:
+  preface:
+    response: file|mock_data/iosxe/cat9k_reload_logs.txt
+    timing:
+      - 0:,0,0.005
+  prompt: ""
+  commands:
+    "":
+      new_state: c9k_disable

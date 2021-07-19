@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import re
 import sys
@@ -63,6 +63,12 @@ class MockDeviceIOS(MockDevice):
         self.set_state(self.transport_handles[transport], 'ping3_extend')
         return True
 
+    def config(self, transport, cmd):
+        m = re.match(r'\s*hostname (\S+)', cmd)
+        if m:
+            self.hostname = m.group(1)
+            return True
+
 
 class MockDeviceTcpWrapperIOS(MockDeviceTcpWrapper):
 
@@ -85,7 +91,7 @@ def main(args=None):
         args = parser.parse_args()
 
     if args.d:
-        logging.getLogger().setLevel(logging.DEBUG)
+        logging.getLogger(__name__).setLevel(logging.DEBUG)
 
     if args.state:
         state = args.state

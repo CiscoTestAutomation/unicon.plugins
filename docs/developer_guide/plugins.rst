@@ -15,12 +15,12 @@ There are two methods of writing plugins for Unicon.
     2. by writing your own package, which installs using ``pip`` and extends
        Unicon functionality without having to modify the core Unicon code.
 
-Both methods have its pros & cons. See below for details.
+Both methods have their pros & cons. See below for details.
 
 Contribution
 ------------
 
-Any plugins contributed to Unicon code under ``unicon.plugins repository``,
+Any plugins contributed to Unicon code under the ``unicon.plugins`` repository,
 becomes part of Unicon. This is a great method to use if your plugin
 is generic, since it is installed automatically as part of every Unicon installation.
 
@@ -30,16 +30,16 @@ verified by its developers, the next version of Unicon release will incorporate
 your plugin.
 
 Under this repository, Unicon follows a hierarchical directory structure for writing
-plugins, which is distributes based on the OS, series, model of the platform 
-which the plugin implements. Any new OS implementations will contribute to a 
-new sub directory under ``unicon.plugins/plugins`` and its series/model will go under that
+plugins, which is distributed based on the OS, platform, model of the platform
+which the plugin implements. Any new OS implementations will contribute to a
+new sub-directory under ``unicon.plugins/plugins`` and its platform/model will go under that.
 
 .. image:: images/plugins.jpg
 
 Unicon also has a generic plugin which implements the common behaviour seen across
 various platform. For any unknown or not implemented os, unicon loads
-generic plugin and uses its `` Connection `` , also generic platform will be used as
-a reference/starting point for new platform implementation
+generic plugin and uses its `Connection`, also generic platform will be used as
+a reference/starting point for new platform implementation.
 
 **Recommendations** :
 
@@ -65,12 +65,12 @@ plugin separately.
 
 There are few major steps involved in creating your own plugin package:
 
-    1. create the plugin module content following the instructions in this page
-       on how to create a plugin. 
+    1. create the plugin module content following the instructions on this page
+       on how to create a plugin.
 
-       .. note:: 
+       .. note::
 
-           make sure the ``__init__.py`` of your top-level package imports 
+           make sure the ``__init__.py`` of your top-level package imports
            and/or contains the implemented ``Connection`` plugin class.
 
     2. create the plugin package by writing a ``setup.py`` setup script. There
@@ -86,7 +86,7 @@ There are few major steps involved in creating your own plugin package:
             )
 
        and replace ``<platform_name>`` with your platform's string name, and
-       ``<module_name>`` being the name of plugin module you developed. 
+       ``<module_name>`` being the name of plugin module you developed.
 
        .. note::
 
@@ -109,12 +109,12 @@ There are few major steps involved in creating your own plugin package:
             )
 
 And voila! Once your plugin is installed (either via ``pip install`` or
-``python setup.py develop`` for development mode), it will be loaded 
+``python setup.py develop`` for development mode), it will be loaded
 automatically by Unicon.
 
 .. _Writing a Setup Script: https://docs.python.org/3/distutils/setupscript.html
 
-For more details, follow the detailed Unicon plugin example 
+For more details, follow the detailed Unicon plugin example
 presented at https://github.com/CiscoDevNet/pyats-plugin-examples.
 
 Implementing a New Platform
@@ -123,52 +123,55 @@ Implementing a New Platform
 Creating a Unicon plugin for a new platform can be sub divided into four
 main steps,
 
-    * Creating a Connection Class:-
-      Defines all the attributes required for this connection.
-    * Writing Connection Provider:-
-      Provides methods to connect and disconnect this platform
-    * Creating State Machine:-
-      Defines all the supported states for this platform and handles state transitions
-    * Creating all required Services:-
-      Defines all the supported services for this platform
+* Creating a Connection Class:
+   * Defines all the attributes required for this connection.
+* Writing Connection Provider:
+   * Provides methods to connect and disconnect this platform
+* Creating State Machine:
+   * Defines all the supported states for this platform and handles state transitions
+* Creating all required Services:
+   * Defines all the supported services for this platform
 
 Connection class
 ----------------
 Connection class serves as the starting point for the device connection.
-Unicon PluginManager bases on the platform to create the right connection class,
+Unicon PluginManager is based on the platform to create the right connection class,
 which in turn initializes all its required components,
 such as connection provider, state machine, supported services and etc.
 
-Users implementing new platform has define connection class, with the required
-parameters which are listed below in this section, new connection class
+Users implementing a new platform have to define a ``Connection class``, with the required
+parameters which are listed below in this section. The new ``Connection`` class
 should satisfy the following conditions
 
-    * It should be subclass(direct or indirect) of ``Connection`` or ``BaseSingleRpConnection`` or ``BaseDualRpConnection``
+    * It should be subclass (direct or indirect) of ``Connection``, ``BaseSingleRpConnection`` or ``BaseDualRpConnection``
 
-    *  Connection class follows class hierarchy which are aligned/derived according to the os, series and model
+    * ``Connection`` follows class hierarchy which is aligned/derived according to the os, platform and model
 
-    * Based the chasis type there should be separate definition of the class
+    * Based the chassis type, there should be a separate definition of the class
 
-Connection class takes the following mandatory parameters
+The ``Connection`` class takes the following mandatory parameters
 
-    * os = OS for which the implementation is intended
-    * series = Platform series of this implementation
-    * model = Model which this implementation supports
-    * chassis_type = Hardware chassis type single_rp, dual_rp or stack
-    * connection_provider_class = Class which implements actual step for
-      connecting to a device
-    * state_machine_class = State machine to be used
-    * subcommand_list = List of subcommand supported
-    * settings = Settings to be used for this connection
+========================= ========================================
+Parameter                 Description
+========================= ========================================
+os                        OS for which the implementation is intended
+platform                  Platform of this implementation
+model                     Model which this implementation supports
+chassis_type              Hardware chassis type single_rp, dual_rp or stack
+connection_provider_class Class which implements actual step for connecting to a device
+state_machine_class       State machine to be used
+subcommand_list           List of subcommand supported
+settings                  Settings to be used for this connection
+========================= ========================================
 
-os and chassis_type of the implementation has to be mentioned in the connection.
+``os`` and ``chassis_type`` of the implementation has to be mentioned in the connection.
 
 .. code-block:: python
 
     # Example Connection class Nxos single Rp connection
     class NxosSingleRpConnection(BaseSingleRpConnection):
       os = 'nxos'
-      series = None
+      platform = None
       chassis_type = 'single_rp'
       state_machine_class = NxosSingleRpStateMachine
       connection_provider_class = NxosSingleRpConnectionProvider
@@ -178,33 +181,34 @@ os and chassis_type of the implementation has to be mentioned in the connection.
     # Example Connection class Nxos Dual Rp connection
     class NxosDualRPConnection(BaseDualRpConnection):
       os = 'nxos'
-      series = None
+      platform = None
       chassis_type = 'dual_rp'
       state_machine_class = NxosDualRpStateMachine
       connection_provider_class = NxosDualRpConnectionProvider
       subcommand_list = HANxosServiceList
       settings = NxosSettings()
 
-Base Connection (e.g `BaseSingleRpConnection<unicon.bases.routers.connection.BaseSingleRpConnection>` and `BaseDualRpConnection<unicon.bases.routers.connection.BaseDualRpConnection>`) classes of
-unicon defines the workflow of connection and it satisfies all common needs of
-router connection, user may not need to override any of the method unless there is
+Base Connection (e.g `BaseSingleRpConnection<unicon.bases.routers.connection.BaseSingleRpConnection>`
+and `BaseDualRpConnection<unicon.bases.routers.connection.BaseDualRpConnection>`) classes of
+unicon defines the workflow of ``Connection`` and it satisfies all common needs of
+router connection, the user may not need to override any of the methods unless there is
 specific scenario to handle.
 
 
 
 Connection Provider
 -------------------
-The connection class for any platform depends on connection provider for initiation a
-connection. As the name suggests their role is to provide a method to let the
+The connection class for any platform depends on the connection provider for initiating a
+connection. As the name suggests, their role is to provide a method to let the
 application connect and disconnect to the device.
 
-This class provides two essential methods namely connect and disconnect.
-Connect method defines all the steps involved in connection process, which are
+This class provides two essential methods, namely ``connect`` and ``disconnect``.
+The ``connect`` method defines all the steps involved in the connection process, which are
 defined as separate methods. These steps vary
 depending on the chassis type and the device, changing the behaviour of these
 can be achieved by overriding the method corresponding to each step.
 
-In the case of singleRP the steps involved in connection process are
+In the case of singleRP the steps involved in the connection process are:
   1. get_connection_dialog
   2. establish_connection
   3. init_handle
@@ -212,8 +216,8 @@ In the case of singleRP the steps involved in connection process are
   This is handled by the `BaseSingleRpConnectionProvider<unicon.bases.routers.connection_provider.BaseSingleRpConnectionProvider>` class.
 
 
-Whereas DualRp does few additional step like designate handles, initialize/unlock
-standby and assign ha mode.
+Whereas DualRp does a few additional steps like designate handles, initialize/unlock
+standby, and assign ha mode.
 
   This is handled by the `BaseDualRpConnectionProvider<unicon.bases.routers.connection_provider.BaseDualRpConnectionProvider>` class.
 
@@ -221,30 +225,30 @@ standby and assign ha mode.
 
 Pattern
 -------
-For all patterns used by match_buffer, eg. dialog, statemachine, expect,
+For all patterns used by ``match_buffer``, eg. dialog, statemachine, expect,
 by default, pty_backend match_buffer will detect the match mode.
 It can be turned off by passing match_mode_detect=False to spawn or by changing settings.
 
 Rules:
 
-1. search whole buffer with re.DOTALL if:
+1. search the whole buffer with re.DOTALL if:
 
-- pattern contains any of: r'\n', r'\r', .
-- pattern equals to any of: r'.*', r'^.*$', r'.*$', r'^.*', r'.+', r'^.+$', r'.+$', r'^.+'
+   - pattern contains any of: r'\n', r'\r', .
+   - pattern equals to any of: r'.*', r'^.*$', r'.*$', r'^.*', r'.+', r'^.+$', r'.+$', r'^.+'
 
-2. If pattern ends with '$' but not r'\$', match_buffer will only match last line
+2. If the pattern ends with '$' but not r'\\$', match_buffer will only match the last line
 
-3. In other situations, search whole buffer with re.DOTALL
+3. In other situations, search the whole buffer with re.DOTALL
 
 
 
 StateMachine
 ------------
-State machine class holds the details of all supported states for a platform
+The State Machine class holds the details of all supported states for a platform
 and handles the transition of the device to different states.
-Each platform has their own state machine class. State machine class provides
-a create method where all the device states have to be created.
-State Machine should be sub class of ``StateMachine`` class from
+Each platform has their own state machine class. The State Machine class provides
+a ``create`` method where all the device states have to be created.
+The State Machine should be sub class of ``StateMachine`` class from
 ``unicon.statemachine``
 
 .. code-block:: python
@@ -260,9 +264,10 @@ State Machine should be sub class of ``StateMachine`` class from
         self.create_path(enable, config, 'config term', None)
         self.create_path(config, enable, 'end', None)
 
-For more detailed document on state machine refer
-
-<todo> add link state machine detail document here
+..
+  <TODO> Add link to detailed documentation here
+  For more detailed document on state machine refer
+  <link>
 
 Creating New Services
 ---------------------
@@ -271,11 +276,11 @@ Refer detailed document :ref:`new-service-creation`
 Settings
 --------
 
-Unicon Connection behavior can changed by modifying its settings. The default
+Unicon Connection behavior can be changed by modifying its settings. The default
 settings for unicon is 'unicon.setting.Settings', users can inherit and
-change this settings if they wish to provide any platform or plugin level
-setting. Unicon connection class takes an additional input settings, which
-can be used to provide plugin/platform level settings
+change these settings if they wish to provide any platform or plugin level
+setting. Unicon ``Connection`` class takes additional input settings, which
+can be used to provide plugin/platform level settings.
 
 .. code-block:: python
 
@@ -289,11 +294,11 @@ can be used to provide plugin/platform level settings
 
 **Recommendations** :
 
-  * We strictly recommend to follow generic plugins file and class structure
+  * We strictly recommend to follow the generic plugins file and class structure
     while implementing your new platforms.
 
-  * Also its highly recommended to use the generic plugins Statemachine and services
-    as the base class for your implementations statemachine and services.
+  * It is also highly recommended to use the generic plugins Statemachine and services
+    as the base class for your implementation's statemachine and services.
 
-Consider adding `DEFAULT_HOSTNAME_PATTERN` attribute for `Settings` object for
+Consider adding the `DEFAULT_HOSTNAME_PATTERN` attribute to the `Settings` object for the
 `learn_hostname` feature to work. Refer :ref:`learn-hostname-feature`.

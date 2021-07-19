@@ -29,7 +29,7 @@ def get_dev():
     dev = Connection(hostname=box['hostname'],
                      username=box['username'],
                      tacacs_password=box['tacacs_password'],
-                     start=[box['cmd']],
+                     start=[box['cmd']], 
                      os='aireos')
     dev.connect()
     return dev
@@ -149,6 +149,12 @@ class TestAireosReboots(unittest.TestCase):
         self.device.reload()
         # self.assertEqual(execute_show(self.device), True)
 
+    # reload with error patterns in the mock data
+    def test_reload_with_errors(self):
+        with self.assertRaises(SubCommandFailure) as err:
+            self.device.reload("reset system forced with errors")
+        device.disconnect()
+
     def test_transfer_simconf_devshell(self):
         simconf = """
 AP_BASE_MAC=00:0b:0c
@@ -231,6 +237,14 @@ class TestAireOsPlugin(unittest.TestCase):
         self.cc.connect()
         self.cc.reload()
 
+    def test_restart(self):
+        self.c.connect()
+        self.c.reload("restart")
+
+    def test_force_switchover(self):
+        self.c.connect()
+        self.c.reload("redundancy force-switchover")
+
     def test_press_any_key(self):
         self.c.connect()
         self.c.execute("grep exclude generation 'show run-config startup-commands'")
@@ -244,7 +258,9 @@ class TestAireOsPlugin(unittest.TestCase):
         self.c.execute("show command with more")
 
     def test_execute_error_pattern(self):
-        for cmd in ['transfer upload start', 'show foo', 'debug lwapp']:
+        for cmd in ['transfer upload start', 'show foo', 'debug lwapp', 'config time ntp delete foo',
+                    'config time ntp delete 2', 'config wlan enable 20', 'config wlan security web-auth captive-bypass enable 10',
+                    'config wlan error', 'config wlan interface 511 all-interfaces', 'config wlan create 511 Company-guest Company-guest']:
             with self.assertRaises(SubCommandFailure) as err:
                 r = self.c.execute(cmd)
 
@@ -276,7 +292,20 @@ class TestAireosPluginStates(unittest.TestCase):
     def test_all_states(self):
         states = ['show', 'test', 'debug', 'transfer', 'license', 'reset', 'save', 'shell']
         for state in states:
+            self.c.log.info('Changing to state %s' % state)
             self.c.state_machine.go_to(state, self.c.spawn)
+            self.assertEqual(self.c.state_machine.current_state, state)
+
+
+class TestAireosPluginConnect(unittest.TestCase):
+
+    def test_connect_with_capwap_sim(self):
+        c = Connection(hostname='Controller',
+                            start=['mock_device_cli --os aireos  --state aireos_exec --hostname "Cisco Capwap Simulator"'],
+                            os='aireos',
+                            username='lab',
+                            init_config_commands=[])
+        c.connect()
 
 
 if __name__ == '__main__':  # pragma: no cover

@@ -37,3 +37,9 @@ class FtdStatements(object):
                                    args=None,
                                    loop_continue=True,
                                    continue_timer=False)
+
+        self.are_you_sure_stmt = Statement(patterns.are_you_sure,
+                                  action='sendline(y)',
+                                  args=None,
+                                  loop_continue=True,
+                                  continue_timer=False)

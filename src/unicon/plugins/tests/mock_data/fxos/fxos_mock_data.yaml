@@ -1,7 +1,17 @@
+
+console:
+  preface: |
+    Trying 2.2.2.2...
+    Connected to ts.cisco.com.
+    Escape character is '^]'.
+  commands:
+    "":
+      new_state: chassis_login
+
 chassis_login:
   preface: |2
     Cisco FPR Series Security Appliance
-  prompt: "QP-A-Y-A login: "
+  prompt: "%N login: "
   commands:
     "admin":
       new_state: chassis_password
@@ -20,7 +30,7 @@ chassis_exec_fail:
   prompt: "this is not a valid prompt"
 
 chassis_exec:
-  prompt: "QP-A-Y-A# "
+  prompt: "%N# "
   commands:
     "term length 0": ""
     "term width 0": ""
@@ -34,7 +44,7 @@ chassis_exec:
     "exit":
       new_state: chassis_login
 
-console:
+ftd_exec:
   prompt: "> "
   commands:
     "connect fxos":
@@ -126,7 +136,7 @@ ftd_module_root:
       new_state: ftd_expert
 
 
-fxos_connect:
+fxos_console:
   preface: Escape character is '^]'.
   prompt: ""
   commands:
@@ -136,10 +146,14 @@ fxos_connect:
 fxos_exec:
   prompt: "Firepower# "
   commands:
+    "connect ftd":
+      nwe_state: ftd_exec
     "exit":
-      new_state: console
+      new_state: ftd_exec
     "scope system":
       new_state: fxos_system
+    "scope security":
+      new_state: fxos_security
     "scope service-profile":
       new_state: fxos_service_profile
     "connect fxos":
@@ -152,7 +166,14 @@ fxos_exec:
       new_state: connect_cimc
     "connect module 1 console":
       new_state: module_console_wait
+    "config change":
+      new_state: fxos_exec_modified
 
+fxos_exec_modified:
+    prompt: "Firepower* #"
+    commands:
+      "top":
+        new_state: fxos_exec
 
 connect_cimc:
   preface: |
@@ -186,12 +207,21 @@ fxos_system:
     "scope services":
       new_state: fxos_system_services
 
+fxos_security:
+  prompt: "Firepower /security # "
+  commands:
+    "top":
+      new_state: fxos_exec
+    "clear-user-sessions all": This closes all the user sessions. Are you sure? (yes/no)
+
 fxos_system_services:
   prompt: "Firepower /system/services # "
   commands:
     "create ntp-server 192.168.200.101":
       new_state: fxos_system_services_modified
     "commit-buffer": "Error: update failed"
+    "show foo": "% Invalid Command at '^' marker"
+    "show chassis inventory 1 fa": "% Ambiguous command at '^' marker"
 
 fxos_system_services_modified:
   prompt: "Firepower /system/services* # "
