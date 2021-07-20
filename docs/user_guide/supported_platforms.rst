@@ -70,6 +70,7 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
     ``staros``
     ``vos``
     ``junos``
+    ``eos``
     ``sros``
     ``viptela``,,,"Identical to os=sdwan, platform=viptela."
     ``windows``
