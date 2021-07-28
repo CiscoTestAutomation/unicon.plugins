@@ -23,8 +23,6 @@ class NxosSettings(GenericSettings):
         self.RELOAD_TIMEOUT = 600
         self.RELOAD_RECONNECT_WAIT = 60
         self.CONSOLE_TIMEOUT = 30
-        self.GUESTSHELL_RETRIES = 20
-        self.GUESTSHELL_RETRY_SLEEP = 5
         self.ATTACH_CONSOLE_DISABLE_SLEEP = 250
         self.ERROR_PATTERN = [
             r'^%\s*[Ii]nvalid (command|input|number)',
@@ -43,3 +41,10 @@ class NxosSettings(GenericSettings):
             r'^%\s*[Ee](RROR|rror).*',
             r'^%\s*Ambiguous command'
         ]
+
+        self.GUESTSHELL_CONFIG_CMDS = []
+        self.GUESTSHELL_CONFIG_VERIFY_CMDS = []
+        self.GUESTSHELL_CONFIG_VERIFY_PATTERN = r''
+        self.GUESTSHELL_ENABLE_CMDS = 'guestshell enable'
+        self.GUESTSHELL_ENABLE_VERIFY_CMDS = 'show guestshell | i State'
+        self.GUESTSHELL_ENABLE_VERIFY_PATTERN = r'State\s*:\s*Activated'

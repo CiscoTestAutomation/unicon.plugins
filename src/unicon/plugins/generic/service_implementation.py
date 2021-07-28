@@ -1108,6 +1108,7 @@ class Reload(BaseService):
                         break
 
                 con.context = context
+                con.spawn.sendline()
                 con.connection_provider.connect()
                 self.result = True
 
@@ -1332,6 +1333,12 @@ class Ping(BaseService):
             self.result = dialog.process(
                 spawn, context=ping_context, timeout=timeout)
         except Exception as err:
+            # catch the prompt before raising an exception
+            # this uses 'any' state and not 'end_state'
+            # on purpose, this works best with real devices.
+            handle.state_machine.go_to('any',
+                                       handle.spawn,
+                                       context=self.context)
             raise SubCommandFailure("Ping failed", err) from err
 
         self.result = self.result.match_output
@@ -2011,8 +2018,6 @@ class HAReloadService(BaseService):
                 sleep(6)
                 counter += 1
 
-        con.disconnect()
-        con.connect()
         con.log.info("+++ Reload Completed Successfully +++")
         self.result = True
         if return_output:
@@ -2572,3 +2577,153 @@ class Switchto(BaseService):
 
     def post_service(self, *args, **kwargs):
         pass
+
+
+class GuestshellService(BaseService):
+    """Service to provide a Linux console.
+
+    Arguments:
+        enable_guestshell: Enable the guestshell if not already enabled
+        timeout: Timeout for entering/exiting guestshell mode
+        retries: If enable_guestshell is True, number of retries
+          (waiting 5 seconds per retry) to successfully issue the
+          "guestshell enable" command, and also the number of retries to wait
+          for the guestshell to become activated afterward.
+          Default is 20 (100 seconds maximum)
+
+    Example:
+        .. code-block:: python
+
+            with rtr.guestshell(enable_guestshell=True, retries=10) as gs:
+                gs.execute("ifconfig")
+
+            with rtr.guestshell() as gs:
+                gs.execute("ls")
+                gs.execute("pwd")
+    """
+
+    def __init__(self, connection, *args, **kwargs):
+        super().__init__(connection, *args, **kwargs)
+        self.start_state = "enable"
+        self.end_state = "enable"
+
+    def call_service(self, **kwargs):
+        self.result = self.__class__.ContextMgr(connection=self.connection,
+                                                **kwargs)
+
+    class ContextMgr(object):
+        def __init__(self, connection,
+                     enable_guestshell=False, timeout=None, retries=None):
+            self.conn = connection
+            self.enable_guestshell = enable_guestshell
+            self.timeout = timeout or connection.settings.EXEC_TIMEOUT
+            self.retries = retries or connection.settings.GUESTSHELL_RETRIES
+
+        def __enter__(self):
+
+            if 'guestshell' not in [s.name for s in self.conn.state_machine.states]:
+                raise NotImplementedError('Guest shell state not implemented')
+
+            if self.enable_guestshell:
+                self.conn.log.debug("+++ enabling guestshell +++")
+
+                if self.conn.settings.GUESTSHELL_CONFIG_CMDS:
+                    output = self.conn.execute(self.conn.settings.GUESTSHELL_CONFIG_VERIFY_CMDS)
+                    if isinstance(output, dict):
+                        output = '\n'.join(output.values())
+
+                    if not re.search(self.conn.settings.GUESTSHELL_CONFIG_VERIFY_PATTERN, output):
+                        self.conn.configure(self.conn.settings.GUESTSHELL_CONFIG_CMDS)
+                        for _ in range(self.retries):
+                            output = self.conn.execute(self.conn.settings.GUESTSHELL_CONFIG_VERIFY_CMDS)
+                            if isinstance(output, dict):
+                                output = '\n'.join(output.values())
+
+                            if re.search(self.conn.settings.GUESTSHELL_CONFIG_VERIFY_PATTERN, output):
+                                break
+                            else:
+                                sleep(self.conn.settings.GUESTSHELL_RETRY_SLEEP)
+                                continue
+                        else:
+                            raise SubCommandFailure(
+                                "Failed to enable guestshell after %d tries"
+                                % self.retries)
+
+                if self.conn.settings.GUESTSHELL_ENABLE_CMDS:
+                    # "guestshell enable" may fail with a "please retry request"
+                    # if the guestshell is already undergoing another transition,
+                    # so we may potentially need to retry the command.
+                    for _ in range(self.retries):
+                        # Note: "guestshell enable" is an exec command not a config
+                        output = self.conn.execute(self.conn.settings.GUESTSHELL_ENABLE_CMDS,
+                                                   timeout=self.timeout)
+                        if isinstance(output, dict):
+                            output = '\n'.join(output.values())
+                        if not output or re.search("already enabled|enabled successfully", output):
+                            break
+                        elif "please retry request" in output:
+                            sleep(self.conn.settings.GUESTSHELL_RETRY_SLEEP)
+                            continue
+                        else:
+                            # Other output indicates some unexpected failure
+                            raise SubCommandFailure(
+                                "Failed to enable guestshell: %s" % output)
+                    else:
+                        raise SubCommandFailure(
+                            "Failed to enable guestshell after %d tries"
+                            % self.retries)
+
+                if self.conn.settings.GUESTSHELL_ENABLE_VERIFY_CMDS:
+                    # Okay, we successfully issued "guestshell enable".
+                    # Now it may take some time for the guestshell to become
+                    # fully activated (ready for use).
+                    self.conn.log.debug("+++ waiting for guestshell activation +++")
+                    for i in range(self.retries):
+                        output = self.conn.execute(self.conn.settings.GUESTSHELL_ENABLE_VERIFY_CMDS,
+                                                   timeout=self.timeout)
+
+                        if isinstance(output, dict):
+                            output = '\n'.join(output.values())
+                        if re.search(self.conn.settings.GUESTSHELL_ENABLE_VERIFY_PATTERN, output):
+                            # Success
+                            break
+                        elif "failed" in output.lower():
+                            # Terminal state, won't recover
+                            raise SubCommandFailure(
+                                "Failed to install/activate guestshell: %s"
+                                % output)
+                        else:
+                            # Not yet ready
+                            sleep(self.conn.settings.GUESTSHELL_RETRY_SLEEP)
+                            continue
+                    else:
+                        raise SubCommandFailure(
+                            "Guestshell failed to become activated after %d tries"
+                            % self.retries)
+
+            self.conn.log.debug('+++ entering guestshell +++')
+            conn = self.conn.active if self.conn.is_ha else self.conn
+            conn.state_machine.go_to('guestshell',
+                                     conn.spawn,
+                                     timeout=self.timeout,
+                                     context=self.conn.context)
+
+            return self
+
+        def __exit__(self, *args):
+            self.conn.log.debug('--- exiting guestshell ---')
+            conn = self.conn.active if self.conn.is_ha else self.conn
+            conn.state_machine.go_to('enable',
+                                     conn.spawn,
+                                     timeout=self.timeout,
+                                     context=self.conn.context)
+
+            # do not suppress any errors that occurred
+            return False
+
+        def __getattr__(self, attr):
+            if attr in ('execute', 'sendline', 'send', 'expect'):
+                return getattr(self.conn, attr)
+
+            raise AttributeError('%s object has no attribute %s'
+                                 % (self.__class__.__name__, attr))

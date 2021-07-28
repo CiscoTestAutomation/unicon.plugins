@@ -55,6 +55,7 @@ pipeline {
             steps {
                 sh """
                     export PIP_DOWNLOAD_CACHE=/scratch/pip_download_cache
+                    export LC_ALL=C.UTF-8
                     rm -rf /scratch/unicon-dev
                     cd /scratch
                     /usr/bin/python3.6 -m venv unicon-dev
