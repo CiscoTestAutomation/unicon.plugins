@@ -82,6 +82,9 @@ class GenericSettings(Settings):
         self.CONFIG_POST_RELOAD_MAX_RETRIES = 20
         self.CONFIG_POST_RELOAD_RETRY_DELAY_SEC = 9
 
+        self.GUESTSHELL_RETRIES = 20
+        self.GUESTSHELL_RETRY_SLEEP = 5
+
         # Default error pattern
         self.ERROR_PATTERN = [r"% Invalid command at",
                               r"% Invalid input detected at",

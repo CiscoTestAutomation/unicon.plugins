@@ -5,13 +5,14 @@ Unittests for Generic plugin
 
 __author__ = "Dave Wapstra <dwapstra@cisco.com>"
 
-from concurrent.futures import ThreadPoolExecutor
-import multiprocessing
 import os
 import re
 import time
 import unittest
 from unittest.mock import Mock, call, patch
+from concurrent.futures import ThreadPoolExecutor
+
+multiprocessing = __import__('multiprocessing').get_context('fork')
 
 from pyats.datastructures import AttrDict
 

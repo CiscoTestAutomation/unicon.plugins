@@ -61,6 +61,7 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
     ``nxos``
     ``nxos``, ``mds``
     ``nxos``, ``n5k``
+    ``nxos``, ``n7k``
     ``nxos``, ``n9k``
     ``nxos``, ``nxosv``
     ``nxos``, ``aci``

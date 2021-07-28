@@ -7,8 +7,6 @@ Uses the mock_device.py script to test the execute service.
 
 __author__ = "Dave Wapstra <dwapstra@cisco.com>"
 
-from concurrent.futures import ThreadPoolExecutor
-import multiprocessing
 import os
 import re
 import yaml
@@ -16,6 +14,9 @@ import datetime
 import unittest
 import importlib
 from pprint import pformat
+
+from concurrent.futures import ThreadPoolExecutor
+multiprocessing = __import__('multiprocessing').get_context('fork')
 
 from unittest.mock import Mock, call, patch
 

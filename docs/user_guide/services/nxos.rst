@@ -488,31 +488,6 @@ command      str (no vdc)              alternate command.
     in. Isn't is obvious !!
 
 
-guestshell
-----------
-
-Service to execute commands in the Linux "guest shell" available on certain
-Nexus platforms. ``guestshell`` gives you a router-like object to execute
-commands on using a Python context manager.
-
-=================   ========   ===================================================================
-Argument            Type       Description
-=================   ========   ===================================================================
-enable_guestshell   boolean    Explicitly enable the guestshell before attempting to enter.
-timeout             int (10)   Timeout for "guestshell enable", "guestshell", and "exit" commands.
-retries             int (20)   Number of retries (x 5 second interval) to attempt to enable guestshell.
-=================   ========   ===================================================================
-
-.. code-block:: python
-
-    with device.guestshell(enable_guestshell=True, retries=30) as gs:
-        output = gs.execute("ifconfig")
-
-    with device.guestshell() as gs:
-        output1 = gs.execute('pwd')
-        output2 = gs.execute('ls -al')
-
-
 reload
 ------
 

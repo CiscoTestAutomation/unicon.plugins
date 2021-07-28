@@ -504,6 +504,24 @@ class TestNxosPluginMaintenanceMode(unittest.TestCase):
         dev.disconnect()
 
 
+class TestNxosPluginDebugMode(unittest.TestCase):
+
+    def test_debug_prompt(self):
+        dev = Connection(
+            hostname='N93_1',
+            start=['mock_device_cli --os nxos --state debug --hostname N93_1'],
+            os='nxos',
+            credentials={
+                'defaut': {
+                    'username': 'cisco',
+                    'password': 'cisco'
+                }
+            }
+        )
+        dev.connect()
+        dev.disconnect()
+
+
 class TestNxosIncorrectLogin(unittest.TestCase):
 
     def test_incorrect_login(self):
@@ -660,56 +678,6 @@ class TestNxosPluginSwitchtoVdc(unittest.TestCase):
     def test_switchto_new_vdc_switchback(self):
         self.c.switchto('N77_4')
         self.c.switchback()
-
-
-class TestNxosVDC(unittest.TestCase):
-
-    def test_connect_login(self):
-        c = Connection(hostname='admin',
-                       start=['mock_device_cli --os nxos --state login'],
-                       os='nxos',
-                       init_exec_commands=[],
-                       init_config_commands=[],
-                       log_buffer=True,
-                       credentials=dict(default=dict(username='cisco', password='cisco'))
-                       )
-        c.connect()
-        c.execute('show version')
-
-    def test_connect_to_non_default_vdc(self):
-        c = Connection(hostname='admin',
-                       start=['mock_device_cli --os nxos --state vdc_exec'],
-                       os='nxos',
-                       init_exec_commands=[],
-                       init_config_commands=[],
-                       log_buffer=True)
-        c.connect()
-        c.switchback()
-        c.configure()
-
-    def test_connect_to_non_default_vdc_with_learn_hostname(self):
-        c = Connection(hostname='admin',
-                       start=['mock_device_cli --os nxos --state vdc_exec'],
-                       os='nxos',
-                       init_exec_commands=[],
-                       init_config_commands=[],
-                       log_buffer=True,
-                       learn_hostname=True)
-        c.connect()
-        c.switchback()
-        c.configure()
-
-    def test_connect_default_vdc_with_more_prompt(self):
-        c = Connection(hostname='N7K-B',
-                       start=['mock_device_cli --os nxos --state vdc_exec2'],
-                       os='nxos',
-                       init_exec_commands=[],
-                       init_config_commands=[],
-                       log_buffer=True,
-                       learn_hostname=True,
-                       mit=True)
-        c.connect()
-        c.switchback()
 
 
 if __name__ == "__main__":

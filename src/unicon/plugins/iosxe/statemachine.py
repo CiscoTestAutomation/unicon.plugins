@@ -71,6 +71,7 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         enable = State('enable', patterns.enable_prompt)
         config = State('config', patterns.config_prompt)
         shell = State('shell', patterns.shell_prompt)
+        guestshell = State('guestshell', patterns.guestshell_prompt)
 
         disable_to_enable = Path(disable, enable, 'enable', Dialog([
             statements.enable_password_stmt,
@@ -82,14 +83,20 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         enable_to_config = Path(enable, config, config_transition, Dialog([statements.syslog_msg_stmt]))
         config_to_enable = Path(config, enable, 'end', Dialog([statements.syslog_msg_stmt]))
 
+        enable_to_guestshell = Path(enable, guestshell, 'guestshell run bash', None)
+        guestshell_to_enable = Path(guestshell, enable, 'exit', None)
+
         self.add_state(disable)
         self.add_state(enable)
         self.add_state(config)
+        self.add_state(guestshell)
 
         self.add_path(disable_to_enable)
         self.add_path(enable_to_disable)
         self.add_path(enable_to_config)
         self.add_path(config_to_enable)
+        self.add_path(enable_to_guestshell)
+        self.add_path(guestshell_to_enable)
 
         rommon = State('rommon', patterns.rommon_prompt)
         enable_to_rommon = Path(enable, rommon, 'reload',
@@ -125,11 +132,22 @@ class IosXEDualRpStateMachine(StateMachine):
         rommon = State('rommon', patterns.rommon_prompt)
         shell = State('shell', patterns.shell_prompt)
 
+        def update_cur_state(sm, state):
+            sm._current_state = state
+
         # Paths
         disable_to_enable = Path(disable, enable, 'enable', Dialog([
             statements.enable_password_stmt,
             statements.bad_password_stmt,
-            statements.syslog_stripper_stmt
+            statements.syslog_stripper_stmt,
+            Statement(
+                pattern=patterns.standby_locked,
+                action=update_cur_state,
+                args={
+                    'sm': self,
+                    'state': 'standby_locked'
+                },
+                loop_continue=False)
         ]))
 
         enable_to_disable = Path(enable, disable, 'disable', Dialog([statements.syslog_msg_stmt]))
