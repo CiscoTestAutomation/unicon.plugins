@@ -11,6 +11,20 @@ from unicon.plugins.nxos.setting import NxosSettings
 from .statemachine import NxosMdsSingleRpStateMachine
 from .statemachine import NxosMdsDualRpStateMachine
 
+from . import service_implementation as svc
+
+
+class NxosMdsServiceList(NxosServiceList):
+    def __init__(self):
+        super().__init__()
+        self.tie = svc.Tie
+
+
+class NxosMdsHaserviceList(HANxosServiceList):
+    def __init__(self):
+        super().__init__()
+        self.tie = svc.Tie
+
 
 class NxosMdsSingleRpConnection(NxosSingleRpConnection):
     os = 'nxos'
@@ -18,7 +32,7 @@ class NxosMdsSingleRpConnection(NxosSingleRpConnection):
     chassis_type = 'single_rp'
     state_machine_class = NxosMdsSingleRpStateMachine
     connection_provider_class = NxosSingleRpConnectionProvider
-    subcommand_list = NxosServiceList
+    subcommand_list = NxosMdsServiceList
     settings = NxosSettings()
 
 
@@ -28,6 +42,6 @@ class NxosMdsDualRPConnection(NxosDualRPConnection):
     chassis_type = 'dual_rp'
     state_machine_class = NxosMdsDualRpStateMachine
     connection_provider_class = NxosDualRpConnectionProvider
-    subcommand_list = HANxosServiceList
+    subcommand_list = NxosMdsHaserviceList
     settings = NxosSettings()
 

@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
-                                New
+                                Fix
 --------------------------------------------------------------------------------
-* IOSXE
-    * Added execute statement for 'Do you want to remove the above files?'
+* <OS>
+    * <describe the changes>

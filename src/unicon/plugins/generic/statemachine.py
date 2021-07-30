@@ -55,12 +55,9 @@ def config_transition(statemachine, spawn, context):
                      Statement(pattern=statemachine.get_state('config').pattern,
                                loop_continue=False,
                                trim_buffer=False),
-                     Statement(pattern=patterns.config_start,
-                               action=config_service_prompt_handler,
-                               args={'config_pattern': statemachine.get_state('config').pattern},
-                               loop_continue=True,
-                               trim_buffer=False)
                      ])
+    if hasattr(statemachine, 'config_transition_statement_list'):
+        dialog += Dialog(statemachine.config_transition_statement_list)
 
     for attempt in range(max_attempts + 1):
         spawn.sendline(statemachine.config_command)

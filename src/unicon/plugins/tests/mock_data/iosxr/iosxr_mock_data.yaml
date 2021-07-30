@@ -51,7 +51,7 @@ ssh_password:
       new_state: enable
 
 exec:
-  prompt: "RP/0/RP0/CPU0:Router>"
+  prompt: "RP/0/RP0/CPU0:%N>"
   commands:
     "enable":
       new_state: enable
@@ -393,7 +393,7 @@ admin:
 
 
 config:
-  prompt: "RP/0/RP0/CPU0:Router(config)#"
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
   commands: &config_cmds
     "end":
       new_state: enable
@@ -428,9 +428,20 @@ config:
     "test failed":
       new_state:
         failed_config
+    "redundancy":
+      new_state: config_redundancy
+
+config_redundancy:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "main-cpu": ""
+    "standby console enable": ""
+    "commit": ""
+    "end":
+      new_state: enable
 
 config_line:
-  prompt: "RP/0/RP0/CPU0:Router(config-line)#"
+  prompt: "RP/0/RP0/CPU0:%N(config-line)#"
   commands: 
     "exec-timeout 0 0": ""
     "clock timezone UTC 0 0": ""
@@ -451,7 +462,7 @@ config_line:
       new_state: commit_prompt
 
 config_exclusive:
-  prompt: "RP/0/RP0/CPU0:Router(config)#"
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
   commands:
     "end":
       new_state: enable
@@ -462,7 +473,7 @@ config_exclusive:
       new_state: commit_prompt
 
 line_console:
-  prompt: "RP/0/RP0/CPU0:Router(config-line)#"
+  prompt: "RP/0/RP0/CPU0:%N(config-line)#"
   commands:
     "exec-timeout 0 0": ""
     "absolute-timeout 0": ""
@@ -474,7 +485,7 @@ line_console:
       new_state: enable
 
 large_config:
-  prompt: "RP/0/RP0/CPU0:Router(config)#"
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
   commands:
     "commit": ""
     "end":
@@ -504,7 +515,7 @@ operation can be service affecting.\n"
       new_state: config
 
 failed_config:
-  prompt: "RP/0/RP0/CPU0:Router(config)#"
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
   commands:
     "commit": ""
     "end":
@@ -519,7 +530,7 @@ failed_config_uncommitted:
       new_state: failed_config_show
 
 failed_config_show:
-  prompt: "RP/0/RP0/CPU0:Router(config)#"
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
   commands:
     "show configuration failed": |2
       Fri Aug  3 15:34:40.336 UTC
@@ -539,7 +550,7 @@ failed_config_show:
       new_state: enable
 
 config1:
-  prompt: "RP/0/RP0/CPU0:Router(config)#"
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
   commands: &config_cmds1
     "end":
       new_state: enable1
@@ -556,7 +567,7 @@ config1:
       end
 
 config_line1:
-  prompt: "RP/0/RP0/CPU0:Router(config-line)#"
+  prompt: "RP/0/RP0/CPU0:%N(config-line)#"
   commands: 
     "exec-timeout 0 0": ""
     "clock timezone UTC 0 0": ""

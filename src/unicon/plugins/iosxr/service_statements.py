@@ -9,10 +9,10 @@ pat = IOSXRSwitchoverPatterns()
 
 
 prompt_switchover_stmt = Statement(pattern=pat.prompt_switchover,
-                              action='sendline()',
-                              args=None,
-                              loop_continue=True,
-                              continue_timer=True)
+                                   action='sendline()',
+                                   args=None,
+                                   loop_continue=True,
+                                   continue_timer=True)
 
 rp_in_standby_stmt = Statement(pattern=pat.rp_in_standby,
                                action=None,
@@ -48,7 +48,7 @@ confirm_module_reload_stmt = Statement(pattern=pat.reload_module_prompt,
 
 
 switchover_statement_list = [prompt_switchover_stmt,
-                             rp_in_standby_stmt # loop_continue = False
+                             rp_in_standby_stmt  # loop_continue = False
                              ]
 
 config_commit_stmt_list = [commit_changes_stmt,

@@ -51,3 +51,6 @@ class IOSXRSettings(GenericSettings):
 
         self.EXECUTE_MATCHED_RETRIES = 1
         self.EXECUTE_MATCHED_RETRY_SLEEP = 0.1
+
+        self.CONFIG_LOCK_RETRIES = 5
+        self.CONFIG_LOCK_RETRY_SLEEP = 30

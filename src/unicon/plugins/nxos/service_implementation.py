@@ -10,17 +10,22 @@ Description:
 
 """
 
+import io
 import re
 import collections
 import warnings
+import logging
 
 from time import sleep
+from datetime import datetime, timedelta
 
 from unicon.bases.routers.services import BaseService
 from unicon.plugins.generic.service_implementation import (
     BashService as GenericBashService)
 from unicon.core.errors import (SubCommandFailure, TimeoutError,
     UniconAuthenticationError)
+
+from unicon.logs import UniconStreamHandler, UNICON_LOG_FORMAT
 
 from unicon.eal.dialogs import Dialog, Statement
 from unicon.plugins.generic.service_implementation import \
@@ -41,6 +46,7 @@ from unicon.plugins.generic.service_implementation import \
     Configure as GenericConfigure
 from unicon.plugins.generic.service_statements import ping6_statement_list, \
     switchover_statement_list, standby_reset_rp_statement_list
+from unicon.plugins.generic.statements import buffer_settled
 from unicon.plugins.generic.service_statements import send_response
 from unicon.plugins.nxos.service_statements import nxos_reload_statement_list, \
     ha_nxos_reload_statement_list, execute_stmt_list
@@ -196,6 +202,10 @@ class Reload(GenericReload):
         self.dialog = Dialog(nxos_reload_statement_list)
         self.timeout = connection.settings.RELOAD_TIMEOUT
         self.command = 'reload'
+        self.log_buffer = io.StringIO()
+        lb = UniconStreamHandler(self.log_buffer)
+        lb.setFormatter(logging.Formatter(fmt=UNICON_LOG_FORMAT))
+        self.connection.log.addHandler(lb)
         self.__dict__.update(kwargs)
 
     def call_service(self,
@@ -208,6 +218,11 @@ class Reload(GenericReload):
                      reload_creds=None,
                      reconnect_sleep=None,
                      *args, **kwargs):
+
+        # Clear log buffer
+        self.log_buffer.seek(0)
+        self.log_buffer.truncate()
+
         con = self.connection
         timeout = timeout or self.timeout
         reconnect_sleep = reconnect_sleep or con.settings.RELOAD_RECONNECT_WAIT
@@ -227,7 +242,6 @@ class Reload(GenericReload):
                 "dialog passed must be an instance of Dialog")
         dialog = self.service_dialog(service_dialog=dialog)
         dialog += self.dialog
-        con.spawn.sendline(reload_command)
 
         if reload_creds:
             context = self.context.copy()
@@ -235,54 +249,77 @@ class Reload(GenericReload):
         else:
             context = self.context
 
+        start_time = current_time = datetime.now()
+        timeout_time = timedelta(seconds=self.timeout)
+        con.spawn.sendline(reload_command)
         try:
-            reload_output=dialog.process(con.spawn,
-                           context=context,
-                           prompt_recovery=self.prompt_recovery,
-                           timeout=timeout)
-            counter = 3
-            while(counter < 3):
-                counter = counter + 1
-                try:
-                    con.state_machine.go_to('any',
-                                            con.spawn,
-                                            prompt_recovery=self.prompt_recovery,
-                                            context=self.context)
-                    break
-                except Exception as err:
-                    if counter >= 3:
-                        raise Exception(' Bringing device failed even after retries') from err
-                    con.log.info('Retry in process')
-                    con.spawn.sendline()
+            try:
+                dialog.process(con.spawn,
+                               timeout=timeout,
+                               prompt_recovery=self.prompt_recovery,
+                               context=context)
+                con.log.info('Reload completed')
+            except TimeoutError:
+                con.log.error('Reload timed out')
+
+            if not con.connected:
+                con.disconnect()
+                for x in range(con.settings.RELOAD_RECONNECT_ATTEMPTS):
+                    con.log.info('Waiting for {} seconds'.format(con.settings.RELOAD_WAIT / (x + 1)))
+                    sleep(con.settings.RELOAD_WAIT / (x + 1))
+                    try:
+                        con.log.info('Trying to connect... attempt #{}'.format(x + 1))
+
+                        learn_hostname_ori = con.learn_hostname
+                        # During initialization after reload, hostname may temporarily be "switch".
+                        # When initialization finishes, hostname will be back to original hostname.
+                        con.learn_hostname = False
+                        config_lock_retries_ori = con.settings.CONFIG_LOCK_RETRIES
+                        con.configure.lock_retries = config_lock_retries
+                        config_lock_retry_sleep_ori = con.settings.CONFIG_LOCK_RETRY_SLEEP
+                        con.configure.lock_retry_sleep = config_lock_retry_sleep
+
+                        try:
+                            con.connect()
+                        finally:
+                            con.learn_hostname = learn_hostname_ori
+                            con.settings.CONFIG_LOCK_RETRIES = config_lock_retries_ori
+                            con.settings.CONFIG_LOCK_RETRY_SLEEP = config_lock_retry_sleep_ori
+
+                    except Exception:
+                        con.log.warning('Connection to {} failed'.format(con.hostname))
+                    if con.is_connected:
+                        break
+            else:
+                con.log.info('Waiting for boot messages to settle for {} seconds'.format(
+                    con.settings.POST_RELOAD_WAIT
+                ))
+                wait_time = timedelta(seconds=con.settings.POST_RELOAD_WAIT)
+                settle_time = current_time = datetime.now()
+                while (current_time - settle_time) < wait_time:
+                    if buffer_settled(con.spawn, con.settings.POST_RELOAD_WAIT):
+                        con.log.info('Buffer settled, accessing device..')
+                        break
+                    current_time = datetime.now()
+                    if (current_time - start_time) > timeout_time:
+                        con.log.info('Time out, trying to acces device..')
+                        break
+
+                con.context = context
+                con.connection_provider.connect()
+
         except Exception as err:
-            raise SubCommandFailure("Reload failed : %s" % err)
+            raise SubCommandFailure("Reload failed %s" % err) from err
 
-        con.log.info("Disconnecting")
-        con.disconnect()
-
-        con.log.info("Sleeping for %s secs before reconnect" % reconnect_sleep)
-        sleep(reconnect_sleep)
-
-        learn_hostname_ori = con.learn_hostname
-        # During initialization after reload, hostname may temporarily be "switch".
-        # When initialization finishes, hostname will be back to original hostname.
-        con.learn_hostname = False
-        config_lock_retries_ori = con.settings.CONFIG_LOCK_RETRIES
-        con.configure.lock_retries = config_lock_retries
-        config_lock_retry_sleep_ori = con.settings.CONFIG_LOCK_RETRY_SLEEP
-        con.configure.lock_retry_sleep = config_lock_retry_sleep
-
-        try:
-            con.connect()
-        finally:
-            con.learn_hostname = learn_hostname_ori
-            con.settings.CONFIG_LOCK_RETRIES = config_lock_retries_ori
-            con.settings.CONFIG_LOCK_RETRY_SLEEP = config_lock_retry_sleep_ori
+        self.log_buffer.seek(0)
+        reload_output = self.log_buffer.read()
+        # clear buffer
+        self.log_buffer.truncate()
 
         con.log.debug("+++ Reload Completed Successfully +++")
         self.result = True
         if return_output:
-            self.result = ReloadResult(self.result, reload_output.match_output.replace(reload_command, '', 1))
+            self.result = ReloadResult(self.result, reload_output)
 
 
 class Ping6(BaseService):
@@ -1500,122 +1537,3 @@ class BashService(GenericBashService):
 
             return self
 
-
-class GuestshellService(BaseService):
-    """Service to provide a Linux console.
-
-    Arguments:
-        enable_guestshell: Enable the guestshell if not already enabled
-        timeout: Timeout for entering/exiting guestshell mode
-        retries: If enable_guestshell is True, number of retries
-          (waiting 5 seconds per retry) to successfully issue the
-          "guestshell enable" command, and also the number of retries to wait
-          for the guestshell to become activated afterward.
-          Default is 20 (100 seconds maximum)
-
-    Example:
-        .. code-block:: python
-
-            with rtr.guestshell(enable_guestshell=True, retries=10) as gs:
-                gs.execute("ifconfig")
-
-            with rtr.guestshell() as gs:
-                gs.execute("ls")
-                gs.execute("pwd")
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.start_state = "enable"
-        self.end_state = "enable"
-
-    def call_service(self, **kwargs):
-        self.result = self.__class__.ContextMgr(connection=self.connection,
-                                                **kwargs)
-
-    class ContextMgr(object):
-        def __init__(self, connection,
-                     enable_guestshell=False, timeout=None, retries=None):
-            self.conn = connection
-            self.enable_guestshell = enable_guestshell
-            self.timeout = timeout or connection.settings.EXEC_TIMEOUT
-            self.retries = retries or connection.settings.GUESTSHELL_RETRIES
-
-        def __enter__(self):
-            if self.enable_guestshell:
-                self.conn.log.debug("+++ enabling guestshell +++")
-                # "guestshell enable" may fail with a "please retry request"
-                # if the guestshell is already undergoing another transition,
-                # so we may potentially need to retry the command.
-                for i in range(self.retries):
-                    # Note: "guestshell enable" is an exec command not a config
-                    output = self.conn.execute('guestshell enable',
-                                               timeout=self.timeout)
-                    if not output.strip():
-                        # Command was accepted
-                        break
-                    elif "already enabled" in output:
-                        break
-                    elif "please retry request" in output:
-                        sleep(self.conn.settings.GUESTSHELL_RETRY_SLEEP)
-                        continue
-                    else:
-                        # Other output indicates some unexpected failure
-                        raise SubCommandFailure(
-                            "Failed to enable guestshell: %s" % output)
-                else:
-                    raise SubCommandFailure(
-                        "Failed to enable guestshell after %d tries"
-                        % self.retries)
-
-                # Okay, we successfully issued "guestshell enable".
-                # Now it may take some time for the guestshell to become
-                # fully activated (ready for use).
-                self.conn.log.debug("+++ waiting for guestshell activation +++")
-                for i in range(self.retries):
-                    output = self.conn.execute("show guestshell | i State",
-                                               timeout=self.timeout)
-
-                    if "activated" in output.lower():
-                        # Success
-                        break
-                    elif "failed" in output.lower():
-                        # Terminal state, won't recover
-                        raise SubCommandFailure(
-                            "Failed to install/activate guestshell: %s"
-                            % output)
-                    else:
-                        # Not yet ready
-                        sleep(self.conn.settings.GUESTSHELL_RETRY_SLEEP)
-                        continue
-                else:
-                    raise SubCommandFailure(
-                        "Guestshell failed to become activated after %d tries"
-                        % self.retries)
-
-            self.conn.log.debug('+++ entering guestshell +++')
-            conn = self.conn.active if self.conn.is_ha else self.conn
-            conn.state_machine.go_to('guestshell',
-                                     conn.spawn,
-                                     timeout=self.timeout,
-                                     context=self.conn.context)
-
-            return self
-
-        def __exit__(self, *args):
-            self.conn.log.debug('--- exiting guestshell ---')
-            conn = self.conn.active if self.conn.is_ha else self.conn
-            conn.state_machine.go_to('enable',
-                                     conn.spawn,
-                                     timeout=self.timeout,
-                                     context=self.conn.context)
-
-            # do not suppress any errors that occurred
-            return False
-
-        def __getattr__(self, attr):
-            if attr in ('execute', 'sendline', 'send', 'expect'):
-                return getattr(self.conn, attr)
-
-            raise AttributeError('%s object has no attribute %s'
-                                 % (self.__class__.__name__, attr))

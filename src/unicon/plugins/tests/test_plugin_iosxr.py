@@ -614,5 +614,31 @@ class TestIosXrPluginConfigureExclusiveService(unittest.TestCase):
         conn.disconnect()
 
 
+class TestIosXrPluginReload(unittest.TestCase):
+
+    def test_reload_ncs540(self):
+        md = MockDeviceTcpWrapperIOSXR(hostname='R2', port=0, state='ncs540_enable')
+        md.start()
+
+        c = Connection(
+            hostname='R2',
+            start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
+            os='iosxr',
+            settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+            credentials=dict(default=dict(username='cisco', password='cisco')),
+            init_config_commands=[],
+            mit=True,
+            log_buffer=True
+        )
+        try:
+            c.connect()
+            c.settings.POST_RELOAD_WAIT = 1
+            result = c.reload(return_output=True)
+            self.assertGreater(len(result.output), 10)
+        finally:
+            c.disconnect()
+            md.stop()
+
+
 if __name__ == "__main__":
     unittest.main()

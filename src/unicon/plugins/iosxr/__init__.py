@@ -26,6 +26,8 @@ class IOSXRServiceList(ServiceList):
         self.admin_attach_console = svc.AdminAttachModuleConsole
         self.admin_bash_console = svc.AdminBashService
         self.ping = IosXePing
+        self.reload = svc.Reload
+
 
 class IOSXRHAServiceList(HAServiceList):
     """ Generic dual rp services. """

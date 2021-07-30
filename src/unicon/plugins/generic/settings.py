@@ -45,6 +45,8 @@ class GenericSettings(Settings):
         self.HA_RELOAD_TIMEOUT = 500
         self.RELOAD_TIMEOUT = 300
         self.RELOAD_WAIT = 240
+        self.POST_RELOAD_WAIT = 60
+        self.RELOAD_RECONNECT_ATTEMPTS = 3
         self.CONSOLE_TIMEOUT = 60
 
         # When connecting to a device via telnet, how long (in seconds)
@@ -79,6 +81,9 @@ class GenericSettings(Settings):
         # because HA sync is in progress, wait this many times and for this long
         self.CONFIG_POST_RELOAD_MAX_RETRIES = 20
         self.CONFIG_POST_RELOAD_RETRY_DELAY_SEC = 9
+
+        self.GUESTSHELL_RETRIES = 20
+        self.GUESTSHELL_RETRY_SLEEP = 5
 
         # Default error pattern
         self.ERROR_PATTERN = [r"% Invalid command at",

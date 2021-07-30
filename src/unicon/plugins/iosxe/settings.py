@@ -37,3 +37,10 @@ class IosXESettings(GenericSettings):
 
         self.SERVICE_PROMPT_CONFIG_CMD = 'service prompt config'
         self.CONFIG_PROMPT_WAIT = 2
+
+        self.GUESTSHELL_CONFIG_CMDS = ['iox', 'app-hosting appid guestshell', 'app-vnic management guest-interface 0']
+        self.GUESTSHELL_CONFIG_VERIFY_CMDS = ['show iox-service', 'show app-hosting list']
+        self.GUESTSHELL_CONFIG_VERIFY_PATTERN = r'guestshell\s+RUNNING'
+        self.GUESTSHELL_ENABLE_CMDS = 'guestshell enable'
+        self.GUESTSHELL_ENABLE_VERIFY_CMDS = []
+        self.GUESTSHELL_ENABLE_VERIFY_PATTERN = r''

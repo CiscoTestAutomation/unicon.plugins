@@ -802,11 +802,14 @@ Arguments:
       on connect() is maintained, no connection initialization is done and the
       exec and config initialization commands are not executed.  It is possible to use
       the `mit` option with HA connections, however please note that HA initialization is not done.
-      Default is False.
+      Default is False. For more info on device state, see :doc:`Statemachine <../developer_guide/statemachine>`
       *(Optional)*
 
     * **settings**: Dictionary or Settings class instance with updated settings for this connection.
       Pass a dictionary to update some of the settings, or pass a Settings object with all settings.
+      *(Optional)*
+
+    * **overwrite_settings**: Boolean option to allow settings to be appended (if the attribute is a list).
       *(Optional)*
 
     * **log_stdout**: Boolean option to enable/disable logging to standard output. Default is True.
@@ -831,6 +834,12 @@ Arguments:
       enable state after setting up connection. Default is True.
       *(Optional)*
 
+    * **trim_line**: Boolean option to enable line trimming if the line has additional `\\r\\n` characters.
+      *(Optional)*
+
+    * **reconnect**: Boolean option to enable automatic reconnect in case the connection has not been made
+      or the connection was lost. Default: True
+      *(Optional)*
 
 For *Single RP* connection, `start` will be a list with only one element.
 
@@ -1042,6 +1051,7 @@ basis, as documented in :ref:`topology_credential_password_modeling`.
                       ip: 10.64.70.11
                       port: 2042
                       login_creds: [termserv, default]
+                      ssh_options: "-v -i /path/to/identityfile"
 
     """)
     dev = tb.devices.my_device

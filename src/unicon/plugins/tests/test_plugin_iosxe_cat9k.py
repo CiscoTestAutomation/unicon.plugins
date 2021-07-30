@@ -6,6 +6,7 @@ import unittest
 
 from unicon import Connection
 from unicon.plugins.tests.mock.mock_device_iosxe import MockDeviceTcpWrapperIOSXE
+from unicon.plugins.tests.mock.mock_device_iosxe_cat9k import MockDeviceTcpWrapperIOSXECat9k
 
 
 class TestIosXeCat9kPlugin(unittest.TestCase):
@@ -135,6 +136,31 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
         c.reload(image_to_boot='tftp://1.1.1.1/latest.bin')
         self.assertEqual(c.state_machine.current_state, 'enable')
         c.disconnect()
+
+    def test_reload_ha(self):
+        md = MockDeviceTcpWrapperIOSXECat9k(port=0, state='cat9k_ha_active_escape,cat9k_ha_standby_escape')
+        md.start()
+
+        c = Connection(
+            hostname='switch',
+            start=[
+                'telnet 127.0.0.1 {}'.format(md.ports[0]),
+                'telnet 127.0.0.1 {}'.format(md.ports[1]),
+            ],
+            os='iosxe',
+            platform='cat9k',
+            settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+            credentials=dict(default=dict(username='cisco', password='cisco'),
+                             alt=dict(username='admin', password='lab')),
+            # debug=True
+        )
+        try:
+            c.connect()
+            c.reload()
+            self.assertEqual(c.state_machine.current_state, 'enable')
+        finally:
+            c.disconnect()
+            md.stop()
 
 
 if __name__ == '__main__':

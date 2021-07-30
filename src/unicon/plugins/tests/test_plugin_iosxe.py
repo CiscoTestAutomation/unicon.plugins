@@ -417,6 +417,19 @@ class TestIosXESDWANConfigure(unittest.TestCase):
         d.configure('no logging console')
         d.disconnect()
 
+    def test_config_transaction_sdwan_iosxe_confirm(self):
+        d = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe --state sdwan_enable2'],
+                       os='iosxe', platform='sdwan',
+                       credentials=dict(default=dict(username='cisco', password='cisco')),
+                       log_buffer=True,
+                       mit=True
+                       )
+
+        d.connect()
+        d.configure('no logging console')
+        d.disconnect()
+
 
 class TestIosXEC8KvPluginReload(unittest.TestCase):
     @classmethod
@@ -573,7 +586,7 @@ class TestIosXEConfigure(unittest.TestCase):
             start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
             os='iosxe',
             credentials=dict(default=dict(username='cisco', password='cisco')),
-            mit=True
+            mit=True,
         )
         try:
             c.connect()
@@ -748,6 +761,78 @@ class TestIosXEEnableSecret(unittest.TestCase):
         dev = tb.devices.R1
         dev.connect()
         dev.disconnect()
+
+
+class TestIosXEluginGuestShellService(unittest.TestCase):
+
+    def test_guestshell(self):
+        c = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe --state general_enable --hostname Router'],
+                       os='iosxe',
+                       credentials=dict(default=dict(username='cisco', password='cisco')),
+                       log_buffer=True
+                       )
+        with c.guestshell() as console:
+            output = console.execute('pwd')
+            self.assertEqual(output, '/home/guestshell')
+        self.assertIn('exit', c.spawn.match.match_output)
+        self.assertIn('Router#', c.spawn.match.match_output)
+        c.disconnect()
+
+    def test_guestshell_activate(self):
+        c = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe --state general_enable --hostname Router'],
+                       os='iosxe',
+                       credentials=dict(default=dict(username='cisco', password='cisco')),
+                       log_buffer=True
+                       )
+        with c.guestshell(enable_guestshell=True) as console:
+            output = console.execute('pwd')
+            self.assertEqual(output, '/home/guestshell')
+        self.assertIn('exit', c.spawn.match.match_output)
+        self.assertIn('Router#', c.spawn.match.match_output)
+        c.disconnect()
+
+    def test_guestshell_activate_configure(self):
+        c = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe --state enable_guestshell --hostname Router'],
+                       os='iosxe',
+                       credentials=dict(default=dict(username='cisco', password='cisco')),
+                       log_buffer=True,
+                       mit=True
+                       )
+        with c.guestshell(enable_guestshell=True) as console:
+            output = console.execute('pwd')
+            self.assertEqual(output, '/home/guestshell')
+        self.assertIn('exit', c.spawn.match.match_output)
+        self.assertIn('Router#', c.spawn.match.match_output)
+        c.disconnect()
+
+class TestIosXEping(unittest.TestCase):
+
+    def test_ping_failed_protocol(self):
+        md = MockDeviceTcpWrapperIOSXE(port=0, state='ping_fail', hostname='PE1')
+        md.start()
+
+        c = Connection(
+            hostname='PE1',
+            start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
+            os='iosxe',
+            connection_timeout=10,
+            mit=True
+        )
+        try:
+            c.connect()
+            try:
+                c.ping('10.10.10.10')
+            except Exception:
+                pass
+            c.configure()
+        except Exception:
+            raise
+        finally:
+            c.disconnect()
+            md.stop()
 
 
 if __name__ == "__main__":
