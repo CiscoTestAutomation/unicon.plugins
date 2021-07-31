@@ -34,6 +34,6 @@ jobs:
         make develop
         cd tests
         # python -m unittest discover -b -v 2> /dev/null
-        py.test -n 5 -v tests/
+        py.test -n 5 -v
         # py.test --splits 5 --group ${{ matrix.group}} -v
       shell: bash
