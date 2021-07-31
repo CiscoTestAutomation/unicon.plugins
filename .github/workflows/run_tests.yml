@@ -25,12 +25,13 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pyats[full]
+        pip install pyats[full] pytest pytest-xdist
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip uninstall unicon.plugins -y
     - name: Test Unit Tests
       run: |
         make develop
         cd tests
-        python -m unittest discover -b -v 2> /dev/null
+        # python -m unittest discover -b -v 2> /dev/null
+        py.test -n 5 -v tests/
       shell: bash
