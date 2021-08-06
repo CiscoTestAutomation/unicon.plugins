@@ -16,7 +16,7 @@ jobs:
       matrix:
         # python-version: [3.6, 3.7, 3.8, 3.9]
         python-version: [3.6]
-        group: [1, 2, 3, 4]
+        group: [1, 2, 3]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -35,5 +35,5 @@ jobs:
         cd tests
         # python -m unittest discover -b -v 2> /dev/null
         # py.test -n 5 -v
-        py.test --splits 4 --group ${{ matrix.group}} -v
+        py.test --splits 3 --group ${{ matrix.group}} -v
       shell: bash
