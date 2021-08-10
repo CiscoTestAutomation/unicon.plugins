@@ -40,7 +40,6 @@ class ApSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
 
     def init_handle(self):
         con = self.connection
-        con._is_connected = True
         con.state_machine.go_to('enable',
                                 self.connection.spawn,
                                 context=self.connection.context,
@@ -50,7 +49,7 @@ class ApSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
 
 class ApSingleRpConnection(BaseSingleRpConnection):
     os = 'cheetah'
-    series = 'ap'
+    platform = 'ap'
     chassis_type = 'single_rp'
     state_machine_class = GenericSingleRpStateMachine
     connection_provider_class = ApSingleRpConnectionProvider

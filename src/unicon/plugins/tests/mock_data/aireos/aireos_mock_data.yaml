@@ -69,7 +69,11 @@ aireos_exec:
         Top-most releasable space......: 92064 bytes (89.90 KB)
         Total allocated (incl mmap)....: 1758087488 bytes (1.63 GB)
         Total used (incl mmap).........: 1693552032 bytes (1.57 GB)
-
+    "config wlan enable 20": "Request failed for WLAN 20 - WLAN Identifier is invalid."
+    "config wlan security web-auth captive-bypass enable 10": "WLAN Identifier is invalid."
+    "config wlan error": "ERROR: Unable to determine the current AKM state for WLAN ID 2"
+    "config wlan interface 511 all-interfaces": "Request failed - Wlan is in enabled state."
+    "config wlan create 511 Company-guest Company-guest": "WLAN Identifier or Profile Name already in use."
 
 aireos_exec_standby:
   prompt: "(%N-Standby) >"

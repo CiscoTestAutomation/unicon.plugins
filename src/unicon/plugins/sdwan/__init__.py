@@ -7,5 +7,5 @@ from .viptela import ViptelaSingleRPConnection
 
 class SDWANConnection(ViptelaSingleRPConnection):
     os = 'viptela'
-    series = None
+    platform = None
     chassis_type = 'single_rp'

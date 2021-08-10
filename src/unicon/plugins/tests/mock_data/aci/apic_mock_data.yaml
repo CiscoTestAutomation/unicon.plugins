@@ -7,7 +7,7 @@ apic_connect:
 
 
 apic_exec:
-  prompt: APC#
+  prompt: "APC#"
   commands: &exec_commands
     "terminal length 0": ""
     "terminal width 0": ""
@@ -28,7 +28,7 @@ apic_exec:
 
 
 apic_hostname_with_escape_codes:
-  prompt: "%1B[0m%1B[27m%1B[24m%1B[JAPC-0001-2001# "
+  prompt: "%1B[0m%1B[27m%1B[24m%1B[JAPC# "
   commands: *exec_commands
 
 
@@ -62,15 +62,16 @@ apic_ssh_password:
       new_state: apic_exec
 
 apic_config:
-  prompt: APC(config)#
-  commands: 
+  prompt: "APC(config)#"
+  commands:
     "tenant test":
       new_state: apic_config_tenant
     "end":
       new_state: apic_exec
 
 apic_config_tenant:
-  prompt: APC(config-tenant)#
-  commands: 
+  prompt: "APC(config-tenant)#"
+  commands:
     "end":
       new_state: apic_exec
+

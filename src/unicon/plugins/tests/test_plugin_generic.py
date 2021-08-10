@@ -5,19 +5,21 @@ Unittests for Generic plugin
 
 __author__ = "Dave Wapstra <dwapstra@cisco.com>"
 
-from concurrent.futures import ThreadPoolExecutor
-import multiprocessing
 import os
 import re
 import time
 import unittest
 from unittest.mock import Mock, call, patch
+from concurrent.futures import ThreadPoolExecutor
+
+multiprocessing = __import__('multiprocessing').get_context('fork')
 
 from pyats.datastructures import AttrDict
 
 import unicon
 from unicon import Connection
 from unicon.eal.dialogs import Dialog
+from unicon.plugins.utils import sanitize
 from unicon.plugins.tests.mock.mock_device_ios import MockDeviceTcpWrapperIOS
 from unicon.mock.mock_device import MockDevice, MockDeviceTcpWrapper
 from unicon.plugins.generic.statements import login_handler, password_handler, passphrase_handler
@@ -27,6 +29,10 @@ from pyats.topology.credentials import Credentials
 from unicon.core.errors import (SubCommandFailure, StateMachineError,
     SpawnInitError, CredentialsExhaustedError, UniconAuthenticationError,
     ConnectionError )
+
+
+unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC=0
+unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC=0.2
 
 
 class TestPasswordHandler(unittest.TestCase):
@@ -116,14 +122,13 @@ class TestPasswordHandler(unittest.TestCase):
     def test_enable_password(self):
         d = Connection(hostname='Router',
                 start=['mock_device_cli --os ios --state console_test_enable'],
-                os='ios', enable_password='enpasswd', connection_timeout=15)
+                os='ios', enable_password='enpasswd', connection_timeout=15, mit=True)
         d.connect()
 
     def test_password_retries(self):
         with self.assertRaises(UniconAuthenticationError):
             for x in range(4):
                 password_handler(self.spawn, self.context, self.session)
-
 
 
 class TestCredentialLoginPasswordHandlers(unittest.TestCase):
@@ -225,10 +230,10 @@ class TestCredentialLoginPasswordHandlers(unittest.TestCase):
 
     def test_enable_password(self):
         d = Connection(hostname='Router',
-                       start=['mock_device_cli --os ios '
-                              '--state console_test_enable'],
+                       start=['mock_device_cli --os ios --state console_test_enable'],
                        os='ios', connection_timeout=15,
-                       credentials=self.context.credentials)
+                       credentials=self.context.credentials,
+                       mit=True)
         d.connect()
 
     def test_enable_password_default_cred_explicit(self):
@@ -238,19 +243,19 @@ class TestCredentialLoginPasswordHandlers(unittest.TestCase):
         })
 
         d = Connection(hostname='Router',
-                       start=['mock_device_cli --os ios '
-                              '--state console_test_enable'],
+                       start=['mock_device_cli --os ios --state console_test_enable'],
                        os='ios', connection_timeout=15,
                        credentials=credentials,
-                       login_creds=None
+                       login_creds=None,
+                       mit=True
                        )
         d.connect()
 
         d = Connection(hostname='Router',
-                       start=['mock_device_cli --os ios '
-                              '--state login_enable'],
+                       start=['mock_device_cli --os ios --state login_enable'],
                        os='ios', connection_timeout=15,
-                       credentials=credentials
+                       credentials=credentials,
+                       mit=True
                        )
         d.connect()
 
@@ -261,19 +266,19 @@ class TestCredentialLoginPasswordHandlers(unittest.TestCase):
         })
 
         d = Connection(hostname='Router',
-                       start=['mock_device_cli --os ios '
-                              '--state console_test_enable'],
+                       start=['mock_device_cli --os ios --state console_test_enable'],
                        os='ios', connection_timeout=15,
-                       credentials=credentials
+                       credentials=credentials,
+                       mit=True
                        )
         d.connect()
 
         d = Connection(hostname='Router',
-                start=['mock_device_cli --os ios '\
-                    '--state login_enable'],
-                os='ios', connection_timeout=15,
-                credentials=credentials
-                )
+                       start=['mock_device_cli --os ios --state login_enable'],
+                       os='ios', connection_timeout=15,
+                       credentials=credentials,
+                       mit=True
+                       )
         d.connect()
 
     def test_enable_password_default_cred_default_enable(self):
@@ -282,18 +287,18 @@ class TestCredentialLoginPasswordHandlers(unittest.TestCase):
         })
 
         d = Connection(hostname='Router',
-                       start=['mock_device_cli --os ios '
-                              '--state console_test_enable'],
-                       os='ios', connection_timeout=15,
+                       start=['mock_device_cli --os ios --state console_test_enable'],
+                       os='ios',
+                       connection_timeout=15,
                        credentials=credentials
                        )
         with self.assertRaises(ConnectionError):
             d.connect()
 
         d = Connection(hostname='Router',
-                       start=['mock_device_cli --os ios '
-                              '--state login_enable'],
-                       os='ios', connection_timeout=15,
+                       start=['mock_device_cli --os ios --state login_enable'],
+                       os='ios',
+                       connection_timeout=15,
                        credentials=credentials
                        )
         with self.assertRaises(ConnectionError):
@@ -307,17 +312,17 @@ class TestCredentialLoginPasswordHandlers(unittest.TestCase):
         })
 
         d = Connection(hostname='Router',
-                       start=['mock_device_cli --os ios '
-                              '--state console_test_enable'],
-                       os='ios', connection_timeout=15,
+                       start=['mock_device_cli --os ios --state console_test_enable'],
+                       os='ios',
+                       connection_timeout=15,
                        credentials=credentials,
                        login_creds='mycred')
         d.connect()
 
         d = Connection(hostname='Router',
-                       start=['mock_device_cli --os ios '
-                              '--state login_enable'],
-                       os='ios', connection_timeout=15,
+                       start=['mock_device_cli --os ios --state login_enable'],
+                       os='ios',
+                       connection_timeout=15,
                        credentials=credentials,
                        login_creds='mycred')
         d.connect()
@@ -330,17 +335,17 @@ class TestCredentialLoginPasswordHandlers(unittest.TestCase):
         })
 
         d = Connection(hostname='Router',
-                       start=['mock_device_cli --os ios '
-                              '--state console_test_enable'],
-                       os='ios', connection_timeout=15,
+                       start=['mock_device_cli --os ios --state console_test_enable'],
+                       os='ios',
+                       connection_timeout=15,
                        credentials=credentials,
                        login_creds='mycred')
         d.connect()
 
         d = Connection(hostname='Router',
-                       start=['mock_device_cli --os ios '
-                              '--state login_enable'],
-                       os='ios', connection_timeout=15,
+                       start=['mock_device_cli --os ios --state login_enable'],
+                       os='ios',
+                       connection_timeout=15,
                        credentials=credentials,
                        login_creds='mycred')
         d.connect()
@@ -353,17 +358,17 @@ class TestCredentialLoginPasswordHandlers(unittest.TestCase):
         })
 
         d = Connection(hostname='Router',
-                       start=['mock_device_cli --os ios '
-                              '--state console_test_enable'],
-                       os='ios', connection_timeout=15,
+                       start=['mock_device_cli --os ios --state console_test_enable'],
+                       os='ios',
+                       connection_timeout=15,
                        credentials=credentials,
                        login_creds='mycred')
         d.connect()
 
         d = Connection(hostname='Router',
-                       start=['mock_device_cli --os ios '
-                              '--state login_enable'],
-                       os='ios', connection_timeout=15,
+                       start=['mock_device_cli --os ios --state login_enable'],
+                       os='ios',
+                       connection_timeout=15,
                        credentials=credentials,
                        login_creds='mycred')
         d.connect()
@@ -375,18 +380,18 @@ class TestCredentialLoginPasswordHandlers(unittest.TestCase):
         })
 
         d = Connection(hostname='Router',
-                       start=['mock_device_cli --os ios '
-                              '--state console_test_enable'],
-                       os='ios', connection_timeout=15,
+                       start=['mock_device_cli --os ios --state console_test_enable'],
+                       os='ios',
+                       connection_timeout=15,
                        credentials=credentials,
                        login_creds='mycred')
         with self.assertRaises(ConnectionError):
             d.connect()
 
         d = Connection(hostname='Router',
-                       start=['mock_device_cli --os ios '
-                              '--state login_enable'],
-                       os='ios', connection_timeout=15,
+                       start=['mock_device_cli --os ios --state login_enable'],
+                       os='ios',
+                       connection_timeout=15,
                        credentials=credentials,
                        login_creds='mycred')
         with self.assertRaises(ConnectionError):
@@ -398,9 +403,9 @@ class TestCredentialLoginPasswordHandlers(unittest.TestCase):
         })
 
         d = Connection(hostname='Router',
-                       start=['mock_device_cli --os ios '
-                              '--state connect_ssh_passphrase'],
-                       os='ios', connection_timeout=15,
+                       start=['mock_device_cli --os ios --state connect_ssh_passphrase'],
+                       os='ios',
+                       connection_timeout=15,
                        credentials=credentials,
                        init_exec_commands=[],
                        init_config_commands=[])
@@ -413,9 +418,9 @@ class TestCredentialLoginPasswordHandlers(unittest.TestCase):
         })
 
         d = Connection(hostname='Router',
-                       start=['mock_device_cli --os ios '
-                              '--state connect_ssh_passphrase'],
-                       os='ios', connection_timeout=15,
+                       start=['mock_device_cli --os ios --state connect_ssh_passphrase'],
+                       os='ios',
+                       connection_timeout=15,
                        credentials=credentials,
                        init_exec_commands=[],
                        init_config_commands=[])
@@ -429,11 +434,13 @@ class TestGenericServices(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.d = Connection(hostname='Router',
-                            start=['mock_device_cli --os ios --state exec'],
-                            os='ios', enable_password='cisco',
-                            username='cisco',
-                            tacacs_password='cisco',
-                            service_attributes=dict(ping=dict(timeout=2468)))
+                           start=['mock_device_cli --os ios --state exec'],
+                           os='ios',
+                           credentials=dict(default=dict(
+                               username='cisco',
+                               password='cisco',
+                           )),
+                           service_attributes=dict(ping=dict(timeout=2468)))
         cls.d.connect()
         cls.md = MockDevice(device_os='ios', state='exec')
         cls.ha = MockDeviceTcpWrapperIOS(port=0, state='login,exec_standby')
@@ -444,14 +451,19 @@ class TestGenericServices(unittest.TestCase):
 
         cls.ha.start()
         cls.ha_device = Connection(hostname='Router',
-                                    start=['telnet 127.0.0.1 '+  str(cls.ha.ports[0]), 'telnet 127.0.0.1 '+ str(cls.ha.ports[1]) ],
-                                    os='ios', username='cisco', tacacs_password='cisco', enable_password='cisco')
+                                   start=['telnet 127.0.0.1 ' + str(cls.ha.ports[0]),
+                                          'telnet 127.0.0.1 ' + str(cls.ha.ports[1])],
+                                   os='ios',
+                                   credentials=dict(default=dict(
+                                       username='cisco',
+                                       password='cisco',
+                                   )),
+                                   init_config_commands=[],
+                                   init_exec_commands=[])
         cls.ha_device.connect()
         cls.logfile_testfile = '/tmp/test_log_file.log'
 
     @classmethod
-    @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-    @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
     def tearDownClass(cls):
         cls.d.disconnect()
         cls.ha_device.disconnect()
@@ -527,6 +539,13 @@ class TestGenericServices(unittest.TestCase):
         with self.assertRaises(SubCommandFailure):
             self.ha_device.execute('unkown command', error_pattern=['^% '])
 
+    def test_append_error_pattern(self):
+        with self.assertRaises(SubCommandFailure):
+            self.d.execute('unkown command', append_error_pattern=['unkown command'])
+
+        with self.assertRaises(SubCommandFailure):
+            self.ha_device.execute('unkown command', append_error_pattern=['unkown command'])
+
     def test_multi_thread_execute(self):
         commands = ['show version'] * 3
         with ThreadPoolExecutor(max_workers=3) as executor:
@@ -572,6 +591,8 @@ class TestConfigureService(unittest.TestCase):
             username='cisco',
             tacacs_password='cisco',
             enable_password='cisco',
+            mit=True,
+            log_buffer=True
         )
         cls.d.connect()
 
@@ -585,6 +606,7 @@ class TestConfigureService(unittest.TestCase):
             username='cisco',
             tacacs_password='cisco',
             enable_password='cisco',
+            log_buffer=True
         )
         cls.d_ha.connect()
 
@@ -647,20 +669,29 @@ class TestConfigureService(unittest.TestCase):
         self.d_ha.configure.bulk = False
 
     def test_config_lock_retries_succeed(self):
-        self.d.execute('set config lock count 2')
+        self.d.settings.CONFIG_LOCK_RETRY_SLEEP = 1
+        self.d.execute('set config lock count 1')
         self.d.configure('no logging console',
                          lock_retries=2, lock_retry_sleep=1)
         self.d.configure('no logging console')
 
     def test_config_lock_retries_fail(self):
+        self.d.settings.CONFIG_LOCK_RETRY_SLEEP = 1
         self.d.execute('set config lock count 3')
-        with self.assertRaises(SubCommandFailure):
+        with self.assertRaises(StateMachineError):
             self.d.configure('no logging console', lock_retries=2)
 
     def test_configure_error_pattern(self):
         with self.assertRaises(SubCommandFailure):
-            r = self.d.configure('Not valid configuration',
-                                 error_pattern=[r'% Invalid command'])
+            self.d.configure('Not valid configuration',
+                             error_pattern=[r'% Invalid command'])
+        self.assertEqual(self.d.state_machine.current_state,
+                         self.d.configure.end_state)
+
+    def test_configure_append_error_pattern(self):
+        with self.assertRaises(SubCommandFailure):
+            self.d.configure('Not valid configuration',
+                             append_error_pattern=[r'Not valid configuration'])
 
     def test_configure_error_pattern2(self):
         error_pattern = [r'% Invalid command']
@@ -672,24 +703,62 @@ class TestConfigureService(unittest.TestCase):
         finally:
             self.d.settings.CONFIGURE_ERROR_PATTERN, error_pattern = \
                 error_pattern, self.d.settings.CONFIGURE_ERROR_PATTERN
+        self.assertEqual(self.d.state_machine.current_state,
+                         self.d.configure.end_state)
 
     def test_ha_config_lock_retries_succeed(self):
         self.d_ha.execute('set config lock count 2')
+        self.d_ha.settings.CONFIG_LOCK_RETRY_SLEEP = 1
         self.d_ha.configure('no logging console',
                             lock_retries=2, lock_retry_sleep=1)
         self.d_ha.configure('no logging console')
 
     def test_ha_config_lock_retries_fail(self):
         self.d_ha.execute('set config lock count 3')
-        with self.assertRaises(SubCommandFailure):
+        self.d_ha.settings.CONFIG_LOCK_RETRY_SLEEP = 1
+        with self.assertRaises(StateMachineError):
             self.d_ha.configure('no logging console', lock_retries=2)
 
     def test_configure_ca_trustpoint(self):
         self.d.configure(['crypto pki trustpoint KEYPAIR', 'rsakeypair SSHKEYS'])
 
+    def test_configure_commit_cmd_attribute(self):
+        c = Connection(
+            hostname='Router',
+            start=['mock_device_cli --os ios --state enable'],
+            os='ios',
+            mit=True,
+            settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+            service_attributes=dict(configure=dict(commit_cmd="mycommit cmd")),
+            log_buffer=True
+        )
+        c.connect()
+        self.assertEqual(c.configure.commit_cmd, 'mycommit cmd')
+
+    def test_configure_user_end_exit(self):
+        c = Connection(
+            hostname='switch',
+            start=['mock_device_cli --os nxos --state exec'],
+            os='nxos',
+            mit=True,
+            settings=dict(POST_DISCONNECT_WAIT_SEC=0,GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+            log_buffer=True
+        )
+        c.connect()
+        c.configure('end')
+        self.assertEqual(c.state_machine.current_state, 'enable')
+
+        c.configure('exit')
+        self.assertEqual(c.state_machine.current_state, 'enable')
+
+        with self.assertRaises(SubCommandFailure):
+            c.configure('exitt')
+
+        c.configure(['line console', 'exit', 'exit'])
+        self.assertEqual(c.state_machine.current_state, 'enable')
+        c.disconnect()
+
     @classmethod
-    @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-    @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
     def tearDownClass(cls):
         cls.d.disconnect()
         cls.d_ha.disconnect()
@@ -710,12 +779,11 @@ class TestExecuteService(unittest.TestCase):
         cls.ha.start()
         cls.ha_device = Connection(hostname='Router',
                         start=['telnet 127.0.0.1 '+  str(cls.ha.ports[0]), 'telnet 127.0.0.1 '+ str(cls.ha.ports[1]) ],
-                        os='ios', username='cisco', tacacs_password='cisco', enable_password='cisco')
+                        os='ios', username='cisco', tacacs_password='cisco', enable_password='cisco',
+                        init_config_commands=[], init_exec_commands=[])
         cls.ha_device.connect()
 
     @classmethod
-    @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-    @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
     def tearDownClass(cls):
         cls.d.disconnect()
         cls.ha_device.disconnect()
@@ -807,8 +875,6 @@ class TestTransmitReceive(unittest.TestCase):
         cls.term_buffer_pattern = re.compile(r'term width 0.*#', re.S)
 
     @classmethod
-    @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-    @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
     def tearDownClass(cls):
         cls.d.disconnect()
 
@@ -877,10 +943,36 @@ class TestEscapeHandler(unittest.TestCase):
                        os='ios', line_password="cisco",
                        username='cisco',
                        tacacs_password='cisco',
-                       enable_password='cisco')
+                       enable_password='cisco',
+                       settings={'ESCAPE_CHAR_CHATTY_TERM_WAIT': 3,
+                                 'ESCAPE_CHAR_PROMPT_WAIT': 3})
         r = c.connect()
-        last_lines = "\n".join(r.splitlines()[-4:])
-        self.assertEqual(last_lines, '\nUser Access Verification\nPassword: cisco\nRouter>')
+        first_lines = '\n'.join(r.splitlines()[0:21])
+        # Need to sanitize strings because due to the timing and stripping of log messages
+        # in the connect return string, sometimes empty lines can be inserted into the output
+        # at different places
+        self.assertEqual(sanitize(first_lines.replace('\r', '')), sanitize("""\
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+
+#######################
+#          #    ######
+#         # #   #     #
+#        #   #  #     #
+#       #     # ######
+#       ####### #     #
+#       #     # #     #
+####### #     # ######
+#######################
+
+User Access Verification
+
+Password: cisco
+Router>
+enable
+Password: cisco
+Router#"""))
 
     def test_escape_handler_username(self):
         c = Connection(hostname='Router',
@@ -888,10 +980,39 @@ class TestEscapeHandler(unittest.TestCase):
                        os='ios', line_password="cisco",
                        username='cisco',
                        tacacs_password='cisco',
-                       enable_password='cisco')
+                       enable_password='cisco',
+                       settings={'ESCAPE_CHAR_CHATTY_TERM_WAIT': 3,
+                                 'ESCAPE_CHAR_PROMPT_WAIT': 3})
         r = c.connect()
-        last_lines = "\n".join(r.splitlines()[-4:])
-        self.assertEqual(last_lines, '#######################\nusername: cisco\nPassword: cisco\nRouter>')
+        first_lines = '\n'.join(r.splitlines()[0:24])
+        # Need to sanitize strings because due to the timing and stripping of log messages
+        # in the connect return string, sometimes empty lines can be inserted into the output
+        # at different places
+        self.assertEqual(sanitize(first_lines.replace('\r', '')), sanitize("""\
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+
+#######################
+#          #    ######
+#         # #   #     #
+#        #   #  #     #
+#       #     # ######
+#       ####### #     #
+#       #     # #     #
+####### #     # ######
+#######################
+
+username: cisco
+Password: cisco
+Router>
+enable
+Password: cisco
+Router#
+term length 0
+Router#
+term width 0
+Router#"""))
 
     def test_escape_handler_password(self):
         c = Connection(hostname='Router',
@@ -899,13 +1020,28 @@ class TestEscapeHandler(unittest.TestCase):
                        os='ios', line_password="cisco",
                        username='cisco',
                        tacacs_password='cisco',
-                       enable_password='cisco')
+                       enable_password='cisco',
+                       settings={'ESCAPE_CHAR_CHATTY_TERM_WAIT': 3,
+                                 'ESCAPE_CHAR_PROMPT_WAIT': 3})
         r = c.connect()
-        expected_pattern = re.compile(
-            ".*" + re.escape("Escape character is '^]'.\r\npassword: cisco\r\nRouter>"),
-            re.DOTALL)
-        self.assertRegex(r, expected_pattern)
+        first_lines = '\n'.join(r.splitlines()[0:13])
+        # Need to sanitize strings because due to the timing and stripping of log messages
+        # in the connect return string, sometimes empty lines can be inserted into the output
+        # at different places
+        self.assertEqual(sanitize(first_lines.replace('\r', '')), sanitize("""\
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
 
+password: cisco
+Router>
+enable
+Password: cisco
+Router#
+term length 0
+Router#
+term width 0
+Router#"""))
 
     def tearDown(self):
         if self.old_term_setting:
@@ -913,8 +1049,7 @@ class TestEscapeHandler(unittest.TestCase):
         else:
             os.environ.pop('TERM')
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
+
 class TestLearnHostname(unittest.TestCase):
 
     def test_learn_hostname_default(self):
@@ -970,6 +1105,7 @@ class TestLearnHostname(unittest.TestCase):
         self.assertNotIn('#',c.hostname)
         c.disconnect()
 
+
 class TestLargeConfigOnXR(unittest.TestCase):
 
     def test_exception(self):
@@ -984,6 +1120,7 @@ class TestLargeConfigOnXR(unittest.TestCase):
         d.connect()
         d.configure('large config', timeout=20)
         d.disconnect()
+
 
 class TestConnect(unittest.TestCase):
 
@@ -1066,8 +1203,6 @@ class TestClearLinePasswords(unittest.TestCase):
          md.stop()
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestTacacsLoginPasswordPrompt(unittest.TestCase):
 
     def test_connect_with_custom_auth_prompt(self):
@@ -1109,7 +1244,8 @@ class TestTacacsLoginPasswordPrompt(unittest.TestCase):
 
     def test_ha_connect_with_custom_auth_prompt(self):
         d = Connection(hostname='Router', start=['mock_device_cli --os ios --state custom_login,exec_standby'],
-                         username='cisco', tacacs_password='cisco', os='ios', enable_password='cisco')
+                       username='cisco', tacacs_password='cisco', os='ios', enable_password='cisco',
+                       mit=True)
         d.settings.LOGIN_PROMPT = r'Identifier:'
         d.settings.PASSWORD_PROMPT = r'Passe:'
         d.connect()
@@ -1149,14 +1285,13 @@ class TestTacacsLoginPasswordPrompt(unittest.TestCase):
         md.stop()
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestLearnOS(unittest.TestCase):
 
     def test_learn_os(self):
         template_testbed = """
         devices:
           Router:
+            os: generic
             type: router
             credentials:
               default:
@@ -1173,8 +1308,48 @@ class TestLearnOS(unittest.TestCase):
         """
         t = loader.load(template_testbed)
         d = t.devices['Router']
+        d.connect(learn_hostname=True, learn_os=True, mit=True)
+        self.assertEqual(d.os, 'ios')
+        d.disconnect()
+
+    def test_learn_os_ha(self):
+        template_testbed = """
+        devices:
+          Router:
+            os: generic
+            type: router
+            credentials:
+              default:
+                password: cisco
+                username: cisco
+              enable:
+                password: cisco
+                username: cisco
+            connections:
+              defaults:
+                class: unicon.Unicon
+              a:
+                command: mock_device_cli --os ios --state exec
+              b:
+                command: mock_device_cli --os ios --state exec_standby
+        """
+        t = loader.load(template_testbed)
+        d = t.devices['Router']
         d.connect(learn_hostname=True, learn_os=True)
         self.assertEqual(d.os, 'ios')
+        d.disconnect()
+
+
+class TestSwitchTo(unittest.TestCase):
+
+    def test_switchto(self):
+        d = Connection(hostname='Router', start=['mock_device_cli --os ios --state exec'],
+                       credentials=dict(default=dict(password='cisco')), mit=True)
+        d.connect()
+        d.switchto('enable')
+        d.switchto(['disable', 'config', 'enable'])
+        d.switchto(to_state='disable')
+        self.assertEqual(d.state_machine.current_state, 'disable')
 
 
 if __name__ == "__main__":

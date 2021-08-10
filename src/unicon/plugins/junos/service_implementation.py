@@ -39,16 +39,12 @@ class BashService(BashService):
 
             return self
 
+
 class Configure(Configure):
+
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'config'
         self.end_state = 'enable'
         self.service_name = 'config'
-
-    def call_service(self, command=[], reply=Dialog([]),
-                      timeout=None, *args, **kwargs):
-        self.commit_cmd = ('commit synchronize')
-        super().call_service(command,
-                             reply=reply,
-                             timeout=timeout, *args, **kwargs)
+        self.commit_cmd = 'commit synchronize'

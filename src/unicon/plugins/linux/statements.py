@@ -2,6 +2,8 @@ from unicon.core.errors import ConnectionError
 from unicon.eal.dialogs import Statement
 from unicon.plugins.generic.statements import (pre_connection_statement_list,
                                                generic_statements)
+from unicon.plugins.generic.service_statements import (
+    execution_statement_list as generic_execution_statements)
 from unicon.plugins.utils import (get_current_credential,
                                   common_cred_username_handler,
                                   common_cred_password_handler)
@@ -88,3 +90,4 @@ linux_auth_other_statement_list = [generic_statements.login_incorrect,
 linux_auth_username_password_statement_list = [linux_statements.username_stmt,
                                                linux_statements.password_stmt,
                                                linux_statements.passphrase_stmt]
+linux_execution_statements = generic_execution_statements + [generic_statements.sudo_stmt]

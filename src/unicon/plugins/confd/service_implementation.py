@@ -49,6 +49,8 @@ class Command(BaseService):
         self.timeout_pattern = ['Timeout occurred', ]
         self.result = None
         self.timeout = connection.settings.EXEC_TIMEOUT
+        self.start_state = 'any'
+        self.end_state = 'any'
 
     def call_service(self, command,
                      reply=Dialog([]),
@@ -139,6 +141,8 @@ class Configure(BaseService):
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
         self.timeout = connection.settings.CONFIG_TIMEOUT
+        self.start_state = 'any'
+        self.end_state = 'any'
 
     def call_service(self, command=[],
                      reply=Dialog([]),
@@ -247,10 +251,7 @@ class Execute(GenericServices.Execute):
         super().__init__(connection, context, **kwargs)
 
     def pre_service(self, command, *args, **kwargs):
-        super().pre_service(*args, **kwargs)
         sm = self.get_sm()
-        con = self.connection
-
         self.saved_cli_style = sm.current_cli_style
         if 'style' in kwargs:
             style = kwargs['style']
@@ -260,6 +261,7 @@ class Execute(GenericServices.Execute):
             elif sm.current_cli_style == 'juniper':
                 if style[0].lower() == 'c':
                     self.start_state = "cisco_" + sm.current_cli_mode
+        super().pre_service(*args, **kwargs)
 
     def post_service(self, *args, **kwargs):
         sm = self.get_sm()
@@ -292,6 +294,8 @@ class CliStyle(BaseService):
     def __init__(self, connection, context, **kwargs):
         # Connection object will have all the received details
         super().__init__(connection, context, **kwargs)
+        self.start_state = 'any'
+        self.end_state = 'any'
         self.__dict__.update(kwargs)
 
     def call_service(self, style, *args, **kwargs):

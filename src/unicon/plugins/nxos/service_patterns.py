@@ -13,6 +13,7 @@ Description:
 class ReloadPatterns():
     def __init__(self):
         self.reload_confirm_nxos = r'^(.*)This command will reboot the system. \(y\/n\)\?  \[n\]\s?$'
+        self.auto_provision_nxos = r'Abort( Power On)? Auto Provisioning .*:'
         #self.useraccess = r'^.*User Access Verification'
         #self.username = r'^.*([Uu]sername|[Ll]ogin): ?$'
         #self.password = r'^.*[Pp]assword: ?$'
@@ -39,3 +40,4 @@ class HaNxosReloadPatterns:
         self.password = r'^.*[Pp]assword: ?$'
         self.run_init = r' Entering runlevel'
         self.system_up = r'System is coming up ... Please wait'
+        self.skip_poap = r'^.*System is not fully online. Skip POAP\? \(yes\/no\)\[n\]:\s*$'

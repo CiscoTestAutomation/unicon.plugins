@@ -5,8 +5,8 @@ from unicon.plugins.iosxr import (IOSXRSingleRpConnection,
 
 from unicon.plugins.iosxr.asr9k.statemachine import (IOSXRASR9KSingleRpStateMachine,
                                                      IOSXRASR9KDualRpStateMachine)
-from unicon.plugins.iosxr.__init__ import (IOSXRServiceList,
-                                           IOSXRHAServiceList)
+from unicon.plugins.iosxr import (IOSXRServiceList,
+                                  IOSXRHAServiceList)
 
 from unicon.plugins.iosxr.connection_provider import (IOSXRSingleRpConnectionProvider,
                                                       IOSXRDualRpConnectionProvider)
@@ -28,7 +28,7 @@ class IOSXRASR9KHAServiceList(IOSXRHAServiceList):
 
 class IOSXRASR9KSingleRpConnection(IOSXRSingleRpConnection):
     os = 'iosxr'
-    series = 'asr9k'
+    platform = 'asr9k'
     chassis_type = 'single_rp'
     state_machine_class = IOSXRASR9KSingleRpStateMachine
     connection_provider_class = IOSXRSingleRpConnectionProvider
@@ -38,7 +38,7 @@ class IOSXRASR9KSingleRpConnection(IOSXRSingleRpConnection):
 
 class IOSXRASR9KDualRpConnection(IOSXRDualRpConnection):
     os = 'iosxr'
-    series = 'asr9k'
+    platform = 'asr9k'
     chassis_type = 'dual_rp'
     state_machine_class = IOSXRASR9KDualRpStateMachine
     connection_provider_class = IOSXRDualRpConnectionProvider

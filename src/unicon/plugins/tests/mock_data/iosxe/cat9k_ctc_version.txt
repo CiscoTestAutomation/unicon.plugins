@@ -1,0 +1,87 @@
+Cisco IOS XE Software, Version 2021-06-07_01.06_sdcunha
+Cisco IOS Software [Bengaluru], Catalyst L3 Switch Software (CAT9K_IOSXE), Experimental Version 17.7.20210607:074942 [s2c/polaris_dev-/nobackup/sdcunha/cat9k_super_ctc_build_ws 100]
+Copyright (c) 1986-2021 by Cisco Systems, Inc.
+Compiled Mon 07-Jun-21 01:00 by sdcunha
+
+
+Cisco IOS-XE software, Copyright (c) 2005-2021 by cisco Systems, Inc.
+All rights reserved.  Certain components of Cisco IOS-XE software are
+licensed under the GNU General Public License ("GPL") Version 2.0.  The
+software code licensed under GPL Version 2.0 is free software that comes
+with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+GPL code under the terms of GPL Version 2.0.  For more details, see the
+documentation or "License Notice" file accompanying the IOS-XE software,
+or the applicable URL provided on the flyer accompanying the IOS-XE
+software.
+
+
+ROM: IOS-XE ROMMON
+BOOTLDR: System Bootstrap, Version 17.6.1r[FC2], RELEASE SOFTWARE (P)
+
+ssr-cat9300 uptime is 2 days, 18 hours, 41 minutes
+Uptime for this control processor is 2 days, 18 hours, 42 minutes
+System returned to ROM by Critical software exception, system report at /crashinfo/ssr-cat9300_1_RP_0-system-report_1_20210608-184725-UTC.tar.gz
+System image file is "flash:packages.conf"
+Last reload reason: Critical software exception, system report at /crashinfo/ssr-cat9300_1_RP_0-system-report_1_20210608-184725-UTC.tar.gz
+
+
+
+This product contains cryptographic features and is subject to United
+States and local country laws governing import, export, transfer and
+use. Delivery of Cisco cryptographic products does not imply
+third-party authority to import, export, distribute or use encryption.
+Importers, exporters, distributors and users are responsible for
+compliance with U.S. and local country laws. By using this product you
+agree to comply with applicable laws and regulations. If you are unable
+to comply with U.S. and local laws, return this product immediately.
+
+A summary of U.S. laws governing Cisco cryptographic products may be found at:
+http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+If you require further assistance please contact us by sending email to
+export@cisco.com.
+
+
+Technology Package License Information: 
+
+------------------------------------------------------------------------------
+Technology-package                                     Technology-package
+Current                        Type                       Next reboot  
+------------------------------------------------------------------------------
+network-advantage   	Smart License                 	 network-advantage   
+dna-advantage       	Subscription Smart License    	 dna-advantage                 
+AIR License Level: AIR DNA Advantage
+Next reload AIR license Level: AIR DNA Advantage
+
+
+Smart Licensing Status: Registration Not Applicable/Not Applicable
+
+cisco C9300-24P (X86) processor with 1140345K/6147K bytes of memory.
+Processor board ID FCW2223G0B9
+1 Virtual Ethernet interface
+28 Gigabit Ethernet interfaces
+8 Ten Gigabit Ethernet interfaces
+2 TwentyFive Gigabit Ethernet interfaces
+2 Forty Gigabit Ethernet interfaces
+2048K bytes of non-volatile configuration memory.
+8388608K bytes of physical memory.
+1638400K bytes of Crash Files at crashinfo:.
+11264000K bytes of Flash at flash:.
+
+Base Ethernet MAC Address          : 00:b6:70:dd:28:80
+Motherboard Assembly Number        : 73-18271-03
+Motherboard Serial Number          : FOC22221AD2
+Model Revision Number              : A0
+Motherboard Revision Number        : A0
+Model Number                       : C9300-24P
+System Serial Number               : FCW2223G0B9
+CLEI Code Number                   : 
+
+
+Switch Ports Model              SW Version        SW Image              Mode   
+------ ----- -----              ----------        ----------            ----   
+*    1 41    C9300-24P          17.07.01          CAT9K_IOSXE           INSTALL
+
+
+Configuration register is 0x102
+

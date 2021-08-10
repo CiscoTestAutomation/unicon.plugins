@@ -9,9 +9,15 @@ class IOSXRPatterns(GenericPatterns):
     def __init__(self):
         super().__init__()
         self.enable_prompt = r'^(.*?)RP/\w+(/\S+)?/\S+\d+:(%N|ios|xr)\s?#\s?$'
+
+        # [xr-vm_node0_RP1_CPU0:~]$
+        # [xr-vm_node0_RSP1_CPU0:~]$
+        # [node0_RP1_CPU0:~]$
+        # #  << this is a prompt, not a comment
+        self.run_prompt = r'^(.*?)(?:\[(xr-vm_)?node\d_(?:RS?P[01]|[\d+])_CPU\d:(.*?)\]\s?\$\s?|[\r\n]+\s?#\s?)$'
+
         # don't use hostname match in config prompt - hostname may be truncated
         # see CSCve48115 and CSCve51502
-        self.run_prompt = r'^(.*?)(?:\[xr-vm_.*:([\s\S]+)?\]\s?\$\s?|[\r\n]+\s?#\s?)$'
         self.config_prompt = r'^(.*?)RP/\S+\(config.*\)\s?#\s?$'
         self.exclusive_prompt = r'^(.*?)RP/\S+\(config.*\)#\s?$'
         self.telnet_prompt = r'^.*Escape character is.*'
@@ -30,3 +36,4 @@ class IOSXRPatterns(GenericPatterns):
         self.rp_extract_status = r'^\d+\s+(\w+)\s+\-?\d+.*$'
         self.confirm_y_prompt = r"\[confirm( with only 'y' or 'n')?\]\s*\[y/n\].*$"
         self.reload_module_prompt = r"^(.*)?Reload hardware module ? \[no,yes\].*$"
+        self.proceed_config_mode = r'Would you like to proceed in configuration mode\? \[no\]:\s*$'

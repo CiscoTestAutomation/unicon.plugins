@@ -14,12 +14,6 @@ class AireosDualRpConnectionProvider(GenericDualRpConnectionProvider):
         con.log.info('+++ connection to %s +++' % str(self.connection.b.spawn))
         self.establish_connection()
 
-        # The following stages invoke execute and configure services on the
-        # device, which require a connection.
-        self.connection._is_connected = True
-        for subconnection in con.subconnections:
-            subconnection._is_connected = True
-
         # Maintain initial state
         if not con.mit:
 

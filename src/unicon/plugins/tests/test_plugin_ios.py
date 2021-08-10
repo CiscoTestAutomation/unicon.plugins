@@ -77,6 +77,7 @@ class TestIosPluginConnect(unittest.TestCase):
         c.setup_connection = Mock()
         c.state_machine = Mock()
         c.state_machine.states = []
+        c._get_learned_hostname = Mock(return_value='Router')
         c.connection_provider = c.connection_provider_class(c)
         c.spawn = Mock()
         c.spawn.buffer = ''
@@ -255,13 +256,13 @@ class TestIosPluginExecute(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.c = Connection(hostname='Router',
-                            start=['mock_device_cli --os ios --state exec'],
-                            os='ios',
-                            username='cisco',
-                            tacacs_password='cisco',
-                            enable_password='cisco',
-                            init_exec_commands=[],
-                            init_config_commands=[])
+                           start=['mock_device_cli --os ios --state exec'],
+                           os='ios',
+                           username='cisco',
+                           tacacs_password='cisco',
+                           enable_password='cisco',
+                           init_exec_commands=[],
+                           init_config_commands=[])
         cls.c.connect()
         with open(os.path.join(mockdata_path, 'ios/ios_mock_data.yaml'), 'rb') as datafile:
             cls.command_data = yaml.safe_load(datafile.read())
@@ -280,13 +281,10 @@ class TestIosPluginExecute(unittest.TestCase):
         with self.assertRaises(SubCommandFailure) as err:
             r = self.c.execute('not a real command')
 
-
     def test_execute_error_pattern_negative(self):
         r = self.c.execute('not a real command partial')
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestIosPluginReload(unittest.TestCase):
 
     @classmethod
@@ -296,22 +294,43 @@ class TestIosPluginReload(unittest.TestCase):
                             os='ios',
                             username='cisco',
                             tacacs_password='cisco',
-                            enable_password='cisco')
+                            enable_password='cisco',
+                            init_exec_commands=[],
+                            init_config_commands=[],
+                            settings={
+                                'POST_DISCONNECT_WAIT_SEC': 0,
+                                'GRACEFUL_DISCONNECT_WAIT_SEC': 0
+                            })
         cls.c2 = Connection(hostname='Router2',
                             start=['mock_device_cli --os ios --state enable'],
                             os='ios',
                             username='cisco',
                             tacacs_password='cisco',
-                            enable_password='cisco')
+                            enable_password='cisco',
+                            init_exec_commands=[],
+                            init_config_commands=[],
+                            settings={
+                                'POST_DISCONNECT_WAIT_SEC': 0,
+                                'GRACEFUL_DISCONNECT_WAIT_SEC': 0
+                            })
         cls.c3 = Connection(hostname='Router3',
                             start=['mock_device_cli --os ios --state enable'],
                             os='ios',
                             username='cisco',
                             tacacs_password='cisco',
-                            enable_password='cisco')
+                            enable_password='cisco',
+                            init_exec_commands=[],
+                            init_config_commands=[],
+                            settings={
+                                'POST_DISCONNECT_WAIT_SEC': 0,
+                                'GRACEFUL_DISCONNECT_WAIT_SEC': 0
+                            })
         cls.c1.connect()
         cls.c2.connect()
         cls.c3.connect()
+        cls.c1.settings.POST_RELOAD_WAIT = 1
+        cls.c2.settings.POST_RELOAD_WAIT = 1
+        cls.c3.settings.POST_RELOAD_WAIT = 1
 
     @classmethod
     def tearDownClass(cls):
@@ -323,22 +342,27 @@ class TestIosPluginReload(unittest.TestCase):
         with ThreadPoolExecutor(max_workers=3) as executor:
             tasks = [executor.submit(dev.reload, timeout=20)
                      for dev in [self.c1, self.c2, self.c3]]
-            results = [task.result() for task in tasks]
+            [task.result() for task in tasks]
 
 
 class TestIosPagentPluginConnect(unittest.TestCase):
 
     def test_login_connect(self):
         c = Connection(hostname='Router',
-                            start=['mock_device_cli --os ios --state pagent_disable_without_license'],
-                            os='ios',
-                            series='pagent',
-                            username='cisco',
-                            enable_password='cisco',
-                            tacacs_password='cisco',
-                            pagent_key='899573834241')
+                       start=['mock_device_cli --os ios --state pagent_disable_without_license'],
+                       os='ios',
+                       platform='pagent',
+                       username='cisco',
+                       enable_password='cisco',
+                       tacacs_password='cisco',
+                       pagent_key='899573834241',
+                       settings={
+                           'POST_DISCONNECT_WAIT_SEC': 0,
+                           'GRACEFUL_DISCONNECT_WAIT_SEC': 0
+                       })
         c.connect()
         self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
+        c.disconnect()
 
 
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
@@ -370,6 +394,31 @@ class TestIosPluginConnectCredentials(unittest.TestCase):
         self.assertEqual(r.is_connected(), True)
 
 
+class TestIosPluginConfigure(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.c = Connection(hostname='Router',
+                           start=['mock_device_cli --os ios --state exec'],
+                           os='ios',
+                           credentials=dict(default=dict(username='cisco',password='cisco')),
+                           init_exec_commands=[],
+                           init_config_commands=[],
+                           settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+                           )
+        cls.c.connect()
+
+    def test_configure_exception(self):
+        with self.assertRaises(SubCommandFailure):
+            self.c.configure('invalid command')
+
+    def test_configure_hostname(self):
+        self.c.configure('hostname R1')
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.c.disconnect()
+
+
 if __name__ == "__main__":
     unittest.main()
-

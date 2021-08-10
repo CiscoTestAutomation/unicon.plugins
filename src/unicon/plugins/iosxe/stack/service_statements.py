@@ -21,6 +21,7 @@ def send_boot_cmd(spawn, context):
     spawn.sendline(cmd)
 
 def stack_press_return(spawn, context):
+    spawn.log.info('Waiting for {} seconds'.format(spawn.timeout))
     time.sleep(spawn.timeout)
     spawn.sendline()
 
@@ -53,47 +54,69 @@ secure_passwd = Statement(pattern=switchover_pat.secure_passwd_std,
 build_config = Statement(pattern=switchover_pat.build_config,
                         action=None,
                         loop_continue=True, continue_timer=False)
+
 sw_init = Statement(pattern=switchover_pat.switchover_init,
-                        action=None,
-                        loop_continue=True, continue_timer=False)
+                    action=None,
+                    loop_continue=True,
+                    continue_timer=False)
 
 user_acc = Statement(pattern=switchover_pat.useracess,
-                        action=None, args=None,
-                        loop_continue=True, continue_timer=False)
+                     action=None,
+                     args=None,
+                     loop_continue=True,
+                     continue_timer=False)
+
 switch_prompt = Statement(pattern=switchover_pat.rommon_prompt,
-                        action=update_curr_state, args={'state': 'rommon'},
-                        loop_continue=False, continue_timer=False)
+                          action=update_curr_state,
+                          args={'state': 'rommon'},
+                          loop_continue=False,
+                          continue_timer=False)
+
 en_state = Statement(pattern=switchover_pat.enable_prompt,
-                        action=update_curr_state, args={'state': 'enable'},
-                        loop_continue=False, continue_timer=False)
+                     action=update_curr_state,
+                     args={'state': 'enable'},
+                     loop_continue=False,
+                     continue_timer=False)
+
 dis_state = Statement(pattern=switchover_pat.disable_prompt,
-                        action=update_curr_state, args={'state': 'disable'},
-                        loop_continue=False, continue_timer=False)
+                      action=update_curr_state,
+                      args={'state': 'disable'},
+                      loop_continue=False,
+                      continue_timer=False)
+
 press_return = Statement(pattern=switchover_pat.press_return,
-                        action=stack_press_return, args=None,
-                        loop_continue=True, continue_timer=False)
+                         action=stack_press_return,
+                         args=None,
+                         loop_continue=False,
+                         continue_timer=False)
+
+found_return = Statement(pattern=switchover_pat.press_return,
+                         args=None,
+                         loop_continue=False,
+                         continue_timer=False)
 
 switchover_fail_pattern = '|'.join([switchover_pat.switchover_fail1,
-                            switchover_pat.switchover_fail2,
-                            switchover_pat.switchover_fail3,
-                            switchover_pat.switchover_fail4,
-                            switchover_pat.switchover_fail5])
+                                    switchover_pat.switchover_fail2,
+                                    switchover_pat.switchover_fail3,
+                                    switchover_pat.switchover_fail4,
+                                    switchover_pat.switchover_fail5])
 
 switchover_fail = Statement(pattern=switchover_fail_pattern,
-                        action=switchover_failed, args=None,
-                        loop_continue=False, continue_timer=False)
+                            action=switchover_failed, args=None,
+                            loop_continue=False, continue_timer=False)
 
 stack_switchover_stmt_list = [save_config, proceed_sw, commit_changes,
-                                term_state, gen_rsh_key, auto_pro, secure_passwd,
-                                build_config, sw_init, user_acc, switch_prompt,
-                                en_state, dis_state, press_return, switchover_fail]
+                              term_state, gen_rsh_key, auto_pro, secure_passwd,
+                              build_config, sw_init, user_acc, switch_prompt,
+                              found_return, switchover_fail]
 
 # reload service statements
 reload_pat = StackIosXEReloadPatterns()
 
 reload_shelf = Statement(pattern=reload_pat.reload_entire_shelf,
-                        action='sendline()',
-                        loop_continue=True, continue_timer=False)
+                         action='sendline()',
+                         loop_continue=True,
+                         continue_timer=False)
 
 stack_reload_stmt_list = list(reload_statement_list)
 

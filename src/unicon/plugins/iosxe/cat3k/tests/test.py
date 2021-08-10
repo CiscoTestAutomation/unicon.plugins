@@ -15,7 +15,7 @@ tftp_image = "tftp://172.18.200.210/BB_IMAGES/polaris_dev/rp_super_universalk9.e
 
 os = "iosxe"
 chassis_type = "single_rp"
-series = "cat3k"
+platform = "cat3k"
 
 
 class TestIosXE(unittest.TestCase):
@@ -26,7 +26,7 @@ class TestIosXE(unittest.TestCase):
                              tacacs_password=password,
                              start=[start],
                              os=os,
-                             series=series)
+                             platform=platform)
         cls.con.connect()
 
     @classmethod

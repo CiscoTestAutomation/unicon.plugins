@@ -14,7 +14,6 @@ class CimcConnectionProvider(GenericSingleRpConnectionProvider):
     """
     def init_handle(self):
         con = self.connection
-        con._is_connected = True
         self.execute_init_commands()
 
 
@@ -34,7 +33,7 @@ class CimcConnection(GenericSingleRpConnection):
         Connection class for cimc connections.
     """
     os = 'cimc'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     state_machine_class = CimcStateMachine
     connection_provider_class = CimcConnectionProvider

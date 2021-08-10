@@ -20,7 +20,7 @@ class IosXEQuadServiceList(HAIosXEServiceList):
 
 class IosXEQuadRPConnection(BaseQuadRpConnection):
     os = 'iosxe'
-    series = None
+    platform = None
     chassis_type = 'quad'
     subcommand_list = IosXEQuadServiceList
     state_machine_class = IosXEQuadStateMachine

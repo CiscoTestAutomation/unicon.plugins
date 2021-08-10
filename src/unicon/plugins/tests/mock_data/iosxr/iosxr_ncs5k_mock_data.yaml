@@ -149,6 +149,7 @@ ncs5k_config:
     "end":
       new_state: ncs5k_enable
     "no logging console": ""
+    "logging console disable": ""
     "line console": ""
     "exec-timeout 0 0": ""
     "clock timezone UTC 0 0": ""

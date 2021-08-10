@@ -110,29 +110,35 @@ class StackSwitchover(BaseService):
         connect_dialog = self.connection.connection_provider.get_connection_dialog()
         dialog += connect_dialog
 
+        conn.log.info('Processing on active rp %s-%s' % (conn.hostname, conn.alias))
         conn.sendline(switchover_cmd)
         try:
             match_object = dialog.process(conn.spawn, timeout=timeout,
-                            prompt_recovery=self.prompt_recovery,
-                            context=conn.context)
+                                          prompt_recovery=self.prompt_recovery,
+                                          context=conn.context)
         except Exception as e:
             raise SubCommandFailure('Error during switchover ', e) from e
 
-        # try boot up original active rp with current active system 
+        # try boot up original active rp with current active system
         # image, if it moved to rommon state.
         if 'state' in conn.context and conn.context.state == 'rommon':
             try:
-                conn.state_machine.detect_state(conn.spawn)
+                conn.state_machine.detect_state(conn.spawn, context=conn.context)
                 conn.state_machine.go_to('enable', conn.spawn, timeout=timeout,
-                            prompt_recovery=self.prompt_recovery,
-                            context=conn.context, dialog=Dialog([switch_prompt]))
+                                         prompt_recovery=self.prompt_recovery,
+                                         context=conn.context, dialog=Dialog([switch_prompt]))
             except Exception as e:
                 self.connection.log.warning('Fail to bring up original active rp from rommon state.', e)
             finally:
                 conn.context.pop('state')
 
+        # To ensure the stack is ready to accept the login
+        self.connection.log.info('Sleeping for %s secs.' % \
+                                 self.connection.settings.POST_SWITCHOVER_SLEEP)
+        sleep(self.connection.settings.POST_SWITCHOVER_SLEEP)
+
         # check all members are ready
-        conn.state_machine.detect_state(conn.spawn)
+        conn.state_machine.detect_state(conn.spawn, context=conn.context)
 
         interval = self.connection.settings.SWITCHOVER_POSTCHECK_INTERVAL
         if utils.is_all_member_ready(conn, timeout=timeout, interval=interval):
@@ -214,6 +220,7 @@ class StackReload(BaseService):
 
         reload_dialog += Dialog([switch_prompt])
 
+        conn.log.info('Processing on active rp %s-%s' % (conn.hostname, conn.alias))
         conn.sendline(reload_cmd)
         try:
             reload_cmd_output = reload_dialog.process(

@@ -51,7 +51,7 @@ ssh_password:
       new_state: enable
 
 exec:
-  prompt: "RP/0/RP0/CPU0:Router>"
+  prompt: "RP/0/RP0/CPU0:%N>"
   commands:
     "enable":
       new_state: enable
@@ -393,15 +393,18 @@ admin:
 
 
 config:
-  prompt: "RP/0/RP0/CPU0:Router(config)#"
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
   commands: &config_cmds
     "end":
       new_state: enable
     "exit":
       new_state: enable
-    "logging console disable": ""
     "no logging console": ""
+    "logging console disable": ""
     "!end indicator for bulk configure": ""
+    "line console 0":
+      new_state:
+        config_line
     "line con 0":
       new_state:
         config_line
@@ -410,7 +413,6 @@ config:
     "line console":
       new_state: config_line
     "hostname Router": ""
-    "no logging console": ""
     "large config":
       new_state: large_config
     "line console":
@@ -426,26 +428,41 @@ config:
     "test failed":
       new_state:
         failed_config
+    "redundancy":
+      new_state: config_redundancy
+
+config_redundancy:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "main-cpu": ""
+    "standby console enable": ""
+    "commit": ""
+    "end":
+      new_state: enable
 
 config_line:
-  prompt: "RP/0/RP0/CPU0:Router(config-line)#"
+  prompt: "RP/0/RP0/CPU0:%N(config-line)#"
   commands: 
     "exec-timeout 0 0": ""
     "clock timezone UTC 0 0": ""
     "commit": ""
     "end":
       new_state: enable
+    "no logging console": ""
     "absolute-timeout 0": ""
+    "exec-timeout 0": ""
     "exec-timeout 0 0": ""
     "absolute-timeout 0": ""
     "session-timeout 0": ""
+    "line console 0":
+      new_state: config_line
     "line default":
       new_state: config_line
     "commit":
       new_state: commit_prompt
 
 config_exclusive:
-  prompt: "RP/0/RP0/CPU0:Router(config)#"
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
   commands:
     "end":
       new_state: enable
@@ -456,7 +473,7 @@ config_exclusive:
       new_state: commit_prompt
 
 line_console:
-  prompt: "RP/0/RP0/CPU0:Router(config-line)#"
+  prompt: "RP/0/RP0/CPU0:%N(config-line)#"
   commands:
     "exec-timeout 0 0": ""
     "absolute-timeout 0": ""
@@ -468,8 +485,9 @@ line_console:
       new_state: enable
 
 large_config:
-  prompt: "RP/0/RP0/CPU0:Router(config)#"
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
   commands:
+    "commit": ""
     "end":
       new_state: delay_enable
 
@@ -489,16 +507,17 @@ commit_prompt:
       new_state: config
 
 commit_replace:
-  prompt: "This commit will replace or remove the entire running configuration. This\n
-operation can be service affecting.\n
-Do you wish to proceed? [no]:"
+  preface: "This commit will replace or remove the entire running configuration. This\n
+operation can be service affecting.\n"
+  prompt: "Do you wish to proceed? [no]:"
   commands:
     "yes":
       new_state: config
 
 failed_config:
-  prompt: "RP/0/RP0/CPU0:Router(config)#"
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
   commands:
+    "commit": ""
     "end":
       response: "Uncommitted changes found, commit them before exiting(yes/no/cancel)? [cancel]:"
       new_state: failed_config_uncommitted
@@ -511,7 +530,7 @@ failed_config_uncommitted:
       new_state: failed_config_show
 
 failed_config_show:
-  prompt: "RP/0/RP0/CPU0:Router(config)#"
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
   commands:
     "show configuration failed": |2
       Fri Aug  3 15:34:40.336 UTC
@@ -531,13 +550,15 @@ failed_config_show:
       new_state: enable
 
 config1:
-  prompt: "RP/0/RP0/CPU0:Router(config)#"
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
   commands: &config_cmds1
     "end":
       new_state: enable1
     "exit":
       new_state: enable1
     "no logging console": ""
+    "logging console disable": ""
+    "commit": ""
     "line console":
       new_state: config_line1
     "show configuration": |
@@ -546,13 +567,14 @@ config1:
       end
 
 config_line1:
-  prompt: "RP/0/RP0/CPU0:Router(config-line)#"
+  prompt: "RP/0/RP0/CPU0:%N(config-line)#"
   commands: 
     "exec-timeout 0 0": ""
     "clock timezone UTC 0 0": ""
     "commit": ""
     "end":
       new_state: enable1
+    "no logging console": ""
     "absolute-timeout 0": ""
     "exec-timeout 0 0": ""
     "absolute-timeout 0": ""
@@ -633,6 +655,7 @@ admin_config:
   commands:
     "show configuration": |
       % No configuration changes found.
+    "commit": ""
     "end":
       new_state: admin1
     "exit":
@@ -710,6 +733,8 @@ config2:
     "exit":
       new_state: enable2
     "no logging console": ""
+    "logging console disable": ""
+    "commit": ""
     "line console":
       new_state: config_line2
     "show configuration": |
@@ -721,6 +746,7 @@ config_line2:
   prompt: "RP/0/0/CPU0:%N(config-line)#"
   commands:
     "exec-timeout 0 0": ""
+    "no logging console": ""
     "clock timezone UTC 0 0": ""
     "commit": ""
     "end":
@@ -846,6 +872,7 @@ config3:
     "exit":
       new_state: enable3
     "no logging console": ""
+    "logging console disable": ""
     "line console":
       new_state: config_line3
 
@@ -853,6 +880,7 @@ config_line3:
   prompt: "RP/0/0/CPU0:%N(config-line)#"
   commands:
     "exec-timeout 0 0": ""
+    "no logging console": ""
     "clock timezone UTC 0 0": ""
     "commit": ""
     "end":
@@ -923,6 +951,8 @@ asr9k_config:
       new_state: asr9k_config_line
     "hostname Router": ""
     "no logging console": ""
+    "logging console disable": ""
+    "commmit": ""
     "line console":
       new_state:
         asr9k_line_console        
@@ -939,6 +969,7 @@ asr9k_config_line:
     "exec-timeout 0 0": ""
     "absolute-timeout 0": ""
     "session-timeout 0": ""
+    "commit": ""
     "line default":
       new_state: asr9k_config_line
 
@@ -949,6 +980,7 @@ asr9k_line_console:
     "absolute-timeout 0": ""
     "session-timeout 0": ""
     "line default": ""
+    "commit": ""
     "end":
       new_state: asr9k_enable
 
@@ -985,17 +1017,20 @@ iosxrv_config:
       new_state: iosxrv_config_line
     "hostname Router": ""
     "no logging console": ""
+    "logging console disable": ""
+    "commit": ""
     "line console":
-      new_state: iosxrv_line_console        
+      new_state: iosxrv_line_console
 
 iosxrv_config_line:
   prompt: "RP/0/0/CPU0:iosxrv-1(config-line)#"
-  commands: 
+  commands:
     "exec-timeout 0 0": ""
     "clock timezone UTC 0 0": ""
     "commit": ""
     "end":
       new_state: asr9k_enable
+    "no logging console": ""
     "absolute-timeout 0": ""
     "exec-timeout 0 0": ""
     "absolute-timeout 0": ""
@@ -1010,6 +1045,7 @@ iosxrv_line_console:
     "absolute-timeout 0": ""
     "session-timeout 0": ""
     "line default": ""
+    "commit": ""
     "end":
       new_state: iosxrv_enable
 
@@ -1046,6 +1082,7 @@ moonshine_config:
       new_state: config_line
     "hostname Router": ""
     "no logging console": ""
+    "logging console disable": ""
     "line console":
       new_state:
         line_console
@@ -1059,11 +1096,10 @@ moonshine_failed_config:
   prompt: "RP/0/0/CPU0:Router(config)#"
   commands:
     "end":
-      response: "Uncommitted changes found, commit them before exiting(yes/no/cancel)? [cancel]:"
       new_state: moonshine_failed_config_uncommitted
 
 moonshine_failed_config_uncommitted:
-  prompt: ""
+  prompt: "Uncommitted changes found, commit them before exiting(yes/no/cancel)? [cancel]:"
   commands:
     "yes":
       response: "% Failed to commit one or more configuration items during a pseudo-atomic operation. All changes made have been reverted. Please issue 'show configuration failed [inheritance]' from this session to view the errors"
@@ -1115,6 +1151,7 @@ config4:
     "exit":
       new_state: enable4
     "no logging console": ""
+    "logging console disable": ""
     "line console":
       new_state: config_line4
 
@@ -1123,6 +1160,7 @@ config_line4:
   commands:
     "exec-timeout 0 0": ""
     "clock timezone UTC 0 0": ""
+    "no logging console": ""
     "commit": ""
     "end":
       new_state: enable4
@@ -1147,9 +1185,84 @@ iosxr_config_ios:
 xr_vm:
   prompt: "[xr-vm_node0_RP1_CPU0:~]$"
   commands: *enable_cmds
+xr_vm2:
+  prompt: "[node0_RP1_CPU0:~]$"
+  commands: *enable_cmds
 host:
   prompt: "[host:~]$"
   commands: *enable_cmds
+
+
+# Enable/config prompts for RP vs RSP
+
+enable_bash_run_prompt_rp:
+  prompt: "RP/0/RP/CPU0:%N#"
+  commands:
+    "terminal length 0": ""
+    "terminal width 0": ""
+    "configure terminal":
+      new_state: config_bash_run_prompt_rp
+    "run":
+      new_state: bash_console_prompt_rp
+
+config_bash_run_prompt_rp:
+  prompt: "RP/0/RP/CPU0:%N(config)#"
+  commands:
+    "end":
+      new_state: enable_bash_run_prompt_rp
+    "exit":
+      new_state: enable_bash_run_prompt_rp
+    "no logging console": ""
+    "logging console disable": ""
+    "line console": ""
+    "exec-timeout 0 0": ""
+    "absolute-timeout 0": ""
+    "session-timeout 0": ""
+    "line default": ""
+    "commit": ""
+
+bash_console_prompt_rp:
+  prompt: "[xr-vm_node0_RP0_CPU0:~]$"
+  commands:
+    "pwd": |
+      disk0:
+    "exit":
+      new_state: enable_bash_run_prompt_rp
+
+
+enable_bash_run_prompt_rsp:
+  prompt: "RP/0/RSP/CPU0:%N#"
+  commands:
+    "terminal length 0": ""
+    "terminal width 0": ""
+    "configure terminal":
+      new_state: config_bash_run_prompt_rsp
+    "run":
+      new_state: bash_console_prompt_rsp
+
+config_bash_run_prompt_rsp:
+  prompt: "RP/0/RSP/CPU0:%N(config)#"
+  commands:
+    "end":
+      new_state: enable_bash_run_prompt_rsp
+    "exit":
+      new_state: enable_bash_run_prompt_rsp
+    "no logging console": ""
+    "logging console disable": ""
+    "line console": ""
+    "exec-timeout 0 0": ""
+    "absolute-timeout 0": ""
+    "session-timeout 0": ""
+    "line default": ""
+    "commit": ""
+
+bash_console_prompt_rsp:
+  prompt: "[xr-vm_node0_RSP0_CPU0:~]$"
+  commands:
+    "pwd": |
+      disk0:
+    "exit":
+      new_state: enable_bash_run_prompt_rsp
 
 
 ping_proto:

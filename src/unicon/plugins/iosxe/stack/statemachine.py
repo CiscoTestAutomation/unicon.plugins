@@ -17,13 +17,6 @@ class StackIosXEStateMachine(IosXESingleRpStateMachine):
         self.remove_path('enable', 'rommon')
         self.remove_path('rommon', 'disable')
         self.remove_state('rommon')
-        # incase there is no previous shell state regiestered
-        try:
-            self.remove_path('shell', 'enable')
-            self.remove_path('enable', 'shell')
-            self.remove_state('shell')
-        except Exception:
-            pass
 
         rommon = State('rommon', patterns.rommon_prompt)
         enable_to_rommon = Path(self.get_state('enable'), rommon, 'reload',
@@ -33,12 +26,3 @@ class StackIosXEStateMachine(IosXESingleRpStateMachine):
         self.add_state(rommon)
         self.add_path(enable_to_rommon)
         self.add_path(rommon_to_disable)
-
-
-        shell = State('shell', patterns.shell_prompt)
-        enable_to_shell = Path(self.get_state('enable'),
-            shell, 'request platform software system shell')
-        shell_to_enable = Path(shell, self.get_state('enable'), 'exit', None)
-        self.add_state(shell)
-        self.add_path(enable_to_shell)
-        self.add_path(shell_to_enable)

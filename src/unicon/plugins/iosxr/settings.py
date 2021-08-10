@@ -44,6 +44,13 @@ class IOSXRSettings(GenericSettings):
             r'^%\s*Unmatched +quote.*',
             r'^%\s*Error +parsing +piping+ string\. +Quitting.*'
         ]
+        self.CONFIGURE_ERROR_PATTERN = [
+            r'^%\s*[Ii]nvalid (command|input|number)',
+            r'^%\s*Failed to commit.*'
+        ]
 
         self.EXECUTE_MATCHED_RETRIES = 1
         self.EXECUTE_MATCHED_RETRY_SLEEP = 0.1
+
+        self.CONFIG_LOCK_RETRIES = 5
+        self.CONFIG_LOCK_RETRY_SLEEP = 30

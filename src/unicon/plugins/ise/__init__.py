@@ -104,7 +104,7 @@ class IseConnection(BaseLinuxConnection):
         Connection class for Ise connections.
     """
     os = 'ise'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     state_machine_class = IseStateMachine
     connection_provider_class = IseConnectionProvider
@@ -117,4 +117,3 @@ class IseConnection(BaseLinuxConnection):
         """
         self.spawn.sendline('exit')
         self.spawn.close()
-        self._is_connected = False

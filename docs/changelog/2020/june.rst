@@ -1,10 +1,13 @@
 June 2020
--------------
+============
+
+July 7th
+------------
 
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
 
-        ``unicon.plugins``, v20.6
+        ``unicon``, v20.6
 
 
 Install Instructions
@@ -12,7 +15,7 @@ Install Instructions
 
 .. code-block:: bash
 
-    bash$ pip install unicon.plugins
+    bash$ pip install unicon
 
 
 Upgrade Instructions
@@ -20,34 +23,17 @@ Upgrade Instructions
 
 .. code-block:: bash
 
-    bash$ pip install --upgrade unicon.plugins
+    bash$ pip install --upgrade unicon
 
 
 Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
+* Enhanced device connectivity verification functionality
 
-* Fixed ambiguous python shebang in mock devices
-* Updated generic configure pattern to include ca-trustpoint
+* Fixed bug in switch to vdc keywords
 
-* [IOSXE] Added recovery-mode support
-* [IOSXE] Updated shell pattern
+* Removed old expect_log, use device.log.setLevel to enable/disable debug internal log
 
-* [IOSXR] Added commit retry timer that can be controlled under settings in the testbed yaml file
-* [IOSXR] Updated admin_config prompt
-* [IOSXR] Fixed enable pattern
+* Updates to mock_device to handle keystrokes
 
-* [AIREOS] Added Invalid error_patterns
-* [AIREOS] Enhanced reload pattern
-* [AIREOS] Fixed HA execute service to use service dialogs
-* [AIREOS/IOS] Added logging console disable to INIT_EXEC_COMMANDS
-
-* [JUNOS] Enhanced plugin to fail on commit failures
-* [JUNOS] Updated CONFIGURE_ERROR_PATTERN in setting
-
-* [STAROS] Updated error patterns and exec init commands
-
-* [LINUX] Updated single hash prompt pattern
-
-* [NXOS] Fixed switchover timeout hard code issue
-
-* [CIMC] Update CIMC prompt pattern
+* Used %1B for Escape code instead of ESC in mock data

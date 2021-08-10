@@ -63,6 +63,12 @@ class MockDeviceIOS(MockDevice):
         self.set_state(self.transport_handles[transport], 'ping3_extend')
         return True
 
+    def config(self, transport, cmd):
+        m = re.match(r'\s*hostname (\S+)', cmd)
+        if m:
+            self.hostname = m.group(1)
+            return True
+
 
 class MockDeviceTcpWrapperIOS(MockDeviceTcpWrapper):
 
@@ -74,8 +80,7 @@ class MockDeviceTcpWrapperIOS(MockDeviceTcpWrapper):
 
 
 def main(args=None):
-    logging.basicConfig(stream=sys.stderr, level=logging.INFO,
-                        format="%(asctime)s [%(levelname)8s]:  %(message)s")
+
     if not args:
         parser = argparse.ArgumentParser()
         parser.add_argument('--state', help='initial state')

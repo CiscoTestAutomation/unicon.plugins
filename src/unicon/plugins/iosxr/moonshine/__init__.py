@@ -8,7 +8,7 @@ from unicon.plugins.iosxr.moonshine.pty_backend import MoonshineSpawn
 
 class MoonshineSingleRpConnection(IOSXRSingleRpConnection):
     os = 'iosxr'
-    series = 'moonshine'
+    platform = 'moonshine'
     chassis_type = 'single_rp'    
     state_machine_class = MoonshineSingleRpStateMachine
     connection_provider_class = MoonshineSingleRpConnectionProvider
@@ -32,7 +32,7 @@ class MoonshineSingleRpConnection(IOSXRSingleRpConnection):
 
 class MoonshineDualRpConnection(IOSXRDualRpConnection):
     os = 'iosxr'
-    series = 'moonshine'
+    platform = 'moonshine'
     chassis_type = 'dual_rp'
     state_machine_class = MoonshineDualRpStateMachine
     connection_provider_class = MoonshineDualRpConnectionProvider

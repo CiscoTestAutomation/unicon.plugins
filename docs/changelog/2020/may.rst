@@ -1,10 +1,13 @@
 May 2020
--------------
+============
+
+May 26th
+------------
 
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
 
-        ``unicon.plugins``, v20.5
+        ``unicon``, v20.5
 
 
 Install Instructions
@@ -12,7 +15,7 @@ Install Instructions
 
 .. code-block:: bash
 
-    bash$ pip install unicon.plugins
+    bash$ pip install unicon
 
 
 Upgrade Instructions
@@ -20,22 +23,10 @@ Upgrade Instructions
 
 .. code-block:: bash
 
-    bash$ pip install --upgrade unicon.plugins
+    bash$ pip install --upgrade unicon
 
 
 Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
+* No new features
 
-* Updated reset_standby logic
-
-* Added IOSXE cat9k plugin unit test
-
-* Updated shell pattern on IOSXE and added the corresponding unit test
-
-* Fixed bash_console access in case of spitfire plugin
-
-* Added dialog to the enable->disable statemachine transition under IOSXE
-
-* Fixing enable pattern in IOSXR plugin
-
-* Additional NXOS error patterns

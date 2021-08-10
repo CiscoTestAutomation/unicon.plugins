@@ -62,10 +62,85 @@ to respond to the password prompt.  Credentials are available in ``rtr.credentia
     cmd = ['sudo su root', 'uname -a', 'whoami', 'exit']
     device.shellexec(cmd, reply=Dialog([password_stmt]))
 
+
+configure
+---------
+
+Service to execute commands on configuration mode.
+
+================  ========================    ====================================================
+Argument          Type                        Description
+================  ========================    ====================================================
+command           list                        list of commands to configure
+reply             Dialog                      additional dialog
+timeout           int                         timeout value for the command execution takes.
+error_pattern     list                        List of regex strings to check output for errors.
+prompt_recovery   bool (default False)        Enable/Disable prompt recovery feature
+target            str (default "active")      Target RP where to execute service, for DualRp only
+mode              str (default: "default")    Mode to configure ("default" or "dual")
+================  ========================    ====================================================
+
+
+.. code-block:: python
+
+    rtr.configure(['feature isis', 'commit'], mode="dual")
+
+    # config dual-stage
+    # Enter configuration commands, one per line. End with CNTL/Z.
+    # R1(config-dual-stage)# feature isis
+    # R1(config-dual-stage)# commit
+    # Verification Succeeded.
+
+    # Proceeding to apply configuration. This might take a while depending on amount of configuration in buffer.
+    # Please avoid other configuration changes during this time.
+    # Configuration committed by user 'admin' using Commit ID : 1000000002
+    # R1(config-dual-stage)# end
+    # R1#
+
+
+If you want to bring device to configure dual stage, you can use the `go_to` function in state machine
+and use `'config_dual': True` as the context. The following is an example to do that.
+
+.. code-block:: python
+
+    rtr.state_machine.go_to('config', rtr.spawn, context={'config_dual': True})
+
+    # config dual-stage
+    # Enter configuration commands, one per line. End with CNTL/Z.
+    # R1(config-dual-stage)#
+
+    # execute command in configure dual stage
+    rtr.execute('no logging console')
+
+    # R1(config-dual-stage)# no logging console
+    # R1(config-dual-stage)# 
+
+
+attach
+------
+
+Service to attach to line card to execute commands in. Returns a
+router-like object to execute commands on using python context managers.
+
+====================    ======================    =================================================
+Argument                Type                      Description
+====================    ======================    =================================================
+module_num              int                       module number to attach to
+timeout                 int (default 60 sec)      timeout in sec for executing commands
+target                  standby/active            by default commands will be executed on active,
+                                                  use target=standby to execute command on standby.
+====================    ======================    =================================================
+
+.. code-block:: python
+
+    with device.attach(1) as lc_1:
+        output1 = lc_1.execute('show interface')
+
+
 attach_console
 --------------
 
-Service to attach to line card console to execute commands in. Returns a 
+Service to attach to line card console to execute commands in. Returns a
 router-like object to execute commands on using python context managers.
 
 ====================    ======================    ========================================
@@ -76,7 +151,7 @@ login_name              str                       name to login with, default: r
 default_escape_chars    str                       default escape char, default: ~,
 change_prompt           str                       new prompt to change to for ez automation
 timeout                 int (default 60 sec)      timeout in sec for executing commands
-prompt                  str                       bash prompt (defaut: bash-\d.\d# )
+prompt                  str                       bash prompt (default: bash-\d.\d# )
 ====================    ======================    ========================================
 
 .. code-block:: python
@@ -279,7 +354,7 @@ Most of the time simply providing the VDC name is just good enough.
     step-n7k-2-vdc1(config-console)# end
     step-n7k-2-vdc1# Out[3]: 'vdc1'
 
-You see a relatively longer output becuase everytime it switches to a new VDC,
+You see a relatively longer output because every time it switches to a new VDC,
 the terminal is reinitialized.
 
 .. note::
@@ -291,7 +366,7 @@ switchback
 -----------
 
 It is just the opposite of `switchto`. It is used to return to the *default*
-VDC. This sevice takes no mandatory arguments.
+VDC. This service takes no mandatory arguments.
 
 ==========   ======================    =============================
 Argument     Type                      Description
@@ -411,31 +486,6 @@ command      str (no vdc)              alternate command.
     You can call `delete_vdc` even when you are inside a VDC. Only thing to
     take care is that you can't delete the same VDC in which you are already
     in. Isn't is obvious !!
-
-
-guestshell
-----------
-
-Service to execute commands in the Linux "guest shell" available on certain
-Nexus platforms. ``guestshell`` gives you a router-like object to execute
-commands on using a Python context manager.
-
-=================   ========   ===================================================================
-Argument            Type       Description
-=================   ========   ===================================================================
-enable_guestshell   boolean    Explicitly enable the guestshell before attempting to enter.
-timeout             int (10)   Timeout for "guestshell enable", "guestshell", and "exit" commands.
-retries             int (20)   Number of retries (x 5 second interval) to attempt to enable guestshell.
-=================   ========   ===================================================================
-
-.. code-block:: python
-
-    with device.guestshell(enable_guestshell=True, retries=30) as gs:
-        output = gs.execute("ifconfig")
-
-    with device.guestshell() as gs:
-        output1 = gs.execute('pwd')
-        output2 = gs.execute('ls -al')
 
 
 reload

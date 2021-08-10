@@ -1,46 +1,14 @@
 November 2019
 =============
 
-November 27th
--------------
-
-.. csv-table:: Module Versions
-    :header: "Modules", "Versions"
-
-        ``unicon.plugins``, v19.11.1
-
-
-Install Instructions
-^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: bash
-
-    bash$ pip install unicon.plugins
-
-
-Upgrade Instructions
-^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: bash
-
-    bash$ pip install --upgrade unicon.plugins
-
-
-Features and Bug Fixes:
-^^^^^^^^^^^^^^^^^^^^^^^
-
-- aireos plugin
-
-  - remove f-strings that is not supported on python 3.4 and 3.5
-
-
 November 26th
 -------------
 
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
 
-        ``unicon.plugins``, v19.11
+        ``unicon``, v19.11
+
 
 
 Install Instructions
@@ -48,7 +16,7 @@ Install Instructions
 
 .. code-block:: bash
 
-    bash$ pip install unicon.plugins
+    bash$ pip install unicon
 
 
 Upgrade Instructions
@@ -56,11 +24,26 @@ Upgrade Instructions
 
 .. code-block:: bash
 
-    bash$ pip install --upgrade unicon.plugins
+    bash$ pip install --upgrade unicon
 
 
 Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
+- core
+
+  - separate plugins from unicon to be a sinlge package unicon.plugins
+
+  - use mock_device_cli instead of python run mock_device
+
+  - add matched_retries for Statement to avoid transient match on output
+
+  - enhance UniconStreamHandler to handle UnicodeEncodeError
+
+  - enhance RawPtySpawn to set environment variable via via settings
+
+  - enhance RawSpawn to use shlex for start command split
+
+  - now allow settings.DEFAULT_LEARNED_HOSTNAME to be used by plugins
 
 - generic plugin
 

@@ -16,7 +16,6 @@ class VosConnectionProvider(GenericSingleRpConnectionProvider):
 
     def init_handle(self):
         con = self.connection
-        con._is_connected = True
         con.connection_timeout = 300
         con.state_machine.go_to('shell',
                                 self.connection.spawn,
@@ -43,7 +42,7 @@ class VosConnection(GenericSingleRpConnection):
         Connection class for vos connections.
     """
     os = 'vos'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     state_machine_class = VosStateMachine
     connection_provider_class = VosConnectionProvider

@@ -1,0 +1,298 @@
+
+cat9k_ha_active_escape:
+  commands:
+   "":
+     new_state: cat9k_ha_active_disable
+
+
+cat9k_ha_standby_escape:
+  commands:
+   "":
+     new_state: cat9k_ha_standby_disable
+
+cat9k_ha_active_disable:
+  prompt: "%N>"
+  commands:
+   "enable":
+     new_state: cat9k_ha_active_enable
+
+cat9k_ha_active_enable:
+  prompt: "%N#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "sh redundancy stat | inc my state": |
+       my state = 13 -ACTIVE 
+    "show redundancy sta |  in peer": |
+           peer state = 8  -STANDBY HOT 
+    "show redundancy sta | inc Redundancy State": |
+      Redundancy State              = sso
+    "sh redundancy state": |4
+               my state = 13 -ACTIVE 
+             peer state = 8  -STANDBY HOT 
+                   Mode = Duplex
+                   Unit = Primary
+                Unit ID = 3
+
+        Redundancy Mode (Operational) = sso
+        Redundancy Mode (Configured)  = sso
+        Redundancy State              = sso
+             Maintenance Mode = Disabled
+            Manual Swact = enabled
+         Communications = Up
+
+           client count = 125
+         client_notification_TMR = 30000 milliseconds
+                   RF debug mask = 0x0   
+
+    "write erase":
+        response: |
+            ************************************************************************************************************
+            Erasing Nvram will not clear license trust code.
+            ************************************************************************************************************
+        new_state: cat9k_ha_active_enable_wrerase_confirm
+    "show version": |
+        Cisco IOS XE Software, Version BLD_POLARIS_DEV_LATEST_20210709_153157_2
+        Cisco IOS Software [Bengaluru], Catalyst L3 Switch Software (CAT9K_IOSXE), Experimental Version 17.7.20210709:154156 [S2C-build-polaris_dev-141820-/nobackup/mcpre/BLD-BLD_POLARIS_DEV_LATEST_20210709_153157 121]
+        Copyright (c) 1986-2021 by Cisco Systems, Inc.
+        Compiled Fri 09-Jul-21 14:38 by mcpre
+
+
+        Cisco IOS-XE software, Copyright (c) 2005-2021 by cisco Systems, Inc.
+        All rights reserved.  Certain components of Cisco IOS-XE software are
+        licensed under the GNU General Public License ("GPL") Version 2.0.  The
+        software code licensed under GPL Version 2.0 is free software that comes
+        with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+        GPL code under the terms of GPL Version 2.0.  For more details, see the
+        documentation or "License Notice" file accompanying the IOS-XE software,
+        or the applicable URL provided on the flyer accompanying the IOS-XE
+        software.
+
+
+        ROM: IOS-XE ROMMON
+        BOOTLDR: System Bootstrap, Version 17.7.0.20, DEVELOPMENT SOFTWARE
+
+        mac-gen2 uptime is 7 hours, 58 minutes
+        Uptime for this control processor is 7 hours, 59 minutes
+        System returned to ROM by LocalSoft
+        System image file is "bootflash:packages.conf"
+        Last reload reason: LocalSoft
+
+
+
+        This product contains cryptographic features and is subject to United
+        States and local country laws governing import, export, transfer and
+        use. Delivery of Cisco cryptographic products does not imply
+        third-party authority to import, export, distribute or use encryption.
+        Importers, exporters, distributors and users are responsible for
+        compliance with U.S. and local country laws. By using this product you
+        agree to comply with applicable laws and regulations. If you are unable
+        to comply with U.S. and local laws, return this product immediately.
+
+        A summary of U.S. laws governing Cisco cryptographic products may be found at:
+        http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+        If you require further assistance please contact us by sending email to
+        export@cisco.com.
+
+
+        Technology Package License Information: 
+
+        ------------------------------------------------------------------------------
+        Technology-package                                     Technology-package
+        Current                        Type                       Next reboot  
+        ------------------------------------------------------------------------------
+        network-advantage   	Smart License                 	 network-advantage   
+        dna-advantage       	Subscription Smart License    	 dna-advantage                 
+        AIR License Level: AIR DNA Advantage
+        Next reload AIR license Level: AIR DNA Advantage
+
+
+        Smart Licensing Status: Registration Not Applicable/Not Applicable
+
+        cisco C9407R (X86) processor (revision V01) with 1843930K/6147K bytes of memory.
+        Processor board ID FXS2144Q2G7
+        1 Virtual Ethernet interface
+        120 Gigabit Ethernet interfaces
+        48 Ten Gigabit Ethernet interfaces
+        8 TwentyFive Gigabit Ethernet interfaces
+        8 Hundred Gigabit Ethernet interfaces
+        32768K bytes of non-volatile configuration memory.
+        15932592K bytes of physical memory.
+        11161600K bytes of Bootflash at bootflash:.
+        1638400K bytes of Crash Files at crashinfo:.
+        11161600K bytes of Bootflash at bootflash-1-1:.
+        1638400K bytes of Crash Files at crashinfo-1-1:.
+
+        Base Ethernet MAC Address          : 38:0e:4d:9a:e6:80
+        Motherboard Assembly Number        : 4B77
+        Motherboard Serial Number          : FXS213701D7
+        Model Revision Number              : V02
+        Motherboard Revision Number        : 3
+        Model Number                       : C9407R              
+        System Serial Number               : FXS2144Q2G7
+
+    "reload":
+        new_state: cat9k_ha_active_enable_reload_confirm
+
+    "config term":
+        new_state: cat9k_ha_active_config
+
+cat9k_ha_active_enable_reload_confirm:
+    prompt: "System configuration has been modified. Save? [yes/no]: "
+    commands:
+      "n":
+        new_state: cat9k_ha_active_enable_reload_proceed
+
+
+cat9k_ha_active_enable_reload_proceed:
+  prompt: "Proceed with reload? [confirm]"
+  commands:
+    "":
+      new_state: cat9k_ha_active_enable_reload
+
+cat9k_ha_active_enable_reload:
+  preface:
+    response: file|mock_data/iosxe/cat9k_ha_reload.txt
+    timing:
+    - 0:,0,0.02
+  prompt: ""
+  commands:
+    "":
+      new_state: cat9k_ha_standby_disable_locked
+
+
+cat9k_ha_active_enable_wrerase_confirm:
+    prompt: "Erasing the nvram filesystem will remove all configuration files! Continue? [confirm]"
+    commands:
+      "":
+        response: |
+            [OK]
+            Erase of nvram: complete
+        new_state: cat9k_ha_active_enable
+
+
+cat9k_ha_active_config:
+  prompt: "%N(config)#"
+  commands:
+    "no logging console": ""
+    "line console 0": ""
+    "exec-timeout 0": ""
+    "end":
+        new_state: cat9k_ha_active_enable
+    "redundancy":
+        new_state: cat9k_ha_active_config_redundancy
+
+cat9k_ha_active_config_redundancy:
+  prompt: "%N(config-red)#"
+  commands:
+    "main-cpu":
+        new_state: cat9k_ha_active_config_redundancy_mc
+
+cat9k_ha_active_config_redundancy_mc:
+  prompt: "%N(config-red-mc)#"
+  commands:
+    "standby console enable": ""
+    "end":
+      new_state: cat9k_ha_active_enable
+
+
+cat9k_ha_standby_disable_locked:
+    prompt: "%N-stby>"
+    commands:
+      "enable": "Standby console disabled"
+
+cat9k_ha_standby_disable:
+    prompt: "%N-stby>"
+    commands:
+      "enable":
+        new_state: cat9k_ha_standby_enable
+
+
+cat9k_ha_standby_enable:
+  prompt: "%N-stby#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "sh redundancy stat | inc my state": |
+        my state = 8  -STANDBY HOT
+    "show version": |
+        Cisco IOS XE Software, Version BLD_POLARIS_DEV_LATEST_20210709_153157_2
+        Cisco IOS Software [Bengaluru], Catalyst L3 Switch Software (CAT9K_IOSXE), Experimental Version 17.7.20210709:154156 [S2C-build-polaris_dev-141820-/nobackup/mcpre/BLD-BLD_POLARIS_DEV_LATEST_20210709_153157 121]
+        Copyright (c) 1986-2021 by Cisco Systems, Inc.
+        Compiled Fri 09-Jul-21 14:38 by mcpre
+
+
+        Cisco IOS-XE software, Copyright (c) 2005-2021 by cisco Systems, Inc.
+        All rights reserved.  Certain components of Cisco IOS-XE software are
+        licensed under the GNU General Public License ("GPL") Version 2.0.  The
+        software code licensed under GPL Version 2.0 is free software that comes
+        with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+        GPL code under the terms of GPL Version 2.0.  For more details, see the
+        documentation or "License Notice" file accompanying the IOS-XE software,
+        or the applicable URL provided on the flyer accompanying the IOS-XE
+        software.
+
+
+        ROM: IOS-XE ROMMON
+        BOOTLDR: System Bootstrap, Version 17.7.0.20, DEVELOPMENT SOFTWARE
+
+        mac-gen2 uptime is 7 hours, 58 minutes
+        Uptime for this control processor is 7 hours, 59 minutes
+        System returned to ROM by EHSA standby down
+        System image file is "bootflash:packages.conf"
+        Last reload reason: EHSA standby down
+
+
+
+        This product contains cryptographic features and is subject to United
+        States and local country laws governing import, export, transfer and
+        use. Delivery of Cisco cryptographic products does not imply
+        third-party authority to import, export, distribute or use encryption.
+        Importers, exporters, distributors and users are responsible for
+        compliance with U.S. and local country laws. By using this product you
+        agree to comply with applicable laws and regulations. If you are unable
+        to comply with U.S. and local laws, return this product immediately.
+
+        A summary of U.S. laws governing Cisco cryptographic products may be found at:
+        http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+        If you require further assistance please contact us by sending email to
+        export@cisco.com.
+
+
+        Technology Package License Information: 
+
+        ------------------------------------------------------------------------------
+        Technology-package                                     Technology-package
+        Current                        Type                       Next reboot  
+        ------------------------------------------------------------------------------
+        network-advantage   	Smart License                 	 network-advantage   
+        dna-advantage       	Subscription Smart License    	 dna-advantage                 
+        AIR License Level: AIR DNA Advantage
+        Next reload AIR license Level: AIR DNA Advantage
+
+
+        Smart Licensing Status: Registration Not Applicable/Not Applicable
+
+        cisco C9407R (X86) processor (revision V01) with 1843930K/6147K bytes of memory.
+        Processor board ID FXS2144Q2G7
+        1 Virtual Ethernet interface
+        120 Gigabit Ethernet interfaces
+        48 Ten Gigabit Ethernet interfaces
+        8 TwentyFive Gigabit Ethernet interfaces
+        8 Hundred Gigabit Ethernet interfaces
+        32768K bytes of non-volatile configuration memory.
+        15932584K bytes of physical memory.
+        11161600K bytes of Bootflash at bootflash:.
+        1638400K bytes of Crash Files at crashinfo:.
+        11161600K bytes of Bootflash at bootflash-1-0:.
+        1638400K bytes of Crash Files at crashinfo-1-0:.
+
+        Base Ethernet MAC Address          : 38:0e:4d:9a:e6:80
+        Motherboard Assembly Number        : 4B77
+        Motherboard Serial Number          : FXS213701D7
+        Model Revision Number              : V02
+        Motherboard Revision Number        : 3
+        Model Number                       : C9407R              
+        System Serial Number               : FXS2144Q2G7

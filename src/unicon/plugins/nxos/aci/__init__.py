@@ -1,3 +1,3 @@
 __author__ = "dwapstra"
 
-from .n9k import AciN9KConnection
+from .connection import AciN9KConnection  # noqa

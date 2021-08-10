@@ -26,6 +26,8 @@ class IOSXRServiceList(ServiceList):
         self.admin_attach_console = svc.AdminAttachModuleConsole
         self.admin_bash_console = svc.AdminBashService
         self.ping = IosXePing
+        self.reload = svc.Reload
+
 
 class IOSXRHAServiceList(HAServiceList):
     """ Generic dual rp services. """
@@ -33,7 +35,7 @@ class IOSXRHAServiceList(HAServiceList):
         super().__init__()
         self.execute = svc.HAExecute
         self.reload = svc.HaReload
-        self.configure= svc.HaConfigureService
+        self.configure = svc.HaConfigureService
         self.admin_execute = svc.HaAdminExecute
         self.admin_configure = svc.HaAdminConfigure
         self.switchover = svc.Switchover
@@ -47,17 +49,17 @@ class IOSXRHAServiceList(HAServiceList):
 
 class IOSXRSingleRpConnection(BaseSingleRpConnection):
     os = 'iosxr'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     state_machine_class = IOSXRSingleRpStateMachine
-    connection_provider_class = IOSXRSingleRpConnectionProvider 
+    connection_provider_class = IOSXRSingleRpConnectionProvider
     subcommand_list = IOSXRServiceList
     settings = IOSXRSettings()
 
 
 class IOSXRDualRpConnection(BaseDualRpConnection):
     os = 'iosxr'
-    series = None
+    platform = None
     chassis_type = 'dual_rp'
     state_machine_class = IOSXRDualRpStateMachine
     connection_provider_class = IOSXRDualRpConnectionProvider

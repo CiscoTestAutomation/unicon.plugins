@@ -12,19 +12,18 @@ logger = logging.getLogger(__name__)
 class MockDeviceDellos6(MockDevice):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, device_os='dellos6', **kwargs)
+        super().__init__(*args, device_os='dell_os6', **kwargs)
 
 
 class MockDeviceTcpWrapperDellos6(MockDeviceTcpWrapper):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, device_os='dellos6', **kwargs)
+        super().__init__(*args, device_os='dell_os6', **kwargs)
         self.mockdevice = MockDeviceDellos6(*args, **kwargs)
 
 
 def main(args=None):
-    logging.basicConfig(stream=sys.stderr, level=logging.INFO,
-                        format="%(asctime)s [%(levelname)8s]:  %(message)s")
+
     if not args:
         parser = argparse.ArgumentParser()
         parser.add_argument('--state', help='initial state')

@@ -351,16 +351,28 @@ sma_prompt_1:
   commands: *cmds
 
 sudo_password:
-  prompt: "Password: "
+  prompt: "[sudo] password for cisco: "
   commands:
-    "cisco":
+    "sudo_password":
       new_state: sudo
 
 sudo:
   prompt: "Linux# "
   commands:
+    "sudo_invalid":
+        new_state: sudo_invalid
     "exit":
       new_state: exec
+
+sudo_invalid:
+  prompt: "[sudo] password for cisco: "
+  commands:
+    "unknown":
+      response: "cisco is not in the sudoers file.  This incident will be reported."
+      new_state: sudo
+    "invalid": "Sorry, try again."
+    "sudo":
+      new_state: sudo_password
 
 hit_enter:
   prompt: "Hit Enter to proceed: "
@@ -433,7 +445,7 @@ ios_r1_telnet:
      
   prompt: "Password:"
   commands:
-    "cisco":
+    "cisco1":
       new_state: ios_r1_exec
 
 ios_r1_exec:
@@ -447,7 +459,7 @@ ios_r1_exec:
 ios_r1_password:
   prompt: "Password:"
   commands:
-    "cisco":
+    "cisco11":
       new_state: ios_r1_enable
 
 ios_r1_enable:
@@ -455,7 +467,8 @@ ios_r1_enable:
   commands:
     "telnet 2.2.2.2":
       new_state: ios_r2_telnet
-
+    "ssh 2.2.2.2 username user1":
+      new_state: ios_r2_telnet
 
 
 ios_r2_telnet:
@@ -469,7 +482,7 @@ ios_r2_telnet:
      
   prompt: "Password:"
   commands:
-    "cisco":
+    "cisco2":
       new_state: ios_r2_exec
 
 ios_r2_exec:
@@ -481,7 +494,7 @@ ios_r2_exec:
 ios_r2_password:
   prompt: "Password:"
   commands:
-    "cisco":
+    "cisco22":
       new_state: ios_r2_enable
 
 ios_r2_enable:
@@ -489,6 +502,8 @@ ios_r2_enable:
   commands:
     "telnet 10.2.3.3":
       new_state: ios_sw3_telnet
+    "telnet 10.2.3.4":
+      new_state: ios_sw4_telnet
 
 ios_sw3_telnet:
   preface: |
@@ -498,7 +513,7 @@ ios_sw3_telnet:
      
   prompt: "Password:"
   commands:
-    "cisco":
+    "cisco3":
       new_state: ios_sw3_exec
 
 ios_sw3_exec:
@@ -507,8 +522,54 @@ ios_sw3_exec:
     "enable":
       new_state: ios_sw3_enable
 
+ios_sw3_password:
+  prompt: "Password:"
+  commands:
+    "cisco33":
+      new_state: ios_sw03_enable
+
 ios_sw3_enable:
   prompt: "Sw03#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": ""
+
+
+
+
+ios_sw4_telnet:
+  preface: |
+    Trying 10.2.3.4 ... Open
+
+    User Access Verification
+     
+  prompt: "Password:"
+  commands:
+    "cisco4":
+      new_state: ios_sw4_exec
+
+ios_sw4_exec:
+  prompt: "Sw04>"
+  commands:
+    "enable":
+      new_state: ios_sw4_password
+
+ios_sw4_password:
+  prompt: "Password:"
+  commands:
+    "cisco44":
+      new_state: ios_sw4_enable
+
+ios_sw4_enable:
+  prompt: "Sw04#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": ""
+
+
+
 
 exec_ps1:
   prompt: "Linux$ "

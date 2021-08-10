@@ -223,6 +223,26 @@ stack_enable:
     "redundancy reload shelf":
       new_state: reload_prompt
 
+    "request platform software system shell":
+      new_state: stack_shell_confirm
+
+stack_shell_confirm:
+  prompt: "Are you sure you want to continue? [y/n] "
+  commands:
+    "y":
+      new_state: stack_bash
+
+stack_bash:
+  prompt: "[Router_RP_0:/]$"
+  commands:
+    "df /bootflash/": |
+      Filesystem     1K-blocks    Used Available Use% Mounted on
+      /dev/sda1        5974888 3569476   2101900  63% /bootflash
+    "stty cols 200": ""
+    "stty rows 200": ""
+    "exit":
+      new_state: stack_enable
+
 stack_config:
   prompt: "Router(config)#"
   commands:
@@ -254,8 +274,10 @@ switchover_prompt2:
     "":
       response: file|mock_data/iosxe/iosxe_stack_switchover.txt
       timing:
-        - 0:,0,0.005
-      new_state: stack_enable
+        - 0:6,0,0.02
+        - 6:,1,0.005
+      new_state: stack_login
+
 
 reload_prompt:
   prompt: "System configuration has been modified. Save? [yes/no]:"

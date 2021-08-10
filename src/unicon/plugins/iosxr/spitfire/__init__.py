@@ -29,15 +29,15 @@ class SpitfireHAServiceList(HAServiceList):
     def __init__(self):
         super().__init__()
         self.execute = svc.HAExecute
-        self.configure= svc.HaConfigureService
-        self.attach_console = svc.AttachModuleConsole        
+        self.configure = svc.HaConfigureService
+        self.attach_console = svc.AttachModuleConsole
         self.switchover = svc.Switchover
         self.bash_console = svc.BashService
         self.switchto = Switchto
 
 class SpitfireSingleRpConnection(BaseSingleRpConnection):
     os = 'iosxr'
-    series = 'spitfire'
+    platform = 'spitfire'
     chassis_type = 'single_rp'
     state_machine_class = SpitfireSingleRpStateMachine
     connection_provider_class = SpitfireSingleRpConnectionProvider
@@ -46,7 +46,7 @@ class SpitfireSingleRpConnection(BaseSingleRpConnection):
 
 class SpitfireDualRpConnection(BaseDualRpConnection):
     os = 'iosxr'
-    series = 'spitfire'
+    platform = 'spitfire'
     chassis_type = 'dual_rp'
     state_machine_class = SpitfireDualRpStateMachine
     connection_provider_class = SpitfireDualRpConnectionProvider

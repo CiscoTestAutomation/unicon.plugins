@@ -31,41 +31,9 @@ class MockDeviceAsa(MockDevice):
             self.command_handler(transport, ' ')
         return True
 
-    def run(self):
-        """ Runs the mock device on standard input/output """
-        self.add_port(0, self.states[0])
-        self.add_transport(sys.stdout, 0)
-
-        while True:
-            self.state_handler(sys.stdout)
-
-            prompt = self.get_prompt(sys.stdout)
-
-            print(prompt, end="", flush=True)
-
-            cmd = ""
-            if self.method_handler(sys.stdout, cmd):
-                continue
-            else:
-                try:
-                    while True:
-                        key = wait_key()
-                        if key in ['\x04']:
-                            raise EOFError()
-                        if key == '\n':
-                            break
-                        else:
-                            cmd += key
-
-                except EOFError:
-                    break
-
-                self.command_handler(sys.stdout, cmd)
-
 
 def main(args=None):
-    logging.basicConfig(stream=sys.stderr, level=logging.INFO,
-                        format="%(asctime)s [%(levelname)8s]:  %(message)s")
+
     if not args:
         parser = argparse.ArgumentParser()
         parser.add_argument('--state', help='initial state')

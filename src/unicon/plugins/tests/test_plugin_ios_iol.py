@@ -17,7 +17,7 @@ class TestIosIolPluginHASwitchover(unittest.TestCase):
             start=['telnet 127.0.0.1 ' + str(cls.ha.ports[0]),
                    'telnet 127.0.0.1 ' + str(cls.ha.ports[1])],
             os='ios',
-            series='iol',
+            platform='iol',
             username='cisco',
             tacacs_password='cisco',
             enable_password='cisco',

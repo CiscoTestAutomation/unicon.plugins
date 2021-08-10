@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from unicon.plugins.generic import service_implementation as svc
 from unicon.bases.routers.services import BaseService
 from unicon.core.errors import SubCommandFailure
-from unicon.eal.dialogs import Dialog
+from unicon.eal.dialogs import Dialog, Statement
 from unicon.plugins.generic.service_implementation import BashService
 from unicon.plugins.generic.service_implementation import GetRPState as GenericGetRPState
 
@@ -43,7 +43,7 @@ class Configure(svc.Configure):
         self.end_state = 'enable'
 
     def call_service(self, command=[], reply=Dialog([]),
-                      timeout=None, *args, **kwargs):
+                     timeout=None, *args, **kwargs):
         self.commit_cmd = get_commit_cmd(**kwargs)
         super().call_service(command,
                              reply=reply + Dialog(config_commit_stmt_list),
@@ -60,11 +60,17 @@ class ConfigureExclusive(Configure):
 
 class HaConfigureService(svc.HaConfigureService):
     def call_service(self, command=[], reply=Dialog([]), target='active',
-                      timeout=None, *args, **kwargs):
+                     timeout=None, *args, **kwargs):
         self.commit_cmd = get_commit_cmd(**kwargs)
         super().call_service(command,
                              reply=reply + Dialog(config_commit_stmt_list),
                              target=target, timeout=timeout, *args, **kwargs)
+
+
+class Reload(svc.Reload):
+
+    def call_service(self, reload_command='reload', *args, **kwargs):
+        super().call_service(reload_command, *args, **kwargs)
 
 
 class HaReload(svc.HAReloadService):
@@ -75,7 +81,7 @@ class HaReload(svc.HAReloadService):
                                  timeout=timeout, *args, **kwargs)
         else:
             super().call_service(reload_command=reload_command or "reload",
-                                 timeout=timeout, *args, **kwargs) 
+                                 timeout=timeout, *args, **kwargs)
 
 
 class AdminExecute(Execute):
@@ -260,8 +266,7 @@ class AttachModuleConsole(BaseService):
 
             # expect output until prompt again
             # wait for timeout provided by user
-            out = self.conn.expect([r'(.+)[\r\n]*%s' % self.change_prompt],
-                                   timeout = timeout)
+            out = self.conn.expect([r'(.+)[\r\n]*%s$' % self.change_prompt], timeout=timeout)
             raw = out.last_match.groups()[0].strip()
 
             # remove the echo back - best effort
@@ -309,7 +314,7 @@ class AdminAttachModuleConsole(AttachModuleConsole):
         def __init__(self, connection,
                            module_num,
                            login_name = 'root',
-                           change_prompt = '\~(.+)?\]\$',
+                           change_prompt = r'\~(.+)?\]\$',
                            timeout = None):
             self.conn = connection
             self.module_num = module_num
@@ -378,8 +383,8 @@ class BashService(BashService):
 
             sm = self.conn.state_machine
 
-            if hasattr(self.conn, 'series') and \
-                self.conn.series == 'spitfire':
+            if hasattr(self.conn, 'platform') and \
+                self.conn.platform == 'spitfire':
                 # In case of spitfire plugin
                 sm.go_to('xr_run', self.conn.spawn)
             else:
@@ -427,6 +432,11 @@ class GetRPState(GenericGetRPState):
             rtr.get_rp_state()
             rtr.get_rp_state(target='standby')
     """
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.start_state = 'any'
+        self.end_state = 'any'
+
     def call_service(self,
                      target='active',
                      timeout=None,
@@ -435,9 +445,4 @@ class GetRPState(GenericGetRPState):
                      **kwargs):
 
         """send the command on the right rp and return the output"""
-        super().call_service(
-            target = target,
-            timeout = timeout,
-            utils = utils,
-            *args,
-            **kwargs)
+        return super().call_service(target=target, timeout=timeout, utils=utils, *args, **kwargs)

@@ -134,3 +134,12 @@ def slugify(text):
     text = re.sub(pattern, '_', text)
     text = re.sub(r'_{2,}', '_', text).strip('_')
     return text
+
+
+def sanitize(s):
+    """ Remove escape codes and non ASCII characters from output
+    """
+    ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
+    s = ansi_escape.sub('', s)
+    mpa = dict.fromkeys(range(32))
+    return s.translate(mpa).strip().replace(' ', '')

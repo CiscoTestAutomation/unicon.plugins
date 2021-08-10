@@ -34,8 +34,7 @@ class AciApicConnectionProvider(GenericSingleRpConnectionProvider):
 
     def init_handle(self):
         con = self.connection
-        con._is_connected = True
-        if con.state_machine.current_state != 'setup':
+        if con.state_machine.current_state not in ['setup', 'shell']:
             super().init_handle()
 
 

@@ -1,7 +1,6 @@
 __author__ = "Giacomo Trifilo <gtrifilo@cisco.com>"
 
-import re
-
+from ..service_statements import boot_image
 from unicon.eal.dialogs import Statement
 from .patterns import IosXECat3kPatterns
 from .setting import IosXECat3kSettings
@@ -9,27 +8,6 @@ from .setting import IosXECat3kSettings
 patterns = IosXECat3kPatterns()
 settings = IosXECat3kSettings()
 
-
-def boot_image(spawn, context, session):
-    if not context.get('boot_prompt_count'):
-        context['boot_prompt_count'] = 1
-    if context.get('boot_prompt_count') < \
-            settings.MAX_ALLOWABLE_CONSECUTIVE_BOOT_ATTEMPTS:
-        if "image_to_boot" in context:
-            cmd = "boot {}".format(context['image_to_boot'])
-        else:
-            spawn.sendline('dir flash:')
-            dir_listing = spawn.expect('.* bytes used').match_output
-            m = re.search(r'(\S+\.bin)[\r\n]', dir_listing)
-            if m:
-                boot_image = m.group(1)
-                cmd = "boot flash:{}".format(boot_image)
-            else:
-                cmd = "boot"
-        spawn.sendline(cmd)
-        context['boot_prompt_count'] += 1
-    else:
-        raise Exception("Too many failed boot attempts have been detected.")
 
 boot_reached = Statement(pattern=patterns.rommon_prompt,
                          action=boot_image,

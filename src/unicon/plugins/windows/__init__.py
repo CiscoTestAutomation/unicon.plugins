@@ -16,8 +16,7 @@ class WindowsConnectionProvider(GenericSingleRpConnectionProvider):
     """
 
     def init_handle(self):
-        con = self.connection
-        con._is_connected = True
+        pass
 
 
 class WindowsServiceList(ServiceList):
@@ -33,7 +32,7 @@ class WindowsConnection(GenericSingleRpConnection):
         Connection class for windows connections.
     """
     os = 'windows'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     state_machine_class = WindowsStateMachine
     connection_provider_class = WindowsConnectionProvider

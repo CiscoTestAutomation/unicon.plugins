@@ -32,7 +32,7 @@ class HAAireosServiceList(AireosServiceList):
 
 class AireosConnection(GenericSingleRpConnection):
     os = 'aireos'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     state_machine_class = AireosStateMachine
     connection_provider_class = GenericSingleRpConnectionProvider
@@ -42,7 +42,7 @@ class AireosConnection(GenericSingleRpConnection):
 
 class AireosDualRPConnection(GenericDualRPConnection):
     os = 'aireos'
-    series = None
+    platform = None
     chassis_type = 'dual_rp'
     subcommand_list = HAAireosServiceList
     state_machine_class = AireosDualRpStateMachine

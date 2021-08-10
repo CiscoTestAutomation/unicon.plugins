@@ -3,28 +3,34 @@ import re
 from unicon.plugins.generic import GenericSingleRpConnectionProvider
 from unicon.plugins.generic import GenericDualRpConnectionProvider
 from unicon.plugins.nxos.service_statements import additional_connection_dialog
-from unicon.eal.dialogs import Dialog
+from unicon.eal.dialogs import Dialog, Statement
 from unicon.plugins.nxos.utils import NxosUtils
+from unicon.plugins.generic.statements import more_prompt_handler
+from unicon.plugins.generic.patterns import GenericPatterns
 
 utils = NxosUtils()
+generic_patterns = GenericPatterns()
+
 
 class NxosSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # in case device is on a vdc, this should be updated.
+        self.connection.current_vdc = None
 
     def get_connection_dialog(self):
         dialog = super().get_connection_dialog()
         dialog += Dialog(additional_connection_dialog)
         return dialog
 
-    def disconnect(self):
-        # check whether we are on vdc
-        if self.connection.current_vdc:
-            self.connection.log.info("device is on VDC, switching back before disconnecting")
-            self.connection.switchback()
-
-        super().disconnect()
-
 
 class NxosDualRpConnectionProvider(GenericDualRpConnectionProvider):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # in case device is on a vdc, this should be updated.
+        self.connection.current_vdc = None
 
     def unlock_standby(self):
         """not required on this platform"""
@@ -64,12 +70,3 @@ class NxosDualRpConnectionProvider(GenericDualRpConnectionProvider):
     def assign_ha_mode(self):
         for subconnection in self.connection.subconnections:
             subconnection.mode = 'sso'
-
-
-    def disconnect(self):
-        # check whether we are on vdc
-        if self.connection.current_vdc:
-            self.connection.log.info("device is on VDC, switching back before disconnecting")
-            self.connection.switchback()
-        super().disconnect()
-

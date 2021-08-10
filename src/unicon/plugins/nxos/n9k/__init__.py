@@ -20,12 +20,12 @@ class HANxos9kServiceList(HANxosServiceList):
 
 
 class Nxos9kSingleRpConnection(NxosSingleRpConnection):
-    series = 'n9k'
+    platform = 'n9k'
     subcommand_list = Nxos9kServiceList
     settings = Nxos9kSettings()
 
 
 class Nxos9kDualRPConnection(NxosDualRPConnection):
-    series = 'n9k'
+    platform = 'n9k'
     subcommand_list = HANxos9kServiceList
     settings = Nxos9kSettings()

@@ -1,10 +1,13 @@
 August 2020
--------------
+============
+
+August 25th
+------------
 
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
 
-        ``unicon.plugins``, v20.8
+        ``unicon``, v20.8
 
 
 Install Instructions
@@ -12,7 +15,7 @@ Install Instructions
 
 .. code-block:: bash
 
-    bash$ pip install unicon.plugins
+    bash$ pip install unicon
 
 
 Upgrade Instructions
@@ -20,22 +23,15 @@ Upgrade Instructions
 
 .. code-block:: bash
 
-    bash$ pip install --upgrade unicon.plugins
+    bash$ pip install --upgrade unicon
 
 
 Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
-
-* Updated terminal size settings for NXOS/ACI/N9K and linux plugins.
-
-* [APIC] Added 'Error' to the list of error_patterns
-
-* [ASA] Added statement to handle for 'Proceed with reload?'
-
-* [IOSXE] Changed IOSXE plugin shell_prompt (non-greedy match on wildcard)
-* [IOSXE] Added stack and quad plugins to support devices with stack/quad chassis type
-
-* [IOSXR] Updated IOSXR/ncs5k STANDBY_STATE_REGEX in the setttings
-* [IOSXR] Added asr9k/ncs5k ha reload service
-
-* [Generic] Added learn_os feature for generic plugins redirect to corresponding plugin connection
+* Infrastructure changed to support multi-connections(dual, stack & quad)
+* Infrastructure changed to support learn os feature in generic plugin
+* Enhanced cli proxy feature, now can support HA device
+* Allowed to set the connection terminal size via ROWS and COLUMNS environment variables for the connection
+* Updated spawn read method to ignore non-utf8 decoder errors
+* Allowed prompt_recovery to pass from connection class variable to service variable
+* Added trim line option in the unicon logging to trim empty lines

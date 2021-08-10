@@ -1,0 +1,77 @@
+connect_ssh:
+  preface: |
+    The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
+    RSA key fingerprint is a1:07:ac:9b:8c:c2:db:c5:4c:dc:70:b5:09:2a:a5:b1.
+  prompt: "Are you sure you want to continue connecting (yes/no/[fingerprint])? "
+  commands:
+    "yes":
+      new_state: login
+
+login:
+  prompt: "login as: "
+  commands:
+    "admin":
+      new_state: password
+
+password:
+  prompt: "password: "
+  commands:
+    "developer":
+      new_state: exec
+exec:
+  prompt: "<%N>"
+  commands:
+    "display version" : |
+        HP Comware Software, Version 7.1.049, Release 0204P01
+        Copyright (c) 2010-2015 Hewlett-Packard Development Company, L.P.
+        HP VSR1000 uptime is 0 weeks, 0 days, 3 hours, 9 minutes
+        Last reboot reason : Power on
+        Boot image: flash:/VSR1000-CMW710-BOOT-R0204P01-X64.bin
+        Boot image version: 7.1.049P14, Release 0204P01
+          Compiled Feb 02 2015 15:45:24
+        System image: flash:/VSR1000-CMW710-SYSTEM-R0204P01-X64.bin
+        System image version: 7.1.049, Release 0204P01
+          Compiled Feb 02 2015 15:45:24
+
+        CPU ID: 0x01000101, vCPUs: Total 2, Available 1
+        4.00G bytes RAM Memory
+        Basic    BootWare Version:  1.02
+        Extended BootWare Version:  1.02
+        [SLOT  1]VNIC-E1000         (Driver)1.0
+        [SLOT  2]VNIC-E1000         (Driver)1.0
+    "screen-length disable": ""
+    "save":
+        new_state: save_confirm
+
+save_confirm:
+  prompt: "The current configuration will be written to the device. Are you sure? [Y/N]:"
+  commands:
+    "Y":
+        new_state: save_file_name
+    "N":
+        new_state: exec   
+
+save_file_name:
+  prompt: |
+        Please input the file name(*.cfg)[flash:/startup.cfg]
+        (To leave the existing filename unchanged, press the enter key):
+  commands:
+      "":
+        new_state: confirm_overwrite
+      "newfile.cfg":
+        response: | 
+                Validating file. Please wait...
+                Configuration is saved to device successfully.
+        new_state: exec
+      "oldfile.cfg":
+        new_state: confirm_overwrite
+
+
+
+confirm_overwrite:
+  prompt: "flash:/startup.cfg exists, overwrite? [Y/N]:"
+  commands:
+      "Y":
+        new_state: exec
+        
+

@@ -1,13 +1,13 @@
 January 2020
-=============
+============
 
 January 28th
--------------
+------------
 
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
 
-        ``unicon.plugins``, v20.1
+        ``unicon``, v20.1
 
 
 Install Instructions
@@ -15,7 +15,7 @@ Install Instructions
 
 .. code-block:: bash
 
-    bash$ pip install unicon.plugins
+    bash$ pip install unicon
 
 
 Upgrade Instructions
@@ -23,32 +23,43 @@ Upgrade Instructions
 
 .. code-block:: bash
 
-    bash$ pip install --upgrade unicon.plugins
+    bash$ pip install --upgrade unicon
 
 
 Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
+- No core changes.
+  
+- See also the unicon.plugins changelog.
 
-- Introduction of sros plugin for Nokia SR devices.
 
-- Added switchto service to iosxr/spitfire plugin.
+January 16th
+------------
 
-- aireos plugin:
+.. csv-table:: Module Versions
+    :header: "Modules", "Versions"
 
-  - Handle 'Would you like to save them now?' prompt.
+        ``unicon``, v19.12.1
 
-- nxos and fxos/ftd plugins:
 
-  - Fix a bug where credentials were not properly converted to plaintext.
+Install Instructions
+^^^^^^^^^^^^^^^^^^^^
 
-- iosxe plugin
+.. code-block:: bash
 
-    - Now copy service passes in vrf via the command line instead of
-      expecting to be prompted for vrf.
+    bash$ pip install unicon
 
-    - iosxe configure service now responds to confirm/want to continue prompts.
 
-- generic and iosxe/cat3k plugins
+Upgrade Instructions
+^^^^^^^^^^^^^^^^^^^^
 
-    - Fixed reload service timeout issue, now waiting longer when
-      connecting after reload.
+.. code-block:: bash
+
+    bash$ pip install --upgrade unicon
+
+
+Features and Bug Fixes:
+^^^^^^^^^^^^^^^^^^^^^^^
+- robot
+
+  - fix for getting ats or pyats library

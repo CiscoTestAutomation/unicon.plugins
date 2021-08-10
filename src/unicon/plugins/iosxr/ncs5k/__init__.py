@@ -27,7 +27,7 @@ class Ncs5kHAServiceList(IOSXRHAServiceList):
 
 class Ncs5kSingleRpConnection(IOSXRSingleRpConnection):
     os = 'iosxr'
-    series = 'ncs5k'
+    platform = 'ncs5k'
     chassis_type = 'single_rp'
     state_machine_class = IOSXRSingleRpStateMachine
     connection_provider_class = IOSXRSingleRpConnectionProvider
@@ -37,7 +37,7 @@ class Ncs5kSingleRpConnection(IOSXRSingleRpConnection):
 
 class Ncs5kDualRpConnection(IOSXRDualRpConnection):
     os = 'iosxr'
-    series = 'ncs5k'
+    platform = 'ncs5k'
     chassis_type = 'dual_rp'
     state_machine_class = IOSXRDualRpStateMachine
     connection_provider_class = IOSXRDualRpConnectionProvider

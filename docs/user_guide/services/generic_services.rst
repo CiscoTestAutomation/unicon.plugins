@@ -10,7 +10,7 @@ such services which are applicable on both HA and Non-HA platform.
 There could be cases when a particular platform supports more services
 than listed below or there could be some omissions as well. In that case
 please refer to the platform specific service documentations. For example
-NXOS supports `vdc` handling APIs which are not relevant on other platfroms
+NXOS supports `vdc` handling APIs which are not relevant on other platforms
 line XR or IOS etc. Also in case of linux we only have `execute` service.
 
 .. _controlled_settings:
@@ -55,6 +55,14 @@ Alternatively, you can pass an empty list when executing a command to avoid erro
 
     >>> c.execute('show command error', error_pattern=[])
 
+You can also append a pattern to the existing patterns defined in the settings when executing a command
+(e.g. to add an error pattern for a specific command to execute).
+
+.. code-block:: python
+
+    >>> c.execute('show command error', append_error_pattern=['^specific error pattern'])
+
+
 **EOF Exception handling**
 
 If device connection is closed/terminated unexpectedly during service calling, we can reconnect
@@ -75,8 +83,8 @@ Sample usage:
 
 **Printing matched patterns**
 
-If you want to print the dialog statements matched patterns during the run
-, you can specify the `STATEMENT_LOG_DEBUG` option to True.
+If you want to print the dialog statements matched patterns during the run,
+you need to set the log level to logging.DEBUG or connect with debug=True.
 
 Default value is False.
 
@@ -88,7 +96,12 @@ Default value is False.
     >>> uut = tb.devices['uut']
     >>>
     >>> uut.connect()
-    >>> uut.settings.STATEMENT_LOG_DEBUG=True
+    >>> uut.log.setLevel(logging.DEBUG)
+
+Alternative:
+
+    >>> uut.connect(debug=True)
+
 
 **Environment variables**
 
@@ -131,7 +144,7 @@ Refer :ref:`prompt_recovery_label`  for details on prompt_recovery feature.
 
 .. note::
 
-    Not all platforms allow command exection on the standby RP as it
+    Not all platforms allow command execution on the standby RP as it
     may not be possible to unlock the standby RP.
     Please check before using this option.
 
@@ -148,25 +161,26 @@ If you want to pass a multiline string as a single command, you should pass
 a list where the list item as a multiline string, see example below.
 
 
-===================   ========================    ====================================================
-Argument              Type                        Description
-===================   ========================    ====================================================
-timeout               int (default 60 sec)        timeout value for the command execution takes.
-reply                 Dialog                      additional dialog
-command               str                         command to execute on device handle
-target                standby/active              by default commands will be executed on active,
-                                                  use target=standby to execute command on standby.
-prompt_recovery       bool (default False)        Enable/Disable prompt recovery feature
-error_pattern         list                        List of regex strings to check output for errors.
-search_size           int (default 8K bytes)      maximum size in bytes to search at the
-                                                  end of the buffer
-allow_state_change    bool (default False)        By default, end state should be same as start state.
-                                                  If True, end state can be any valid state.
-service_dialog        Dialog                      service_dialog overrides the execute service
-                                                  dialog.
-matched_retries       int (default 1)             retry times if statement pattern is matched
-matched_retry_sleep   float (default 0.05 sec)    sleep between matched_retries
-===================   ========================    ====================================================
+====================   ========================    ====================================================
+Argument               Type                        Description
+====================   ========================    ====================================================
+timeout                int (default 60 sec)        timeout value for the command execution takes.
+reply                  Dialog                      additional dialog
+command                str                         command to execute on device handle
+target                 standby/active              by default commands will be executed on active,
+                                                   use target=standby to execute command on standby.
+prompt_recovery        bool (default False)        Enable/Disable prompt recovery feature
+error_pattern          list                        List of regex strings to check output for errors.
+append_error_pattern   list                        List of regex strings append to error_pattern.
+search_size            int (default 8K bytes)      maximum size in bytes to search at the
+                                                   end of the buffer
+allow_state_change     bool (default False)        By default, end state should be same as start state.
+                                                   If True, end state can be any valid state.
+service_dialog         Dialog                      service_dialog overrides the execute service
+                                                   dialog.
+matched_retries        int (default 1)             retry times if statement pattern is matched
+matched_retry_sleep    float (default 0.05 sec)    sleep between matched_retries
+====================   ========================    ====================================================
 
 By default, device start state should be same as end state. For example, if we
 use `execute()` service when device is at enable state then after running the command,
@@ -252,23 +266,24 @@ is specified as standby. Use `prompt_recovery` argument for using
 on prompt_recovery feature.
 
 
-================  =======================    ========================================
-Argument          Type                       Description
-================  =======================    ========================================
-timeout           int (default 60 sec)       timeout value for the command execution takes.
-error_pattern     list                       List of regex strings to check output for errors.
-reply             Dialog                     additional dialog
-command           list                       list of commands to configure
-prompt_recovery   bool (default False)       Enable/Disable prompt recovery feature
-force             bool (default False)       For XR, run commit force at end of config.
-replace           bool (default False)       For XR, run commit replace at end of config.
-lock_retries      int (default 0)            retry times if config mode is locked
-lock_retry_sleep  int (default 2 sec)        sleep between lock_retries
-target            str (default "active")     Target RP where to execute service, for DualRp only
-bulk              bool (default False)       If False, send all commands in one sendline. If True, send commands in chunked mode
-bulk_chunk_lines  int (default 50)           maximum number of commands to send per chunk, 0 means to send all commands in a single chunk
-bulk_chunk_sleep  float (default 0.5 sec)    sleep between sending command chunks
-================  =======================    ========================================
+====================  =======================    ========================================
+Argument              Type                       Description
+====================  =======================    ========================================
+timeout               int (default 60 sec)       timeout value for the command execution takes.
+error_pattern         list                       List of regex strings to check output for errors.
+append_error_pattern  list                        List of regex strings append to error_pattern.
+reply                 Dialog                     additional dialog
+command               list                       list of commands to configure
+prompt_recovery       bool (default False)       Enable/Disable prompt recovery feature
+force                 bool (default False)       For XR, run commit force at end of config.
+replace               bool (default False)       For XR, run commit replace at end of config.
+lock_retries          int (default 0)            retry times if config mode is locked
+lock_retry_sleep      int (default 2 sec)        sleep between lock_retries
+target                str (default "active")     Target RP where to execute service, for DualRp only
+bulk                  bool (default False)       If False, send all commands in one sendline. If True, send commands in chunked mode
+bulk_chunk_lines      int (default 50)           maximum number of commands to send per chunk, 0 means to send all commands in a single chunk
+bulk_chunk_sleep      float (default 0.5 sec)    sleep between sending command chunks
+====================  =======================    ========================================
 
 
 
@@ -288,7 +303,7 @@ bulk_chunk_sleep  float (default 0.5 sec)    sleep between sending command chunk
         rtr.configure(cmd, force=True)
         rtr.configure(cmd, replace=True)
 
-For `(os='iosxe', series='sdwan')` plugin, `configure()` service issue `config-transaction`
+For `(os='iosxe', platform='sdwan')` plugin, `configure()` service issue `config-transaction`
 command in place of `'config term` and run `commit` command before moving out of config mode.
 
 ..  code-block:: python
@@ -364,8 +379,8 @@ return :
 
 expect
 ------
-Match a list of patterns against the buffer . If target is passed as standby,
-patterns  matchs against the buffer on standby spawn channel.
+Match a list of patterns against the buffer. If target is passed as standby,
+patterns matches against the buffer on standby spawn channel.
 
 ===========   ===========    ========================================
 Argument      Type                      Description
@@ -505,7 +520,7 @@ Return `True`, if file handler updated with new filename.
         Example ::
 
           rtr.log_file(filename='/some/path/uut.log')
-          rtr.log_file() # Returns currect FileHandler filename
+          rtr.log_file() # Returns current FileHandler filename
 
 
 enable
@@ -623,6 +638,37 @@ record_hops                 Number of hops
         output = ping(addr="9.33.11.41")
         output = ping(addr="10.2.1.1", extd_ping='yes')
 
+
+switchto
+--------
+
+The `switchto` service is a helper method to switch between CLI states. This can be used to switch
+to known states in the statemachine, e.g. 'enable' or 'rommon' (if supported by the plugin).
+
+===================   ========================    ====================================================
+Argument              Type                        Description
+===================   ========================    ====================================================
+to_state              str or list                 target state(s) to switch to
+timeout               int (default 60 sec)        timeout value for the command execution takes.
+===================   ========================    ====================================================
+
+.. code-block:: python
+
+        #Example
+        --------
+
+        >>> dev.state_machine.states
+        [disable, enable, config, rommon, shell]
+        >>>
+        >>> dev.switchto('config')
+
+        %UNICON-INFO: +++ switchto: config +++
+        config term
+        R1(conf)#
+        >>>
+
+
+
 traceroute
 ----------
 
@@ -731,9 +777,9 @@ due to console messages over terminal and this results in reload timeout.
 In such a case `prompt_recovery` can be used to recover the device.
 Refer :ref:`prompt_recovery_label` for details on prompt_recovery feature.
 
-===============   =======================     ========================================
+===============   =======================     ================================================================================
 Argument          Type                        Description
-===============   =======================     ========================================
+===============   =======================     ================================================================================
 reload_command    str                         reload command to be issued on device.
                                               default reload_command is "reload"
 reply             Dialog                      additional dialogs/new dialogs which are not handled by default.
@@ -742,7 +788,8 @@ reload_creds      list or str ('default')     Credentials to use if device promp
 prompt_recovery   bool (default False)        Enable/Disable prompt recovery feature
 return_output     bool (default False)        Return namedtuple with result and reload command output
                                               This option is available for generic, nxos and iosxe/cat3k (single rp) plugin.
-===============   =======================     ========================================
+image_to_boot     str                         Image to boot from rommon. Available for iosxe/cat3k and iosxe/cat9k
+===============   =======================     ================================================================================
 
     return :
         * True on Success
@@ -880,6 +927,31 @@ Service return running configuration of the device.
         rtr.get_config(target='standby')
 
 
+guestshell
+----------
+
+Service to execute commands in the Linux "guest shell" available on certain
+NXOS and IOSXE platforms. ``guestshell`` gives you a router-like object to execute
+commands on using a Python context manager.
+
+=================   ========   ===================================================================
+Argument            Type       Description
+=================   ========   ===================================================================
+enable_guestshell   boolean    Explicitly enable the guestshell before attempting to enter.
+timeout             int (10)   Timeout for "guestshell enable", "guestshell", and "exit" commands.
+retries             int (20)   Number of retries (x 5 second interval) to attempt to enable guestshell.
+=================   ========   ===================================================================
+
+.. code-block:: python
+
+    with device.guestshell(enable_guestshell=True, retries=30) as gs:
+        output = gs.execute("ifconfig")
+
+    with device.guestshell() as gs:
+        output1 = gs.execute('pwd')
+        output2 = gs.execute('ls -al')
+
+
 sync_state
 ----------
 
@@ -908,17 +980,17 @@ Service to switchover the device.
 Refer :ref:`prompt_recovery_label` for details on `prompt_recovery` argument.
 
 
-===============   =======================     ========================================
-Argument          Type                        Description
-===============   =======================     ========================================
-command           str                         switchover command to be issued on device.
-                                              default command is "redundancy force-switchover"
-reply             Dialog                      additional dialogs/new dialogs which are not handled by default.
-timeout           int                         timeout value in sec, Default Value is 500 sec
-sync_standby      boolean                     Flag to decide whether to wait for standby to be UP or Not. default: True
-prompt_recovery   boolean                     Enable/Disable prompt recovery feature. Default is False.
-switchover_creds  list or str ('default')     Credentials to use if device prompts for user/pw.
-===============   =======================     ========================================
+================   =======================     =========================================================================
+Argument           Type                        Description
+================   =======================     =========================================================================
+command            str                         switchover command to be issued on device.
+                                               default command is "redundancy force-switchover"
+reply              Dialog                      additional dialogs/new dialogs which are not handled by default.
+timeout            int                         timeout value in sec, Default Value is 500 sec
+sync_standby       boolean                     Flag to decide whether to wait for standby to be UP or Not. default: True
+prompt_recovery    boolean                     Enable/Disable prompt recovery feature. Default is False.
+switchover_creds   list or str ('default')     Credentials to use if device prompts for user/pw.
+================   =======================     =========================================================================
 
  return :
     * True on Success
@@ -976,7 +1048,7 @@ timeout           int           timeout value in sec, Default Value is 500 sec
 
 
 Stack RP Services
-================
+=================
 
 In addition to the common services, following are applicable only for
 *ha* platforms with *stack* RP.

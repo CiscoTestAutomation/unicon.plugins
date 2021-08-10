@@ -1,0 +1,218 @@
+
+
+asa_fp2k_console_disable:
+  prompt: "%N> "
+  commands:
+    "enable":
+      new_state: asa_fp2k_console_password
+
+asa_fp2k_console_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: asa_fp2k_console_enable
+
+asa_fp2k_console_enable:
+  prompt: "%N# "
+  commands:
+    "disable":
+      new_state: asa_fp2k_console_disable
+    "exit":
+      new_state: asa_fp2k_console_disable
+    "connect fxos":
+      new_state: asa_fp2k_console_fxos
+      response: |
+        Configuring session.
+        .
+        Connecting to FXOS.
+        ...
+        Connected to FXOS. Escape character sequence is 'CTRL-^X'.
+
+        NOTICE: You have connected to the FXOS CLI with read-only privileges.
+        For admin level privileges connect using 'connect fxos admin'.
+        Config commands and commit-buffer are not supported in appliance mode.
+
+
+        d used and distributed under
+        license.
+
+        Certain components of this software are licensed under the "GNU General Public
+        License, version 3" provided with ABSOLUTELY NO WARRANTY under the terms of
+        "GNU General Public License, Version 3", available here:
+        http://www.gnu.org/licenses/gpl.html. See User Manual (''Licensing'') for
+        details.
+
+        Certain components of this software are licensed under the "GNU General Public
+        License, version 2" provided with ABSOLUTELY NO WARRANTY under the terms of
+        "GNU General Public License, version 2", available here:
+        http://www.gnu.org/licenses/old-licenses/gpl-2.0.html. See User Manual
+        (''Licensing'') for details.
+
+        Certain components of this software are licensed under the "GNU LESSER GENERAL
+        PUBLIC LICENSE, version 3" provided with ABSOLUTELY NO WARRANTY under the terms
+        of "GNU LESSER GENERAL PUBLIC LICENSE" Version 3", available here:
+        http://www.gnu.org/licenses/lgpl.html. See User Manual (''Licensing'') for
+        details.
+
+        Certain components of this software are licensed under the "GNU Lesser General
+        Public License, version 2.1" provided with ABSOLUTELY NO WARRANTY under the
+        terms of "GNU Lesser General Public License, version 2", available here:
+        http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html. See User Manual
+        (''Licensing'') for details.
+
+        Certain components of this software are licensed under the "GNU Library General
+        Public License, version 2" provided with ABSOLUTELY NO WARRANTY under the terms
+        of "GNU Library General Public License, version 2", available here:
+        http://www.gnu.org/licenses/old-licenses/lgpl-2.0.html. See User Manual
+        (''Licensing'') for details.
+
+    "connect fxos admin":
+      new_state: asa_fp2k_console_fxos
+      response: |
+        Configuring session.
+        .
+        Connecting to FXOS.
+        ...
+        Connected to FXOS. Escape character sequence is 'CTRL-^X'.
+
+        NOTICE: You have connected to the FXOS CLI with admin privileges.
+        Config commands and commit-buffer are not supported in appliance mode.
+
+
+        d used and distributed under
+        license.
+
+        Certain components of this software are licensed under the "GNU General Public
+        License, version 3" provided with ABSOLUTELY NO WARRANTY under the terms of
+        "GNU General Public License, Version 3", available here:
+        http://www.gnu.org/licenses/gpl.html. See User Manual (''Licensing'') for
+        details.
+
+        Certain components of this software are licensed under the "GNU General Public
+        License, version 2" provided with ABSOLUTELY NO WARRANTY under the terms of
+        "GNU General Public License, version 2", available here:
+        http://www.gnu.org/licenses/old-licenses/gpl-2.0.html. See User Manual
+        (''Licensing'') for details.
+
+        Certain components of this software are licensed under the "GNU LESSER GENERAL
+        PUBLIC LICENSE, version 3" provided with ABSOLUTELY NO WARRANTY under the terms
+        of "GNU LESSER GENERAL PUBLIC LICENSE" Version 3", available here:
+        http://www.gnu.org/licenses/lgpl.html. See User Manual (''Licensing'') for
+        details.
+
+        Certain components of this software are licensed under the "GNU Lesser General
+        Public License, version 2.1" provided with ABSOLUTELY NO WARRANTY under the
+        terms of "GNU Lesser General Public License, version 2", available here:
+        http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html. See User Manual
+        (''Licensing'') for details.
+
+        Certain components of this software are licensed under the "GNU Library General
+        Public License, version 2" provided with ABSOLUTELY NO WARRANTY under the terms
+        of "GNU Library General Public License, version 2", available here:
+        http://www.gnu.org/licenses/old-licenses/lgpl-2.0.html. See User Manual
+        (''Licensing'') for details.
+
+    "connect fxos root":
+      new_state: asa_fp2k_console_expert_root
+      response: |
+        Connecting to FXOS.
+        ...
+        Connected to FXOS. Escape character sequence is 'CTRL-^X'.
+
+    "show version | inc Version": |
+      Cisco Adaptive Security Appliance Software Version 99.16(1)222
+      SSP Operating System Version 82.10(1.377i)
+      Device Manager Version 7.15(1)
+
+    "reload":
+      new_state: asa_fp2k_console_reload_proceed
+
+
+asa_fp2k_console_reload_proceed:
+  prompt: "Proceed with reload? [confirm] "
+  keys:
+    "y":
+      response: file|mock_data/asa/fp2k_reload.txt
+      timing:
+        - 0:,0,0.005
+      new_state: asa_fp2k_console_disable
+
+
+asa_fp2k_console_expert_root:
+  prompt: "root@firepower-2120:~# "
+  keys:
+    ctrl-\^x:
+      new_state: asa_fp2k_console_enable
+  commands:
+    "exit":
+      new_state: asa_fp2k_console_enable
+
+
+
+asa_fp2k_console_config:
+  prompt: "%N(config)# "
+  commands:
+    "end":
+      new_state: asa_fp2k_console_enable
+
+
+asa_fp2k_console_fxos:
+  prompt: "firepower-2120# "
+  keys:
+    ctrl-\^x:
+      new_state: asa_fp2k_console_enable
+  commands:
+    "show version | inc Version": |2
+        Version: 82.10(1.377i)
+    "connect local-mgmt":
+      new_state: asa_fp2k_console_fxos_mgmt
+      response: |
+        Warning: network service is not available when entering 'connect local-mgmt'
+    "exit":
+      new_state: asa_fp2k_console_enable
+      response: |
+        Connection with FXOS terminated.
+        Type help or '?' for a list of available commands.
+
+
+asa_fp2k_console_fxos_mgmt:
+  prompt: "firepower-2120(local-mgmt)# "
+  commands:
+    "exit":
+      new_state: asa_fp2k_console_fxos
+
+
+asa_fp2k_console_enable_to_rommon:
+  prompt: "%N# "
+  commands:
+    "reload":
+      new_state: asa_fp2k_console_reload_to_rommon_proceed
+
+
+asa_fp2k_console_reload_to_rommon_proceed:
+  prompt: "Proceed with reload? [confirm] "
+  keys:
+    "y":
+      new_state: asa_fp2k_console_rommon_break
+
+
+asa_fp2k_console_rommon_break:
+  preface:
+    response: file|mock_data/asa/fp2k_reload_rommon.txt
+    timing:
+      - 0:,0,0.005
+  prompt: "Use BREAK or ESC to interrupt boot."
+  keys:
+    ctrl-\[:
+      response: Boot interrupted.
+      new_state: asa_fp2k_console_rommon
+
+
+asa_fp2k_console_rommon:
+  prompt: "rommon 1 >"
+  commands:
+    "boot":
+      response: file|mock_data/asa/fp2k_rommon_boot.txt
+      timing:
+        - 0:,0,0.005
+      new_state: asa_fp2k_console_disable

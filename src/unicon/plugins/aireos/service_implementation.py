@@ -149,6 +149,7 @@ class AireosCopy(BaseService):
         self.error_pattern = []
         self.start_state = 'enable'
         self.end_state = 'enable'
+        self.timeout = 300
         self.result = None
         self.dialog = Dialog([
             [pr.are_you_sure,

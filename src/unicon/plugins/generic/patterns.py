@@ -57,3 +57,18 @@ class GenericPatterns(UniconCorePatterns):
         self.passphrase_prompt = r'^.*Enter passphrase for key .*?:\s*?'
 
         self.learn_os_prompt = r'^(.*?([>\$~%]|[^#\s]#|~ #|~/|^admin:|^#)\s?(\x1b\S+)?)$|(^.*This \(D\)RP Node is not ready or active for login \/configuration.*)'
+
+        self.sudo_password_prompt = r'^.*\[sudo\] password for .*?:\s*?'
+
+        self.syslog_message_pattern = r'^.*?%\w+(-\w+)?-\d+-\w+.*$'
+
+        self.config_locked = r'Configuration (mode )?(is )?locked|Config mode cannot be entered'
+
+        self.config_start = r'Enter configuration commands, one per line\.\s+End with CNTL/Z\.\s*$'
+
+        self.enable_secret = r'^.*?(Enter|Confirm) enable secret:\s*$'
+
+        self.enter_your_selection_2 = r'^.*?Enter your selection \[2]:\s*$'
+
+        self.guestshell_prompt = r'^(.*)\[\S+@guestshell\s+.*\][#\$]\s?$'
+
