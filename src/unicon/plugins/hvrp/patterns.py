@@ -24,13 +24,15 @@ class HvrpPatterns(UniconCorePatterns):
         self.password = r'^.*[Pp]assword:$'
         
         # <HOSTNAME> #
-        self.enable_prompt = r'^(.*)\<\w+\>$'
+        self.enable_prompt = r'^(.*)\<\w+\>\s*$'
 
         # [~HOSTNAME] #
-        self.config_prompt = r'^(.*)\[\~*\S+\]$'
+        self.config_prompt = r'^(.*)\[\~*\S+\]\s*$'
 
         # Exit with uncommitted changes? [yes,no] (yes)
-        self.commit_changes_prompt = r'Exit with uncommitted changes?'
+        self.commit_changes_prompt = r'Exit with uncommitted changes? [yes,no] (yes)\s*$'
+        
+        # Correct Password
         self.password_ok = r'Password OK\s*$'
 
         # Bad Password
