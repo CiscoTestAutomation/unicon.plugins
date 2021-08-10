@@ -101,9 +101,9 @@ class HAReload(GenericHAReload):
 
 
 class HASwitchover(GenericHASwitchover):
-    def call_service(self, command=[], dialog=Dialog([]), timeout=None, *args,
+    def call_service(self, command=[], reply=Dialog([]), timeout=None, *args,
                      **kwargs):
-        super().call_service(command, dialog=dialog + Dialog([confirm]), timeout=timeout, *args, **kwargs)
+        super().call_service(command, reply=reply + Dialog([confirm]), timeout=timeout, *args, **kwargs)
 
 
 class BashService(GenericBashService):

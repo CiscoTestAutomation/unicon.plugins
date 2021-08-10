@@ -10,6 +10,7 @@ class NxosPatterns(GenericPatterns):
         super().__init__()
         self.enable_prompt = r'^(.*?)([Rr]outer|[Ss]witch|%N)(\(standby\))?(\(maint-mode\))?#\s?$'
         self.config_prompt = r'^(?P<hostname00>.*)(\(maint-mode\))?\(.*(con|cfg|ipsec-profile)\S*\)#\s?$'
+        self.debug_prompt = r'^(.*?)Linux\(debug\)#\s*$'
         self.reboot = r'This command will reboot the system. \(y\/n\)\?  \[n\]'
         self.secure_password = r'^.*Do you want to enforce secure password standard \(yes\/no\) \[y\]\:'
         self.auto_provision = r'Abort( Power On)? Auto Provisioning and continue with normal setup \?\(yes\/no\)\[n\]\:'
@@ -31,7 +32,6 @@ class NxosPatterns(GenericPatterns):
         self.system_up = r'System is coming up ... Please wait'
         self.delete_vdc_confirm = r'^.*Continue deleting this vdc\s?\(y\/n\)\?\s+\[no\]'
         self.shell_prompt = r'^(.*)(bash-\S+|Linux)[#\$]\s?$'
-        self.guestshell_prompt = r'^(.*)\[\S+@guestshell\s+.*\][#\$]\s?$'
         self.commit_verification = r'^(.*)Commit +Successful.*$'
         self.module_prompt = r'^(.*?)module-\d+#\s*?$'
         self.module_elam_prompt = r'^(.*?)module-\d+(\(\w+-elam\))?#\s*?$'

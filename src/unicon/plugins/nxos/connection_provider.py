@@ -3,10 +3,13 @@ import re
 from unicon.plugins.generic import GenericSingleRpConnectionProvider
 from unicon.plugins.generic import GenericDualRpConnectionProvider
 from unicon.plugins.nxos.service_statements import additional_connection_dialog
-from unicon.eal.dialogs import Dialog
+from unicon.eal.dialogs import Dialog, Statement
 from unicon.plugins.nxos.utils import NxosUtils
+from unicon.plugins.generic.statements import more_prompt_handler
+from unicon.plugins.generic.patterns import GenericPatterns
 
 utils = NxosUtils()
+generic_patterns = GenericPatterns()
 
 
 class NxosSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
@@ -16,45 +19,10 @@ class NxosSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
         # in case device is on a vdc, this should be updated.
         self.connection.current_vdc = None
 
-    def establish_connection(self):
-        super().establish_connection()
-        con = self.connection
-        m = con.spawn.match.last_match
-        hostname = m.groupdict()['hostname00']
-        if hostname and '-' in hostname:
-            con.log.info('We may be on a VDC, checking')
-            con.sendline('show vdc')
-            con.expect(r'.+#\s*$')
-            vdc_info = con.spawn.match.match_output
-            m = re.search(r'^1', vdc_info, re.MULTILINE)
-            if m:
-                con.log.info('Current VDC: Admin')
-            else:
-                m = re.search(r'^[2345678]\s*(?P<vdc_name>\S+)', vdc_info, re.MULTILINE)
-                if m:
-                    vdc_name = m.groupdict()['vdc_name']
-                    con.log.info('Current VDC {}'.format(vdc_name))
-                    con.current_vdc = vdc_name
-                    con.hostname = con.hostname.replace('-' + vdc_name, '')
-                    vdc_hostname = con.hostname + '-' + vdc_name
-                    if con.is_ha:
-                        con.active.state_machine.hostname = vdc_hostname
-                        con.standby.state_machine.hostname = vdc_hostname
-                    else:
-                        con.state_machine.hostname = vdc_hostname
-
     def get_connection_dialog(self):
         dialog = super().get_connection_dialog()
         dialog += Dialog(additional_connection_dialog)
         return dialog
-
-    def disconnect(self):
-        # check whether we are on vdc
-        if self.connection.current_vdc:
-            self.connection.log.info("device is on VDC, switching back before disconnecting")
-            self.connection.switchback()
-
-        super().disconnect()
 
 
 class NxosDualRpConnectionProvider(GenericDualRpConnectionProvider):
@@ -102,12 +70,3 @@ class NxosDualRpConnectionProvider(GenericDualRpConnectionProvider):
     def assign_ha_mode(self):
         for subconnection in self.connection.subconnections:
             subconnection.mode = 'sso'
-
-
-    def disconnect(self):
-        # check whether we are on vdc
-        if self.connection.current_vdc:
-            self.connection.log.info("device is on VDC, switching back before disconnecting")
-            self.connection.switchback()
-        super().disconnect()
-

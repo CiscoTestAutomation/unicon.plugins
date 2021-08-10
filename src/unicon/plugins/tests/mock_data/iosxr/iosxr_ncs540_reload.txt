@@ -1,0 +1,78 @@
+Reloading node  0/RP0/CPU0
+ 
+RL: Reboot initiated with code 1, cause User initiated graceful reload reboot_timeout 30 shutdown delay 0
+RL: Shutdown initiated
+Query the node to be reloaded 
+ IP of node to be reloaded 192.0.0.4
+stopping heartbeat: calvados is down... 0
+sending stop hb
+Cause: User initiated graceful reload
+VM IP addr sent for reload 192.0.0.4
+
+
+Received ack from sdrmgr for reload request.Returncode:0
+successful disconnection from service 
+wd_disconnect_cb 550 CMP-WD disconnected successfully
+Invmgr successful disconnection from service
+RP/0/RP0/CPU0:ios#
+Disconnecting from 'default-sdr--1' console. Continue(Y/N)?
+
+
+
+
+Connecting to 'default-sdr--1' console
+bootlogd: ioctl(/dev/pts/2, TIOCCONS): Device or resource busy
+Configuring network interfaces... done.
+Starting system message bus: dbus.
+Starting OpenBSD Secure Shell server: sshd
+sshd start/running, process 1800
+Starting rpcbind daemon...done.
+Starting random number generator daemon.
+Starting system log daemon...0
+Starting kernel log daemon...0
+tftpd-hpa disabled in /etc/default/tftpd-hpa
+Starting internet superserver: xinetd.
+Libvirt not initialized for container instance
+Starting crond: OK
+SIOCADDRT: File exists
+
+
+ios con0/RP0/CPU0 is now available
+
+
+
+
+
+Press RETURN to get started.
+
+
+
+RP/0/RP0/CPU0:Jan 25 15:23:20.317 UTC: fpd-serv[215]: %PKT_INFRA-FM-3-FAULT_MAJOR : ALARM_MAJOR :FPD-NEED-UPGRADE :DECLARE :0/RP0:  
+
+
+
+
+This product contains cryptographic features and is subject to United 
+States and local country laws governing import, export, transfer and 
+use. Delivery of Cisco cryptographic products does not imply third-party 
+authority to import, export, distribute or use encryption. Importers, 
+exporters, distributors and users are responsible for compliance with 
+U.S. and local country laws. By using this product you agree to comply 
+with applicable laws and regulations. If you are unable to comply with 
+U.S. and local laws, return this product immediately. 
+
+A summary of U.S. laws governing Cisco cryptographic products may be 
+found at:
+http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+If you require further assistance please contact us by sending email to 
+export@cisco.com.
+
+
+
+%SMART_LIC-3-EVAL_EXPIRED:Evaluation period expired
+%SMART_LIC-3-EVAL_EXPIRED:Evaluation period expired
+
+
+SYSTEM CONFIGURATION IN PROCESS
+

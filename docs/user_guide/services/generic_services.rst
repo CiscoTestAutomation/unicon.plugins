@@ -180,7 +180,7 @@ service_dialog         Dialog                      service_dialog overrides the 
                                                    dialog.
 matched_retries        int (default 1)             retry times if statement pattern is matched
 matched_retry_sleep    float (default 0.05 sec)    sleep between matched_retries
-===================   ========================    ====================================================
+====================   ========================    ====================================================
 
 By default, device start state should be same as end state. For example, if we
 use `execute()` service when device is at enable state then after running the command,
@@ -925,6 +925,31 @@ Service return running configuration of the device.
         --------
         rtr.get_config()
         rtr.get_config(target='standby')
+
+
+guestshell
+----------
+
+Service to execute commands in the Linux "guest shell" available on certain
+NXOS and IOSXE platforms. ``guestshell`` gives you a router-like object to execute
+commands on using a Python context manager.
+
+=================   ========   ===================================================================
+Argument            Type       Description
+=================   ========   ===================================================================
+enable_guestshell   boolean    Explicitly enable the guestshell before attempting to enter.
+timeout             int (10)   Timeout for "guestshell enable", "guestshell", and "exit" commands.
+retries             int (20)   Number of retries (x 5 second interval) to attempt to enable guestshell.
+=================   ========   ===================================================================
+
+.. code-block:: python
+
+    with device.guestshell(enable_guestshell=True, retries=30) as gs:
+        output = gs.execute("ifconfig")
+
+    with device.guestshell() as gs:
+        output1 = gs.execute('pwd')
+        output2 = gs.execute('ls -al')
 
 
 sync_state

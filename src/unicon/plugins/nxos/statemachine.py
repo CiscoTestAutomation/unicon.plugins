@@ -1,7 +1,6 @@
 from unicon.eal.dialogs import Dialog, Statement
 from unicon.plugins.generic.statements import default_statement_list
 from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine, config_transition
-from unicon.plugins.generic.statemachine import GenericDualRpStateMachine
 from unicon.plugins.nxos.patterns import NxosPatterns
 from unicon.statemachine import State, Path
 
@@ -29,6 +28,7 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         module = State('module', patterns.module_prompt)
         module_elam = State('module_elam', patterns.module_elam_prompt)
         module_elam_insel = State('module_elam_insel', patterns.module_elam_insel_prompt)
+        debug = State('debug', patterns.debug_prompt)
 
         enable_to_config = Path(enable, config, send_config_cmd, None)
         config_to_enable = Path(config, enable, 'end', Dialog([
@@ -48,6 +48,8 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         module_elam_to_module = Path(module_elam, module, 'exit', None)
         module_elam_insel_to_module = Path(module_elam_insel, module_elam, 'exit', None)
 
+        debug_to_enable = Path(debug, enable, 'exit', None)
+
         # Add State and Path to State Machine
         self.add_state(enable)
         self.add_state(config)
@@ -57,6 +59,7 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         self.add_state(module)
         self.add_state(module_elam)
         self.add_state(module_elam_insel)
+        self.add_state(debug)
 
         self.add_path(enable_to_config)
         self.add_path(config_to_enable)
@@ -68,6 +71,7 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         self.add_path(module_to_enable)
         self.add_path(module_elam_to_module)
         self.add_path(module_elam_insel_to_module)
+        self.add_path(debug_to_enable)
 
         self.add_default_statements(default_statement_list)
 

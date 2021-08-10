@@ -407,14 +407,14 @@ class TestNxosPluginReloadService(unittest.TestCase):
     def test_reload_config_lock_retries_succeed_with_default(self):
         dev = Connection(
             hostname='N93_1',
-            start=['mock_device_cli --os nxos --state login2'],
+            start=['mock_device_cli --os nxos --state login2 --hostname N93_1'],
             os='nxos',
             username='cisco',
             tacacs_password='cisco',
             enable_password='cisco',
         )
         dev.connect()
-        dev.start = ['mock_device_cli --os nxos --state reconnect_login']
+        dev.start = ['mock_device_cli --os nxos --state reconnect_login --hostname N93_1']
         dev.settings.RELOAD_RECONNECT_WAIT = 1
         dev.settings.CONFIG_LOCK_RETRY_SLEEP = 1
         dev.reload()
@@ -424,7 +424,7 @@ class TestNxosPluginReloadService(unittest.TestCase):
     def test_reload_config_lock_retries_succeed(self):
         dev = Connection(
             hostname='N93_1',
-            start=['mock_device_cli --os nxos --state login2'],
+            start=['mock_device_cli --os nxos --state login2 --hostname N93_1'],
             os='nxos',
             username='cisco',
             tacacs_password='cisco',
@@ -433,7 +433,7 @@ class TestNxosPluginReloadService(unittest.TestCase):
         dev.connect()
         dev.settings.RELOAD_RECONNECT_WAIT = 1
         dev.settings.CONFIG_LOCK_RETRY_SLEEP = 1
-        dev.start = ['mock_device_cli --os nxos --state reconnect_login']
+        dev.start = ['mock_device_cli --os nxos --state reconnect_login --hostname N93_1']
         dev.reload(config_lock_retries=2, config_lock_retry_sleep=1)
         dev.configure('no logging console')
         dev.disconnect()
@@ -441,7 +441,7 @@ class TestNxosPluginReloadService(unittest.TestCase):
     def test_reload_config_lock_retries_fail(self):
         dev = Connection(
             hostname='N93_1',
-            start=['mock_device_cli --os nxos --state login2'],
+            start=['mock_device_cli --os nxos --state login2 --hostname N93_1'],
             os='nxos',
             username='cisco',
             tacacs_password='cisco',
@@ -451,14 +451,14 @@ class TestNxosPluginReloadService(unittest.TestCase):
         dev.settings.RELOAD_RECONNECT_WAIT = 1
         dev.settings.CONFIG_LOCK_RETRY_SLEEP = 1
         dev.settings.CONFIG_LOCK_RETRIES = 1
-        dev.start = ['mock_device_cli --os nxos --state reconnect_login']
-        with self.assertRaises(ConnectionError):
+        dev.start = ['mock_device_cli --os nxos --state reconnect_login --hostname N93_1']
+        with self.assertRaises(SubCommandFailure):
             dev.reload(config_lock_retries=1, config_lock_retry_sleep=1)
 
     def test_reload_skip_poap(self):
         dev = Connection(
             hostname='N93_1',
-            start=['mock_device_cli --os nxos --state login2'],
+            start=['mock_device_cli --os nxos --state login2 --hostname N93_1'],
             os='nxos',
             username='cisco',
             tacacs_password='cisco',
@@ -470,12 +470,46 @@ class TestNxosPluginReloadService(unittest.TestCase):
         dev.configure('no logging console')
         dev.disconnect()
 
+    def test_reload_skip_poap2(self):
+        dev = Connection(
+            hostname='N93_1',
+            start=['mock_device_cli --os nxos --state exec2 --hostname N93_1'],
+            os='nxos',
+            username='cisco',
+            tacacs_password='cisco',
+            enable_password='cisco',
+        )
+        dev.connect()
+        dev.settings.RELOAD_RECONNECT_WAIT = 1
+        dev.reload(reload_command='reload skip_poap2')
+        dev.reload(reload_command='reload skip_poap2')
+        dev.configure('no logging console')
+        dev.disconnect()
+
 class TestNxosPluginMaintenanceMode(unittest.TestCase):
 
     def test_maint_mode(self):
         dev = Connection(
             hostname='N93_1',
-            start=['mock_device_cli --os nxos --state exec_maint'],
+            start=['mock_device_cli --os nxos --state exec_maint --hostname N93_1'],
+            os='nxos',
+            credentials={
+                'defaut': {
+                    'username': 'cisco',
+                    'password': 'cisco'
+                }
+            }
+        )
+        dev.connect()
+        dev.disconnect()
+
+
+class TestNxosPluginDebugMode(unittest.TestCase):
+
+    def test_debug_prompt(self):
+        dev = Connection(
+            hostname='N93_1',
+            start=['mock_device_cli --os nxos --state debug --hostname N93_1'],
             os='nxos',
             credentials={
                 'defaut': {
@@ -644,44 +678,6 @@ class TestNxosPluginSwitchtoVdc(unittest.TestCase):
     def test_switchto_new_vdc_switchback(self):
         self.c.switchto('N77_4')
         self.c.switchback()
-
-
-class TestNxosVDC(unittest.TestCase):
-
-    def test_connect_login(self):
-        c = Connection(hostname='admin',
-                       start=['mock_device_cli --os nxos --state login'],
-                       os='nxos',
-                       init_exec_commands=[],
-                       init_config_commands=[],
-                       log_buffer=True,
-                       credentials=dict(default=dict(username='cisco', password='cisco'))
-                       )
-        c.connect()
-        c.execute('show version')
-
-    def test_connect_to_non_default_vdc(self):
-        c = Connection(hostname='admin',
-                       start=['mock_device_cli --os nxos --state vdc_exec'],
-                       os='nxos',
-                       init_exec_commands=[],
-                       init_config_commands=[],
-                       log_buffer=True)
-        c.connect()
-        c.switchback()
-        c.configure()
-
-    def test_connect_to_non_default_vdc_with_learn_hostname(self):
-        c = Connection(hostname='admin',
-                       start=['mock_device_cli --os nxos --state vdc_exec'],
-                       os='nxos',
-                       init_exec_commands=[],
-                       init_config_commands=[],
-                       log_buffer=True,
-                       learn_hostname=True)
-        c.connect()
-        c.switchback()
-        c.configure()
 
 
 if __name__ == "__main__":

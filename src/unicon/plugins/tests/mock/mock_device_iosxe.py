@@ -52,10 +52,13 @@ class MockDeviceIOSXE(MockDevice):
             self.files_on_flash.append(filename)
             return True
         elif cmd == 'dir':
-            lines = ['   52429131    Apr 05 08:53:17 2021  ' + f for f in self.files_on_flash]
-            self._write('\n'.join(lines), transport)
-            self._write('\n\n', transport)
-            return True
+            if self.files_on_flash:
+                lines = ['   52429131    Apr 05 08:53:17 2021  ' + f for f in self.files_on_flash]
+                self._write('\n'.join(lines), transport)
+                self._write('\n\n', transport)
+                return True
+            else:
+                return False
         elif re.match(r'delete \S+', cmd):
             m = re.match(r'delete (\S+)', cmd)
             filename = m.group(1)
@@ -63,6 +66,46 @@ class MockDeviceIOSXE(MockDevice):
             return True
         elif re.match(r'copy flash:\S+ scp:\S+', cmd):
             self.set_state(self.transport_handles[transport], 'scp_password')
+            return True
+        elif re.match(r'copy http://127.0.0.1:\d+/test.txt flash:', cmd):
+            return True
+        elif re.match(r'copy test.txt http://127.0.0.1:\d+/R1_test.txt', cmd):
+            return True
+
+    def general_config(self, transport, cmd):
+        if 'path bootflash:' in cmd:
+            return True
+
+    def ctc_enable(self, transport, cmd):
+        if cmd == 'dir':
+            if self.files_on_flash:
+                lines = ['Directory of flash:/', '']
+                lines += ['319519  drwx            28672  Jun 11 2021 06:11:45 +00:00 ' + f for f in self.files_on_flash]
+                self._write('\n'.join(lines), transport)
+                self._write('\n\n', transport)
+                return True
+            else:
+                return False
+        elif re.match(r'mkdir flash:/ctc.*', cmd):
+            return True
+        elif re.match(r'delete /force /recursive ctc.*', cmd):
+            m = re.match(r'delete /force /recursive (ctc.*.tar.gz)', cmd)
+            filename = m.group(1)
+            self.files_on_flash.remove(filename)
+            return True
+        elif re.match(r'copy ctc_.*', cmd):
+            self.set_state(self.transport_handles[transport], 'ctc_copy_address')
+            return True
+
+    def ctc_shell_flash(self, transport, cmd):
+        if re.match(r'mv flash:/\* ctc.*', cmd):
+            return True
+        elif re.match(r'tar cfz ctc_.*', cmd):
+            m = re.match(r'tar cfz (ctc_.*.tar.gz) .*', cmd)
+            filename = m.group(1)
+            self.files_on_flash.append(filename)
+            return True
+        elif re.match(r'rm -rf ctc_.*', cmd):
             return True
 
 
@@ -151,8 +194,7 @@ class MockDeviceQuadIOSXE(MockDevice):
 
 
 def main(args=None):
-    logging.basicConfig(stream=sys.stderr, level=logging.INFO,
-                        format="%(asctime)s [%(levelname)8s]:  %(message)s")
+
     if not args:
         parser = argparse.ArgumentParser()
         parser.add_argument('--state', help='initial state')

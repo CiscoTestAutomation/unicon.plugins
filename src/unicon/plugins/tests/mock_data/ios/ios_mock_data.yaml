@@ -267,7 +267,7 @@ confirm_prompt:
 
 enable:
   prompt: "%N#"
-  commands:
+  commands: &enable_cmds
     "setup_mgmt":
       new_state: ios_setup_mgmt
     "enable": ""

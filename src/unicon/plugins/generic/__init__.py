@@ -62,6 +62,7 @@ class ServiceList:
         self.expect_log = svc.ExpectLogging
         self.attach = svc.AttachModuleService
         self.switchto = svc.Switchto
+        self.guestshell = svc.GuestshellService
 
 
 class HAServiceList(ServiceList):

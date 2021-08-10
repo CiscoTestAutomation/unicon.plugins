@@ -36,3 +36,4 @@ class IOSXRPatterns(GenericPatterns):
         self.rp_extract_status = r'^\d+\s+(\w+)\s+\-?\d+.*$'
         self.confirm_y_prompt = r"\[confirm( with only 'y' or 'n')?\]\s*\[y/n\].*$"
         self.reload_module_prompt = r"^(.*)?Reload hardware module ? \[no,yes\].*$"
+        self.proceed_config_mode = r'Would you like to proceed in configuration mode\? \[no\]:\s*$'

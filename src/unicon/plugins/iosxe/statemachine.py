@@ -2,13 +2,14 @@
 
 __author__ = "Myles Dear <pyats-support@cisco.com>"
 
+import re
 from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine, config_transition
 from unicon.plugins.generic.statements import (connection_statement_list,
                                                default_statement_list)
 from unicon.plugins.generic.service_statements import reload_statement_list
-from unicon.plugins.generic.statements import GenericStatements
+from unicon.plugins.generic.statements import GenericStatements, buffer_settled
 from unicon.statemachine import State, Path, StateMachine
-from unicon.eal.dialogs import Dialog
+from unicon.eal.dialogs import Dialog, Statement
 from .patterns import IosXEPatterns
 from .statements import boot_from_rommon_statement_list
 
@@ -16,8 +17,34 @@ patterns = IosXEPatterns()
 statements = GenericStatements()
 
 
+def config_service_prompt_handler(spawn, config_pattern):
+    """ Check if we need to send the sevice config prompt command.
+    """
+    if hasattr(spawn.settings, 'SERVICE_PROMPT_CONFIG_CMD') and spawn.settings.SERVICE_PROMPT_CONFIG_CMD:
+        # if the config prompt is seen, return
+        if re.search(config_pattern, spawn.buffer):
+            return
+        else:
+            # if no buffer changes for a few seconds, check again
+            if buffer_settled(spawn, spawn.settings.CONFIG_PROMPT_WAIT):
+                if re.search(config_pattern, spawn.buffer):
+                    return
+                else:
+                    spawn.sendline(spawn.settings.SERVICE_PROMPT_CONFIG_CMD)
+
+
 class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
     config_command = 'config term'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.config_transition_statement_list = [
+            Statement(pattern=patterns.config_start,
+                      action=config_service_prompt_handler,
+                      args={'config_pattern': self.get_state('config').pattern},
+                      loop_continue=True,
+                      trim_buffer=False)
+        ]
 
     def create(self):
         super().create()
@@ -44,6 +71,7 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         enable = State('enable', patterns.enable_prompt)
         config = State('config', patterns.config_prompt)
         shell = State('shell', patterns.shell_prompt)
+        guestshell = State('guestshell', patterns.guestshell_prompt)
 
         disable_to_enable = Path(disable, enable, 'enable', Dialog([
             statements.enable_password_stmt,
@@ -55,14 +83,20 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         enable_to_config = Path(enable, config, config_transition, Dialog([statements.syslog_msg_stmt]))
         config_to_enable = Path(config, enable, 'end', Dialog([statements.syslog_msg_stmt]))
 
+        enable_to_guestshell = Path(enable, guestshell, 'guestshell run bash', None)
+        guestshell_to_enable = Path(guestshell, enable, 'exit', None)
+
         self.add_state(disable)
         self.add_state(enable)
         self.add_state(config)
+        self.add_state(guestshell)
 
         self.add_path(disable_to_enable)
         self.add_path(enable_to_disable)
         self.add_path(enable_to_config)
         self.add_path(config_to_enable)
+        self.add_path(enable_to_guestshell)
+        self.add_path(guestshell_to_enable)
 
         rommon = State('rommon', patterns.rommon_prompt)
         enable_to_rommon = Path(enable, rommon, 'reload',
@@ -98,11 +132,22 @@ class IosXEDualRpStateMachine(StateMachine):
         rommon = State('rommon', patterns.rommon_prompt)
         shell = State('shell', patterns.shell_prompt)
 
+        def update_cur_state(sm, state):
+            sm._current_state = state
+
         # Paths
         disable_to_enable = Path(disable, enable, 'enable', Dialog([
             statements.enable_password_stmt,
             statements.bad_password_stmt,
-            statements.syslog_stripper_stmt
+            statements.syslog_stripper_stmt,
+            Statement(
+                pattern=patterns.standby_locked,
+                action=update_cur_state,
+                args={
+                    'sm': self,
+                    'state': 'standby_locked'
+                },
+                loop_continue=False)
         ]))
 
         enable_to_disable = Path(enable, disable, 'disable', Dialog([statements.syslog_msg_stmt]))

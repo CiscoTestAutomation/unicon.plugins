@@ -37,7 +37,6 @@ class NxosServiceList(ServiceList):
         self.delete_vdc = svc.DeleteVdc
         self.attach_console = svc.AttachModuleConsole
         self.bash_console = svc.BashService
-        self.guestshell = svc.GuestshellService
         self.configure = svc.Configure
         self.configure_dual = svc.ConfigureDual
         self.execute = svc.NxosExecute
@@ -60,7 +59,6 @@ class HANxosServiceList(HAServiceList):
         self.delete_vdc = svc.DeleteVdc
         self.attach_console = svc.AttachModuleConsole
         self.bash_console = svc.BashService
-        self.guestshell = svc.GuestshellService
         self.ping6 = svc.Ping6
         self.configure = svc.Configure
 

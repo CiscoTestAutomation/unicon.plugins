@@ -381,7 +381,7 @@ ping1_sweep_isr_vrf:
 
 sdwan_enable:
   prompt: "Router#"
-  commands:
+  commands: &sdwan_enable_cmds
     "term length 0": ""
     "term width 0": ""
     "show sdwan version": "16.12.1.0.533"
@@ -397,13 +397,39 @@ sdwan_enable:
 sdwan_config:
   preface: "admin connected from 127.0.0.1 using console on Router"
   prompt: "Router(config)#"
-  commands:
+  commands: &sdwan_config_cmds
     "no logging console": ""
     "line console 0": "syntax error: \"console\" is not a valid value."
     "exec-timeout 0" : "syntax error: unknown command"
     "commit": "% No modifications to commit."
     "end":
       new_state: sdwan_enable
+
+sdwan_enable2:
+  prompt: "Router#"
+  commands:
+   <<: *sdwan_enable_cmds
+   "config-transaction":
+      new_state: sdwan_config2
+
+sdwan_config2:
+  prompt: "Router(config)#"
+  commands:
+    <<: *sdwan_config_cmds
+    "commit":
+      response: |
+        The following warnings were generated:
+        'system is-vmanaged': This device is being managed by the vManage. Any
+        configuration changes to this device will be overwritten by the vManage after
+        the control connection to the vManage comes back up.
+      new_state: sdwan_config_commit_confirm
+
+sdwan_config_commit_confirm:
+  prompt: "Proceed? [yes,no]"
+  commands:
+    "yes":
+      new_state: sdwan_config2
+
 
 do_you_want_to_remove:
   preface: |
@@ -412,7 +438,7 @@ do_you_want_to_remove:
     No path specified, will use booted path bootflash:packages.conf
     Cleaning bootflash:
       Scanning boot directory for packages ... done.
-      Preparing packages list to delete ... 
+      Preparing packages list to delete ...
         C9800-L-mono-universalk9_wlc.17.03.03.SPA.pkg
           File is in use, will not delete.
         C9800-L-rpboot.17.03.03.SPA.pkg

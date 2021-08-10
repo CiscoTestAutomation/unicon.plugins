@@ -13,6 +13,7 @@ Description:
 class ReloadPatterns():
     def __init__(self):
         self.reload_confirm_nxos = r'^(.*)This command will reboot the system. \(y\/n\)\?  \[n\]\s?$'
+        self.auto_provision_nxos = r'Abort( Power On)? Auto Provisioning .*:'
         #self.useraccess = r'^.*User Access Verification'
         #self.username = r'^.*([Uu]sername|[Ll]ogin): ?$'
         #self.password = r'^.*[Pp]assword: ?$'
