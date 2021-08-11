@@ -40,13 +40,15 @@ class HvrpSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         return con.connect_reply \
                     + Dialog(custom_auth_stmt + connection_statement_list
                          if custom_auth_stmt else connection_statement_list)
-    
+
     def disconnect(self):
         """ Logout and disconnect from the device
         """
         con = self.connection
         if con.connected:
+            con.log.info('Disconnecting...')
             con.sendline('quit')
             sleep(2)
+            con.expect('.*')
             con.log.info('Closing connection...')
-
+            con.spawn.close()
