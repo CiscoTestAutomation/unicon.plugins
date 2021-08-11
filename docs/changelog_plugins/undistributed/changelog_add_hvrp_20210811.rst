@@ -2,4 +2,4 @@
                                 New
 --------------------------------------------------------------------------------
 * HVRP
-    * New plugin for connection for Huawei devices
+    * New plugin to connect to Huawei devices
