@@ -64,10 +64,10 @@ class TestSlxosPluginConfigure(unittest.TestCase):
                         )
         c.connect()
         cmd = 'configure'
-        ret = c.execute(cmd).replace('\r', '')
+        c.execute(cmd).replace('\r', '')
         self.assertIn("{hostname}(config)#".format(hostname=hostname), c.spawn.match.match_output)
         cmd = 'end'
-        ret = c.execute(cmd).replace('\r', '')
+        c.execute(cmd).replace('\r', '')
         self.assertIn("{hostname}#".format(hostname=hostname), c.spawn.match.match_output)
         c.disconnect()
 
