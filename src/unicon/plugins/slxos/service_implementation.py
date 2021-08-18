@@ -22,7 +22,6 @@ class Copy(Copy):
         self.start_state = 'enable'
         self.end_state = 'enable'
         self.dialog += Dialog([slxos_statements.save_confirm])
-        self.error_pattern = [r'Error while parsing source URL\. Please refer the usage and enter the complete command\.']
 
 
 class Save(Copy):
