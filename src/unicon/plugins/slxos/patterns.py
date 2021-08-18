@@ -20,10 +20,10 @@ class SlxosPatterns(GenericPatterns):
         super().__init__()
 
         self.default_hostname_pattern = r'SLX'
-        self.username = r'^.*[Ll]ogin:\s?$'
-        self.password = r'^.*[Pp]assword:\s?$'
+        self.username = r'^.*[Ll]ogin:\s*$'
+        self.password = r'^.*[Pp]assword:\s*$'
         # SLX#
-        self.enable_prompt = r'^(.*?)(.*|%N|SLX)#\s?$'
+        self.enable_prompt = r'^(.*?)(.*|%N|SLX)#\s*$'
         # SLX(config)#
-        self.config_prompt = r'^\S+\(config\)#\s?$'
-        self.save_confirm = r'This operation will (back up the current|modify your startup) configuration\. Do you want to continue\? \[y/n\]:'
+        self.config_prompt = r'^\S+\(config\)#\s*$'
+        self.save_confirm = r'This operation will (back up the current|modify your startup) configuration\. Do you want to continue\? \[y/n\]:\s*$'
