@@ -171,7 +171,7 @@ Argument                    Description
 addr                        Destination address
 proto                       protocol(ip/ipv6)
 count                       Number of pings to transmit
-src_addr                    IP for source field in ping packet
+source                      Source address or interface
 data_pat                    data pattern that would be used to perform ping.
 dest_end                    ending network 127 address
 dest_start                  beginning network 127 address
@@ -190,7 +190,7 @@ tunnel                      Tunnel interface number
 tos                         TOS field value
 multicast                   multicast addr
 udp                         (y/n) enable/disable UDP transmission for ipv6.
-int                         Interface
+interface                   Interface
 vcid                        VC Identifier
 topo                        topology nam
 verbose                     (y/n) enable/disable verbose mode

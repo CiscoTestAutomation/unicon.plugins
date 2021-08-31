@@ -310,6 +310,7 @@ config:
     "exitt":
       new_state: exec
     "b": "% Ambiguous command at '^' marker."
+    "boot": "% Incomplete command at '^' marker."
 
 config_line:
   prompt: "%N(config-line)#"

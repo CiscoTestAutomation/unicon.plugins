@@ -61,6 +61,7 @@ class TestIosXeCat9kPlugin(unittest.TestCase):
             c.connect()
             self.assertEqual(c.state_machine.current_state, 'rommon')
             c.execute('unlock flash:')
+            c.settings.POST_RELOAD_WAIT = 1
             c.reload(image_to_boot='tftp://1.1.1.1/latest.bin')
             self.assertEqual(c.state_machine.current_state, 'enable')
         finally:
@@ -86,6 +87,7 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
         )
         try:
             c.connect()
+            c.settings.POST_RELOAD_WAIT = 1
             c.reload()
             self.assertEqual(c.state_machine.current_state, 'enable')
         finally:
@@ -133,6 +135,7 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
                        settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
                        log_buffer=True)
         c.connect()
+        c.settings.POST_RELOAD_WAIT = 1
         c.reload(image_to_boot='tftp://1.1.1.1/latest.bin')
         self.assertEqual(c.state_machine.current_state, 'enable')
         c.disconnect()
@@ -156,6 +159,7 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
         )
         try:
             c.connect()
+            c.settings.POST_RELOAD_WAIT = 1
             c.reload()
             self.assertEqual(c.state_machine.current_state, 'enable')
         finally:

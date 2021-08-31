@@ -212,6 +212,7 @@ class TestIosXEStackReload(unittest.TestCase):
                        username='cisco',
                        tacacs_password='cisco',
                        enable_password='cisco')
+        d.settings.STACK_POST_RELOAD_SLEEP = 0
         d.connect()
         self.assertTrue(d.active.alias == 'peer_1')
 

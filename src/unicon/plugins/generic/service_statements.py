@@ -108,6 +108,11 @@ def ping_loop_message_handler():
     raise SubCommandFailure("Error while Executing ping command")
 
 
+def ping_invalid_input_handler(spawn):
+    spawn.log.warning('Invalid ping input, skipping entry')
+    spawn.sendline()
+
+
 def ping_handler(spawn, context, send_key):
     if context.get(send_key):
         spawn.sendline(context[send_key])
@@ -459,7 +464,7 @@ ipv6_hop = Statement(pattern=pat.ipv6_hop,
                      loop_continue=True,
                      continue_timer=False)
 
-pv6_dest = Statement(pattern=pat.pv6_dest,
+ipv6_dest = Statement(pattern=pat.ipv6_dest,
                      action=ping_handler,
                      args={'send_key': 'ipv6_dst_headers'},
                      loop_continue=False,
@@ -483,7 +488,7 @@ dest_start = Statement(pattern=pat.dest_start,
 
 interface = Statement(pattern=pat.interface,
                       action=ping_handler,
-                      args={'send_key': 'int'},
+                      args={'send_key': 'interface'},
                       loop_continue=True,
                       continue_timer=False)
 
@@ -547,7 +552,7 @@ verbomode = Statement(pattern=pat.verbomode,
 
 ext_cmds_source = Statement(pattern=pat.ext_cmds_source,
                             action=ping_handler,
-                            args={'send_key': 'src_addr'},
+                            args={'send_key': 'source'},
                             loop_continue=True,
                             continue_timer=False)
 
@@ -653,10 +658,10 @@ tr_maximum_ttl = Statement(pattern=tr_pat.maximum_ttl,
                            continue_timer=False)
 
 tr_port = Statement(pattern=tr_pat.port_number,
-                           action=ping_handler,
-                           args={'send_key': 'port'},
-                           loop_continue=True,
-                           continue_timer=False)
+                    action=ping_handler,
+                    args={'send_key': 'port'},
+                    loop_continue=True,
+                    continue_timer=False)
 
 tr_style = Statement(pattern=tr_pat.style,
                      action=ping_handler,
@@ -665,10 +670,10 @@ tr_style = Statement(pattern=tr_pat.style,
                      continue_timer=False)
 
 tr_resolve_as_number = Statement(pattern=tr_pat.resolve_as_number,
-                       action=ping_handler,
-                       args={'send_key': 'resolve_as_number'},
-                       loop_continue=True,
-                       continue_timer=False)
+                                 action=ping_handler,
+                                 args={'send_key': 'resolve_as_number'},
+                                 loop_continue=True,
+                                 continue_timer=False)
 
 trace_route_dialog_list = [unkonwn_protocol, protocol, tr_target, tr_ingress,
                            tr_source, tr_numeric, tr_dscp, tr_timeout,
@@ -709,8 +714,14 @@ others = Statement(pattern=pat.others,
                    loop_continue=True,
                    continue_timer=False)
 
-extended_ping_dialog_list = [unkonwn_protocol, protocol, transport, mask,
-                             address, vcid, tunnel, repeat, size, verbose,
+invalid_input = Statement(pattern=pat.invalid_command,
+                          action=ping_invalid_input_handler,
+                          args=None,
+                          loop_continue=True,
+                          continue_timer=False)
+
+extended_ping_dialog_list = [invalid_input, unkonwn_protocol, protocol, transport,
+                             mask, address, vcid, tunnel, repeat, size, verbose,
                              interval, packet_timeout, sending_interval,
                              output_interface, novell_echo_type, vrf, ext_cmds,
                              sweep_range, range_interval, range_max, range_min,
@@ -722,16 +733,16 @@ extended_ping_dialog_list = [unkonwn_protocol, protocol, transport, mask,
                              qos, packet, others]
 
 # TODO include ping_loop_message in dialog
-ping_dialog_list = [unkonwn_protocol, protocol, transport, mask,
+ping_dialog_list = [invalid_input, unkonwn_protocol, protocol, transport, mask,
                     address, vcid, tunnel, repeat, size, verbose, interval,
                     packet_timeout, sending_interval, output_interface,
                     novell_echo_type, vrf, ext_cmds, sweep_range, range_interval,
                     range_max, range_min, verbomode, others]
 
-ping6_statement_list = [unkonwn_protocol, ipv6_source, ipv6_udp, ipv6_priority,
-                        ipv6_verbose, ipv6_precedence, ipv6_dscp, ipv6_hop,
-                        pv6_dest, ipv6_extn_header, protocol, transport, mask,
-                        address, vcid, tunnel, repeat, size, verbose, interval,
+ping6_statement_list = [invalid_input, unkonwn_protocol, ipv6_source, ipv6_udp,
+                        ipv6_priority, ipv6_verbose, ipv6_precedence, ipv6_dscp,
+                        ipv6_hop, ipv6_dest, ipv6_extn_header, protocol, transport,
+                        mask, address, vcid, tunnel, repeat, size, verbose, interval,
                         packet_timeout, sending_interval, output_interface,
                         novell_echo_type, vrf, ext_cmds, sweep_range,
                         range_interval, range_max, range_min, dest_start,

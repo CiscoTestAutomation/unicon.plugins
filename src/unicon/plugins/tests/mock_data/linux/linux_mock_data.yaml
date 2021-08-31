@@ -147,6 +147,10 @@ exec:
       /tmp
       /var
       /opt
+    "sudo ls": |
+      /tmp
+      /var
+      /opt
     "sudo":
       new_state: sudo_password
     "exit":
@@ -261,6 +265,10 @@ exec:
         - '1'
         - '0'
         - '2'
+    "sudo_invalid":
+        new_state: sudo_invalid
+    "sudo bash":
+        new_state: sudo_password
 
 exec2:
   prompt: "Linux# "
@@ -359,8 +367,7 @@ sudo_password:
 sudo:
   prompt: "Linux# "
   commands:
-    "sudo_invalid":
-        new_state: sudo_invalid
+    <<: *cmds
     "exit":
       new_state: exec
 
