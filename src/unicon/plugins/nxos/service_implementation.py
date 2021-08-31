@@ -357,23 +357,29 @@ class Ping6(BaseService):
     def call_service(self, *args, **kwargs):
         con = self.get_handle()
 
+        # Extended ping options
+        # If one of these is passed, set 'extd_ping' to 'y' automatically
+        ext_ping_options = [
+            'multicast', 'transport', 'mask', 'vcid', 'tunnel',
+            'dest_start', 'dest_end', 'exp', 'pad', 'ttl',
+            'reply_mode', 'dscp', 'proto', 'verbose', 'src_route_type',
+            'src_route_addr', 'extended_verbose', 'topo',
+            'validate_reply_data', 'force_exp_null_label',
+            'lsp_ping_trace_rev', 'oif', 'tos', 'data_pat',
+            'interface', 'udp', 'precedence', 'novell_type',
+            'extended_timeout_limit', 'sweep_min', 'sweep_max',
+            'sweep_interval', 'source', 'df_bit',
+            'ipv6_ext_headers', 'ipv6_hbh_headers',
+            'ipv6_dst_headers', 'ping_packet_timeout',
+            'sweep_ping', 'timestamp_count', 'record_hops',
+            'ping_failures'
+        ]
+
         # Ping Options
-        ping_options = ['multicast', 'transport', 'mask', 'vcid', 'tunnel',
-                        'dest_start', 'dest_end', 'exp', 'pad', 'ttl',
-                        'reply_mode', 'dscp', 'proto', 'count', 'size',
-                        'verbose', 'interval', 'timeout_limit',
-                        'send_interval', 'vrf', 'src_route_type',
-                        'src_route_addr', 'extended_verbose', 'topo',
-                        'validate_reply_data', 'force_exp_null_label',
-                        'lsp_ping_trace_rev', 'oif', 'tos', 'data_pat',
-                        'int', 'udp', 'precedence', 'novell_type',
-                        'extended_timeout_limit', 'sweep_min', 'sweep_max',
-                        'sweep_interval', 'src_addr', 'df_bit',
-                        'ipv6_ext_headers', 'ipv6_hbh_headers',
-                        'ipv6_dst_headers', 'ping_packet_timeout',
-                        'sweep_ping', 'timestamp_count', 'record_hops',
-                        'ping_failures', 'extd_ping', 'addr'
-                        ]
+        ping_options = [
+            'addr', 'count', 'size', 'vrf', 'extd_ping',
+            'send_interval', 'interval', 'timeout_limit',
+        ] + ext_ping_options
 
         # Default value setting
         ping_context = AttributeDict({})
@@ -387,10 +393,36 @@ class Ping6(BaseService):
             else:
                 ping_context[a] = ""
 
-        # Read input values passed
+        # old to new argument mapping
+        deprecated_arg_map = {
+            'int': 'interface',
+            'src_addr': 'source'
+        }
+        # process input values passed
         # Stringify values in case they are passed as objects.
         for key in kwargs:
-            ping_context[key] = str(kwargs[key])
+
+            # if one of the extended ping options is given,
+            # automatically set extd_ping to y
+            # If extd_ping is explicitly set to 'n',
+            # it will be set by logic below
+            if key in ext_ping_options:
+                ping_context['extd_ping'] = 'y'
+
+            if key in deprecated_arg_map:
+                con.log.warning(
+                    'ping service "{key}" argument is deprecated, '
+                    'please use "{new_key}" instead'.format(
+                        key=key,
+                        new_key=deprecated_arg_map.get(key)
+                    ))
+                old_key = key
+                key = deprecated_arg_map.get(key)
+                ping_context[key] = str(kwargs[old_key])
+            else:
+                # this also sets extd_ping to 'n'
+                # if provided by user
+                ping_context[key] = str(kwargs[key])
 
         # Validate Inputs
         if ping_context['addr'] == "":
@@ -417,8 +449,8 @@ class Ping6(BaseService):
         # Value is device ping6 arguments. Prepend and append whitespace.
         ping_seq = collections.OrderedDict()
         ping_seq['multicast'] = ' multicast '
-        ping_seq['int'] = ' interface '
-        ping_seq['src_addr'] = ' source '
+        ping_seq['interface'] = ' interface '
+        ping_seq['source'] = ' source '
         ping_seq['count'] = ' count '
         ping_seq['send_interval'] = ' interval '
         ping_seq['size'] = ' packet-size '

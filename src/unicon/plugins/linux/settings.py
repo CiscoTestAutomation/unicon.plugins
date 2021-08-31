@@ -42,7 +42,8 @@ class LinuxSettings(GenericSettings):
         # Default error pattern
         self.ERROR_PATTERN = [
             r'^.*?No such file or directory\s*$',
-            r'^.*?is not in the sudoers file.  This incident will be reported.'
+            r'^.*?is not in the sudoers file.  This incident will be reported.',
+            r'^.*?command not found'
         ]
 
         # If True, check the command return code for executed commands

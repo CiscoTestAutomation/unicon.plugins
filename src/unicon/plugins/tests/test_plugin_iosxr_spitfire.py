@@ -435,5 +435,18 @@ class TestIosXrSpitfireConfigure(unittest.TestCase):
         self._conn.enable()
 
 
+class TestIosXrSpitfireSyslogHandler(unittest.TestCase):
+
+    """Tests for syslog message handling."""
+    def test_connect_syslog_messages(self):
+        conn = Connection(
+            hostname='Router',
+            start=['mock_device_cli --os iosxr --platform spitfire --state spitfire_connect_syslog'],
+            os='iosxr',
+            platform='spitfire'
+        )
+        conn.connect()
+
+
 if __name__ == "__main__":
     unittest.main()

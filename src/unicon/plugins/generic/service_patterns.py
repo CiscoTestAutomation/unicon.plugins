@@ -79,7 +79,7 @@ class PingPatterns():
         self.ipv6_precedence = r'^.*Precedence \[.+\]\s?: $'
         self.ipv6_dscp = r'^.*DSCP \[.+\]\s?: $'
         self.ipv6_hop = r'^.*Include hop by hop option\? \[.+\]\s?: $'
-        self.pv6_dest = r'^.*Include destination option\? \[.+\]\s?: $'
+        self.ipv6_dest = r'^.*Include destination option\? \[.+\]\s?: $'
         self.ipv6_extn_header = r'^.*Include extension headers\? \[.+\]\s?: $'
         self.ext_cmds_timeout = r'ADD TIMEOUT PATTERNS'
         # For IPV4
@@ -118,6 +118,9 @@ class PingPatterns():
         self.lsrtv_timestamp_count = r'^.*Number of timestamps \[.*\]: $}'
         self.lsrtv_noroom = r'^.*No room for that option$'
         self.lsrtv_invalid_hop = r'^.*Invalid number of hops$'
+        # Invalid commands
+        self.invalid_command = r'^.*% *Invalid.*'
+
 
 class CopyPatterns():
     def __init__(self):

@@ -560,7 +560,7 @@ class TestNxosPluginConfigure(unittest.TestCase):
         self.assertIn('Commit Successful', out)
 
     def test_configure_error_pattern(self):
-        for cmd in ['b']:
+        for cmd in ['b', 'boot']:
           with self.assertRaises(SubCommandFailure):
               self.dev.configure(cmd)
         self.dev.disconnect()

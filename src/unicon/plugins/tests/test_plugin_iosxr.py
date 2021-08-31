@@ -584,14 +584,7 @@ class TestIosXRPluginPing(unittest.TestCase):
                        tacacs_password='cisco',
                        enable_password='cisco')
         r = c.ping('10.0.0.2', vrf='management')
-        self.assertEqual(r.strip(), "\r\n".join("""ping vrf management
-Protocol [ip]: 
-Target IP address: 10.0.0.2
-Repeat count [5]: 
-Datagram size [100]: 
-Timeout in seconds [2]: 
-Extended commands? [no]: n
-Sweep range of sizes? [no]: n
+        self.assertEqual(r.strip(), "\r\n".join("""ping vrf management 10.0.0.2
 Type escape sequence to abort.
 Sending 5, 100-byte ICMP Echos to 10.0.0.2, timeout is 2 seconds:
 !!!!!

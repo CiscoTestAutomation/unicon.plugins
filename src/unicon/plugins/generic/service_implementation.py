@@ -31,7 +31,10 @@ from unicon.core.errors import SubCommandFailure, StateMachineError, \
 from unicon.eal.dialogs import Dialog
 from unicon.eal.dialogs import Statement
 from unicon.plugins.generic.statements import (
-    chatty_term_wait, custom_auth_statements, buffer_settled)
+    chatty_term_wait,
+    custom_auth_statements,
+    buffer_settled,
+    default_statement_list)
 from unicon.plugins.generic.service_statements import reload_statement_list, \
     ping_dialog_list, extended_ping_dialog_list, copy_statement_list, \
     ha_reload_statement_list, switchover_statement_list, \
@@ -1014,7 +1017,7 @@ class Reload(BaseService):
         self.start_state = 'enable'
         self.end_state = 'enable'
         self.timeout = connection.settings.RELOAD_TIMEOUT
-        self.dialog = Dialog(reload_statement_list)
+        self.dialog = Dialog(reload_statement_list + default_statement_list)
         self.log_buffer = io.StringIO()
         lb = UniconStreamHandler(self.log_buffer)
         lb.setFormatter(logging.Formatter(fmt=UNICON_LOG_FORMAT))
@@ -1028,6 +1031,7 @@ class Reload(BaseService):
                      timeout=None,
                      return_output=False,
                      reload_creds=None,
+                     raise_on_error=True,
                      *args, **kwargs):
         con = self.connection
         timeout = timeout or self.timeout
@@ -1055,7 +1059,7 @@ class Reload(BaseService):
             raise SubCommandFailure(
                 "dialog passed must be an instance of Dialog")
 
-        dialog += self.service_dialog(service_dialog=self.dialog)
+        dialog += self.dialog
         custom_auth_stmt = custom_auth_statements(con.settings.LOGIN_PROMPT, con.settings.PASSWORD_PROMPT)
         if custom_auth_stmt:
             dialog += Dialog(custom_auth_stmt)
@@ -1069,51 +1073,58 @@ class Reload(BaseService):
         start_time = current_time = datetime.now()
         timeout_time = timedelta(seconds=self.timeout)
         con.spawn.sendline(reload_command)
+
         try:
-            try:
-                dialog.process(con.spawn,
-                               timeout=timeout,
-                               prompt_recovery=self.prompt_recovery,
-                               context=context)
-            except TimeoutError:
-                con.log.error('Reload timed out')
-
-            if not con.connected:
-                con.disconnect()
-                for x in range(con.settings.RELOAD_RECONNECT_ATTEMPTS):
-                    con.log.info('Waiting for {} seconds'.format(con.settings.RELOAD_WAIT / (x + 1)))
-                    sleep(con.settings.RELOAD_WAIT / (x + 1))
-                    try:
-                        con.log.info('Trying to connect... attempt #{}'.format(x + 1))
-                        con.connect()
-                    except Exception:
-                        con.log.warning('Connection to {} failed'.format(con.hostname))
-                        self.result = False
-                    if con.is_connected:
-                        self.result = True
-                        break
+            dialog.process(con.spawn,
+                           timeout=timeout,
+                           prompt_recovery=self.prompt_recovery,
+                           context=context)
+        except TimeoutError:
+            if raise_on_error:
+                raise
             else:
-                con.log.info('Waiting for boot messages to settle for {} seconds'.format(
-                    con.settings.POST_RELOAD_WAIT
-                ))
-                wait_time = timedelta(seconds=con.settings.POST_RELOAD_WAIT)
-                settle_time = current_time = datetime.now()
-                while (current_time - settle_time) < wait_time:
-                    if buffer_settled(con.spawn, con.settings.POST_RELOAD_WAIT):
-                        con.log.info('Buffer settled, accessing device..')
-                        break
-                    current_time = datetime.now()
-                    if (current_time - start_time) > timeout_time:
-                        con.log.info('Time out, trying to acces device..')
-                        break
+                con.log.exception('Reload timed out')
+                self.result = False
 
-                con.context = context
-                con.spawn.sendline()
-                con.connection_provider.connect()
-                self.result = True
+        if not con.connected:
+            con.disconnect()
+            for x in range(con.settings.RELOAD_RECONNECT_ATTEMPTS):
+                con.log.info('Waiting for {} seconds'.format(con.settings.RELOAD_WAIT / (x + 1)))
+                sleep(con.settings.RELOAD_WAIT / (x + 1))
+                try:
+                    con.log.info('Trying to connect... attempt #{}'.format(x + 1))
+                    con.connect()
+                except Exception:
+                    con.log.exception('Connection to {} failed'.format(con.hostname))
+                    self.result = False
+                if con.is_connected:
+                    self.result = True
+                    break
+        else:
+            con.log.info('Waiting for boot messages to settle for {} seconds'.format(
+                con.settings.POST_RELOAD_WAIT
+            ))
+            wait_time = timedelta(seconds=con.settings.POST_RELOAD_WAIT)
+            settle_time = current_time = datetime.now()
+            while (current_time - settle_time) < wait_time:
+                if buffer_settled(con.spawn, con.settings.POST_RELOAD_WAIT):
+                    con.log.info('Buffer settled, accessing device..')
+                    break
+                current_time = datetime.now()
+                if (current_time - start_time) > timeout_time:
+                    con.log.info('Time out, trying to acces device..')
+                    break
 
-        except Exception as err:
-            raise SubCommandFailure("Reload of device {} failed {}".format(con.hostname, err))
+        try:
+            con.context = context
+            con.connection_provider.connect()
+            self.result = True
+        except Exception:
+            if raise_on_error:
+                raise
+            else:
+                con.log.exception('Connection to {} failed'.format(con.hostname))
+                self.result = False
 
         self.log_buffer.seek(0)
         reload_output = self.log_buffer.read()
@@ -1127,6 +1138,7 @@ class Reload(BaseService):
             con.log.info('--- Reload of device {} completed ---'.format(con.hostname))
         else:
             con.log.info('--- Reload of device {} failed ---'.format(con.hostname))
+
 
 class Traceroute(BaseService):
     """ Service to issue traceroute response request to another network from device.
@@ -1256,27 +1268,57 @@ class Ping(BaseService):
     def call_service(self, addr, command="ping", timeout=None, **kwargs):  # noqa: C901
         con = self.connection
         con.log.debug("+++ ping +++")
+
+        # Extended ping options
+        # If one of these is passed, set 'extd_ping' to 'y' automatically
+        ext_ping_options = [
+            'data_pat',
+            'df_bit',
+            'dscp',
+            'exp',
+            'extended_verbose',
+            'force_exp_null_label',
+            'ingress_int',
+            'interface',
+            'pad',
+            'precedence',
+            'record_hops',
+            'reply_mode',
+            'source',
+            'src_route_addr',
+            'src_route_type',
+            'sweep_interval',
+            'sweep_max',
+            'sweep_min',
+            'sweep_ping',
+            'timestamp_count',
+            'tos',
+            'ttl',
+            'udp',
+            'validate_reply_data',
+            'verbose',
+        ]
+
         # Ping Options
-        ping_options = ['multicast', 'transport', 'mask', 'vcid', 'tunnel',
-                        'dest_start', 'dest_end', 'exp', 'pad', 'ttl',
-                        'reply_mode', 'dscp', 'proto', 'count', 'size',
-                        'verbose', 'interval', 'timeout_limit',
-                        'send_interval', 'vrf', 'src_route_type',
-                        'src_route_addr', 'extended_verbose', 'topo',
-                        'validate_reply_data', 'force_exp_null_label',
-                        'lsp_ping_trace_rev', 'oif', 'tos', 'data_pat',
-                        'int', 'udp', 'precedence', 'novell_type',
-                        'extended_timeout_limit', 'sweep_min', 'sweep_max',
-                        'sweep_interval', 'src_addr', 'df_bit',
-                        'ipv6_ext_headers', 'ipv6_hbh_headers',
-                        'ipv6_dst_headers', 'ping_packet_timeout',
-                        'sweep_ping', 'timestamp_count', 'record_hops',
-                        'ping_failures', 'extd_ping', 'addr'
-                        ]
+        ping_options = [
+            'multicast', 'transport', 'mask', 'vcid', 'tunnel',
+            'dest_start', 'dest_end',
+            'proto', 'count', 'size',
+            'interval', 'timeout_limit',
+            'send_interval', 'vrf', 'topo',
+            'lsp_ping_trace_rev', 'oif',
+            'novell_type', 'extd_ping',
+            'extended_timeout_limit',
+            'ipv6_ext_headers', 'ipv6_hbh_headers',
+            'ipv6_dst_headers', 'ping_packet_timeout',
+            'ping_failures', 'addr'
+        ] + ext_ping_options
 
         # Default value setting
         timeout = timeout or self.timeout
 
+        # Prepare ping context
+        # set some default values
         ping_context = AttributeDict({})
         for a in ping_options:
             if a == "novell_type":
@@ -1288,13 +1330,39 @@ class Ping(BaseService):
             else:
                 ping_context[a] = ""
 
+        # old to new argument mapping
+        deprecated_arg_map = {
+            'int': 'interface',
+            'src_addr': 'source'
+        }
         # Read input values passed
         # Convert to string in case users pass in non-string types such as
         # integer for repeat_count or ipaddress for addr, src_addr or
         # src_route_addr keys.
         # The EAL backend requires all commands to be of string type.
         for key in kwargs:
-            ping_context[key] = str(kwargs[key])
+
+            # if one of the extended ping options is given,
+            # automatically set extd_ping to y.
+            # If extd_ping is explicitly set to 'n',
+            # it will be set by logic below
+            if key in ext_ping_options:
+                ping_context['extd_ping'] = 'y'
+
+            if key in deprecated_arg_map:
+                con.log.warning(
+                    'ping service "{key}" argument is deprecated, '
+                    'please use "{new_key}" instead'.format(
+                        key=key,
+                        new_key=deprecated_arg_map.get(key)
+                    ))
+                old_key = key
+                key = deprecated_arg_map.get(key)
+                ping_context[key] = str(kwargs[old_key])
+            else:
+                # this also sets extd_ping to 'n'
+                # if provided by user
+                ping_context[key] = str(kwargs[key])
 
         # Validate Inputs
         if ping_context['addr'] == "":
@@ -1313,8 +1381,13 @@ class Ping(BaseService):
         elif ping_context['src_route_addr'] != "":
             raise SubCommandFailure("If src route addr is set, "
                                     "then src route type is mandatory \n")
+
         # Stringify the command in case it is an object.
         ping_str = str(command)
+
+        # If only the address is passed, ping it directly
+        if not kwargs:
+            ping_str += ' {}'.format(addr)
 
         if ping_context['topo'] != "":
             ping_str = ping_str + "  topo " + ping_context['topo']
@@ -1869,7 +1942,7 @@ class HAReloadService(BaseService):
         self.start_state = 'enable'
         self.end_state = 'enable'
         self.timeout = connection.settings.HA_RELOAD_TIMEOUT
-        self.dialog = Dialog(ha_reload_statement_list)
+        self.dialog = Dialog(ha_reload_statement_list + default_statement_list)
         self.command = 'reload'
         self.__dict__.update(kwargs)
 
@@ -1912,8 +1985,6 @@ class HAReloadService(BaseService):
         fmt_str = "+++ reloading  %s  with reload_command %s and timeout is %s +++"
         con.log.info(fmt_str % (con.hostname, command, timeout))
         dialog += self.dialog
-        dialog = self.service_dialog(handle=con.active,
-                                     service_dialog=dialog)
         custom_auth_stmt = custom_auth_statements(con.settings.LOGIN_PROMPT, con.settings.PASSWORD_PROMPT)
 
         if reload_creds:

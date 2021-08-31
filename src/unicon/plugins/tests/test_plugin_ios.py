@@ -122,7 +122,7 @@ class TestIosPluginPing(unittest.TestCase):
                             tacacs_password='cisco',
                             enable_password='cisco')
         c.ping('1.1.1.1')
-        self.assertEqual("\n".join(c.spawn.match.match_output.splitlines()), """n
+        self.assertEqual("\n".join(c.spawn.match.match_output.splitlines()), """ping 1.1.1.1
 Type escape sequence to abort.
 Sending 5, 100-byte ICMP Echos to 1.1.1.1, timeout is 2 seconds:
 !!!!!
@@ -140,7 +140,7 @@ Router#""")
             c.ping('10.10.10.10')
         except SubCommandFailure:
             pass
-        self.assertEqual("\n".join(c.spawn.match.match_output.splitlines()), """n
+        self.assertEqual("\n".join(c.spawn.match.match_output.splitlines()), """ping 10.10.10.10
 Type escape sequence to abort.
 Sending 5, 100-byte ICMP Echos to 10.10.10.10, timeout is 2 seconds:
 .....
@@ -179,20 +179,14 @@ Success rate is 100 percent (5/5), round-trip min/avg/max = 1/1/1 ms
                             tacacs_password='cisco',
                             enable_password='cisco')
         r = c.ping('1.1.1.1', vrf='management')
-        self.assertEqual(r, "\r\n".join("""ping vrf management
-Protocol [ip]: 
-Target IP address: 1.1.1.1
-Repeat count [5]: 
-Datagram size [100]: 
-Timeout in seconds [2]: 
-Extended commands? [no]: n
-Sweep range of sizes? [no]: n
+        self.assertEqual(r, "\r\n".join("""ping vrf management 1.1.1.1
 Type escape sequence to abort.
 Sending 5, 100-byte ICMP Echos to 1.1.1.1, timeout is 2 seconds:
 !!!!!
-Success rate is 100 percent (5/5), round-trip min/avg/max = 1/1/3 ms
+Success rate is 100 percent (5/5), round-trip min/avg/max = 1/1/1 ms
 
 """.splitlines()))
+
 
 class TestIosPluginClear(unittest.TestCase):
 

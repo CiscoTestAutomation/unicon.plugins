@@ -34,6 +34,7 @@ class LinuxServiceList:
         self.execute = lnx_svc.Execute
         self.ping = lnx_svc.Ping
         self.expect_log = svc.ExpectLogging
+        self.sudo = lnx_svc.Sudo
 
 
 class LinuxConnection(BaseLinuxConnection):

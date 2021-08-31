@@ -209,6 +209,7 @@ class TestIosXEQuadReload(unittest.TestCase):
                            username='cisco',
                            tacacs_password='cisco',
                            enable_password='cisco')
+        cls.d.settings.QUAD_RELOAD_SLEEP = 0
         cls.d.connect()
 
     @classmethod
