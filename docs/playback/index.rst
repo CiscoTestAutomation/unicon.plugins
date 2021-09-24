@@ -133,3 +133,24 @@ Here is a recording on creating a mock with a big amount of show commands.
     <script id="asciicast-WU9egjeFtJQiW8vIlD0SH9HvV" src="https://asciinema.org/a/WU9egjeFtJQiW8vIlD0SH9HvV.js" async></script>
 
 .. _pickle: https://docs.python.org/3/library/pickle.html
+
+By default, when a mock device is created, it will only store the first output of each command in the YAML file, regardless of the number of times the command was executed.
+If you wish to record all the commands and to be able to execute them multiple times, you can do so by passing the argument ``--allow_repated_commands``.
+
+.. code-block:: bash
+
+    python -m unicon.playback.mock --recorded-data recorded/nx-osv-1 --output data/nxos/mock_data.yaml --allow_repated_commands
+
+If you take a look at the resulting YAML file, you will notice that each stored command will have a structure similar to the one below:
+
+.. code-block:: yaml
+
+        execute:
+          commands:
+            show interfaces GigabitEthernet1:
+              response:
+                - "GigabitEthernet1 is up, line protocol is up..."
+                - "GigabitEthernet1 is up, line protocol is up..."
+              response_type: circular
+
+With this yaml file you will never run out of outputs for this command as it will circle between the outputs every time the command is called.
