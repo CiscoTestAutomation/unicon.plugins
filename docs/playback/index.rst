@@ -139,7 +139,7 @@ If you wish to record all the commands and to be able to execute them multiple t
 
 .. code-block:: bash
 
-    python -m unicon.playback.mock --recorded-data recorded/nx-osv-1 --output data/nxos/mock_data.yaml --allow_repated_commands
+    python -m unicon.playback.mock --recorded-data recorded/nx-osv-1 --output data/nxos/mock_data.yaml --allow-repated-commands
 
 If you take a look at the resulting YAML file, you will notice that each stored command will have a structure similar to the one below:
 
