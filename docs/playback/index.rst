@@ -135,7 +135,7 @@ Here is a recording on creating a mock with a big amount of show commands.
 .. _pickle: https://docs.python.org/3/library/pickle.html
 
 By default, when a mock device is created, it will only store the first output of each command in the YAML file, regardless of the number of times the command was executed.
-If you wish to record all the commands and to be able to execute them multiple times, you can do so by passing the argument ``--allow_repated_commands``.
+If you wish to record all the commands and to be able to execute them multiple times, you can do so by passing the argument ``--allow-repated-commands``.
 
 .. code-block:: bash
 
