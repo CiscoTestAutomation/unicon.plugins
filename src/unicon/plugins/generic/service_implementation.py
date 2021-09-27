@@ -2248,9 +2248,8 @@ class SwitchoverService(BaseService):
             config_commands = self.connection.settings.HA_INIT_CONFIG_COMMANDS
             con.configure(config_commands, prompt_recovery=self.prompt_recovery)
 
-            # Clear Standby buffer
-            con.standby.spawn.sendline("\r")
-            con.standby.spawn.expect(".*")
+            # Determine standby state
+            con.standby.spawn.sendline()
             try:
                 con.standby.state_machine.go_to('any',
                                                 con.standby.spawn,

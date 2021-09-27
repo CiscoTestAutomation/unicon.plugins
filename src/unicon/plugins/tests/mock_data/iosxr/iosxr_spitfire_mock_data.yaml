@@ -341,3 +341,26 @@ spitefire_root_username:
     "admin":
       # straight to enable, can be updated in future to handle passwed entry
       new_state: spitfire_enable
+
+
+spitfire_showtech_syslog:
+  prompt: RP/0/RP0/CPU0:%N#
+  commands:
+    "show tech":
+      response: |
+        Mon Sep  6 07:35:38.478 UTC
+        ++ Show tech start time: 2021-Sep-06.073538.UTC ++
+        Mon Sep  6 07:35:38 UTC 2021 Waiting for gathering to complete
+        ......
+        RP/0/RP1/CPU0:Sep  6 07:35:59.806 UTC: rmf_svr[271]: %HA-REDCON-1-STANDBY_READY : standby card is ready
+        
+        RP/0/RP1/CPU0:Sep  6 07:35:59.806 UTC: rmf_svr[271]: %HA-REDCON-1-STANDBY_READY : standby card is ready
+        
+
+      timing:
+        - 0:2,0,0.01
+        - 3:3,0.5,0
+        - 3:4,0.5,0.1,0.1
+        - 4:5,0.5,0.1
+        - 5:8,5,3
+        - 8:,3
