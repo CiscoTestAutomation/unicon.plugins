@@ -506,10 +506,11 @@ class TestNxosPluginMaintenanceMode(unittest.TestCase):
 
 class TestNxosPluginDebugMode(unittest.TestCase):
 
-    def test_debug_prompt(self):
-        dev = Connection(
+    @classmethod
+    def setUpClass(cls):
+        cls.dev = Connection(
             hostname='N93_1',
-            start=['mock_device_cli --os nxos --state debug --hostname N93_1'],
+            start=['mock_device_cli --os nxos --state exec --hostname N93_1'],
             os='nxos',
             credentials={
                 'defaut': {
@@ -518,8 +519,20 @@ class TestNxosPluginDebugMode(unittest.TestCase):
                 }
             }
         )
-        dev.connect()
-        dev.disconnect()
+        cls.dev.connect()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.dev.disconnect()
+
+    def test_debug_prompt(self):
+        self.dev.execute('load dplug', allow_state_change=True)
+        self.dev.enable()
+
+    def test_debug_sqlite(self):
+        self.dev.execute('load dplug', allow_state_change=True)
+        self.dev.execute('sqlite3 test.db', allow_state_change=True)
+        self.dev.enable()
 
 
 class TestNxosIncorrectLogin(unittest.TestCase):

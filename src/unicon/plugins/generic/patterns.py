@@ -60,7 +60,10 @@ class GenericPatterns(UniconCorePatterns):
 
         self.sudo_password_prompt = r'^.*\[sudo\] password for .*?:\s*?'
 
-        self.syslog_message_pattern = r'^.*?%\w+(-\w+)?-\d+-\w+.*$'
+        # *Sep 6 23:13:38.188: %PNP-6-PNP_SDWAN_STARTED: PnP SDWAN started (7) via (pnp-sdwan-abort-on-cli) by (pid=3, pname=Exec)
+        # *Sep 6 23:18:11.702: %ENVIRONMENTAL-1-ALERT: Temp: Inlet 1, Location: R0, State: Warning, Reading: 45 Celsius
+        # *Sep 6 17:43:41.291: %Cisco-SDWAN-RP_0-CFGMGR-4-WARN-300005: New admin password not set yet, waiting for daemons to read initial config.
+        self.syslog_message_pattern = r'^.*?%\w+(-\S+)?-\d+-\w+.*$'
 
         self.config_locked = r'Configuration (mode )?(is )?locked|Config mode cannot be entered'
 
@@ -71,4 +74,6 @@ class GenericPatterns(UniconCorePatterns):
         self.enter_your_selection_2 = r'^.*?Enter your selection \[2]:\s*$'
 
         self.guestshell_prompt = r'^(.*)\[\S+@guestshell\s+.*\][#\$]\s?$'
+        
+        self.press_any_key = r'^.*?Press any key to continue\.\s*$'
 

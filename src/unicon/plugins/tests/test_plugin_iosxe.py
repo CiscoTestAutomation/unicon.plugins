@@ -835,5 +835,24 @@ class TestIosXEping(unittest.TestCase):
             md.stop()
 
 
+class TestSyslogHandler(unittest.TestCase):
+
+    def test_syslog_handler_timeout(self):
+        c = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state endless_syslog --hostname PE1'],
+            os='iosxe',
+            connection_timeout=5,
+            settings=dict(PROMPT_RECOVERY_COMMANDS = ['\x06']),
+            prompt_recovery=True
+        )
+        try:
+            c.connect()
+        except Exception:
+            raise
+        finally:
+            c.disconnect()
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -9,7 +9,7 @@ __author__ = "Sritej K V R <skanakad@cisco.com>"
 
 import os
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, Mock, call
 
 from pyats.topology import loader
 
@@ -446,6 +446,25 @@ class TestIosXrSpitfireSyslogHandler(unittest.TestCase):
             platform='spitfire'
         )
         conn.connect()
+
+    def test_connect_syslog_messages_show_tech(self):
+        conn = Connection(
+            hostname='Router',
+            start=['mock_device_cli --os iosxr --platform spitfire --state spitfire_showtech_syslog'],
+            os='iosxr',
+            platform='spitfire',
+            mit=True
+        )
+
+        def sendline_wrapper(func, *args, **kwargs):
+            def wrapper(*args, **kwargs):
+                return func(*args, **kwargs)
+            return wrapper
+
+        conn.connect()
+        conn.spawn.sendline = Mock(side_effect=sendline_wrapper(conn.spawn.sendline))
+        conn.execute('show tech')
+        conn.spawn.sendline.assert_has_calls([call('show tech'), call(), call()])
 
 
 if __name__ == "__main__":

@@ -77,15 +77,22 @@ def syslog_wait_send_return(spawn, session):
     If a syslog messsage was seen, this handler is executed.
     Read the buffer, if its growing, return.
 
-    If the buffer is not growing, read updates up to wait_time
+    If the buffer is not growing, read updates up to SYSLOG_WAIT
     and check if in that period the buffer stayed the same.
     If so, the last message was a syslog message and we want
-    to send a return to get back the prompt.
+    to send a return to get back the prompt. A return is sent
+    and the length of the buffer is stored, another return
+    is sent only if the buffer size changed the next time
+    this handler is called (i.e. another syslog message was received).
     """
     buffer_len = session.get('buffer_len', 0)
     if len(spawn.buffer) == buffer_len:
-        if buffer_settled(spawn, spawn.settings.SYSLOG_WAIT):
+        if not session.get('syslog_sent_cr', False) and \
+                buffer_settled(spawn, spawn.settings.SYSLOG_WAIT):
             spawn.sendline()
+            session['syslog_sent_cr'] = True
+    else:
+        session['syslog_sent_cr'] = False
     session['buffer_len'] = len(spawn.buffer)
 
 
@@ -312,18 +319,17 @@ def incorrect_login_handler(spawn, context, session):
         # does not fail. Skip it for the first attempt
         raise UniconAuthenticationError(
             'Login failure, either wrong username or password')
-    else:
-        if 'incorrect_login_attempts' not in session:
-            session['incorrect_login_attempts'] = 1
+    if 'incorrect_login_attempts' not in session:
+        session['incorrect_login_attempts'] = 1
 
-        # Let's give a chance for unicon to login with right credentials
-        # let's give three attempts
-        if session['incorrect_login_attempts'] <= 3:
-            session['incorrect_login_attempts'] = \
-                session['incorrect_login_attempts'] + 1
-        else:
-            raise UniconAuthenticationError(
-                'Login failure, either wrong username or password')
+    # Let's give a chance for unicon to login with right credentials
+    # let's give three attempts
+    if session['incorrect_login_attempts'] <= 3:
+        session['incorrect_login_attempts'] = \
+            session['incorrect_login_attempts'] + 1
+    else:
+        raise UniconAuthenticationError(
+            'Login failure, either wrong username or password')
 
 
 def sudo_password_handler(spawn, context, session):
@@ -540,21 +546,26 @@ class GenericStatements():
                                          args=None,
                                          loop_continue=True,
                                          trim_buffer=False,
-                                         continue_timer=True)
+                                         continue_timer=False)
 
         self.syslog_stripper_stmt = Statement(pattern=pat.syslog_message_pattern,
                                               action=syslog_stripper,
                                               args=None,
                                               loop_continue=True,
                                               trim_buffer=False,
-                                              continue_timer=True)
+                                              continue_timer=False)
 
         self.enter_your_selection_stmt = Statement(pattern=pat.enter_your_selection_2,
                                                    action='sendline()',
                                                    args=None,
                                                    loop_continue=True,
                                                    continue_timer=True)
-
+        
+        self.press_any_key_stmt = Statement(pattern=pat.press_any_key,
+                                            action='sendline()',
+                                            args=None,
+                                            loop_continue=True,
+                                            continue_timer=False)
 
 
 #############################################################
@@ -575,7 +586,8 @@ pre_connection_statement_list = [generic_statements.escape_char_stmt,
                                  generic_statements.hit_enter_stmt,
                                  generic_statements.press_ctrlx_stmt,
                                  generic_statements.connected_stmt,
-                                 generic_statements.syslog_msg_stmt
+                                 generic_statements.syslog_msg_stmt,
+                                 generic_statements.press_any_key_stmt
                                  ]
 
 #############################################################

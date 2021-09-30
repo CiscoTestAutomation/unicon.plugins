@@ -12,8 +12,10 @@ from unicon.plugins.iosxe.service_implementation import Copy
 from unicon.plugins.tests.mock.mock_device_iosxe import MockDeviceTcpWrapperIOSXE
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0)
+unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
+unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC = 0.2
+
+
 class TestIosXEPluginHAConnect(unittest.TestCase):
     """ Run unit testing on a mocked IOSXE ASR HA device """
 
@@ -83,8 +85,6 @@ class TestIosXEPluginHAConnect(unittest.TestCase):
         dev.disconnect()
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0)
 class TestIosXEPluginSwitchoverWithStandbyCredentials(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -103,6 +103,51 @@ class TestIosXEPluginSwitchoverWithStandbyCredentials(unittest.TestCase):
 
     def test_switchover(self):
         self.c.execute('redundancy force-switchover')
+
+
+class TestIosXEEnableSecret(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.md = MockDeviceTcpWrapperIOSXE(port=0, state='enable_reload_config_dialog,asr_exec_standby')
+        cls.md.start()
+
+        cls.testbed = """
+        devices:
+          Router:
+            os: iosxe
+            type: router
+            credentials:
+                default:
+                    username: cisco
+                    password: cisco
+                enable:
+                    password: Secret12345
+            connections:
+              defaults:
+                class: unicon.Unicon
+              a:
+                protocol: telnet
+                ip: 127.0.0.1
+                port: {}
+              b:
+                protocol: telnet
+                ip: 127.0.0.1
+                port: {}
+        """.format(cls.md.ports[0], cls.md.ports[1])
+        tb = loader.load(cls.testbed)
+        cls.r = tb.devices.Router
+        cls.r.connect(init_config_commands=[])
+
+    @classmethod
+    def tearDownClass(self):
+        self.md.stop()
+
+    def test_reload_enable_secret(self):
+        self.r.execute('reload_config_dialog')
+        self.r.reload()
+        self.r.disconnect()
+    
 
 if __name__ == "__main__":
     unittest.main()

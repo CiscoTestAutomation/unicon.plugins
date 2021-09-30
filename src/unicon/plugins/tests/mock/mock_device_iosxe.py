@@ -62,7 +62,8 @@ class MockDeviceIOSXE(MockDevice):
         elif re.match(r'delete \S+', cmd):
             m = re.match(r'delete (\S+)', cmd)
             filename = m.group(1)
-            self.files_on_flash.remove(filename)
+            if filename in self.files_on_flash:
+                self.files_on_flash.remove(filename)
             return True
         elif re.match(r'copy flash:\S+ scp:\S+', cmd):
             self.set_state(self.transport_handles[transport], 'scp_password')
@@ -91,7 +92,8 @@ class MockDeviceIOSXE(MockDevice):
         elif re.match(r'delete /force /recursive ctc.*', cmd):
             m = re.match(r'delete /force /recursive (ctc.*.tar.gz)', cmd)
             filename = m.group(1)
-            self.files_on_flash.remove(filename)
+            if filename in self.files_on_flash:
+                self.files_on_flash.remove(filename)
             return True
         elif re.match(r'copy ctc_.*', cmd):
             self.set_state(self.transport_handles[transport], 'ctc_copy_address')

@@ -132,6 +132,8 @@ general_enable:
                  RF debug mask = 0x0   
     "redundancy force-switchover":
       new_state: enable_general_standby
+    "reload_config_dialog":
+      new_state: enable_reload_config_dialog
     "reload":
       new_state: ha_reload_proceed
     "trim":
@@ -533,7 +535,7 @@ initial_config_dialog:
 
   prompt: "\nWould you like to enter the initial configuration dialog? [yes/no]: "
   commands:
-    "no":
+    "no": &enable_secret
       new_state: enter_enable_secret
       response: |2
           
@@ -546,6 +548,7 @@ initial_config_dialog:
           at least 1 upper case, 1 lower case, 1 digit and
           should not contain [cisco]
           -------------------------------------------------
+    "n": *enable_secret
 
 enter_enable_secret:
   prompt: "  Enter enable secret: "
@@ -1053,3 +1056,20 @@ ping_protocol_fail:
       timing:
       - 0:,0,0.015,0.01
       new_state: ping_fail
+
+
+endless_syslog:
+  prompt: ""
+  keys:
+    ctrl-f:
+      new_state: general_enable
+  commands:
+    "": "%MY-1-MSG: never ending message"
+
+
+enable_reload_config_dialog:
+  prompt: "%N#"
+  commands:
+    <<: *gen_enable_cmds
+    "reload":
+      new_state: initial_config_dialog

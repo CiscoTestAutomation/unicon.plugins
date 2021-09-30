@@ -104,7 +104,8 @@ class GenericSettings(Settings):
                                         r'% Configuring IP routing on a LAN subinterface is only allowed if that '
                                         r'subinterface is already configured as part of an IEEE 802.10, IEEE 802.1Q, '
                                         r'or ISL vLAN.',
-                                        r'% OSPF: Please enable segment-routing globally'
+                                        r'% OSPF: Please enable segment-routing globally',
+                                        r"% Invalid input detected at '^' marker"
                                         ]
 
         # Number of times to retry for config mode by configure service.

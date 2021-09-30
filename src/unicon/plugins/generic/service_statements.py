@@ -316,6 +316,7 @@ reload_statement_list = [save_env, confirm_reset, reload_confirm,
                          generic_statements.password_ok_stmt, login_stmt,
                          generic_statements.enable_secret_stmt,
                          generic_statements.enter_your_selection_stmt,
+                         generic_statements.syslog_msg_stmt,
                          # Below statements have loop_continue=False
                          password_stmt, press_enter, press_return,
                          connection_closed_stmt
@@ -1021,14 +1022,11 @@ sso_ready = Statement(pattern=pat.sso_ready,
 loader_prompt = None
 rommon_prompt = None
 
-ha_reload_statement_list = [save_env, sso_ready, press_enter,
-                            reload_proceed, reload_entire_shelf,
-                            reload_this_shelf, useracess, config_byte,
-                            setup_dialog, auto_install_dialog,
-                            login_notready, redundant, default_prompts,
-                            auto_provision, login_stmt, password_stmt,
-                            generic_statements.password_ok_stmt,
-                           ]
+ha_reload_statement_list = [sso_ready, reload_proceed, reload_entire_shelf,
+                            reload_this_shelf, config_byte, login_notready,
+                            redundant, default_prompts
+                            # no idea why we have default prompts...
+                           ] + reload_statement_list
 
 #############################################################################
 # Reset Standby  Command  Statement
