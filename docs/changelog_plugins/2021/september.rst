@@ -7,8 +7,8 @@ September 28th
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
 
-        ``unicon.plugins``, v21.8
-        ``unicon``, v21.8
+        ``unicon.plugins``, v21.9
+        ``unicon``, v21.9
 
 Install Instructions
 ^^^^^^^^^^^^^^^^^^^^
