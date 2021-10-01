@@ -1,5 +1,36 @@
+September 2021
+========
+
+September 28th
+------
+
+.. csv-table:: Module Versions
+    :header: "Modules", "Versions"
+
+        ``unicon.plugins``, v21.8
+        ``unicon``, v21.8
+
+Install Instructions
+^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+    bash$ pip install unicon.plugins
+    bash$ pip install unicon
+
+Upgrade Instructions
+^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+    bash$ pip install --upgrade unicon.plugins
+    bash$ pip install --upgrade unicon
+
+Features and Bug Fixes:
+^^^^^^^^^^^^^^^^^^^^^^^
+
 --------------------------------------------------------------------------------
-                                      Fix                                       
+                                      Fix
 --------------------------------------------------------------------------------
 
 * iosxr
@@ -17,5 +48,3 @@
 
 * linux
     * Add `sudo` service
-
-

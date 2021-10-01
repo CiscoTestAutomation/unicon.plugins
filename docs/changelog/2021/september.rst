@@ -1,14 +1,14 @@
-August 2021
+September 2021
 ========
 
-August 31st
+September 28
 ------
 
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
 
-        ``unicon.plugins``, v21.8
-        ``unicon``, v21.8
+        ``unicon.plugins``, v21.9
+        ``unicon``, v21.9
 
 Install Instructions
 ^^^^^^^^^^^^^^^^^^^^
@@ -30,15 +30,11 @@ Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 --------------------------------------------------------------------------------
-                                      Fix                                       
+                                      New
 --------------------------------------------------------------------------------
+* No new features
 
-* generic
-    * Refactored ping service
-        * Automatically set extd_ping to 'y' if extended option is specified
-        * Handle invalid input errors
-        * Add address to ping command if no other options are given
-        * Deprecated arguments `int` and `src_addr` for ``interface`` and ``source``
-    * Modified reload service, added `raise_on_error` option
-
-
+--------------------------------------------------------------------------------
+                                      Fix
+--------------------------------------------------------------------------------
+* No Changes
