@@ -269,7 +269,7 @@ on prompt_recovery feature.
 ====================  =======================    ========================================
 Argument              Type                       Description
 ====================  =======================    ========================================
-timeout               int (default 60 sec)       timeout value for the command execution takes.
+timeout               int                        timeout value for the command execution takes.
 error_pattern         list                       List of regex strings to check output for errors.
 append_error_pattern  list                        List of regex strings append to error_pattern.
 reply                 Dialog                     additional dialog
