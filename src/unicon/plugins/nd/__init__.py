@@ -3,7 +3,7 @@ Module:
     unicon.plugins.nd
 
 Authors:
-    pyATS TEAM (pyats-support@cisco.com, pyats-support-ext@cisco.com)
+    pyATS TEAM (pyats-support-ext@cisco.com)
 
 Description:
     This subpackage implements ND
