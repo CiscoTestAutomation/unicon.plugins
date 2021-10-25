@@ -50,8 +50,28 @@ def syslog_stripper(spawn):
     spawn.buffer = re.sub(pat.syslog_message_pattern, '', spawn.buffer, flags=re.M).strip()
 
 
+def buffer_wait(spawn, wait_time):
+    ''' Keep reading the buffer until wait_time.
+
+    Args:
+        wait_time (float): wait time in seconds
+    Returns:
+        None
+    '''
+    time_wait = timedelta(seconds=wait_time)
+    start_time = current_time = datetime.now()
+    while (current_time - start_time) < time_wait:
+        spawn.read_update_buffer()
+        current_time = datetime.now()
+
+
 def buffer_settled(spawn, wait_time):
     """Wait up to wait_time for the buffer to settle.
+
+    Args:
+        wait_time (float): wait time in seconds
+    Returns:
+        True/False
 
     If the buffer is growing, return False immediately,
     if the buffer did not grow during wait_time,
@@ -99,13 +119,17 @@ def syslog_wait_send_return(spawn, session):
 def chatty_term_wait(spawn, trim_buffer=False):
     """ Wait some time for any chatter to cease from the device.
     """
-    for retry_number in range(
-            spawn.settings.ESCAPE_CHAR_CHATTY_TERM_WAIT_RETRIES):
+    for retry_number in range(spawn.settings.ESCAPE_CHAR_CHATTY_TERM_WAIT_RETRIES):
 
         if buffer_settled(spawn, spawn.settings.ESCAPE_CHAR_CHATTY_TERM_WAIT):
             break
         else:
-            sleep(spawn.settings.ESCAPE_CHAR_CHATTY_TERM_WAIT * (retry_number + 1))
+            buffer_wait(spawn, spawn.settings.ESCAPE_CHAR_CHATTY_TERM_WAIT * (retry_number + 1))
+
+    else:
+        spawn.log.warning('The buffer has not settled because the device is chatty. '
+                          'You can try adjusting ESCAPE_CHAR_CHATTY_TERM_WAIT and '
+                          'ESCAPE_CHAR_CHATTY_TERM_WAIT_RETRIES')
 
     if trim_buffer:
         spawn.trim_buffer()
@@ -143,18 +167,19 @@ def escape_char_callback(spawn):
     for retry_number in range(spawn.settings.ESCAPE_CHAR_PROMPT_WAIT_RETRIES):
         # hit enter
         spawn.sendline()
-        spawn.read_update_buffer()
 
-        # incremental sleep logic
-        sleep(spawn.settings.ESCAPE_CHAR_PROMPT_WAIT * (retry_number + 1))
-
-        # did we get prompt after?
-        spawn.read_update_buffer()
+        # incremental wait logic
+        buffer_wait(spawn, spawn.settings.ESCAPE_CHAR_PROMPT_WAIT * (retry_number + 1))
 
         # check buffer
         if known_buffer != len(spawn.buffer.strip()):
             # we got new stuff - assume it's the the prompt, get out
             break
+
+    else:
+        spawn.log.warning('Device is not responding, it might be slow. '
+                          'You can try adjusting the ESCAPE_CHAR_PROMPT_WAIT and '
+                          'ESCAPE_CHAR_PROMPT_WAIT_RETRIES settings.')
 
 
 def ssh_continue_connecting(spawn):
@@ -353,7 +378,14 @@ def sudo_password_handler(spawn, context, session):
 
 
 def wait_and_enter(spawn):
-    sleep(0.5)  # otherwise newline is sometimes lost?
+    # wait for 0.5 second and read the buffer
+    # this avoids issues where the 'sendline'
+    # is somehow lost
+    wait_time = timedelta(seconds=0.5)
+    settle_time = current_time = datetime.now()
+    while (current_time - settle_time) < wait_time:
+        spawn.read_update_buffer()
+        current_time = datetime.now()
     spawn.sendline()
 
 

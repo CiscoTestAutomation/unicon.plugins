@@ -114,11 +114,11 @@ exec:
       new_state: ha_reset_reload
     "crash command":
       new_state: loader
-    "copy  scp: bootflash:":
-      new_state: src_file
-    "copy  bootflash: scp://10.0.0.7/tmp/test.cfg":
-      new_state: src_file
-    "copy  bootflash: bootflash:/test-2.cfg":
+    "copy  scp://N9K/nxosgolden.bin bootflash:":
+      new_state: vrf_prompt
+    "copy  bootflash:/run-cfg.cfg scp://10.0.0.7/tmp/test.cfg":
+      new_state: vrf_prompt
+    "copy  bootflash:/test-1.cfg bootflash:/test-2.cfg":
       new_state: src_file
     "end": ""
     "ping6 2003::7010 vrf management": |

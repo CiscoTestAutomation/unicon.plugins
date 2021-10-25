@@ -9,9 +9,10 @@ from unicon.plugins.generic.service_statements import reload_statement_list
 from unicon.plugins.generic.service_implementation import ReloadResult
 from unicon.eal.dialogs import Dialog
 from unicon.core.errors import SubCommandFailure
-from .service_statements import boot_reached, tcpdump_continue
 from unicon.utils import AttributeDict
 
+from ..statements import boot_from_rommon_stmt
+from .service_statements import tcpdump_continue
 
 class Reload(BaseService):
     """Service to reload the device.
@@ -43,8 +44,7 @@ class Reload(BaseService):
         self.start_state = 'enable'
         self.end_state = 'enable'
         self.timeout = connection.settings.RELOAD_TIMEOUT
-        self.dialog = Dialog(reload_statement_list)
-        self.dialog.append(boot_reached)
+        self.dialog = Dialog(reload_statement_list + [boot_from_rommon_stmt])
 
     def call_service(self,
                      reload_command='reload',
@@ -71,7 +71,7 @@ class Reload(BaseService):
         try:
             reload_op=dialog.process(con.spawn, context=context, timeout=timeout,
                 prompt_recovery=self.prompt_recovery)
-            con.state_machine.go_to(['disable', 'enable'], con.spawn,
+            con.state_machine.go_to('enable', con.spawn,
                                     context=context,
                                     timeout=con.connection_timeout,
                                     prompt_recovery=self.prompt_recovery)

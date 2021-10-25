@@ -2,21 +2,23 @@
 
 __author__ = "Myles Dear"
 
-
+import re
 from unicon.eal.dialogs import Dialog
+from unicon.core.errors import SubCommandFailure
 
-from unicon.plugins.generic.service_implementation import \
-    Configure as GenericConfigure, \
-    Execute as GenericExecute,\
-    Ping as GenericPing,\
-    HaConfigureService as GenericHAConfigure,\
-    HaExecService as GenericHAExecute,\
-    HAReloadService as GenericHAReload,\
-    SwitchoverService as GenericHASwitchover, \
-    Traceroute as GenericTraceroute, \
-    Copy as GenericCopy, \
-    ResetStandbyRP as GenericResetStandbyRP, \
-    Reload as GenericReload
+from unicon.plugins.generic.service_implementation import (
+    Configure as GenericConfigure,
+    Execute as GenericExecute,
+    Ping as GenericPing,
+    HaConfigureService as GenericHAConfigure,
+    HaExecService as GenericHAExecute,
+    HAReloadService as GenericHAReload,
+    SwitchoverService as GenericHASwitchover,
+    Traceroute as GenericTraceroute,
+    Copy as GenericCopy,
+    ResetStandbyRP as GenericResetStandbyRP,
+    Reload as GenericReload,
+    Enable as GenericEnable)
 
 
 from .service_statements import execute_statement_list, configure_statement_list, confirm
@@ -88,10 +90,32 @@ class HAExecute(GenericHAExecute):
 
 
 class HAReload(GenericHAReload):
+
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+
+    def pre_service(self, *args, **kwargs):
+        self.prompt_recovery = self.connection.prompt_recovery
+        if 'prompt_recovery' in kwargs:
+            self.prompt_recovery = kwargs.get('prompt_recovery')
+        self.context.pop('boot_prompt_count', None)
+        sm = self.get_sm()
+        if sm.current_state != 'rommon':
+            return super().pre_service(*args, **kwargs)
+
     # Non-stacked platforms such as ASR and ISR do not use the same
     # reload command as the generic implementation (whose reload command
     # covers stackable platforms only).
     def call_service(self, command=[], reload_command=[], reply=Dialog([]), timeout=None, *args, **kwargs):
+        sm = self.get_sm()
+
+        self.context["image_to_boot"] = \
+            kwargs.get("image_to_boot", kwargs.get('image', ''))
+
+        # boot_cmd is used by the boot_image handler, see statements.py
+        if sm.current_state == 'rommon' and reload_command:
+            self.connection.active.context['boot_cmd'] = reload_command
+
         if command:
             super().call_service(command or "reload",
                                  timeout=timeout, *args, **kwargs)
@@ -173,8 +197,13 @@ class Reload(GenericReload):
         super().__init__(connection, context, **kwargs)
 
     def pre_service(self, *args, **kwargs):
+        self.prompt_recovery = self.connection.prompt_recovery
+        if 'prompt_recovery' in kwargs:
+            self.prompt_recovery = kwargs.get('prompt_recovery')
         self.context.pop('boot_prompt_count', None)
-        return super().pre_service(*args, **kwargs)
+        sm = self.get_sm()
+        if sm.current_state != 'rommon':
+            return super().pre_service(*args, **kwargs)
 
     def call_service(self,
                      reload_command='reload',
@@ -185,12 +214,20 @@ class Reload(GenericReload):
                      reload_creds=None,
                      grub_boot_image=None,
                      *args, **kwargs):
+        sm = self.get_sm()
 
         if grub_boot_image:
             # Add the grub prompt statement
             self.dialog.insert(index=0, statement=grub_prompt_stmt)
             # update the context with the boot_image
             self.context.update({'boot_image': grub_boot_image})
+
+        self.context["image_to_boot"] = \
+            kwargs.get("image_to_boot", kwargs.get('image', ''))
+
+        # boot_cmd is used by the boot_image handler, see statements.py
+        if sm.current_state == 'rommon' and reload_command != 'reload':
+            self.context['boot_cmd'] = reload_command
 
         super().call_service(
             reload_command=reload_command,
@@ -200,6 +237,8 @@ class Reload(GenericReload):
             return_output=return_output,
             reload_creds=reload_creds,
             *args, **kwargs)
+
+        self.context.pop("image_to_boot", None)
 
 
 class Rommon(GenericExecute):
@@ -211,5 +250,62 @@ class Rommon(GenericExecute):
         self.start_state = 'rommon'
         self.end_state = 'rommon'
         self.service_name = 'rommon'
-        self.timeout = 600
         self.__dict__.update(kwargs)
+
+    def log_service_call(self):
+        alias = self.handle.via or self.handle.alias
+        if alias:
+            self.connection.log.info(
+                "+++ %s with alias '%s': %s +++" %
+                (self.connection.hostname if
+                 (self.connection.hostname != self.connection.settings.DEFAULT_LEARNED_HOSTNAME) else "", alias,
+                 self.service_name))
+        else:
+            self.connection.log.info(
+                "+++ %s: %s +++" %
+                (self.connection.hostname if
+                 (self.connection.hostname != self.connection.settings.DEFAULT_LEARNED_HOSTNAME) else "",
+                 self.service_name))
+
+    def pre_service(self, *args, **kwargs):
+        self.timeout = kwargs.get('reload_timeout', 600)
+        sm = self.get_sm()
+        con = self.connection
+        sm.go_to('enable',
+                 con.spawn,
+                 context=self.context)
+        con.configure('config-register 0x0')
+        super().pre_service(*args, **kwargs)
+
+
+class HARommon(Rommon):
+    """ Brings device to the Rommon prompt and executes commands specified
+    """
+    def __init__(self, connection, context, **kwargs):
+        # Connection object will have all the received details
+        super().__init__(connection, context, **kwargs)
+        self.start_state = 'rommon'
+        self.end_state = 'rommon'
+        self.service_name = 'rommon'
+        self.__dict__.update(kwargs)
+
+    def pre_service(self, *args, **kwargs):
+        con = self.connection
+
+        # call pre_service to reload to rommon
+        super().pre_service(*args, **kwargs)
+
+        # check connection states
+        subcon1, subcon2 = list(con._subconnections.values())
+
+        # Check current state
+        for subcon in [subcon1, subcon2]:
+            subcon.sendline()
+            subcon.state_machine.go_to(
+                'any',
+                subcon.spawn,
+                context=subcon.context,
+                prompt_recovery=subcon.prompt_recovery,
+                timeout=subcon.connection_timeout,
+            )
+            con.log.debug('{} in state: {}'.format(subcon.alias, subcon.state_machine.current_state))

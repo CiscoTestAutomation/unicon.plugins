@@ -23,7 +23,9 @@ from unicon.statemachine import State, Path, StateMachine
 from unicon.eal.dialogs import Dialog, Statement
 
 from .statements import (authentication_statement_list,
-                         default_statement_list, buffer_settled)
+                         default_statement_list,
+                         buffer_settled,
+                         buffer_wait)
 
 patterns = GenericPatterns()
 statements = GenericStatements()
@@ -46,7 +48,9 @@ def config_service_prompt_handler(spawn, config_pattern):
 
 
 def config_transition(statemachine, spawn, context):
-    # Config may be locked, retry until max attempts or config state reached
+    '''
+    Config may be locked, retry until max attempts or config state reached
+    '''
     wait_time = spawn.settings.CONFIG_LOCK_RETRY_SLEEP
     max_attempts = spawn.settings.CONFIG_LOCK_RETRIES
     dialog = Dialog([Statement(pattern=statemachine.get_state('enable').pattern,
@@ -55,12 +59,14 @@ def config_transition(statemachine, spawn, context):
                      Statement(pattern=statemachine.get_state('config').pattern,
                                loop_continue=False,
                                trim_buffer=False),
+                     statements.syslog_msg_stmt
                      ])
     if hasattr(statemachine, 'config_transition_statement_list'):
         dialog += Dialog(statemachine.config_transition_statement_list)
 
     for attempt in range(max_attempts + 1):
         spawn.sendline(statemachine.config_command)
+        buffer_wait(spawn, 0.2)
         dialog.process(spawn, timeout=spawn.settings.CONFIG_TIMEOUT, context=context)
 
         statemachine.detect_state(spawn)

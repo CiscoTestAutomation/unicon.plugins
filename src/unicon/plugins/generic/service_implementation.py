@@ -475,10 +475,23 @@ class Enable(BaseService):
         self.end_state = 'enable'
         self.__dict__.update(kwargs)
 
+    def pre_service(self, *args, **kwargs):
+        self.prompt_recovery = self.connection.prompt_recovery
+        if 'prompt_recovery' in kwargs:
+            self.prompt_recovery = kwargs.get('prompt_recovery')
+
     def call_service(self, target=None, command='', *args, **kwargs):
         handle = self.get_handle(target)
         spawn = self.get_spawn(target)
         sm = self.get_sm(target)
+
+        # If the device is in rommon, enable() will use the
+        # image_to_boot info to boot the image specified
+        # by the user. This is used by boot_image in iosxe/statements.py
+        # (IOSXE only implementation at this time.)
+        handle.context["image_to_boot"] = \
+            kwargs.get("image_to_boot", kwargs.get('image', ''))
+
         # override command to be enable when command is given
         if command:
             disable = sm.get_state('disable')
@@ -1040,8 +1053,8 @@ class Reload(BaseService):
         self.log_buffer.seek(0)
         self.log_buffer.truncate()
 
-        fmt_msg = "+++ reloading  %s  " \
-                  " with reload_command  '%s'  " \
+        fmt_msg = "+++ reloading %s " \
+                  " with reload_command '%s' " \
                   "and timeout is %s seconds +++"
         con.log.info(fmt_msg % (self.connection.hostname, reload_command, timeout))
 
@@ -1982,7 +1995,7 @@ class HAReloadService(BaseService):
 
         # TODO counter value must be moved to settings
         counter = 0
-        fmt_str = "+++ reloading  %s  with reload_command %s and timeout is %s +++"
+        fmt_str = "+++ reloading %s with reload_command '%s' and timeout is %s +++"
         con.log.info(fmt_str % (con.hostname, command, timeout))
         dialog += self.dialog
         custom_auth_stmt = custom_auth_statements(con.settings.LOGIN_PROMPT, con.settings.PASSWORD_PROMPT)
@@ -1998,10 +2011,6 @@ class HAReloadService(BaseService):
 
         if custom_auth_stmt:
             dialog += Dialog(custom_auth_stmt)
-        con.active.state_machine.go_to('enable',
-                                       con.active.spawn,
-                                       prompt_recovery=self.prompt_recovery,
-                                       context=context)
 
         # Issue reload command
         con.active.spawn.sendline(command)
