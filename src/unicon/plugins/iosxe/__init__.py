@@ -44,6 +44,7 @@ class HAIosXEServiceList(HAServiceList):
         self.traceroute = svc.Traceroute
         self.copy = svc.Copy
         self.reset_standby_rp = svc.ResetStandbyRP
+        self.rommon = svc.HARommon
 
 
 class IosXESingleRpConnection(BaseSingleRpConnection):

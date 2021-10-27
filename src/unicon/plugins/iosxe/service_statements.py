@@ -2,37 +2,10 @@
 
 __author__ = "Myles Dear <pyats-support@cisco.com>"
 
-import re
-
 from unicon.eal.dialogs import Statement
 from .patterns import IosXEPatterns
 
 patterns = IosXEPatterns()
-
-
-def boot_image(spawn, context, session):
-    if not context.get('boot_prompt_count'):
-        context['boot_prompt_count'] = 1
-    if context.get('boot_prompt_count') < \
-            spawn.settings.MAX_BOOT_ATTEMPTS:
-        if "image_to_boot" in context:
-            cmd = "boot {}".format(context['image_to_boot']).strip()
-        elif spawn.settings.FIND_BOOT_IMAGE:
-            spawn.sendline('dir flash:')
-            dir_listing = spawn.expect('.* bytes used').match_output
-            m = re.search(r'(\S+\.bin)[\r\n]', dir_listing)
-            if m:
-                boot_image = m.group(1)
-                cmd = "boot flash:{}".format(boot_image)
-            else:
-                cmd = "boot"
-        else:
-            cmd = "boot"
-        spawn.sendline(cmd)
-        context['boot_prompt_count'] += 1
-    else:
-        raise Exception("Too many failed boot attempts have been detected.")
-
 
 
 overwrite_previous = Statement(pattern=patterns.overwrite_previous,

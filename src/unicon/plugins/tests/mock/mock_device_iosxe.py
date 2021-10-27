@@ -15,6 +15,7 @@ class MockDeviceIOSXE(MockDevice):
         super().__init__(*args, device_os="iosxe", **kwargs)
         self.config_lock_counter = 0
         self.files_on_flash = []
+        self.rommon_prompt_count = 1
 
     def enable_asr(self, transport, cmd):
         if cmd == "redundancy force-switchover":
@@ -109,6 +110,20 @@ class MockDeviceIOSXE(MockDevice):
             return True
         elif re.match(r'rm -rf ctc_.*', cmd):
             return True
+
+    def general_rommon(self, transport, cmd):
+        self.rommon_prompt_count += 1
+        self.mock_data['general_rommon']['prompt'] = 'rommon{}>'.format(self.rommon_prompt_count)
+
+    def ha_asr1k_enable_reload_to_rommon(self, transport, cmd):
+        if cmd == "reload":
+            if len(self.transport_ports) > 1:
+                self.state_change_switchover(transport, 'ha_asr1k_boot_to_rommon', 'ha_asr1k_boot_to_rommon_stdby')
+                other_transport = [t for t in self.transport_handles if t != transport][0]
+                prompt = self.transport_ports[self.transport_handles[other_transport]]['prompt']
+                self._write('\n'.format(prompt), other_transport)
+            return True
+
 
 
 class MockDeviceTcpWrapperIOSXE(MockDeviceTcpWrapper):

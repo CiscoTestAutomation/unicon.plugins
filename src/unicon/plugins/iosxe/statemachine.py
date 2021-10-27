@@ -3,6 +3,7 @@
 __author__ = "Myles Dear <pyats-support@cisco.com>"
 
 import re
+from datetime import datetime
 from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine, config_transition
 from unicon.plugins.generic.statements import (connection_statement_list,
                                                default_statement_list)
@@ -11,10 +12,18 @@ from unicon.plugins.generic.statements import GenericStatements, buffer_settled
 from unicon.statemachine import State, Path, StateMachine
 from unicon.eal.dialogs import Dialog, Statement
 from .patterns import IosXEPatterns
-from .statements import boot_from_rommon_statement_list
+from .statements import (
+    boot_image, boot_timeout_stmt,
+    boot_from_rommon_statement_list)
 
 patterns = IosXEPatterns()
 statements = GenericStatements()
+
+
+def boot_from_rommon(statemachine, spawn, context):
+    context['boot_start_time'] = datetime.now()
+    context['boot_prompt_count'] = 1
+    boot_image(spawn, context, None)
 
 
 def config_service_prompt_handler(spawn, config_pattern):
@@ -59,7 +68,7 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         self.remove_state('config')
         self.remove_state('enable')
         self.remove_state('disable')
-        # incase there is no previous shell state regiestered
+        # incase there is no previous shell state registered
         try:
             self.remove_state('shell')
             self.remove_path('shell', 'enable')
@@ -72,6 +81,7 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         config = State('config', patterns.config_prompt)
         shell = State('shell', patterns.shell_prompt)
         guestshell = State('guestshell', patterns.guestshell_prompt)
+        rommon = State('rommon', patterns.rommon_prompt)
 
         disable_to_enable = Path(disable, enable, 'enable', Dialog([
             statements.enable_password_stmt,
@@ -98,12 +108,12 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         self.add_path(enable_to_guestshell)
         self.add_path(guestshell_to_enable)
 
-        rommon = State('rommon', patterns.rommon_prompt)
-        enable_to_rommon = Path(enable, rommon, 'reload',
-            Dialog(connection_statement_list + reload_statement_list))
-        rommon_to_disable = \
-            Path(rommon, disable, '\r', Dialog(
-                connection_statement_list + boot_from_rommon_statement_list))
+        enable_to_rommon = Path(enable, rommon, 'reload', Dialog(
+            connection_statement_list + reload_statement_list))
+
+        rommon_to_disable = Path(rommon, disable, boot_from_rommon, Dialog(
+            boot_from_rommon_statement_list))
+
         self.add_state(rommon)
         self.add_path(enable_to_rommon)
         self.add_path(rommon_to_disable)
@@ -160,8 +170,8 @@ class IosXEDualRpStateMachine(StateMachine):
             connection_statement_list + reload_statement_list))
 
         rommon_to_disable = \
-            Path(rommon, disable, '\r', Dialog(
-                connection_statement_list + boot_from_rommon_statement_list))
+            Path(rommon, disable, boot_from_rommon, Dialog(
+                boot_from_rommon_statement_list))
 
         self.add_state(disable)
         self.add_state(enable)

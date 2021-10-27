@@ -57,10 +57,10 @@ class GenericSettings(Settings):
         self.ESCAPE_CHAR_CHATTY_TERM_WAIT_RETRIES = 12
 
         # prompt wait delay
-        self.ESCAPE_CHAR_PROMPT_WAIT = 0.25
+        self.ESCAPE_CHAR_PROMPT_WAIT = 0.5
 
         # prompt wait retries
-        # (wait time: 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75 == total wait: 7.0s)
+        # (wait time: 0.5, 1, 1.5, 2, 2.5, 3, 3.5 == total wait: 14.0s)
         self.ESCAPE_CHAR_PROMPT_WAIT_RETRIES = 7
 
         # syslog message handling timers

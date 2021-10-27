@@ -91,7 +91,12 @@ class NxosCopy(GenericCopy):
                     kwargs['dest'] = kwargs['dest'] + '//' + kwargs['server'] + \
                                      '/' +kwargs['dest_file']
             elif re.match(r'.*:/*$', kwargs['dest'].strip()):
-                kwargs['dest'] = kwargs['dest'] + '/' +kwargs['dest_file']
+                kwargs['dest'] = kwargs['dest'] + '/' + kwargs['dest_file']
+        if 'source_file' in kwargs and 'source' in kwargs:
+            kwargs['source'] = kwargs['source'] + '/' + kwargs['source_file']
+        # set default vrf 'management' for NXOS
+        if 'vrf' not in kwargs:
+            kwargs['vrf'] = 'management'
         super().call_service(*args, **kwargs)
 
 
