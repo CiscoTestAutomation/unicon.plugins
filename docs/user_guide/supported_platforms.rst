@@ -59,6 +59,7 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
     ``ironware``
     ``ise``
     ``linux``, , , "Generic Linux server with bash prompts"
+    ``nd``, , , "Nexus Dashboard (ND) Linux server. identical to os: linux"
     ``nxos``
     ``nxos``, ``mds``
     ``nxos``, ``n5k``
