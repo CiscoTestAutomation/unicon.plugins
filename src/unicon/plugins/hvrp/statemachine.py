@@ -44,7 +44,7 @@ class HvrpSingleRpStateMachine(StateMachine):
         ])
 
         enable_to_config = Path(enable, config, 'system-view', None)
-        config_to_enable = Path(config, enable, 'quit', config_dialog)
+        config_to_enable = Path(config, enable, 'return', config_dialog)
 
 
         # Add State and Path to State Machine
