@@ -1,22 +1,19 @@
 """
 Module:
     unicon.plugins.hvrp
-
 Authors:
     Miguel Botia (mibotiaf@cisco.com), Leonardo Anez (leoanez@cisco.com)
-
 Description:
     This subpackage implements services specific to HVRP.
 """
 
-from unicon.bases.routers.services import BaseService
 from unicon.plugins.generic.service_implementation import BashService, \
                                                           Send, Sendline, \
                                                           Expect, Execute, \
                                                           Configure ,\
                                                           Enable, Disable, \
                                                           LogUser
-from unicon.eal.dialogs import Dialog
+
 
 class Configure(Configure):
 

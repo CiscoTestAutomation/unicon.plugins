@@ -1,19 +1,16 @@
 """
 Module:
     unicon.plugins.hvrp
-
 Authors:
     Miguel Botia (mibotiaf@cisco.com), Leonardo Anez (leoanez@cisco.com)
-
 Description:
     This subpackage implements Huawei VRP devices
 """
 
-from unicon.plugins.generic import ServiceList
 from unicon.bases.routers.connection import BaseSingleRpConnection
 from unicon.plugins.hvrp.connection_provider import HvrpSingleRpConnectionProvider
 from .statemachine import HvrpSingleRpStateMachine
-from .setting import HvrpSettings
+from unicon.plugins.hvrp.settings import HvrpSettings
 from unicon.plugins.generic import ServiceList, service_implementation as gsvc
 from unicon.plugins.hvrp import service_implementation as svc
 

@@ -1,26 +1,21 @@
 """
 Module:
     unicon.plugins.hvrp
-
 Authors:
     Miguel Botia (mibotiaf@cisco.com), Leonardo Anez (leoanez@cisco.com)
-
 Description:
      Module for defining all the Statements and callback required for the
     Current implementation
 """
-
 from unicon.eal.dialogs import Statement
-from unicon.eal.helpers import sendline
-from unicon.core.errors import UniconAuthenticationError
 from unicon.plugins.hvrp.patterns import HvrpPatterns
 from unicon.plugins.generic.statements import pre_connection_statement_list, \
-                                              login_handler, user_access_verification, \
-                                              password_handler, bad_password_handler, \
-                                              incorrect_login_handler
-
+    login_handler, user_access_verification, \
+    password_handler, bad_password_handler, \
+    incorrect_login_handler
 
 pat = HvrpPatterns()
+
 
 #############################################################
 #  Hvrp statements
@@ -44,10 +39,10 @@ class HvrpStatements(object):
                                            continue_timer=False)
 
         self.login_incorrect = Statement(pattern=pat.login_incorrect,
-                                           action=incorrect_login_handler,
-                                           args=None,
-                                           loop_continue=True,
-                                           continue_timer=False)
+                                         action=incorrect_login_handler,
+                                         args=None,
+                                         loop_continue=True,
+                                         continue_timer=False)
 
         self.login_stmt = Statement(pattern=pat.username,
                                     action=login_handler,
@@ -64,6 +59,12 @@ class HvrpStatements(object):
                                        args=None,
                                        loop_continue=True,
                                        continue_timer=False)
+        self.save_config_notice = Statement(pattern=r'(\[y\/n\])',
+                                            action=lambda
+                                                spawn: spawn.sendline('y'),
+                                            args=None,
+                                            loop_continue=True,
+                                            continue_timer=False)
 
 
 #############################################################
@@ -83,4 +84,7 @@ authentication_statement_list = [hvrp_statements.bad_password_stmt,
                                  hvrp_statements.password_stmt
                                  ]
 
-connection_statement_list = authentication_statement_list + pre_connection_statement_list
+connection_statement_list = authentication_statement_list + \
+                            pre_connection_statement_list
+
+default_statement_list = [hvrp_statements.save_config_notice]

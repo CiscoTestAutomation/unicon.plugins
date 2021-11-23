@@ -1,17 +1,17 @@
 """
 Module:
     unicon.plugins.hvrp
-
 Authors:
     Miguel Botia (mibotiaf@cisco.com), Leonardo Anez (leoanez@cisco.com)
-
 Description:
      This module implements a HVRP state machine.
 """
 
 from unicon.plugins.hvrp.patterns import HvrpPatterns
 from unicon.statemachine import State, Path, StateMachine
-from unicon.eal.dialogs import Statement, Dialog
+from unicon.eal.dialogs import Dialog
+
+from unicon.plugins.hvrp.statements import default_statement_list
 
 patterns = HvrpPatterns()
 
@@ -24,6 +24,7 @@ class HvrpSingleRpStateMachine(StateMachine):
         for this platform, also have detail about moving from
         one state to another
     """
+
 
     def create(self):
         """creates the hvrp state machine"""
@@ -45,9 +46,11 @@ class HvrpSingleRpStateMachine(StateMachine):
         enable_to_config = Path(enable, config, 'system-view', None)
         config_to_enable = Path(config, enable, 'quit', config_dialog)
 
+
         # Add State and Path to State Machine
         self.add_state(enable)
         self.add_state(config)
 
         self.add_path(enable_to_config)
         self.add_path(config_to_enable)
+        self.add_default_statements(default_statement_list)

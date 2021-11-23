@@ -1,16 +1,15 @@
 """
 Module:
     unicon.plugins.hvrp
-
 Authors:
     Miguel Botia (mibotiaf@cisco.com), Leonardo Anez (leoanez@cisco.com)
-
 Description:
     This Module implements two methods for conection and disconnection for HVRP devices.
 """
 
 from time import sleep
-from unicon.bases.routers.connection_provider import BaseSingleRpConnectionProvider
+from unicon.bases.routers.connection_provider import \
+    BaseSingleRpConnectionProvider
 from unicon.eal.dialogs import Dialog
 from .statements import connection_statement_list
 from unicon.plugins.generic.statements import custom_auth_statements
@@ -22,8 +21,8 @@ class HvrpSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         additional dialogs and steps required for
         connecting to any device via generic implementation
     """
-    def __init__(self, *args, **kwargs):
 
+    def __init__(self, *args, **kwargs):
         """ Initializes the generic connection provider
         """
         super().__init__(*args, **kwargs)
@@ -35,11 +34,11 @@ class HvrpSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         """
         con = self.connection
         custom_auth_stmt = custom_auth_statements(
-                             self.connection.settings.LOGIN_PROMPT,
-                             self.connection.settings.PASSWORD_PROMPT)
+            self.connection.settings.LOGIN_PROMPT,
+            self.connection.settings.PASSWORD_PROMPT)
         return con.connect_reply \
-                    + Dialog(custom_auth_stmt + connection_statement_list
-                         if custom_auth_stmt else connection_statement_list)
+               + Dialog(custom_auth_stmt + connection_statement_list
+                        if custom_auth_stmt else connection_statement_list)
 
     def disconnect(self):
         """ Logout and disconnect from the device
