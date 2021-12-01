@@ -22,7 +22,7 @@ class HvrpPatterns(UniconCorePatterns):
         self.password = r'^.*[Pp]assword:'
 
         # <HOSTNAME-01> | <HOSTNAME>#
-        self.enable_prompt = r'^(.*)\<.*\>'
+        self.enable_prompt = r'^(.*)\<.*\>$'
 
         # [~HOSTNAME] | <HOSTNAME-01> # # breaks on [\y\n] # Warning: All the configuration will be saved to the next startup configuration. Continue? [y/n]:
         self.config_prompt = r'^\[.*\]'
