@@ -45,6 +45,7 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
     ``iosxe``
     ``iosxe``, ``cat3k``
     ``iosxe``, ``cat3k``, ``ewlc``
+    ``iosxe``, ``cat8k``
     ``iosxe``, ``cat9k``
     ``iosxe``, ``csr1000v``
     ``iosxe``, ``csr1000v``, ``vewlc``

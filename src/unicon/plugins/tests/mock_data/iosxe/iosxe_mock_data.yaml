@@ -199,6 +199,8 @@ general_enable:
     "show running-config": ""
     "copy running-config nvram:startup-config": ""
     "write memory": ""
+    "tclsh":
+      new_state: tclsh
 
 general_config:
   prompt: "%N(conf)#"
@@ -587,6 +589,12 @@ enter_selection:
   prompt: "Enter your selection [2]: "
   commands:
     "":
+      new_state: press_return
+      response: |
+        Building configuration...
+        [OK]
+        Use the enabled mode 'configure' command to modify this configuration.
+    "2":
       new_state: press_return
       response: |
         Building configuration...
@@ -1107,7 +1115,6 @@ general_rommon:
       new_state: general_exec
 
 
-
 enable_container:
   prompt: "%N#"
   commands:
@@ -1140,3 +1147,10 @@ meraki_ctrl_c2:
 
 meraki_container_ssh:
   prompt: "44-b6-be-0e-56-00-SFO-SMK-N-CA-switch:~$"
+
+
+tclsh:
+  prompt: "%N(tcl)#"
+  commands:
+    "exit":
+      new_state: general_enable

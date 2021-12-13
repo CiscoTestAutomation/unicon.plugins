@@ -707,9 +707,12 @@ class Execute(BaseService):
 
         command_output = {}
         for command in commands:
-            alias = con.via or con.alias
-            if alias:
-                con.log.info("+++ %s with alias '%s': executing command '%s' +++" % (con.hostname, alias, command))
+            via = con.via
+            alias = con.alias if hasattr(con, 'alias') and con.alias != 'cli' else None
+            if alias and via:
+                con.log.info("+++ %s with via '%s' and alias '%s': executing command '%s' +++" % (con.hostname, via, alias, command))
+            elif via:
+                con.log.info("+++ %s with via '%s': executing command '%s' +++" % (con.hostname, via, command))
             else:
                 con.log.info("+++ %s: executing command '%s' +++" % (con.hostname, command))
             con.sendline(command)
@@ -1084,7 +1087,7 @@ class Reload(BaseService):
             context = self.context
 
         start_time = current_time = datetime.now()
-        timeout_time = timedelta(seconds=self.timeout)
+        timeout_time = timedelta(seconds=timeout)
         con.spawn.sendline(reload_command)
 
         try:

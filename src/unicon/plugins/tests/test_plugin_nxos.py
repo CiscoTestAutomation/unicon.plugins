@@ -9,6 +9,7 @@ __author__ = "Dave Wapstra <dwapstra@cisco.com>"
 
 import os
 import yaml
+import logging
 import unittest
 from unittest.mock import patch
 
@@ -485,6 +486,49 @@ class TestNxosPluginReloadService(unittest.TestCase):
         dev.reload(reload_command='reload skip_poap2')
         dev.configure('no logging console')
         dev.disconnect()
+
+    def test_reload_sleep_succeed(self):
+        dev = Connection(
+            hostname='N93_1',
+            start=['mock_device_cli --os nxos --state login2 --hostname N93_1'],
+            os='nxos',
+            username='cisco',
+            tacacs_password='cisco',
+            enable_password='cisco',
+        )
+        dev.connect()
+        dev.settings.POST_RELOAD_WAIT = 1
+        reconnect_sleep_value = 0.05
+        with self.assertLogs(dev.log, logging.DEBUG) as cm:
+            dev.reload(reload_command='reload buffer settle', 
+                       reconnect_sleep=reconnect_sleep_value)
+            self.assertIn(
+                f'INFO:{dev.log.name}:Waiting for boot messages to settle for '
+                f'{reconnect_sleep_value} seconds', 
+                cm.output)
+            self.assertNotIn(
+                f'INFO:{dev.log.name}:Waiting for boot messages to settle for '
+                f'{dev.settings.POST_RELOAD_WAIT} seconds', 
+                cm.output)
+
+    def test_reload_sleep_timeout(self):
+        dev = Connection(
+            hostname='N93_1',
+            start=['mock_device_cli --os nxos --state login2 --hostname N93_1'],
+            os='nxos',
+            username='cisco',
+            tacacs_password='cisco',
+            enable_password='cisco',
+        )
+        dev.connect()
+        with self.assertLogs(dev.log, logging.DEBUG) as cm:
+            dev.reload(reload_command='reload buffer settle', 
+                       reconnect_sleep=1.5, 
+                       timeout=1)
+            self.assertIn(
+                f'INFO:{dev.log.name}:Time out, trying to acces device..', 
+                cm.output)
+
 
 class TestNxosPluginMaintenanceMode(unittest.TestCase):
 

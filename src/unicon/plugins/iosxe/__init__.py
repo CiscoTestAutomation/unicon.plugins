@@ -28,6 +28,7 @@ class IosXEServiceList(ServiceList):
         self.copy = svc.Copy
         self.reload = svc.Reload
         self.rommon = svc.Rommon
+        self.tclsh = svc.Tclsh
 
 
 class HAIosXEServiceList(HAServiceList):
@@ -45,6 +46,7 @@ class HAIosXEServiceList(HAServiceList):
         self.copy = svc.Copy
         self.reset_standby_rp = svc.ResetStandbyRP
         self.rommon = svc.HARommon
+        self.tclsh = svc.Tclsh
 
 
 class IosXESingleRpConnection(BaseSingleRpConnection):

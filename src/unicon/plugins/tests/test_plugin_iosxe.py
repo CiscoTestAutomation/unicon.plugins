@@ -855,7 +855,6 @@ class TestSyslogHandler(unittest.TestCase):
 
 
 class TestIosxeAsr1k(unittest.TestCase):
-    
     def test_connect_asr1k_ha(self):
         md = MockDeviceTcpWrapperIOSXE(port=0, state='ha_asr1k_exec,ha_asr1k_stby_exec', hostname='R1')
         md.start()
@@ -934,6 +933,21 @@ class TestIosxeAsr1k(unittest.TestCase):
         finally:
             c.disconnect()
             md.stop()
+
+
+class TestIosxeTclsh(unittest.TestCase):
+
+    def test_tclsh(self):
+        c = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state general_enable --hostname PE1'],
+            os='iosxe',
+            mit=True
+        )
+        c.connect()
+        c.tclsh()
+        c.enable()
+        c.disconnect()
 
 
 if __name__ == "__main__":

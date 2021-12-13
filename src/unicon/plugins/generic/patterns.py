@@ -71,9 +71,9 @@ class GenericPatterns(UniconCorePatterns):
 
         self.enable_secret = r'^.*?(Enter|Confirm) enable secret:\s*$'
 
-        self.enter_your_selection_2 = r'^.*?Enter your selection \[2]:\s*$'
+        self.enter_your_selection_2 = r'^.*?Enter your selection( \[2])?:\s*$'
 
         self.guestshell_prompt = r'^(.*)\[\S+@guestshell\s+.*\][#\$]\s?$'
-        
+
         self.press_any_key = r'^.*?Press any key to continue\.\s*$'
 
