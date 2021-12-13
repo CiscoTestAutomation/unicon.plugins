@@ -4,6 +4,7 @@ Plugins Changelog
 .. toctree::
    :maxdepth: 2
 
+   2021/december
    2021/september
    2021/august
    2021/july
