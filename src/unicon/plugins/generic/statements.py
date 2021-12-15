@@ -15,6 +15,7 @@ from datetime import datetime, timedelta
 from unicon.eal.dialogs import Statement
 from unicon.eal.helpers import sendline
 from unicon.core.errors import UniconAuthenticationError
+from unicon.core.errors import ConnectionError as UniconConnectionError
 from unicon.utils import Utils
 
 from unicon.plugins.generic.patterns import GenericPatterns
@@ -44,6 +45,9 @@ def connection_refused_handler(spawn):
 def connection_failure_handler(spawn):
     raise Exception('received disconnect from router %s' % (str(spawn)))
 
+def permission_denied_handler(spawn):
+    raise UniconConnectionError(
+        'Permission denied for device "%s"' % (str(spawn)))
 
 def syslog_stripper(spawn):
     """Strip syslog from spawn buffer"""
@@ -588,15 +592,21 @@ class GenericStatements():
                                               continue_timer=False)
 
         self.enter_your_selection_stmt = Statement(pattern=pat.enter_your_selection_2,
-                                                   action='sendline()',
+                                                   action='sendline(2)',
                                                    args=None,
                                                    loop_continue=True,
                                                    continue_timer=True)
-        
+
         self.press_any_key_stmt = Statement(pattern=pat.press_any_key,
                                             action='sendline()',
                                             args=None,
                                             loop_continue=True,
+                                            continue_timer=False)
+
+        self.permission_denied_stmt = Statement(pattern=pat.permission_denied,
+                                            action=permission_denied_handler,
+                                            args=None,
+                                            loop_continue=False,
                                             continue_timer=False)
 
 
@@ -619,7 +629,8 @@ pre_connection_statement_list = [generic_statements.escape_char_stmt,
                                  generic_statements.press_ctrlx_stmt,
                                  generic_statements.connected_stmt,
                                  generic_statements.syslog_msg_stmt,
-                                 generic_statements.press_any_key_stmt
+                                 generic_statements.press_any_key_stmt,
+                                 generic_statements.permission_denied_stmt,
                                  ]
 
 #############################################################

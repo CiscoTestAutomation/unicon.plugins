@@ -255,7 +255,7 @@ class Reload(GenericReload):
             context = self.context
 
         start_time = current_time = datetime.now()
-        timeout_time = timedelta(seconds=self.timeout)
+        timeout_time = timedelta(seconds=timeout)
         con.spawn.sendline(reload_command)
         try:
             try:
@@ -275,34 +275,34 @@ class Reload(GenericReload):
                     try:
                         con.log.info('Trying to connect... attempt #{}'.format(x + 1))
 
-                        learn_hostname_ori = con.learn_hostname
+                        learn_hostname_orig = con.learn_hostname
                         # During initialization after reload, hostname may temporarily be "switch".
                         # When initialization finishes, hostname will be back to original hostname.
                         con.learn_hostname = False
-                        config_lock_retries_ori = con.settings.CONFIG_LOCK_RETRIES
-                        con.configure.lock_retries = config_lock_retries
-                        config_lock_retry_sleep_ori = con.settings.CONFIG_LOCK_RETRY_SLEEP
-                        con.configure.lock_retry_sleep = config_lock_retry_sleep
+                        config_lock_retries_orig = con.settings.CONFIG_LOCK_RETRIES
+                        con.settings.CONFIG_LOCK_RETRIES = config_lock_retries
+                        config_lock_retry_sleep_orig = con.settings.CONFIG_LOCK_RETRY_SLEEP
+                        con.settings.CONFIG_LOCK_RETRY_SLEEP = config_lock_retry_sleep
 
                         try:
                             con.connect()
                         finally:
-                            con.learn_hostname = learn_hostname_ori
-                            con.settings.CONFIG_LOCK_RETRIES = config_lock_retries_ori
-                            con.settings.CONFIG_LOCK_RETRY_SLEEP = config_lock_retry_sleep_ori
+                            con.learn_hostname = learn_hostname_orig
+                            con.settings.CONFIG_LOCK_RETRIES = config_lock_retries_orig
+                            con.settings.CONFIG_LOCK_RETRY_SLEEP = config_lock_retry_sleep_orig
 
                     except Exception:
                         con.log.warning('Connection to {} failed'.format(con.hostname))
                     if con.is_connected:
                         break
             else:
-                con.log.info('Waiting for boot messages to settle for {} seconds'.format(
-                    con.settings.POST_RELOAD_WAIT
-                ))
-                wait_time = timedelta(seconds=con.settings.POST_RELOAD_WAIT)
+                seconds = reconnect_sleep or con.settings.POST_RELOAD_WAIT
+                con.log.info('Waiting for boot messages to settle for {} '
+                             'seconds'.format(seconds))
+                wait_time = timedelta(seconds=seconds)
                 settle_time = current_time = datetime.now()
                 while (current_time - settle_time) < wait_time:
-                    if buffer_settled(con.spawn, con.settings.POST_RELOAD_WAIT):
+                    if buffer_settled(con.spawn, seconds):
                         con.log.info('Buffer settled, accessing device..')
                         break
                     current_time = datetime.now()

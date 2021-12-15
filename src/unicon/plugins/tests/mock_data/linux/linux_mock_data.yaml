@@ -18,6 +18,25 @@ connect_ssh:
     "yes":
       new_state: password
 
+connect_ssh_key_error:
+  preface: |
+    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    @    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+    Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+    It is also possible that a host key has just been changed.
+    The fingerprint for the ECDSA key sent by the remote host is
+    SHA256:zDkX6A76of5LWxP8FQD9dZULQVQCpvYaGcWS4PnyqPE.
+    Please contact your system administrator.
+    Add correct host key in ~/.ssh/known_hosts to get rid of this message.
+    Offending ECDSA key in ~/.ssh/known_hosts:13
+    Password authentication is disabled to avoid man-in-the-middle attacks.
+    Keyboard-interactive authentication is disabled to avoid man-in-the-middle attacks.
+    virl@172.25.192.90: Permission denied (publickey,password).
+  prompt: ""
+  commands: ""
+
 
 connect_sma:
   prompt: "testuser@pod-esa01's password: "

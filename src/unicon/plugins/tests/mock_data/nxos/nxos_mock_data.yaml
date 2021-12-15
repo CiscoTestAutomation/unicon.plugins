@@ -402,6 +402,8 @@ exec2:
       new_state: confirm_reload3
     "reload skip_poap2":
       new_state: confirm_reload4
+    "reload buffer settle":
+      new_state: confirm_reload5
     "show feature": |
       Feature Name          Instance  State
       --------------------  --------  --------

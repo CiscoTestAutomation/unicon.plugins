@@ -253,13 +253,23 @@ class Rommon(GenericExecute):
         self.__dict__.update(kwargs)
 
     def log_service_call(self):
-        alias = self.handle.via or self.handle.alias
-        if alias:
+        via = self.handle.via
+        alias = self.handle.alias if hasattr(self.handle, 'alias') and self.handle.alias != 'cli' else None
+        self.handle.alias
+        if alias and via:
             self.connection.log.info(
-                "+++ %s with alias '%s': %s +++" %
+                "+++ %s with via '%s' and alias '%s': %s +++" %
                 (self.connection.hostname if
-                 (self.connection.hostname != self.connection.settings.DEFAULT_LEARNED_HOSTNAME) else "", alias,
-                 self.service_name))
+                 (self.connection.hostname !=
+                  self.connection.settings.DEFAULT_LEARNED_HOSTNAME) else "",
+                 via, alias, self.service_name))
+        elif via:
+            self.connection.log.info(
+                "+++ %s with via '%s': %s +++" %
+                (self.connection.hostname if
+                 (self.connection.hostname !=
+                  self.connection.settings.DEFAULT_LEARNED_HOSTNAME) else "",
+                 via, self.service_name))
         else:
             self.connection.log.info(
                 "+++ %s: %s +++" %
@@ -309,3 +319,14 @@ class HARommon(Rommon):
                 timeout=subcon.connection_timeout,
             )
             con.log.debug('{} in state: {}'.format(subcon.alias, subcon.state_machine.current_state))
+
+
+
+class Tclsh(Execute):
+
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.start_state = 'tclsh'
+        self.end_state = 'tclsh'
+        self.service_name = 'tclsh'
+        self.__dict__.update(kwargs)
