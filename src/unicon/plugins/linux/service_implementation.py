@@ -254,3 +254,12 @@ class Ping(BaseService):
 
         if self.match_flag:
             raise SubCommandFailure(self.result, self.match_list)
+
+
+class Sudo(Execute):
+
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+
+    def call_service(self, command='bash', **kwargs):
+        super().call_service('sudo {}'.format(command), **kwargs)

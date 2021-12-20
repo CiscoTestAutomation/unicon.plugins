@@ -39,7 +39,7 @@ with open(os.path.join(mockdata_path, 'linux/linux_mock_data.yaml'), 'rb') as da
 @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0)
 class TestLinuxPluginConnect(unittest.TestCase):
 
-  def test_connect_ssh(self):
+    def test_connect_ssh(self):
         c = Connection(hostname='linux',
                        start=['mock_device_cli --os linux --state connect_ssh'],
                        os='linux',
@@ -48,7 +48,7 @@ class TestLinuxPluginConnect(unittest.TestCase):
         c.connect()
         c.disconnect()
 
-  def test_connect_sma(self):
+    def test_connect_sma(self):
         c = Connection(hostname='sma03',
                        start=['mock_device_cli --os linux --state connect_sma'],
                        os='linux',
@@ -64,7 +64,7 @@ class TestLinuxPluginConnect(unittest.TestCase):
         c.disconnect()
         c1.disconnect()
 
-  def test_connect_for_password(self):
+    def test_connect_for_password(self):
         c = Connection(hostname='agent-lab11-pm',
                        start=['mock_device_cli --os linux --state connect_for_password'],
                        os='linux',
@@ -73,7 +73,7 @@ class TestLinuxPluginConnect(unittest.TestCase):
         c.connect()
         c.disconnect()
 
-  def test_bad_connect_for_password(self):
+    def test_bad_connect_for_password(self):
         c = Connection(hostname='agent-lab11-pm',
                        start=['mock_device_cli --os linux --state connect_for_password'],
                        os='linux',
@@ -82,7 +82,7 @@ class TestLinuxPluginConnect(unittest.TestCase):
         with self.assertRaisesRegex(UniconConnectionError, 'failed to connect to agent-lab11-pm'):
             c.connect()
 
-  def test_bad_connect_for_password_credential(self):
+    def test_bad_connect_for_password_credential(self):
         c = Connection(hostname='agent-lab11-pm',
                        start=['mock_device_cli --os linux --state connect_for_password'],
                        os='linux',
@@ -91,7 +91,7 @@ class TestLinuxPluginConnect(unittest.TestCase):
         with self.assertRaisesRegex(UniconConnectionError, 'failed to connect to agent-lab11-pm'):
             c.connect()
 
-  def test_bad_connect_for_password_credential_no_recovery(self):
+    def test_bad_connect_for_password_credential_no_recovery(self):
         """ Ensure password retry does not happen if a credential fails. """
         c = Connection(hostname='agent-lab11-pm',
                        start=['mock_device_cli --os linux --state connect_for_password'],
@@ -103,7 +103,7 @@ class TestLinuxPluginConnect(unittest.TestCase):
         with self.assertRaisesRegex(UniconConnectionError, 'failed to connect to agent-lab11-pm'):
             c.connect()
 
-  def test_bad_connect_for_password_credential_proper_recovery(self):
+    def test_bad_connect_for_password_credential_proper_recovery(self):
         """ Test proper way to try multiple device credentials. """
         c = Connection(hostname='agent-lab11-pm',
             start=['mock_device_cli --os linux --state connect_for_password'],
@@ -118,7 +118,7 @@ class TestLinuxPluginConnect(unittest.TestCase):
             c.context.login_creds=['default']
             c.connect()
 
-  def test_bad_connect_for_password_credential_proper_recovery_pyats(self):
+    def test_bad_connect_for_password_credential_proper_recovery_pyats(self):
         """ Test proper way to try multiple device credentials via pyats. """
         testbed = """
         devices:
@@ -148,7 +148,7 @@ class TestLinuxPluginConnect(unittest.TestCase):
         self.assertEqual(l.is_connected(), True)
         l.disconnect()
 
-  def test_connect_for_login_incorrect(self):
+    def test_connect_for_login_incorrect(self):
         c = Connection(hostname='agent-lab11-pm',
                        start=['mock_device_cli --os linux --state login'],
                        os='linux',
@@ -157,14 +157,21 @@ class TestLinuxPluginConnect(unittest.TestCase):
         with self.assertRaisesRegex(UniconConnectionError, 'failed to connect to agent-lab11-pm'):
             c.connect()
 
-  def test_connect_hit_enter(self):
+    def test_bad_connect_ssh_key(self):
+        c = Connection(hostname='agent-lab11-pm',
+                       start=['mock_device_cli --os linux --state connect_ssh_key_error'],
+                       os='linux')
+        with self.assertRaises(UniconConnectionError):
+            c.connect()
+
+    def test_connect_hit_enter(self):
         c = Connection(hostname='linux',
                        start=['mock_device_cli --os linux --state hit_enter'],
                        os='linux')
         c.connect()
         c.disconnect()
 
-  def test_connect_timeout(self):
+    def test_connect_timeout(self):
         testbed = """
         devices:
           lnx-server:
@@ -182,7 +189,7 @@ class TestLinuxPluginConnect(unittest.TestCase):
         self.assertEqual(l.is_connected(), True)
         l.disconnect()
 
-  def test_connect_timeout_error(self):
+    def test_connect_timeout_error(self):
         testbed = """
         devices:
           lnx-server:
@@ -200,7 +207,7 @@ class TestLinuxPluginConnect(unittest.TestCase):
           l.connect(connection_timeout=0.5)
         l.disconnect()
 
-  def test_connect_passphrase(self):
+    def test_connect_passphrase(self):
         testbed = """
         devices:
           lnx-server:
@@ -220,7 +227,7 @@ class TestLinuxPluginConnect(unittest.TestCase):
         l = tb.devices['lnx-server']
         l.connect()
 
-  def test_connect_connectReply(self):
+    def test_connect_connectReply(self):
         c = Connection(hostname='linux',
                        start=['mock_device_cli --os linux --state connect_ssh'],
                        os='linux',
@@ -231,7 +238,7 @@ class TestLinuxPluginConnect(unittest.TestCase):
         self.assertIn("^(.*?)Password:", str(c.connection_provider.get_connection_dialog()))
         c.disconnect()
 
-  def test_connect_admin_prompt(self):
+    def test_connect_admin_prompt(self):
         c = Connection(hostname='linux',
                        start=['mock_device_cli --os linux --state linux_password4'],
                        os='linux',
@@ -661,14 +668,29 @@ class TestLinuxPluginExecute(unittest.TestCase):
 
     def test_sudo_handler(self):
       self.c.execute('sudo')
+      self.assertEqual(self.c.spawn.match.match_output,
+                       ' sudo_password\r\nLinux# ')
 
       self.c.context.credentials['sudo']['password'] = 'unknown'
       with self.assertRaises(unicon.core.errors.SubCommandFailure):
         self.c.execute('sudo_invalid')
 
+      self.c.context.credentials['sudo']['password'] = 'sudo_password'
+      self.c.sudo()
+      self.assertEqual(self.c.spawn.match.match_output,
+                       ' sudo_password\r\nLinux# ')
+      self.c.execute('exit')
+      self.assertEqual(self.c.spawn.match.match_output,
+                       'exit\r\nLinux$ ')
+      self.c.sudo('ls')
+      self.assertEqual(self.c.spawn.match.match_output,
+                       'sudo ls\r\n/tmp\r\n/var\r\n/opt\r\nLinux$ ')
+
       self.c.context.credentials['sudo']['password'] = 'invalid'
       with self.assertRaises(unicon.core.errors.SubCommandFailure):
         self.c.execute('sudo_invalid')
+      self.assertEqual(self.c.spawn.match.match_output,
+                       ' invalid\r\nSorry, try again.\r\n[sudo] password for cisco:')
 
 
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)

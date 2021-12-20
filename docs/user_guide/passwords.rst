@@ -226,8 +226,11 @@ Linux password logic
 --------------------
 
 When connecting to the device, the password from the current credential is used.
-If another password prompt appears (e.g. after executing `sudo`),
+If another password prompt appears during command execution,
 no response is sent and the command will timeout by default.
+
+To execute commands using `sudo`, use the ``sudo`` service. See
+:ref:`linux_sudo`
 
 If connecting via ssh, the username of the currently logged in user is used
 by default if not otherwise specified via credentials or via ``command``
@@ -251,7 +254,7 @@ Example code using the password statement:
     dialog = Dialog()
     dialog.append(password_stmt)
 
-    device.execute('sudo', reply=dialog)
+    device.execute('command that prompts for password', reply=dialog)
 
 
 ASA password logic

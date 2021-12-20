@@ -61,7 +61,7 @@ Use `prompt_recovery` argument for using `prompt_recovery` feature.
 ===============   ======================    ========================================
 Argument          Type                      Description
 ===============   ======================    ========================================
-timeout           int (default 60 sec)      timeout value for the command execution takes.
+timeout           int (default 30 sec)      timeout value for the command execution takes.
 reply             Dialog                    additional dialog
 command           str or list               string or list of commands to configure
 prompt_recovery   bool (default False)      Enable/Disable prompt recovery feature

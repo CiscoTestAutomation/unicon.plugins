@@ -5,9 +5,12 @@ import re
 from unicon.eal.dialogs import Dialog
 from unicon.core.errors import SubCommandFailure
 from unicon.plugins.generic.service_statements import reload_statement_list
+from unicon.plugins.generic.service_implementation import (
+    Execute as GenericExecute
+)
 
-from ..service_implementation import Reload as XEReload, Rommon as XERommon
-from .statements import boot_from_rommon_stmt
+from ..service_implementation import Reload as XEReload
+from ..statements import boot_from_rommon_stmt
 
 
 class Reload(XEReload):
@@ -35,7 +38,7 @@ class Reload(XEReload):
             super().call_service(*args, **kwargs)
 
 
-class Rommon(XERommon):
+class Rommon(GenericExecute):
     """ Brings device to the Rommon prompt and executes commands specified
     """
     def __init__(self, connection, context, **kwargs):

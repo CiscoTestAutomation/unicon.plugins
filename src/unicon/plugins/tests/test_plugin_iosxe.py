@@ -835,5 +835,120 @@ class TestIosXEping(unittest.TestCase):
             md.stop()
 
 
+class TestSyslogHandler(unittest.TestCase):
+
+    def test_syslog_handler_timeout(self):
+        c = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state endless_syslog --hostname PE1'],
+            os='iosxe',
+            connection_timeout=5,
+            settings=dict(PROMPT_RECOVERY_COMMANDS = ['\x06']),
+            prompt_recovery=True
+        )
+        try:
+            c.connect()
+        except Exception:
+            raise
+        finally:
+            c.disconnect()
+
+
+class TestIosxeAsr1k(unittest.TestCase):
+    def test_connect_asr1k_ha(self):
+        md = MockDeviceTcpWrapperIOSXE(port=0, state='ha_asr1k_exec,ha_asr1k_stby_exec', hostname='R1')
+        md.start()
+
+        c = Connection(
+            hostname='R1',
+            start=[
+                'telnet 127.0.0.1 {}'.format(md.ports[0]),
+                'telnet 127.0.0.1 {}'.format(md.ports[1])
+            ],
+            os='iosxe',
+            connection_timeout=10,
+            mit=True
+        )
+        try:
+            c.connect()
+        except Exception:
+            raise
+        finally:
+            c.disconnect()
+            md.stop()
+
+    def test_connect_asr1k_ha_rommon(self):
+        md = MockDeviceTcpWrapperIOSXE(port=0, state='ha_asr1k_exec,ha_asr1k_stby_exec', hostname='R1')
+        md.start()
+
+        c = Connection(
+            hostname='R1',
+            start=[
+                'telnet 127.0.0.1 {}'.format(md.ports[0]),
+                'telnet 127.0.0.1 {}'.format(md.ports[1])
+            ],
+            os='iosxe',
+            connection_timeout=10,
+            credentials=dict(default=dict(password='lab'))
+        )
+        try:
+            c.connect()
+            c.execute('reload_to_rommon')
+            c.rommon()
+            c.enable(target='active')
+            c.enable(target='standby')
+        except Exception:
+            raise
+        finally:
+            c.disconnect()
+            md.stop()
+
+    def test_connect_asr1k_ha_rommon_boot_image(self):
+        md = MockDeviceTcpWrapperIOSXE(port=0, state='ha_asr1k_exec,ha_asr1k_stby_exec', hostname='R1')
+        md.start()
+
+        c = Connection(
+            hostname='R1',
+            start=[
+                'telnet 127.0.0.1 {}'.format(md.ports[0]),
+                'telnet 127.0.0.1 {}'.format(md.ports[1])
+            ],
+            os='iosxe',
+            connection_timeout=10,
+            credentials=dict(default=dict(password='lab'))
+        )
+        try:
+            c.connect()
+            c.execute('reload_to_rommon')
+            c.rommon()
+            c.enable(target='active', image='test/packages.conf')
+            c.enable(target='standby', image='test/packages.conf')
+
+            c.execute('reload_to_rommon')
+            c.rommon()
+            c.enable(target='active', image_to_boot='test/packages.conf')
+            c.enable(target='standby', image_to_boot='test/packages.conf')
+        except Exception:
+            raise
+        finally:
+            c.disconnect()
+            md.stop()
+
+
+class TestIosxeTclsh(unittest.TestCase):
+
+    def test_tclsh(self):
+        c = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state general_enable --hostname PE1'],
+            os='iosxe',
+            mit=True
+        )
+        c.connect()
+        c.tclsh()
+        c.enable()
+        c.disconnect()
+
+
 if __name__ == "__main__":
     unittest.main()

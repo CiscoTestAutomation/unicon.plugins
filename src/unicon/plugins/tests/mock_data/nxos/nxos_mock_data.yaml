@@ -114,11 +114,11 @@ exec:
       new_state: ha_reset_reload
     "crash command":
       new_state: loader
-    "copy  scp: bootflash:":
-      new_state: src_file
-    "copy  bootflash: scp://10.0.0.7/tmp/test.cfg":
-      new_state: src_file
-    "copy  bootflash: bootflash:/test-2.cfg":
+    "copy  scp://N9K/nxosgolden.bin bootflash:":
+      new_state: vrf_prompt
+    "copy  bootflash:/run-cfg.cfg scp://10.0.0.7/tmp/test.cfg":
+      new_state: vrf_prompt
+    "copy  bootflash:/test-1.cfg bootflash:/test-2.cfg":
       new_state: src_file
     "end": ""
     "ping6 2003::7010 vrf management": |
@@ -193,6 +193,8 @@ exec:
       2021 Mar 11 19:42:13  %SYSMGR-2-SERVICE_CRASHED: Service "eth_port_channel" (PID 23139) hasn't caught signal 9 (no core).
 
     "show running-config | include ip tftp source-interface |ip ftp source-interface": ""
+    "load dplug":
+      new_state: debug
 
 vdc3_password_standard:
   preface: |
@@ -310,6 +312,7 @@ config:
     "exitt":
       new_state: exec
     "b": "% Ambiguous command at '^' marker."
+    "boot": "% Incomplete command at '^' marker."
 
 config_line:
   prompt: "%N(config-line)#"
@@ -399,6 +402,8 @@ exec2:
       new_state: confirm_reload3
     "reload skip_poap2":
       new_state: confirm_reload4
+    "reload buffer settle":
+      new_state: confirm_reload5
     "show feature": |
       Feature Name          Instance  State
       --------------------  --------  --------
@@ -765,5 +770,15 @@ admin_config:
 debug:
   prompt: "Linux(debug)#"
   commands:
+    "sqlite3 test.db":
+      new_state: sqlite
     "exit":
       new_state: exec
+
+sqlite:
+  prompt: "sqlite> "
+  commands:
+    ".tables": |
+      qmap query_tbl_push_304087142 vmtag_status_table
+    ".exit":
+      new_state: debug

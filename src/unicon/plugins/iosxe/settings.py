@@ -30,10 +30,12 @@ class IosXESettings(GenericSettings):
         self.CONFIG_LOCK_RETRY_SLEEP = 30
         self.CONFIG_LOCK_RETRIES = 10
 
-        self.BOOT_TIMEOUT = 420
+        self.BOOT_TIMEOUT = 600
 
         self.FIND_BOOT_IMAGE = True
         self.MAX_BOOT_ATTEMPTS = 3
+        self.BOOT_FILESYSTEM = 'bootflash:'
+        self.BOOT_FILE_REGEX = r'(\S+\.bin)'
 
         self.SERVICE_PROMPT_CONFIG_CMD = 'service prompt config'
         self.CONFIG_PROMPT_WAIT = 2

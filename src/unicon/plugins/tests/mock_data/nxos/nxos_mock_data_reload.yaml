@@ -91,6 +91,12 @@ confirm_reload4:
     "y":
       new_state: skip_poap2
 
+confirm_reload5:
+  prompt: "This command will reboot the system. (y/n)?  [n]"
+  commands:
+    "y":
+      new_state: login_after_buffer_settle_reload
+
 skip_poap2:
   preface: |2
       Waiting for system online status before starting POAP ...
@@ -473,6 +479,140 @@ login_after_reload:
     "cisco":
       new_state: password_after_reload
 
+login_after_buffer_settle_reload:
+  preface: |2
+    non_utf-8_character b'[ \xe0'
+    b'[ \xe0'
+    CISCO SWITCH Ver7.33
+    Device detected on 0:6:0 after 0 msecs
+    Device detected on 0:1:1 after 0 msecs
+    Device detected on 0:1:0 after 0 msecs
+    MCFrequency 1333Mhz
+    Relocated to memory
+    Time: 6/13/2019  16:40:9
+    NorthStar/Alpine Present
+    MP Card Present
+    MIFPGA Present
+    Code Signing Results:                                    0x0
+    Using Upgrade FPGA
+    Checking and setting PSU fan directions
+    PMB RD: Nack error
+    FPGA Revison        : 0x13
+    FPGA ID             : 0x1237305
+    FPGA Date           : 0x20140213
+    Power Debug Register: 0x0
+    Reset Cause Register: 0x4
+    Boot Ctrl Register  : 0xe0ff
+    FPGA Update Status  : 0x20
+    Detected CISCO MPFPGA
+    FPGA Update Status  : 0x20
+    Detected CISCO MIFPGA
+    Version 2.16.1240. Copyright (C) 2013 American Megatrends, Inc.
+    Board type  2
+    CISCO TOR
+    IOFPGA @ 0xc8000000
+    SLOT_ID @ 0xf
+    check_bootmode: grub: Continue grub
+    Trying to read config file /boot/grub/menu.lst.local from (hd0,5)
+    Filesystem type is ext2fs, partition type 0x83
+
+    Booting bootflash:/ISSUCleanGolden.system.gbin ...
+    Booting bootflash:/ISSUCleanGolden.system.gbin
+    Trying diskboot
+    Filesystem type is ext2fs, partition type 0x83
+    Image valid
+
+
+    Image Signature verification was Successful.
+
+    Boot Time: 6/13/2019  16:41:2
+    Installing klm_card_index
+    done
+    Linking n9k flash devices
+    INIT: version 2.88 booting
+    Installing ata_piix module ... done.
+    Unsquashing rootfs ...
+    Installing isan procfs ... done.
+    Installing SSE module with card index 21022 ... done.
+    Creating SSE device node 246 ... done.
+    Loading I2C driver ... done.
+    Installing CCTRL driver for card_type 6 1263589
+    with mpa_card_type 1 ... done.
+    Loading IGB driver ... done.
+    Checking SSD firmware ...
+        Model Number:       Micron_M550_MTFDDAT064MAY
+        Serial Number:      MSA183101FN
+        Firmware Revision:  MU01
+
+    Checking all filesystems.
+    Installing SPROM driver ... IS_N9K done.
+    1
+    read MPA_ID : 1
+    Installing pfmsvcs module with SPROM card index 21022 ... done.
+    Installing nvram module ... done.
+    Installing if_index module with port mode 6 ... done.
+    Installing fcfwd
+    Installing RNI lcnd ... done
+    Installing LC netdev ... done
+    Installing psdev module ... done.
+    Installing veobc module ... done.
+    Inserting eMMC module ...
+    Inserting OBFL module ... done.
+    Making OBFL character devices
+    mounting plog for N9k!
+    Mounting OBFL pstore for mtd
+    exit code: 1
+    Starting OpenBSD Secure Shell server: sshd ... done.
+    tune2fs 1.42.1 (17-Feb-2012)
+    Setting reserved blocks percentage to 0% (0 blocks)
+    Starting portmap daemon...
+    creating NFS state directory: done
+    starting 8 nfsd kernel threads: done
+    starting mountd: done
+    starting statd: done
+    Saving image for img-sync ...
+    Loading system software
+    Installing local RPMS
+    Patch Repository Setup completed successfully
+    Creating /dev/mcelog
+    Starting mcelog daemon
+    Overwriting dme stub lib
+    INIT: Entering runlevel: 3
+    Running S93thirdparty-script...
+
+    Populating conf files for hybrid sysmgr ...
+    Starting hybrid sysmgr ...
+    Installing FC2 module using inband eth0 vegas 8 fc2_dom_family 25 ...done
+    inserting /isan/lib/modules/klm_cisco_nb.o ... done
+    Executing Prune clis.
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %USER-0-SYSTEM_MSG:  before access to bkout_cfg  - clis
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-PS_OK: Power supply 1 ok (Serial number DCB1833Y4QL)
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-PS_FANOK: Fan in Power supply 1 ok
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-PS_ABSENT: Power supply 2 is absent/shutdown, ps-redundancy might be affected
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-PS_RED_MODE_CHG: Power supply operational redundancy mode changed to non-redundant
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-FANMOD_FAN_OK: Fan module 1 (Fan1(sys_fan1) fan) ok
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-FANMOD_FAN_OK: Fan module 2 (Fan2(sys_fan2) fan) ok
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-FANMOD_FAN_OK: Fan module 3 (Fan3(sys_fan3) fan) ok
+    2019 Jun 13 16:41:42  %$ VDC-1 %$  %USER-2-SYSTEM_MSG: <<%USBHSD-2-MOUNT>> logflash: online  - usbhsd
+    2019 Jun 13 16:41:44  %$ VDC-1 %$  %DAEMON-2-SYSTEM_MSG: <<%ASCII-CFG-2-CONF_CONTROL>> Ascii replay - ascii-cfg[27976]
+    2019 Jun 13 16:41:46  %$ VDC-1 %$ netstack: Registration with cli server complete
+    2019 Jun 13 16:41:55  %$ VDC-1 %$ %USER-2-SYSTEM_MSG: ssnmgr_app_init called on ssnmgr up - aclmgr
+    2019 Jun 13 16:42:03  %$ VDC-1 %$ %USER-0-SYSTEM_MSG: end of default policer - copp
+    2019 Jun 13 16:42:03  %$ VDC-1 %$ %COPP-2-COPP_DEFAULT_POLICY: Control-plane is unprotected. Default CoPP policy (strict) will be configured.
+    2019 Jun 13 16:42:03  %$ VDC-1 %$ %COPP-2-COPP_POLICY: Control-Plane is protected with policy copp-system-p-policy-strict.
+    2019 Jun 13 16:42:05  %$ VDC-1 %$ %CARDCLIENT-2-FPGA_BOOT_PRIMARY: IOFPGA booted from Primary
+    2019 Jun 13 16:42:05  %$ VDC-1 %$ %CARDCLIENT-2-FPGA_BOOT_PRIMARY: MIFPGA booted from Primary
+    2019 Jun 13 16:42:05  %$ VDC-1 %$ %CARDCLIENT-2-FPGA_BOOT_PRIMARY: GEM_MIFPGA booted from Primary
+    2019 Jun 13 16:42:05  %$ VDC-1 %$ %ASCII-CFG-2-CONFIG_REPLAY_STATUS: Bootstrap Replay Started.
+    2019 Jun 13 16:42:05  %$ VDC-1 %$ %VDC_MGR-2-VDC_ONLINE: vdc 1 has come online
+
+
+    User Access Verification
+  prompt: "Username: "
+  commands:
+    "cisco":
+      new_state: chatty_password_after_reload
+
 reconnect_login:
   prompt: "Username: "
   commands:
@@ -487,7 +627,7 @@ password_after_reload:
 
 exec_after_reload:
   prompt: "switch# "
-  commands:
+  commands: &exec_after_reload
     "not a real command":
       response:
       - |2
@@ -514,6 +654,26 @@ exec_after_reload:
       --------------------  --------  --------
       bash-shell             1          enabled
       bfd                    1          disabled
+
+chatty_password_after_reload:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: chatty_exec_after_reload
+
+chatty_exec_after_reload:
+  preface: 
+    response: |2
+      2019 Jun 13 16:42:05  %$ VDC-1 %$ %CARDCLIENT-2-FPGA_BOOT_PRIMARY: GEM_MIFPGA booted from Primary
+    timing:
+      - 0:,1,0
+  prompt: "switch# "
+  commands:
+    <<: *exec_after_reload
+    "config term":
+      new_state: config_unlock_after_reload
+
+
 
 config_lock_1_after_reload:
   preface: |

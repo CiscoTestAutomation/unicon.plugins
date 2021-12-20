@@ -16,6 +16,8 @@ This part of the document covers all the services supported by Unicon.
     fxos
     fxos_fp4k
     fxos_fp9k
+    gaia
+    iosxe
     iosxr
     junos
     linux

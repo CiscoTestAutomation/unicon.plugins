@@ -37,6 +37,7 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
     ``fxos``, ``fp4k``
     ``fxos``, ``fp9k``
     ``fxos``, ``ftd``,,"Deprecated, please use one of the other fxos plugins."
+    ``gaia``, , , "Check Point Gaia OS"
     ``ios``, ``ap``
     ``ios``, ``iol``
     ``ios``, ``iosv``
@@ -44,6 +45,7 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
     ``iosxe``
     ``iosxe``, ``cat3k``
     ``iosxe``, ``cat3k``, ``ewlc``
+    ``iosxe``, ``cat8k``
     ``iosxe``, ``cat9k``
     ``iosxe``, ``csr1000v``
     ``iosxe``, ``csr1000v``, ``vewlc``
@@ -58,6 +60,7 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
     ``ironware``
     ``ise``
     ``linux``, , , "Generic Linux server with bash prompts"
+    ``nd``, , , "Nexus Dashboard (ND) Linux server. identical to os: linux"
     ``nxos``
     ``nxos``, ``mds``
     ``nxos``, ``n5k``

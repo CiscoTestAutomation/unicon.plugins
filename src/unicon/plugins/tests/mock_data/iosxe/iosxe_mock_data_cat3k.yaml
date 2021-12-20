@@ -174,7 +174,7 @@ cat3k_exec:
 
 enable_cat3k:
   prompt: "Router#"
-  commands:
+  commands: &cat3k_enable_cmds
     "term length 0": ""
     "term width 0": ""
     "show version": *SV
@@ -361,3 +361,11 @@ reload_cat3k_logs:
   commands:
     "":
       new_state: cat3k_exec
+
+
+cat3k_enable_reload_to_rommon:
+  prompt: "%N#"
+  commands:
+    <<: *cat3k_enable_cmds
+    "reload":
+      new_state: cat3k_rommon

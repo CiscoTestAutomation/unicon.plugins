@@ -8,8 +8,8 @@ class SpitfireSettings(IOSXRSettings):
     def __init__(self):
         super().__init__()
         self.SPITFIRE_INIT_EXEC_COMMANDS = [
-            'term length 0',
-            'term width 0',
+            'terminal length 0',
+            'terminal width 0',
             'show version',
             'bash cat /etc/bake-info.txt',
             'bash cat /etc/build-info.txt'

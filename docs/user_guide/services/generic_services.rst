@@ -269,7 +269,7 @@ on prompt_recovery feature.
 ====================  =======================    ========================================
 Argument              Type                       Description
 ====================  =======================    ========================================
-timeout               int (default 60 sec)       timeout value for the command execution takes.
+timeout               int                        timeout value for the command execution takes.
 error_pattern         list                       List of regex strings to check output for errors.
 append_error_pattern  list                        List of regex strings append to error_pattern.
 reply                 Dialog                     additional dialog
@@ -580,7 +580,7 @@ Argument                    Description
 addr                        Destination address
 proto                       protocol(ip/ipv6)
 count                       Number of pings to transmit
-src_addr                    IP for source field in ping packet
+source                      Source address or interface
 data_pat                    data pattern that would be used to perform ping.
 dest_end                    ending network 127 address
 dest_start                  beginning network 127 address
@@ -599,7 +599,7 @@ tunnel                      Tunnel interface number
 tos                         TOS field value
 multicast                   multicast addr
 udp                         (y/n) enable/disable UDP transmission for ipv6.
-int                         Interface
+interface                   Interface
 vcid                        VC Identifier
 topo                        topology nam
 verbose                     (y/n) enable/disable verbose mode
@@ -850,6 +850,33 @@ target       str                       'standby' to bring standby console to bas
     with device.bash_console(target='standby') as bash:
         output1 = bash.execute('ls', target='standby')
         output2 = bash.execute('pwd', target='standby' )
+
+
+
+guestshell
+----------
+
+Service to execute commands in the Linux "guest shell" available on certain
+NXOS and IOSXE platforms. ``guestshell`` gives you a router-like object to execute
+commands on using a Python context manager.
+
+=================   ========   ===================================================================
+Argument            Type       Description
+=================   ========   ===================================================================
+enable_guestshell   boolean    Explicitly enable the guestshell before attempting to enter.
+timeout             int (10)   Timeout for "guestshell enable", "guestshell", and "exit" commands.
+retries             int (20)   Number of retries (x 5 second interval) to attempt to enable guestshell.
+=================   ========   ===================================================================
+
+.. code-block:: python
+
+    with device.guestshell(enable_guestshell=True, retries=30) as gs:
+        output = gs.execute("ifconfig")
+
+    with device.guestshell() as gs:
+        output1 = gs.execute('pwd')
+        output2 = gs.execute('ls -al')
+
 
 
 
@@ -1136,6 +1163,7 @@ timeout           int                         timeout value in sec, Default Valu
 image_to_boot     str                         image to boot from rommon state
 prompt_recovery   bool (default False)        Enable/Disable prompt recovery feature
 return_output     bool (default False)        Return namedtuple with result and reload command output
+raise_on_error    bool (default: True)        Raise exception on error
 ===============   =======================     ========================================
 
     return :
