@@ -29,6 +29,7 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         module_elam = State('module_elam', patterns.module_elam_prompt)
         module_elam_insel = State('module_elam_insel', patterns.module_elam_insel_prompt)
         debug = State('debug', patterns.debug_prompt)
+        sqlite = State('sqlite', patterns.sqlite_prompt)
 
         enable_to_config = Path(enable, config, send_config_cmd, None)
         config_to_enable = Path(config, enable, 'end', Dialog([
@@ -49,6 +50,7 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         module_elam_insel_to_module = Path(module_elam_insel, module_elam, 'exit', None)
 
         debug_to_enable = Path(debug, enable, 'exit', None)
+        sqlite_to_debug = Path(sqlite, debug, '.exit', None)
 
         # Add State and Path to State Machine
         self.add_state(enable)
@@ -60,6 +62,7 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         self.add_state(module_elam)
         self.add_state(module_elam_insel)
         self.add_state(debug)
+        self.add_state(sqlite)
 
         self.add_path(enable_to_config)
         self.add_path(config_to_enable)
@@ -72,6 +75,7 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         self.add_path(module_elam_to_module)
         self.add_path(module_elam_insel_to_module)
         self.add_path(debug_to_enable)
+        self.add_path(sqlite_to_debug)
 
         self.add_default_statements(default_statement_list)
 

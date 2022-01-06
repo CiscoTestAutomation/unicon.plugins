@@ -4,9 +4,14 @@ Unittests for iosxe/cat9k plugin
 
 import unittest
 
+import unicon
 from unicon import Connection
 from unicon.plugins.tests.mock.mock_device_iosxe import MockDeviceTcpWrapperIOSXE
 from unicon.plugins.tests.mock.mock_device_iosxe_cat9k import MockDeviceTcpWrapperIOSXECat9k
+
+
+unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
+unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC = 0.2
 
 
 class TestIosXeCat9kPlugin(unittest.TestCase):
@@ -18,6 +23,19 @@ class TestIosXeCat9kPlugin(unittest.TestCase):
                        platform='cat9k',
                        credentials=dict(default=dict(username='admin', password='cisco')),
                        settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+                       log_buffer=True
+                       )
+        d.connect()
+        d.disconnect()
+
+    def test_connect_learn_hostname(self):
+        d = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe --state c9k_login --hostname WLC'],
+                       os='iosxe',
+                       platform='cat9k',
+                       credentials=dict(default=dict(username='admin', password='cisco')),
+                       settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+                       learn_hostname=True,
                        log_buffer=True
                        )
         d.connect()
@@ -61,6 +79,7 @@ class TestIosXeCat9kPlugin(unittest.TestCase):
             c.connect()
             self.assertEqual(c.state_machine.current_state, 'rommon')
             c.execute('unlock flash:')
+            c.settings.POST_RELOAD_WAIT = 1
             c.reload(image_to_boot='tftp://1.1.1.1/latest.bin')
             self.assertEqual(c.state_machine.current_state, 'enable')
         finally:
@@ -86,6 +105,7 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
         )
         try:
             c.connect()
+            c.settings.POST_RELOAD_WAIT = 1
             c.reload()
             self.assertEqual(c.state_machine.current_state, 'enable')
         finally:
@@ -133,6 +153,7 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
                        settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
                        log_buffer=True)
         c.connect()
+        c.settings.POST_RELOAD_WAIT = 1
         c.reload(image_to_boot='tftp://1.1.1.1/latest.bin')
         self.assertEqual(c.state_machine.current_state, 'enable')
         c.disconnect()
@@ -156,11 +177,36 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
         )
         try:
             c.connect()
+            c.settings.POST_RELOAD_WAIT = 1
             c.reload()
             self.assertEqual(c.state_machine.current_state, 'enable')
         finally:
             c.disconnect()
             md.stop()
+
+
+class TestIosXeCat9kPluginContainer(unittest.TestCase):
+
+    def test_container_exit(self):
+        c = Connection(hostname='switch',
+                       start=['mock_device_cli --os iosxe --state meraki_container_shell'],
+                       os='iosxe',
+                       platform='cat9k',
+                       log_buffer=True,
+                       init_config_commands=[])
+        c.connect()
+        c.disconnect()
+
+    def test_container_ssh(self):
+        c = Connection(hostname='switch',
+                       start=['mock_device_cli --os iosxe --state meraki_container_ssh'],
+                       os='iosxe',
+                       platform='cat9k',
+                       log_buffer=True,
+                       mit=True,
+                       init_config_commands=[])
+        c.connect()
+        c.disconnect()
 
 
 if __name__ == '__main__':

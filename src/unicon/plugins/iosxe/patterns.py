@@ -30,6 +30,7 @@ class IosXEPatterns(GenericPatterns):
         self.do_you_want_to = r'^.*Do you want to remove the above files\? \[y\/n]\s*$'
         self.confirm_uncommited_changes = r'Uncommitted changes found, commit them\? \[yes\/no\/CANCEL\]\s*$'
         self.proceed_confirm = r'^.*Proceed\? \[yes,no\]\s*$'
+        self.tclsh_prompt = r'^(.*?)(WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(-standby)?(\(boot\))?(\(recovery-mode\))?\(tcl.*?\)#[\s\x07]*$'
 
 
 class IosXEReloadPatterns(ReloadPatterns):

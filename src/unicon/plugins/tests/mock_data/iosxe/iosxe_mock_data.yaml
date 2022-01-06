@@ -132,6 +132,8 @@ general_enable:
                  RF debug mask = 0x0   
     "redundancy force-switchover":
       new_state: enable_general_standby
+    "reload_config_dialog":
+      new_state: enable_reload_config_dialog
     "reload":
       new_state: ha_reload_proceed
     "trim":
@@ -194,10 +196,16 @@ general_enable:
     "copy http://myftpserver/myimage.bin flash:/": ""
     "show running-config | include ip http client source-interface": |
       ip http client source-interface GigabitEthernet0/0/1
+    "show running-config": ""
+    "copy running-config nvram:startup-config": ""
+    "write memory": ""
+    "tclsh":
+      new_state: tclsh
 
 general_config:
   prompt: "%N(conf)#"
   commands: &general_config_cmds
+    "config-register 0x2102": ""
     "archive": ""
     "do-exec archive config": ""
     "ip ftp source-interface GigabitEthernet0/0/0": ""
@@ -533,7 +541,7 @@ initial_config_dialog:
 
   prompt: "\nWould you like to enter the initial configuration dialog? [yes/no]: "
   commands:
-    "no":
+    "no": &enable_secret
       new_state: enter_enable_secret
       response: |2
           
@@ -546,6 +554,7 @@ initial_config_dialog:
           at least 1 upper case, 1 lower case, 1 digit and
           should not contain [cisco]
           -------------------------------------------------
+    "n": *enable_secret
 
 enter_enable_secret:
   prompt: "  Enter enable secret: "
@@ -580,6 +589,12 @@ enter_selection:
   prompt: "Enter your selection [2]: "
   commands:
     "":
+      new_state: press_return
+      response: |
+        Building configuration...
+        [OK]
+        Use the enabled mode 'configure' command to modify this configuration.
+    "2":
       new_state: press_return
       response: |
         Building configuration...
@@ -676,9 +691,9 @@ management_setup_enable_secret:
   prompt: "Enter enable secret: "
   commands:
     "Secret12345":
-      new_state: management_setup_enable_secret
+      new_state: management_setup_enable_secret2
 
-management_setup_enable_secret:
+management_setup_enable_secret2:
   prompt: "Confirm enable secret: "
   commands:
     "Secret12345":
@@ -1053,3 +1068,89 @@ ping_protocol_fail:
       timing:
       - 0:,0,0.015,0.01
       new_state: ping_fail
+
+
+endless_syslog:
+  prompt: ""
+  keys:
+    ctrl-f:
+      new_state: general_enable
+  commands:
+    "": "%MY-1-MSG: never ending message"
+
+
+enable_reload_config_dialog:
+  prompt: "%N#"
+  commands:
+    <<: *gen_enable_cmds
+    "reload":
+      new_state: initial_config_dialog
+
+boot_to_rommon:
+  preface: |2
+    Initializing Hardware ...
+
+
+    System integrity status: 9B710000  12030000  A0A00A05
+
+
+    System Bootstrap, Version 17.7(2r), RELEASE SOFTWARE
+    Copyright (c) 1994-2021  by cisco Systems, Inc.
+
+    Current image running: Boot ROM0
+    Last reset cause: LocalSoft
+
+    ASR1000-RP3 platform with 67108864 Kbytes of main memory
+
+  prompt: "rommon1>"
+  commands:
+    "":
+      new_state: general_rommon
+
+
+general_rommon:
+  prompt: "rommon1>"
+  commands:
+    "boot":
+      new_state: general_exec
+
+
+enable_container:
+  prompt: "%N#"
+  commands:
+    <<: *gen_enable_cmds
+    "app-hosting connect appid meraki co":
+      new_state: meraki_container_shell
+
+
+meraki_container_shell:
+  preface: |
+    Connected to appliance. Exit using ^c^c^c
+    Clear existing connection in case of failure
+  prompt: "/ # "
+  commands:
+    "exit":
+      BusyBox v1.32.0 (2021-10-12 10:15:40 UTC) built-in shell (ash)
+  keys:
+    ctrl-c:
+      new_state: meraki_ctrl_c
+
+meraki_ctrl_c:
+  keys:
+    ctrl-c:
+      new_state: meraki_ctrl_c2
+
+meraki_ctrl_c2:
+  keys:
+    ctrl-c:
+      new_state: enable_container
+
+meraki_container_ssh:
+  prompt: "44-b6-be-0e-56-00-SFO-SMK-N-CA-switch:~$"
+
+
+tclsh:
+  prompt: "%N(tcl)#"
+  commands:
+    "exit":
+      new_state: general_enable

@@ -91,7 +91,12 @@ class NxosCopy(GenericCopy):
                     kwargs['dest'] = kwargs['dest'] + '//' + kwargs['server'] + \
                                      '/' +kwargs['dest_file']
             elif re.match(r'.*:/*$', kwargs['dest'].strip()):
-                kwargs['dest'] = kwargs['dest'] + '/' +kwargs['dest_file']
+                kwargs['dest'] = kwargs['dest'] + '/' + kwargs['dest_file']
+        if 'source_file' in kwargs and 'source' in kwargs:
+            kwargs['source'] = kwargs['source'] + '/' + kwargs['source_file']
+        # set default vrf 'management' for NXOS
+        if 'vrf' not in kwargs:
+            kwargs['vrf'] = 'management'
         super().call_service(*args, **kwargs)
 
 
@@ -250,7 +255,7 @@ class Reload(GenericReload):
             context = self.context
 
         start_time = current_time = datetime.now()
-        timeout_time = timedelta(seconds=self.timeout)
+        timeout_time = timedelta(seconds=timeout)
         con.spawn.sendline(reload_command)
         try:
             try:
@@ -270,34 +275,34 @@ class Reload(GenericReload):
                     try:
                         con.log.info('Trying to connect... attempt #{}'.format(x + 1))
 
-                        learn_hostname_ori = con.learn_hostname
+                        learn_hostname_orig = con.learn_hostname
                         # During initialization after reload, hostname may temporarily be "switch".
                         # When initialization finishes, hostname will be back to original hostname.
                         con.learn_hostname = False
-                        config_lock_retries_ori = con.settings.CONFIG_LOCK_RETRIES
-                        con.configure.lock_retries = config_lock_retries
-                        config_lock_retry_sleep_ori = con.settings.CONFIG_LOCK_RETRY_SLEEP
-                        con.configure.lock_retry_sleep = config_lock_retry_sleep
+                        config_lock_retries_orig = con.settings.CONFIG_LOCK_RETRIES
+                        con.settings.CONFIG_LOCK_RETRIES = config_lock_retries
+                        config_lock_retry_sleep_orig = con.settings.CONFIG_LOCK_RETRY_SLEEP
+                        con.settings.CONFIG_LOCK_RETRY_SLEEP = config_lock_retry_sleep
 
                         try:
                             con.connect()
                         finally:
-                            con.learn_hostname = learn_hostname_ori
-                            con.settings.CONFIG_LOCK_RETRIES = config_lock_retries_ori
-                            con.settings.CONFIG_LOCK_RETRY_SLEEP = config_lock_retry_sleep_ori
+                            con.learn_hostname = learn_hostname_orig
+                            con.settings.CONFIG_LOCK_RETRIES = config_lock_retries_orig
+                            con.settings.CONFIG_LOCK_RETRY_SLEEP = config_lock_retry_sleep_orig
 
                     except Exception:
                         con.log.warning('Connection to {} failed'.format(con.hostname))
                     if con.is_connected:
                         break
             else:
-                con.log.info('Waiting for boot messages to settle for {} seconds'.format(
-                    con.settings.POST_RELOAD_WAIT
-                ))
-                wait_time = timedelta(seconds=con.settings.POST_RELOAD_WAIT)
+                seconds = reconnect_sleep or con.settings.POST_RELOAD_WAIT
+                con.log.info('Waiting for boot messages to settle for {} '
+                             'seconds'.format(seconds))
+                wait_time = timedelta(seconds=seconds)
                 settle_time = current_time = datetime.now()
                 while (current_time - settle_time) < wait_time:
-                    if buffer_settled(con.spawn, con.settings.POST_RELOAD_WAIT):
+                    if buffer_settled(con.spawn, seconds):
                         con.log.info('Buffer settled, accessing device..')
                         break
                     current_time = datetime.now()
@@ -357,23 +362,29 @@ class Ping6(BaseService):
     def call_service(self, *args, **kwargs):
         con = self.get_handle()
 
+        # Extended ping options
+        # If one of these is passed, set 'extd_ping' to 'y' automatically
+        ext_ping_options = [
+            'multicast', 'transport', 'mask', 'vcid', 'tunnel',
+            'dest_start', 'dest_end', 'exp', 'pad', 'ttl',
+            'reply_mode', 'dscp', 'proto', 'verbose', 'src_route_type',
+            'src_route_addr', 'extended_verbose', 'topo',
+            'validate_reply_data', 'force_exp_null_label',
+            'lsp_ping_trace_rev', 'oif', 'tos', 'data_pat',
+            'interface', 'udp', 'precedence', 'novell_type',
+            'extended_timeout_limit', 'sweep_min', 'sweep_max',
+            'sweep_interval', 'source', 'df_bit',
+            'ipv6_ext_headers', 'ipv6_hbh_headers',
+            'ipv6_dst_headers', 'ping_packet_timeout',
+            'sweep_ping', 'timestamp_count', 'record_hops',
+            'ping_failures'
+        ]
+
         # Ping Options
-        ping_options = ['multicast', 'transport', 'mask', 'vcid', 'tunnel',
-                        'dest_start', 'dest_end', 'exp', 'pad', 'ttl',
-                        'reply_mode', 'dscp', 'proto', 'count', 'size',
-                        'verbose', 'interval', 'timeout_limit',
-                        'send_interval', 'vrf', 'src_route_type',
-                        'src_route_addr', 'extended_verbose', 'topo',
-                        'validate_reply_data', 'force_exp_null_label',
-                        'lsp_ping_trace_rev', 'oif', 'tos', 'data_pat',
-                        'int', 'udp', 'precedence', 'novell_type',
-                        'extended_timeout_limit', 'sweep_min', 'sweep_max',
-                        'sweep_interval', 'src_addr', 'df_bit',
-                        'ipv6_ext_headers', 'ipv6_hbh_headers',
-                        'ipv6_dst_headers', 'ping_packet_timeout',
-                        'sweep_ping', 'timestamp_count', 'record_hops',
-                        'ping_failures', 'extd_ping', 'addr'
-                        ]
+        ping_options = [
+            'addr', 'count', 'size', 'vrf', 'extd_ping',
+            'send_interval', 'interval', 'timeout_limit',
+        ] + ext_ping_options
 
         # Default value setting
         ping_context = AttributeDict({})
@@ -387,10 +398,36 @@ class Ping6(BaseService):
             else:
                 ping_context[a] = ""
 
-        # Read input values passed
+        # old to new argument mapping
+        deprecated_arg_map = {
+            'int': 'interface',
+            'src_addr': 'source'
+        }
+        # process input values passed
         # Stringify values in case they are passed as objects.
         for key in kwargs:
-            ping_context[key] = str(kwargs[key])
+
+            # if one of the extended ping options is given,
+            # automatically set extd_ping to y
+            # If extd_ping is explicitly set to 'n',
+            # it will be set by logic below
+            if key in ext_ping_options:
+                ping_context['extd_ping'] = 'y'
+
+            if key in deprecated_arg_map:
+                con.log.warning(
+                    'ping service "{key}" argument is deprecated, '
+                    'please use "{new_key}" instead'.format(
+                        key=key,
+                        new_key=deprecated_arg_map.get(key)
+                    ))
+                old_key = key
+                key = deprecated_arg_map.get(key)
+                ping_context[key] = str(kwargs[old_key])
+            else:
+                # this also sets extd_ping to 'n'
+                # if provided by user
+                ping_context[key] = str(kwargs[key])
 
         # Validate Inputs
         if ping_context['addr'] == "":
@@ -417,8 +454,8 @@ class Ping6(BaseService):
         # Value is device ping6 arguments. Prepend and append whitespace.
         ping_seq = collections.OrderedDict()
         ping_seq['multicast'] = ' multicast '
-        ping_seq['int'] = ' interface '
-        ping_seq['src_addr'] = ' source '
+        ping_seq['interface'] = ' interface '
+        ping_seq['source'] = ' source '
         ping_seq['count'] = ' count '
         ping_seq['send_interval'] = ' interval '
         ping_seq['size'] = ' packet-size '

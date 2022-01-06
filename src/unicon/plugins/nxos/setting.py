@@ -34,6 +34,7 @@ class NxosSettings(GenericSettings):
         ]
         self.CONFIGURE_ERROR_PATTERN = [
             r'^%\s*[Ii]nvalid (command|input|number)',
+            r'^%\s*[Ii]ncomplete (command|input)',
             r'^%\s*[Cc]an not open.*',
             r'^%\s*[Nn]ot supported.*',
             r'^%\s*[Ff]ail.*',

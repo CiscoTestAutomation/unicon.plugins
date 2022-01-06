@@ -1,4 +1,4 @@
-__version__ = '21.7'
+__version__ = '21.12'
 
 supported_chassis = [
     'single_rp',
@@ -36,4 +36,6 @@ supported_os = [
     'eos',
     'gaia',
     'hvrp'
+    'slxos',
+    'nd'
 ]

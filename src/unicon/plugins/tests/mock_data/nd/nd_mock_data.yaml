@@ -1,0 +1,622 @@
+
+nd_connect_console_server:
+  preface: |
+    Trying 127.0.0.1...
+    Connected to localhost.
+    Escape character is '^]'.
+  prompt: ""
+  commands:
+    "":
+      new_state: nd_login2
+
+connect_ssh:
+  preface: |
+    The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
+    RSA key fingerprint is a1:07:ac:9b:8c:c2:db:c5:4c:dc:70:b5:09:2a:a5:b1.
+  prompt: "Are you sure you want to continue connecting (yes/no)? "
+  commands:
+    "yes":
+      new_state: password
+
+
+connect_sma:
+  prompt: "testuser@pod-esa01's password: "
+  commands:
+    "cisco":
+      response: |
+        AsyncOS 11.5.0 for Cisco C690 build 014
+
+        Welcome to the Cisco C690 Email Security Appliance
+      new_state: sma_prompt
+    "cisco1":
+      response: |
+        AsyncOS 11.5.0 for Cisco C690 build 014
+
+        Welcome to the Cisco C690 Email Security Appliance
+      new_state: sma_prompt_1
+
+connect_for_password:
+  prompt: "Password for testuser@2pod2m-client025.ibauto: "
+  commands:
+    "cisco":
+      new_state: exec6
+    "bad_pw":
+        response: |
+
+           Permission denied, please try again.
+
+
+login:
+  preface: "\n\n"
+  prompt: "Login: "
+  commands:
+    "cisco":
+      new_state: password
+
+nd_login2:
+  prompt: "Login: "
+  commands:
+    "cisco":
+      new_state: nd_password2
+
+nd_login3:
+  prompt: "Identifier: "
+  commands:
+    "user3":
+      new_state: nd_password3
+
+password:
+  prompt: "cisco@localhost password: "
+  commands:
+    "cisco":
+      new_state: exec
+    "wrong_password":
+      response: |
+        Login incorrect
+      new_state: login
+
+nd_password2:
+  prompt: "cisco@localhost password: "
+  commands:
+    "cisco":
+      new_state: exec3
+
+nd_password3:
+  prompt: "name@localhost Passe: "
+  commands:
+    "cisco":
+      new_state: exec
+
+nd_password4:
+  prompt: "admin@1.1.1.1's password: "
+  commands:
+    "cisco":
+      response: |
+        Command Line Interface is starting up, please wait ...
+        Welcome to the Platform Command Line Interface
+        VMware Installation:
+                2 vCPU: Intel(R) Xeon(R) CPU E5-2680 0 @ 2.70GHz
+                Disk 1: 110GB, Partitions aligned
+                8192 Mbytes RAM
+      new_state: exec17
+
+exec:
+  prompt: "ND$ "
+  commands: &cmds
+    "stty cols 200": ""
+    "stty rows 200": ""
+    "prompt1":
+        new_state: exec
+    "prompt2":
+        new_state: exec2
+    "prompt3":
+        new_state: exec3
+    "prompt4":
+        new_state: exec4
+    "prompt5":
+        new_state: exec5
+    "prompt6":
+        new_state: exec6
+    "prompt7":
+        new_state: exec7
+    "prompt8":
+        new_state: exec8
+    "prompt9":
+        new_state: exec9
+    "prompt10":
+        new_state: exec10
+    "prompt11":
+        new_state: exec11
+    "prompt12":
+        new_state: exec12
+    "prompt13":
+        new_state: exec13
+    "prompt14":
+        new_state: exec14
+    "prompt15":
+        new_state: exec15
+    "prompt16":
+        new_state: exec16
+    "prompt17":
+        new_state: exec17
+    "prompt18":
+        new_state: exec18
+    "prompt19":
+        new_state: exec19
+    "ls": |
+      /tmp
+      /var
+      /opt
+    "sudo":
+      new_state: sudo_password
+    "exit":
+      new_state: login
+
+    "telnet localhost 64001":
+      new_state: ios_connect_console_server
+    "telnet 127.0.0.1 64001":
+      new_state: ios_connect_console_server
+    "telnet 7009":
+      new_state: nd_connect_console_server
+    "source env.sh": ""
+    "ping -c 1 localhost": |
+      PING localhost (127.0.0.1): 56 data bytes
+      64 bytes from 127.0.0.1: icmp_seq=0 ttl=64 time=0.031 ms
+
+      --- localhost ping statistics ---
+      1 packets transmitted, 1 packets received, 0.0% packet loss
+      round-trip min/avg/max/stddev = 0.031/0.031/0.031/0.000 ms
+    "ssh localhost": ""
+    "ssh -l admin localhost": ""
+    "ssh -l cisco2 localhost": ""
+    "telnet 10.3.3.1":
+      new_state: ios_r1_telnet
+
+    "xml":
+      response: |
+        <xml>
+        <a>looks like a prompt</a>
+        </xml>
+      timing:
+        - 0:,0,0.05
+    "banner1":
+      response: |
+        #########
+        Banner  #
+        #########
+      timing:
+        - 0:,0,0.05
+    "banner2":
+      response: |
+        %%%%%%%%
+        Banner %
+        %%%%%%%%
+      timing:
+        - 0:,0,0.05
+
+    "ping -A -c5 127.0.0.1":
+      response: |
+        PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.
+        64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.018 ms
+        64 bytes from 127.0.0.1: icmp_seq=2 ttl=64 time=0.022 ms
+        64 bytes from 127.0.0.1: icmp_seq=3 ttl=64 time=0.022 ms
+        64 bytes from 127.0.0.1: icmp_seq=4 ttl=64 time=0.024 ms
+        64 bytes from 127.0.0.1: icmp_seq=5 ttl=64 time=0.029 ms
+
+        --- 127.0.0.1 ping statistics ---
+        5 packets transmitted, 5 received, 0% packet loss, time 801ms
+        rtt min/avg/max/mdev = 0.018/0.023/0.029/0.003 ms, ipg/ewma 200.425/0.020 ms
+      timing:
+        - 0:1,0
+        - 1:6,0,0.2
+        - 6:,0
+
+    "ping -A -c5 2.2.2.2":
+      response: |
+        PING 2.2.2.2 (2.2.2.2) 56(84) bytes of data.
+
+        --- 2.2.2.2 ping statistics ---
+        5 packets transmitted, 0 received, 100% packet loss, time 14005ms
+      timing:
+        - 0:1,0
+        - 1:,1,0.05
+
+    "ping -A -c10 127.0.0.1":
+      response: |
+        PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.
+        64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.018 ms
+        64 bytes from 127.0.0.1: icmp_seq=2 ttl=64 time=0.022 ms
+        64 bytes from 127.0.0.1: icmp_seq=3 ttl=64 time=0.022 ms
+        64 bytes from 127.0.0.1: icmp_seq=4 ttl=64 time=0.024 ms
+        64 bytes from 127.0.0.1: icmp_seq=5 ttl=64 time=0.029 ms
+        64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.018 ms
+        64 bytes from 127.0.0.1: icmp_seq=2 ttl=64 time=0.022 ms
+        64 bytes from 127.0.0.1: icmp_seq=3 ttl=64 time=0.022 ms
+        64 bytes from 127.0.0.1: icmp_seq=4 ttl=64 time=0.024 ms
+        64 bytes from 127.0.0.1: icmp_seq=5 ttl=64 time=0.029 ms
+
+        --- 127.0.0.1 ping statistics ---
+        10 packets transmitted, 10 received, 0% packet loss, time 801ms
+        rtt min/avg/max/mdev = 0.018/0.023/0.029/0.003 ms, ipg/ewma 200.425/0.020 ms
+
+    "ping6 -A -c5 ::1":
+      response: |
+        PING ::1(::1) 56 data bytes
+        64 bytes from ::1: icmp_seq=1 ttl=64 time=0.016 ms
+        64 bytes from ::1: icmp_seq=2 ttl=64 time=0.031 ms
+        64 bytes from ::1: icmp_seq=3 ttl=64 time=0.031 ms
+        64 bytes from ::1: icmp_seq=4 ttl=64 time=0.045 ms
+        64 bytes from ::1: icmp_seq=5 ttl=64 time=0.071 ms
+
+        --- ::1 ping statistics ---
+        5 packets transmitted, 5 received, 0% packet loss, time 801ms
+        rtt min/avg/max/mdev = 0.016/0.038/0.071/0.020 ms, ipg/ewma 200.464/0.029 ms
+
+    "ssh -l admin 127.0.0.1 -p 64100":
+      new_state: ios_exec
+    'cd abc': |
+      bash: cd: abc: No such file or directory
+    "echo $?":
+      response:
+        - '1'
+        - '0'
+        - '2'
+
+exec2:
+  prompt: "ND# "
+  commands: *cmds
+
+exec3:
+  prompt: "ND> "
+  commands: *cmds
+
+exec4:
+  prompt: "user@host ~$ "
+  commands: *cmds
+
+exec5:
+  prompt: "agent-lab9-pm:~:2017> "
+  commands: *cmds
+
+exec6:
+  prompt: "root@agent-lab11-pm:~# "
+  commands: *cmds
+
+exec7:
+  prompt: "root@localhost ~% "
+  commands: *cmds
+
+exec8:
+  prompt: "vm-7:3>"
+  commands: *cmds
+
+exec9:
+  prompt: "%1B]0;cisco@dev-server:~^Gcisco@dev-server:3> "
+  commands: *cmds
+
+exec10:
+  prompt: "(dev) user@dev-1-name dir$ "
+  commands: *cmds
+
+exec11:
+  prompt: "[user@new-host dir]$ "
+  commands: *cmds
+
+exec12:
+  prompt: "host ~ # "
+  commands: *cmds
+
+exec13:
+  prompt: "host:~ # "
+  commands: *cmds
+
+exec14:
+  prompt: "%1B]0;rally@rally: /workspace\x07rally@rally:/workspace$ %1B[K"
+  commands: *cmds
+
+exec15:
+  prompt: "$ "
+  commands: *cmds
+
+exec16:
+  prompt: "root@sj21-pxe-03.cisco.com:~/"
+  commands: *cmds
+
+exec17:
+  prompt: "admin:"
+  commands: *cmds
+
+exec18:
+  preface:
+    response: |
+      ########################################################################
+
+      <host:root>/root:
+    timing:
+      - 0:,0,0.05
+  prompt: "# "
+  commands: *cmds
+
+exec19:
+    prompt: "~ #"
+    commands: *cmds
+
+
+sma_prompt:
+  prompt: "sma03:testuser 1] "
+  commands: *cmds
+
+sma_prompt_1:
+  prompt: "pod-esa01.cisco.com:testuser 1] "
+  commands: *cmds
+
+sudo_password:
+  prompt: "[sudo] password for cisco: "
+  commands:
+    "sudo_password":
+      new_state: sudo
+
+sudo:
+  prompt: "ND# "
+  commands:
+    "sudo_invalid":
+        new_state: sudo_invalid
+    "exit":
+      new_state: exec
+
+sudo_invalid:
+  prompt: "[sudo] password for cisco: "
+  commands:
+    "unknown":
+      response: "cisco is not in the sudoers file.  This incident will be reported."
+      new_state: sudo
+    "invalid": "Sorry, try again."
+    "sudo":
+      new_state: sudo_password
+
+hit_enter:
+  prompt: "Hit Enter to proceed: "
+  commands:
+    "":
+      new_state: exec2
+
+
+
+### Cisco IOS states for proxy testing
+
+ios_connect_console_server:
+  preface: |
+    Trying 127.0.0.1...
+    Connected to localhost.
+    Escape character is '^]'.
+  prompt: ""
+  commands:
+    "":
+      new_state: ios_login
+
+ios_login:
+  prompt: "Username: "
+  commands:
+    "admin":
+      new_state: ios_exec
+
+ios_exec:
+  prompt: Router>
+  commands:
+    "enable":
+      new_state: ios_enable
+
+ios_enable:
+  prompt: Router#
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": ""
+    "config term":
+      new_state: ios_config
+
+ios_config:
+  prompt: "Router(conf)#"
+  commands:
+    "no logging console": ""
+    "line console 0":
+      new_state: ios_config_line
+    "exit":
+      new_state: ios_enable
+    "end":
+      new_state: ios_enable
+
+ios_config_line:
+  prompt: "Router(config-line)#"
+  commands:
+    "exec-timeout 0": ""
+    "end":
+      new_state: ios_enable
+
+
+ios_r1_telnet:
+  preface: |2
+    Trying 10.3.3.1...
+    Connected to 10.3.3.1.
+    Escape character is '^]'.
+
+
+    User Access Verification
+     
+  prompt: "Password:"
+  commands:
+    "cisco1":
+      new_state: ios_r1_exec
+
+ios_r1_exec:
+  prompt: "R01>"
+  commands:
+    "enable":
+      new_state: ios_r1_password
+    "":
+      new_state: ios_r1_exec
+
+ios_r1_password:
+  prompt: "Password:"
+  commands:
+    "cisco11":
+      new_state: ios_r1_enable
+
+ios_r1_enable:
+  prompt: "R01#"
+  commands:
+    "telnet 2.2.2.2":
+      new_state: ios_r2_telnet
+    "ssh 2.2.2.2 username user1":
+      new_state: ios_r2_telnet
+
+
+ios_r2_telnet:
+  preface: |2
+    Trying 2.2.2.2...
+    Connected to 2.2.2.2.
+    Escape character is '^]'.
+
+
+    User Access Verification
+     
+  prompt: "Password:"
+  commands:
+    "cisco2":
+      new_state: ios_r2_exec
+
+ios_r2_exec:
+  prompt: "R02>"
+  commands:
+    "enable":
+      new_state: ios_r2_password
+
+ios_r2_password:
+  prompt: "Password:"
+  commands:
+    "cisco22":
+      new_state: ios_r2_enable
+
+ios_r2_enable:
+  prompt: "R02#"
+  commands:
+    "telnet 10.2.3.3":
+      new_state: ios_sw3_telnet
+    "telnet 10.2.3.4":
+      new_state: ios_sw4_telnet
+
+ios_sw3_telnet:
+  preface: |
+    Trying 10.2.3.3 ... Open
+
+    User Access Verification
+     
+  prompt: "Password:"
+  commands:
+    "cisco3":
+      new_state: ios_sw3_exec
+
+ios_sw3_exec:
+  prompt: "Sw03>"
+  commands:
+    "enable":
+      new_state: ios_sw3_enable
+
+ios_sw3_password:
+  prompt: "Password:"
+  commands:
+    "cisco33":
+      new_state: ios_sw03_enable
+
+ios_sw3_enable:
+  prompt: "Sw03#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": ""
+
+
+
+
+ios_sw4_telnet:
+  preface: |
+    Trying 10.2.3.4 ... Open
+
+    User Access Verification
+     
+  prompt: "Password:"
+  commands:
+    "cisco4":
+      new_state: ios_sw4_exec
+
+ios_sw4_exec:
+  prompt: "Sw04>"
+  commands:
+    "enable":
+      new_state: ios_sw4_password
+
+ios_sw4_password:
+  prompt: "Password:"
+  commands:
+    "cisco44":
+      new_state: ios_sw4_enable
+
+ios_sw4_enable:
+  prompt: "Sw04#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": ""
+
+
+
+
+exec_ps1:
+  prompt: "ND$ "
+  commands:
+    "stty cols 200": ""
+    "stty rows 200": ""
+    "for x in 1 2 3; do":
+      new_state: exec_ps2
+
+exec_ps2:
+  prompt: "> "
+  commands:
+    "echo $x":
+      response: |
+        > 
+        > 
+      timing:
+        - 0:,0.5,0.5
+    "done":
+      new_state: exec
+      response: |
+        1
+        2
+        3
+
+login_ssh_delay:
+  preface:
+    response: |
+      Last login: Tue Dec 11 16:01:04 2018 from localhost
+    timing:
+      - 0:,10
+  prompt: "[user@host ~]$ "
+  commands: *cmds
+
+login_passphrase:
+  preface:
+    response: |
+      Last login: Tue Dec 11 16:01:04 2018 from localhost
+  prompt: "Enter passphrase for key '/home/virl/.ssh/id_rsa': "
+  commands:
+    "cisco":
+      new_state: exec
+
+
+prompt_recovery:
+  prompt: "this is not a valid prompt"
+  commands:
+    "":
+      new_state: exec
+

@@ -294,3 +294,73 @@ spitfire_attach_console:
       new_state: spitfire_enable
     "ls": |
         dummy_file dummy_file2
+
+
+spitfire_connect_syslog:
+  prompt: "RP/0/RP0/CPU0:Jul 11 23:15:38.837 UTC: envmon[213]: %PKT_INFRA-FM-3-FAULT_MAJOR : ALARM_MAJOR :Out of tolerance :DECLARE :0: System has insufficient operational fans. Increasing fan speed to maximum "
+  preface: |
+    RP/0/RP0/CPU0:Jul 11 23:14:01.916 UTC: envmon[213]: %PKT_INFRA-FM-3-FAULT_MAJOR : ALARM_MAJOR :Power Group redundancy lost :DECLARE :0:  
+
+    !!!!!!!!!!!!!!!!!!!! NO root-system username is configured. Need to configure root-system username. !!!!!!!!!!!!!!!!!!!!Configuration lock is held by another agent.  Please wait. [.OK]
+
+
+            --- Administrative User Dialog ---
+
+
+      Enter root-system username: RP/0/RP0/CPU0:Jul 11 23:14:10.730 UTC: envmon[213]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :Invalid sensor read error :DECLARE :0/RP0/CPU0: MB_PORT_Sensor has raised an alarm for Invalid Sensor read error 
+    RP/0/RP0/CPU0:Jul 11 23:14:10.730 UTC: envmon[213]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :Invalid sensor read error :DECLARE :0/RP0/CPU0: DIMM_TEMP2 has raised an alarm for Invalid Sensor read error 
+    RP/0/RP0/CPU0:Jul 11 23:14:57.423 UTC: envmon[213]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :Out o
+
+    2021-07-13 19:16:50,404: %UNICON-INFO: connection to R1
+    f tolerance :DECLARE :0/FT0: 0/FT0 fan 0 is out of tolerance 
+    RP/0/RP0/CPU0:Jul 11 23:14:57.423 UTC: envmon[213]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :Sensor in failed state :DECLARE :0/FT0: 0/FT0 fan 0 failed 
+    RP/0/RP0/CPU0:Jul 11 23:14:57.423 UTC: envmon[213]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :Sensor in failed state :DECLARE :0/FT0: Locked Fan motor 
+    RP/0/RP0/CPU0:Jul 11 23:14:57.423 UTC: envmon[213]: %PKT_INFRA-FM-3-FAULT_MAJOR : ALARM_MAJOR :Sensor in failed state :DECLARE :0: System has insufficient operational fans. Increasing fan speed to maximum 
+    RP/0/RP0/CPU0:Jul 11 23:14:57.426 UTC: envmon[213]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :Out of tolerance :DECLARE :0/FT0: 0/FT0 fan 1 is out of tolerance 
+    RP/0/RP0/CPU0:Jul 11 23:14:57.426 UTC: envmon[213]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :Sensor in failed state :DECLARE :0/FT0: 0/FT0 fan 1 failed 
+    RP/0/RP0/CPU0:Jul 11 23:15:16.490 UTC: envmon[213]: %PKT_INFRA-FM-2-FAULT_CRITICAL : ALARM_CRITICAL :high voltage alarm :DECLARE :0/RP0/CPU0: MB_VDDC 
+    RP/0/RP0/CPU0:Jul 11 23:15:18.261 UTC: envmon[213]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :Sensor in failed state :CLEAR :0/FT0: 0/FT0 fan 1 failed 
+    RP/0/RP0/CPU0:Jul 11 23:15:18.262 UTC: envmon[213]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :Out of tolerance :DECLARE :0/FT0: Out of threshold fan 
+    RP/0/RP0/CPU0:Jul 11 23:15:28.284 UTC: envmon[213]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :Sensor in failed state :DECLARE :0/FT0: 0/FT0 fan 1 failed 
+    RP/0/RP0/CPU0:Jul 11 23:15:28.284 UTC: envmon[213]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :Out of tolerance :CLEAR :0/FT0:  
+    RP/0/RP0/CPU0:Jul 11 23:15:38.533 UTC: envmon[213]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :Sensor in failed state :CLEAR :0/FT0: 0/FT0 fan 0 failed 
+    RP/0/RP0/CPU0:Jul 11 23:15:38.534 UTC: envmon[213]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :Out of tolerance :DECLARE :0/FT0: Out of threshold fan 
+    RP/0/RP0/CPU0:Jul 11 23:15:38.837 UTC: envmon[213]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :Sensor in failed state :CLEAR :0/FT0: 0/FT0 fan 1 failed 
+    RP/0/RP0/CPU0:Jul 11 23:15:38.837 UTC: envmon[213]: %PKT_INFRA-FM-4-FAULT_MINOR : ALARM_MINOR :Sensor in failed state :CLEAR :0/FT0:  
+    RP/0/RP0/CPU0:Jul 11 23:15:38.837 UTC: envmon[213]: %PKT_INFRA-FM-3-FAULT_MAJOR : ALARM_MAJOR :Sensor in failed state :CLEAR :0:  
+    
+
+  commands:
+    "":
+      new_state: spitefire_root_username
+
+
+spitefire_root_username:
+  prompt: "  Enter root-system username: "
+  commands:
+    "admin":
+      # straight to enable, can be updated in future to handle passwed entry
+      new_state: spitfire_enable
+
+
+spitfire_showtech_syslog:
+  prompt: RP/0/RP0/CPU0:%N#
+  commands:
+    "show tech":
+      response: |
+        Mon Sep  6 07:35:38.478 UTC
+        ++ Show tech start time: 2021-Sep-06.073538.UTC ++
+        Mon Sep  6 07:35:38 UTC 2021 Waiting for gathering to complete
+        ......
+        RP/0/RP1/CPU0:Sep  6 07:35:59.806 UTC: rmf_svr[271]: %HA-REDCON-1-STANDBY_READY : standby card is ready
+        
+        RP/0/RP1/CPU0:Sep  6 07:35:59.806 UTC: rmf_svr[271]: %HA-REDCON-1-STANDBY_READY : standby card is ready
+        
+
+      timing:
+        - 0:2,0,0.01
+        - 3:3,0.5,0
+        - 3:4,0.5,0.1,0.1
+        - 4:5,0.5,0.1
+        - 5:8,5,3
+        - 8:,3
