@@ -17,7 +17,8 @@ class TestDellos10PluginConnect(unittest.TestCase):
     def test_login_connect(self):
         c = Connection(hostname='OS10',
                         start=['mock_device_cli --os dellos10 --state exec'],
-                        os='dellos10',
+                        os='dell',
+                        platform='os10',
                         username='knox',
                         tacacs_password='dell1111')
         c.connect()
@@ -26,7 +27,8 @@ class TestDellos10PluginConnect(unittest.TestCase):
     def test_login_connect_ssh(self):
         c = Connection(hostname='OS10',
                         start=['mock_device_cli --os dellos10 --state connect_ssh'],
-                        os='dellos10',
+                        os='dell',
+                        platform='os10',
                         username='knox',
                         tacacs_password='dell1111')
         c.connect()
@@ -35,7 +37,8 @@ class TestDellos10PluginConnect(unittest.TestCase):
     def test_login_connect_connectReply(self):
         c = Connection(hostname='OS10',
                         start=['mock_device_cli --os dellos10 --state exec'],
-                        os='dellos10',
+                        os='dell',
+                        platform='os10',
                         username='knox',
                         tacacs_password='dell1111',
                         connect_reply = Dialog([[r'^(.*?)Password:']]))
@@ -48,7 +51,8 @@ class TestDellos10PluginExecute(unittest.TestCase):
     def test_execute_show_feature(self):
         c = Connection(hostname='OS10',
                         start=['mock_device_cli --os dellos10 --state exec'],
-                        os='dellos10',
+                        os='dell',
+                        platform='os10',
                         username='knox',
                         tacacs_password='dell1111',
                         init_exec_commands=[],
