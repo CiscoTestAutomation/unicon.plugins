@@ -79,7 +79,18 @@ cat9k_boot_to_rommon:
 cat9k_rommon:
     prompt: "switch:"
     commands:
+      "set": |
+        BOOT=bootflash:/cat9k_iosxe.17.06.01.SPA.bin;
+        BOOT_LOADER_UPGRADE_DISABLE=1
+        MANUAL_BOOT=yes
+      "MANUAL_BOOT=yes": ""
+      "unset TFTP_FILE": ""
+      "unset BOOT": ""
+      "TFTP_BLKSIZE=8192": ""
+      "unset BOOT_DEVICE_MODE": ""
       "unlock flash:": ""
+      "ping 1.1.1.1": |
+        16 bytes from 1.1.1.1: ICMPv4 seq#0 RTT=656 ms
       "boot":
         new_state: cat9k_rommon_boot
       "boot tftp://1.1.1.1/latest.bin":

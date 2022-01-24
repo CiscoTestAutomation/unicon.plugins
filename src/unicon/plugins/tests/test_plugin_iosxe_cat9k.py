@@ -38,8 +38,11 @@ class TestIosXeCat9kPlugin(unittest.TestCase):
                        learn_hostname=True,
                        log_buffer=True
                        )
-        d.connect()
-        d.disconnect()
+        try:
+            d.connect()
+            self.assertEqual(d.hostname, 'WLC')
+        finally:
+            d.disconnect()
 
     def test_boot_from_rommon(self):
         md = MockDeviceTcpWrapperIOSXE(port=0, state='cat9k_rommon')
@@ -82,6 +85,151 @@ class TestIosXeCat9kPlugin(unittest.TestCase):
             c.settings.POST_RELOAD_WAIT = 1
             c.reload(image_to_boot='tftp://1.1.1.1/latest.bin')
             self.assertEqual(c.state_machine.current_state, 'enable')
+        finally:
+            c.disconnect()
+            md.stop()
+
+    def test_connect_cat9k_rommon_init(self):
+        md = MockDeviceTcpWrapperIOSXECat9k(port=0, state='cat9k_rommon', hostname='R1')
+        md.start()
+
+        con = Connection(
+            hostname='R1',
+            start=[
+                'telnet 127.0.0.1 {}'.format(md.ports[0]),
+            ],
+            os='iosxe',
+            platform='cat9k',
+            connection_timeout=10,
+            settings={'FIND_BOOT_IMAGE': False},
+            credentials=dict(default=dict(password='cisco')),
+            log_buffer=True,
+            image_to_boot='tftp://1.1.1.1/cat9k_iosxe.SSA.bin',
+        )
+        try:
+            con.connect()
+        except Exception:
+            raise
+        finally:
+            con.disconnect()
+            md.stop()
+
+    def test_connect_cat9k_rommon_init_commands(self):
+        md = MockDeviceTcpWrapperIOSXECat9k(port=0, state='cat9k_rommon', hostname='R1')
+        md.start()
+
+        con = Connection(
+            hostname='R1',
+            start=[
+                'telnet 127.0.0.1 {}'.format(md.ports[0]),
+            ],
+            os='iosxe',
+            platform='cat9k',
+            connection_timeout=10,
+            settings={
+                'FIND_BOOT_IMAGE': False,
+                'ROMMON_INIT_COMMANDS': [
+                    'set',
+                    'ping 1.1.1.1'
+                ]
+            },
+            credentials=dict(default=dict(password='cisco')),
+            log_buffer=True,
+            image_to_boot='tftp://1.1.1.1/cat9k_iosxe.SSA.bin',
+        )
+        try:
+            con.connect()
+        except Exception:
+            raise
+        finally:
+            con.disconnect()
+            md.stop()
+
+    def test_connect_cat9k_ha_rommon_init_commands(self):
+        md = MockDeviceTcpWrapperIOSXECat9k(port=0, state='cat9k_ha_active_rommon,cat9k_ha_standby_rommon')
+        md.start()
+
+        c = Connection(
+            hostname='switch',
+            start=[
+                'telnet 127.0.0.1 {}'.format(md.ports[0]),
+                'telnet 127.0.0.1 {}'.format(md.ports[1]),
+            ],
+            os='iosxe',
+            platform='cat9k',
+            log_buffer=True,
+            credentials=dict(default=dict(username='cisco', password='cisco'),
+                             alt=dict(username='admin', password='lab')),
+            settings={
+                'FIND_BOOT_IMAGE': False,
+                'ROMMON_INIT_COMMANDS': [
+                    'set',
+                    'ping 1.1.1.1'
+                ]
+            }
+        )
+        try:
+            c.connect()
+            self.assertEqual(c.state_machine.current_state, 'enable')
+            self.assertEqual(c.hostname, 'switch')
+        finally:
+            c.disconnect()
+            md.stop()
+
+    def test_connect_cat9k_ha_rommon_init_commands_learn_hostname(self):
+        md = MockDeviceTcpWrapperIOSXECat9k(port=0, state='cat9k_ha_active_rommon,cat9k_ha_standby_rommon')
+        md.start()
+
+        c = Connection(
+            hostname='switch',
+            start=[
+                'telnet 127.0.0.1 {}'.format(md.ports[0]),
+                'telnet 127.0.0.1 {}'.format(md.ports[1]),
+            ],
+            os='iosxe',
+            platform='cat9k',
+            log_buffer=True,
+            credentials=dict(default=dict(username='cisco', password='cisco'),
+                             alt=dict(username='admin', password='lab')),
+            settings={
+                'FIND_BOOT_IMAGE': False,
+                'ROMMON_INIT_COMMANDS': [
+                    'set',
+                    'ping 1.1.1.1'
+                ]
+            },
+            learn_hostname=True
+        )
+        try:
+            c.connect()
+            self.assertEqual(c.state_machine.current_state, 'enable')
+            self.assertEqual(c.hostname, 'Router')
+        finally:
+            c.disconnect()
+            md.stop()
+
+
+    def test_connect_cat9k_ha_learn_hostname(self):
+        md = MockDeviceTcpWrapperIOSXECat9k(hostname='R1', port=0, state='cat9k_ha_active_enable,cat9k_ha_standby_enable')
+        md.start()
+
+        c = Connection(
+            hostname='switch',
+            start=[
+                'telnet 127.0.0.1 {}'.format(md.ports[0]),
+                'telnet 127.0.0.1 {}'.format(md.ports[1]),
+            ],
+            os='iosxe',
+            platform='cat9k',
+            log_buffer=True,
+            credentials=dict(default=dict(username='cisco', password='cisco'),
+                             alt=dict(username='admin', password='lab')),
+            learn_hostname=True
+        )
+        try:
+            c.connect()
+            self.assertEqual(c.state_machine.current_state, 'enable')
+            self.assertEqual(c.hostname, 'R1')
         finally:
             c.disconnect()
             md.stop()

@@ -21,8 +21,14 @@ c8k_disable:
   prompt: "%N>"
   commands:
     "en":
-      new_state: c8k_enable
+      new_state: c8k_enable_password
     "enable":
+      new_state: c8k_enable_password
+
+c8k_enable_password:
+  prompt: "Password:"
+  commands:
+    "cisco":
       new_state: c8k_enable
 
 c8k_enable:
@@ -271,6 +277,20 @@ c8k_password2:
   prompt: "Password: "
   commands:
     "cisco":
+      new_state: c8k_disable2
+
+c8k_disable2:
+  prompt: "%N>"
+  commands:
+    "en":
+      new_state: c8k_enable_password2
+    "enable":
+      new_state: c8k_enable_password2
+
+c8k_enable_password2:
+  prompt: "Password:"
+  commands:
+    "cisco":
       new_state: c8k_enable2
 
 c8k_enable2:
@@ -321,8 +341,14 @@ c8k_disable3:
   prompt: "%N>"
   commands:
     "en":
-      new_state: c8k_enable3
+      new_state: c8k_enable_password3
     "enable":
+      new_state: c8k_enable_password3
+
+c8k_enable_password3:
+  prompt: "Password:"
+  commands:
+    "cisco":
       new_state: c8k_enable3
 
 c8k_enable3:

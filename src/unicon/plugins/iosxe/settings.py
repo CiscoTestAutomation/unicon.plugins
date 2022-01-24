@@ -46,3 +46,5 @@ class IosXESettings(GenericSettings):
         self.GUESTSHELL_ENABLE_CMDS = 'guestshell enable'
         self.GUESTSHELL_ENABLE_VERIFY_CMDS = []
         self.GUESTSHELL_ENABLE_VERIFY_PATTERN = r''
+
+        self.ROMMON_INIT_COMMANDS = []

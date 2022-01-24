@@ -37,5 +37,6 @@ supported_os = [
     'gaia',
     'hvrp'
     'slxos',
-    'nd'
+    'nd',
+    'viptela'
 ]

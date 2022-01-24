@@ -1574,3 +1574,66 @@ class BashService(GenericBashService):
 
             return self
 
+
+
+class L2ribDtService(BaseService):
+    """ Service to provide an console to do l2rib commands
+
+    Arguments:
+        client_id: Client Id used for the client connection
+                   If not passed, random client id will be used
+
+    Example:
+        .. code-block:: python
+
+            with rtr.l2rib_dt(client_id=1000) as l2rib:
+                l2rib.execute('help')
+
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.start_state = "l2rib_dt"
+        self.end_state = "l2rib_dt"
+
+    def pre_service(self, *args, **kwargs):
+        if kwargs.get('client_id'):
+            self.context['_client_id'] = kwargs.get('client_id')
+
+        super().pre_service(self,args,kwargs)
+
+    def call_service(self, target=None, client_id = None, **kwargs):
+        handle = self.get_handle(target)
+        self.result = self.ContextMgr(connection=handle, **kwargs)
+
+    class ContextMgr(object):
+        def __init__(self, connection, **kwargs):
+            self.conn = connection
+
+        def __enter__(self):
+            self.conn.log.debug('--- attaching l2rib console ---')
+
+            sm = self.conn.state_machine
+            sm.go_to('l2rib_dt', self.conn.spawn)
+
+            return self
+
+        def __exit__(self, exc_type, exc_value, exc_tb):
+            self.conn.log.debug('--- detaching l2rib console ---')
+
+            sm = self.conn.state_machine
+            sm.go_to('enable', self.conn.spawn)
+
+            # do not suppress
+            return False
+
+        def __getattr__(self, attr):
+            if attr in ('execute', 'sendline', 'send', 'expect'):
+                return getattr(self.conn, attr)
+
+            raise AttributeError('%s object has no attribute %s'
+                                 % (self.__class__.__name__, attr))
+
+    def post_service(self, *args, **kwargs):
+        self.context.pop('_client_id', None)
+
+        super().post_service(self,args,kwargs)

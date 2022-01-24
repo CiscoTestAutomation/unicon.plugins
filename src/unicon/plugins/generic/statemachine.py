@@ -66,7 +66,7 @@ def config_transition(statemachine, spawn, context):
 
     for attempt in range(max_attempts + 1):
         spawn.sendline(statemachine.config_command)
-        buffer_wait(spawn, 0.2)
+        buffer_wait(spawn, spawn.settings.CONFIG_TRANSITION_WAIT)
         dialog.process(spawn, timeout=spawn.settings.CONFIG_TIMEOUT, context=context)
 
         statemachine.detect_state(spawn)
