@@ -35,7 +35,7 @@ supported_os = [
     'ironware',
     'eos',
     'gaia',
-    'hvrp'
+    'hvrp',
     'slxos',
     'nd',
     'viptela'

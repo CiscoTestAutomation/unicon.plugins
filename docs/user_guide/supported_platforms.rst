@@ -38,6 +38,7 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
     ``fxos``, ``fp9k``
     ``fxos``, ``ftd``,,"Deprecated, please use one of the other fxos plugins."
     ``gaia``, , , "Check Point Gaia OS"
+    ``hvrp``
     ``ios``, ``ap``
     ``ios``, ``iol``
     ``ios``, ``iosv``

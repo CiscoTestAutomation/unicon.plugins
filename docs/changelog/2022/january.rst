@@ -1,16 +1,16 @@
 January 2022
-==========
+============
 
-January 25 - Unicon v22.1 
-------------------------
+January 25 - Unicon v22.1
+---------------------------
 
 
 
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
 
-        ``unicon.plugins``, v22.1 
-        ``unicon``, v22.1 
+        ``unicon.plugins``, v22.1
+        ``unicon``, v22.1
 
 Install Instructions
 ^^^^^^^^^^^^^^^^^^^^
@@ -31,11 +31,6 @@ Upgrade Instructions
 Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-
-
-
-Changelogs
-^^^^^^^^^^
 --------------------------------------------------------------------------------
                                       Fix                                       
 --------------------------------------------------------------------------------
@@ -60,3 +55,5 @@ Changelogs
 * connection provider
     * Added support for ROMMON init commands
     * Updated hostname learning for Dual RP
+
+
