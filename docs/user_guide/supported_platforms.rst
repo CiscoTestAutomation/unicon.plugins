@@ -38,6 +38,7 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
     ``fxos``, ``fp9k``
     ``fxos``, ``ftd``,,"Deprecated, please use one of the other fxos plugins."
     ``gaia``, , , "Check Point Gaia OS"
+    ``hvrp``
     ``ios``, ``ap``
     ``ios``, ``iol``
     ``ios``, ``iosv``
@@ -47,8 +48,11 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
     ``iosxe``, ``cat3k``, ``ewlc``
     ``iosxe``, ``cat8k``
     ``iosxe``, ``cat9k``
+    ``iosxe``, ``c9800``
+    ``iosxe``, ``c9800``, ``ewc_ap``
     ``iosxe``, ``csr1000v``
     ``iosxe``, ``csr1000v``, ``vewlc``
+    ``iosxe``, ``iec3400``
     ``iosxe``, ``sdwan``
     ``iosxr``
     ``iosxr``, ``asr9k``

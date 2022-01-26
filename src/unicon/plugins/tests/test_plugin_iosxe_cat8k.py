@@ -54,7 +54,12 @@ class TestIosXECat8kPluginSwitchover(unittest.TestCase):
             start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
             os='iosxe',
             platform='cat8k',
-            settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2, POST_HA_RELOAD_CONFIG_SYNC_WAIT=1),
+            settings=dict(
+                POST_DISCONNECT_WAIT_SEC=0,
+                GRACEFUL_DISCONNECT_WAIT_SEC=0.2,
+                POST_HA_RELOAD_CONFIG_SYNC_WAIT=1,
+                POST_SWITCHOVER_WAIT=1,
+            ),
             credentials=dict(default=dict(username='admin', password='cisco')),
             mit=True,
         )
@@ -62,6 +67,35 @@ class TestIosXECat8kPluginSwitchover(unittest.TestCase):
             c.connect()
             c.switchover()
             self.assertEqual(c.state_machine.current_state, 'enable')
+        finally:
+            c.disconnect()
+            md.stop()
+
+    def test_switchover_output(self):
+        md = MockDeviceTcpWrapperIOSXECat8k(port=0, state='c8k_login')
+        md.start()
+
+        c = Connection(
+            hostname='Switch',
+            start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
+            os='iosxe',
+            platform='cat8k',
+            settings=dict(
+                POST_DISCONNECT_WAIT_SEC=0,
+                GRACEFUL_DISCONNECT_WAIT_SEC=0.2,
+                POST_HA_RELOAD_CONFIG_SYNC_WAIT=1,
+                POST_SWITCHOVER_WAIT=1,
+            ),
+            credentials=dict(default=dict(username='admin', password='cisco')),
+            mit=True,
+        )
+        try:
+            c.connect()
+            status = c.switchover(return_output=True)
+            self.assertTrue(status.result)
+            self.assertIn(
+                'IOSXE_INFRA-6-CONSOLE_ACTIVE: R0/1 console active.',
+                status.output)
         finally:
             c.disconnect()
             md.stop()
@@ -75,7 +109,11 @@ class TestIosXECat8kPluginSwitchover(unittest.TestCase):
             start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
             os='iosxe',
             platform='cat8k',
-            settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+            settings=dict(
+                POST_DISCONNECT_WAIT_SEC=0,
+                GRACEFUL_DISCONNECT_WAIT_SEC=0.2,
+                POST_SWITCHOVER_WAIT=1,
+            ),
             credentials=dict(default=dict(username='admin', password='cisco')),
             mit=True,
         )
@@ -96,14 +134,19 @@ class TestIosXECat8kPluginSwitchover(unittest.TestCase):
             start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
             os='iosxe',
             platform='cat8k',
-            settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2, POST_HA_RELOAD_CONFIG_SYNC_WAIT=1),
+            settings=dict(
+                POST_DISCONNECT_WAIT_SEC=0,
+                GRACEFUL_DISCONNECT_WAIT_SEC=0.2,
+                POST_HA_RELOAD_CONFIG_SYNC_WAIT=1,
+                SWITCHOVER_COUNTER=2,
+                POST_SWITCHOVER_WAIT=1,
+                ),
             credentials=dict(default=dict(username='admin', password='cisco')),
             mit=True,
         )
         try:
             c.connect()
-            with self.assertRaises(Exception):
-                c.switchover()
+            self.assertFalse(c.switchover())
         finally:
             c.disconnect()
             md.stop()

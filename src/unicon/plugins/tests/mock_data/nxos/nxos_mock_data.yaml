@@ -89,7 +89,7 @@ exec:
     "run bash":
       new_state: bash
     "run bash sudo su":
-      new_state: bash_nxos
+      new_state: bash
     "guestshell enable":
       response:
         - "Note: Guest shell is currently activating or deactivating; please retry request"
@@ -353,6 +353,10 @@ bash:
     "sudo yum list installed | grep n9000": |
       base-files.n9000                        3.0.14-r74.2                   installed
       bfd.lib32_n9000                         1.0.0-r0                       installed
+    "/isan/bin/l2rib_dt 1000":
+        new_state: nxos_l2rib_dt
+    "/isan/bin/l2rib_dt -r":
+        new_state: nxos_l2rib_dt
     "exit":
       new_state: exec
 
@@ -505,13 +509,12 @@ bash_n3k:
     "exit":
       new_state: exec_n3k
 
-
-bash_nxos:
-  prompt: 'bash-3.0# '
+nxos_l2rib_dt:
+  prompt: "L2RIBCLIENT-1000>"
   commands:
-    "ls": ""
-    "exit":
-      new_state: exec
+    "help": "help"
+    "exit" :
+      new_state: bash
 
 console_escape:
   preface: "Escape character is ~,'"

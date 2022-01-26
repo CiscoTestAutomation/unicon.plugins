@@ -40,6 +40,7 @@ class NxosServiceList(ServiceList):
         self.configure = svc.Configure
         self.configure_dual = svc.ConfigureDual
         self.execute = svc.NxosExecute
+        self.l2rib_dt = svc.L2ribDtService
 
 
 class HANxosServiceList(HAServiceList):
@@ -61,6 +62,7 @@ class HANxosServiceList(HAServiceList):
         self.bash_console = svc.BashService
         self.ping6 = svc.Ping6
         self.configure = svc.Configure
+        self.l2rib_dt = svc.L2ribDtService
 
 
 class NxosSingleRpConnection(BaseSingleRpConnection):

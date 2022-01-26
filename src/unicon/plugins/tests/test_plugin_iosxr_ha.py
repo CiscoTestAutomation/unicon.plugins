@@ -51,6 +51,7 @@ class TestIOSXRPluginHAConnect(unittest.TestCase):
         self.r.switchover(sync_standby=False)
 
     def test_switchover_with_standby_sync(self):
+        self.r.settings.STANDBY_STATE_INTERVAL = 1
         self.r.switchover(sync_standby=True)
 
     def test_bash_console(self):

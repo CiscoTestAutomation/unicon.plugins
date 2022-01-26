@@ -49,6 +49,12 @@ class GenericSettings(Settings):
         self.RELOAD_RECONNECT_ATTEMPTS = 3
         self.CONSOLE_TIMEOUT = 60
 
+        # Wait for the config prompt to appear
+        # before checking for the config prompt.
+        # This may need to be adjusted if the RTT between
+        # the execution host and lab device is high.
+        self.CONFIG_TRANSITION_WAIT = 0.2
+
         # When connecting to a device via telnet, how long (in seconds)
         # to pause before checking the spawn buffer
         self.ESCAPE_CHAR_CHATTY_TERM_WAIT = 0.25
@@ -150,6 +156,10 @@ class GenericSettings(Settings):
                               'Unknown protocol -',
                               'bad context', 'Failed to resolve',
                               '(U|u)nknown (H|h)ost']
+
+        # Overwite testbed tokens during token discovery
+        self.LEARN_DEVICE_TOKENS = False
+        self.OVERWRITE_TESTBED_TOKENS = False
 
         self.LEARN_OS_COMMANDS = [
             'show version',

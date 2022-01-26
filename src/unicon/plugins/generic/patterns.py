@@ -77,3 +77,5 @@ class GenericPatterns(UniconCorePatterns):
 
         self.press_any_key = r'^.*?Press any key to continue\.\s*$'
 
+        # VT100 patterns
+        self.get_cursor_position = r'\x1b\[6n'

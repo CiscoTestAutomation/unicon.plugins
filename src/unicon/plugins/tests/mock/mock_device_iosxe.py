@@ -5,7 +5,7 @@ import sys
 import logging
 import argparse
 
-from unicon.mock.mock_device import MockDevice, MockDeviceTcpWrapper
+from unicon.mock.mock_device import MockDevice, MockDeviceTcpWrapper, wait_key
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +72,11 @@ class MockDeviceIOSXE(MockDevice):
         elif re.match(r'copy http://127.0.0.1:\d+/test.txt flash:', cmd):
             return True
         elif re.match(r'copy test.txt http://127.0.0.1:\d+/R1_test.txt', cmd):
+            return True
+        elif cmd == 'get terminal position':
+            self._write('\x1b[6n', transport)
+            sys.stdout.flush()
+            wait_key()
             return True
 
     def general_config(self, transport, cmd):

@@ -35,7 +35,7 @@ c9k_enable:
       "term length 0": ""
       "term width 0": ""
       "reload":
-        new_state: cat9k_ha_reload_proceed
+        new_state: c9k_reload_proceed
       "show version" :
         response: |
           Cisco IOS XE Software, Version 16.09.02

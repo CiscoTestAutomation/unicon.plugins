@@ -296,3 +296,64 @@ cat9k_ha_standby_enable:
         Motherboard Revision Number        : 3
         Model Number                       : C9407R              
         System Serial Number               : FXS2144Q2G7
+
+cat9k_ha_active_rommon:
+    prompt: "switch:"
+    commands:
+      "set": |
+        BOOT=bootflash:/cat9k_iosxe.17.06.01.SPA.bin;
+        BOOT_LOADER_UPGRADE_DISABLE=1
+        MANUAL_BOOT=yes
+      "MANUAL_BOOT=yes": ""
+      "unset TFTP_FILE": ""
+      "unset BOOT": ""
+      "TFTP_BLKSIZE=8192": ""
+      "unset BOOT_DEVICE_MODE": ""
+      "unlock flash:": ""
+      "ping 1.1.1.1": |
+        16 bytes from 1.1.1.1: ICMPv4 seq#0 RTT=656 ms
+      "boot":
+        new_state: cat9k_ha_active_rommon_boot
+      "boot tftp://1.1.1.1/latest.bin":
+        new_state: cat9k_ha_active_rommon_boot
+
+cat9k_ha_active_rommon_boot:
+  preface:
+    response: file|mock_data/iosxe/cat9k_ha_reload.txt
+    timing:
+      - 0:,0,0.005
+  prompt: ""
+  commands:
+    "":
+      new_state: cat9k_ha_active_disable
+
+
+cat9k_ha_standby_rommon:
+    prompt: "switch:"
+    commands:
+      "set": |
+        BOOT=bootflash:/cat9k_iosxe.17.06.01.SPA.bin;
+        BOOT_LOADER_UPGRADE_DISABLE=1
+        MANUAL_BOOT=yes
+      "MANUAL_BOOT=yes": ""
+      "unset TFTP_FILE": ""
+      "unset BOOT": ""
+      "TFTP_BLKSIZE=8192": ""
+      "unset BOOT_DEVICE_MODE": ""
+      "unlock flash:": ""
+      "ping 1.1.1.1": |
+        16 bytes from 1.1.1.1: ICMPv4 seq#0 RTT=656 ms
+      "boot":
+        new_state: cat9k_ha_standby_rommon_boot
+      "boot tftp://1.1.1.1/latest.bin":
+        new_state: cat9k_ha_standby_rommon_boot
+
+cat9k_ha_standby_rommon_boot:
+  preface:
+    response: file|mock_data/iosxe/cat9k_ha_reload.txt
+    timing:
+      - 0:,0,0.005
+  prompt: ""
+  commands:
+    "":
+      new_state: cat9k_ha_active_disable

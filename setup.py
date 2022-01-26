@@ -106,6 +106,7 @@ setup(
                          'tests/mock_data/*/*.txt',
                          'tests/mock_data/*/*/*.txt',
                          'tests/unittest/ssh_host_key',
+                         'tools/pid_tokens.csv'
                          ]},
 
     # Standalone scripts

@@ -577,6 +577,7 @@ class TestIosXEConfigure(unittest.TestCase):
           with self.assertRaises(SubCommandFailure) as err:
               r = c.configure(cmd)
         c.disconnect()
+
     def test_configure_with_msgs(self):
         md = MockDeviceTcpWrapperIOSXE(port=0, state='config_with_msgs')
         md.start()
@@ -947,6 +948,26 @@ class TestIosxeTclsh(unittest.TestCase):
         c.connect()
         c.tclsh()
         c.enable()
+        c.disconnect()
+
+
+class TestConfigTransition(unittest.TestCase):
+
+    def test_config_transition_setting(self):
+        c = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state general_enable --hostname PE1'],
+            os='iosxe',
+            mit=True
+        )
+        c.connect()
+        self.assertEqual(c.settings.CONFIG_TRANSITION_WAIT, 0.2)
+        self.assertEqual(c.spawn.settings.CONFIG_TRANSITION_WAIT, 0.2)
+        c.configure()
+        c.settings.CONFIG_TRANSITION_WAIT = 1
+        c.configure()
+        self.assertEqual(c.settings.CONFIG_TRANSITION_WAIT, 1)
+        self.assertEqual(c.spawn.settings.CONFIG_TRANSITION_WAIT, 1)
         c.disconnect()
 
 

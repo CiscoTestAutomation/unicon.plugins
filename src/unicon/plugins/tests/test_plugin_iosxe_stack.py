@@ -143,7 +143,8 @@ class TestIosXEStackConfigure(unittest.TestCase):
                        chassis_type='stack',
                        username='cisco',
                        tacacs_password='cisco',
-                       enable_password='cisco')
+                       enable_password='cisco',
+                       log_buffer=True)
         c.connect()
 
         c.configure('no logging console', target='standby')
@@ -160,7 +161,8 @@ class TestIosXEStackGetRPState(unittest.TestCase):
                        chassis_type='stack',
                        username='cisco',
                        tacacs_password='cisco',
-                       enable_password='cisco')
+                       enable_password='cisco',
+                       log_buffer=True)
         c.connect()
 
         r = c.get_rp_state(target='active')
