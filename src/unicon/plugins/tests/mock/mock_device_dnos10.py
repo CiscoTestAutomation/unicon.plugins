@@ -35,7 +35,7 @@ def main(args=None):
         logging.getLogger(__name__).setLevel(logging.DEBUG)
 
     state = args.state or 'login,console_standby'
-    hostname = args.hostname or 'OS10'
+    hostname = args.hostname or 'DellOS10'
     md = MockDeviceDnos10(hostname=hostname, state=state)
     md.run()
 

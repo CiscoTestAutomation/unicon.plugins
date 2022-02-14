@@ -8,7 +8,7 @@ connect_ssh:
       new_state: user_access_veri
 
 exec:
-  prompt: "OS10#"
+  prompt: "%N#"
   commands:
     "show ip interface brief" : |
       Interface Name            IP-Address          OK       Method       Status     Protocol

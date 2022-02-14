@@ -17,23 +17,23 @@ unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC = 0.2
 class TestDnos10PluginConnect(unittest.TestCase):
 
     def test_login_connect(self):
-        c = Connection(hostname='OS10',
+        c = Connection(hostname='DellOS10',
                         start=['mock_device_cli --os dnos10 --state exec'],
                         os='dnos10',
                         credentials=dict(default=dict(username='knox', password='dell1111')))
         c.connect()
-        self.assertIn('OS10#', c.spawn.match.match_output)
+        self.assertIn('DellOS10#', c.spawn.match.match_output)
 
     def test_login_connect_ssh(self):
-        c = Connection(hostname='OS10',
+        c = Connection(hostname='DellOS10',
                         start=['mock_device_cli --os dnos10 --state connect_ssh'],
                         os='dnos10',
                         credentials=dict(default=dict(username='knox', password='dell1111')))
         c.connect()
-        self.assertIn('OS10#', c.spawn.match.match_output)
+        self.assertIn('DellOS10#', c.spawn.match.match_output)
 
     def test_login_connect_connectReply(self):
-        c = Connection(hostname='OS10',
+        c = Connection(hostname='DellOS10',
                         start=['mock_device_cli --os dnos10 --state exec'],
                         os='dnos10',
                         credentials=dict(default=dict(username='knox', password='dell1111')),
@@ -45,7 +45,7 @@ class TestDnos10PluginConnect(unittest.TestCase):
 class TestDnos10PluginExecute(unittest.TestCase):
 
     def test_execute_show_feature(self):
-        c = Connection(hostname='OS10',
+        c = Connection(hostname='DellOS10',
                         start=['mock_device_cli --os dnos10 --state exec'],
                         os='dnos10',
                         credentials=dict(default=dict(username='knox', password='dell1111')),
