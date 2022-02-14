@@ -50,7 +50,9 @@ class TestDnos6PluginExecute(unittest.TestCase):
         c = Connection(hostname='DellOS6',
                         start=['mock_device_cli --os dnos6 --state exec'],
                         os='dnos6',
-                        credentials=dict(default=dict(username='knox', password='dell1111')))
+                        credentials=dict(default=dict(username='knox', password='dell1111')),
+                        init_exec_commands=[],
+                        init_config_commands=[])
         c.connect()
         cmd = 'show ip interface'
         expected_response = mock_data['exec']['commands'][cmd].strip()
