@@ -2,12 +2,16 @@ import os
 import yaml
 import unittest
 
+import unicon
 from unicon import Connection
 from unicon.eal.dialogs import Dialog
 from unicon.mock.mock_device import mockdata_path
 
 with open(os.path.join(mockdata_path, 'dnos6/dnos6_mock_data.yaml'), 'rb') as datafile:
     mock_data = yaml.safe_load(datafile.read())
+
+unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
+unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC = 0.2
 
 
 class TestDnos6PluginConnect(unittest.TestCase):
@@ -16,8 +20,7 @@ class TestDnos6PluginConnect(unittest.TestCase):
         c = Connection(hostname='DellOS6',
                         start=['mock_device_cli --os dnos6 --state exec'],
                         os='dnos6',
-                        username='knox',
-                        tacacs_password='dell1111')
+                        credentials=dict(default=dict(username='knox', password='dell1111')))
         c.connect()
         self.assertIn('DellOS6#', c.spawn.match.match_output)
         c.disconnect()
@@ -26,8 +29,7 @@ class TestDnos6PluginConnect(unittest.TestCase):
         c = Connection(hostname='DellOS6',
                         start=['mock_device_cli --os dnos6 --state connect_ssh'],
                         os='dnos6',
-                        username='knox',
-                        tacacs_password='dell1111')
+                        credentials=dict(default=dict(username='knox', password='dell1111')))
         c.connect()
         self.assertIn('DellOS6#', c.spawn.match.match_output)
         c.disconnect()
@@ -36,8 +38,7 @@ class TestDnos6PluginConnect(unittest.TestCase):
         c = Connection(hostname='DellOS6',
                         start=['mock_device_cli --os dnos6 --state exec'],
                         os='dnos6',
-                        username='knox',
-                        tacacs_password='dell1111',
+                        credentials=dict(default=dict(username='knox', password='dell1111')),
                         connect_reply = Dialog([[r'^(.*?)Password:']]))
         c.connect()
         self.assertIn("^(.*?)Password:", str(c.connection_provider.get_connection_dialog()))
@@ -49,8 +50,7 @@ class TestDnos6PluginExecute(unittest.TestCase):
         c = Connection(hostname='DellOS6',
                         start=['mock_device_cli --os dnos6 --state exec'],
                         os='dnos6',
-                        username='knox',
-                        tacacs_password='dell1111')
+                        credentials=dict(default=dict(username='knox', password='dell1111')))
         c.connect()
         cmd = 'show ip interface'
         expected_response = mock_data['exec']['commands'][cmd].strip()
