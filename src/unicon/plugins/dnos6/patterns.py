@@ -6,8 +6,6 @@ https://youtube.com/c/dataknox
 Contents largely inspired by sample Unicon repo:
 https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_example/src/unicon_plugin_example
 '''
-import re
-
 from unicon.plugins.generic.patterns import GenericPatterns
 
 
