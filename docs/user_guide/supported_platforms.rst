@@ -33,6 +33,8 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
     ``confd``
     ``confd``, ``esc``
     ``confd``, ``nfvis``
+    ``dnos6``
+    ``dnos10``
     ``fxos``,,,"Tested with FP2K."
     ``fxos``, ``fp4k``
     ``fxos``, ``fp9k``

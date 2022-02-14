@@ -13,7 +13,7 @@ from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine
 from . import statements as stmts
 
 
-class DellSingleRpStateMachine(GenericSingleRpStateMachine):
+class Dnos10SingleRpStateMachine(GenericSingleRpStateMachine):
 
     def create(self):
         '''

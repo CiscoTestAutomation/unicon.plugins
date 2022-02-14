@@ -9,20 +9,19 @@ https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_e
 
 from unicon.bases.routers.connection import BaseSingleRpConnection
 from unicon.plugins.generic import GenericSingleRpConnectionProvider
-from .statemachine import DellSingleRpStateMachine
-from .services import DellServiceList
-from .settings import DellSettings
+from .statemachine import Dnos6SingleRpStateMachine
+from .services import Dnos6ServiceList
+from .settings import Dnos6Settings
 
 
-class DellSingleRPConnection(BaseSingleRpConnection):
-    '''DellosSingleRPConnection
+class Dnos6SingleRPConnection(BaseSingleRpConnection):
+    '''Dnos6SingleRPConnection
 
-    Dell PowerSwitch platform support. Because our imaginary platform was inspired
-    from Cisco IOSv platform, we are extending (inhering) from its plugin.
+    Dell OS6 PowerSwitch support.
     '''
-    os = 'dell'
+    os = 'dnos6'
     chassis_type = 'single_rp'
-    state_machine_class = DellSingleRpStateMachine
+    state_machine_class = Dnos6SingleRpStateMachine
     connection_provider_class = GenericSingleRpConnectionProvider
-    subcommand_list = DellServiceList
-    settings = DellSettings()
+    subcommand_list = Dnos6ServiceList
+    settings = Dnos6Settings()

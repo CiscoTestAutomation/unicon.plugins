@@ -10,7 +10,7 @@ https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_e
 from unicon.plugins.generic.settings import GenericSettings
 
 
-class DellSettings(GenericSettings):
+class Dnos10Settings(GenericSettings):
 
     def __init__(self):
         # inherit any parent settings

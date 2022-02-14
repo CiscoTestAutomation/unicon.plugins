@@ -27,7 +27,8 @@ class Execute(GenericExec):
         # call parent
         super().call_service(*args, **kwargs)
 
-class DellServiceList(IosvServiceList):
+
+class Dnos10ServiceList(IosvServiceList):
     '''
     class aggregating all service lists for this platform
     '''

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import re
 import sys
 import logging
 import argparse
@@ -9,17 +8,17 @@ from unicon.mock.mock_device import MockDevice, MockDeviceTcpWrapper
 
 logger = logging.getLogger(__name__)
 
-class MockDeviceDellos10(MockDevice):
+class MockDeviceDnos10(MockDevice):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, device_os='dell_os10', **kwargs)
+        super().__init__(*args, device_os='dnos10', **kwargs)
 
 
-class MockDeviceTcpWrapperDellos10(MockDeviceTcpWrapper):
+class MockDeviceTcpWrapperDnos10(MockDeviceTcpWrapper):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, device_os='dell_os10', **kwargs)
-        self.mockdevice = MockDeviceDellos10(*args, **kwargs)
+        super().__init__(*args, device_os='dnos10', **kwargs)
+        self.mockdevice = MockDeviceDnos10(*args, **kwargs)
 
 
 def main(args=None):
@@ -37,7 +36,7 @@ def main(args=None):
 
     state = args.state or 'login,console_standby'
     hostname = args.hostname or 'OS10'
-    md = MockDeviceDellos10(hostname=hostname, state=state)
+    md = MockDeviceDnos10(hostname=hostname, state=state)
     md.run()
 
 
