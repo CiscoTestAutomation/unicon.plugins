@@ -2,7 +2,7 @@
                                 Fix
 --------------------------------------------------------------------------------
 * dnos6
-    * removed dell os and os6 platform, replaced with dnos6 os
+    * NON BACKWARDS-COMPATIBLE CHANGE: removed dell os and os6 platform, replaced with dnos6 os
 
 --------------------------------------------------------------------------------
                                 New
