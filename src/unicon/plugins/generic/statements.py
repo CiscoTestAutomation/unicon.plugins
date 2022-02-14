@@ -36,6 +36,11 @@ utils = Utils()
 #  Callbacks
 #############################################################
 
+def terminal_position_handler(spawn, session, context):
+    """ send terminal position (VT100) """
+    spawn.send('\x1b[0;200R')
+
+
 def connection_refused_handler(spawn):
     """ handles connection refused scenarios
     """
@@ -609,6 +614,11 @@ class GenericStatements():
                                             loop_continue=False,
                                             continue_timer=False)
 
+        self.terminal_position_stmt = Statement(pattern=pat.get_cursor_position,
+                                                action=terminal_position_handler,
+                                                args=None,
+                                                loop_continue=True,
+                                                continue_timer=False)
 
 #############################################################
 #  Statement lists

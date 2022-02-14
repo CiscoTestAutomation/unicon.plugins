@@ -50,6 +50,11 @@ from .service_statements import execution_statement_list, configure_statement_li
 utils = GenericUtils()
 ReloadResult = collections.namedtuple('ReloadResult', ['result', 'output'])
 
+class SwitchoverResult:
+    def __init__(self, result, output, **kwargs):
+        self.result = result
+        self.output = output
+
 
 def invalid_state_change_action(spawn, err_state, sm):
     msg = "Expected device to reach '{}' state, but landed on '{}' state."\

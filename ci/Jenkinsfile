@@ -12,10 +12,13 @@ pipeline {
         stage('Clone repos') {
             steps {
                 checkout([$class: 'GitSCM', branches: [[name: '*/dev']], extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'unicon']], userRemoteConfigs: [[credentialsId: 'e8a7354a-c71a-42cb-83ee-49ab5ad40085', url: 'https://wwwin-github.cisco.com/pyATS/unicon.git']]])
+                checkout([$class: 'GitSCM', branches: [[name: '*/dev']], extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'genieparser']], userRemoteConfigs: [[credentialsId: 'e8a7354a-c71a-42cb-83ee-49ab5ad40085', url: 'https://wwwin-github.cisco.com/pyATS/genieparser.git']]])
                 script {
                     sh """
                     ls -l
-                    cd unicon
+                    cd ${WORKSPACE}/unicon
+                    git remote -v
+                    cd ${WORKSPACE}/genieparser
                     git remote -v
                     """
                 }
@@ -23,28 +26,16 @@ pipeline {
         }
 
         stage('Checkout branches') {
-            when { not { changeRequest() } }
             steps {
                 script {
                     sh """
-                    cd unicon
                     # checkout same branch on unicon, if it exists
-                    git checkout ${BRANCH_NAME} || true
-                    """
-                }
-            }
-        }
-
-        stage('Checkout branches (PR)') {
-            when {
-                changeRequest()
-            }
-            steps {
-                script {
-                    sh """
-                    cd unicon
-                    # checkout same branch on unicon, if it exists
-                    git checkout origin/${CHANGE_BRANCH} || true
+                    cd ${WORKSPACE}/unicon
+                    git checkout ${env.CHANGE_BRANCH == null ? env.GIT_BRANCH : env.CHANGE_BRANCH} || true
+                    git status
+                    # checkout same branch on genieparser, if it exists
+                    cd ${WORKSPACE}/genieparser
+                    git checkout ${env.CHANGE_BRANCH == null ? env.GIT_BRANCH : env.CHANGE_BRANCH} || true
                     git status
                     """
                 }
@@ -63,9 +54,11 @@ pipeline {
                     pip install --upgrade pip
                     pip3 install wheel asyncssh cryptography==3.3.1 pytest pytest-xdist
                     pip3 install -i http://pyats-pypi.cisco.com/simple --trusted-host pyats-pypi.cisco.com cisco-distutils ats[full]
-                    cd $WORKSPACE/unicon
+                    cd ${WORKSPACE}
                     make develop
-                    cd ..
+                    cd ${WORKSPACE}/unicon
+                    make develop
+                    cd ${WORKSPACE}/genieparser
                     make develop
                 """
             }

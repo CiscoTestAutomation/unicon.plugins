@@ -7,3 +7,4 @@ class IosXECat8kSettings(IosXESettings):
 
     def __init__(self):
         super().__init__()
+        self.POST_SWITCHOVER_WAIT = 30

@@ -534,3 +534,30 @@ reconnect_sleep           int (default 60 sec)        sleep time interval before
 
         # using return_output
         result, output = rtr.reload(return_output=True)
+
+
+l2rib_dt
+--------
+
+Layer 2 Routing Information Base (L2RIB) developer tool service.
+
+With this service, the l2rib tool can be used to execute commands. The service
+is intended to be used as a context manager, see example below.
+
+=======================   =======================     ===============================================
+Argument                  Type                        Description
+=======================   =======================     ===============================================
+client_id                 int                         (optional) Client identifier for l2rib_dt tool.
+                                                      By default, a random ID will be used.
+=======================   =======================     ===============================================
+
+
+.. code-block:: python
+
+        # default client ID (random)
+        with rtr.l2rib_dt() as l2rib:
+            l2rib.execute('l2rib command')
+
+        # specific client ID
+        with rtr.l2rib_dt(client_id=1000) as l2rib:
+            l2rib.execute('l2rib command')

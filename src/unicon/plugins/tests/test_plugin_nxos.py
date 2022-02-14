@@ -737,5 +737,42 @@ class TestNxosPluginSwitchtoVdc(unittest.TestCase):
         self.c.switchback()
 
 
+class TestNxosL2ribClient(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.dev = Connection(hostname='switch',
+                             start=['mock_device_cli --os nxos --state exec'],
+                             os='nxos',
+                             username='cisco',
+                             tacacs_password='cisco',
+                             init_exec_commands=[],
+                             init_config_commands=[],
+                             log_buffer=True)
+        cls.dev.connect()
+
+    def test_l2rib_client(self):
+        self.dev.execute('run bash sudo su', allow_state_change=True)
+        self.dev.execute('/isan/bin/l2rib_dt -r', allow_state_change=True)
+        self.dev.execute('help')
+        self.dev.enable()
+
+    def test_l2rib_client_context_manager(self):
+        with self.dev.l2rib_dt() as rib:
+            rib.execute('help')
+
+    def test_l2rib_client_execute(self):
+        self.dev.l2rib_dt().execute('help')
+        self.dev.enable()
+
+    def test_l2rib_client_id(self):
+        with self.dev.l2rib_dt(client_id=1000) as rib:
+            rib.execute('help')
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.dev.disconnect()
+
+
 if __name__ == "__main__":
     unittest.main()

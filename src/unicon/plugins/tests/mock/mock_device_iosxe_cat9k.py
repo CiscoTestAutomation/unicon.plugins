@@ -6,6 +6,7 @@ import logging
 import argparse
 
 from unicon.mock.mock_device import MockDevice, MockDeviceTcpWrapper
+from unicon.plugins.tests.mock.mock_device_iosxe import MockDeviceIOSXE, MockDeviceTcpWrapperIOSXE
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +35,14 @@ class MockDeviceIOSXECat9k(MockDevice):
             logger.info(handles)
             self.set_state(self.transport_handles[handles[0]],
                            'cat9k_ha_standby_disable')
+
+    def cat9k_rommon(self, transport, cmd):
+        if re.match(r'boot tftp://.*', cmd):
+            handles = [h for h in self.transport_handles if h == transport]
+            self.set_state(self.transport_handles[handles[0]],
+                           'cat9k_rommon_boot')
+            return True
+
 
 
 class MockDeviceTcpWrapperIOSXECat9k(MockDeviceTcpWrapper):

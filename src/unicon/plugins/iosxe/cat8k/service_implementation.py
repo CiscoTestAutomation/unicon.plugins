@@ -1,12 +1,15 @@
 __author__ = "Lukas McClelland <lumcclel@cisco.com>"
 
-
+import io
 import re
-import warnings
+import logging
 from time import sleep
+
 from unicon.eal.dialogs import Dialog
 from unicon.core.errors import SubCommandFailure
 from unicon.bases.routers.services import BaseService
+from unicon.logs import UniconStreamHandler, UNICON_LOG_FORMAT
+from unicon.plugins.generic.service_implementation import SwitchoverResult
 from unicon.plugins.iosxe.cat8k.service_statements import switchover_statement_list
 
 
@@ -39,12 +42,17 @@ class SwitchoverService(BaseService):
         self.timeout = connection.settings.SWITCHOVER_TIMEOUT
         self.dialog = Dialog(switchover_statement_list)
         self.command = 'redundancy force-switchover'
+        self.log_buffer = io.StringIO()
+        lb = UniconStreamHandler(self.log_buffer)
+        lb.setFormatter(logging.Formatter(fmt=UNICON_LOG_FORMAT))
+        self.connection.log.addHandler(lb)
         self.__dict__.update(kwargs)
 
     def call_service(self, command=None,
                      reply=Dialog([]),
                      timeout=None,
                      sync_standby=True,
+                     return_output=False,
                      *args,
                      **kwargs):
 
@@ -52,7 +60,16 @@ class SwitchoverService(BaseService):
         con = self.connection
         timeout = timeout or self.timeout
         command = command or self.command
+
+        if not isinstance(reply, Dialog):
+            raise SubCommandFailure(
+                "dialog passed via 'reply' must be an instance of Dialog")
+
         reply += self.dialog
+
+        # Clear log buffer
+        self.log_buffer.seek(0)
+        self.log_buffer.truncate()
 
         con.log.debug("+++ Issuing switchover on  %s  with "
                       "switchover_command %s and timeout is %s +++"
@@ -71,23 +88,30 @@ class SwitchoverService(BaseService):
         try:
             reply.process(con.spawn,
                            timeout=timeout,
-                           prompt_recovery=self.prompt_recovery)
+                           prompt_recovery=self.prompt_recovery,
+                           context=self.context)
         except TimeoutError:
             pass
         except SubCommandFailure as err:
             raise SubCommandFailure("Switchover Failed %s" % str(err)) from err
+
+        con.log.info(f'Waiting {con.settings.POST_SWITCHOVER_WAIT} seconds')
+        sleep(con.settings.POST_SWITCHOVER_WAIT)
 
         con.state_machine.go_to(
             'any',
             con.spawn,
             prompt_recovery=self.prompt_recovery,
             timeout=con.connection_timeout,
+            context=self.context
         )
         con.state_machine.go_to(
             'enable',
             con.spawn,
-            prompt_recovery=self.prompt_recovery
+            prompt_recovery=self.prompt_recovery,
+            context=self.context
         )
+        self.result = True
 
         if not sync_standby:
             con.log.info("Standby state check disabled on user request")
@@ -100,6 +124,7 @@ class SwitchoverService(BaseService):
                 try:
                     output = con.execute('show platform')
                 except (SubCommandFailure, TimeoutError):
+                    self.result = False
                     con.log.info(
                         "Encountered subcommand failure while trying to "
                         "execute 'show platform'. Waiting for %s seconds"
@@ -116,6 +141,17 @@ class SwitchoverService(BaseService):
                         sleep(sleep_per_interval)
 
                 if interval * sleep_per_interval >= standby_wait_time:
-                    raise Exception(
+                    con.log.error(
                             'Standby failed to complete initialization within '
                             '{} seconds'.format(standby_wait_time))
+                    self.result = False
+
+        self.log_buffer.seek(0)
+        switchover_output = self.log_buffer.read()
+        # clear buffer
+        self.log_buffer.truncate()
+
+        if return_output:
+            self.result = SwitchoverResult(
+                result=self.result,
+                output=switchover_output)
