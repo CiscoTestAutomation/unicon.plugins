@@ -4,7 +4,7 @@ from pathlib import Path
 from pyats.topology.loader import load
 from unittest.mock import MagicMock, patch
 from unicon.plugins.utils import AbstractTokenDiscovery
-from unicon.plugins.utils import load_pid_token_csv_file
+from unicon.plugins.utils import load_token_csv_file
 from unicon.plugins.tests.mock.mock_device_generic import (
     MockDeviceTcpWrapperGeneric
 )
@@ -172,6 +172,7 @@ devices:
             log_contents = f.read()
         self.assertIn('+++ Unicon plugin linux +++', log_contents)
 
+
 class TestAbstractTokenDiscoveryStandardization(unittest.TestCase):
     """ Run unit testing on AbstractTokenDiscovery.standardize_tokens()
     """
@@ -334,9 +335,9 @@ devices:
 
     def test_pid_file_sorted(self):
         repo_dir = Path(os.path.realpath(__file__)).parents[4]
-        pid_file = \
+        token_csv_file = \
             os.path.join(repo_dir, os.path.join('tools', 'pid_tokens.csv'))
-        pid_data = load_pid_token_csv_file(pid_file)
+        pid_data = load_token_csv_file(token_csv_file)
         keys = list(pid_data.keys())
         sorted_keys = sorted(pid_data.keys())
         self.assertListEqual(keys, sorted_keys, msg=
@@ -399,6 +400,56 @@ class TestAbstractTokenDiscoveryHAConnection(unittest.TestCase):
             self.assertEqual(dev.platform, 'asr1k')
             self.assertEqual(dev.model, 'asr1000')
             self.assertEqual(dev.pid, 'ASR1006')
+
+
+class TestUtils(unittest.TestCase):
+
+    def test_load_token_csv_file(self):
+        main_repo_dir = Path(os.path.realpath(__file__)).parents[4]
+        lookup_file = os.path.join(main_repo_dir, \
+            os.path.join('tools', 'pid_tokens.csv'))
+
+        # Test default behavior
+        data = load_token_csv_file(file_path=lookup_file)
+        subset_dict = {
+            'WS-C6513-E': {
+                'os': 'iosxe',
+                'platform': 'cat6k',
+                'model': 'CAT6500'
+            },
+            '2501FRAD-FX': {
+                'os': 'ios',
+                'platform': 'c2k',
+                'model': 'C2500'
+            },
+            'NCS2002-SA': {
+                'os': 'iosxr',
+                'platform': 'ncs2k',
+                'model': 'NCS2000'
+            }
+        }
+        self.assertEqual(data, {**data, **subset_dict})
+
+        # Test different key
+        data = load_token_csv_file(file_path=lookup_file, key='model')
+        subset_dict = {
+            'CAT6500': {
+                'pid': 'WS-C6513-E',
+                'os': 'iosxe',
+                'platform': 'cat6k'
+            },
+            'C2500': {
+                'pid': 'CISCO2525',
+                'os': 'ios',
+                'platform': 'c2k'
+            },
+            'N3500': {
+                'pid': 'N3K-C3548P-XL',
+                'os': 'nxos',
+                'platform': 'n3k'
+            }
+        }
+        self.assertEqual(data, {**data, **subset_dict})
 
 
 if __name__ == "__main__":

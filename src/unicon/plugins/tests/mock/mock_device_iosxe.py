@@ -2,8 +2,11 @@
 
 import re
 import sys
+import fnmatch
 import logging
 import argparse
+import datetime
+from textwrap import dedent
 
 from unicon.mock.mock_device import MockDevice, MockDeviceTcpWrapper, wait_key
 
@@ -53,18 +56,21 @@ class MockDeviceIOSXE(MockDevice):
             self.files_on_flash.append(filename)
             return True
         elif cmd == 'dir':
+            lines = ['      Directory of flash:/']
             if self.files_on_flash:
-                lines = ['   52429131    Apr 05 08:53:17 2021  ' + f for f in self.files_on_flash]
+                lines += ['   52429131    Apr 05 08:53:17 2021  ' + f for f in self.files_on_flash]
                 self._write('\n'.join(lines), transport)
                 self._write('\n\n', transport)
+                self._write('        11353194496 bytes total (1054248960 bytes free)', transport)
                 return True
             else:
                 return False
         elif re.match(r'delete \S+', cmd):
             m = re.match(r'delete (\S+)', cmd)
             filename = m.group(1)
-            if filename in self.files_on_flash:
-                self.files_on_flash.remove(filename)
+            for fn in self.files_on_flash:
+                if fnmatch.fnmatch(fn, filename):
+                    self.files_on_flash.remove(filename)
             return True
         elif re.match(r'copy flash:\S+ scp:\S+', cmd):
             self.set_state(self.transport_handles[transport], 'scp_password')
@@ -78,9 +84,67 @@ class MockDeviceIOSXE(MockDevice):
             sys.stdout.flush()
             wait_key()
             return True
+        elif re.match(r'dir flash:/?CRFT_\*', cmd):
+            lines = ['   52429131    Apr 05 08:53:17 2021  ' + f for f in self.files_on_flash if 'CRFT_' in f]
+            if lines:
+                self._write('\n'.join(lines), transport)
+                self._write('\n\n', transport)
+                return True
+            else:
+                return False
+        elif re.match(r'dir flash:/?BTRACE_\*', cmd):
+            lines = ['   52429131    Apr 05 08:53:17 2021  ' + f for f in self.files_on_flash if 'BTRACE_' in f]
+            if lines:
+                self._write('\n'.join(lines), transport)
+                self._write('\n\n', transport)
+                return True
+            else:
+                return False
+        elif re.match(r'request platform software trace archive target flash:/.*', cmd):
+            output = dedent("""
+            Creating archive file [flash:/test.tar.gz]
+
+            Done with creation of the archive file: [flash:/test.tar.gz]
+            """)
+            self._write(output, transport)
+            self._write('\n\n', transport)
+            self.files_on_flash.append('test.tar.gz')
+            return True
+        elif re.match(r'request platform software crft.*', cmd):
+            self._write('Successful remote archive of CRFT collection to "/bootflash/test.tar.gz" with checksum 20df732e655aed41522550cc4e6f0329', transport)
+            self._write('\n\n', transport)
+            self.files_on_flash.append('test.tar.gz')
+            return True
+        elif re.match('copy flash:/CRFT.*', cmd):
+            self._write('537450 bytes copied in 3.021 secs (177905 bytes/sec)\n', transport)
+            return True
+        elif re.match(r"verify /md5 (.*)", cmd):
+            m = re.match(r"verify /md5 (.*)", cmd)
+            filename = m.group(1)
+            output = dedent("""
+
+            .............Done!
+
+            verify /md5 ({}) = d8e8fca2dc0f896fd7cb4cb0031ba249
+            """.format(filename))
+            self._write(output, transport)
+            self._write('\n\n', transport)
+            return True
+        elif re.match("show clock", cmd):
+            ts = datetime.datetime.now()
+            self._write('{}{} UTC {}{}{}\n\n'.format(
+                ts.strftime(r'%H:%M:%S'),
+                ts.strftime(r'.%f')[:4],
+                ts.strftime(r'%a %b '),
+                ts.strftime(r'%d').lstrip('0'),
+                ts.strftime(r' %Y')), transport)
+            return True
+
 
     def general_config(self, transport, cmd):
         if 'path bootflash:' in cmd:
+            return True
+        elif 'platform crft' in cmd:
             return True
 
     def ctc_enable(self, transport, cmd):

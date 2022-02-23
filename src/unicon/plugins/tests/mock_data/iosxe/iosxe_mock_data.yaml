@@ -167,11 +167,15 @@ general_enable:
 
     "show tcp brief | inc .22 |.23": |
       0160C06C  127.0.0.1.22                127.0.0.1.51363             ESTAB
+    "show tcp brief | inc .22 |.23 ": |
+      0160C06C  127.0.0.1.22                127.0.0.1.51363             ESTAB
     "copy ftp://myftpserver/myimage.bin flash:/": ""
     "dir": |
       Directory of flash:/
 
       52429131    Apr 05 08:53:17 2021  test.txt
+
+      11353194496 bytes total (1055051776 bytes free)
 
     "show archive": ""
     "show policy-map interface tenGigabitEthernet 2/0/11": |
@@ -201,6 +205,64 @@ general_enable:
     "write memory": ""
     "tclsh":
       new_state: tclsh
+    "delete /force flash:CRFT_*": ""
+    "dir flash:CRFT_*": |
+      Directory of flash:/CRFT_*
+
+
+      No such file
+
+
+      11353194496 bytes total (1055051776 bytes free)
+
+    "dir flash:BTRACE_*": |
+      Directory of flash:/BTRACE_*
+
+
+      No such file
+
+
+      11353194496 bytes total (1055051776 bytes free)
+
+    "dir flash:/CRFT_*":
+      response:
+      - |
+        Directory of flash:/CRFT_*
+
+        34  -rw-      537450  Dec 22 2021 07:05:46 +00:00  CRFT__U1__000001__C8000V_2021-12-22_07-05-46.tar.gz
+
+        11353194496 bytes total (1055051776 bytes free)
+
+      - |
+        Directory of flash:/CRFT_*
+
+
+        No such file
+
+
+        11353194496 bytes total (1055051776 bytes free)
+
+    "dir flash:/BTRACE_*": |
+      Directory of flash:/BTRACE_*
+
+
+      No such file
+
+
+      11353194496 bytes total (1055051776 bytes free)
+
+    "show ntp associations":
+      response:
+        - |2
+            address         ref clock       st   when   poll reach  delay  offset   disp
+          *~127.127.1.1     .LOCL.           0      6     16   377  0.000   0.000  1.204
+           * sys.peer, # selected, + candidate, - outlyer, x falseticker, ~ configured
+        - |2
+            address         ref clock       st   when   poll reach  delay  offset   disp
+          *~127.127.1.1     .LOCL.           0      6     16   377  0.000   0.000  1.204
+           ~10.1.1.1        .INIT.          16      -   1024     0  0.000   0.000 15937.
+           * sys.peer, # selected, + candidate, - outlyer, x falseticker, ~ configured
+    
 
 general_config:
   prompt: "%N(conf)#"
@@ -239,6 +301,8 @@ general_config:
     "iox": ""
     "app-hosting appid guestshell": ""
     "app-vnic management guest-interface 0": ""
+    "service internal": ""
+    "ntp server 10.1.1.1": ""
 
 
 general_config_line:

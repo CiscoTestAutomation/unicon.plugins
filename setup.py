@@ -45,7 +45,8 @@ def version_info(*paths):
 version, version_range = version_info('src', 'unicon', 'plugins', '__init__.py')
 
 install_requires = ['unicon {range}'.format(range = version_range),
-                    'pyyaml']
+                    'pyyaml',
+                    'PrettyTable']
 
 # launch setup
 setup(

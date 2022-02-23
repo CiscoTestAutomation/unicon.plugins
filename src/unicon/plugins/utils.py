@@ -157,28 +157,45 @@ def sanitize(s):
     return s.translate(mpa).strip().replace(' ', '')
 
 
-def load_pid_token_csv_file(file_path):
+def load_token_csv_file(file_path, key='pid'):
     """ Opens the provided .csv file and loads the contents into a dictionary
 
-    This functions assumes the csv file has the following format:
-    pid,os,platform,model
+    A header is required for correct loading. For example:
+    pid,os,platform,model,etc...
+
+    By default, this function uses 'pid' as a key column for the return
+    dictionary, but a different key can be specified instead
+    load_token_csv_file(file_path, key='custom_key')
 
     For example:
     ASR1002-F,iosxe,asr1k,ASR1000
     or
     CISCO1005,iosxe,c1k,C1000
     """
-    pid_dict = {}
+
+    ret_dict = {}
     with open(file_path) as f:
         reader = csv.reader(f)
-        next(reader, None)  # skip the file headers
-        for rows in reader:
-            pid_dict[rows[0]] = {
-                'os':rows[1],
-                'platform':rows[2],
-                'model':rows[3]
-            }
-    return pid_dict
+        header = next(reader, None)
+
+        # Create an index mapping for dynamic token loading. Isolate the index
+        # of the key and dump the rest into a dict. For example:
+        # {'os': 1, 'platform': 2, 'model': 3}, where key_index = 0
+        index_map = {}
+        key_index = 0
+        for index in range(len(header)):
+            if header[index] == key:
+                key_index = index
+            else:
+                index_map[header[index]] = index
+
+        # Populate return dict by looping through rows and applying index_map
+        for row in reader:
+            key_dict = ret_dict.setdefault(row[key_index], {})
+            for token_name, token_index in index_map.items():
+                key_dict[token_name] = row[token_index]
+
+    return ret_dict
 
 
 class AbstractTokenDiscovery():
@@ -206,7 +223,7 @@ class AbstractTokenDiscovery():
         main_repo_dir = Path(os.path.realpath(__file__)).parents[3]
         self.pid_lookup_file = os.path.join(main_repo_dir, \
             os.path.join('tools', 'pid_tokens.csv'))
-        self.pid_data = load_pid_token_csv_file(file_path=self.pid_lookup_file)
+        self.pid_data = load_token_csv_file(file_path=self.pid_lookup_file)
 
         # Attach commands and accompying classes for cleaner looping
         self.commands_and_classes = {
@@ -260,7 +277,7 @@ class AbstractTokenDiscovery():
         discovery_prompt_stmt = \
             Statement(pattern=self.con.state_machine\
                 .get_state('learn_tokens_state').pattern)
-        dialog = Dialog([discovery_prompt_stmt])
+        dialog = Dialog([discovery_prompt_stmt]) + self.con.state_machine.default_dialog
 
         # Execute the command on the device
         for cmd in self.commands_and_classes:
