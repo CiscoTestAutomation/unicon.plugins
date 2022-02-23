@@ -64,7 +64,6 @@ docs:
 	@echo "Done."
 	@echo ""
 
-
 test:
 	@$(TESTCMD)
 

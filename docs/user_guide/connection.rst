@@ -13,12 +13,12 @@ There are two primary ways of creating device CLI connections using Unicon:
 Using pyATS Testbed YAML
 ------------------------
 
-The simplest way to create a device connection using Unicon is through a 
-pyATS testbed YAML file. 
+The simplest way to create a device connection using Unicon is through a
+pyATS testbed YAML file.
 
 The testbed YAML file contains all necessary information that instructs Unicon
-on *how* a connection should be established (eg, using what parameters and 
-credentials). 
+on *how* a connection should be established (eg, using what parameters and
+credentials).
 
 .. code-block:: yaml
 
@@ -27,7 +27,7 @@ credentials).
     #
     #   a simple pyATS testbed YAML file
 
-      
+
   devices:
       csr1000v-1:
           type: router
@@ -42,7 +42,7 @@ credentials).
               cli:
                   protocol: ssh
                   ip: 168.10.1.35
- 
+
 Note that in the above file, the following key values are used by Unicon
 to identify the proper plugin to use to create the underlying connection:
 
@@ -51,7 +51,7 @@ to identify the proper plugin to use to create the underlying connection:
   * ``model:`` - platform model of the device [optional]
 
 If an equivalent unicon connection plugin is not found for a device, unicon
-will use the ``generic plugin``. 
+will use the ``generic plugin``.
 
 .. tip::
 
@@ -75,7 +75,7 @@ test scripts, or within Python:
     testbed = loader.load('my-testbed.yaml')
 
     device = testbed.devices['csr1000v-1']
-    
+
     device.connect()
 
     device.execute('show version')
@@ -548,26 +548,26 @@ This example uses the 'cli' connection which initiates a SSH session the to defa
     admin@127.0.0.1's password:
 
     admin connected from 127.0.0.1 using ssh on nso-dev-server
-    admin@ncs# 
+    admin@ncs#
     2017-06-02T08:15:55: %UNICON-INFO: +++ initializing handle +++
 
     2017-06-02T08:15:55: %UNICON-INFO: +++ None  +++
     paginate false
-    admin@ncs# 
+    admin@ncs#
     2017-06-02T08:15:55: %UNICON-INFO: +++ execute  +++
     screen-length 0
-    admin@ncs# 
+    admin@ncs#
     2017-06-02T08:15:55: %UNICON-INFO: +++ execute  +++
     screen-width 0
-    admin@ncs# 
+    admin@ncs#
     2017-06-02T08:15:55: %UNICON-INFO: Attaching  all Subcommands
-    >>> 
+    >>>
 
 
 
 **Connecting to NSO CLI via ncs_cli command using above testbed file**
 
-It is also possible to run the ncs_cli command to initiate the CLI session, 
+It is also possible to run the ncs_cli command to initiate the CLI session,
 use the 'command' option in the testbed.yaml file to specify the ncs_cli command.
 
 Specify the 'via' option if the default is not specified in the connection defaults.
@@ -604,18 +604,18 @@ Specify the 'via' option if the default is not specified in the connection defau
     2017-06-02T08:19:19: %UNICON-INFO: ncs_cli -C
 
     dwapstra connected from 10.0.2.2 using ssh on nso-dev-server
-    dwapstra@ncs# 
+    dwapstra@ncs#
     2017-06-02T08:19:19: %UNICON-INFO: +++ initializing handle +++
 
     2017-06-02T08:19:19: %UNICON-INFO: +++ None  +++
     paginate false
-    dwapstra@ncs# 
+    dwapstra@ncs#
     2017-06-02T08:19:19: %UNICON-INFO: +++ execute  +++
     screen-length 0
-    dwapstra@ncs# 
+    dwapstra@ncs#
     2017-06-02T08:19:19: %UNICON-INFO: +++ execute  +++
     screen-width 0
-    dwapstra@ncs# 
+    dwapstra@ncs#
     2017-06-02T08:19:19: %UNICON-INFO: Attaching  all Subcommands
 
 
@@ -714,8 +714,8 @@ Check here for more details on pyATS `Connection Pool`_ feature.
 Python APIs
 -----------
 
-This section covers how to connect to a device in standalone mode, using raw 
-Python APIs directly. 
+This section covers how to connect to a device in standalone mode, using raw
+Python APIs directly.
 
 To connect to a device, you need.
     * IP address
@@ -928,7 +928,7 @@ and ``CONFIGURE_ERROR_PATTERN`` by using ``overwrite_settings=False`` argument.
      '^%\\s*[Ii]nvalid (command|input)',
      '^%\\s*[Ii]ncomplete (command|input)',
      '^%\\s*[Aa]mbiguous (command|input)']
-    
+
     # this can be done from testbed yaml as well
     # the following is an example testbed
     devices:
@@ -1176,7 +1176,7 @@ To enable debug logs, use below:
     import logging
     uut.log.setLevel(logging.DEBUG)
 
-Debug log now integrates with pyATS testbed yaml file. You can enable it 
+Debug log now integrates with pyATS testbed yaml file. You can enable it
 by define the `debug: True` in the yaml file:
 
 .. code-block:: python
@@ -1350,7 +1350,7 @@ In pyATS shell:
     # pyats shell --testbed-file testbed.yaml
     >>> from genie.testbed import load
     >>> testbed = load('testbed.yaml')
-    -------------------------------------------------------------------------------            
+    -------------------------------------------------------------------------------
     >>> dev = testbed.devices['uut']
     >>> dev.connect(learn_os=True)
     # dev.connect()  << if learn_os is not provided, then it will use generic plugin
@@ -1416,7 +1416,7 @@ In pyATS shell:
 
     2020-08-11 16:17:40,221: %UNICON-INFO: Learned device os: iosxe
 
-    2020-08-11 16:17:40,222: %UNICON-INFO: 
+    2020-08-11 16:17:40,222: %UNICON-INFO:
     Learned device os: iosxe
     Redirect to corresponding plugins.
 
@@ -1492,4 +1492,113 @@ In pyATS shell:
     Router(config-line)#exec-timeout 0
     Router(config-line)#end
     Router#
-    
+
+
+Device Abstraction Token Discovery
+----------------------------------
+
+Device abstraction tokens are device specific data points that allow pyATS, Genie, and Unicon to alter program behavior to best suit each device.
+These tokens include:
+
+- `device.os`
+- `device.os_flavor`
+- `device.version`
+- `device.platform`
+- `device.model`
+- `device.pid`
+
+During the initial connection to a device, Unicon will learn the device abstraction tokens using the following steps:
+
+#. Execute the following show commands on the device:
+    - `show version`
+    - `show inventory`
+    - `uname -a`
+#. Convert the raw output into dictionaries using parsers
+#. The dictionaries are used to retrieve specific data which are then assigned as abstraction tokens under the device object
+#. Finally, Unicon will redirect to the correct connection plugin.
+
+.. note::
+    The data gathered by executing the show commands is only used to set up the device abstraction tokens.
+
+To make use of this feature, you can choose from the following actions:
+
+1. Set the `learn_tokens` argument to True when calling `device.connect`
+
+.. code-block:: python
+
+    device.connect(learn_tokens=True)
+
+2. Use device connection settings in the testbed file
+
+.. code-block:: yaml
+
+    devices:
+      device1:
+        ...
+        connections:
+          defaults:
+            class: unicon.Unicon
+          a:
+            ...
+            settings:
+              learn_tokens: True
+
+3. Use device connection arguments in the testbed file
+
+.. code-block:: yaml
+
+    devices:
+      device1:
+        ...
+        connections:
+          defaults:
+            class: unicon.Unicon
+          a:
+            ...
+            arguments:
+              learn_tokens: True
+
+By default, token discovery will not overwrite tokens that you have already defined in your testbed file. 
+It will only assign discovered tokens to the device object if the token does not yet exist or if the value is generic. For example: `platform: generic`.
+
+You can override this behavior if you'd like. Using the `overwrite_testbed_tokens` flag will cause any discovered token to be assigned to the device object regardless of what has been defined in the testbed. 
+This flag can be set in the same way as `learn_tokens`:
+
+1. Set the `overwrite_testbed_tokens` argument to True when calling `device.connect`
+
+.. code-block:: python
+
+    device.connect(learn_tokens=True, overwrite_testbed_tokens=True)
+
+2. Use device connection settings in the testbed file
+
+.. code-block:: yaml
+
+    devices:
+      device1:
+        ...
+        connections:
+          defaults:
+            class: unicon.Unicon
+          a:
+            ...
+            settings:
+              learn_tokens: True
+              overwrite_testbed_tokens: True
+
+3. Use device connection arguments in the testbed file
+
+.. code-block:: yaml
+
+    devices:
+      device1:
+        ...
+        connections:
+          defaults:
+            class: unicon.Unicon
+          a:
+            ...
+            arguments:
+              learn_tokens: True
+              overwrite_testbed_tokens: True
+
