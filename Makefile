@@ -15,7 +15,7 @@ PYPIREPO      = pypitest
 
 DEPENDENCIES = robotframework pyyaml dill coverage Sphinx \
 			   sphinxcontrib-napoleon sphinxcontrib-mockautodoc \
-			   sphinx-rtd-theme asyncssh
+			   sphinx-rtd-theme asyncssh PrettyTable
 
 
 .PHONY: clean package distribute develop undevelop help devnet\
@@ -63,7 +63,6 @@ docs:
 	@echo ""
 	@echo "Done."
 	@echo ""
-
 
 test:
 	@$(TESTCMD)

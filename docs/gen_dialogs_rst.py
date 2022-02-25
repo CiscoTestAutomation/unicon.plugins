@@ -141,7 +141,8 @@ Dialog Patterns
 
             try:
                 print_dialogs('execute', c.execute.dialog if c.execute.dialog else Dialog([]))
-                print_dialogs('configure', c.configure.dialog if c.configure.dialog else Dialog([]))
+                if hasattr(c, 'configure'):
+                    print_dialogs('configure', c.configure.dialog if c.configure.dialog else Dialog([]))
             except Exception:
                 print('---------------- ERROR ---------------', file=sys.stderr)
                 traceback.print_exc()

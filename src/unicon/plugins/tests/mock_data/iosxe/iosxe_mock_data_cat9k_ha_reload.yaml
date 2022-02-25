@@ -135,6 +135,9 @@ cat9k_ha_active_enable:
     "reload":
         new_state: cat9k_ha_active_enable_reload_confirm
 
+    "install add file activate commit":
+        new_state: cat9k_ha_active_install_add
+
     "config term":
         new_state: cat9k_ha_active_config
 
@@ -357,3 +360,9 @@ cat9k_ha_standby_rommon_boot:
   commands:
     "":
       new_state: cat9k_ha_active_disable
+
+cat9k_ha_active_install_add:
+  prompt: "This operation may require a reload of the system. Do you want to proceed? [y/n]"
+  commands:
+    "y":
+      new_state: cat9k_ha_active_enable_reload_confirm

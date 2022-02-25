@@ -117,10 +117,10 @@ class HAReload(GenericHAReload):
             self.connection.active.context['boot_cmd'] = reload_command
 
         if command:
-            super().call_service(command or "reload",
+            super().call_service(command or "reload", reply=reply,
                                  timeout=timeout, *args, **kwargs)
         else:
-            super().call_service(reload_command=reload_command or "reload",
+            super().call_service(reload_command=reload_command or "reload", reply=reply,
                                  timeout=timeout, *args, **kwargs)
 
 

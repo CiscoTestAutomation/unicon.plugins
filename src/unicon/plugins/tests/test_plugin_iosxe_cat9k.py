@@ -6,6 +6,7 @@ import unittest
 
 import unicon
 from unicon import Connection
+from unicon.eal.dialogs import Statement, Dialog
 from unicon.plugins.tests.mock.mock_device_iosxe import MockDeviceTcpWrapperIOSXE
 from unicon.plugins.tests.mock.mock_device_iosxe_cat9k import MockDeviceTcpWrapperIOSXECat9k
 
@@ -41,6 +42,23 @@ class TestIosXeCat9kPlugin(unittest.TestCase):
         try:
             d.connect()
             self.assertEqual(d.hostname, 'WLC')
+        finally:
+            d.disconnect()
+
+    def test_connect_learn_hostname_config_mode(self):
+        d = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe --state c9k_config --hostname c9300-55'],
+                       os='iosxe',
+                       platform='cat9k',
+                       credentials=dict(default=dict(username='admin', password='cisco')),
+                       settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+                       learn_hostname=True,
+                       log_buffer=True,
+                       connection_timeout=3
+                       )
+        try:
+            d.connect()
+            self.assertEqual(d.hostname, 'c9300-55')
         finally:
             d.disconnect()
 
@@ -332,7 +350,40 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
             c.disconnect()
             md.stop()
 
+    def test_reload_ha_adding_dialog(self):
+        md = MockDeviceTcpWrapperIOSXECat9k(port=0, state='cat9k_ha_active_escape,cat9k_ha_standby_escape')
+        md.start()
 
+        c = Connection(
+            hostname='switch',
+            start=[
+                'telnet 127.0.0.1 {}'.format(md.ports[0]),
+                'telnet 127.0.0.1 {}'.format(md.ports[1]),
+            ],
+            os='iosxe',
+            platform='cat9k',
+            settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+            credentials=dict(default=dict(username='cisco', password='cisco'),
+                             alt=dict(username='admin', password='lab')),
+
+        )
+        install_add_one_shot_dialog = Dialog([
+                Statement(pattern=r".*reload of the system\. "
+                                  r"Do you want to proceed\? \[y\/n\]",
+                          action='sendline(y)',
+                          loop_continue=True,
+                          continue_timer=False),
+            ])
+        try:
+            c.connect()
+            c.settings.POST_RELOAD_WAIT = 1
+
+            c.reload('install add file activate commit',
+                               reply=install_add_one_shot_dialog,)
+            self.assertEqual(c.state_machine.current_state, 'enable')
+        finally:
+            c.disconnect()
+            md.stop()
 class TestIosXeCat9kPluginContainer(unittest.TestCase):
 
     def test_container_exit(self):
