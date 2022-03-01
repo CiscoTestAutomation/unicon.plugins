@@ -6,16 +6,16 @@ https://youtube.com/c/dataknox
 Contents largely inspired by sample Unicon repo:
 https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_example/src/unicon_plugin_example
 '''
-import re
 
-from unicon.plugins.generic.patterns import GenericPatterns
+from unicon.plugins.generic.settings import GenericSettings
 
 
-class DellPatterns(GenericPatterns):
+class Dnos10Settings(GenericSettings):
+
     def __init__(self):
+        # inherit any parent settings
         super().__init__()
-        self.login_prompt = r' *login here: *?'
-        self.disable_mode = r'\w+>$'
-        self.privileged_mode = r'\w+[^\(config\)]#$'
-        self.config_mode = r'\w+\(config[-\w]+\)#$'
-        self.password = r'Password:'
+        self.CONNECTION_TIMEOUT = 60*5
+        self.ESCAPE_CHAR_CALLBACK_PRE_SENDLINE_PAUSE_SEC = 1
+        self.HA_INIT_EXEC_COMMANDS = []
+        self.HA_INIT_CONFIG_COMMANDS = []

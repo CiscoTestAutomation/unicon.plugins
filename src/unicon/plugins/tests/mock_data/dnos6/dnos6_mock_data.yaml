@@ -8,7 +8,7 @@ connect_ssh:
       new_state: user_access_veri
 
 exec:
-  prompt: "DellOS6#"
+  prompt: "%N#"
   commands:
     "show ip interface" : |
       "Default Gateway................................ 0.0.0.0
@@ -34,3 +34,4 @@ user_password:
   commands:
     "dell1111":
       new_state: exec
+
