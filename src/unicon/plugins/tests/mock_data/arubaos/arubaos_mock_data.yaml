@@ -1,0 +1,44 @@
+configure:
+  commands:
+    end:
+      new_state: execute
+    line console 0:
+      new_state: configure_line
+    no logging console: ''
+  prompt: switch(config)#
+configure_line:
+  commands:
+    end:
+      new_state: execute
+    exec-timeout 0: ''
+  prompt: switch(config-line)#
+connect:
+  commands:
+    ? ''
+    : new_state: execute
+  preface: 'Trying mock_device ...
+
+    Connected to mock_device.
+
+    Escape character is ''^]''.'
+  prompt: ''
+execute:
+  commands:
+    config term:
+      new_state: configure
+    config-transaction:
+      new_state: configure
+    no paging: "\n"
+    show image version: "\n\n----------------------------------\nPartition\
+      \       \t: 0:0 (/mnt/disk1)\nSoftware Version\t: ArubaOS 8.6.0.16 (Digitally\
+      \ Signed SHA1/SHA256 - Production Build)\nBuild number    \t: 82590\nLabel\
+      \           \t: 82590\nBuilt on        \t: Thu Dec 16 13:28:34 UTC 2021\n\
+      ----------------------------------\nPartition       \t: 0:1 (/mnt/disk2) **Default\
+      \ boot**\nSoftware Version\t: ArubaOS 8.10.0.0 LSR (Digitally Signed SHA1/SHA256\
+      \ - Developer/Internal Build)\nBuild number    \t: 0000\nLabel         \
+      \  \t: jenkins@yk-aos-preflight-ENG.0000\nBuilt on        \t: Wed Mar 9 09:41:5\
+      \n"
+    show version: ''
+    term length 0: ''
+    term width 0: ''
+  prompt: '(ArubaMM) *[mynode] #'

@@ -38,5 +38,6 @@ supported_os = [
     'hvrp',
     'slxos',
     'nd',
-    'viptela'
+    'viptela',
+    'arubaos'
 ]
