@@ -777,19 +777,21 @@ due to console messages over terminal and this results in reload timeout.
 In such a case `prompt_recovery` can be used to recover the device.
 Refer :ref:`prompt_recovery_label` for details on prompt_recovery feature.
 
-===============   =======================     ================================================================================
-Argument          Type                        Description
-===============   =======================     ================================================================================
-reload_command    str                         reload command to be issued on device.
-                                              default reload_command is "reload"
-reply             Dialog                      additional dialogs/new dialogs which are not handled by default.
-timeout           int                         timeout value in sec, Default Value is 300 sec
-reload_creds      list or str ('default')     Credentials to use if device prompts for user/pw.
-prompt_recovery   bool (default False)        Enable/Disable prompt recovery feature
-return_output     bool (default False)        Return namedtuple with result and reload command output
-                                              This option is available for generic, nxos and iosxe/cat3k (single rp) plugin.
-image_to_boot     str                         Image to boot from rommon. Available for iosxe/cat3k and iosxe/cat9k
-===============   =======================     ================================================================================
+====================      =======================      ================================================================================
+Argument                  Type                         Description
+====================      =======================      ================================================================================
+reload_command            str                          reload command to be issued on device.
+                                                       default reload_command is "reload"
+reply                     Dialog                       additional dialogs/new dialogs which are not handled by default.
+timeout                   int                          timeout value in sec, Default Value is 300 sec
+reload_creds              list or str ('default')      Credentials to use if device prompts for user/pw.
+prompt_recovery           bool (default False)         Enable/Disable prompt recovery feature
+return_output             bool (default False)         Return namedtuple with result and reload command output
+                                                       This option is available for generic, nxos and iosxe/cat3k (single rp) plugin.
+image_to_boot             str                          Image to boot from rommon. Available for iosxe/cat3k and iosxe/cat9k
+error_pattern             list                         List of regex strings to check output for errors.
+append_error_pattern      list                         List of regex strings append to error_pattern.
+====================      =======================      ================================================================================
 
     return :
         * True on Success
