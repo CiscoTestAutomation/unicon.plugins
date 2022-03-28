@@ -1155,18 +1155,20 @@ reload
 
 Service to reload the stack device.
 
-===============   =======================     ========================================
-Argument          Type                        Description
-===============   =======================     ========================================
-reload_command    str                         reload command to be issued on device.
-                                              default reload_command is "redundancy reload shelf"
-reply             Dialog                      additional dialogs/new dialogs which are not handled by default.
-timeout           int                         timeout value in sec, Default Value is 900 sec
-image_to_boot     str                         image to boot from rommon state
-prompt_recovery   bool (default False)        Enable/Disable prompt recovery feature
-return_output     bool (default False)        Return namedtuple with result and reload command output
-raise_on_error    bool (default: True)        Raise exception on error
-===============   =======================     ========================================
+===============           =======================     ========================================
+Argument                  Type                        Description
+===============           =======================     ========================================
+reload_command            str                         reload command to be issued on device.
+                                                      default reload_command is "redundancy reload shelf"
+reply                     Dialog                      additional dialogs/new dialogs which are not handled by default.
+timeout                   int                         timeout value in sec, Default Value is 900 sec
+image_to_boot             str                         image to boot from rommon state
+prompt_recovery           bool (default False)        Enable/Disable prompt recovery feature
+return_output             bool (default False)        Return namedtuple with result and reload command output
+raise_on_error            bool (default: True)        Raise exception on error
+error_pattern             list                        List of regex strings to check output for errors.
+append_error_pattern      list                        List of regex strings append to error_pattern.
+====================      =======================     ================================================================================
 
     return :
         * True on Success
@@ -1275,16 +1277,18 @@ reload
 
 Service to reload the quad rp device.
 
-===============   =======================     ========================================
-Argument          Type                        Description
-===============   =======================     ========================================
-reload_command    str                         reload command to be issued on device.
-                                              default reload_command is "reload"
-reply             Dialog                      additional dialogs/new dialogs which are not handled by default.
-timeout           int                         timeout value in sec, Default Value is 900 sec
-prompt_recovery   bool (default False)        Enable/Disable prompt recovery feature
-return_output     bool (default False)        Return namedtuple with result and reload command output
-===============   =======================     ========================================
+===============         =======================     ========================================
+Argument                Type                        Description
+===============         =======================     ========================================
+reload_command          str                         reload command to be issued on device.
+                                                    default reload_command is "reload"
+reply                   Dialog                      additional dialogs/new dialogs which are not handled by default.
+timeout                 int                         timeout value in sec, Default Value is 900 sec
+prompt_recovery         bool (default False)        Enable/Disable prompt recovery feature
+return_output           bool (default False)        Return namedtuple with result and reload command output
+error_pattern           list                        List of regex strings to check output for errors.
+append_error_pattern    list                        List of regex strings append to error_pattern.
+====================    =======================     ========================================
 
     return :
         * True on Success
