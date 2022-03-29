@@ -220,9 +220,7 @@ class AbstractTokenDiscovery():
 
         # Load the pid token lookup file
         self.pid_data = {}
-        main_repo_dir = Path(os.path.realpath(__file__)).parents[3]
-        self.pid_lookup_file = os.path.join(main_repo_dir, \
-            os.path.join('tools', 'pid_tokens.csv'))
+        self.pid_lookup_file = Path(__file__).parent / 'pid_tokens.csv'
         self.pid_data = load_token_csv_file(file_path=self.pid_lookup_file)
 
         # Attach commands and accompying classes for cleaner looping

@@ -1583,8 +1583,8 @@ This flag can be set in the same way as `learn_tokens`:
           a:
             ...
             settings:
-              learn_tokens: True
-              overwrite_testbed_tokens: True
+              LEARN_DEVICE_TOKENS: True
+              OVERWRITE_TESTBED_TOKENS: True
 
 3. Use device connection arguments in the testbed file
 
