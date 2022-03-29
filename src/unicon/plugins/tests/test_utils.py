@@ -60,7 +60,10 @@ devices:
         # Test that connection was redirected to the corresponding plugin
         with open(self.dev.logfile) as f:
             log_contents = f.read()
-        self.assertIn('+++ Unicon plugin asa (unicon.plugins.asa) +++', log_contents)
+        self.assertRegexpMatches(
+            log_contents,
+            r'\+\+\+ Unicon plugin asa( \(unicon\.plugins\.asa\))? \+\+\+'
+        )
 
 
     def test_ios_learn_tokens_from_show_version(self):
@@ -78,8 +81,10 @@ devices:
         # Test that connection was redirected to the corresponding plugin
         with open(self.dev.logfile) as f:
             log_contents = f.read()
-        self.assertIn('+++ Unicon plugin ios (unicon.plugins.ios) +++', log_contents)
-
+        self.assertRegexpMatches(
+            log_contents,
+            r'\+\+\+ Unicon plugin ios( \(unicon\.plugins\.ios\))? \+\+\+'
+        )
 
     # Test that finding a pid from show version that exists in refernce file,
     # is enough to get all tokens. 'show inventory' not called
@@ -99,8 +104,10 @@ devices:
         # Test that connection was redirected to the corresponding plugin
         with open(self.dev.logfile) as f:
             log_contents = f.read()
-        self.assertIn('+++ Unicon plugin iosxe ', log_contents)
-
+        self.assertRegexpMatches(
+            log_contents,
+            r'\+\+\+ Unicon plugin iosxe( \(unicon\.plugins\.iosxe\))? \+\+\+'
+        )
 
     def test_iosxr_learn_tokens_from_show_version(self):
         # Set up device to use correct mock_device data
@@ -117,8 +124,10 @@ devices:
         # Test that connection was redirected to the corresponding plugin
         with open(self.dev.logfile) as f:
             log_contents = f.read()
-        self.assertIn('+++ Unicon plugin iosxr/iosxrv (unicon.plugins.iosxr.iosxrv) +++', log_contents)
-
+        self.assertRegexpMatches(
+            log_contents,
+            r'\+\+\+ Unicon plugin iosxr/iosxrv( \(unicon\.plugins\.iosxr\.iosxrv\))? \+\+\+'
+        )
 
     def test_nxos_learn_tokens_from_show_version(self):
         # Set up device to use correct mock_device data
@@ -137,8 +146,10 @@ devices:
         # Test that connection was redirected to the corresponding plugin
         with open(self.dev.logfile) as f:
             log_contents = f.read()
-        self.assertIn('+++ Unicon plugin nxos/n5k (unicon.plugins.nxos.n5k) +++', log_contents)
-
+        self.assertRegexpMatches(
+            log_contents,
+            r'\+\+\+ Unicon plugin nxos/n5k( \(unicon\.plugins\.nxos\.n5k\))? \+\+\+'
+        )
 
     def test_learn_tokens_with_show_inventory(self):
         # Set up device to use correct mock_device data
@@ -170,8 +181,10 @@ devices:
         # Test that connection was redirected to the corresponding plugin
         with open(self.dev.logfile) as f:
             log_contents = f.read()
-        self.assertIn('+++ Unicon plugin linux (unicon.plugins.linux) +++', log_contents)
-
+        self.assertRegexpMatches(
+            log_contents,
+            r'\+\+\+ Unicon plugin linux( \(unicon\.plugins\.linux\))? \+\+\+'
+        )
 
 
 class TestAbstractTokenDiscoveryStandardization(unittest.TestCase):
