@@ -167,7 +167,10 @@ devices:
         # Test that connection was redirected to the corresponding plugin
         with open(self.dev.logfile) as f:
             log_contents = f.read()
-        self.assertIn('+++ Unicon plugin iosxe ', log_contents)
+        self.assertRegexpMatches(
+            log_contents,
+            r'\+\+\+ Unicon plugin iosxe( \(unicon\.plugins\.iosxe\))? \+\+\+'
+        )
 
     def test_linux_learn_tokens(self):
         self.dev.connections.cli.command = \
