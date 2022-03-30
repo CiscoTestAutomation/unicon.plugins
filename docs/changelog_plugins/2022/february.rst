@@ -1,3 +1,42 @@
+February 2022
+==========
+
+February 24 - Unicon.Plugins v22.2 
+------------------------
+
+
+
+.. csv-table:: Module Versions
+    :header: "Modules", "Versions"
+
+        ``unicon.plugins``, v22.2 
+        ``unicon``, v22.2 
+
+Install Instructions
+^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+    bash$ pip install unicon.plugins
+    bash$ pip install unicon
+
+Upgrade Instructions
+^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+    bash$ pip install --upgrade unicon.plugins
+    bash$ pip install --upgrade unicon
+
+Features and Bug Fixes:
+^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+Changelogs
+^^^^^^^^^^
+
 --------------------------------------------------------------------------------
                                       Fix                                       
 --------------------------------------------------------------------------------
