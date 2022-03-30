@@ -838,6 +838,8 @@ Argument     Type                      Description
 ==========   ======================    ========================================
 timeout      int (default 60 sec)      timeout in sec for executing commands
 target       str                       'standby' to bring standby console to bash.
+switch       str                       switch to connect to (optional)
+rp           str                       rp to connect to (optional)
 ==========   ======================    ========================================
 
 .. code-block:: python
@@ -851,6 +853,9 @@ target       str                       'standby' to bring standby console to bas
         output1 = bash.execute('ls', target='standby')
         output2 = bash.execute('pwd', target='standby' )
 
+    # connect bash console on standby RP
+    with device.bash_console(switch='standby', rp='active') as bash:
+        output1 = bash.execute('ls')
 
 
 guestshell

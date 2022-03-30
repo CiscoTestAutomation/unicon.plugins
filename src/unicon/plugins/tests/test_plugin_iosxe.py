@@ -391,6 +391,20 @@ class TestIosXEluginBashService(unittest.TestCase):
         self.assertIn('Router#', c.spawn.match.match_output)
         c.disconnect()
 
+    def test_bash_standby(self):
+        c = Connection(hostname='R1',
+                       start=['mock_device_cli --os iosxe --state general_enable --hostname R1'],
+                       os='iosxe',
+                       credentials=dict(default=dict(username='cisco', password='cisco')),
+                       log_buffer=True
+                       )
+        with c.bash_console(switch='standby', rp='active') as console:
+            console.execute('ls')
+        self.assertIn('exit', c.spawn.match.match_output)
+        self.assertIn('R1#', c.spawn.match.match_output)
+        c.disconnect()
+
+
 class TestIosXESDWANConfigure(unittest.TestCase):
 
     def test_config_transaction(self):
@@ -695,6 +709,20 @@ class TestIosXEConfigure(unittest.TestCase):
         c.configure(['no logging console'])
         c.disconnect()
 
+    def test_configure_host_list(self):
+        c = Connection(hostname='Switch',
+                       start=['mock_device_cli --os iosxe --state general_enable'],
+                       os='iosxe',
+                       mit=True,
+                       init_exec_commands=[],
+                       init_config_commands=[],
+                       log_buffer=True
+                       )
+        c.connect()
+        try:
+            c.configure(['ip host-list host1'])
+        finally:
+            c.disconnect()
 
 class TestIosXEEnableSecret(unittest.TestCase):
 

@@ -2478,7 +2478,7 @@ class BashService(BaseService):
         )
 
     class ContextMgr(object):
-        def __init__(self, connection, enable_bash=False, timeout=None):
+        def __init__(self, connection, enable_bash=False, timeout=None, **kwargs):
             self.conn = connection
             # Specific platforms has its own prompt
             self.enable_bash = enable_bash

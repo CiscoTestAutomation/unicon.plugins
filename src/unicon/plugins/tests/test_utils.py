@@ -60,7 +60,10 @@ devices:
         # Test that connection was redirected to the corresponding plugin
         with open(self.dev.logfile) as f:
             log_contents = f.read()
-        self.assertIn('+++ Unicon plugin asa +++', log_contents)
+        self.assertRegexpMatches(
+            log_contents,
+            r'\+\+\+ Unicon plugin asa( \(unicon\.plugins\.asa\))? \+\+\+'
+        )
 
 
     def test_ios_learn_tokens_from_show_version(self):
@@ -78,8 +81,10 @@ devices:
         # Test that connection was redirected to the corresponding plugin
         with open(self.dev.logfile) as f:
             log_contents = f.read()
-        self.assertIn('+++ Unicon plugin ios +++', log_contents)
-
+        self.assertRegexpMatches(
+            log_contents,
+            r'\+\+\+ Unicon plugin ios( \(unicon\.plugins\.ios\))? \+\+\+'
+        )
 
     # Test that finding a pid from show version that exists in refernce file,
     # is enough to get all tokens. 'show inventory' not called
@@ -99,8 +104,10 @@ devices:
         # Test that connection was redirected to the corresponding plugin
         with open(self.dev.logfile) as f:
             log_contents = f.read()
-        self.assertIn('+++ Unicon plugin iosxe +++', log_contents)
-
+        self.assertRegexpMatches(
+            log_contents,
+            r'\+\+\+ Unicon plugin iosxe( \(unicon\.plugins\.iosxe\))? \+\+\+'
+        )
 
     def test_iosxr_learn_tokens_from_show_version(self):
         # Set up device to use correct mock_device data
@@ -117,8 +124,10 @@ devices:
         # Test that connection was redirected to the corresponding plugin
         with open(self.dev.logfile) as f:
             log_contents = f.read()
-        self.assertIn('+++ Unicon plugin iosxr/iosxrv +++', log_contents)
-
+        self.assertRegexpMatches(
+            log_contents,
+            r'\+\+\+ Unicon plugin iosxr/iosxrv( \(unicon\.plugins\.iosxr\.iosxrv\))? \+\+\+'
+        )
 
     def test_nxos_learn_tokens_from_show_version(self):
         # Set up device to use correct mock_device data
@@ -137,8 +146,10 @@ devices:
         # Test that connection was redirected to the corresponding plugin
         with open(self.dev.logfile) as f:
             log_contents = f.read()
-        self.assertIn('+++ Unicon plugin nxos/n5k +++', log_contents)
-
+        self.assertRegexpMatches(
+            log_contents,
+            r'\+\+\+ Unicon plugin nxos/n5k( \(unicon\.plugins\.nxos\.n5k\))? \+\+\+'
+        )
 
     def test_learn_tokens_with_show_inventory(self):
         # Set up device to use correct mock_device data
@@ -156,7 +167,10 @@ devices:
         # Test that connection was redirected to the corresponding plugin
         with open(self.dev.logfile) as f:
             log_contents = f.read()
-        self.assertIn('+++ Unicon plugin iosxe +++', log_contents)
+        self.assertRegexpMatches(
+            log_contents,
+            r'\+\+\+ Unicon plugin iosxe( \(unicon\.plugins\.iosxe\))? \+\+\+'
+        )
 
     def test_linux_learn_tokens(self):
         self.dev.connections.cli.command = \
@@ -170,7 +184,10 @@ devices:
         # Test that connection was redirected to the corresponding plugin
         with open(self.dev.logfile) as f:
             log_contents = f.read()
-        self.assertIn('+++ Unicon plugin linux +++', log_contents)
+        self.assertRegexpMatches(
+            log_contents,
+            r'\+\+\+ Unicon plugin linux( \(unicon\.plugins\.linux\))? \+\+\+'
+        )
 
 
 class TestAbstractTokenDiscoveryStandardization(unittest.TestCase):
@@ -334,9 +351,10 @@ devices:
         tokens)
 
     def test_pid_file_sorted(self):
-        repo_dir = Path(os.path.realpath(__file__)).parents[4]
-        token_csv_file = \
-            os.path.join(repo_dir, os.path.join('tools', 'pid_tokens.csv'))
+        token_csv_file = os.path.join(
+            Path(os.path.realpath(__file__)).parents[1],
+            os.path.join('pid_tokens.csv')
+        )
         pid_data = load_token_csv_file(token_csv_file)
         keys = list(pid_data.keys())
         sorted_keys = sorted(pid_data.keys())
@@ -405,9 +423,10 @@ class TestAbstractTokenDiscoveryHAConnection(unittest.TestCase):
 class TestUtils(unittest.TestCase):
 
     def test_load_token_csv_file(self):
-        main_repo_dir = Path(os.path.realpath(__file__)).parents[4]
-        lookup_file = os.path.join(main_repo_dir, \
-            os.path.join('tools', 'pid_tokens.csv'))
+        lookup_file = os.path.join(
+            Path(os.path.realpath(__file__)).parents[1],
+            os.path.join('pid_tokens.csv')
+        )
 
         # Test default behavior
         data = load_token_csv_file(file_path=lookup_file)
