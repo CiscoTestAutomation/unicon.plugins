@@ -25,7 +25,7 @@ class IosXEPatterns(GenericPatterns):
         self.enable_prompt = \
             r'^(.*?)(WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(-standby)?(\(boot\))?(\(recovery-mode\))?#[\s\x07]*$'
         self.press_enter = ReloadPatterns().press_enter
-        self.config_prompt = r'^(.*)\(.*(con|cfg|ipsec-profile|ca-trustpoint|cs-server|ca-profile|gkm-local-server|cloud)\S*\)#\s?$'
+        self.config_prompt = r'^(.*)\(.*(con|cfg|ipsec-profile|ca-trustpoint|cs-server|ca-profile|gkm-local-server|cloud|host-list)\S*\)#\s?$'
         self.are_you_sure_ywtdt = r'Are you sure you want to do this\? \[yes/no\]:\s*$'
         self.do_you_want_to = r'^.*Do you want to remove the above files\? \[y\/n]\s*$'
         self.confirm_uncommited_changes = r'Uncommitted changes found, commit them\? \[yes\/no\/CANCEL\]\s*$'

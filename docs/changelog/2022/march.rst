@@ -1,7 +1,7 @@
-February 2022
+March 2022
 ==========
 
-February 24 - Unicon.Plugins v22.2 
+March 29 - Unicon v22.3 
 ------------------------
 
 
@@ -9,8 +9,8 @@ February 24 - Unicon.Plugins v22.2
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
 
-        ``unicon.plugins``, v22.2 
-        ``unicon``, v22.2 
+        ``unicon.plugins``, v22.3 
+        ``unicon``, v22.3 
 
 Install Instructions
 ^^^^^^^^^^^^^^^^^^^^
@@ -36,17 +36,20 @@ Features and Bug Fixes:
 
 Changelogs
 ^^^^^^^^^^
+--------------------------------------------------------------------------------
+                                      Fix                                       
+--------------------------------------------------------------------------------
+
+* plugin manager
+    * Modified plugin log message to include module
+    * Change plugin override warnings to debug logs
+
 
 --------------------------------------------------------------------------------
                                       Fix                                       
 --------------------------------------------------------------------------------
 
-* utils
-    * Modified AbstractTokenDiscovery
-        * Extended prompt dialog to handle output containing "--More--"
-    * Modified load_pid_token_csv_file
-        * Renamed to load_token_csv_file
-        * Adjusted logic to support dynamic csv loading based on header fields
-        * Added an optional `key` argument to allow for different keys to be specified other than pid
+* iosxe
+    * fix the issue for the situtation when reply passed in reload service for ha devices
 
 

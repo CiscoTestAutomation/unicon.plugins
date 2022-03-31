@@ -132,16 +132,34 @@ class HASwitchover(GenericHASwitchover):
 
 class BashService(GenericBashService):
 
+    def pre_service(self, *args, **kwargs):
+        handle = self.get_handle(kwargs.get('target'))
+        if kwargs.get('switch'):
+            handle.context['_switch'] = kwargs.get('switch')
+        else:
+            handle.context.pop('_switch', None)
+        if kwargs.get('rp'):
+            handle.context['_rp'] = kwargs.get('rp')
+        else:
+            handle.context.pop('_rp', None)
+        super().pre_service(*args, **kwargs)
+
     class ContextMgr(GenericBashService.ContextMgr):
-        def __init__(self, connection, enable_bash=False, timeout=None):
+        def __init__(self, connection, enable_bash=False, timeout=None, **kwargs):
             super().__init__(connection=connection,
                              enable_bash=enable_bash,
-                             timeout=timeout)
+                             timeout=timeout,
+                             **kwargs)
 
         def __enter__(self):
+
             self.conn.log.debug('+++ attaching bash shell +++')
             # enter shell prompt
-            self.conn.state_machine.go_to('shell', self.conn.spawn, timeout=self.timeout)
+            self.conn.state_machine.go_to(
+                'shell',
+                self.conn.spawn,
+                timeout=self.timeout,
+                context=self.conn.context)
 
             for cmd in self.conn.settings.BASH_INIT_COMMANDS:
                 self.conn.execute(

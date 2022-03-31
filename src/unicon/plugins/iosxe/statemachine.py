@@ -19,6 +19,20 @@ from .statements import (
 patterns = IosXEPatterns()
 statements = GenericStatements()
 
+def enable_bash_console_transition(statemachine, spawn, context):
+    ''' Transition from enable mode to bash_console
+
+    Optional arguments are set by bash_console() (switch and rp).
+    '''
+    switch = context.get('_switch')
+    rp = context.get('_rp')
+    cmd = 'request platform software system shell'
+    if switch:
+        cmd += f' switch {switch}'
+    if rp:
+        cmd += f' rp {rp}'
+    spawn.sendline(cmd)
+
 
 def boot_from_rommon(statemachine, spawn, context):
     context['boot_start_time'] = datetime.now()
@@ -128,7 +142,7 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         # Adding SHELL state to IOSXE platform.
         shell_dialog = Dialog([[patterns.access_shell, 'sendline(y)', None, True, False]])
 
-        enable_to_shell = Path(enable, shell, 'request platform software system shell', shell_dialog)
+        enable_to_shell = Path(enable, shell, enable_bash_console_transition, shell_dialog)
         shell_to_enable = Path(shell, enable, 'exit', None)
 
         # Add State and Path to State Machine
@@ -207,7 +221,7 @@ class IosXEDualRpStateMachine(StateMachine):
         # Adding SHELL state to IOSXE platform.
         shell_dialog = Dialog([[patterns.access_shell, 'sendline(y)', None, True, False]])
 
-        enable_to_shell = Path(enable, shell, 'request platform software system shell', shell_dialog)
+        enable_to_shell = Path(enable, shell, enable_bash_console_transition, shell_dialog)
         shell_to_enable = Path(shell, enable, 'exit', None)
 
         # Add State and Path to State Machine

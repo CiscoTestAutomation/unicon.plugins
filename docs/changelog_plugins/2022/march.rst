@@ -1,7 +1,7 @@
-February 2022
+March 2022
 ==========
 
-February 24 - Unicon v22.2 
+March 29 - Unicon.Plugins v22.3 
 ------------------------
 
 
@@ -9,8 +9,8 @@ February 24 - Unicon v22.2
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
 
-        ``unicon.plugins``, v22.2 
-        ``unicon``, v22.2 
+        ``unicon.plugins``, v22.3 
+        ``unicon``, v22.3 
 
 Install Instructions
 ^^^^^^^^^^^^^^^^^^^^
@@ -36,31 +36,33 @@ Features and Bug Fixes:
 
 Changelogs
 ^^^^^^^^^^
-
 --------------------------------------------------------------------------------
                                       Fix                                       
 --------------------------------------------------------------------------------
 
-* routers/connection provider
-    * Updates to allow hostname learning when device is found in config mode
+* iosxe
+    * Add support for switch and rp keyword arguments for bash console service
+    * Added host-list to config pattern
 
-* bases
-    * Modified BaseCommonRpConnectionProvider
-        * Added shared implementation of learn_tokens method to reduce duplicate code
-    * Modified BaseSingleRpConnectionProvider
-        * Remove duplicate code from learn_tokens
-    * Modified BaseMultiRpConnectionProvider
-        * Remove duplicate code from learn_tokens
+* iosxe/cat8k
+    * Fix switchover service transitions
+
+* all
+    * Moved the pid_tokens.csv file to properly include it during packaging
+
+* generic
+    * Added broken pipe to the reload connection_closed pattern
+    * Fix loading of token info file
+
+* dnos6
+    * NON BACKWARDS-COMPATIBLE CHANGE removed dell os and os6 platform, replaced with dnos6 os
 
 
 --------------------------------------------------------------------------------
                                       New                                       
 --------------------------------------------------------------------------------
 
-* statemachine
-    * add_path
-        * add index to identify where to add the new path in self.paths
-    * add_state
-        * add index to identify where to add the new state in self.states
+* dnos10
+    * added plugin support for dnos10
 
 
