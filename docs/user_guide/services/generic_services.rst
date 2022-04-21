@@ -1173,6 +1173,7 @@ return_output             bool (default False)        Return namedtuple with res
 raise_on_error            bool (default: True)        Raise exception on error
 error_pattern             list                        List of regex strings to check output for errors.
 append_error_pattern      list                        List of regex strings append to error_pattern.
+member                    int                         the meber we want to reload.
 ====================      =======================     ================================================================================
 
     return :
