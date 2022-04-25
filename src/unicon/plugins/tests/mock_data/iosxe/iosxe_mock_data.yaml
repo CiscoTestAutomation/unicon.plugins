@@ -265,6 +265,9 @@ general_enable:
 
     "request platform software system shell switch standby rp active":
       new_state: bash_console_switch_standby_rp_active
+    
+    "show log | in BOOTTIME": "*Sep 22 14:46:00.419: %SYS-6-BOOTTIME: Time taken to reboot after reload =  417 seconds"
+    "show log | in PLATFORM_SYS-6-UPTIME": "%PLATFORM_SYS-6-UPTIME: Time taken to initialize system =  364 seconds"
 
 
 general_config:
@@ -318,14 +321,14 @@ config_host_list:
 
 
 general_config_line:
-  prompt: "Router(config-line)#"
+  prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
     "end":
       new_state: general_enable
 
 config_general_redundancy:
-    prompt: Router(config-red)#
+    prompt: "%N(config-red)#"
     commands:
       "main-cpu":
         new_state: config_general_redundancy_main_cpu
@@ -333,7 +336,7 @@ config_general_redundancy:
         new_state: general_enable
 
 config_general_server:
-    prompt: Router(cs-server)#
+    prompt: "%N(cs-server)#"
     commands:
       "grant auto": |
           grant auto
@@ -357,20 +360,20 @@ config_general_server:
         new_state: general_enable
 
 config_general_redundancy_main_cpu:
-    prompt: Router(config-r-mc)#
+    prompt: "%N(config-r-mc)#"
     commands:
       "standby console enable": ""
       "end":
         new_state: general_enable
 
 general_config_ca_profile:
-  prompt: "Router(ca-profile-enroll)#"
+  prompt: "%N(ca-profile-enroll)#"
   commands:
     "end":
       new_state: general_enable
 
 general_bash:
-  prompt: "[Router_RP_0:/]$"
+  prompt: "[%N_RP_0:/]$"
   commands:
     "df /bootflash/": |
       Filesystem     1K-blocks    Used Available Use% Mounted on
@@ -402,12 +405,12 @@ are_you_sure_ywtdt:
      new_state: general_config
 
 standby_exec:
-  prompt: "Router-standby# "
+  prompt: "%N-standby# "
   commands:
     "cisco": ""
 
 iosxe_config_1:
-  prompt: Router(conf)#
+  prompt: "%N(conf)#"
   commands: 
     "identity number 101":
       new_state: iosxe_config_2
@@ -415,7 +418,7 @@ iosxe_config_1:
       new_state: general_enable
 
 iosxe_config_2:
-  prompt: Router(config-gkm-group)#
+  prompt: "%N(config-gkm-group)#"
   commands:
     "server local": 
         new_state: iosxe_config_3
@@ -423,7 +426,7 @@ iosxe_config_2:
         new_state: iosxe_config_1
 
 iosxe_config_3:
-  prompt: Router(config-gkm-group)#
+  prompt: "%N(config-gkm-group)#"
   commands: 
     "end":
       new_state: iosxe_config_2

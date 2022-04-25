@@ -1053,9 +1053,20 @@ class Reload(BaseService):
                      return_output=False,
                      reload_creds=None,
                      raise_on_error=True,
+                     error_pattern=None,
+                     append_error_pattern=None,
                      *args, **kwargs):
+
+
         con = self.connection
         timeout = timeout or self.timeout
+        self.error_pattern= error_pattern or con.settings.ERROR_PATTERN
+        if not isinstance(self.error_pattern, list):
+            raise ValueError('error_pattern should be a list')
+        if append_error_pattern:
+            if not isinstance(append_error_pattern, list):
+                raise ValueError('append_error_pattern should be a list')
+            self.error_pattern += append_error_pattern
 
         # Clear log buffer
         self.log_buffer.seek(0)
@@ -1096,10 +1107,12 @@ class Reload(BaseService):
         con.spawn.sendline(reload_command)
 
         try:
-            dialog.process(con.spawn,
-                           timeout=timeout,
-                           prompt_recovery=self.prompt_recovery,
-                           context=context)
+            reload_output = dialog.process(con.spawn,
+                            timeout=timeout,
+                            prompt_recovery=self.prompt_recovery,
+                            context=context)
+            self.result = reload_output.match_output
+            self.get_service_result()
         except TimeoutError:
             if raise_on_error:
                 raise
@@ -1968,8 +1981,8 @@ class HAReloadService(BaseService):
         self.__dict__.update(kwargs)
 
     def call_service(self,  # noqa: C901
-                     command=None,
                      reload_command=None,
+                     command=None,
                      dialog=Dialog([]),
                      reply=Dialog([]),
                      target='active',
@@ -1977,10 +1990,21 @@ class HAReloadService(BaseService):
                      return_output=False,
                      reload_creds=None,
                      target_standby_state='STANDBY HOT',
+                     error_pattern = None,
+                     append_error_pattern= None,
                      *args,
                      **kwargs):
 
+
         con = self.connection
+        self.error_pattern = error_pattern or con.settings.ERROR_PATTERN
+        if not isinstance(self.error_pattern, list):
+                raise ValueError('error_pattern should be a list')
+        if append_error_pattern:
+            if not isinstance(append_error_pattern, list):
+                raise ValueError('append_error_pattern should be a list')
+            self.error_pattern += append_error_pattern
+
         if reply:
             if dialog:
                 con.log.warning("**** Both 'reply' and 'dialog' were provided "
@@ -2027,6 +2051,9 @@ class HAReloadService(BaseService):
                                            context=context,
                                            prompt_recovery=self.prompt_recovery,
                                            timeout=timeout)
+            self.result=reload_output.match_output
+            self.get_service_result()
+
             con.active.state_machine.go_to('any',
                                            con.active.spawn,
                                            prompt_recovery=self.prompt_recovery,
@@ -2054,6 +2081,18 @@ class HAReloadService(BaseService):
                     if round == standby_sync_try - 1:
                         raise Exception(
                             'Bringing standby to any state failed within {} sec'.format(standby_wait_time)) from err
+
+            # If standby is in rommon, use state machine to transition to disable state
+            if con.standby.state_machine.current_state == 'rommon':
+                con.log.info('Standby is in ROMMON state, transitioning to disable mode')
+                con.standby.state_machine.go_to(
+                    'disable',
+                    con.standby.spawn,
+                    context=sby_context,
+                    timeout=timeout,
+                    prompt_recovery=self.prompt_recovery,
+                    dialog=con.connection_provider.get_connection_dialog()
+                )
 
         except Exception as err:
             raise SubCommandFailure("Reload failed : %s" % err) from err

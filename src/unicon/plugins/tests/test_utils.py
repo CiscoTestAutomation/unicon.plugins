@@ -106,7 +106,7 @@ devices:
             log_contents = f.read()
         self.assertRegexpMatches(
             log_contents,
-            r'\+\+\+ Unicon plugin iosxe( \(unicon\.plugins\.iosxe\))? \+\+\+'
+            r'\+\+\+ Unicon plugin iosxe( \(unicon\.(internal\.)?plugins\.iosxe\))? \+\+\+'
         )
 
     def test_iosxr_learn_tokens_from_show_version(self):
@@ -169,7 +169,7 @@ devices:
             log_contents = f.read()
         self.assertRegexpMatches(
             log_contents,
-            r'\+\+\+ Unicon plugin iosxe( \(unicon\.plugins\.iosxe\))? \+\+\+'
+            r'\+\+\+ Unicon plugin iosxe( \(unicon\.(internal\.)?plugins\.iosxe\))? \+\+\+'
         )
 
     def test_linux_learn_tokens(self):

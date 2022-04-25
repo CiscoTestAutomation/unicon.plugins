@@ -1,13 +1,25 @@
 spitfire_login:
   prompt: "Username: "
   commands:
-    "cisco":
+    "admin":
+      new_state: spitfire_pw
+
+spitfire_login_after_reload:
+  preface: |
+    Won't send login name and/or authentication information.
+    Connected to vxr-slurm-146.cisco.com.
+    Escape character is '^]'.
+    
+    User Access Verification
+  prompt: "Username: "
+  commands:
+    "admin":
       new_state: spitfire_pw
 
 spitfire_pw:
   prompt: "Password: "
   commands:
-    "cisco123":
+    "lab":
       response: |
         SYSTEM CONFIGURATION COMPLETED
       new_state: spitfire_enable
@@ -126,8 +138,267 @@ spitfire_enable:
 
           export PS1='#'
           [node0_0_CPU0:~]$export PS1='#'
+    "show terminal":
+      response:
+        - |2
+          Fri Apr 22 01:56:38.752 UTC
+          Line "con0_RP1_CPU0", Location "0/RP1/CPU0", Type "Console"
+          Length: 0 lines, Width: 0 columns
+          Baud rate (TX/RX) is 115200, "No" Parity, 2 stopbits, 8 databits
+          Template: console
+          Capabilities: Timestamp Enabled
+          Allowed transports are none.
+    "reload":
+      new_state: spitfire_reload_confirm
 
-
+spitfire_reload_confirm:
+  preface: |
+    Fri Apr 22 01:29:55.844 UTC
+  prompt: "Proceed with reload? [confirm]"
+  commands:
+    "":
+      new_state: spitfire_login_after_reload
+      response: |
+        RP/0/RP0/CPU0:ios#
+        Preparing system for backup. This may take a few minutes especially for large configurations.
+        	Status report: node0_RP0_CPU0: START TO BACKUP
+        	Status report: node0_RP0_CPU0: BACKUP HAS COMPLETED SUCCESSFULLY
+        [Done]
+        redis: 2022/04/22 01:30:31 pubsub.go:159: redis: discarding bad PubSub connection: EOF
+        [  OK  ] Stopped IOS-XR Reaperd and Process Manager.
+        [  OK  ] Stopped NPU SDK Setup.
+        [  OK  ] Stopped NOS Bootup FPD Upgrade Service.
+                 Stopping Lightning Fast Webserver With Light System Requirements...
+                 Stopping Cisco Directory Services...
+        [  OK  ] Stopped Lightning Fast Webserver With Light System Requirements.
+        [  OK  ] Stopped Cisco Directory Services.
+        [  OK  ] Stopped Setup Network OS Bootstrap.
+                 Stopping CPA Setup...
+                 Stopping IOS-XR ISO Installation...
+        [  OK  ] Stopped CPA Setup.
+                 Stopping FPGA Setup...
+        [  OK  ] Stopped FPGA Setup.
+        [  OK  ] Stopped IOS-XR ISO Installation.
+                 Stopping Service for factory reset...
+        [  OK  ] Stopped OpenSSH Key Generation.
+        [  OK  ] Stopped Service for factory reset.
+        [  OK  ] Stopped target Basic System.
+        [  OK  ] Stopped target Sockets.
+        [  OK  ] Closed D-Bus System Message Bus Socket.
+        [  OK  ] Closed Syslog Socket.
+        [  OK  ] Closed sshd.socket.
+        [  OK  ] Closed RPCbind Server Activation Socket.
+        [  OK  ] Stopped target Paths.
+        [  OK  ] Stopped target Slices.
+        [  OK  ] Stopped target Local File Systems.
+                 Unmounting /qsm...
+                 Unmounting /mnt/dr_part...
+                 Unmounting /selinux...
+                 Unmounting /mnt/pacific...
+                 Unmounting /dev/syslog...
+                 Unmounting /mnt/pdtmpfs...
+                 Unmounting /var/xr/disk1...
+                 Unmounting /mnt/fuse/ftp...
+                 Unmounting /mnt/fuse/tftp...
+                 Unmounting /run/netns/xrnns...
+                 Unmounting /run/netns/vrf-default...
+                 Unmounting /run/netns/default...
+                 Unmounting /mnt/fuse/parser_server...
+                 Unmounting /var/lib/docker...
+                 Unmounting /mnt/fuse/rdsfs...
+                 Unmounting /boot/efi...
+                 Unmounting /var/xr/scratch...
+                 Unmounting /run/netns/global-vrf...
+                 Unmounting /mnt/fuse/nvgen_server...
+                 Unmounting /var/volatile...
+                 Unmounting /sys/kernel/debug/tracing...
+        [  OK  ] Unmounted /qsm.
+        [  OK  ] Unmounted /mnt/dr_part.
+        [  OK  ] Unmounted /selinux.
+        [  OK  ] Unmounted /mnt/pacific.
+        [  OK  ] Unmounted /dev/syslog.
+        [  OK  ] Unmounted /mnt/pdtmpfs.
+        [  OK  ] Unmounted /mnt/fuse/ftp.
+        [  OK  ] Unmounted /mnt/fuse/tftp.
+        [  OK  ] Unmounted /run/netns/xrnns.
+        [  OK  ] Unmounted /var/xr/disk1.
+        [  OK  ] Unmounted /run/netns/vrf-default.
+        [  OK  ] Unmounted /run/netns/default.
+        [  OK  ] Unmounted /mnt/fuse/parser_server.
+        [  OK  ] Unmounted /var/lib/docker.
+        [  OK  ] Unmounted /mnt/fuse/rdsfs.
+        [  OK  ] Unmounted /boot/efi.
+        [  OK  ] Unmounted /var/xr/scratch.
+        [  OK  ] Unmounted /run/netns/global-vrf.
+        [  OK  ] Unmounted /mnt/fuse/nvgen_server.
+        [  OK  ] Unmounted /var/volatile.
+        [  OK  ] Unmounted /sys/kernel/debug/tracing.
+                 Unmounting /boot...
+                 Unmounting /run/netns...
+                 Unmounting /mnt...
+        [  OK  ] Unmounted /run/netns.
+        [  OK  ] Unmounted /mnt.
+        [  OK  ] Unmounted /boot.
+        [  OK  ] Stopped target Local File Systems (Pre).
+                 Stopping Monitoring of LVM2 mirrors... dmeventd or progress polling...
+        [  OK  ] Stopped Create Static Device Nodes in /dev.
+        [  OK  ] Stopped Create System Users.
+        [  OK  ] Reached target Shutdown.
+        [ 1460.033349] pm-fpga: Changing Status LED to amber color ...
+        [ 1460.043239] pm-fpga: Power cycling local CPU power zone
+        [ 1460.053233] pm-fpga: Waiting for FPGA to process the power operation .....................
+        [ 1461.962847] irq 16: nobody cared (try booting with the "irqpoll" option)
+        [ 1461.964309] handlers:
+        [ 1461.964744] [<000000000a4b0d1a>] i801_isr
+        [ 1461.965429] Disabling IRQ #16
+        [ 1465.386568] pm-fpga: ERROR: Timeout waiting for FPGA to process the power operation
+        [ 1465.387953] reboot: Restarting system
+        Welcome to GRUB!
+        
+        WARNING: Secure boot disabled
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          Booting `IOS-XR-latest'
+        
+        Booting latest from Disk..
+        Loading Kernel..
+        Loading initrd..
+        /init: line 51: cannot redirect standard input from /dev/null: No such file or directory
+        Variable dbCisco, length 0
+          Reading all physical volumes.  This may take a while...
+          Found volume group "main-xr-vg" using metadata type lvm2
+          8 logical volume(s) in volume group "main-xr-vg" now active
+          8 logical volume(s) in volume group "main-xr-vg" now active
+          8 logical volume(s) in volume group "main-xr-vg" now active
+        Overriding bzImage
+        fsck from util-linux 2.28.1
+        e2fsck 1.43 (17-May-2016)
+        Pass 1: Checking inodes, blocks, and sizes
+        Pass 2: Checking directory structure
+        Pass 3: Checking directory connectivity
+        Pass 4: Checking reference counts
+        Pass 5: Checking group summary information
+        Boot: 26/61184 files (3.8% non-contiguous), 22569/244736 blocks
+        fsck from util-linux 2.28.1
+        e2fsck 1.43 (17-May-2016)
+        Pass 1: Checking inodes, blocks, and sizes
+        Pass 2: Checking directory structure
+        Pass 3: Checking directory connectivity
+        Pass 4: Checking reference counts
+        Pass 5: Checking group summary information
+        Disk1: 76/4489216 files (1.3% non-contiguous), 328149/17952768 blocks
+        fsck from util-linux 2.28.1
+        e2fsck 1.43 (17-May-2016)
+        Pass 1: Checking inodes, blocks, and sizes
+        Pass 2: Checking directory structure
+        Pass 3: Checking directory connectivity
+        Pass 4: Checking reference counts
+        Pass 5: Checking group summary information
+        Docker: 47/498736 files (8.5% non-contiguous), 68616/1994752 blocks
+        fsck from util-linux 2.28.1
+        e2fsck 1.43 (17-May-2016)
+        Pass 1: Checking inodes, blocks, and sizes
+        Pass 2: Checking directory structure
+        Pass 3: Checking directory connectivity
+        Pass 4: Checking reference counts
+        Pass 5: Checking group summary information
+        Log: 12094/399840 files (0.3% non-contiguous), 85528/1596416 blocks
+        fsck from util-linux 2.28.1
+        e2fsck 1.43 (17-May-2016)
+        Pass 1: Checking inodes, blocks, and sizes
+        Pass 2: Checking directory structure
+        Pass 3: Checking directory connectivity
+        Pass 4: Checking reference counts
+        Pass 5: Checking group summary information
+        Scratch: 81/290304 files (4.9% non-contiguous), 53395/1160192 blocks
+        fsck from util-linux 2.28.1
+        e2fsck 1.43 (17-May-2016)
+        Pass 1: Checking inodes, blocks, and sizes
+        Pass 2: Checking directory structure
+        Pass 3: Checking directory connectivity
+        Pass 4: Checking reference counts
+        Pass 5: Checking group summary information
+        RootFS: 59703/1994752 files (0.4% non-contiguous), 2942584/15958016 blocks
+        fstab not modified
+        Setup encrypted LV...
+        Invoke selinux initialization...
+        Enable selinux to relabel filesystem from initramfs
+        Loading custom SELinux policy modules...
+        iosxr policy module is up to date
+        Loading IMA policy
+        IMA basic policy
+        IMA policy loaded successfully!
+        Set-up of LNT keyring
+        ->Secure Boot CA certificate found: /etc/vxr/certs/IOS-XR-SW-SEC-CA_dev_cert.crt (DEV)
+        ->Certificate imported into LNT user keyring
+        ->Secure Boot CA certificate found: /etc/vxr/certs/IOS-XR-SW-SEC-CA_rel_cert.crt (RELEASE)
+        ->Certificate imported into LNT user keyring
+        Generate audit rules from component rules
+        /sbin/augenrules: No change
+        Switch to new root and run init
+        [   11.791759] xrnginstall[1036]: 2022 Apr 22 01:31:05.529 UTC: Setting up dumper and build info files
+        [   11.922542] xrnginstall[1036]: 2022 Apr 22 01:31:05.660 UTC: XR Lineup:  xr-dev.lu%EFR-00000432736
+        [   11.926352] xrnginstall[1036]: 2022 Apr 22 01:31:05.664 UTC: XR Version: 7.8.1.05I
+        [   11.957742] xrnginstall[1036]: 2022 Apr 22 01:31:05.695 UTC: Completed set up of dumper and build info files
+        [   11.963867] xrnginstall[1036]: 2022 Apr 22 01:31:05.701 UTC: Preparing IOS-XR
+        [   11.967492] xrnginstall[1036]: 2022 Apr 22 01:31:05.705 UTC: Already pointing at latest FS
+        [   12.342263] xrnginstall[1036]: /etc/init.d/tp_app_cgrp_cfg.sh: line 62: echo: write error: Invalid argument
+        [   12.415621] xrnginstall[1036]: /etc/init.d/tp_app_cgrp_cfg.sh: line 62: echo: write error: Invalid argument
+        [   12.427407] xrnginstall[1036]: /etc/init.d/tp_app_cgrp_cfg.sh: line 62: echo: write error: Invalid argument
+        [   12.576122] xrnginstall[1036]: 2022 Apr 22 01:31:06.314 UTC: Load platform kernel modules
+        [   12.662792] xrnginstall[1036]: 2022 Apr 22 01:31:06.400 UTC: Succeeded loading platform kernel modules
+        [   12.667474] xrnginstall[1036]: 2022 Apr 22 01:31:06.405 UTC: Enable hardware
+        [FAILED] Failed to start Machine Check Exception Logging Daemon.
+        See 'systemctl status mcelog.service' for details.
+        [   14.577019] xrnginstall[1036]: 2022 Apr 22 01:31:08.314 UTC: Succeeded enabling hardware
+        [   14.708122] xrnginstall[1036]: 2022 Apr 22 01:31:08.446 UTC: Checking if rollback cleanup is required
+        [   14.712008] xrnginstall[1036]: 2022 Apr 22 01:31:08.449 UTC: Finished rollback cleanup stage
+        [   14.728506] xrnginstall[1036]: 2022 Apr 22 01:31:08.466 UTC: Run XR DHClient script
+        [   14.731631] xrnginstall[1036]: 2022 Apr 22 01:31:08.469 UTC: Starting DHClient
+        [   14.734816] xrnginstall[1036]: 2022 Apr 22 01:31:08.472 UTC: Attempting to get information via dhclient...
+        [   14.849817] xrnginstall[1036]: 2022 Apr 22 01:31:08.587 UTC: Getting information via dhclient
+        [   14.870403] xrnginstall[1036]: 2022 Apr 22 01:31:08.608 UTC: Start diskboot-install-node
+        [   14.880756] xrnginstall[1036]: 2022 Apr 22 01:31:08.618 UTC: Loading DHCP parameters
+        [   14.970694] xrnginstall[1036]: 2022 Apr 22 01:31:08.708 UTC: Calculating software cookie from local software
+        [   17.344267] xrnginstall[1036]: 2022 Apr 22 01:31:11.081 UTC: Stored software cookie matches local software (d1f1e876d57b67a24c3b001f4066fefa)
+        [   17.366293] xrnginstall[1036]: 2022 Apr 22 01:31:11.104 UTC: Have determined the active RP's IP is 1.0.0.32
+        [   17.397050] xrnginstall[1036]: 2022 Apr 22 01:31:11.134 UTC: No mirror gISO ztp.ini available - sync not required
+        [   17.401089] xrnginstall[1036]: 2022 Apr 22 01:31:11.138 UTC: dhclient request has verified the current software
+        [   17.488022] xrnginstall[1036]: 2022 Apr 22 01:31:11.225 UTC: xrnginstall completed successfully
+        
+        
+        
+        
+        This product contains cryptographic features and is subject to United
+        States and local country laws governing import, export, transfer and
+        use. Delivery of Cisco cryptographic products does not imply third-party
+        authority to import, export, distribute or use encryption. Importers,
+        exporters, distributors and users are responsible for compliance with
+        U.S. and local country laws. By using this product you agree to comply
+        with applicable laws and regulations. If you are unable to comply with
+        U.S. and local laws, return this product immediately.
+        
+        A summary of U.S. laws governing Cisco cryptographic products may be
+        found at:
+        http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+        
+        If you require further assistance please contact us by sending email to
+        export@cisco.com.
+        
+        
+        
+        
+        
+        ios con0/RP0/CPU0 is in standby
 spitfire_confirm_switchover:
   preface: "Wed Jul 10 11:15:37.842 UTC"
   prompt: "Proceed with switchover 0/RP0/CPU0 -> 0/RP1/CPU0? [confirm]"

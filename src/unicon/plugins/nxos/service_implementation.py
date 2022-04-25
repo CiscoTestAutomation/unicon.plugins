@@ -185,6 +185,8 @@ class Reload(GenericReload):
         config_lock_retry_sleep: sleep between retries, default is 9 sec
         reload_creds: name or list of names of credential(s) to use if
                       username or password is prompted for during reload.
+        error_pattern: list of regex to detect command errors
+        append_error_pattern: list of regex added to default list of error patterns
 
     Returns:
         bool: True on success False otherwise
@@ -222,6 +224,8 @@ class Reload(GenericReload):
                      config_lock_retry_sleep=None,
                      reload_creds=None,
                      reconnect_sleep=None,
+                     error_pattern=None,
+                     append_error_pattern=None,
                      *args, **kwargs):
 
         # Clear log buffer
@@ -230,6 +234,15 @@ class Reload(GenericReload):
 
         con = self.connection
         timeout = timeout or self.timeout
+
+        self.error_pattern = error_pattern or con.settings.ERROR_PATTERN
+        if not isinstance(self.error_pattern, list):
+            raise TypeError('error_pattern must be a list')
+        if append_error_pattern:
+            if not isinstance(append_error_pattern, list):
+                raise TypeError('append_error_pattern must be a list')
+            self.error_pattern += append_error_pattern
+
         reconnect_sleep = reconnect_sleep or con.settings.RELOAD_RECONNECT_WAIT
         config_lock_retries = config_lock_retries \
                               or con.settings.CONFIG_POST_RELOAD_MAX_RETRIES
@@ -259,10 +272,12 @@ class Reload(GenericReload):
         con.spawn.sendline(reload_command)
         try:
             try:
-                dialog.process(con.spawn,
-                               timeout=timeout,
-                               prompt_recovery=self.prompt_recovery,
-                               context=context)
+                reload_output=dialog.process(con.spawn,
+                                             timeout=timeout,
+                                             prompt_recovery=self.prompt_recovery,
+                                             context=context)
+                self.result = reload_output.match_output
+                self.get_service_result()
                 con.log.info('Reload completed')
             except TimeoutError:
                 con.log.error('Reload timed out')
@@ -561,6 +576,8 @@ class HANxosReloadService(GenericHAReload):
         config_lock_retry_sleep: sleep between retries, default is 9 sec
         reload_creds: name or list of names of credential(s) to use if
                       username or password is prompted for during reload.
+        error_pattern: list of regex to detect command errors
+        append_error_pattern: list of regex added to default list of error patterns
 
     Returns:
         bool: True on success False otherwise
@@ -594,6 +611,8 @@ class HANxosReloadService(GenericHAReload):
                      config_lock_retries=None,
                      config_lock_retry_sleep=None,
                      reload_creds=None,
+                     error_pattern=None,
+                     append_error_pattern=None,
                      *args,
                      **kwargs):
 
@@ -601,6 +620,15 @@ class HANxosReloadService(GenericHAReload):
         # create an alias for connection.
         con = self.connection
         timeout = timeout or self.timeout
+
+        self.error_pattern = error_pattern or con.settings.ERROR_PATTERN
+        if not isinstance(self.error_pattern, list):
+            raise TypeError('error_pattern must be a list')
+        if append_error_pattern:
+            if not isinstance(append_error_pattern, list):
+                raise TypeError('append_error_pattern must be a list')
+            self.error_pattern += append_error_pattern
+
         config_lock_retries = config_lock_retries \
                               or con.settings.CONFIG_POST_RELOAD_MAX_RETRIES
         config_lock_retry_sleep = config_lock_retry_sleep \
@@ -641,6 +669,9 @@ class HANxosReloadService(GenericHAReload):
                 prompt_recovery=self.prompt_recovery,
                 timeout=timeout
             )
+            self.result = reload_op.match_output
+            self.get_service_result()
+
             reload_op_standby=standby_dialog.process(
                 con.standby.spawn,
                 context=sby_context,

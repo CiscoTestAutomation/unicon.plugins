@@ -15,6 +15,8 @@ from pyats.topology import loader
 
 import unicon
 from unicon import Connection
+from unicon.core.errors import SubCommandFailure
+from unicon.eal.dialogs import Statement, Dialog
 
 from unicon.mock.mock_device import MockDeviceSSHWrapper
 
@@ -58,6 +60,29 @@ class TestNxosAciPlugin(unittest.TestCase):
         c.connect()
         c.settings.POST_RELOAD_WAIT = 1
         c.reload()
+        c.disconnect()
+
+    def test_reload_with_error_pattern(self):
+        c = Connection(hostname='LEAF',
+                        start=['mock_device_cli --os nxos --state n9k_login --hostname LEAF'],
+                        os='nxos',
+                        platform='aci',
+                        tacacs_password='cisco123')
+
+        install_add_one_shot_dialog = Dialog([
+                   Statement(pattern=r"FAILED:.* ",
+                             action=None,
+                             loop_continue=False,
+                             continue_timer=False),
+        ])
+        error_pattern=[r"FAILED:.* ",]
+
+        c.connect()
+        c.settings.POST_RELOAD_WAIT = 1
+        with self.assertRaises(SubCommandFailure):
+             c.reload('active_install_add',
+                      dialog=install_add_one_shot_dialog,
+                      error_pattern = error_pattern)
         c.disconnect()
 
     def test_attach_console(self):

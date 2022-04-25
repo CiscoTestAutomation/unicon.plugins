@@ -102,11 +102,21 @@ class Reload(BaseService):
                      dialog=Dialog([]),
                      timeout=None,
                      discovery_timeout=0,
+                     error_pattern=None,
+                     append_error_pattern=None,
                      *args,
                      **kwargs):
 
         con = self.connection
         timeout = timeout or self.timeout
+
+        self.error_pattern = error_pattern or con.settings.ERROR_PATTERN
+        if not isinstance(self.error_pattern, list):
+            raise TypeError('error_pattern must be a list')
+        if append_error_pattern:
+            if not isinstance(append_error_pattern, list):
+                raise TypeError('append_error_pattern must be a list')
+            self.error_pattern += append_error_pattern
 
         fmt_msg = "+++ reloading %s " \
                   "with reload_command '%s' " \
@@ -135,6 +145,7 @@ class Reload(BaseService):
                            context=self.context)
             if self.result:
                 self.result = self.result.match_output
+                self.get_service_result()
 
             con.log.info('Reload done, waiting %s seconds' % con.settings.POST_RELOAD_WAIT)
             sleep(con.settings.POST_RELOAD_WAIT)

@@ -9,6 +9,7 @@ from unicon import Connection
 from unicon.eal.dialogs import Statement, Dialog
 from unicon.plugins.tests.mock.mock_device_iosxe import MockDeviceTcpWrapperIOSXE
 from unicon.plugins.tests.mock.mock_device_iosxe_cat9k import MockDeviceTcpWrapperIOSXECat9k
+from unicon.core.errors import SubCommandFailure
 
 
 unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
@@ -278,6 +279,39 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
             c.disconnect()
             md.stop()
 
+    def test_reload_with_error_pattern(self):
+        md = MockDeviceTcpWrapperIOSXE(port=0, state='c9k_login4')
+        md.start()
+
+        c = Connection(
+            hostname='switch',
+            start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
+            os='iosxe',
+            platform='cat9k',
+            settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+            credentials=dict(default=dict(username='cisco', password='cisco'),
+                             alt=dict(username='admin', password='lab')),
+            mit=True,
+        )
+        install_add_one_shot_dialog = Dialog([
+                Statement(pattern=r"FAILED:.* ",
+                          action=None,
+                          loop_continue=False,
+                          continue_timer=False),
+        ])
+        error_pattern=[r"FAILED:.* ",]
+
+        try:
+            c.connect()
+            c.settings.POST_RELOAD_WAIT = 1
+            with self.assertRaises(SubCommandFailure):
+                c.reload('active_install_add',
+                                reply=install_add_one_shot_dialog,
+                                error_pattern = error_pattern)
+        finally:
+            c.disconnect()
+            md.stop()
+
     def test_rommon(self):
         c = Connection(hostname='switch',
                        start=['mock_device_cli --os iosxe --state cat9k_enable_reload_to_rommon'],
@@ -350,6 +384,49 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
             c.disconnect()
             md.stop()
 
+    def test_connect_ha_from_rommon(self):
+        md = MockDeviceTcpWrapperIOSXECat9k(port=0, state='cat9k_ha_active_rommon,cat9k_ha_standby_rommon')
+        md.start()
+
+        c = Connection(
+            hostname='switch',
+            start=[
+                'telnet 127.0.0.1 {}'.format(md.ports[0]),
+                'telnet 127.0.0.1 {}'.format(md.ports[1]),
+            ],
+            os='iosxe',
+            platform='cat9k',
+            settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+            credentials=dict(default=dict(username='cisco', password='cisco'),
+                             alt=dict(username='admin', password='lab')),
+            image_to_boot='tftp://1.1.1.1/latest.bin'
+        )
+        try:
+            c.connect()
+            self.assertEqual(c.state_machine.current_state, 'enable')
+        finally:
+            c.disconnect()
+            md.stop()
+
+    def test_reload_ha_from_rommon_with_image(self):
+        c = Connection(hostname='switch',
+                       start=[
+                           'mock_device_cli --os iosxe --state cat9k_ha_active_rommon',
+                           'mock_device_cli --os iosxe --state cat9k_ha_standby_rommon'
+                        ],
+                       os='iosxe',
+                       platform='cat9k',
+                       credentials=dict(default=dict(username='cisco', password='cisco'),
+                                        alt=dict(username='admin', password='lab')),
+                       settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+                       log_buffer=True)
+        try:
+            c.connect()
+            c.reload(image_to_boot='tftp://1.1.1.1/latest.bin', timeout=10)
+            self.assertEqual(c.state_machine.current_state, 'enable')
+        finally:
+            c.disconnect()
+
     def test_reload_ha_adding_dialog(self):
         md = MockDeviceTcpWrapperIOSXECat9k(port=0, state='cat9k_ha_active_escape,cat9k_ha_standby_escape')
         md.start()
@@ -384,6 +461,51 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
         finally:
             c.disconnect()
             md.stop()
+
+    def test_reload_ha_with_error_pattern(self):
+        md = MockDeviceTcpWrapperIOSXECat9k(port=0, state='cat9k_ha_active_escape,cat9k_ha_standby_escape')
+        md.start()
+
+        c = Connection(
+            hostname='switch',
+            start=[
+                'telnet 127.0.0.1 {}'.format(md.ports[0]),
+                'telnet 127.0.0.1 {}'.format(md.ports[1]),
+            ],
+            os='iosxe',
+            platform='cat9k',
+            settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+            credentials=dict(default=dict(username='cisco', password='cisco'),
+                             alt=dict(username='admin', password='lab')),
+
+        )
+        install_add_one_shot_dialog = Dialog([
+                Statement(pattern=r".*reload of the system\. "
+                                  r"Do you want to proceed\? \[y\/n\]",
+                          action='sendline(y)',
+                          loop_continue=True,
+                          continue_timer=False),
+
+                Statement(pattern=r"FAILED:.* ",
+                          action=None,
+                          loop_continue=False,
+                          continue_timer=False),
+        ])
+        error_pattern=[r"FAILED:.* ",]
+
+        try:
+            c.connect()
+            c.settings.POST_RELOAD_WAIT = 1
+            with self.assertRaises(SubCommandFailure):
+                c.reload('install add file activate commit_1',
+                                reply=install_add_one_shot_dialog,
+                                error_pattern = error_pattern)
+
+            self.assertEqual(c.state_machine.current_state, 'enable')
+        finally:
+            c.disconnect()
+            md.stop()
+
 class TestIosXeCat9kPluginContainer(unittest.TestCase):
 
     def test_container_exit(self):

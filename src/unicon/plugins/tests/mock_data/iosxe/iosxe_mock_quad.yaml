@@ -11,7 +11,7 @@ quad_password:
       new_state: quad_exec
 
 quad_exec:
-  prompt: "Router>"
+  prompt: "%N>"
   commands:
     "term length 0": ""
     "term width 0": ""
@@ -148,7 +148,7 @@ quad_enable_pwd:
       new_state: quad_enable
 
 quad_enable:
-  prompt: "Router#"
+  prompt: "%N#"
   commands:
     "term length 0": ""
     "term width 0": ""
@@ -218,8 +218,11 @@ quad_enable:
     "reload":
       new_state: quad_reload_prompt
 
+    "active_install_add":
+       new_state: quad_install_add_commit
+
 quad_config:
-  prompt: "Router(config)#"
+  prompt: "%N(config)#"
   commands:
     "no logging console": ""
     "line console 0":
@@ -230,20 +233,20 @@ quad_config:
       new_state: quad_config_red
 
 quad_config_red:
-  prompt: "Router(config-red)#"
+  prompt: "%N(config-red)#"
   commands:
     "main-cpu":
       new_state: quad_config_r_mc
 
 quad_config_r_mc:
-  prompt: "Router(config-r-mc)#"
+  prompt: "%N(config-r-mc)#"
   commands:
     "standby console enable": ""
     "end":
       new_state: quad_enable
 
 quad_config_line:
-  prompt: "Router(config-line)#"
+  prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
     "end":
@@ -451,7 +454,7 @@ quad_stby_password:
       new_state: quad_stby_exec
 
 quad_stby_exec:
-  prompt: "Router-stby>"
+  prompt: "%N-stby>"
   commands:
     "term length 0": ""
     "term width 0": ""
@@ -475,7 +478,7 @@ quad_stby_enable_pwd:
       new_state: quad_stby_enable
 
 quad_stby_enable:
-  prompt: "Router-stby#"
+  prompt: "%N-stby#"
   commands:
     "term length 0": ""
     "term width 0": ""
@@ -785,3 +788,13 @@ quad_stby_reload:
         Press RETURN to get started!
 
       new_state: quad_stby_exec
+quad_install_add_commit:
+  preface: |2
+     Copying image file: bootflash:asr1000rpx86-universalk9.BLD_V166_THROTTLE_LATEST_20171101_090919_2.SSA.bin to standby
+     rsync: write failed on "asr1000rpx86-universalk9.BLD_V166_THROTTLE_LATEST_20171101_090919_2.SSA.bin" (in bootflash): No space left on device (28)
+     rsync error: error in file IO (code 11) at ../rsync-3.1.2/receiver.c(393) [receiver=3.1.2]
+     rsync error: error in file IO (code 11) at ../rsync-3.1.2/io.c(1633) [generator=3.1.2]
+     rsync: read error: Connection reset by peer (104)
+     FAILED: install_add_activate_commit : Copy bootflash:asr1000rpx86-universalk9.BLD_V16
+
+  new_state: quad_enable

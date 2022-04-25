@@ -340,6 +340,8 @@ enable:
       new_state: reload_hardware_confirm_prompt
     "copy  harddisk: tftp:":
       new_state: copy_harddisk_wildcard_tftp
+    "active_install_add":
+           new_state: install_add_commit
 
 half_confirm_prompt:
   prompt: "Clear logging buffer [confirm] [y"
@@ -378,7 +380,7 @@ prompt_yn:
       new_state: enable
 
 admin:
-  prompt: "RP/0/RP0/CPU0:Router(admin)#"
+  prompt: "RP/0/RP0/CPU0:%N(admin)#"
   commands: &admin_commands
     "clear configuration inconsistency": |2
 
@@ -1087,7 +1089,7 @@ iosxrv9k_exec:
 # ---    moonshine  -----
 
 moonshine_enable:
-  prompt: "RP/0/0/CPU0:Router#"
+  prompt: "RP/0/0/CPU0:%N#"
   commands:
     "configure terminal":
       new_state: moonshine_config
@@ -1098,7 +1100,7 @@ moonshine_enable:
     "terminal width 0": ""
 
 moonshine_config:
-  prompt: "RP/0/0/CPU0:Router(config)#"
+  prompt: "RP/0/0/CPU0:%N(config)#"
   commands:
     "logging console disable": ""
     "line con 0":
@@ -1121,7 +1123,7 @@ moonshine_config:
         moonshine_failed_config
 
 moonshine_failed_config:
-  prompt: "RP/0/0/CPU0:Router(config)#"
+  prompt: "RP/0/0/CPU0:%N(config)#"
   commands:
     "end":
       new_state: moonshine_failed_config_uncommitted
@@ -1134,7 +1136,7 @@ moonshine_failed_config_uncommitted:
       new_state: moonshine_failed_config_show
 
 moonshine_failed_config_show:
-  prompt: "RP/0/0/CPU0:Router(config)#"
+  prompt: "RP/0/0/CPU0:%N(config)#"
   commands:
     "show configuration failed": |2
       Fri Aug  3 15:34:40.336 UTC
@@ -1386,3 +1388,13 @@ ping1_sweep_vrf:
         Sending 5, 100-byte ICMP Echos to 10.0.0.2, timeout is 2 seconds:
         !!!!!
         Success rate is 100 percent (5/5), round-trip min/avg/max = 1/1/3 ms
+
+install_add_commit:
+  preface: |2
+      Copying image file: bootflash:asr1000rpx86-universalk9.BLD_V166_THROTTLE_LATEST_20171101_090919_2.SSA.bin to standby
+      rsync: write failed on "asr1000rpx86-universalk9.BLD_V166_THROTTLE_LATEST_20171101_090919_2.SSA.bin" (in bootflash): No space left on device (28)
+      rsync error: error in file IO (code 11) at ../rsync-3.1.2/receiver.c(393) [receiver=3.1.2]
+      rsync error: error in file IO (code 11) at ../rsync-3.1.2/io.c(1633) [generator=3.1.2]
+      rsync: read error: Connection reset by peer (104)
+      FAILED: install_add_activate_commit : Copy bootflash:asr1000rpx86-universalk9.BLD_V16
+  new_state: enable

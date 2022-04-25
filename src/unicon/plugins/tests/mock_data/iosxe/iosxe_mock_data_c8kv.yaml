@@ -1,5 +1,5 @@
 c8kv_enable:
-  prompt: 'Router#'
+  prompt: '%N#'
   commands:
     'term length 0': ''
     'term width 0': ''
@@ -74,7 +74,7 @@ c8kv_enable:
       new_state: 'c8kv_config_term'
 
 c8kv_config_term:
-  prompt: Router(config)#
+  prompt: "%N(config)#"
   commands:
     'no logging console': ''
     'line console 0': ''
@@ -226,7 +226,7 @@ c8kv_grub_boot_image:
       new_state: 'c8kv_exec'
 
 c8kv_exec:
-  prompt: 'Router>'
+  prompt: '%N>'
   commands:
     'enable':
       new_state: 'c8kv_enable'

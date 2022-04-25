@@ -19,7 +19,8 @@ n9k_exec:
       new_state: attach_module
     "vsh_lc":
       new_state: vsh
-
+    "active_install_add":
+         new_state: install_add_commit_aci
 
 vsh:
   prompt: "module-1# "
@@ -58,7 +59,16 @@ n9k_password:
     "cisco123":
       new_state: n9k_exec
 
+install_add_commit_aci:
+    preface: |2
+       Copying image file: bootflash:asr1000rpx86-universalk9.BLD_V166_THROTTLE_LATEST_20171101_090919_2.SSA.bin to standby
+       rsync: write failed on "asr1000rpx86-universalk9.BLD_V166_THROTTLE_LATEST_20171101_090919_2.SSA.bin" (in bootflash): No space left on device (28)
+       rsync error: error in file IO (code 11) at ../rsync-3.1.2/receiver.c(393) [receiver=3.1.2]
+       rsync error: error in file IO (code 11) at ../rsync-3.1.2/io.c(1633) [generator=3.1.2]
+       rsync: read error: Connection reset by peer (104)
+       FAILED: install_add_activate_commit : Copy bootflash:asr1000rpx86-universalk9.BLD_V16
 
+    new_state: n9k_exec 
 # (none) login: admin
 # ********************************************************************************
 #      Fabric discovery in progress, show commands are not fully functional

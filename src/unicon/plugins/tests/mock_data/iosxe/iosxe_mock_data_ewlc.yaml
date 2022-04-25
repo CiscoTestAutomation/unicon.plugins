@@ -11,7 +11,7 @@ ewlc_password:
       new_state: ewlc_exec
 
 ewlc_exec:
-  prompt: "Router>"
+  prompt: "%N>"
   commands:
     "term length 0": ""
     "term width 0": ""
@@ -98,7 +98,7 @@ ewlc_exec:
       new_state: ewlc_enable
 
 ewlc_enable:
-  prompt: "Router#"
+  prompt: "%N#"
   commands:
     "term length 0": ""
     "term width 0": ""
@@ -115,7 +115,7 @@ ewlc_enable:
       response: file|mock_data/iosxe/iosxe_reset_standby.txt
 
 ewlc_config:
-  prompt: "Router(config)#"
+  prompt: "%N(config)#"
   commands:
     "no logging console": ""
     "line console 0":
@@ -134,7 +134,7 @@ ewlc_wlan_shutdown_confirm:
           new_state: ewlc_config
 
 ewlc_config_line:
-  prompt: "Router(config-line)#"
+  prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
     "end":
@@ -184,7 +184,7 @@ ewlc_copy_tftp_flash_vrf_dest_file:
 
 # ========Recovery mode=========
 ewlc_exec_recovery_mode:
-  prompt: "Router(recovery-mode)> "
+  prompt: "%N(recovery-mode)> "
   commands:
     "term length 0": ""
     "term width 0": ""
@@ -256,7 +256,7 @@ ewlc_exec_recovery_mode:
       new_state: ewlc_enable_recovery_mode
 
 ewlc_enable_recovery_mode:
-  prompt: "Router(recovery-mode)#"
+  prompt: "%N(recovery-mode)#"
   commands:
     "term length 0": ""
     "term width 0": ""

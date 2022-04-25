@@ -13,7 +13,7 @@ c4k_password:
       new_state: c4k_enable
 
 c4k_disable:
-  prompt: "Router>"
+  prompt: "%N>"
   commands:
     "en":
       new_state: c4k_enable
@@ -25,7 +25,7 @@ cat4k_locked:
   prompt: ""
 
 cat4k_exec:
-  prompt: "Router>"
+  prompt: "%N>"
   commands:
     "term length 0": ""
     "term width 0": ""
@@ -72,7 +72,7 @@ cat4k_exec:
       new_state: c4k_enable
 
 c4k_enable:
-  prompt: "Router#"
+  prompt: "%N#"
   commands:
     "term length 0": ""
     "term width 0": ""
@@ -104,14 +104,14 @@ c4k_enable:
       new_state: cat4k_system_config_change
 
 cat4k_config:
-  prompt: "Router(config)#"
+  prompt: "%N(config)#"
   commands:
     "no logging console": ""
     "line console 0":
       new_state: cat4k_config_line
 
 cat4k_config_line:
-  prompt: "Router(config-line)#"
+  prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
     "end":

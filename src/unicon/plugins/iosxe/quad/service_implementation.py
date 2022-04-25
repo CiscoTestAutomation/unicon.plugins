@@ -256,12 +256,22 @@ class QuadReload(BaseService):
                      reply=Dialog([]),
                      timeout=None,
                      return_output=False,
-                     *args, **kwargs):
+                     error_pattern=None,
+                     append_error_pattern=None,
+                     *args,
+                     **kwargs):
 
         self.result = False
         reload_cmd = reload_command or self.reload_command
         timeout = timeout or self.timeout
         conn = self.connection.active
+        self.error_pattern= error_pattern or conn.settings.ERROR_PATTERN
+        if not isinstance(self.error_pattern, list):
+            raise ValueError('error_pattern should be a list')
+        if append_error_pattern:
+            if not isinstance(append_error_pattern, list):
+                raise ValueError('append_error_pattern should be a list')
+            self.error_pattern += append_error_pattern
 
         reload_dialog = self.dialog
         if reply:
@@ -276,10 +286,11 @@ class QuadReload(BaseService):
                                 (conn.hostname, conn.alias))
         conn.sendline(reload_cmd)
         try:
-            reload_output = reload_dialog.process(
-                conn.spawn, timeout=timeout,
-                prompt_recovery=self.prompt_recovery,
-                context=conn.context)
+            reload_output = reload_dialog.process(conn.spawn, timeout=timeout,
+                                                  prompt_recovery=self.prompt_recovery,
+                                                  context=conn.context)
+            self.result=reload_output.match_output
+            self.get_service_result()
         except Exception as e:
             raise SubCommandFailure('Error during reload', e) from e
 

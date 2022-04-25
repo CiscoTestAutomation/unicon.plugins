@@ -17,7 +17,7 @@ isr_enable_password:
       new_state: enable_isr
 
 isr_exec:
-  prompt: "Router>"
+  prompt: "%N>"
   commands: 
     "show version": &SV |2
       Cisco IOS Software, IOS-XE Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 15.3(2)S1, RELEASE SOFTWARE (fc1)
@@ -96,7 +96,7 @@ isr_exec:
 
 
 isr_bash:
-  prompt: "[Router:/]$"
+  prompt: "[%N:/]$"
   commands:
     "ls": |
         3pa    dev     init   mount_packages.sh  sys
@@ -122,7 +122,7 @@ act_reply:
       
 
 enable_isr:
-  prompt: "Router#"
+  prompt: "%N#"
   commands:
     "term length 0": ""
     "term width 0": ""
@@ -187,7 +187,7 @@ enable_isr:
       new_state: do_you_want_to_remove
 
 disable_isr:
-  prompt: "Router>"
+  prompt: "%N>"
   commands:
     "enable":
       new_state: isr_enable_password
@@ -195,14 +195,14 @@ disable_isr:
       new_state: isr_enable_password
 
 config_isr:
-  prompt: "Router(config)#"
+  prompt: "%N(config)#"
   commands:
     "no logging console": ""
     "line console 0":
       new_state: config_line_isr
 
 config_line_isr:
-  prompt: "Router(config-line)#"
+  prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
     "end":
@@ -378,58 +378,6 @@ ping1_sweep_isr_vrf:
         Sending 30, 100-byte ICMP Echos to 192.0.0.6, timeout is 2 seconds:
         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         Success rate is 100 percent (30/30), round-trip min/avg/max = 1/1/3 ms
-
-sdwan_enable:
-  prompt: "Router#"
-  commands: &sdwan_enable_cmds
-    "term length 0": ""
-    "term width 0": ""
-    "show sdwan version": "16.12.1.0.533"
-    "show sdwan software": |2
-      VERSION        ACTIVE  DEFAULT  PREVIOUS  CONFIRMED  TIMESTAMP
-      --------------------------------------------------------------------------------
-      16.12.1.0.533  true    true     false     auto       2019-05-21T03:00:31-00:00
-    "show version": *SV
-    "config term": "This command is not supported"
-    "config-transaction":
-      new_state: sdwan_config
-
-sdwan_config:
-  preface: "admin connected from 127.0.0.1 using console on Router"
-  prompt: "Router(config)#"
-  commands: &sdwan_config_cmds
-    "no logging console": ""
-    "line console 0": "syntax error: \"console\" is not a valid value."
-    "exec-timeout 0" : "syntax error: unknown command"
-    "commit": "% No modifications to commit."
-    "end":
-      new_state: sdwan_enable
-
-sdwan_enable2:
-  prompt: "Router#"
-  commands:
-   <<: *sdwan_enable_cmds
-   "config-transaction":
-      new_state: sdwan_config2
-
-sdwan_config2:
-  prompt: "Router(config)#"
-  commands:
-    <<: *sdwan_config_cmds
-    "commit":
-      response: |
-        The following warnings were generated:
-        'system is-vmanaged': This device is being managed by the vManage. Any
-        configuration changes to this device will be overwritten by the vManage after
-        the control connection to the vManage comes back up.
-      new_state: sdwan_config_commit_confirm
-
-sdwan_config_commit_confirm:
-  prompt: "Proceed? [yes,no]"
-  commands:
-    "yes":
-      new_state: sdwan_config2
-
 
 do_you_want_to_remove:
   preface: |

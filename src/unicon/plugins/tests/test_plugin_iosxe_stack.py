@@ -11,6 +11,7 @@ from pyats.topology import loader
 
 import unicon
 from unicon import Connection
+from unicon.eal.dialogs import Statement, Dialog
 from unicon.core.errors import SubCommandFailure
 from unicon.plugins.tests.mock.mock_device_iosxe import MockDeviceTcpWrapperIOSXE
 
@@ -22,7 +23,7 @@ unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC = 0
 class TestIosXEStackConnect(unittest.TestCase):
 
     def test_stack_connect(self):
-        md = MockDeviceTcpWrapperIOSXE(port=0, state='stack_login' + ',stack_login'*4, stack=True)
+        md = MockDeviceTcpWrapperIOSXE(hostname='Router', port=0, state='stack_login' + ',stack_login'*4, stack=True)
         md.start()
         d = Connection(hostname='Router',
                        start = ['telnet 127.0.0.1 ' + str(i) for i in md.ports[:]],
@@ -41,7 +42,7 @@ class TestIosXEStackConnect(unittest.TestCase):
 
     def test_stack_connect2(self):
         d = Connection(hostname='Router',
-                       start = ['mock_device_cli --os iosxe --state stack_login']*5,
+                       start = ['mock_device_cli --os iosxe --state stack_login --hostname Router']*5,
                        os='iosxe',
                        chassis_type='stack',
                        username='cisco',
@@ -52,7 +53,7 @@ class TestIosXEStackConnect(unittest.TestCase):
         self.assertEqual(d.spawn.match.match_output, 'term width 0\r\nRouter#')
 
     def test_stack_connect3(self):
-        md = MockDeviceTcpWrapperIOSXE(port=0, state='stack_enable' + ',stack_enable'*2, stack=True)
+        md = MockDeviceTcpWrapperIOSXE(hostname='Router', port=0, state='stack_enable' + ',stack_enable'*2, stack=True)
         md.start()
         testbed = '''
             devices:
@@ -93,7 +94,7 @@ class TestIosXEStackExecute(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.c = Connection(hostname='Router',
-                       start = ['mock_device_cli --os iosxe --state stack_enable']*5,
+                       start = ['mock_device_cli --os iosxe --state stack_enable --hostname Router']*5,
                        os='iosxe',
                        chassis_type='stack',
                        username='cisco',
@@ -114,7 +115,7 @@ class TestIosXEStackDisableEnable(unittest.TestCase):
 
     def test_disable_enable(self):
         c = Connection(hostname='Router',
-                       start = ['mock_device_cli --os iosxe --state stack_enable']*5,
+                       start = ['mock_device_cli --os iosxe --state stack_enable --hostname Router']*5,
                        os='iosxe',
                        chassis_type='stack',
                        username='cisco',
@@ -138,7 +139,7 @@ class TestIosXEStackDisableEnable(unittest.TestCase):
 class TestIosXEStackConfigure(unittest.TestCase):
     def test_stack_config(self):
         c = Connection(hostname='Router',
-                       start = ['mock_device_cli --os iosxe --state stack_login']*5,
+                       start = ['mock_device_cli --os iosxe --state stack_login --hostname Router']*5,
                        os='iosxe',
                        chassis_type='stack',
                        username='cisco',
@@ -156,7 +157,7 @@ class TestIosXEStackGetRPState(unittest.TestCase):
 
     def test_stack_get_rp_state(self):
         c = Connection(hostname='Router',
-                       start = ['mock_device_cli --os iosxe --state stack_login']*5,
+                       start = ['mock_device_cli --os iosxe --state stack_login --hostname Router']*5,
                        os='iosxe',
                        chassis_type='stack',
                        username='cisco',
@@ -180,7 +181,7 @@ class TestIosXEStackSwitchover(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.c = Connection(hostname='Router',
-                           start = ['mock_device_cli --os iosxe --state stack_login']*5,
+                           start = ['mock_device_cli --os iosxe --state stack_login --hostname Router']*5,
                            os='iosxe',
                            chassis_type='stack',
                            credentials=dict(default=dict(username='cisco', password='cisco')),
@@ -205,7 +206,7 @@ class TestIosXEStackSwitchover(unittest.TestCase):
 class TestIosXEStackReload(unittest.TestCase):
 
     def test_reload(self):
-        md = MockDeviceTcpWrapperIOSXE(port=0, state='stack_enable' + ',stack_enable'*4, stack=True)
+        md = MockDeviceTcpWrapperIOSXE(hostname='Router', port=0, state='stack_enable' + ',stack_enable'*4, stack=True)
         md.start()
         d = Connection(hostname='Router',
                        start = ['telnet 127.0.0.1 ' + str(i) for i in md.ports[:]],
@@ -222,11 +223,61 @@ class TestIosXEStackReload(unittest.TestCase):
         d.disconnect()
         md.stop()
 
+    def test_reload_member(self):
+
+        md = MockDeviceTcpWrapperIOSXE(port=0, state='stack_enable' + ',stack_enable'*4, stack=True)
+        md.start()
+        d = Connection(hostname='Router',
+                       start = ['telnet 127.0.0.1 ' + str(i) for i in md.ports[:]],
+                       os='iosxe',
+                       chassis_type='stack',
+                       username='cisco',
+                       tacacs_password='cisco',
+                       enable_password='cisco')
+        d.settings.STACK_POST_RELOAD_SLEEP = 0
+        d.connect()
+        self.assertTrue(d.active.alias == 'peer_1')
+
+        d.reload(member=1)
+        d.disconnect()
+        md.stop()
+
+    def test_reload_with_error_pattern(self):
+        md = MockDeviceTcpWrapperIOSXE(port=0, state='stack_enable' + ',stack_enable'*4, stack=True)
+        md.start()
+        d = Connection(hostname='Router',
+                       start = ['telnet 127.0.0.1 ' + str(i) for i in md.ports[:]],
+                       os='iosxe',
+                       chassis_type='stack',
+                       username='cisco',
+                       tacacs_password='cisco',
+                       enable_password='cisco')
+
+        install_add_one_shot_dialog = Dialog([
+                Statement(pattern=r"FAILED:.* ",
+                          action=None,
+                          loop_continue=False,
+                          continue_timer=False),
+         ])
+        error_pattern=[r"FAILED:.* ",]
+
+        try:
+            d.connect()
+            d.settings.STACK_POST_RELOAD_SLEEP = 0
+            with self.assertRaises(SubCommandFailure):
+                d.reload('active_install_add',
+                          reply=install_add_one_shot_dialog,
+                          error_pattern = error_pattern)
+        finally:
+             d.disconnect()
+             md.stop()
+
+
 
 class TestIosXEluginBashService(unittest.TestCase):
 
     def test_bash(self):
-        md = MockDeviceTcpWrapperIOSXE(port=0, state='stack_enable' + ',stack_enable'*4, stack=True)
+        md = MockDeviceTcpWrapperIOSXE(hostname='Router', port=0, state='stack_enable' + ',stack_enable'*4, stack=True)
         md.start()
         try:
             d = Connection(hostname='Router',
