@@ -15,6 +15,8 @@ from unittest.mock import Mock, patch
 
 import unicon
 from unicon import Connection
+from unicon.eal.dialogs import Statement, Dialog
+
 from unicon.core.errors import SubCommandFailure
 
 
@@ -40,6 +42,30 @@ class TestIosXrNcs5kPlugin(unittest.TestCase):
         c.connect()
         c.reload()
         self.assertIn('\r\nRP/0/RP0/CPU0:Router#', c.spawn.match.match_output)
+
+    def test_reload_with_error_pattern(self):
+        c = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxr --state ncs5k_enable'],
+                       os='iosxr',
+                       platform='ncs5k',
+                       username='lab')
+        install_add_one_shot_dialog = Dialog([
+                   Statement(pattern=r"FAILED:.* ",
+                             action=None,
+                             loop_continue=False,
+                             continue_timer=False),
+           ])
+        error_pattern=[r"FAILED:.* ",]
+
+        try:
+            c.connect()
+            c.settings.POST_RELOAD_WAIT = 1
+            with self.assertRaises(SubCommandFailure):
+                c.reload('active_install_add',
+                          dialog=install_add_one_shot_dialog,
+                          error_pattern = error_pattern)
+        finally:
+            c.disconnect()
 
     def test_reload_credentials(self):
         c = Connection(hostname='Router',

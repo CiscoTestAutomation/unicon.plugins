@@ -12,7 +12,7 @@ password:
       new_state: exec
 
 exec:
-  prompt: "Router> "
+  prompt: "%N> "
   commands:
     "show version": &SV |
       Cisco IOS Software, 7200 Software (C7200P-ADVENTERPRISEK9-M), Experimental Version 15.0(20100325:222114) [scube_alto-gclendon-alto_precollapse 221]
@@ -76,7 +76,7 @@ exec:
       new_state: enable
           
 enable:
-  prompt: "Router#"
+  prompt: "%N#"
   commands:
     "term length 0": ""
     "term width 0": ""
@@ -86,14 +86,14 @@ enable:
 
 
 config:
-  prompt: "Router(conf)#"
+  prompt: "%N(conf)#"
   commands:
     "no logging console": ""
     "line console 0":
       new_state: config_line
 
 config_line:
-  prompt: "Router(config-line)#"
+  prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
     "end":

@@ -10,6 +10,8 @@ from pyats.topology import loader
 
 import unicon
 from unicon import Connection
+from unicon.core.errors import SubCommandFailure
+from unicon.eal.dialogs import Statement, Dialog
 from unicon.plugins.tests.mock.mock_device_iosxe import MockDeviceTcpWrapperIOSXE
 
 
@@ -18,7 +20,8 @@ from unicon.plugins.tests.mock.mock_device_iosxe import MockDeviceTcpWrapperIOSX
 class TestIosXEQuadConnect(unittest.TestCase):
 
     def test_quad_connect(self):
-        md = MockDeviceTcpWrapperIOSXE(port=0,
+        md = MockDeviceTcpWrapperIOSXE(hostname='Router',
+                                       port=0,
                                        quad=True,
                                        state='quad_login,quad_ics_login,quad_stby_login,quad_ics_login')
         md.start()
@@ -36,10 +39,10 @@ class TestIosXEQuadConnect(unittest.TestCase):
 
     def test_quad_connect2(self):
         d = Connection(hostname='Router',
-                       start=['mock_device_cli --os iosxe --state quad_login',
-                              'mock_device_cli --os iosxe --state quad_ics_login',
-                              'mock_device_cli --os iosxe --state quad_stby_login',
-                              'mock_device_cli --os iosxe --state quad_ics_login'],
+                       start=['mock_device_cli --os iosxe --state quad_login --hostname Router',
+                              'mock_device_cli --os iosxe --state quad_ics_login --hostname Router',
+                              'mock_device_cli --os iosxe --state quad_stby_login --hostname Router',
+                              'mock_device_cli --os iosxe --state quad_ics_login --hostname Router'],
                        os='iosxe',
                        chassis_type='quad',
                        username='cisco',
@@ -51,7 +54,8 @@ class TestIosXEQuadConnect(unittest.TestCase):
         d.disconnect()
 
     def test_quad_connect3(self):
-        md = MockDeviceTcpWrapperIOSXE(port=0,
+        md = MockDeviceTcpWrapperIOSXE(hostname='Router',
+                                       port=0,
                                        quad=True,
                                        state='quad_login,quad_ics_login,quad_stby_login,quad_ics_login')
         md.start()
@@ -109,10 +113,10 @@ class TestIosXEQuadDisableEnable(unittest.TestCase):
 
     def test_disable_enable(self):
         d = Connection(hostname='Router',
-                       start=['mock_device_cli --os iosxe --state quad_login',
-                              'mock_device_cli --os iosxe --state quad_ics_login',
-                              'mock_device_cli --os iosxe --state quad_stby_login',
-                              'mock_device_cli --os iosxe --state quad_ics_login'],
+                       start=['mock_device_cli --os iosxe --state quad_login --hostname Router',
+                              'mock_device_cli --os iosxe --state quad_ics_login --hostname Router',
+                              'mock_device_cli --os iosxe --state quad_stby_login --hostname Router',
+                              'mock_device_cli --os iosxe --state quad_ics_login --hostname Router'],
                        os='iosxe',
                        chassis_type='quad',
                        username='cisco',
@@ -139,10 +143,10 @@ class TestIosXEQuadGetRPState(unittest.TestCase):
 
     def test_get_rp_state(self):
         d = Connection(hostname='Router',
-                       start=['mock_device_cli --os iosxe --state quad_login',
-                              'mock_device_cli --os iosxe --state quad_ics_login',
-                              'mock_device_cli --os iosxe --state quad_stby_login',
-                              'mock_device_cli --os iosxe --state quad_ics_login'],
+                       start=['mock_device_cli --os iosxe --state quad_login --hostname Router',
+                              'mock_device_cli --os iosxe --state quad_ics_login --hostname Router',
+                              'mock_device_cli --os iosxe --state quad_stby_login --hostname Router',
+                              'mock_device_cli --os iosxe --state quad_ics_login --hostname Router'],
                        os='iosxe',
                        chassis_type='quad',
                        username='cisco',
@@ -168,7 +172,8 @@ class TestIosXEQuadSwitchover(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.md = MockDeviceTcpWrapperIOSXE(port=0,
+        cls.md = MockDeviceTcpWrapperIOSXE(hostname='Router',
+                                           port=0,
                                            quad=True,
                                            state='quad_login,quad_ics_login,quad_stby_login,quad_ics_login')
         cls.md.start()
@@ -197,7 +202,8 @@ class TestIosXEQuadReload(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.md = MockDeviceTcpWrapperIOSXE(port=0,
+        cls.md = MockDeviceTcpWrapperIOSXE(hostname='Router',
+                                           port=0,
                                            quad=True,
                                            state='quad_login,quad_ics_login,quad_stby_login,quad_ics_login')
         cls.md.start()
@@ -220,6 +226,20 @@ class TestIosXEQuadReload(unittest.TestCase):
     def test_reload(self):
         self.d.reload()
 
+    def test_relaod_with_error_pattern(self):
+
+        install_add_one_shot_dialog = Dialog([
+                Statement(pattern=r"FAILED:.* ",
+                          action=None,
+                          loop_continue=False,
+                          continue_timer=False),
+         ])
+        error_pattern=[r"FAILED:.* ",]
+
+        with self.assertRaises(SubCommandFailure):
+                self.d.reload('active_install_add',
+                          reply=install_add_one_shot_dialog,
+                          error_pattern = error_pattern)
 
 if __name__ == "__main__":
     unittest.main()

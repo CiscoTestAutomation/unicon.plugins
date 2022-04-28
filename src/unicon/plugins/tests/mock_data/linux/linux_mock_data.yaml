@@ -427,13 +427,13 @@ ios_login:
       new_state: ios_exec
 
 ios_exec:
-  prompt: Router>
+  prompt: "%N>"
   commands:
     "enable":
       new_state: ios_enable
 
 ios_enable:
-  prompt: Router#
+  prompt: "%N#"
   commands:
     "term length 0": ""
     "term width 0": ""
@@ -442,7 +442,7 @@ ios_enable:
       new_state: ios_config
 
 ios_config:
-  prompt: "Router(conf)#"
+  prompt: "%N(conf)#"
   commands:
     "no logging console": ""
     "line console 0":
@@ -453,7 +453,7 @@ ios_config:
       new_state: ios_enable
 
 ios_config_line:
-  prompt: "Router(config-line)#"
+  prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
     "end":

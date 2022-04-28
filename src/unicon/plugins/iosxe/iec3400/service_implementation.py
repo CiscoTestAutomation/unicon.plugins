@@ -44,9 +44,21 @@ class Reload(BaseService):
                      dialog=Dialog([]),
                      timeout=None,
                      return_output=False,
-                     *args, **kwargs):
+                     error_pattern=None,
+                     append_error_pattern=None,
+                     *args,
+                     **kwargs):
+
         con = self.connection
         timeout = timeout or self.timeout
+
+        self.error_pattern= error_pattern or con.settings.ERROR_PATTERN
+        if not isinstance(self.error_pattern, list):
+            raise ValueError('error_pattern should be a list')
+        if append_error_pattern:
+            if not isinstance(append_error_pattern, list):
+                raise ValueError('append_error_pattern should be a list')
+            self.error_pattern += append_error_pattern
         sm = self.get_sm()
         assert isinstance(dialog,
                           Dialog), "dialog passed must be an instance of Dialog"

@@ -3,11 +3,13 @@
 
 __author__ = "Rob Trotter <rlt@cisco.com>"
 
-from unicon.plugins.iosxe import IosXESingleRpConnection, IosXEDualRPConnection
+from unicon.plugins.iosxe import (
+    IosXESingleRpConnection,
+    IosXEDualRPConnection,
+    IosXEServiceList,
+    HAIosXEServiceList)
 
-from .. import IosXEServiceList
-
-from .statemachine import IosXECat9kSingleRpStateMachine
+from .statemachine import IosXECat9kSingleRpStateMachine, IosXECat9kDualRpStateMachine
 from .settings import IosXECat9kSettings
 from . import service_implementation as svc
 
@@ -19,6 +21,13 @@ class IosXECat9kServiceList(IosXEServiceList):
         self.rommon = svc.Rommon
 
 
+
+class IosxeCat9kHAServiceList(HAIosXEServiceList):
+    def __init__(self):
+        super().__init__()
+        self.reload = svc.HAReloadService
+
+
 class IosXECat9kSingleRpConnection(IosXESingleRpConnection):
     platform = 'cat9k'
     state_machine_class = IosXECat9kSingleRpStateMachine
@@ -28,4 +37,6 @@ class IosXECat9kSingleRpConnection(IosXESingleRpConnection):
 
 class IosXECat9kDualRPConnection(IosXEDualRPConnection):
     platform = 'cat9k'
+    subcommand_list = IosxeCat9kHAServiceList
     settings = IosXECat9kSettings()
+    state_machine_class = IosXECat9kDualRpStateMachine

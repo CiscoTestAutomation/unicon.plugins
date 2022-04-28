@@ -15,6 +15,7 @@ from unittest.mock import patch
 
 import unicon
 from unicon import Connection
+from unicon.eal.dialogs import Statement, Dialog
 from unicon.core.errors import SubCommandFailure, StateMachineError, \
     ConnectionError
 from unicon.plugins.tests.mock.mock_device_nxos import MockDeviceTcpWrapperNXOS
@@ -529,6 +530,66 @@ class TestNxosPluginReloadService(unittest.TestCase):
                 f'INFO:{dev.log.name}:Time out, trying to acces device..', 
                 cm.output)
 
+    def test_reload_with_error_pattern(self):
+        c = Connection(
+             hostname='N93_1',
+             start=['mock_device_cli --os nxos --state login2 --hostname N93_1'],
+             os='nxos',
+             username='cisco',
+             tacacs_password='cisco',
+             enable_password='cisco',
+         )
+        install_add_one_shot_dialog = Dialog([
+                  Statement(pattern=r".*reload of the system\. "
+                                    r"Do you want to proceed\? \[y\/n\]",
+                            action='sendline(y)',
+                            loop_continue=True,
+                            continue_timer=False),
+
+                  Statement(pattern=r"FAILED:.* ",
+                            action=None,
+                            loop_continue=False,
+                            continue_timer=False),
+          ])
+        error_pattern=[r"FAILED:.* ",]
+
+        try:
+            c.connect()
+            c.settings.POST_RELOAD_WAIT = 1
+            with self.assertRaises(SubCommandFailure):
+                c.reload('active_install_add',
+                          reply=install_add_one_shot_dialog,
+                          error_pattern = error_pattern)
+
+            self.assertEqual(c.state_machine.current_state, 'enable')
+        finally:
+             c.disconnect()
+
+    def test_reload_ha_with_error_pattern(self):
+        md = MockDeviceTcpWrapperNXOS(port=0, state='exec,nxos_exec_standby')
+        md.start()
+        c = Connection(hostname='switch',
+                        start=['telnet 127.0.0.1 ' + str(md.ports[0]),
+                               'telnet 127.0.0.1 ' + str(md.ports[1])],
+                        os='nxos', username='cisco', tacacs_password='cisco')
+        install_add_one_shot_dialog = Dialog([
+                  Statement(pattern=r"FAILED:.* ",
+                            action=None,
+                            loop_continue=False,
+                            continue_timer=False),
+          ])
+        error_pattern=[r"FAILED:.* ",]
+
+        try:
+            c.connect()
+            c.settings.POST_RELOAD_WAIT = 1
+            with self.assertRaises(SubCommandFailure):
+                c.reload('active_install_add',
+                          reply=install_add_one_shot_dialog,
+                          error_pattern = error_pattern)
+        finally:
+            c.disconnect()
+            md.stop()
 
 class TestNxosPluginMaintenanceMode(unittest.TestCase):
 

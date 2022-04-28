@@ -1,4 +1,4 @@
-__version__ = '22.3'
+__version__ = '22.4'
 
 supported_chassis = [
     'single_rp',
@@ -30,7 +30,6 @@ supported_os = [
     'sros',
     'apic',
     'windows',
-    'dell',
     'comware',
     'ironware',
     'eos',
@@ -38,5 +37,7 @@ supported_os = [
     'hvrp',
     'slxos',
     'nd',
-    'viptela'
+    'viptela',
+    'dnos6',
+    'dnos10'
 ]

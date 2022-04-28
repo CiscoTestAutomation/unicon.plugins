@@ -191,24 +191,36 @@ class StackReload(BaseService):
         self.reload_command = "redundancy reload shelf"
         self.dialog = Dialog(stack_reload_stmt_list)
 
-    def call_service(self, 
+    def call_service(self,
                      reload_command=None,
                      reply=Dialog([]),
                      timeout=None,
                      image_to_boot=None,
                      return_output=False,
-                     *args, **kwargs):
+                     member=None,
+                     error_pattern = None,
+                     append_error_pattern= None,
+                     *args,
+                     **kwargs):
 
         self.result = False
+        if member:
+            self.reload_command = f'reload slot {member}'
         reload_cmd = reload_command or self.reload_command
         timeout = timeout or self.timeout
         conn = self.connection.active
 
+        self.error_pattern = error_pattern or conn.settings.ERROR_PATTERN
+        if not isinstance(self.error_pattern, list):
+            raise ValueError('error_pattern should be a list')
+        if append_error_pattern:
+            if not isinstance(append_error_pattern, list):
+                raise ValueError('append_error_pattern should be a list')
+            self.error_pattern += append_error_pattern
         # update all subconnection context with image_to_boot
         if image_to_boot:
             for subconn in self.connection:
                 subconn.context.image_to_boot = image_to_boot
-
         reload_dialog = self.dialog
         if reply:
             reload_dialog = reply + reload_dialog
@@ -223,10 +235,12 @@ class StackReload(BaseService):
         conn.log.info('Processing on active rp %s-%s' % (conn.hostname, conn.alias))
         conn.sendline(reload_cmd)
         try:
-            reload_cmd_output = reload_dialog.process(
-                conn.spawn, timeout=timeout,
-                prompt_recovery=self.prompt_recovery,
-                context=conn.context)
+            reload_cmd_output = reload_dialog.process(conn.spawn,
+                                                     timeout=timeout,
+                                                     prompt_recovery=self.prompt_recovery,
+                                                     context=conn.context)
+            self.result=reload_cmd_output.match_output
+            self.get_service_result()
         except Exception as e:
             raise SubCommandFailure('Error during reload', e) from e
 
@@ -260,7 +274,6 @@ class StackReload(BaseService):
                                         context=conn.context)
             except Exception as e:
                 raise SubCommandFailure('Failed to bring device to disable mode.', e) from e
-
         # check active and standby rp is ready
         self.connection.log.info('Wait for Standby RP to be ready.')
 
@@ -272,6 +285,15 @@ class StackReload(BaseService):
                 'Standby RP is not in Ready state. Reload failed' % timeout)
             self.result = False
             return
+
+        if member:
+            if utils.is_all_member_ready(conn, timeout=timeout, interval=interval):
+                self.connection.log.info('All Members are ready.')
+            else:
+                self.connection.log.info(f'Timeout in {timeout} secs. '
+                    f'Member{member} is not in Ready state. Reload failed')
+                self.result = False
+                return
 
         self.connection.log.info('Sleeping for %s secs.' % \
                 self.connection.settings.STACK_POST_RELOAD_SLEEP)

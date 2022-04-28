@@ -1,6 +1,6 @@
 asr_exec_standby:
-  prompt: Router-stby>
-  commands: 
+  prompt: "%N-stby>"
+  commands:
     "show version": &SV |2
       Cisco IOS XE Software, Version BLD_POLARIS_DEV_LATEST_20170913_031230_2
       Cisco IOS Software [Fuji], ASR1000 Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Experimental Version 16.7.20170913:022807 [polaris_dev-/scratch/mcpre/BLD-BLD_POLARIS_DEV_LATEST_20170913_031230 164]
@@ -64,7 +64,7 @@ asr_exec_standby:
       new_state: enable_asr_standby
 
 enable_asr_standby:
-    prompt: Router-stby#
+    prompt: "%N-stby#"
     commands:
       "term length 0": ""
       "term width 0": ""
@@ -74,14 +74,14 @@ enable_asr_standby:
         new_state: asr_exec_standby
       "enable": ""
       "show redundancy sta |  in peer": |2
-             peer state = 13 -ACTIVE 
+             peer state = 13 -ACTIVE
       "show redundancy sta | inc Redundancy State": |2
         Redundancy State              = sso
       "sh redundancy stat | inc my state": |2
         my state = 8  -STANDBY HOT
       "sh redundancy state": |2
-               my state = 8  -STANDBY HOT 
-             peer state = 13 -ACTIVE 
+               my state = 8  -STANDBY HOT
+             peer state = 13 -ACTIVE
                    Mode = Duplex
                    Unit = Secondary
                 Unit ID = 49
@@ -95,7 +95,7 @@ enable_asr_standby:
 
            client count = 84
          client_notification_TMR = 30000 milliseconds
-                   RF debug mask = 0x0   
+                   RF debug mask = 0x0
 
       "show redundancy": |2
         Redundant System Information :
@@ -118,7 +118,7 @@ enable_asr_standby:
         Copyright (c) 1986-2017 by Cisco Systems, Inc.
         Compiled Wed 13-Sep-17 04:13 by mcpre
                                   BOOT = harddisk:packages.conf,12;
-                           CONFIG_FILE = 
+                           CONFIG_FILE =
                 Configuration register = 0x2002
 
         Peer (slot: 6, state: ACTIVE) information is not available because this is the standby processor
@@ -137,7 +137,7 @@ asr_password:
       new_state: asr_exec
 
 asr_exec:
-  prompt: "Router>"
+  prompt: "%N>"
   commands:
     "term length 0": ""
     "term width 0": ""
@@ -147,7 +147,7 @@ asr_exec:
 
 
 enable_asr:
-  prompt: "Router#"
+  prompt: "%N#"
   commands:
     "term length 0": ""
     "term width 0": ""
@@ -167,7 +167,7 @@ enable_asr:
 
          21  -rw-   439612520  Mar 22 2017 00:16:56 +00:00  asr_image.issu-asr-lns
       78704144384 bytes total (72496394240 bytes free)
-   
+
 
     "config term":
       new_state: config_asr
@@ -176,14 +176,14 @@ enable_asr:
       new_state: asr_act_reply
 
     "show redundancy sta |  in peer": |2
-           peer state = 8  -STANDBY HOT 
+           peer state = 8  -STANDBY HOT
     "show redundancy sta | inc Redundancy State": |2
       Redundancy State              = sso
     "sh redundancy stat | inc my state": |2
-             my state = 13 -ACTIVE 
+             my state = 13 -ACTIVE
     "sh redundancy state": |2
-             my state = 13 -ACTIVE 
-           peer state = 8  -STANDBY HOT 
+             my state = 13 -ACTIVE
+           peer state = 8  -STANDBY HOT
                  Mode = Duplex
                  Unit = Primary
               Unit ID = 48
@@ -197,7 +197,7 @@ enable_asr:
 
          client count = 84
        client_notification_TMR = 30000 milliseconds
-                 RF debug mask = 0x0   
+                 RF debug mask = 0x0
     "redundancy force-switchover":
       new_state: enable_asr_standby
     "reload":
@@ -205,7 +205,7 @@ enable_asr:
 
 
 config_asr:
-  prompt: "Router(conf)#"
+  prompt: "%N(conf)#"
   commands:
     "no logging console": ""
     "line console 0":
@@ -214,14 +214,14 @@ config_asr:
       new_state: config_asr_redundancy
 
 config_line_asr:
-  prompt: "Router(config-line)#"
+  prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
     "end":
       new_state: enable_asr
 
 config_asr_redundancy:
-    prompt: Router(config-red)#
+    prompt: "%N(config-red)#"
     commands:
       "main-cpu":
         new_state: config_asr_redundancy_main_cpu
@@ -229,14 +229,14 @@ config_asr_redundancy:
         new_state: enable_asr
 
 config_asr_redundancy_main_cpu:
-    prompt: Router(config-r-mc)#
+    prompt: "%N(config-r-mc)#"
     commands:
       "standby console enable": ""
       "end":
         new_state: enable_asr
 
 asr_bash:
-  prompt: "[Router_RP_0:/]$"
+  prompt: "[%N_RP_0:/]$"
   commands:
     "df /bootflash/": |
       Filesystem     1K-blocks    Used Available Use% Mounted on

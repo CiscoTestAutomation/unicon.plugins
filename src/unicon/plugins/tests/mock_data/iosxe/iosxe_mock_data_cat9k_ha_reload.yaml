@@ -138,6 +138,9 @@ cat9k_ha_active_enable:
     "install add file activate commit":
         new_state: cat9k_ha_active_install_add
 
+    "install add file activate commit_1":
+        new_state: cat9k_ha_active_install_add_1
+
     "config term":
         new_state: cat9k_ha_active_config
 
@@ -153,6 +156,9 @@ cat9k_ha_active_enable_reload_proceed:
   commands:
     "":
       new_state: cat9k_ha_active_enable_reload
+  keys:
+    ctrl-c:
+      new_state: cat9k_ha_active_rommon
 
 cat9k_ha_active_enable_reload:
   preface:
@@ -160,6 +166,9 @@ cat9k_ha_active_enable_reload:
     timing:
     - 0:,0,0.02
   prompt: ""
+  keys:
+    ctrl-c:
+      new_state: cat9k_ha_active_rommon
   commands:
     "":
       new_state: cat9k_ha_standby_disable_locked
@@ -366,3 +375,21 @@ cat9k_ha_active_install_add:
   commands:
     "y":
       new_state: cat9k_ha_active_enable_reload_confirm
+
+cat9k_ha_active_install_add_1:
+  prompt: "This operation may require a reload of the system. Do you want to proceed? [y/n]"
+  commands:
+    "y":
+      new_state: install_add_file_commit
+
+cat9k_ha_active_install_add_1:
+  preface: |2
+    Copying image file: bootflash:asr1000rpx86-universalk9.BLD_V166_THROTTLE_LATEST_20171101_090919_2.SSA.bin to standby
+    rsync: write failed on "asr1000rpx86-universalk9.BLD_V166_THROTTLE_LATEST_20171101_090919_2.SSA.bin" (in bootflash): No space left on device (28)
+    rsync error: error in file IO (code 11) at ../rsync-3.1.2/receiver.c(393) [receiver=3.1.2]
+    rsync error: error in file IO (code 11) at ../rsync-3.1.2/io.c(1633) [generator=3.1.2]
+    rsync: read error: Connection reset by peer (104)
+    FAILED: install_add_activate_commit : Copy bootflash:asr1000rpx86-universalk9.BLD_V16
+
+  new_state: cat9k_ha_active_enable
+

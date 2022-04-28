@@ -55,9 +55,19 @@ class Reload(BaseService):
                      dialog=Dialog([]),
                      timeout=None,
                      reload_creds=None,
+                     error_pattern = None,
+                     append_error_pattern= None,
                      *args, **kwargs):
+
         con = self.connection
         timeout = timeout or self.timeout
+        self.error_pattern = error_pattern or con.settings.ERROR_PATTERN
+        if not isinstance(self.error_pattern, list):
+            raise ValueError('error_pattern should be a list')
+        if append_error_pattern:
+            if not isinstance(append_error_pattern, list):
+                raise ValueError('append_error_pattern should be a list')
+            self.error_pattern += append_error_pattern
 
         fmt_msg = "+++ reloading  %s  " \
                   " with reload_command %s " \
@@ -96,6 +106,7 @@ class Reload(BaseService):
                                context=context)
                 if self.result:
                     self.result = self.result.match_output
+                    self.get_service_result()
                 con.state_machine.go_to('any',
                                         con.spawn,
                                         prompt_recovery=self.prompt_recovery,
@@ -182,10 +193,20 @@ class HAReload(BaseService):
                      target='active',
                      timeout=None,
                      reload_creds=None,
+                     error_pattern = None,
+                     append_error_pattern= None,
                      *args, **kwargs):
         con = self.connection
         self.context = con.active.context
         timeout = timeout or self.timeout
+
+        self.error_pattern = error_pattern or con.settings.ERROR_PATTERN
+        if not isinstance(self.error_pattern, list):
+            raise ValueError('error_pattern should be a list')
+        if append_error_pattern:
+            if not isinstance(append_error_pattern, list):
+                raise ValueError('append_error_pattern should be a list')
+            self.error_pattern += append_error_pattern
 
         fmt_msg = "+++ reloading  %s  " \
                   " with reload_command %s " \
@@ -225,6 +246,7 @@ class HAReload(BaseService):
                                    context=context)
                     if self.result:
                         self.result = self.result.match_output
+                        self.get_service_result()
                 except Exception:
                     self.result = con.active.spawn.buffer
                     if 'is in standby' in self.result:

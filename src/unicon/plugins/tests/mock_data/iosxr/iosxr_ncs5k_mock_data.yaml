@@ -124,7 +124,8 @@ ncs5k_enable:
       Template: console
       Capabilities: Timestamp Enabled
       Allowed transports are none.
-
+    "active_install_add":
+          new_state: install_add_commit_1
 ncs5k_enable_vty:
   prompt: RP/0/RP0/CPU0:%N#
   commands:
@@ -165,3 +166,15 @@ ncs5k_config_vty:
     <<: *config_cmds
     "end":
       new_state: ncs5k_enable_vty
+
+install_add_commit_1:
+     preface: |2
+        Copying image file: bootflash:asr1000rpx86-universalk9.BLD_V166_THROTTLE_LATEST_20171101_090919_2.SSA.bin to standby
+        rsync: write failed on "asr1000rpx86-universalk9.BLD_V166_THROTTLE_LATEST_20171101_090919_2.SSA.bin" (in bootflash): No space left on device (28)
+        rsync error: error in file IO (code 11) at ../rsync-3.1.2/receiver.c(393) [receiver=3.1.2]
+        rsync error: error in file IO (code 11) at ../rsync-3.1.2/io.c(1633) [generator=3.1.2]
+        rsync: read error: Connection reset by peer (104)
+        FAILED: install_add_activate_commit : Copy bootflash:asr1000rpx86-universalk9.BLD_V16
+
+     new_state: ncs5k_enable
+

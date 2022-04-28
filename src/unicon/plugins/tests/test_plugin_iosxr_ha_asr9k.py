@@ -11,6 +11,9 @@ import unittest
 from time import sleep
 
 from unicon import Connection
+from unicon.eal.dialogs import Statement, Dialog
+from unicon.core.errors import SubCommandFailure
+
 from pyats.topology import loader
 
 from unicon.plugins.tests.mock.mock_device_iosxr import MockDeviceTcpWrapperIOSXR
@@ -68,6 +71,20 @@ class TestIOSXRPluginHAConnect(unittest.TestCase):
 
     def test_reload(self):
         self.r.reload(reload_command='admin hw-module location all reload', timeout=30)
+
+    def test_reload_with_error_pattern(self):
+        install_add_one_shot_dialog = Dialog([
+            Statement(pattern=r"FAILED:.* ",
+                      action=None,
+                      loop_continue=False,
+                      continue_timer=False),
+           ])
+        error_pattern=[r"FAILED:.* ",]
+
+        with self.assertRaises(SubCommandFailure):
+            self.r.reload('active_install_add',
+                      reply=install_add_one_shot_dialog,
+                      error_pattern = error_pattern)
 
     def test_bash_console(self):
         with self.r.bash_console() as conn:

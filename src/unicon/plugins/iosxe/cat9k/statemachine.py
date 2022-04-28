@@ -1,7 +1,11 @@
 
 from unicon.core.errors import StateMachineError
-from unicon.plugins.iosxe.statemachine import IosXESingleRpStateMachine, boot_from_rommon
-from unicon.plugins.generic.statements import GenericStatements, buffer_wait
+from unicon.plugins.iosxe.statemachine import (
+    IosXESingleRpStateMachine,
+    IosXEDualRpStateMachine,
+    boot_from_rommon
+    )
+from unicon.plugins.generic.statements import GenericStatements
 from unicon.statemachine import State, Path
 from unicon.eal.dialogs import Dialog, Statement
 
@@ -41,6 +45,38 @@ def container_to_enable_transition(statemachine, spawn, context):
 
 
 class IosXECat9kSingleRpStateMachine(IosXESingleRpStateMachine):
+    def create(self):
+        super().create()
+
+        container_shell = State('container_shell', patterns.container_shell_prompt)
+        container_ssh = State('container_ssh', patterns.container_ssh_prompt)
+
+        rommon = self.get_state('rommon')
+        disable = self.get_state('disable')
+        enable = self.get_state('enable')
+
+        self.add_state(container_shell)
+        self.add_state(container_ssh)
+
+        rommon.pattern = patterns.rommon_prompt
+
+        self.remove_path('rommon', 'disable')
+        self.remove_path('enable', 'rommon')
+
+        rommon_to_disable = Path(rommon, disable, boot_from_rommon, Dialog(
+            boot_from_rommon_statement_list))
+        enable_to_rommon = Path(enable, rommon, 'reload', Dialog(
+            reload_to_rommon_statement_list))
+
+        container_shell_to_enable = Path(container_shell, enable, container_to_enable_transition, None)
+
+        self.add_path(rommon_to_disable)
+        self.add_path(enable_to_rommon)
+        self.add_path(container_shell_to_enable)
+
+
+class IosXECat9kDualRpStateMachine(IosXEDualRpStateMachine):
+
     def create(self):
         super().create()
 

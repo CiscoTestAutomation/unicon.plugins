@@ -205,7 +205,7 @@ class TestIosXEPluginDisableEnable(unittest.TestCase):
 
     def test_disable_enable(self):
         c = Connection(hostname='Router',
-                       start=['mock_device_cli --os iosxe --state isr_exec'],
+                       start=['mock_device_cli --os iosxe --state isr_exec --hostname Router'],
                        os='iosxe',
                        credentials=dict(default=dict(username='cisco', password='cisco')),
                        log_buffer=True
@@ -241,7 +241,7 @@ class TestIosXEPluginPing(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.c = Connection(hostname='Router',
-                           start=['mock_device_cli --os iosxe --state isr_exec'],
+                           start=['mock_device_cli --os iosxe --state isr_exec --hostname Router'],
                            os='iosxe',
                            credentials=dict(default=dict(username='cisco', password='cisco')),
                            log_buffer=True
@@ -307,7 +307,7 @@ class TestIosxePlugingTraceroute(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.c = Connection(hostname='Router',
-                           start=['mock_device_cli --os iosxe --state isr_exec'],
+                           start=['mock_device_cli --os iosxe --state isr_exec --hostname Router'],
                            os='iosxe',
                            credentials=dict(default=dict(username='cisco', password='cisco')),
                            log_buffer=True
@@ -367,7 +367,7 @@ class TestIosXEluginBashService(unittest.TestCase):
 
     def test_bash(self):
         c = Connection(hostname='Router',
-                       start=['mock_device_cli --os iosxe --state isr_exec'],
+                       start=['mock_device_cli --os iosxe --state isr_exec --hostname Router'],
                        os='iosxe',
                        credentials=dict(default=dict(username='cisco', password='cisco')),
                        log_buffer=True
@@ -380,7 +380,7 @@ class TestIosXEluginBashService(unittest.TestCase):
 
     def test_bash_asr(self):
         c = Connection(hostname='Router',
-                       start=['mock_device_cli --os iosxe --state asr_exec'],
+                       start=['mock_device_cli --os iosxe --state asr_exec --hostname Router'],
                        os='iosxe',
                        credentials=dict(default=dict(username='cisco', password='cisco')),
                        log_buffer=True
@@ -409,7 +409,7 @@ class TestIosXESDWANConfigure(unittest.TestCase):
 
     def test_config_transaction(self):
         d = Connection(hostname='Router',
-                       start=['mock_device_cli --os iosxe --state sdwan_enable'],
+                       start=['mock_device_cli --os iosxe --state sdwan_enable --hostname Router'],
                        os='iosxe', platform='sdwan',
                        credentials=dict(default=dict(username='cisco', password='cisco')),
                        log_buffer=True
@@ -421,7 +421,7 @@ class TestIosXESDWANConfigure(unittest.TestCase):
 
     def test_config_transaction_sdwan_iosxe(self):
         d = Connection(hostname='Router',
-                       start=['mock_device_cli --os iosxe --state sdwan_enable'],
+                       start=['mock_device_cli --os iosxe --state sdwan_enable --hostname Router'],
                        os='sdwan', platform='iosxe',
                        credentials=dict(default=dict(username='cisco', password='cisco')),
                        log_buffer=True
@@ -433,7 +433,7 @@ class TestIosXESDWANConfigure(unittest.TestCase):
 
     def test_config_transaction_sdwan_iosxe_confirm(self):
         d = Connection(hostname='Router',
-                       start=['mock_device_cli --os iosxe --state sdwan_enable2'],
+                       start=['mock_device_cli --os iosxe --state sdwan_enable2 --hostname Router'],
                        os='iosxe', platform='sdwan',
                        credentials=dict(default=dict(username='cisco', password='cisco')),
                        log_buffer=True,
@@ -450,7 +450,7 @@ class TestIosXEC8KvPluginReload(unittest.TestCase):
     def setUpClass(cls):
         cls.c = Connection(
             hostname='switch',
-            start=['mock_device_cli --os iosxe --state c8kv_exec'],
+            start=['mock_device_cli --os iosxe --state c8kv_exec --hostname switch'],
             os='iosxe',
             platform='c8kv',
             credentials=dict(default=dict(
@@ -475,7 +475,7 @@ class TestIosXECat3kPluginReload(unittest.TestCase):
     def setUpClass(cls):
         cls.c = Connection(
             hostname='switch',
-            start=['mock_device_cli --os iosxe --state cat3k_exec'],
+            start=['mock_device_cli --os iosxe --state cat3k_exec --hostname switch'],
             os='iosxe',
             platform='cat3k',
             credentials=dict(default=dict(
@@ -498,7 +498,7 @@ class TestIosXEDiol(unittest.TestCase):
 
     def test_connection(self):
         c = Connection(hostname='Router',
-                       start=['mock_device_cli --os iosxe --state standby_exec'],
+                       start=['mock_device_cli --os iosxe --state standby_exec --hostname Router'],
                        os='iosxe',
                        init_exec_commands=[],
                        init_config_commands=[],
@@ -514,7 +514,7 @@ class TestIosXEDiol(unittest.TestCase):
 
     def test_connection_diol_exec(self):
         c = Connection(hostname='RouterRP',
-                       start=['mock_device_cli --os iosxe --state diol_exec'],
+                       start=['mock_device_cli --os iosxe --state diol_exec --hostname RouterRP'],
                        os='iosxe',
                        mit=True,
                        init_exec_commands=[],
@@ -531,7 +531,7 @@ class TestIosXEDiol(unittest.TestCase):
 
     def test_connection_diol_enable(self):
         c = Connection(hostname='RouterRP',
-                       start=['mock_device_cli --os iosxe --state diol_enable'],
+                       start=['mock_device_cli --os iosxe --state diol_enable --hostname RouterRP'],
                        os='iosxe',
                        mit=True,
                        init_exec_commands=[],
@@ -548,7 +548,7 @@ class TestIosXEDiol(unittest.TestCase):
 
     def test_connection_diol_disable(self):
         c = Connection(hostname='RouterRP',
-                       start=['mock_device_cli --os iosxe --state diol_disable'],
+                       start=['mock_device_cli --os iosxe --state diol_disable --hostname RouterRP'],
                        os='iosxe',
                        mit=True,
                        init_exec_commands=[],
@@ -568,7 +568,7 @@ class TestIosXEConfigure(unittest.TestCase):
 
     def test_configure_are_you_sure_ywtdt(self):
         c = Connection(hostname='RouterRP',
-                       start=['mock_device_cli --os iosxe --state general_enable'],
+                       start=['mock_device_cli --os iosxe --state general_enable --hostname RouterRP'],
                        os='iosxe',
                        mit=True,
                        init_exec_commands=[],
@@ -581,7 +581,7 @@ class TestIosXEConfigure(unittest.TestCase):
 
     def test_configure_error_pattern(self):
         c = Connection(hostname='RouterRP',
-                       start=['mock_device_cli --os iosxe --state general_enable'],
+                       start=['mock_device_cli --os iosxe --state general_enable --hostname RouterRP'],
                        os='iosxe',
                        init_exec_commands=[],
                        log_buffer=True
@@ -630,7 +630,7 @@ class TestIosXEConfigure(unittest.TestCase):
 
     def test_config_locked(self):
         c = Connection(hostname='RouterRP',
-                       start=['mock_device_cli --os iosxe --state general_enable'],
+                       start=['mock_device_cli --os iosxe --state general_enable --hostname RouterRP'],
                        os='iosxe',
                        mit=True,
                        init_exec_commands=[],
@@ -665,7 +665,7 @@ class TestIosXEConfigure(unittest.TestCase):
 
     def test_slow_config_mode(self):
         c = Connection(hostname='Switch',
-                       start=['mock_device_cli --os iosxe --state slow_config_mode'],
+                       start=['mock_device_cli --os iosxe --state slow_config_mode --hostname Switch'],
                        os='iosxe',
                        mit=True,
                        init_exec_commands=[],
@@ -698,7 +698,7 @@ class TestIosXEConfigure(unittest.TestCase):
 
     def test_config_no_service_prompt_config(self):
         c = Connection(hostname='Switch',
-                       start=['mock_device_cli --os iosxe --state enable_no_service_prompt_config'],
+                       start=['mock_device_cli --os iosxe --state enable_no_service_prompt_config --hostname Switch'],
                        os='iosxe',
                        mit=True,
                        init_exec_commands=[],
@@ -840,7 +840,7 @@ class TestIosXEluginGuestShellService(unittest.TestCase):
 class TestIosXEping(unittest.TestCase):
 
     def test_ping_failed_protocol(self):
-        md = MockDeviceTcpWrapperIOSXE(port=0, state='ping_fail', hostname='PE1')
+        md = MockDeviceTcpWrapperIOSXE(hostname='PE1', port=0, state='ping_fail')
         md.start()
 
         c = Connection(

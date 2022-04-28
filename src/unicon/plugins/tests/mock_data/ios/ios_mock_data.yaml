@@ -248,7 +248,7 @@ execHashCharacters:
 # Special state 'exec2' to test statemachine failure
 # test_statemachine.py::TestSMGoTo::test_go_to_failure
 exec2:
-  prompt: Router>
+  prompt: "%N>"
   commands:
     "enable": ""
 
