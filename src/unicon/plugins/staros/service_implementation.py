@@ -82,7 +82,9 @@ class Command(BaseService):
 
         con.log.info("+++ command '%s' +++" % command)
         timeout = timeout or con.settings.EXEC_TIMEOUT
-        if not isinstance(reply, Dialog):
+        if (reply is None) or (reply == []):
+            reply = Dialog([])
+        elif not isinstance(reply, Dialog):
             raise SubCommandFailure(
                 "dialog passed via 'reply' must be an instance of Dialog")
 
@@ -160,7 +162,9 @@ class Configure(BaseService):
         if isinstance(command, str):
             command = command.splitlines()
         self.command_list_is_empty = False
-        if not isinstance(reply, Dialog):
+        if (reply is None) or (reply == []):
+            reply = Dialog([])
+        elif not isinstance(reply, Dialog):
             raise SubCommandFailure(
                 "dialog passed via 'reply' must be an instance of Dialog")
 

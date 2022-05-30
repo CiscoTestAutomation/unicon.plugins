@@ -40,6 +40,10 @@ def boot_from_rommon(statemachine, spawn, context):
     boot_image(spawn, context, None)
 
 
+def send_break(statemachine, spawn, context):
+    spawn.send('\x03')
+
+
 def config_service_prompt_handler(spawn, config_pattern):
     """ Check if we need to send the sevice config prompt command.
     """
@@ -97,6 +101,7 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         guestshell = State('guestshell', patterns.guestshell_prompt)
         rommon = State('rommon', patterns.rommon_prompt)
         tclsh = State('tclsh', patterns.tclsh_prompt)
+        macro = State('macro', patterns.macro_prompt)
 
         disable_to_enable = Path(disable, enable, 'enable', Dialog([
             statements.enable_password_stmt,
@@ -114,11 +119,14 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         enable_to_tclsh = Path(enable, tclsh, 'tclsh', None)
         tclsh_to_enable = Path(tclsh, enable, 'exit', None)
 
+        macro_to_config = Path(macro, config, send_break, None)
+
         self.add_state(disable)
         self.add_state(enable)
         self.add_state(config)
         self.add_state(guestshell)
         self.add_state(tclsh)
+        self.add_state(macro)
 
         self.add_path(disable_to_enable)
         self.add_path(enable_to_disable)
@@ -128,6 +136,7 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         self.add_path(guestshell_to_enable)
         self.add_path(enable_to_tclsh)
         self.add_path(tclsh_to_enable)
+        self.add_path(macro_to_config)
 
         enable_to_rommon = Path(enable, rommon, 'reload', Dialog(
             connection_statement_list + reload_statement_list))
@@ -163,6 +172,7 @@ class IosXEDualRpStateMachine(StateMachine):
         rommon = State('rommon', patterns.rommon_prompt)
         shell = State('shell', patterns.shell_prompt)
         tclsh = State('tclsh', patterns.tclsh_prompt)
+        macro = State('macro', patterns.macro_prompt)
 
         def update_cur_state(sm, state):
             sm._current_state = state
@@ -198,11 +208,14 @@ class IosXEDualRpStateMachine(StateMachine):
         enable_to_tclsh = Path(enable, tclsh, 'tclsh', None)
         tclsh_to_enable = Path(tclsh, enable, 'exit', None)
 
+        macro_to_config = Path(macro, config, send_break, None)
+
         self.add_state(disable)
         self.add_state(enable)
         self.add_state(config)
         self.add_state(rommon)
         self.add_state(tclsh)
+        self.add_state(macro)
 
         # Ensure that a locked standby is properly detected.
         # This is done by ensuring this is the last state added
@@ -217,6 +230,7 @@ class IosXEDualRpStateMachine(StateMachine):
         self.add_path(rommon_to_disable)
         self.add_path(enable_to_tclsh)
         self.add_path(tclsh_to_enable)
+        self.add_path(macro_to_config)
 
         # Adding SHELL state to IOSXE platform.
         shell_dialog = Dialog([[patterns.access_shell, 'sendline(y)', None, True, False]])

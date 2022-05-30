@@ -161,7 +161,7 @@ devices:
         self.assertEqual(self.dev.os, 'iosxe')
         self.assertEqual(self.dev.version, '15.2')
         self.assertEqual(self.dev.platform, 'cat5k')
-        self.assertEqual(self.dev.model, 'cat5000')
+        self.assertEqual(self.dev.model, 'c5000')
         self.assertEqual(self.dev.pid, 'WS-C5002')
 
         # Test that connection was redirected to the corresponding plugin
@@ -337,7 +337,7 @@ devices:
             'pid': 'ASR1001-2XOC3POS',
             'os': 'iosxe',
             'platform': 'asr1k',
-            'model': 'ASR1000'
+            'model': 'asr1000'
         },
         tokens)
 
@@ -346,7 +346,7 @@ devices:
             'pid': 'N9K-C9508',
             'os': 'nxos',
             'platform': 'n9k',
-            'model': 'N9500'
+            'model': 'n9500'
         },
         tokens)
 
@@ -423,6 +423,7 @@ class TestAbstractTokenDiscoveryHAConnection(unittest.TestCase):
 class TestUtils(unittest.TestCase):
 
     def test_load_token_csv_file(self):
+        self.maxDiff = None
         lookup_file = os.path.join(
             Path(os.path.realpath(__file__)).parents[1],
             os.path.join('pid_tokens.csv')
@@ -434,17 +435,17 @@ class TestUtils(unittest.TestCase):
             'WS-C6513-E': {
                 'os': 'iosxe',
                 'platform': 'cat6k',
-                'model': 'CAT6500'
+                'model': 'c6500'
             },
             '2501FRAD-FX': {
                 'os': 'ios',
                 'platform': 'c2k',
-                'model': 'C2500'
+                'model': 'c2500'
             },
             'NCS2002-SA': {
                 'os': 'iosxr',
                 'platform': 'ncs2k',
-                'model': 'NCS2000'
+                'model': 'ncs2000'
             }
         }
         self.assertEqual(data, {**data, **subset_dict})
@@ -452,17 +453,17 @@ class TestUtils(unittest.TestCase):
         # Test different key
         data = load_token_csv_file(file_path=lookup_file, key='model')
         subset_dict = {
-            'CAT6500': {
+            'c6500': {
                 'pid': 'WS-C6513-E',
                 'os': 'iosxe',
                 'platform': 'cat6k'
             },
-            'C2500': {
+            'c2500': {
                 'pid': 'CISCO2525',
                 'os': 'ios',
                 'platform': 'c2k'
             },
-            'N3500': {
+            'n3500': {
                 'pid': 'N3K-C3548P-XL',
                 'os': 'nxos',
                 'platform': 'n3k'

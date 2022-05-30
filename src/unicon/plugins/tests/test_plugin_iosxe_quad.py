@@ -226,7 +226,7 @@ class TestIosXEQuadReload(unittest.TestCase):
     def test_reload(self):
         self.d.reload()
 
-    def test_relaod_with_error_pattern(self):
+    def test_reload_with_error_pattern(self):
 
         install_add_one_shot_dialog = Dialog([
                 Statement(pattern=r"FAILED:.* ",

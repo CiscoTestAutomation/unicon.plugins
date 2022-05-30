@@ -643,14 +643,16 @@ class Execute(BaseService):
         matched_retry_sleep = self.matched_retry_sleep \
             if matched_retry_sleep is None else matched_retry_sleep
 
-        if not isinstance(reply, Dialog):
+        if (reply is None) or (reply == []):
+            reply = Dialog([])
+        elif not isinstance(reply, Dialog):
             raise SubCommandFailure(
                 "dialog passed via 'reply' must be an instance of Dialog")
 
         # service_dialog overrides the default execution dialogs
         if 'service_dialog' in kwargs:
             service_dialog = kwargs['service_dialog']
-            if service_dialog is None:
+            if (service_dialog is None) or (service_dialog == []):
                 service_dialog = Dialog([])
             elif not isinstance(service_dialog, Dialog):
                 raise SubCommandFailure(

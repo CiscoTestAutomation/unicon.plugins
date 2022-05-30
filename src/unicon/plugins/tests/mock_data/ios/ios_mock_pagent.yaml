@@ -40,7 +40,8 @@ pagent_disable:
             new_state: enable
 
 pagent_exec:
-    prompt: "%N#"
+  prompt: "%N#"
+  commands:
     "show version": &SV |4
         Cisco IOS Software, C3900 Software (C3900-TPGEN_UNIVERSALK9-M), Experimental Version 15.2(20120817:095748) [yosharma-pagent_v50_0 109]
         Copyright (c) 1986-2012 by Cisco Systems, Inc.
@@ -109,6 +110,9 @@ pagent_exec:
 
     "config term":
       new_state: pagent_config
+    "emu":
+      new_state: pagent_emu_prompt
+
 
 pagent_config:
     prompt: "%N(config)#"
@@ -122,3 +126,9 @@ pagent_config_line:
         "exec-timeout 0": ""
         "end":
             new_state: pagent_exec
+
+pagent_emu_prompt:
+  prompt: "hostnam(EMU:some:data)#"
+  commands:
+    "end":
+        new_state: pagent_exec

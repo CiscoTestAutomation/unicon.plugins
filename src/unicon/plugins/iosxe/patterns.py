@@ -31,6 +31,7 @@ class IosXEPatterns(GenericPatterns):
         self.confirm_uncommited_changes = r'Uncommitted changes found, commit them\? \[yes\/no\/CANCEL\]\s*$'
         self.proceed_confirm = r'^.*Proceed\? \[yes,no\]\s*$'
         self.tclsh_prompt = r'^(.*?)(WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(-standby)?(\(boot\))?(\(recovery-mode\))?\(tcl.*?\)#[\s\x07]*$'
+        self.macro_prompt = r'^(.*?)(\{\.\.\}|then.else.fi)\s*>\s*$'
 
 
 class IosXEReloadPatterns(ReloadPatterns):

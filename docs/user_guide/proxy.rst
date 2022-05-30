@@ -146,6 +146,23 @@ CLI Proxy topology schema
               - device: <name> # proxy device name
                 command: <cmd>
 
+.. note::
+
+    When connecting with SSH via IOS-XR devices, make sure to use the
+    ``username`` keyword in the proxy command. If the username keyword
+    is not used, Unicon will automatically add `-l \<user\>` syntax
+    to the command line.
+
+    Example:
+
+    .. code:: yaml
+
+          cli:
+            protocol: telnet
+            ip: 10.2.3.3
+            proxy:
+              - device: XR1
+                command: ssh 1.2.3.5 username cisco  # Command including username
 
 
 CLI proxy with Unicon standalone Connections
