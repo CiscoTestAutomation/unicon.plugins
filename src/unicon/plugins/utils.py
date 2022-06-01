@@ -149,11 +149,30 @@ def slugify(text):
 
 
 def sanitize(s):
-    """ Remove escape codes and non ASCII characters from output
+    """ Remove escape codes and non ASCII characters from output.
+
+    Remove crypto related lines as workaround for deprecation messages.
+
+    ../python3.10/site-packages/asyncssh/crypto/cipher.py:29: CryptographyDeprecationWarning: Blowfish has been deprecated
+    from cryptography.hazmat.primitives.ciphers.algorithms import Blowfish, CAST5
+    ../python3.10/site-packages/asyncssh/crypto/cipher.py:29: CryptographyDeprecationWarning: CAST5 has been deprecated
+    from cryptography.hazmat.primitives.ciphers.algorithms import Blowfish, CAST5
+    ../python3.10/site-packages/asyncssh/crypto/cipher.py:30: CryptographyDeprecationWarning: SEED has been deprecated
+    from cryptography.hazmat.primitives.ciphers.algorithms import SEED, TripleDES
     """
     ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
     s = ansi_escape.sub('', s)
     mpa = dict.fromkeys(range(32))
+
+    # clean up crypto deprecation warnings
+    lines = s.splitlines()
+    new_lines = []
+    for line in lines:
+        if 'CryptographyDeprecationWarning' not in line \
+            and 'cryptography.hazmat.primitives.ciphers.algorithms' not in line:
+                new_lines.append(line)
+    s = '\n'.join(new_lines)
+
     return s.translate(mpa).strip().replace(' ', '')
 
 

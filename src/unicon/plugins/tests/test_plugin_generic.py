@@ -945,13 +945,11 @@ class TestEscapeHandler(unittest.TestCase):
                        tacacs_password='cisco',
                        enable_password='cisco',
                        settings={'ESCAPE_CHAR_CHATTY_TERM_WAIT': 3,
-                                 'ESCAPE_CHAR_PROMPT_WAIT': 3})
+                                 'ESCAPE_CHAR_PROMPT_WAIT': 3},
+                       init_config_commands=[],
+                       init_exec_commands=[])
         r = c.connect()
-        first_lines = '\n'.join(r.splitlines()[0:21])
-        # Need to sanitize strings because due to the timing and stripping of log messages
-        # in the connect return string, sometimes empty lines can be inserted into the output
-        # at different places
-        self.assertEqual(sanitize(first_lines.replace('\r', '')), sanitize("""\
+        self.assertEqual(sanitize(r.replace('\r', '')), sanitize("""\
 Trying 127.0.0.1...
 Connected to localhost.
 Escape character is '^]'.
@@ -982,13 +980,11 @@ Router#"""))
                        tacacs_password='cisco',
                        enable_password='cisco',
                        settings={'ESCAPE_CHAR_CHATTY_TERM_WAIT': 3,
-                                 'ESCAPE_CHAR_PROMPT_WAIT': 3})
+                                 'ESCAPE_CHAR_PROMPT_WAIT': 3},
+                       init_config_commands=[],
+                       init_exec_commands=[])
         r = c.connect()
-        first_lines = '\n'.join(r.splitlines()[0:24])
-        # Need to sanitize strings because due to the timing and stripping of log messages
-        # in the connect return string, sometimes empty lines can be inserted into the output
-        # at different places
-        self.assertEqual(sanitize(first_lines.replace('\r', '')), sanitize("""\
+        self.assertEqual(sanitize(r.replace('\r', '')), sanitize("""\
 Trying 127.0.0.1...
 Connected to localhost.
 Escape character is '^]'.
@@ -1008,10 +1004,6 @@ Password: cisco
 Router>
 enable
 Password: cisco
-Router#
-term length 0
-Router#
-term width 0
 Router#"""))
 
     def test_escape_handler_password(self):
@@ -1022,13 +1014,11 @@ Router#"""))
                        tacacs_password='cisco',
                        enable_password='cisco',
                        settings={'ESCAPE_CHAR_CHATTY_TERM_WAIT': 3,
-                                 'ESCAPE_CHAR_PROMPT_WAIT': 3})
+                                 'ESCAPE_CHAR_PROMPT_WAIT': 3},
+                       init_config_commands=[],
+                       init_exec_commands=[])
         r = c.connect()
-        first_lines = '\n'.join(r.splitlines()[0:13])
-        # Need to sanitize strings because due to the timing and stripping of log messages
-        # in the connect return string, sometimes empty lines can be inserted into the output
-        # at different places
-        self.assertEqual(sanitize(first_lines.replace('\r', '')), sanitize("""\
+        self.assertEqual(sanitize(r.replace('\r', '')), sanitize("""\
 Trying 127.0.0.1...
 Connected to localhost.
 Escape character is '^]'.
@@ -1037,10 +1027,6 @@ password: cisco
 Router>
 enable
 Password: cisco
-Router#
-term length 0
-Router#
-term width 0
 Router#"""))
 
     def tearDown(self):
