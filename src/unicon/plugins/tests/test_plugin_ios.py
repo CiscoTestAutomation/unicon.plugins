@@ -339,26 +339,6 @@ class TestIosPluginReload(unittest.TestCase):
             [task.result() for task in tasks]
 
 
-class TestIosPagentPluginConnect(unittest.TestCase):
-
-    def test_login_connect(self):
-        c = Connection(hostname='Router',
-                       start=['mock_device_cli --os ios --state pagent_disable_without_license'],
-                       os='ios',
-                       platform='pagent',
-                       username='cisco',
-                       enable_password='cisco',
-                       tacacs_password='cisco',
-                       pagent_key='899573834241',
-                       settings={
-                           'POST_DISCONNECT_WAIT_SEC': 0,
-                           'GRACEFUL_DISCONNECT_WAIT_SEC': 0
-                       })
-        c.connect()
-        self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
-        c.disconnect()
-
-
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
 @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0)
 class TestIosPluginConnectCredentials(unittest.TestCase):

@@ -418,15 +418,10 @@ config:
     "no logging console": ""
     "logging console disable": ""
     "!end indicator for bulk configure": ""
-    "line console 0":
-      new_state:
-        config_line
     "line con 0":
       new_state:
         config_line
     "line default":
-      new_state: config_line
-    "line console":
       new_state: config_line
     "hostname Router": ""
     "large config":
@@ -434,13 +429,14 @@ config:
     "line console":
       new_state:
         line_console
+    "line console 0":
+      new_state:
+        line_console
     "commit":
       new_state: commit_prompt
     "commit force": ""
     "commit replace":
       new_state: commit_replace
-    "end":
-      new_state: enable
     "test failed":
       new_state:
         failed_config
@@ -458,17 +454,14 @@ config_redundancy:
 
 config_line:
   prompt: "RP/0/RP0/CPU0:%N(config-line)#"
-  commands: 
+  commands:
     "exec-timeout 0 0": ""
     "clock timezone UTC 0 0": ""
-    "commit": ""
     "end":
       new_state: enable
     "no logging console": ""
     "absolute-timeout 0": ""
     "exec-timeout 0": ""
-    "exec-timeout 0 0": ""
-    "absolute-timeout 0": ""
     "session-timeout 0": ""
     "line console 0":
       new_state: config_line
@@ -491,6 +484,7 @@ config_exclusive:
 line_console:
   prompt: "RP/0/RP0/CPU0:%N(config-line)#"
   commands:
+    "exec-timeout 0": ""
     "exec-timeout 0 0": ""
     "absolute-timeout 0": ""
     "session-timeout 0": ""
@@ -523,8 +517,7 @@ commit_prompt:
       new_state: config
 
 commit_replace:
-  preface: "This commit will replace or remove the entire running configuration. This\n
-operation can be service affecting.\n"
+  preface: "This commit will replace or remove the entire running configuration. This\noperation can be service affecting.\n"
   prompt: "Do you wish to proceed? [no]:"
   commands:
     "yes":
@@ -584,15 +577,13 @@ config1:
 
 config_line1:
   prompt: "RP/0/RP0/CPU0:%N(config-line)#"
-  commands: 
+  commands:
     "exec-timeout 0 0": ""
     "clock timezone UTC 0 0": ""
     "commit": ""
     "end":
       new_state: enable1
     "no logging console": ""
-    "absolute-timeout 0": ""
-    "exec-timeout 0 0": ""
     "absolute-timeout 0": ""
     "session-timeout 0": ""
     "line default":
@@ -679,7 +670,7 @@ admin_config:
 
 bash_console:
   prompt: "[xr-vm_node0_RP0_CPU0:~]$"
-  commands:
+  commands: &bash_commands
     "pwd": |
       /disk0
     "cd ../common/": |
@@ -1398,3 +1389,15 @@ install_add_commit:
       rsync: read error: Connection reset by peer (104)
       FAILED: install_add_activate_commit : Copy bootflash:asr1000rpx86-universalk9.BLD_V16
   new_state: enable
+
+enable5:
+  prompt: "RP/0/RP0/CPU0:%N#"
+  commands:
+    <<: *enable_cmds
+    "run":
+      new_state: bash_console5
+
+bash_console5:
+  prompt: "[xr-vm_nodeD0_CB0_CPU0:~]$"
+  commands:
+    <<: *bash_commands

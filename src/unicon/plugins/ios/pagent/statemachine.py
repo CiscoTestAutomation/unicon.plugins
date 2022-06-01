@@ -5,12 +5,15 @@ from unicon.plugins.generic.statements import GenericStatements
 from unicon.statemachine import State, Path, StateMachine
 from unicon.eal.dialogs import Dialog
 from .statements import IosPagentStatements
+from .patterns import IosPagentPatterns
 
 statements = GenericStatements()
+patterns = IosPagentPatterns()
 ios_pagent_statements = IosPagentStatements()
 
 
 class IosPagentSingleRpStateMachine(GenericSingleRpStateMachine):
+
     def create(self):
         super().create()
 
@@ -25,5 +28,9 @@ class IosPagentSingleRpStateMachine(GenericSingleRpStateMachine):
                 ios_pagent_statements.pagent_lic_stmt]))
         self.add_path(disable_to_enable)
 
+        emu = State('emu', pattern=patterns.emu_prompt)
 
+        emu_to_enable = Path(emu, enable, 'end', None)
 
+        self.add_state(emu)
+        self.add_path(emu_to_enable)

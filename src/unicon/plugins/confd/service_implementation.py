@@ -69,7 +69,9 @@ class Command(BaseService):
         if not isinstance(command, str):
             raise SubCommandFailure('Command is not a string: %s' % type(command))
 
-        if not isinstance(reply, Dialog):
+        if (reply is None) or (reply == []):
+            reply = Dialog([])
+        elif not isinstance(reply, Dialog):
             raise SubCommandFailure(
                 "dialog passed via 'reply' must be an instance of Dialog")
 
@@ -81,7 +83,7 @@ class Command(BaseService):
 
         if 'service_dialog' in kwargs:
             service_dialog = kwargs['service_dialog']
-            if service_dialog is None:
+            if (service_dialog is None) or (service_dialog == []):
                 service_dialog = Dialog([])
             elif not isinstance(service_dialog, Dialog):
                 raise SubCommandFailure(
@@ -175,7 +177,9 @@ class Configure(BaseService):
         if isinstance(command, str):
             command = command.splitlines()
         self.command_list_is_empty = False
-        if not isinstance(reply, Dialog):
+        if (reply is None) or (reply == []):
+            reply = Dialog([])
+        elif not isinstance(reply, Dialog):
             raise SubCommandFailure(
                 "dialog passed via 'reply' must be an instance of Dialog")
 

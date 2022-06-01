@@ -61,7 +61,9 @@ class SwitchoverService(BaseService):
         timeout = timeout or self.timeout
         command = command or self.command
 
-        if not isinstance(reply, Dialog):
+        if (reply is None) or (reply == []):
+            reply = Dialog([])
+        elif not isinstance(reply, Dialog):
             raise SubCommandFailure(
                 "dialog passed via 'reply' must be an instance of Dialog")
 

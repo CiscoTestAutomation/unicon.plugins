@@ -311,7 +311,27 @@ general_config:
     "ntp server 10.1.1.1": ""
     "ip host-list host1":
       new_state: config_host_list
+    "macro auto execute TEST {":
+      new_state: macro_prompt_brace
 
+macro_prompt_brace:
+  prompt: "{..} >"
+  keys:
+    ctrl-c:
+      new_state: general_config
+  commands:
+    "}":
+      new_state: general_config
+    "if [[ $LINKUP == YES ]]":
+      new_state: macro_prompt_then_else_fi
+
+macro_prompt_then_else_fi:
+  prompt: "then.else.fi>"
+  commands:
+    "then conf t": ""
+    "end": ""
+    "fi":
+      new_state: macro_prompt_brace
 
 config_host_list:
   prompt: "%N(host-list)#"

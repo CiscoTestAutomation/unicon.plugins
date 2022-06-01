@@ -13,6 +13,7 @@ import unittest
 
 from unicon import Connection
 from unicon.core.errors import SubCommandFailure
+from unicon.plugins.utils import sanitize
 
 
 class TestNxosMdsPluginConnect(unittest.TestCase):
@@ -26,7 +27,7 @@ class TestNxosMdsPluginConnect(unittest.TestCase):
                                         password='cisco')),
                        mit=True)
         c.connect()
-        assert c.spawn.match.match_output == 'switch#'
+        assert sanitize(c.spawn.match.match_output) == 'switch#'
 
 
 class TestNxosMdsPluginShellexec(unittest.TestCase):
@@ -40,7 +41,7 @@ class TestNxosMdsPluginShellexec(unittest.TestCase):
                                         password='cisco')),
                        mit=True)
         c.shellexec(['ls'])
-        assert c.spawn.match.match_output == 'exit\r\nswitch#'
+        assert sanitize(c.spawn.match.match_output) == 'exitswitch#'
 
 
 class TestNxosMdsPluginTie(unittest.TestCase):

@@ -407,7 +407,7 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
         finally:
             c.disconnect()
             md.stop()
-
+    """
     def test_reload_ha_from_rommon_with_image(self):
         c = Connection(hostname='switch',
                        start=[
@@ -422,11 +422,11 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
                        log_buffer=True)
         try:
             c.connect()
-            c.reload(image_to_boot='tftp://1.1.1.1/latest.bin', timeout=10)
+            c.reload(image_to_boot='tftp://1.1.1.1/latest.bin', timeout=60)
             self.assertEqual(c.state_machine.current_state, 'enable')
         finally:
             c.disconnect()
-
+    """
     def test_reload_ha_adding_dialog(self):
         md = MockDeviceTcpWrapperIOSXECat9k(port=0, state='cat9k_ha_active_escape,cat9k_ha_standby_escape')
         md.start()

@@ -16,6 +16,7 @@ from pyats.topology import loader
 import unicon
 from unicon import Connection
 from unicon.eal.dialogs import Dialog, Statement
+from unicon.eal.utils import ExpectMatch, MatchMode
 from unicon.core.errors import SubCommandFailure, StateMachineError, UniconAuthenticationError, ConnectionError as UniconConnectionError
 from unicon.plugins.tests.mock.mock_device_iosxe import MockDeviceTcpWrapperIOSXE
 
@@ -723,6 +724,70 @@ class TestIosXEConfigure(unittest.TestCase):
             c.configure(['ip host-list host1'])
         finally:
             c.disconnect()
+
+
+    def test_configure_macro(self):
+        c = Connection(hostname='Switch',
+                       start=['mock_device_cli --os iosxe --state general_enable'],
+                       os='iosxe',
+                       mit=True,
+                       init_exec_commands=[],
+                       init_config_commands=[],
+                       log_buffer=True
+                       )
+        c.connect()
+        cfg = [
+            "macro auto execute TEST {",
+            "if [[ $LINKUP == YES ]]",
+            "then conf t",
+            "end",
+            "fi",
+            "}"
+        ]
+        try:
+            c.configure(cfg)
+        finally:
+            c.disconnect()
+
+    def test_configure_trailing_prompt_stripping(self):
+        c = Connection(hostname='Switch',
+                       start=['mock_device_cli --os iosxe --state general_enable'],
+                       os='iosxe',
+                       mit=True,
+                       init_exec_commands=[],
+                       init_config_commands=[],
+                       log_buffer=True
+                       )
+        config_service = c.configure
+
+        con_state = 'config'
+        pattern = re.compile(c.state_machine.get_state('config').pattern, flags=re.S)
+
+        output = 'help\r\nSwitch(ca-trustpoint)#'
+
+        result = output
+        result_match = ExpectMatch()
+        result_match.last_match = pattern.match(output)
+        result_match.last_match_index = 1
+        result_match.last_match_mode = MatchMode(mode_id=1, mode_name='search only last line')
+        result_match.match_output = output
+
+        new_result = config_service.utils.truncate_trailing_prompt(
+            con_state,
+            result,
+            hostname='Switch',
+            result_match=result_match
+        )
+        self.assertEqual(new_result, 'help\r\n')
+
+        new_result = config_service.utils.truncate_trailing_prompt(
+            con_state,
+            result,
+            hostname='PE1',
+            result_match=result_match
+        )
+        self.assertEqual(new_result, 'help\r\nSwitch(ca-trustpoint)#')
+
 
 class TestIosXEEnableSecret(unittest.TestCase):
 

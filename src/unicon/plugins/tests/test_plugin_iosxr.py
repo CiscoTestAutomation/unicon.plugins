@@ -231,12 +231,15 @@ class TestIosXrPluginAdminService(unittest.TestCase):
 
 
 class TestIosXrPluginBashService(unittest.TestCase):
+
     def test_bash(self):
         conn = Connection(hostname='Router',
                           start=['mock_device_cli --os iosxr --state enable1'],
                           os='iosxr',
-                          enable_password='cisco')
+                          mit=True,
+                          log_buffer=True)
 
+        conn.connect()
         with conn.bash_console() as console:
             console.execute('cd ../common/')
             console.execute('cd ../disk0')
@@ -245,13 +248,16 @@ class TestIosXrPluginBashService(unittest.TestCase):
         ret = conn.spawn.match.match_output
         self.assertIn('exit', ret)
         self.assertIn('Router#', ret)
+        conn.disconnect()
 
     def test_admin_bash(self):
         conn = Connection(hostname='Router',
                           start=['mock_device_cli --os iosxr --state enable1'],
                           os='iosxr',
-                          enable_password='cisco')
+                          mit=True,
+                          log_buffer=True)
 
+        conn.connect()
         with conn.admin_bash_console() as console:
             console.execute('cd cisco_support/')
             out = console.execute('ls')
@@ -259,50 +265,79 @@ class TestIosXrPluginBashService(unittest.TestCase):
         ret = conn.spawn.match.match_output
         self.assertIn('exit', ret)
         self.assertIn('Router#', ret)
+        conn.disconnect()
 
     def test_bash2(self):
         conn = Connection(hostname='Router',
                           start=['mock_device_cli --os iosxr --state enable2'],
                           os='iosxr',
-                          enable_password='cisco')
+                          mit=True,
+                          log_buffer=True)
 
+        conn.connect()
         with conn.bash_console() as console:
             out = console.execute('pwd')
             self.assertIn('disk0', out)
         ret = conn.spawn.match.match_output
         self.assertIn('exit', ret)
         self.assertIn('Router#', ret)
+        conn.disconnect()
 
     def test_admin_bash2(self):
         conn = Connection(hostname='Router',
                           start=['mock_device_cli --os iosxr --state enable2'],
                           os='iosxr',
-                          enable_password='cisco')
+                          mit=True,
+                          log_buffer=True)
 
+        conn.connect()
         with conn.admin_bash_console() as console:
             out = console.execute('pwd')
             self.assertIn('misc', out)
         ret = conn.spawn.match.match_output
         self.assertIn('exit', ret)
         self.assertIn('Router#', ret)
+        conn.disconnect()
 
     def test_run_prompt_rsp(self):
         conn = Connection(hostname='R1',
                           start=['mock_device_cli --os iosxr --state enable_bash_run_prompt_rsp --hostname R1'],
                           os='iosxr',
-                          enable_password='cisco')
+                          mit=True,
+                          log_buffer=True)
 
+        conn.connect()
         with conn.bash_console():
             pass
+        conn.disconnect()
 
     def test_run_prompt_rp(self):
         conn = Connection(hostname='R2',
                           start=['mock_device_cli --os iosxr --state enable_bash_run_prompt_rp --hostname R2'],
                           os='iosxr',
-                          enable_password='cisco')
+                          mit=True,
+                          log_buffer=True)
 
+        conn.connect()
         with conn.bash_console():
             pass
+        conn.disconnect()
+
+    def test_bash5(self):
+        conn = Connection(hostname='Router',
+                          start=['mock_device_cli --os iosxr --state enable5'],
+                          os='iosxr',
+                          mit=True,
+                          log_buffer=True)
+
+        conn.connect()
+        with conn.bash_console() as console:
+            out = console.execute('pwd')
+            self.assertIn('disk0', out)
+        ret = conn.spawn.match.match_output
+        self.assertIn('exit', ret)
+        self.assertIn('Router#', ret)
+        conn.disconnect()
 
 
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)

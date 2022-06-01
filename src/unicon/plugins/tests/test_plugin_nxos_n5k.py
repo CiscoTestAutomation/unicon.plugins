@@ -11,6 +11,7 @@ import unicon
 import unittest
 from unittest.mock import patch
 from unicon import Connection
+from unicon.plugins.utils import sanitize
 
 class TestNxosN5kPluginConnect(unittest.TestCase):
 
@@ -23,7 +24,7 @@ class TestNxosN5kPluginConnect(unittest.TestCase):
                                         password='cisco')),
                        mit=True)
         c.connect()
-        assert c.spawn.match.match_output == 'switch# '
+        assert sanitize(c.spawn.match.match_output) == 'switch#'
 
 
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)

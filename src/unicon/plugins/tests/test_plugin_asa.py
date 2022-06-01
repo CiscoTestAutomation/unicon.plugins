@@ -47,14 +47,14 @@ class TestAsaPluginConnect(unittest.TestCase):
                        os='asa',
                        credentials=dict(default=dict(username='cisco', password='cisco')))
         r = c.connect()
-        self.assertEqual(r.replace('\r', ''), """\
+        self.assertEqual(sanitize(r.replace('\r', '')), sanitize("""\
 ASA/pri/act>
 enable
 Password: cisco
 ASA/pri/act#
 terminal pager 0
 ASA/pri/act#
-""")
+"""))
 
     def test_login_connect_ssh(self):
         c = Connection(hostname='ASA',
@@ -130,7 +130,8 @@ class TestAsaPluginReload(unittest.TestCase):
                             start=['mock_device_cli --os asa --state asa_enable'],
                             os='asa',
                             platform='asa',
-                            credentials=dict(default=dict(username='cisco', password='cisco')))
+                            credentials=dict(default=dict(username='cisco', password='cisco')),
+                            settings=dict(POST_RELOAD_WAIT=1))
         c.connect()
         c.reload()
 
@@ -139,7 +140,8 @@ class TestAsaPluginReload(unittest.TestCase):
                             start=['mock_device_cli --os asa --state asa_reload'],
                             os='asa',
                             platform='asav',
-                            credentials=dict(default=dict(username='cisco', password='cisco')))
+                            credentials=dict(default=dict(username='cisco', password='cisco')),
+                            settings=dict(POST_RELOAD_WAIT=1))
         c.connect()
         c.reload()
 

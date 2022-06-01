@@ -25,6 +25,7 @@ from .service_statements import execute_statement_list, configure_statement_list
 
 from .statements import grub_prompt_stmt
 
+from unicon.plugins.generic.utils import GenericUtils
 from unicon.plugins.generic.service_implementation import BashService as GenericBashService
 
 
@@ -35,6 +36,23 @@ class Configure(GenericConfigure):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.dialog += Dialog(configure_statement_list)
+
+        class ConfigUtils(GenericUtils):
+            def truncate_trailing_prompt(self, con_state,
+                                         result,
+                                         hostname=None,
+                                         result_match=None):
+                host_idx = result.rfind(hostname)
+                if host_idx != -1:
+                    result = result[:host_idx]
+                else:
+                    if result_match and len(result_match.last_match.groups()) > 2:
+                        idx = result.rfind(result_match.last_match.group(2))
+                        if idx:
+                            result = result[:idx]
+                return result
+
+        self.utils = ConfigUtils()
 
 
 class Config(Configure):
