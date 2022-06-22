@@ -7,11 +7,11 @@ https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_e
 from unicon.plugins.generic.patterns import GenericPatterns
 
 
-class aosPatterns():
+class aosPatterns(GenericPatterns):
     def __init__(self):
         super().__init__()
-        self.login_prompt = r'((.|\n)*) *login as: *?'
-        self.disable_mode = r'((.|\n)*)\w+>'
-        self.privileged_mode = r'((.|\n)*)\w+#'
+        self.login_prompt = r' *login as: *?'
+        self.disable_mode = r'w+>'
+        self.privileged_mode = r'\w+#'
         self.config_mode = r'\w+.config.#'
-        self.password = r'((.|\n)*)\w+.*[Pp]assword:'
+        self.password = r'\w+.*[Pp]assword:'
