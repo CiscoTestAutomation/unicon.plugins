@@ -11,7 +11,7 @@ from unicon.plugins.generic.statements import password_handler
 
 statements = GenericStatements()
 patterns = aosPatterns()
-patterns = pat
+
 
 def login_handler(spawn, context, session):
     spawn.sendline(context['\r'])
