@@ -7,7 +7,7 @@ https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_e
 from unicon.plugins.generic.patterns import GenericPatterns
 
 
-class aosPatterns(GenericPatterns):
+class aosPatterns():
     def __init__(self):
         super().__init__()
         self.login_prompt = r'((.|\n)*) *login as: *?'
