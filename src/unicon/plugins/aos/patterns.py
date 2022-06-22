@@ -16,6 +16,8 @@ class aosPatterns():
         self.config_mode = r'\w+.config.#'
         self.password = r'\w+.*[Pp]assword:'
         self.linePassword = r'\w+.*[Pp]assword:'
+        self.escape_char = r'\x03'
+        self.escape_char_callback = r'\x03'
 # self.enable_prompt = r'.*%N#\s?$'
         self.default_hostname_pattern = r'WLC|RouterRP|Router|[Ss]witch|Controller|ios'
 
