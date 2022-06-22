@@ -36,21 +36,21 @@ login_stmt = Statement(pattern=patterns.login_prompt,
                        args=None,
                        loop_continue=True,
                        continue_timer=False
-                           trim_buffer=True)
+                       trim_buffer=True)
 
 enable_stmt = Statement(pattern=patterns.disable_mode,
                         action=send_enabler,
                         args=None,
                         loop_continue=True,
                         continue_timer=False
-                           trim_buffer=True)
+                        trim_buffer=True)
 
 password_stmt = Statement(pattern=patterns.password,
-                        action=password_handler,
-                        args=None,
-                        loop_continue=True,
-                        continue_timer=False
-                           trim_buffer=True)
+                          action=password_handler,
+                          args=None,
+                          loop_continue=True,
+                          continue_timer=False
+                          trim_buffer=True)
 
 login_password = Statement(pattern=patterns.linePassword,
                            action=line_password_handler,
