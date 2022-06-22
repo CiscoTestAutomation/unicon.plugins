@@ -40,4 +40,5 @@ supported_os = [
     'viptela',
     'dnos6',
     'dnos10'
+    'aos'
 ]
