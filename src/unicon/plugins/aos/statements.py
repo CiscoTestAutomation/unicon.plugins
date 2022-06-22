@@ -20,7 +20,7 @@ def send_enabler(spawn, context, session):
 
 
 def confirm_imaginary_handler(spawn):
-    spawn.sendline('i concur')
+    spawn.sendline('i concur or do i')
 
 # define the list of statements particular to this platform
 login_stmt = Statement(pattern=patterns.login_prompt,
@@ -29,11 +29,11 @@ login_stmt = Statement(pattern=patterns.login_prompt,
                        loop_continue=True,
                        continue_timer=False)
 
-enable_stmt = Statement(pattern=patterns.disable_mode,
-                        action=send_enabler,
-                        args=None,
-                        loop_continue=True,
-                        continue_timer=False)
+#enable_stmt = Statement(pattern=patterns.disable_mode,
+#                        action=send_enabler,
+#                        args=None,
+#                        loop_continue=True,
+#                        continue_timer=False)
 
 password_stmt = Statement(pattern=patterns.password,
                         action=enable_password_handler,

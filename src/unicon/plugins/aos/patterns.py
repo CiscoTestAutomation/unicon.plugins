@@ -14,4 +14,4 @@ class aosPatterns(GenericPatterns):
         self.disable_mode = r'\w+#'
         self.privileged_mode = r'\w+#'
         self.config_mode = r'\w+.config.#'
-        self.password = r'\w+.*password:'
+        self.password = r'\w+.*[Pp]assword:'
