@@ -12,6 +12,6 @@ class aosPatterns(GenericPatterns):
         super().__init__()
         self.login_prompt = r' *login as: *?'
         self.disable_mode = r'\w+#'
-        self.privileged_mode = r'\w+.config.#'
+        self.privileged_mode = r'\w+#'
         self.config_mode = r'\w+.config.#'
-        self.password = r'Password:'
+        self.password = r'\w+.*password:'
