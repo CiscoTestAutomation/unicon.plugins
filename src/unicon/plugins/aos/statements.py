@@ -18,6 +18,14 @@ def login_handler(spawn, context, session):
 def send_enabler(spawn, context, session):
     spawn.sendline('\r')
 
+def line_password_handler(spawn, context, session):
+    credential = get_current_credential(context=context, session=session)
+    if credential:
+        common_cred_password_handler(
+            spawn=spawn, context=context, credential=credential,
+            session=session)
+    else:
+        spawn.sendline(context['password'])
 
 def confirm_imaginary_handler(spawn):
     spawn.sendline('i concur or do i')
@@ -40,3 +48,9 @@ password_stmt = Statement(pattern=patterns.password,
                         args=None,
                         loop_continue=True,
                         continue_timer=False)
+
+login_password = Statement(pattern=patterns.linePassword,
+                           action=line_password_handler,
+                           args=None,
+                           loop_continue=True,
+                           continue_timer=False)
