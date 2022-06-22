@@ -29,14 +29,14 @@ login_stmt = Statement(pattern=patterns.login_prompt,
                        loop_continue=True,
                        continue_timer=False)
 
-#enable_stmt = Statement(pattern=patterns.disable_mode,
-#                        action=send_enabler,
-#                        args=None,
-#                        loop_continue=True,
-#                        continue_timer=False)
+enable_stmt = Statement(pattern=patterns.disable_mode,
+                        action=send_enabler,
+                        args=None,
+                        loop_continue=True,
+                        continue_timer=False)
 
 password_stmt = Statement(pattern=patterns.password,
-                        action=enable_password_handler,
+                        action=None,
                         args=None,
                         loop_continue=True,
                         continue_timer=False)
