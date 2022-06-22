@@ -13,10 +13,10 @@ statements = GenericStatements()
 patterns = aosPatterns()
 
 def login_handler(spawn, context, session):
-    spawn.sendline(context['enable_password'])
+    spawn.sendline(context['\r'])
 
 def send_enabler(spawn, context, session):
-    spawn.sendline('enable')
+    spawn.sendline('\r')
 
 
 def confirm_imaginary_handler(spawn):
