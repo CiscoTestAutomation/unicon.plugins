@@ -31,28 +31,28 @@ def confirm_imaginary_handler(spawn):
     spawn.sendline('i concur or do i')
 
 # define the list of statements particular to this platform
-login_stmt = statements(pattern=patterns.login_prompt,
+login_stmt = Statement(pattern=patterns.login_prompt,
                        action=login_handler,
                        args=None,
                        loop_continue=True,
                        continue_timer=True,
                        trim_buffer=True)
 
-enable_stmt = statements(pattern=patterns.disable_mode,
+enable_stmt = Statement(pattern=patterns.disable_mode,
                         action=send_enabler,
                         args=None,
                         loop_continue=True,
                         continue_timer=True,
                         trim_buffer=True)
 
-password_stmt = statements(pattern=patterns.password,
+password_stmt = Statement(pattern=patterns.password,
                           action=password_handler,
                           args=None,
                           loop_continue=True,
                           continue_timer=True,
                           trim_buffer=True)
 
-login_password = statements(pattern=patterns.linePassword,
+login_password = Statement(pattern=patterns.linePassword,
                            action=line_password_handler,
                            args=None,
                            loop_continue=True,
