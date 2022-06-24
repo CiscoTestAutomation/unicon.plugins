@@ -25,12 +25,6 @@ class aosStatements(object):
                                 loop_continue=True,
                                 continue_timer=False)
 
-        self.enable_stmt = Statement(pattern=patterns.disable_mode,
-                                action=send_enabler,
-                                args=None,
-                                loop_continue=True,
-                                continue_timer=False)
-
         self.password_stmt = Statement(pattern=patterns.password,
                                 action=enable_password_handler,
                                 args=None,
@@ -48,7 +42,6 @@ aos_statements = aosStatements()
 #############################################################
 
 aosAuthentication_statement_list = [aos_statements.login_stmt,
-                                 aos_statements.enable_stmt,
                                  aos_statements.password_stmt]
 
 aosConnection_statement_list = aosAuthentication_statement_list + pre_connection_statement_list

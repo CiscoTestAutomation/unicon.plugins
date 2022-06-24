@@ -10,10 +10,11 @@ from unicon.plugins.generic.patterns import GenericPatterns
 class aosPatterns():
     def __init__(self):
         super().__init__()
+        self.shell_prompt = r'^(.*)?(%N)(-RE[01])?\:\~ *\#\s?$|^%\s*$'
         self.login_prompt = r'^(.*?)*login as: *?'
         self.disable_mode = r'^(.*?)((.|\n)*)w+.*>'
         self.privileged_mode = r'^(.*?)((.|\n)*)w+.*#'
         self.config_mode = r'^(.*?)\w+.config.#'
         self.password = r'^(.*?)\w+.*[Pp]assword:'
         self.linePassword = r'^(.*?)\w+.*[Pp]assword:'
-        
+

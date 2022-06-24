@@ -8,8 +8,8 @@ https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_e
 from unicon.statemachine import State, Path, StateMachine
 from unicon.eal.dialogs import Statement, Dialog
 from unicon.plugins.aos.patterns import aosPatterns
-
-class aosSingleRpStateMachine(GenericSingleRpStateMachine):
+patterns = aosPatterns
+class aosSingleRpStateMachine(StateMachine):
 
     def create(self):
         '''

@@ -14,7 +14,7 @@ Description:
 """
 from unicon.bases.routers.connection_provider import BaseSingleRpConnectionProvider
 from unicon.eal.dialogs import Dialog
-from unicon.plugins.aos.statements import connection_statement_list
+from unicon.plugins.aos.statements import aosConnection_statement_list
 from unicon.plugins.generic.statements import custom_auth_statements
 
 
@@ -40,5 +40,5 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
                              self.connection.settings.LOGIN_PROMPT,
                              self.connection.settings.PASSWORD_PROMPT)
         return con.connect_reply \
-                    + Dialog(custom_auth_stmt + connection_statement_list
-                         if custom_auth_stmt else connection_statement_list)
+                    + Dialog(custom_auth_stmt + aosConnection_statement_list
+                         if custom_auth_stmt else aosConnection_statement_list)
