@@ -8,6 +8,8 @@ import logging
 
 from unicon.plugins.generic.service_implementation import Execute as GenericExec
 from unicon.plugins.ios.iosv import IosvServiceList
+from unicon.plugins.generic import ServiceList, service_implementation as aosSi
+from unicon.plugins.junos import service_implementation as svc
 
 logger = logging.getLogger(__name__)
 
@@ -26,14 +28,17 @@ class Execute(GenericExec):
         super().call_service(*args, **kwargs)
 
 
-class aosServiceList(IosvServiceList):
-    '''
-    class aggregating all service lists for this platform
-    '''
-
+class aosServiceList(ServiceList):
     def __init__(self):
-        # use the parent servies
         super().__init__()
+        self.send = svc.Send
+        self.sendline = svc.Sendline
+        self.expect = svc.Expect
+        self.execute = svc.Execute
+        self.configure = svc.Configure
+        self.enable = svc.Enable
+        self.disable = svc.Disable
+        self.log_user = svc.LogUser
+        self.bash_console = svc.BashService
+        self.expect_log = aosSi.ExpectLogging
 
-        # overwrite and add our own
-        self.execute = Execute
