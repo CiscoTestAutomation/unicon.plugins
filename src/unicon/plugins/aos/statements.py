@@ -43,36 +43,36 @@ class aosStatements(object):
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
-                                    trim_buffer=True)
+                                    trim_buffer=False)
         self.password_stmt = Statement(pattern=patterns.password,
                                        action=password_handler,
                                        args=None,
                                        loop_continue=True,
                                        continue_timer=True,
-                                       trim_buffer=True)
+                                       trim_buffer=False)
         self.proxy_stmt = Statement(pattern=patterns.proxy,
                                     action='sendline(This is where I am failing proxy)',
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
-                                    trim_buffer=True)
+                                    trim_buffer=False)
         self.shell_stmt = Statement(pattern=patterns.shell_prompt,
                                     action='sendline(This is where I am failing shell)',
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
-                                    trim_buffer=True)
+                                    trim_buffer=False)
         self.escape_char_stmt = Statement(pattern=patterns.escape_char,
                                      action=escape_char_handler,
                                      args=None,
                                      loop_continue=True,
-                                     continue_timer=True)
+                                     continue_timer=False)
         self.press_return_stmt = Statement(pattern=patterns.press_return,
                                       action=sendline, 
                                       args=None,
                                       loop_continue=True,
                                       continue_timer=True,
-                                      trim_buffer=True)
+                                      trim_buffer=False)
 
 #############################################################
 #  Statement lists

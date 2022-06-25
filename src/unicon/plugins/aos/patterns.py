@@ -15,7 +15,7 @@ class aosPatterns():
         self.linePassword = r'^(.*?)\w+.*[Pp]assword:'
         self.enable_prompt = r'^(.*?)((.|\n)*)w+.*#$'
         self.config_prompt = r'^(.*?)\w+.config.#'
-        self.proxy = r'.*rhome.*\$$'
+        self.proxy = r'(.*rhome.*\$)$'
         self.generic = r'^(.*?)\#$'
         self.escape_char = r"Escape character is '(~)'"
         self.press_return = 'sendline(/r)'
