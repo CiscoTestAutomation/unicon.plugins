@@ -39,7 +39,7 @@ class aosStatements(object):
 
 # This is the statements to login to AOS.
         self.login_stmt = Statement(pattern=patterns.login_prompt,
-                                action='sendline(This is where I am failing login)',
+                                action=login_handler,
                                 args=None,
                                 loop_continue=False,
                                 continue_timer=True,
@@ -49,17 +49,20 @@ class aosStatements(object):
                                 action=password_handler,
                                 args=None,
                                 loop_continue=True,
-                                continue_timer=True)
+                                continue_timer=True,
+                                trim_buffer=False)
         self.proxy_stmt = Statement(pattern=patterns.proxy,
                                     action='sendline(This is where I am failing proxy)',
                                     args=None,
                                     loop_continue=False,
-                                    continue_timer=False)
+                                    continue_timer=False,
+                                    trim_buffer=True)
         self.shell_stmt = Statement(pattern=patterns.shell_prompt,
                                     action='sendline(This is where I am failing shell)',
                                     args=None,
                                     loop_continue=False,
-                                    continue_timer=False)
+                                    continue_timer=False,
+                                    trim_buffer=True)
         escape_char_stmt = Statement(pattern=patterns.escape_char,
                              action=escape_char_handler,
                              args=None,
