@@ -39,18 +39,17 @@ class aosStatements(object):
 
 # This is the statements to login to AOS.
         self.login_stmt = Statement(pattern=patterns.login_prompt,
-                                action=password_handler,
-                                args=None,
-                                loop_continue=True,
-                                continue_timer=True,
-                                trim_buffer=True)
-
+                                    action='sendline(This is where I am failing login)',
+                                    args=None,
+                                    loop_continue=True,
+                                    continue_timer=False,
+                                    trim_buffer=False)
         self.password_stmt = Statement(pattern=patterns.password,
-                                action=password_handler,
-                                args=None,
-                                loop_continue=True,
-                                continue_timer=True,
-                                trim_buffer=True)
+                                       action='sendline(\r)',
+                                       args=None,
+                                       loop_continue=True,
+                                       continue_timer=True,
+                                       trim_buffer=False)
         self.proxy_stmt = Statement(pattern=patterns.proxy,
                                     action='sendline(This is where I am failing proxy)',
                                     args=None,
@@ -60,19 +59,19 @@ class aosStatements(object):
         self.shell_stmt = Statement(pattern=patterns.shell_prompt,
                                     action='sendline(This is where I am failing shell)',
                                     args=None,
-                                    loop_continue=False,
+                                    loop_continue=True,
                                     continue_timer=False,
                                     trim_buffer=True)
-        escape_char_stmt = Statement(pattern=patterns.escape_char,
-                             action=escape_char_handler,
-                             args=None,
-                             loop_continue=True,
-                             continue_timer=False)
-        press_return_stmt = Statement(pattern=patterns.press_return,
-                              action=sendline, 
-                              args=None,
-                              loop_continue=True,
-                              continue_timer=False)
+        self.escape_char_stmt = Statement(pattern=patterns.escape_char,
+                                     action=escape_char_handler,
+                                     args=None,
+                                     loop_continue=True,
+                                     continue_timer=False)
+        self.press_return_stmt = Statement(pattern=patterns.press_return,
+                                      action=sendline, 
+                                      args=None,
+                                      loop_continue=True,
+                                      continue_timer=False)
 
 #############################################################
 #  Statement lists
@@ -87,6 +86,8 @@ aos_statements = aosStatements()
 aosAuthentication_statement_list = [aos_statements.login_stmt,
                                  aos_statements.password_stmt,
                                  aos_statements.shell_stmt,
-                                 aos_statements.proxy_stmt]
+                                 aos_statements.proxy_stmt,
+                                 aos_statements.escape_char_stmt,
+                                 aos_statements.press_return_stmt]
 
 aosConnection_statement_list = aosAuthentication_statement_list

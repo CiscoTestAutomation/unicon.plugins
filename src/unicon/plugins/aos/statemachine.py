@@ -9,6 +9,7 @@ from unicon.statemachine import State, Path, StateMachine
 from unicon.eal.dialogs import Statement, Dialog
 from unicon.plugins.aos.patterns import aosPatterns
 patterns = aosPatterns()
+
 class aosSingleRpStateMachine(StateMachine):
 
     def create(self):
