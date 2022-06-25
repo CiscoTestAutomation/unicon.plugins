@@ -13,8 +13,8 @@ class aosSettings(GenericSettings):
     def __init__(self):
         # inherit any parent settings
         super().__init__()
-        self.CONNECTION_TIMEOUT = 30
-        self.ESCAPE_CHAR_CALLBACK_PRE_SENDLINE_PAUSE_SEC = 2
+        self.CONNECTION_TIMEOUT = 5
+        self.ESCAPE_CHAR_CALLBACK_PRE_SENDLINE_PAUSE_SEC = 3
         self.HA_INIT_EXEC_COMMANDS = []
         self.HA_INIT_CONFIG_COMMANDS = []
         self.CONSOLE_TIMEOUT = 60
@@ -33,9 +33,9 @@ class aosSettings(GenericSettings):
         self.PASSWORD_ATTEMPTS = 3
 
         # User defined login and password prompt pattern.
-        self.LOGIN_PROMPT = r'^.*Login.*:$'
-        self.PASSWORD_PROMPT = r'^(.*?)\w+.*[Pp]assword:$'
-        self.PROXY = r'.*rhome.*\$$'
+        #self.LOGIN_PROMPT = r'^.*Login.*:'
+        #self.PASSWORD_PROMPT = r'^(.*?)\w+.*[Pp]assword:'
+        #self.PROXY = r'.*rhome.*\$$'
 
         # Ignore log messages before executing command
         self.IGNORE_CHATTY_TERM_OUTPUT = False
@@ -48,7 +48,7 @@ class aosSettings(GenericSettings):
 
         # prompt wait retries
         # (wait time: 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75 == total wait: 7.0s)
-        self.ESCAPE_CHAR_PROMPT_WAIT_RETRIES = 7
+        self.ESCAPE_CHAR_PROMPT_WAIT_RETRIES = 10
         # prompt wait delay
         self.ESCAPE_CHAR_PROMPT_WAIT = 100
         

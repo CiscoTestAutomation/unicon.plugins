@@ -39,39 +39,40 @@ class aosStatements(object):
 
 # This is the statements to login to AOS.
         self.login_stmt = Statement(pattern=patterns.login_prompt,
-                                    action='sendline(This is where I am failing login)',
+                                    action=login_handler,
                                     args=None,
                                     loop_continue=True,
-                                    continue_timer=False,
-                                    trim_buffer=False)
+                                    continue_timer=True,
+                                    trim_buffer=True)
         self.password_stmt = Statement(pattern=patterns.password,
-                                       action='sendline(\r)',
+                                       action=password_handler,
                                        args=None,
                                        loop_continue=True,
                                        continue_timer=True,
-                                       trim_buffer=False)
+                                       trim_buffer=True)
         self.proxy_stmt = Statement(pattern=patterns.proxy,
                                     action='sendline(This is where I am failing proxy)',
                                     args=None,
                                     loop_continue=True,
-                                    continue_timer=False,
+                                    continue_timer=True,
                                     trim_buffer=True)
         self.shell_stmt = Statement(pattern=patterns.shell_prompt,
                                     action='sendline(This is where I am failing shell)',
                                     args=None,
                                     loop_continue=True,
-                                    continue_timer=False,
+                                    continue_timer=True,
                                     trim_buffer=True)
         self.escape_char_stmt = Statement(pattern=patterns.escape_char,
                                      action=escape_char_handler,
                                      args=None,
                                      loop_continue=True,
-                                     continue_timer=False)
+                                     continue_timer=True)
         self.press_return_stmt = Statement(pattern=patterns.press_return,
                                       action=sendline, 
                                       args=None,
                                       loop_continue=True,
-                                      continue_timer=False)
+                                      continue_timer=True,
+                                      trim_buffer=True)
 
 #############################################################
 #  Statement lists
