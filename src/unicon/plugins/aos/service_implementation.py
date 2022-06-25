@@ -12,4 +12,4 @@ class Configure(Configure):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'shell'
         self.end_state = 'enable'
-        self.service_name = 'config'
+        #self.service_name = 'shell'

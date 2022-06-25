@@ -11,22 +11,6 @@ from unicon.plugins.ios.iosv import IosvServiceList
 from unicon.plugins.generic import ServiceList, service_implementation as aosSi
 from unicon.plugins.junos import service_implementation as svc
 
-logger = logging.getLogger(__name__)
-
-
-class Execute(GenericExec):
-    '''
-    Demonstrating how to augment an existing service by updating its call
-    service method
-    '''
-
-    def call_service(self, *args, **kwargs):
-        # custom... code here
-        logger.info('execute service called')
-
-        # call parent
-        super().call_service(*args, **kwargs)
-
 
 class aosServiceList(ServiceList):
     def __init__(self):

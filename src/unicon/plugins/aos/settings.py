@@ -13,8 +13,8 @@ class aosSettings(GenericSettings):
     def __init__(self):
         # inherit any parent settings
         super().__init__()
-        self.CONNECTION_TIMEOUT = 10
-        self.ESCAPE_CHAR_CALLBACK_PRE_SENDLINE_PAUSE_SEC = 1
+        self.CONNECTION_TIMEOUT = 30
+        self.ESCAPE_CHAR_CALLBACK_PRE_SENDLINE_PAUSE_SEC = 2
         self.HA_INIT_EXEC_COMMANDS = []
         self.HA_INIT_CONFIG_COMMANDS = []
         self.CONSOLE_TIMEOUT = 60
@@ -33,23 +33,24 @@ class aosSettings(GenericSettings):
         self.PASSWORD_ATTEMPTS = 3
 
         # User defined login and password prompt pattern.
-        self.LOGIN_PROMPT = r'^(.*?)\w+.*[Pp]assword:'
-        self.PASSWORD_PROMPT = r'^(.*?)\w+.*[Pp]assword:'
+        self.LOGIN_PROMPT = r'^.*Login.*:$'
+        self.PASSWORD_PROMPT = r'^(.*?)\w+.*[Pp]assword:$'
+        self.PROXY = r'.*rhome.*\$$'
 
         # Ignore log messages before executing command
         self.IGNORE_CHATTY_TERM_OUTPUT = False
 
         # When connecting to a device via telnet, how long (in seconds)
         # to pause before checking the spawn buffer
-        self.ESCAPE_CHAR_CHATTY_TERM_WAIT_RETRIES = 12
+        self.ESCAPE_CHAR_CHATTY_TERM_WAIT_RETRIES = 100
         # number of cycles to wait for if the terminal is still chatty
-        self.ESCAPE_CHAR_CHATTY_TERM_WAIT = 0.75
+        self.ESCAPE_CHAR_CHATTY_TERM_WAIT = 100
 
         # prompt wait retries
         # (wait time: 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75 == total wait: 7.0s)
         self.ESCAPE_CHAR_PROMPT_WAIT_RETRIES = 7
         # prompt wait delay
-        self.ESCAPE_CHAR_PROMPT_WAIT = 0.25
+        self.ESCAPE_CHAR_PROMPT_WAIT = 100
         
         # pattern to replace '---(more)---' or '---(more #%)---'   
         self.MORE_REPLACE_PATTERN = r'---\(more.*\)---'
