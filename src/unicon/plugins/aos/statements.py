@@ -40,7 +40,7 @@ class aosStatements(object):
 # This is the statements to login to AOS.
         time.sleep(1.0)
         self.login_stmt = Statement(pattern=patterns.login_prompt,
-                                    action='sendline(This is where I am failing login',
+                                    action='sendline(This is where I am failing login)',
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
@@ -51,7 +51,6 @@ class aosStatements(object):
                                        loop_continue=True,
                                        continue_timer=True,
                                        trim_buffer=False)
-        print("Did not match password prompt ")
         self.proxy_stmt = Statement(pattern=patterns.proxy,
                                     action='sendline(This is where I am failing proxy)',
                                     args=None,
