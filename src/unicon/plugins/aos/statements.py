@@ -40,7 +40,7 @@ class aosStatements(object):
 # This is the statements to login to AOS.
         time.sleep(1.0)
         self.login_stmt = Statement(pattern=patterns.login_prompt,
-                                    action='sendline(This is where I am failing login)',
+                                    action=password_handler,
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
