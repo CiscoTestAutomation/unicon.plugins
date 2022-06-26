@@ -33,8 +33,8 @@ class aosSettings(GenericSettings):
         self.PASSWORD_ATTEMPTS = 3
 
         # User defined login and password prompt pattern.
-        #self.LOGIN_PROMPT = r'^.*Login.*:'
-        self.PASSWORD_PROMPT = r'((.|\n)*[Pp]assword:)$'
+        #self.LOGIN_PROMPT = r'^((.|\n)*\$)?'
+        #self.PASSWORD_PROMPT = r'^(.*|\n)*.*[Pp]assword:$'
         #self.PROXY = r'.*rhome.*\$$'
 
         # Ignore log messages before executing command

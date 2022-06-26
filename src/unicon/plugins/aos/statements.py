@@ -12,7 +12,7 @@ from unicon.plugins.generic.statements import password_handler
 from unicon.plugins.generic.statements import login_handler
 from unicon.plugins.generic.statements import enable_password_handler
 from unicon.eal.helpers import sendline
-
+import time
 patterns = aosPatterns()
 
 def escape_char_handler(spawn):
@@ -36,26 +36,29 @@ def escape_char_handler(spawn):
 
 class aosStatements(object):
     def __init__(self):
-
+        
 # This is the statements to login to AOS.
+        time.sleep(1.0)
         self.login_stmt = Statement(pattern=patterns.login_prompt,
-                                    action=login_handler,
+                                    action='sendline(This is where I am failing login',
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
                                     trim_buffer=False)
         self.password_stmt = Statement(pattern=patterns.password,
-                                       action=password_handler,
+                                       action='sendline=(This is where I am failing password)',
                                        args=None,
                                        loop_continue=True,
                                        continue_timer=True,
                                        trim_buffer=False)
+        print("Did not match password prompt ")
         self.proxy_stmt = Statement(pattern=patterns.proxy,
                                     action='sendline(This is where I am failing proxy)',
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
                                     trim_buffer=False)
+
         self.shell_stmt = Statement(pattern=patterns.shell_prompt,
                                     action='sendline(This is where I am failing shell)',
                                     args=None,
