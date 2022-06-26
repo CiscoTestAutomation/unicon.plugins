@@ -38,7 +38,7 @@ class aosStatements(object):
     def __init__(self):
         
 # This is the statements to login to AOS.
-        time.sleep(1.0)
+        time.sleep(2.0)
         self.login_stmt = Statement(pattern=patterns.login_prompt,
                                     action=password_handler,
                                     args=None,
