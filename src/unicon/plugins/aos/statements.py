@@ -46,7 +46,7 @@ class aosStatements(object):
                                     continue_timer=True,
                                     trim_buffer=False)
         self.password_stmt = Statement(pattern=patterns.password,
-                                       action='sendline=(This is where I am failing password)',
+                                       action='sendline(This is where I am failing password)',
                                        args=None,
                                        loop_continue=True,
                                        continue_timer=True,
@@ -75,7 +75,7 @@ class aosStatements(object):
                                       loop_continue=True,
                                       continue_timer=True,
                                       trim_buffer=False)
-
+        time.sleep(1.0)
 #############################################################
 #  Statement lists
 #############################################################
