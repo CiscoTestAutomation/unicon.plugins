@@ -7,11 +7,11 @@ https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_e
 class aosPatterns():
     def __init__(self):
         super().__init__()
-        self.shell_prompt = r'^((.|\n)*\#)$'
-        self.login_prompt = r'^((.|\n)*'
+        self.shell_prompt = r'.+$'
+        self.login_prompt = r'.+$'
         self.disable_mode = r'((.|\n)*\>)$'
         self.config_mode = r'((.|\n)*config.#)$'
-        self.password = r'(.*|\n)*.*[Pp]assword:$'
+        self.password = r'.+$'
         self.linePassword = r'(^(.*?)\w+.*[Pp]assword:)$'
         self.enable_prompt = r'(^(.*?)((.|\n)*)w+.*#)$'
         self.config_prompt = r'(^(.*?)\w+.config.#)$'
