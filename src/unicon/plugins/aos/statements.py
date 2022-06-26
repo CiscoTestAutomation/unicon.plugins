@@ -43,7 +43,7 @@ class aosStatements(object):
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
-                                    trim_buffer=False)
+                                    trim_buffer=True)
         self.password_stmt = Statement(pattern=patterns.password,
                                        action='sendline(This is where I am failing password)',
                                        args=None,
