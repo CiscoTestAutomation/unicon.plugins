@@ -30,6 +30,7 @@ class aosSingleRpConnectionProvider(BaseService):
         """ Initializes the generic connection provider
         """
         self.connection = connection
+        self.context = context
         self.timeout_pattern = ['Timeout occurred', ]
         self.error_pattern = ["my command error"]
         self.start_state = 'enable'
