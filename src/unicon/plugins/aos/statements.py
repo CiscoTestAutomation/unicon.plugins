@@ -45,19 +45,19 @@ class aosStatements(object):
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
-                                    trim_buffer=False)
+                                    trim_buffer=True)
         self.password_stmt = Statement(pattern=patterns.password,
                                        action='sendline(This is where I am failing password)',
                                        args=None,
                                        loop_continue=True,
                                        continue_timer=True,
-                                       trim_buffer=False)
+                                       trim_buffer=True)
         self.proxy_stmt = Statement(pattern=patterns.proxy,
                                     action='sendline(This is where I am failing proxy)',
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
-                                    trim_buffer=False)
+                                    trim_buffer=True)
 
         self.shell_stmt = Statement(pattern=patterns.shell_prompt,
                                     action='sendline(This is where I am failing shell)',
@@ -80,7 +80,8 @@ class aosStatements(object):
                                             action='sendline()',
                                             args=None,
                                             loop_continue=True,
-                                            continue_timer=False)        
+                                            continue_timer=,
+                                            trim_buffer=True)        
 #############################################################
 #  Statement lists
 #############################################################
