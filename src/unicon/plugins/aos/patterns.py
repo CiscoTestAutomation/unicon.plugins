@@ -19,4 +19,4 @@ class aosPatterns():
         self.generic = r'(^(.*?)\#) ?$'
         self.escape_char = r"Escape character is '(~)'"
         self.press_return = '((.|\n)*continue) ?$'
-        self.press_any_key = r'^.*?Press any key to continue\.\s* ?$'
+        self.press_any_key = r'Press any key to continue ?$'
