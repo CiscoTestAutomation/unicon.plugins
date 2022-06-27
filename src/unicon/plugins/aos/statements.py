@@ -76,6 +76,11 @@ class aosStatements(object):
                                       loop_continue=True,
                                       continue_timer=True,
                                       trim_buffer=False)
+        self.press_any_key_stmt = Statement(pattern=patterns.press_any_key,
+                                            action='sendline()',
+                                            args=None,
+                                            loop_continue=True,
+                                            continue_timer=False)        
 #############################################################
 #  Statement lists
 #############################################################
@@ -91,6 +96,7 @@ aosAuthentication_statement_list = [aos_statements.login_stmt,
                                  aos_statements.shell_stmt,
                                  aos_statements.proxy_stmt,
                                  aos_statements.escape_char_stmt,
-                                 aos_statements.press_return_stmt]
+                                 aos_statements.press_return_stmt,
+                                 aos_statements.press_any_key_stmt]
 
 aosConnection_statement_list = aosAuthentication_statement_list
