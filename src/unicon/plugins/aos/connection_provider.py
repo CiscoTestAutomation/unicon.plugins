@@ -46,7 +46,7 @@ class aosSingleRpConnectionProvider(BaseService):
         con = self.connection
         con.log.debug("+++ run_command +++")
         con.spawn.sendline(command)
-        self.result = con.spawn.expect(.*#?)
+        self.result = con.spawn.expect('.*#?')
         custom_auth_stmt = custom_auth_statements(
                              self.connection.settings.LOGIN_PROMPT,
                              self.connection.settings.PASSWORD_PROMPT)
