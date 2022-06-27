@@ -33,7 +33,8 @@ class aosSingleRpStateMachine(StateMachine):
 
         enable_to_shell = Path(enable, shell, command='enable', dialog=None)
         shell_to_enable = Path(shell, enable, command='exit', dialog=None)
-        enter_to_enable = Path(enter, enable, commands= '\r', dialog=None)
+        enter_to_enable = Path(enter, enable, commands='\r', dialog=None)
+        enable_to_enter = Path(enter, enable, commands='exit', dialog=None)
         enable_to_config = Path(enable, config, command='configure', dialog=None)
         config_to_enable = Path(config, enable, command='exit', dialog=None)
 
@@ -45,7 +46,9 @@ class aosSingleRpStateMachine(StateMachine):
         self.add_state(config)
         self.add_state(proxy)
         self.add_state(generic)
-        self.add_state()
+        self.add_state(enter)
+        self.add_path(enter_to_enable)
+        self.add_path(enable_to_enter)
         self.add_path(enable_to_shell)
         self.add_path(shell_to_enable)
 
