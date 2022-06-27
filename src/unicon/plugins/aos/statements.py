@@ -12,7 +12,9 @@ from unicon.plugins.generic.statements import password_handler
 from unicon.plugins.generic.statements import login_handler
 from unicon.plugins.generic.statements import enable_password_handler
 from unicon.eal.helpers import sendline
-import time
+from unicon.plugins.utils import (get_current_credential,
+                                  common_cred_username_handler,
+                                  common_cred_password_handler)
 patterns = aosPatterns()
 
 def escape_char_handler(spawn):
@@ -43,7 +45,7 @@ class aosStatements(object):
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
-                                    trim_buffer=True)
+                                    trim_buffer=False)
         self.password_stmt = Statement(pattern=patterns.password,
                                        action='sendline(This is where I am failing password)',
                                        args=None,
