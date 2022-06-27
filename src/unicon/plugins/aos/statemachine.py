@@ -26,7 +26,7 @@ class aosSingleRpStateMachine(StateMachine):
         config = State('config', patterns.config_prompt)
         proxy = State('proxy', patterns.proxy)
         generic = State('Generic', patterns.generic)
-        enter = State('enter', patterns.press_any_key_
+        enter = State('enter', patterns.press_any_key)
         ##########################################################
         # Path Definition
         ##########################################################
