@@ -41,7 +41,7 @@ class aosStatements(object):
         
 # This is the statements to login to AOS.
         self.login_stmt = Statement(pattern=patterns.login_prompt,
-                                    action='sendline(password)',
+                                    action=spawn.sendline(context['password']),
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
@@ -62,13 +62,13 @@ class aosStatements(object):
                                      action=escape_char_handler,
                                      args=None,
                                      loop_continue=True,
-                                     continue_timer=False)
+                                     continue_timer=True)
         self.press_return_stmt = Statement(pattern=patterns.press_return,
                                       action=sendline, 
                                       args=None,
                                       loop_continue=True,
                                       continue_timer=True,
-                                      trim_buffer=False)
+                                      trim_buffer=True)
         self.press_any_key_stmt = Statement(pattern=patterns.press_any_key,
                                             action='sendline()',
                                             args=None,
