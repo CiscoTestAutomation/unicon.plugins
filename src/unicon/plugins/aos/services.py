@@ -10,7 +10,7 @@ from unicon.plugins.generic.service_implementation import Execute as GenericExec
 from unicon.plugins.ios.iosv import IosvServiceList
 from unicon.plugins.generic import ServiceList, service_implementation as aosSi
 from unicon.plugins.junos import service_implementation as svc
-
+from unicon.plugins.aos.connection_provider import aosSingleRpConnectionProvider
 
 class aosServiceList(ServiceList):
     def __init__(self):
@@ -25,4 +25,5 @@ class aosServiceList(ServiceList):
         self.log_user = svc.LogUser
         self.bash_console = svc.BashService
         self.expect_log = aosSi.ExpectLogging
+        self.run_command = aosSingleRpConnectionProvider
 
