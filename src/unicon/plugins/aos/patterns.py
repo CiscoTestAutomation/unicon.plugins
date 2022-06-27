@@ -7,16 +7,16 @@ https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_e
 class aosPatterns():
     def __init__(self):
         super().__init__()
-        self.shell_prompt = r'.+#$'
+        self.shell_prompt = r'.+#$ ?$'
         self.login_prompt = r'^.*[Pp]assword( for )?(\S+)?: ?$'
-        self.disable_mode = r'((.|\n)*\>)$'
-        self.config_mode = r'((.|\n)*config.#)$'
-        self.password = r'.+assword:$'
-        self.linePassword = r'(^(.*?)\w+.*[Pp]assword:)$'
-        self.enable_prompt = r'(^(.*?)((.|\n)*)w+.*#)$'
-        self.config_prompt = r'(^(.*?)\w+.config.#)$'
-        self.proxy = r'((.|\n)*rhome.*\$)$'
-        self.generic = r'(^(.*?)\#)$'
+        self.disable_mode = r'((.|\n)*\>) ?$'
+        self.config_mode = r'((.|\n)*config.#) ?$'
+        self.password = r'.+assword: ?$'
+        self.linePassword = r'(^(.*?)\w+.*[Pp]assword:) ?$'
+        self.enable_prompt = r'(^(.*?)((.|\n)*)w+.*#) ?$'
+        self.config_prompt = r'(^(.*?)\w+.config.#) ?$'
+        self.proxy = r'((.|\n)*rhome.*\$) ?$'
+        self.generic = r'(^(.*?)\#) ?$'
         self.escape_char = r"Escape character is '(~)'"
-        self.press_return = '((.|\n)*continue)$'
-        self.press_any_key = r'^.*?Press any key to continue\.\s*$'
+        self.press_return = '((.|\n)*continue) ?$'
+        self.press_any_key = r'^.*?Press any key to continue\.\s* ?$'

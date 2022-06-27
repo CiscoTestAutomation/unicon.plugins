@@ -43,7 +43,7 @@ class aosStatements(object):
         self.login_stmt = Statement(pattern=patterns.login_prompt,
                                     action=password_handler,
                                     args=None,
-                                    loop_continue=False,
+                                    loop_continue=True,
                                     continue_timer=True,
                                     trim_buffer=True)
         self.password_stmt = Statement(pattern=patterns.password,
