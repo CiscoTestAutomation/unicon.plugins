@@ -33,8 +33,8 @@ class aosSingleRpStateMachine(StateMachine):
 
         enable_to_shell = Path(enable, shell, command='enable', dialog=None)
         shell_to_enable = Path(shell, enable, command='exit', dialog=None)
-        enter_to_enable = Path(enter, enable, commands='\r', dialog=None)
-        enable_to_enter = Path(enter, enable, commands='exit', dialog=None)
+        enter_to_enable = Path(enter, enable, command='\r', dialog=None)
+        enable_to_enter = Path(enter, enable, command='exit', dialog=None)
         enable_to_config = Path(enable, config, command='configure', dialog=None)
         config_to_enable = Path(config, enable, command='exit', dialog=None)
 
