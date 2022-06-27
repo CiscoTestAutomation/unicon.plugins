@@ -10,6 +10,6 @@ class Configure(Configure):
 
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
-        self.start_state = 'shell'
+        self.start_state = 'enable'
         self.end_state = 'enable'
         #self.service_name = 'shell'

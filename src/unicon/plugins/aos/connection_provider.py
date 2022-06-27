@@ -25,8 +25,8 @@ class aosSingleRpConnectionProvider(BaseService):
         additional dialogs and steps required for
         connecting to any device via generic implementation
     """
-    def __init__(self, connection, **kwargs):
-
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
         """ Initializes the generic connection provider
         """
         self.connection = connection
@@ -37,7 +37,7 @@ class aosSingleRpConnectionProvider(BaseService):
         self.result = None
         self.__dict__.update(kwargs)
 
-    def call_service(self, connection, command,dialog=Dialog([]), *args, **kwargs):
+    def call_service(self, command,dialog=Dialog([]), *args, **kwargs):
         """ creates and returns a Dialog to handle all device prompts
             appearing during initial connection to the device.
             See statements.py for connnection statement lists
@@ -52,6 +52,7 @@ class aosSingleRpConnectionProvider(BaseService):
         return con.connect_reply \
                     + Dialog(custom_auth_stmt + aosConnection_statement_list
                          if custom_auth_stmt else aosConnection_statement_list)
+    
     def pre_service(self, *args, **kwargs):
         # Check if connection is established
         if self.connection.is_connected:
