@@ -43,13 +43,13 @@ class aosStatements(object):
         self.login_stmt = Statement(pattern=patterns.login_prompt,
                                     action=password_handler,
                                     args=None,
-                                    loop_continue=True,
+                                    loop_continue=False,
                                     continue_timer=True,
                                     trim_buffer=True)
         self.password_stmt = Statement(pattern=patterns.password,
                                        action='sendline(This is where I am failing password)',
                                        args=None,
-                                       loop_continue=True,
+                                       loop_continue=False,
                                        continue_timer=True,
                                        trim_buffer=True)
         self.proxy_stmt = Statement(pattern=patterns.proxy,
@@ -72,7 +72,7 @@ class aosStatements(object):
         self.press_any_key_stmt = Statement(pattern=patterns.press_any_key,
                                             action='sendline()',
                                             args=None,
-                                            loop_continue=True,
+                                            loop_continue=False,
                                             continue_timer=True,
                                             trim_buffer=True)        
         self.shell_stmt = Statement(pattern=patterns.shell_prompt,
