@@ -8,7 +8,7 @@ class aosPatterns():
     def __init__(self):
         super().__init__()
         self.shell_prompt = r'.+#$'
-        self.login_prompt = r'.+$'
+        self.login_prompt = r'^.*[Pp]assword( for )?(\S+)?: ?$'
         self.disable_mode = r'((.|\n)*\>)$'
         self.config_mode = r'((.|\n)*config.#)$'
         self.password = r'.+assword:$'
