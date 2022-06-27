@@ -31,14 +31,14 @@ class aosSingleRpConnectionProvider(BaseService):
         """
         self.connection = connection
         self.context = context
-        self.timeout_pattern = ['Timeout occurred' ]
+        self.timeout_pattern = ["Timeout occurred"]
         self.error_pattern = ["my command error"]
         self.start_state = 'enable'
         self.end_state = 'enable'
         self.result = None
         self.__dict__.update(kwargs)
 
-    def call_service(self, command,dialog=Dialog([]), *args, **kwargs):
+    def call_service(self, command, dialog=Dialog([]) *args, **kwargs):
         """ creates and returns a Dialog to handle all device prompts
             appearing during initial connection to the device.
             See statements.py for connnection statement lists
