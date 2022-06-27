@@ -58,13 +58,6 @@ class aosStatements(object):
                                     loop_continue=True,
                                     continue_timer=True,
                                     trim_buffer=True)
-
-        self.shell_stmt = Statement(pattern=patterns.shell_prompt,
-                                    action='sendline(This is where I am failing shell)',
-                                    args=None,
-                                    loop_continue=True,
-                                    continue_timer=True,
-                                    trim_buffer=False)
         self.escape_char_stmt = Statement(pattern=patterns.escape_char,
                                      action=escape_char_handler,
                                      args=None,
@@ -80,8 +73,14 @@ class aosStatements(object):
                                             action='sendline()',
                                             args=None,
                                             loop_continue=True,
-                                            continue_timer=,
+                                            continue_timer=True,
                                             trim_buffer=True)        
+        self.shell_stmt = Statement(pattern=patterns.shell_prompt,
+                                    action='sendline(This is where I am failing shell)',
+                                    args=None,
+                                    loop_continue=True,
+                                    continue_timer=True,
+                                    trim_buffer=False)
 #############################################################
 #  Statement lists
 #############################################################
