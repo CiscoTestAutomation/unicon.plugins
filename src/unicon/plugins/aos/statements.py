@@ -82,7 +82,7 @@ class aosStatements(object):
                                             trim_buffer=True,
                                             debug_statement=True,
                                             matched_retries=3,
-                                            match_retry_sleep=1)        
+                                            matched_retry_sleep=1)        
         self.shell_stmt = Statement(pattern=patterns.shell_prompt,
                                     action='sendline(This is where I am failing shell)',
                                     args=None,
