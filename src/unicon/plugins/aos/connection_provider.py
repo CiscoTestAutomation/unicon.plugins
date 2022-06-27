@@ -25,12 +25,11 @@ class aosSingleRpConnectionProvider(BaseService):
         additional dialogs and steps required for
         connecting to any device via generic implementation
     """
-    def __init__(self, connection, context, **kwargs):
+    def __init__(self, connection, **kwargs):
 
         """ Initializes the generic connection provider
         """
         self.connection = connection
-        self.context = context
         self.timeout_pattern = ['Timeout occurred', ]
         self.error_pattern = ["my command error"]
         self.start_state = 'enable'
@@ -53,7 +52,7 @@ class aosSingleRpConnectionProvider(BaseService):
         return con.connect_reply \
                     + Dialog(custom_auth_stmt + aosConnection_statement_list
                          if custom_auth_stmt else aosConnection_statement_list)
-    def pre_service(self, context, *args, **kwargs):
+    def pre_service(self, *args, **kwargs):
         # Check if connection is established
         if self.connection.is_connected:
             return
@@ -64,14 +63,12 @@ class aosSingleRpConnectionProvider(BaseService):
 
         # Bring the device to required state to issue a command.
         self.connection.state_machine.go_to(self.start_state,
-                                            self.connection.spawn,
-                                            context=self.connection.context)
+                                            self.connection.spawn)
 
-    def post_service(self, context, *args, **kwargs):
+    def post_service(self, *args, **kwargs):
         # Bring the device back to end state which is disable
         self.connection.state_machine.go_to(self.end_state,
-                                            self.connection.spawn,
-                                            context=self.connection.context)
+                                            self.connection.spawn)
 
     def get_service_result(self):
         # Base class get_service will verify error and timeout pattern and return
