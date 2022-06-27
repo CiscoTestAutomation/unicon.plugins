@@ -26,7 +26,7 @@ class aosSingleRpConnectionProvider(BaseService):
         connecting to any device via generic implementation
     """
     def __init__(self, connection, context, **kwargs):
-        super().__init__(connection, context, **kwargs)
+        super().__init__(self, connection, context, **kwargs)
         """ Initializes the generic connection provider
         """
         self.connection = connection
