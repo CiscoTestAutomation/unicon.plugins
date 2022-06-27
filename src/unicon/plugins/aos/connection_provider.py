@@ -47,13 +47,14 @@ class aosSingleRpConnectionProvider(BaseService):
         con.log.debug("+++ run_command +++")
         con.spawn.sendline(command)
         self.result = con.spawn.expect('.*#?')
+        '''
         custom_auth_stmt = custom_auth_statements(
                              self.connection.settings.LOGIN_PROMPT,
-                             self.connection.settings.PASSWORD_PROMPT)
+                             self.connection.settings.PASSWORD_PROMPT,)
         return con.connect_reply \
                     + Dialog(custom_auth_stmt + aosConnection_statement_list
                          if custom_auth_stmt else aosConnection_statement_list)
-    
+    '''
     def pre_service(self, *args, **kwargs):
         # Check if connection is established
         if self.connection.is_connected:
@@ -65,12 +66,14 @@ class aosSingleRpConnectionProvider(BaseService):
 
         # Bring the device to required state to issue a command.
         self.connection.state_machine.go_to(self.start_state,
-                                            self.connection.spawn)
+                                            self.connection.spawn,
+                                            context=self.connection.context)
 
     def post_service(self, *args, **kwargs):
         # Bring the device back to end state which is disable
         self.connection.state_machine.go_to(self.end_state,
-                                            self.connection.spawn)
+                                            self.connection.spawn,
+                                            context=self.connection.context)
 
     def get_service_result(self):
         # Base class get_service will verify error and timeout pattern and return
