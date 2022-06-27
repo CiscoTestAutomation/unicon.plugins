@@ -26,13 +26,14 @@ class aosSingleRpStateMachine(StateMachine):
         config = State('config', patterns.config_prompt)
         proxy = State('proxy', patterns.proxy)
         generic = State('Generic', patterns.generic)
+        enter = State('enter', patterns.press_any_key_
         ##########################################################
         # Path Definition
         ##########################################################
 
         enable_to_shell = Path(enable, shell, command='enable', dialog=None)
         shell_to_enable = Path(shell, enable, command='exit', dialog=None)
-        
+        enter_to_enable = Path(enter, enable, commands= '\r', dialog=None)
         enable_to_config = Path(enable, config, command='configure', dialog=None)
         config_to_enable = Path(config, enable, command='exit', dialog=None)
 
@@ -44,6 +45,7 @@ class aosSingleRpStateMachine(StateMachine):
         self.add_state(config)
         self.add_state(proxy)
         self.add_state(generic)
+        self.add_state()
         self.add_path(enable_to_shell)
         self.add_path(shell_to_enable)
 
