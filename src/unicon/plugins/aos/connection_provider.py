@@ -53,7 +53,7 @@ class aosSingleRpConnectionProvider(BaseService):
         return con.connect_reply \
                     + Dialog(custom_auth_stmt + aosConnection_statement_list
                          if custom_auth_stmt else aosConnection_statement_list)
-    def pre_service(self, *args, **kwargs):
+    def pre_service(self, context, *args, **kwargs):
         # Check if connection is established
         if self.connection.is_connected:
             return
@@ -67,7 +67,7 @@ class aosSingleRpConnectionProvider(BaseService):
                                             self.connection.spawn,
                                             context=self.connection.context)
 
-    def post_service(self, *args, **kwargs):
+    def post_service(self, context, *args, **kwargs):
         # Bring the device back to end state which is disable
         self.connection.state_machine.go_to(self.end_state,
                                             self.connection.spawn,
