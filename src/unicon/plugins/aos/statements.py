@@ -41,7 +41,7 @@ class aosStatements(object):
         
 # This is the statements to login to AOS.
         self.login_stmt = Statement(pattern=patterns.login_prompt,
-                                    action='sendline([password])',
+                                    action=common_cred_password_handler,
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
