@@ -61,33 +61,14 @@ class aosStatements(object):
                                     continue_timer=True,
                                     trim_buffer=True,
                                     debug_statement=True)
-        self.escape_char_stmt = Statement(pattern=patterns.escape_char,
-                                     action=escape_char_handler,
-                                     args=None,
-                                     loop_continue=True,
-                                     continue_timer=True,
-                                    debug_statement=True)
-        self.press_return_stmt = Statement(pattern=patterns.press_return,
-                                      action=sendline, 
-                                      args=None,
-                                      loop_continue=True,
-                                      continue_timer=True,
-                                      trim_buffer=True,
-                                    debug_statement=True)
         self.press_any_key_stmt = Statement(pattern=patterns.press_any_key,
                                             action='sendline()',
                                             args=(timeout=10),
                                             loop_continue=False,
                                             continue_timer=True,
                                             trim_buffer=True,
-                                            debug_statement=True,       
-        self.shell_stmt = Statement(pattern=patterns.shell_prompt,
-                                    action='sendline(This is where I am failing shell)',
-                                    args=None,
-                                    loop_continue=True,
-                                    continue_timer=True,
-                                    trim_buffer=True,
-                                    debug_statement=True)
+                                            debug_statement=True)       
+
 #############################################################
 #  Statement lists
 #############################################################
