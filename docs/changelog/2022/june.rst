@@ -36,5 +36,12 @@ Features and Bug Fixes:
 
 Changelogs
 ^^^^^^^^^^
+--------------------------------------------------------------------------------
+                                      New                                       
+--------------------------------------------------------------------------------
 
-- no changes
+* routers
+    * Connection_provider
+        * update designate handle for BaseStackRpConnectionProvider to support
+
+
