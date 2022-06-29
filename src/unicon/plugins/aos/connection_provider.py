@@ -17,25 +17,64 @@ from unicon.eal.dialogs import Dialog
 from unicon.plugins.aos.statements import aosConnection_statement_list
 from unicon.plugins.generic.statements import custom_auth_statements
 from unicon.plugins.aos.statements import aosStatements
-
-class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
+from unicon.eal.expect import Spawn
+import time
+class aosSingleRpConnectionProvider(BaseService):
     """ Implements Junos singleRP Connection Provider,
         This class overrides the base class with the
         additional dialogs and steps required for
         connecting to any device via generic implementation
     """
-    def __init__(self, *args, **kwargs):
+    def __init__(self,  connection,  context, **kwargs):
+        self.connection = connection
+        self.context = context
+        self.timeout_pattern = ['Timeout', "Timed Out" ]
+        self.error_pattern = ["error", "abort"]
+        self.start_state = 'enable'
+        self.end_state = 'disable'
+        self.result = None
+        self.__dict__.update(kwargs)
 
-        """ Initializes the generic connection provider
-        """
-        super().__init__(*args, **kwargs)
-
-    def get_connection_dialog(self):
-        """ creates and returns a Dialog to handle all device prompts
-            appearing during initial connection to the device.
-            See statements.py for connnection statement lists
-        """
+    def call_service(self, command,
+                     dialog=Dialog([]),
+                     timeout=20,
+                     *args, **kwargs):
         con = self.connection
-        return con.connect_reply + \
-                    Dialog(aosConnection_statement_list)
+        password="assword:"
+        response="yes"
+        fingerprint="(yes/no/[fingerprint])?"
+        continues="Press any key to continue"
+        prompt="#"
+        #s = Spawn(spawn_command="ssh alp041@10.119.95.7")
+        if dialog is None:
+            con.spawn.sendline(command)
+            time.sleep(2)
+            self.result = con.spawn.expect(".*$")
+            time.sleep(2)
+            t = str(self.result)
+            try:
+                if fingerprint in t:
+                    print(t)
+                    con.send(response + "\r")
+                    time.sleep(1)
+                    t = str(con.expect([r".*$"]))
+                if password in t:
+                    print(t)
+                    con.send(secret + "\r")
+                    time.sleep(1)
+                    t = str(con.expect([r".*$"]))
+                if continues in t:
+                    print(t)
+                    con.sendline()
+                    con.sendline()
+                    time.sleep(1)
+                    t = str(con.expect([r".*$"]))
+                if prompt in t:
+                    con.sendline("show vlan")
+                    t = str(con.expect([r".*$"]))
+                    print(t)
+                    s.close()
+            except TimeoutError as err:
+                print('errored becuase of timeout')
+
 
