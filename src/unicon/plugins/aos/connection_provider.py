@@ -41,8 +41,10 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         continues="Press any key to continue"
         prompt="#"
         #s = Spawn(spawn_command="ssh alp041@10.119.95.7")
-        print str(dialog)
-        print str(con)
+        d = str(dialog)
+        e =  str(con)
+        print(d)
+        print(e)
         if dialog is None:
             con.spawn.sendline(command)
             time.sleep(2)
