@@ -45,7 +45,6 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         print(d)
         print(e)
         if dialog is None:
-            con.spawn.sendline(command)
             time.sleep(2)
             self.result = con.spawn.expect(".*$")
             time.sleep(2)
