@@ -26,7 +26,7 @@ class aosSingleRpConnectionProvider(BaseService):
         additional dialogs and steps required for
         connecting to any device via generic implementation
     """
-    def __init__(self,  connection,  context, **kwargs):
+    def __init__(self,  *args, **kwargs):
         self.connection = connection
         self.context = context
         self.timeout_pattern = ['Timeout', "Timed Out" ]
