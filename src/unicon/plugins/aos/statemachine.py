@@ -25,7 +25,6 @@ class aosSingleRpStateMachine(StateMachine):
         enable = State('enable', patterns.enable_prompt)
         config = State('config', patterns.config_prompt)
         proxy = State('proxy', patterns.proxy)
-        generic = State('Generic', patterns.generic)
         enter = State('enter', patterns.press_any_key)
         ##########################################################
         # Path Definition
@@ -45,7 +44,6 @@ class aosSingleRpStateMachine(StateMachine):
         self.add_state(enable)
         self.add_state(config)
         self.add_state(proxy)
-        self.add_state(generic)
         self.add_state(enter)
         self.add_path(enter_to_enable)
         self.add_path(enable_to_enter)
