@@ -33,6 +33,7 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         con = self.connection
+        secret = input("Enter secret:")
         password="assword:"
         response="yes"
         fingerprint="(yes/no/[fingerprint])?"
