@@ -20,21 +20,15 @@ from unicon.plugins.generic.statements import custom_auth_statements
 from unicon.plugins.aos.statements import aosStatements
 from unicon.eal.expect import Spawn
 import time
-class aosSingleRpConnectionProvider(BaseService):
+class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
     """ Implements Junos singleRP Connection Provider,
         This class overrides the base class with the
         additional dialogs and steps required for
         connecting to any device via generic implementation
     """
     def __init__(self,  *args, **kwargs):
-        self.connection = connection
-        self.context = context
-        self.timeout_pattern = ['Timeout', "Timed Out" ]
-        self.error_pattern = ["error", "abort"]
-        self.start_state = 'enable'
-        self.end_state = 'disable'
-        self.result = None
-        self.__dict__.update(kwargs)
+        super().__init__(*args, **kwargs)
+
 
     def call_service(self, command,
                      dialog=Dialog([]),
