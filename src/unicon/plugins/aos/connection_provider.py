@@ -68,11 +68,8 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
                     con.sendline()
                     time.sleep(1)
                     t = str(con.expect([r".*$"]))
-                if prompt in t:
-                    con.sendline("show vlan")
-                    t = str(con.expect([r".*$"]))
-                    print(t)
-                    s.close()
+                    return
+
             except TimeoutError as err:
                 print('errored becuase of timeout')
         else:
