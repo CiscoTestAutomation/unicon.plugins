@@ -32,44 +32,6 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        con = self.connection
-        secret = getpass.getpass("Enter secret:")
-        password="assword:"
-        response="yes"
-        fingerprint="(yes/no/[fingerprint])?"
-        continues="Press any key to continue"
-        dialog = None
-        prompt="#"
-        #s = Spawn(spawn_command="ssh alp041@10.119.95.7")
-        d = str(dialog)
-        e =  str(con)
-        print(d)
-        print(e)
-        time.sleep(2)
-        self.result = con.spawn.expect(".*$")
-        time.sleep(2)
-        t = str(self.result)
-        print(t)
-        try:
-            if fingerprint in t:
-                print(t)
-                con.send(response + "\r")
-                time.sleep(1)
-                t = str(con.expect([r".*$"]))
-            if password in t:
-                print(t)
-                con.send(secret + "\r")
-                time.sleep(1)
-                t = str(con.expect([r".*$"]))
-            if continues in t:
-                print(t)
-                con.sendline()
-                con.sendline()
-                time.sleep(1)
-        except:
-            print("error connecting")
-
-        return None
 
 def get_connection_dialog(self):
         """ creates and returns a Dialog to handle all device prompts
