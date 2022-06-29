@@ -30,10 +30,8 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         additional dialogs and steps required for
         connecting to any device via generic implementation
     """
-    def __init__(self, connection,
-                     dialog=Dialog([]),
-                     timeout=20,
-                     *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         con = self.connection
         password="assword:"
         response="yes"
