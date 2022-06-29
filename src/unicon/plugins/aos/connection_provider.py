@@ -70,4 +70,4 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         except:
             print("error connecting")
 
-        return con.connect_reply + Dialog(aosConnection_statement_list)   
+        return con.connect_reply 
