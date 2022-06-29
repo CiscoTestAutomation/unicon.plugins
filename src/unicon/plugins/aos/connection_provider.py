@@ -18,17 +18,18 @@ from unicon.eal.dialogs import Dialog
 from unicon.plugins.aos.statements import aosConnection_statement_list
 from unicon.plugins.generic.statements import custom_auth_statements
 from unicon.plugins.aos.statements import aosStatements
-
+import sleep
 class aosSingleRpConnectionProvider(BaseService):
     """ Implements Junos singleRP Connection Provider,
         This class overrides the base class with the
         additional dialogs and steps required for
         connecting to any device via generic implementation
     """
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, connection, context,  **kwargs):
         """ Initializes the generic connection provider
         """
+        self.connection = connection
+        self.context = context
         self.timeout_pattern = ["Timeout occurred"]
         self.error_pattern = ["my command error"]
         self.start_state = 'enable'
@@ -44,6 +45,7 @@ class aosSingleRpConnectionProvider(BaseService):
         con = self.connection
         con.log.debug("+++ run_command +++")
         con.spawn.sendline(command)
+        time.sleep(2)
         self.result = con.spawn.expect('.*$')
         return con.connect_reply + \
                     Dialog(aosConnection_statement_list)

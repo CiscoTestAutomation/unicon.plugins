@@ -46,28 +46,36 @@ class aosStatements(object):
                                     loop_continue=True,
                                     continue_timer=True,
                                     trim_buffer=True,
-                                    debug_statement=True)
+                                    debug_statement=True,
+                                    matched_retries=3,
+                                    matched_retry_sleep=1)
         self.password_stmt = Statement(pattern=patterns.password,
                                        action=password_handler,
                                        args=None,
                                        loop_continue=True,
                                        continue_timer=True,
                                        trim_buffer=True,
-                                    debug_statement=True)
+                                       debug_statement=True,
+                                       matched_retries=3,
+                                       matched_retry_sleep=1)
         self.ssh_key_check = Statement(pattern=patterns.proxy,
                                     action='sendline(yes)',
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
                                     trim_buffer=True,
-                                    debug_statement=True)
+                                    debug_statement=True,
+                                    matched_retries=3,
+                                    matched_retry_sleep=1)
         self.press_any_key_stmt = Statement(pattern=patterns.press_any_key,
                                             action='sendline()',
                                             args=None,
                                             loop_continue=False,
                                             continue_timer=True,
                                             trim_buffer=True,
-                                            debug_statement=True)       
+                                            debug_statement=True,
+                                            matched_retries=3,
+                                            matched_retry_sleep=1)       
 
 #############################################################
 #  Statement lists
