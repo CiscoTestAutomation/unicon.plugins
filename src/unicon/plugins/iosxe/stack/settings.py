@@ -21,4 +21,5 @@ class IosXEStackSettings(IosXESettings):
         self.STACK_RELOAD_TIMEOUT = 900
         # Reload postcheck interval
         self.RELOAD_POSTCHECK_INTERVAL = 30
-
+        # Timeout for boot
+        self.STACK_BOOT_TIMEOUT = 1000
