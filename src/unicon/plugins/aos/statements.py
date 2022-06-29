@@ -12,9 +12,8 @@ from unicon.plugins.generic.statements import password_handler
 from unicon.plugins.generic.statements import login_handler
 from unicon.plugins.generic.statements import enable_password_handler
 from unicon.eal.helpers import sendline
-from unicon.plugins.utils import (get_current_credential,
-                                  common_cred_username_handler,
-                                  common_cred_password_handler)
+import time
+
 patterns = aosPatterns()
 
 def escape_char_handler(spawn):
@@ -36,6 +35,8 @@ def escape_char_handler(spawn):
 
     spawn.sendline()
 
+
+
 class aosStatements(object):
     def __init__(self):
         
@@ -45,7 +46,7 @@ class aosStatements(object):
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
-                                    trim_buffer=True,
+                                    trim_buffer=False,
                                     debug_statement=True,
                                     matched_retries=3,
                                     matched_retry_sleep=1)
@@ -54,7 +55,7 @@ class aosStatements(object):
                                        args=None,
                                        loop_continue=True,
                                        continue_timer=True,
-                                       trim_buffer=True,
+                                       trim_buffer=False,
                                        debug_statement=True,
                                        matched_retries=3,
                                        matched_retry_sleep=1)
@@ -63,7 +64,7 @@ class aosStatements(object):
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
-                                    trim_buffer=True,
+                                    trim_buffer=False,
                                     debug_statement=True,
                                     matched_retries=3,
                                     matched_retry_sleep=1)
@@ -72,7 +73,7 @@ class aosStatements(object):
                                             args=None,
                                             loop_continue=False,
                                             continue_timer=True,
-                                            trim_buffer=True,
+                                            trim_buffer=False,
                                             debug_statement=True,
                                             matched_retries=3,
                                             matched_retry_sleep=1)       
