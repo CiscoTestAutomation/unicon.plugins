@@ -21,22 +21,6 @@ def escape_char_handler(spawn):
     """
     # Wait a small amount of time for any chatter to cease from the
     # device before attempting to call sendline.
-
-    prev_buf_len = len(spawn.buffer)
-    for retry_number in range(
-            settings.ESCAPE_CHAR_CALLBACK_PAUSE_CHECK_RETRIES):
-        time.sleep(settings.ESCAPE_CHAR_CALLBACK_PAUSE_SEC)
-        spawn.read_update_buffer()
-        cur_buf_len = len(spawn.buffer)
-        if prev_buf_len == cur_buf_len:
-            break
-        else:
-            prev_buf_len = cur_buf_len
-
-    spawn.sendline()
-
-
-
 class aosStatements(object):
     def __init__(self):
         
@@ -71,7 +55,7 @@ class aosStatements(object):
         self.press_any_key_stmt = Statement(pattern=patterns.press_any_key,
                                             action='sendline()',
                                             args=None,
-                                            loop_continue=False,
+                                            loop_continue=True,
                                             continue_timer=True,
                                             trim_buffer=False,
                                             debug_statement=True,
