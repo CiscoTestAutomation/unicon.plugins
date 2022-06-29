@@ -36,7 +36,7 @@ class aosSingleRpConnectionProvider(BaseService):
         self.result = None
         self.__dict__.update(kwargs)
 
-    def call_service(self, command, dialog=Dialog([]),timeout=None, **kwargs):
+    def call_service(self, command, dialog=Dialog([]), **kwargs):
         """ creates and returns a Dialog to handle all device prompts
             appearing during initial connection to the device.
             See statements.py for connnection statement lists
@@ -44,7 +44,7 @@ class aosSingleRpConnectionProvider(BaseService):
         con = self.connection
         con.log.debug("+++ run_command +++")
         con.spawn.sendline(command)
-        self.result = con.spawn.expect('.*#?')
+        self.result = con.spawn.expect('.*$')
         return con.connect_reply + \
                     Dialog(aosConnection_statement_list)
                          
