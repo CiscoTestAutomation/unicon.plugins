@@ -45,36 +45,28 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         e =  str(con)
         print(d)
         print(e)
-        if dialog is None:
-            time.sleep(2)
-            self.result = con.spawn.expect(".*$")
-            time.sleep(2)
-            t = str(self.result)
-            print(t)
-            try:
-                if fingerprint in t:
-                    print(t)
-                    con.send(response + "\r")
-                    time.sleep(1)
-                    t = str(con.expect([r".*$"]))
-                if password in t:
-                    print(t)
-                    con.send(secret + "\r")
-                    time.sleep(1)
-                    t = str(con.expect([r".*$"]))
-                if continues in t:
-                    print(t)
-                    con.sendline()
-                    con.sendline()
-                    time.sleep(1)
-                    t = str(con.expect([r".*$"]))
-                    if self.connection.is_connected:
-                        return
-                    else:
-                        raise ConnectionError("Connection is not established to device")
-
-            except TimeoutError as err:
-                print('errored becuase of timeout')
-        else:
-            self.result = dialog.proces(con.spawn, timeout=timeout)
-
+        time.sleep(2)
+        self.result = con.spawn.expect(".*$")
+        time.sleep(2)
+        t = str(self.result)
+        print(t)
+        try:
+            if fingerprint in t:
+                print(t)
+                con.send(response + "\r")
+                time.sleep(1)
+                t = str(con.expect([r".*$"]))
+            if password in t:
+                print(t)
+                con.send(secret + "\r")
+                time.sleep(1)
+                t = str(con.expect([r".*$"]))
+            if continues in t:
+                print(t)
+                con.sendline()
+                con.sendline()
+                time.sleep(1)
+                t = str(con.expect([r".*$"]))
+        except:
+            print("error connecting")
+        return con.connect      
