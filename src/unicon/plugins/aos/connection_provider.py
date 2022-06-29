@@ -22,7 +22,7 @@ from unicon.eal.expect import Spawn
 from unicon.plugins.aos.statements import (aosConnection_statement_list,
                                            aosStatements)
 from unicon.plugins.generic.statements import custom_auth_statements
-
+import getpass
 
 class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
     """ Implements Junos singleRP Connection Provider,
@@ -33,7 +33,7 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         con = self.connection
-        secret = input("Enter secret:")
+        secret = getpass.getpass("Enter secret:")
         password="assword:"
         response="yes"
         fingerprint="(yes/no/[fingerprint])?"
@@ -71,12 +71,11 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
 
         return None
 
-        con = self.connection
-        custom_auth_stmt = custom_auth_statements(
-                             self.connection.settings.LOGIN_PROMPT,
-                             self.connection.settings.PASSWORD_PROMPT)
-
 def get_connection_dialog(self):
+        """ creates and returns a Dialog to handle all device prompts
+            appearing during initial connection to the device.
+            See statements.py for connnection statement lists  """  
+        con = self.connection
         connection_dialogs = super().get_connection_dialog()
         connection_dialogs += Dialog(aosConnection_statement_list)
 

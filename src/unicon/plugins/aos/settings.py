@@ -13,7 +13,7 @@ class aosSettings(GenericSettings):
     def __init__(self):
         # inherit any parent settings
         super().__init__()
-        self.CONNECTION_TIMEOUT = 10
+        self.CONNECTION_TIMEOUT = 20
         self.ESCAPE_CHAR_CALLBACK_PRE_SENDLINE_PAUSE_SEC = 3
         self.HA_INIT_EXEC_COMMANDS = []
         self.HA_INIT_CONFIG_COMMANDS = []

@@ -12,6 +12,10 @@ from unicon.plugins.aos.settings import aosSettings
 from unicon.plugins.aos.connection_provider import aosSingleRpConnectionProvider
 
 
+def wait_and_send_yes(spawn):
+    time.sleep(0.2)
+    spawn.sendline('yes')
+
 class aosSingleRPConnection(BaseSingleRpConnection):
     '''aosSingleRPConnection
 
