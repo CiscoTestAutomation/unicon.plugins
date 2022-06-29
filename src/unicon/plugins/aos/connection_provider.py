@@ -41,6 +41,8 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         continues="Press any key to continue"
         prompt="#"
         #s = Spawn(spawn_command="ssh alp041@10.119.95.7")
+        print str(dialog)
+        print str(con)
         if dialog is None:
             con.spawn.sendline(command)
             time.sleep(2)
@@ -71,5 +73,6 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
                     s.close()
             except TimeoutError as err:
                 print('errored becuase of timeout')
-
+        else:
+            self.result = dialog.proces(con.spawn, timeout=timeout)
 
