@@ -70,4 +70,11 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         except:
             print("error connecting")
 
-        return con.connect_reply 
+        return None
+
+        con = self.connection
+        custom_auth_stmt = custom_auth_statements(
+                             self.connection.settings.LOGIN_PROMPT,
+                             self.connection.settings.PASSWORD_PROMPT)
+        return con.connect_reply \
+                    + Dialog(custom_auth_stmt + aosConnection_statement_list)
