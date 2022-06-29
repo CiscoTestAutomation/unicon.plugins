@@ -37,6 +37,7 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         response="yes"
         fingerprint="(yes/no/[fingerprint])?"
         continues="Press any key to continue"
+        dialog = None
         prompt="#"
         #s = Spawn(spawn_command="ssh alp041@10.119.95.7")
         d = str(dialog)
