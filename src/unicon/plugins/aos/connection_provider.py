@@ -68,7 +68,10 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
                     con.sendline()
                     time.sleep(1)
                     t = str(con.expect([r".*$"]))
-                    return
+                    if self.connection.is_connected:
+                        return
+                    else:
+                        raise ConnectionError("Connection is not established to device")
 
             except TimeoutError as err:
                 print('errored becuase of timeout')
