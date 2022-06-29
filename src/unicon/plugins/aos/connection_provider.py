@@ -37,5 +37,5 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         """
         con = self.connection
         return con.connect_reply + \
-                    Dialog(connection_statement_list)
+                    Dialog(aosConnection_statement_list)
 
