@@ -81,10 +81,9 @@ aos_statements = aosStatements()
 
 aosAuthentication_statement_list = [aos_statements.login_stmt,
                                  aos_statements.password_stmt,
-                                 aos_statements.shell_stmt,
-                                 aos_statements.proxy_stmt,
                                  aos_statements.escape_char_stmt,
                                  aos_statements.press_return_stmt,
-                                 aos_statements.press_any_key_stmt]
+                                 aos_statements.press_any_key_stmt,
+                                 aos_statements.ssh_key_check]
 
 aosConnection_statement_list = aosAuthentication_statement_list
