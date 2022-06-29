@@ -12,6 +12,7 @@ Description:
     handle majority of platforms and subclassing is seldom
     required.
 """
+from unicon.bases.routers.services import BaseService
 from unicon.bases.routers.connection_provider import BaseSingleRpConnectionProvider
 from unicon.eal.dialogs import Dialog
 from unicon.plugins.aos.statements import aosConnection_statement_list
