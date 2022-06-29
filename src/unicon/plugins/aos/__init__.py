@@ -21,6 +21,5 @@ class aosSingleRPConnection(BaseSingleRpConnection):
     chassis_type = 'single_rp'
     state_machine_class = aosSingleRpStateMachine
     connection_provider_class = aosSingleRpConnectionProvider
-    subcommand_list = aosServiceList
     settings = aosSettings()
 
