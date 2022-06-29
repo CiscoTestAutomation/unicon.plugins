@@ -75,5 +75,9 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         custom_auth_stmt = custom_auth_statements(
                              self.connection.settings.LOGIN_PROMPT,
                              self.connection.settings.PASSWORD_PROMPT)
-        return con.connect_reply \
-                    + Dialog(custom_auth_stmt + aosConnection_statement_list)
+
+def get_connection_dialog(self):
+        connection_dialogs = super().get_connection_dialog()
+        connection_dialogs += Dialog(aosConnection_statement_list)
+
+        return connection_dialogs
