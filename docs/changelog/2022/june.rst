@@ -1,7 +1,7 @@
-May 2022
+June 2022
 ==========
 
-May 31 - Unicon v22.5 
+June 28 - Unicon v22.6 
 ------------------------
 
 
@@ -9,8 +9,8 @@ May 31 - Unicon v22.5
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
 
-        ``unicon.plugins``, v22.5 
-        ``unicon``, v22.5 
+        ``unicon.plugins``, v22.6 
+        ``unicon``, v22.6 
 
 Install Instructions
 ^^^^^^^^^^^^^^^^^^^^
@@ -37,21 +37,11 @@ Features and Bug Fixes:
 Changelogs
 ^^^^^^^^^^
 --------------------------------------------------------------------------------
-                                      Fix                                       
---------------------------------------------------------------------------------
-
-* router connection provider
-    * Updated hostname learning for HA connections
-
-* mock device
-    * Added ctrl-c handler while writing output
-
-
---------------------------------------------------------------------------------
                                       New                                       
 --------------------------------------------------------------------------------
 
-* enhancement for retry and service_dialog arguments
-    * Allow user to simply pass empty list to initialize with empty dialog
+* routers
+    * Connection_provider
+        * update designate handle for BaseStackRpConnectionProvider to support
 
 
