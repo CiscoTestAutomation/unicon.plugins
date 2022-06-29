@@ -21,19 +21,30 @@ def escape_char_handler(spawn):
     """
     # Wait a small amount of time for any chatter to cease from the
     # device before attempting to call sendline.
+
+def run_level():
+    sleep(2)
+
+
 class aosStatements(object):
     def __init__(self):
-        
+
+
 # This is the statements to login to AOS.
+        self.start_stmt = Statement(pattern=patterns.start,
+                                    action=run_level,
+                                    args=None,
+                                    loop_continue=True,
+                                    continue_timer=True,
+                                    trim_buffer=False,
+                                    debug_statement=True)
         self.login_stmt = Statement(pattern=patterns.login_prompt,
                                     action=login_handler,
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
                                     trim_buffer=False,
-                                    debug_statement=True,
-                                    matched_retries=3,
-                                    matched_retry_sleep=1)
+                                    debug_statement=True)
         self.password_stmt = Statement(pattern=patterns.password,
                                        action=password_handler,
                                        args=None,
@@ -72,7 +83,8 @@ aos_statements = aosStatements()
 # Authentication Statements
 #############################################################
 
-aosAuthentication_statement_list = [aos_statements.login_stmt,
+aosAuthentication_statement_list = [aos_statements.start_stmt,
+                                 aos_statements.login_stmt,
                                  aos_statements.password_stmt,
                                  aos_statements.press_any_key_stmt,
                                  aos_statements.ssh_key_check]
