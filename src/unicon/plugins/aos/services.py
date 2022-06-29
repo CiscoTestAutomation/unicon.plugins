@@ -37,12 +37,11 @@ class aosServiceList(IosvServiceList):
 
         # overwrite and add our own
         self.execute = Execute
-        self.send = svc.Send
-        self.sendline = svc.Sendline
-        self.expect = svc.Expect
-        self.log_user = svc.LogUser
-        self.execute = confd_svc.Execute
-        self.configure = confd_svc.Configure
-        self.cli_style = confd_svc.CliStyle
-        self.command = confd_svc.Command
-        self.expect_log = svc.ExpectLogging
+        self.send = Send
+        self.sendline = Sendline
+        self.expect = Expect
+        self.log_user = LogUser
+        self.configure = Configure
+        self.cli_style = CliStyle
+        self.command = Command
+        self.expect_log = ExpectLogging
