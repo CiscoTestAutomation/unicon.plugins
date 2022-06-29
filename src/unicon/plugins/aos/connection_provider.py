@@ -12,21 +12,25 @@ Description:
     handle majority of platforms and subclassing is seldom
     required.
 """
-from unicon.bases.routers.services import BaseService
-from unicon.bases.routers.connection_provider import BaseSingleRpConnectionProvider
-from unicon.eal.dialogs import Dialog
-from unicon.plugins.aos.statements import aosConnection_statement_list
-from unicon.plugins.generic.statements import custom_auth_statements
-from unicon.plugins.aos.statements import aosStatements
-from unicon.eal.expect import Spawn
 import time
+
+from unicon.bases.routers.connection_provider import \
+    BaseSingleRpConnectionProvider
+from unicon.bases.routers.services import BaseService
+from unicon.eal.dialogs import Dialog
+from unicon.eal.expect import Spawn
+from unicon.plugins.aos.statements import (aosConnection_statement_list,
+                                           aosStatements)
+from unicon.plugins.generic.statements import custom_auth_statements
+
+
 class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
     """ Implements Junos singleRP Connection Provider,
         This class overrides the base class with the
         additional dialogs and steps required for
         connecting to any device via generic implementation
     """
-    def __init__(self, command,
+    def __init__(self, connection, command,
                      dialog=Dialog([]),
                      timeout=20,
                      *args, **kwargs):
