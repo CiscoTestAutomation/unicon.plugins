@@ -69,4 +69,4 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
                 t = str(con.expect([r".*$"]))
         except:
             print("error connecting")
-        return con.connect      
+        return con.connect_reply      
