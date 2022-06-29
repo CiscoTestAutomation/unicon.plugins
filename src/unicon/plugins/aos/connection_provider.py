@@ -26,11 +26,7 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         additional dialogs and steps required for
         connecting to any device via generic implementation
     """
-    def __init__(self,  *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-
-    def call_service(self, command,
+    def __init__(self, command,
                      dialog=Dialog([]),
                      timeout=20,
                      *args, **kwargs):
@@ -51,6 +47,7 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
             self.result = con.spawn.expect(".*$")
             time.sleep(2)
             t = str(self.result)
+            print(t)
             try:
                 if fingerprint in t:
                     print(t)
