@@ -40,3 +40,8 @@ class aosSingleRpStateMachine(StateMachine):
 
         #self.add_path(proxy_to_shell)
         #self.add_path(shell_to_proxy)
+    
+    def learn_os_state(self):
+        learn_os = State('learn_os', patterns.learn_os_prompt)
+        self.add_state(learn_os)
+        print(str("!!!!!!!!!!!!!!!!!!!!!!!" + "\r\r\r!!!" + learn_os + "!!!\r\r\r" + "!!!!!!!!!!!!!!!!!!!!"))
