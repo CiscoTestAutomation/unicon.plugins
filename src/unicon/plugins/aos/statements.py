@@ -24,7 +24,9 @@ def escape_char_handler(spawn):
 
 def run_level():
     sleep(1)
-
+    spawn.read_update_buffer()
+    print(str(spawn.read_update_buffer()))    
+    
 def ssh_continue_connecting(spawn):
     """ handles SSH new key prompt
     """

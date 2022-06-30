@@ -19,4 +19,4 @@ class aosPatterns():
         self.escape_char = r"Escape character is '(~)'"
         self.press_any_key = r'.*any key to conti.*'
         self.ssh_key_check = r'.*yes/no/[fingerprint]'
-        self.start = r'.*These computing resources are solely owned by the Company.*'
+        self.start = r'\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*.*'
