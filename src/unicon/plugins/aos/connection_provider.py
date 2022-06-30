@@ -13,7 +13,7 @@ Description:
     required.
 """
 import time
-
+from unicon.plugins.generic import GenericSingleRpConnectionProvider
 from unicon.bases.routers.connection_provider import \
     BaseSingleRpConnectionProvider
 from unicon.bases.routers.services import BaseService
@@ -24,7 +24,7 @@ from unicon.plugins.aos.statements import (aosConnection_statement_list,
 from unicon.plugins.generic.statements import custom_auth_statements
 import getpass
 
-class aosSingleRpConnectionProvider(self):
+class aosSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
     """ Implements Junos singleRP Connection Provider,
         This class overrides the base class with the
         additional dialogs and steps required for
