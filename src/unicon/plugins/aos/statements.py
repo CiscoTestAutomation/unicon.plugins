@@ -50,11 +50,14 @@ def wait_and_enter(spawn):
 def password_handler(spawn, context, session):
     """ handles password prompt
     """
+    print("I am sending the password")
     credential = get_current_credential(context=context, session=session)
     if credential:
         common_cred_password_handler(
             spawn=spawn, context=context, credential=credential,
             session=session)
+    else:
+        print("I did not get the password, oh no :(")
 
 
 class aosStatements(object):
