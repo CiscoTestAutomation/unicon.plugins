@@ -23,12 +23,28 @@ def escape_char_handler(spawn):
     # device before attempting to call sendline.
 
 def run_level():
-    sleep(2)
-    con.expect([r".*$"])
+    sleep(1)
+
+def ssh_continue_connecting(spawn):
+    """ handles SSH new key prompt
+    """
+    sleep(0.1)
+    spawn.sendline('yes')
+
+def wait_and_enter(spawn):
+    # wait for 0.5 second and read the buffer
+    # this avoids issues where the 'sendline'
+    # is somehow lost
+    wait_time = timedelta(seconds=0.5)
+    settle_time = current_time = datetime.now()
+    while (current_time - settle_time) < wait_time:
+        spawn.read_update_buffer()
+        print(str(spawn.read_update_buffer()))
+        current_time = datetime.now()
+        spawn.sendline()
 
 class aosStatements(object):
     def __init__(self):
-
 
 
 # This is the statements to login to AOS.
@@ -56,7 +72,7 @@ class aosStatements(object):
                                        matched_retries=3,
                                        matched_retry_sleep=1)
         self.ssh_key_check = Statement(pattern=patterns.proxy,
-                                    action='sendline(yes)',
+                                    action=ssh_continue_connecting,
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
@@ -65,7 +81,7 @@ class aosStatements(object):
                                     matched_retries=3,
                                     matched_retry_sleep=1)
         self.press_any_key_stmt = Statement(pattern=patterns.press_any_key,
-                                            action='sendline()',
+                                            action=wait_and_enter,
                                             args=None,
                                             loop_continue=True,
                                             continue_timer=True,
