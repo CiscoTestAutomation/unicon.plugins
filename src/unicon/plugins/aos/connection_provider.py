@@ -32,15 +32,15 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-    
+#This funciton must be member of aosSingleRpConnectionProvider    
     def get_connection_dialog(self):
         """ creates and returns a Dialog to handle all device prompts
             appearing during initial connection to the device.
             See statements.py for connnection statement lists  """  
         con = self.connection
         time.sleep(2)
-        print("!!!sleep!!!")
-        print(str(con.spawn.expect(".*$")))
+        #print("!!!sleep!!!")
+        #print(str(con.spawn.expect(".*$")))
         connection_dialogs = super().get_connection_dialog()
         connection_dialogs += Dialog(aosConnection_statement_list)
 
