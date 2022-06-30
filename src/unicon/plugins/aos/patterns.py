@@ -11,7 +11,7 @@ class aosPatterns():
         self.login_prompt = r'.*ogin.*'
         self.disable_mode = r'((.|\n)*>)'
         self.config_mode = r'.*config.#)'
-        self.password = r'.*ssword:'
+        self.password = r'.*ssword:$'
         self.linePassword = r'.*[Pp]assword:'
         self.enable_prompt = r'.*#'
         self.config_prompt = r'.*config.*#)'
@@ -19,6 +19,5 @@ class aosPatterns():
         self.escape_char = r"Escape character is '(~)'"
         self.press_any_key = r'.*any key to conti.*'
         self.ssh_key_check = r'.*yes/no/[fingerprint]'
-        self.start = r'\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*.*'
+        self.start = r'\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*.*\r\n$'
         self.learn_os_prompt = r'^(.*?([>\$~%]|[^#\s]#|~ #|~/|^admin:|^#)\s?(\x1b\S+)?)$|(^.*This \(D\)RP Node is not ready or active for login \/configuration.*)'
-        
