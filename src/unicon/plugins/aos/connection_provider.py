@@ -32,7 +32,8 @@ class aosSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
+        con = self.connection
+        con.spawn.expect(".*$")
 def get_connection_dialog(self):
         """ creates and returns a Dialog to handle all device prompts
             appearing during initial connection to the device.
