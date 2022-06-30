@@ -24,7 +24,7 @@ from unicon.plugins.aos.statements import (aosConnection_statement_list,
 from unicon.plugins.generic.statements import custom_auth_statements
 import getpass
 
-class aosSingleRpConnectionProvider():
+class aosSingleRpConnectionProvider(self):
     """ Implements Junos singleRP Connection Provider,
         This class overrides the base class with the
         additional dialogs and steps required for
