@@ -46,7 +46,6 @@ from unicon.settings import Settings
 from unicon.utils import (AttributeDict, pyats_credentials_available,
     to_plaintext)
 from .patterns import aosPatterns
-from .service_statements import config_commit_stmt_list
 
 import unicon.plugins.nxos
 
