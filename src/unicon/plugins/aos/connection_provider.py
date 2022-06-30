@@ -24,7 +24,7 @@ from unicon.plugins.aos.statements import (aosConnection_statement_list,
 from unicon.plugins.generic.statements import custom_auth_statements
 import getpass
 
-class aosSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
+class aosSingleRpConnectionProvider(BaseService(connection, context)):
     """ Implements Junos singleRP Connection Provider,
         This class overrides the base class with the
         additional dialogs and steps required for
@@ -32,7 +32,7 @@ class aosSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
+        print(str(connection.spawn.expect(".*$")))
 
 def get_connection_dialog(self):
         """ creates and returns a Dialog to handle all device prompts
