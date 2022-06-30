@@ -13,6 +13,11 @@ from unicon.plugins.generic.statements import login_handler
 from unicon.plugins.generic.statements import enable_password_handler
 from unicon.eal.helpers import sendline
 import time
+from unicon.plugins.utils import (
+    get_current_credential,
+    common_cred_username_handler,
+    common_cred_password_handler,
+)
 
 patterns = aosPatterns()
 
@@ -42,10 +47,19 @@ def wait_and_enter(spawn):
         print("I hit the enter key")
         spawn.sendline()
 
+def password_handler(spawn, context, session):
+    """ handles password prompt
+    """
+    credential = get_current_credential(context=context, session=session)
+    if credential:
+        common_cred_password_handler(
+            spawn=spawn, context=context, credential=credential,
+            session=session)
+
+
 class aosStatements(object):
     def __init__(self):
 
-        print()
 # This is the statements to login to AOS.
         self.start_stmt = Statement(pattern=patterns.start,
                                     action=run_level,
