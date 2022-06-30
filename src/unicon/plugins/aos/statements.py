@@ -24,10 +24,11 @@ def escape_char_handler(spawn):
 
 def run_level():
     sleep(2)
-
+    con.expect([r".*$"])
 
 class aosStatements(object):
     def __init__(self):
+
 
 
 # This is the statements to login to AOS.
