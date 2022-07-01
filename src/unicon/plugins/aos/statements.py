@@ -59,41 +59,71 @@ def password_handler(spawn, context, session):
     else:
         print("I did not get the password, oh no :(")
 
+'''
+Example:
+
+    dialog = Dialog([
+        Statement(pattern=r"^username:$",
+                  action=lambda spawn: spawn.sendline("admin"),
+                  args=None,
+                  loop_continue=True,
+                  continue_timer=False ),
+        Statement(pattern=r"^password:$",
+                  action=lambda spawn: spawn.sendline("admin"),
+                  args=None,
+                  loop_continue=True,
+                  continue_timer=False ),
+        Statement(pattern=r"^host-prompt#$",
+                  action=None,
+                  args=None,
+                  loop_continue=False,
+                  continue_timer=False ),
+    ])
+
+    It is also possible to construct a dialog instance by supplying list of
+    statement arguments.
+
+    dialog = Dialog([
+        [r"^username$", lambda spawn: spawn.sendline("admin"), None, True, False],
+        [r"^password:$", lambda spawn: spawn.sendline("admin"), None, True, False],
+        [r"^hostname#$", None, None, False, False]
+    ])
+'''
 
 class aosStatements(object):
     def __init__(self):
 
 # This is the statements to login to AOS.
         self.start_stmt = Statement(pattern=patterns.start,
-                                    action=run_level,
+                                    action=None,
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
                                     trim_buffer=True,
                                     debug_statement=True)
         self.login_stmt = Statement(pattern=patterns.login_prompt,
-                                    action=login_handler,
+                                    action=None,
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
                                     trim_buffer=False,
                                     debug_statement=True)
-        self.password_stmt = Statement(pattern=patterns.password,
-                                       action=password_handler,
+        self.password_stmt = Statement(pattern=r"^password:$",
+                                       action=None,
                                        args=None,
                                        loop_continue=True,
                                        continue_timer=True,
                                        trim_buffer=False,
                                        debug_statement=True)
         self.ssh_key_check = Statement(pattern=patterns.proxy,
-                                    action=ssh_continue_connecting,
+                                    action=None,
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
                                     trim_buffer=False,
                                     debug_statement=True)
         self.press_any_key_stmt = Statement(pattern=patterns.press_any_key,
-                                            action=wait_and_enter,
+                                            action=None,
                                             args=None,
                                             loop_continue=True,
                                             continue_timer=True,
