@@ -44,6 +44,7 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         #print(str(con.spawn.expect(".*$")))
         custom_auth_stmt = False
         connection_dialogs = super().get_connection_dialog()
+        store = [Dialog(aosConnection_statement_list)]
+        print (str(store))
         return con.connect_reply + \
-                    Dialog(aosConnection_statement_list) + \
-                    print (str(Dialog))
+                    Dialog(aosConnection_statement_list)            
