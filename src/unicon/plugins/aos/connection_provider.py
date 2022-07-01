@@ -38,7 +38,7 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         """ creates and returns a Dialog to handle all device prompts
             appearing during initial connection to the device.
             See statements.py for connnection statement lists  """  
-        #con = self.connection
+        con = self.connection
         time.sleep(2)
         #print("!!!sleep!!!")
         #print(str(con.spawn.expect(".*$")))
