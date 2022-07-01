@@ -6,11 +6,13 @@ https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_e
 '''
 
 from unicon.plugins.generic import GenericSettings
-
+import logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class aosSettings(GenericSettings):
-
+    logging.debug('***Settings aosSettings class called(%s)***')
     def __init__(self):
+        logging.debug('***Settings init funtion Loaded(%s)***')
         # inherit any parent settings
         super().__init__()
         self.CONNECTION_TIMEOUT = 20
@@ -26,7 +28,7 @@ class aosSettings(GenericSettings):
             r'.*error: +problem +checking +file:.*',
             r'.*error: +configuration +check-out +failed.*',
             r'.*Users +currently +editing +the +configuration:.*',
-            r'.*error: +commit +failed:.*',
+            r'.*error: +commit +failed:.*'
         ]
 
         # Maximum number of retries for password handler

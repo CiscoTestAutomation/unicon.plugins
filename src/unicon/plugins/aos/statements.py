@@ -18,16 +18,19 @@ from unicon.plugins.utils import (
     common_cred_username_handler,
     common_cred_password_handler,
 )
-
+import logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 patterns = aosPatterns()
 
 def escape_char_handler(spawn):
     """ handles telnet login messages
     """
+    logging.debug('***Statements escape char handler function called(%s)***')
     # Wait a small amount of time for any chatter to cease from the
     # device before attempting to call sendline.
 
 def run_level():
+    logging.debug('***Statements run level function called(%s)***')
     sleep(1)
     spawn.read_update_buffer()
     print("I hit the run_level")
@@ -36,21 +39,23 @@ def run_level():
 def ssh_continue_connecting(spawn):
     """ handles SSH new key prompt
     """
+    logging.debug('***Statements ssh continue connecting function called(%s)***')
     sleep(0.1)
     print("I saw the ssh key configuration")
     spawn.sendline('yes')
 
 def wait_and_enter(spawn):
+    logging.debug('***Statements wait and enter function called(%s)***')
     # wait for 0.5 second and read the buffer
     # this avoids issues where the 'sendline'
     # is somehow lost
-        print("I hit the enter key")
-        spawn.sendline()
+    
+    spawn.sendline()
 
 def password_handler(spawn, context, session):
     """ handles password prompt
     """
-    print("I am sending the password")
+    logging.debug('***Statements password_handler called(%s)***')
     credential = get_current_credential(context=context, session=session)
     if credential:
         common_cred_password_handler(
@@ -91,39 +96,40 @@ Example:
 '''
 
 class aosStatements(object):
+    
     def __init__(self):
-
+        logging.debug('***Statements aosStatements class loaded(%s)***')
 # This is the statements to login to AOS.
         self.start_stmt = Statement(pattern=patterns.start,
-                                    action=None,
+                                    action=run_level,
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
                                     trim_buffer=True,
                                     debug_statement=True)
         self.login_stmt = Statement(pattern=patterns.login_prompt,
-                                    action=None,
+                                    action=login_handler,
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
                                     trim_buffer=False,
                                     debug_statement=True)
         self.password_stmt = Statement(pattern=r"^password:$",
-                                       action=None,
+                                       action=lambda spawn: spawn.sendline(password),
                                        args=None,
                                        loop_continue=True,
                                        continue_timer=True,
                                        trim_buffer=False,
                                        debug_statement=True)
         self.ssh_key_check = Statement(pattern=patterns.proxy,
-                                    action=None,
+                                    action=ssh_continue_connecting,
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
                                     trim_buffer=False,
                                     debug_statement=True)
         self.press_any_key_stmt = Statement(pattern=patterns.press_any_key,
-                                            action=None,
+                                            action=wait_and_enter,
                                             args=None,
                                             loop_continue=True,
                                             continue_timer=True,

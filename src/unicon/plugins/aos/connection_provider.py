@@ -23,6 +23,8 @@ from unicon.plugins.aos.statements import (aosConnection_statement_list,
                                            aosStatements)
 from unicon.plugins.generic.statements import custom_auth_statements
 import getpass
+import logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
     """ Implements Junos singleRP Connection Provider,
@@ -30,6 +32,7 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         additional dialogs and steps required for
         connecting to any device via generic implementation
     """
+    logging.debug('***CP aosSingleRpConnectionProvider class called(%s)***')
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -38,6 +41,7 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         """ creates and returns a Dialog to handle all device prompts
             appearing during initial connection to the device.
             See statements.py for connnection statement lists  """  
+        logging.debug('***CP get Connection Dialog Function called(%s)***')
         con = self.connection
         secret = getpass.getpass("Enter secret:")
         password="assword:"
