@@ -45,5 +45,5 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         custom_auth_stmt = False
         connection_dialogs = super().get_connection_dialog()
         return con.connect_reply + \
-                    Dialog(custom_auth_stmt + aosConnection_statement_list
-                        if custom_auth_stmt else aosConnection_statement_list)
+                    Dialog(aosConnection_statement_list) + \
+                    print (str(Dialog))
