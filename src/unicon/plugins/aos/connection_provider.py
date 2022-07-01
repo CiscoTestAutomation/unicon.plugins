@@ -43,6 +43,7 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         print("!!!sleep!!!")
         #print(str(con.spawn.expect(".*$")))
         password = input("enter the password here:")
+        con.spawn.sendline(password)
         store = [Dialog(aosConnection_statement_list)]
         print (str(store))
         print ("I went past the store print here :)")
