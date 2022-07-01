@@ -42,9 +42,8 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         time.sleep(1)
         print("!!!sleep!!!")
         #print(str(con.spawn.expect(".*$")))
-        custom_auth_stmt = False
-        connection_dialogs = super().get_connection_dialog()
         store = [Dialog(aosConnection_statement_list)]
         print (str(store))
+        print ("I went past the store print here :)")
         return con.connect_reply + \
                     Dialog(aosConnection_statement_list)            
