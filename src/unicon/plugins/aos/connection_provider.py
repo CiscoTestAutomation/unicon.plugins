@@ -82,5 +82,4 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         store = [Dialog(aosConnection_statement_list)]
         print (str(store))
         print ("I went past the store print here :)")
-        return con.connect_reply + \
-                    Dialog(aosConnection_statement_list)            
+        return 
