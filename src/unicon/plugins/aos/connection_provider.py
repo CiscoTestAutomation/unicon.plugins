@@ -39,11 +39,42 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
             appearing during initial connection to the device.
             See statements.py for connnection statement lists  """  
         con = self.connection
-        time.sleep(1)
-        print("!!!sleep!!!")
-        #print(str(con.spawn.expect(".*$")))
-        password = input("enter the password here:")
-        con.spawn.sendline(password)
+        secret = getpass.getpass("Enter secret:")
+        password="assword:"
+        response="yes"
+        fingerprint="(yes/no/[fingerprint])?"
+        continues="Press any key to continue"
+        dialog = None
+        prompt="#"
+        #s = Spawn(spawn_command="ssh alp041@10.119.95.7")
+        d = str(dialog)
+        e =  str(con)
+        print(d)
+        print(e)
+        time.sleep(2)
+        self.result = con.spawn.expect(".*$")
+        time.sleep(2)
+        t = str(self.result)
+        print(t)
+        try:
+            if fingerprint in t:
+                print(t)
+                con.send(response + "\r")
+                time.sleep(1)
+                t = str(con.expect([r".*$"]))
+            if password in t:
+                print(t)
+                con.send(secret + "\r")
+                time.sleep(1)
+                t = str(con.expect([r".*$"]))
+            if continues in t:
+                print(t)
+                con.sendline()
+                con.sendline()
+                time.sleep(1)
+        except:
+            print("error connecting")
+
         store = [Dialog(aosConnection_statement_list)]
         print (str(store))
         print ("I went past the store print here :)")
