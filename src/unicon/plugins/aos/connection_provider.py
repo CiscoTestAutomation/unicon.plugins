@@ -39,9 +39,9 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
             appearing during initial connection to the device.
             See statements.py for connnection statement lists  """  
         con = self.connection
-        time.sleep(2)
+        time.sleep(1)
         print("!!!sleep!!!")
-        print(str(con.spawn.expect(".*$")))
+        #print(str(con.spawn.expect(".*$")))
         custom_auth_stmt = False
         connection_dialogs = super().get_connection_dialog()
         return con.connect_reply + \
