@@ -79,6 +79,10 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
                 time.sleep(1)
                 t = str(con.expect(r".*$"))
                 print (t)
+                con.sendline()
+                time.sleep(1)
+                t = str(con.expect(r".*$"))
+                print (t)
         except:
             print("error connecting")
 
