@@ -42,7 +42,8 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         time.sleep(2)
         #print("!!!sleep!!!")
         #print(str(con.spawn.expect(".*$")))
+        custom_auth_stmt = False
         connection_dialogs = super().get_connection_dialog()
-        connection_dialogs += Dialog(aosConnection_statement_list)
-
-        return connection_dialogs
+        return con.connect_reply + \
+                    Dialog(custom_auth_stmt + aosConnection_statement_list
+                        if custom_auth_stmt else aosConnection_statement_list)
