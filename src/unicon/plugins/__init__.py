@@ -39,6 +39,6 @@ supported_os = [
     'nd',
     'viptela',
     'dnos6',
-    'dnos10'
+    'dnos10',
     'aos'
 ]
