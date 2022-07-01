@@ -59,19 +59,23 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         try:
             if fingerprint in t:
                 print(t)
+                print("fingerprint")
                 con.send(response + "\r")
                 time.sleep(1)
                 t = str(con.expect([r".*$"]))
             if password in t:
                 print(t)
+                print("password complete")
                 con.send(secret + "\r")
                 time.sleep(1)
                 t = str(con.expect([r".*$"]))
             if continues in t:
                 print(t)
-                con.sendline()
+                print("I sent return")
                 con.sendline()
                 time.sleep(1)
+                t = str(con.expect(r".*$"))
+                print (t)
         except:
             print("error connecting")
 
