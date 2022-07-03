@@ -3,7 +3,7 @@ Module:
     unicon.plugins.junos
 
 Authors:
-    pyATS TEAM (pyats-support@cisco.com, pyats-support-ext@cisco.com)
+M pyATS TEAM (pyats-support@cisco.com, pyats-support-ext@cisco.com)
 
 Description:
     This module imports connection provider class which has
@@ -23,7 +23,10 @@ from unicon.plugins.aos.statements import (aosConnection_statement_list,
                                            aosStatements)
 from unicon.plugins.generic.statements import custom_auth_statements
 import getpass
+#This enables logging in the script.
 import logging
+#Logging disable disables logging in the script. In order to turn on logging, comment out logging disable.
+logging.disable(logging.DEBUG)
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):

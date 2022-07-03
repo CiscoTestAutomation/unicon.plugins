@@ -19,8 +19,10 @@ from unicon.plugins.utils import (
     common_cred_username_handler,
     common_cred_password_handler,
 )
-import logging
 import getpass
+import logging
+#Logging disable disables logging in the script. In order to turn on logging, comment out logging disable.
+logging.disable(logging.DEBUG)
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 patterns = aosPatterns()
 

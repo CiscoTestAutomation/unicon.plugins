@@ -6,7 +6,10 @@ https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_e
 '''
 
 from unicon.plugins.generic import GenericSettings
+#This enables logging in the script.
 import logging
+#Logging disable disables logging in the script. In order to turn on logging, comment out logging disable.
+logging.disable(logging.DEBUG)
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 from unicon.plugins.generic.settings import GenericSettings

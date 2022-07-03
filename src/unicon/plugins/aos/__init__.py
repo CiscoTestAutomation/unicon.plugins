@@ -6,17 +6,19 @@ https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_e
 '''
 
 from unicon.bases.routers.connection import BaseSingleRpConnection
-
 from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine
 from unicon.plugins.generic import GenericSingleRpConnectionProvider
 from .connection_provider import aosSingleRpConnectionProvider
 from unicon.plugins.aos.services import aosServiceList
 from unicon.plugins.aos.settings import aosSettings
 from .statemachine import aosSingleRpStateMachine
+#This enables logging in the script.
 import logging
+#Logging disable disables logging in the script. In order to turn on logging, comment out logging disable.
+logging.disable(logging.DEBUG)
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
-
+#Checking to see if this is necessary. I will most likely take this out.
 def wait_and_send_yes(spawn):
     logging.debug('init wait and send yes(%s)')
     time.sleep(0.2)

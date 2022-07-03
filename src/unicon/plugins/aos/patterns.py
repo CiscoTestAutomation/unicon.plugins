@@ -16,11 +16,15 @@ Description:
     Module for defining all the Patterns required for the
     generic implementation
 """
+#This imports the UniconCorePatterns.
 from unicon.patterns import UniconCorePatterns
+#This enables logging in the script.
 import logging
-
+#Logging disable disables logging in the script. In order to turn on logging, comment out logging disable.
+logging.disable(logging.DEBUG)
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
+#Patterns to match different expect statements
 class aosPatterns(UniconCorePatterns):
     def __init__(self):
         logging.debug('***aosPatterns function called(%s)***')

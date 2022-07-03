@@ -14,7 +14,6 @@ import io
 import re
 import collections
 import warnings
-import logging
 
 from time import sleep
 from datetime import datetime, timedelta
@@ -48,7 +47,10 @@ from unicon.utils import (AttributeDict, pyats_credentials_available,
 from .patterns import aosPatterns
 
 import unicon.plugins.nxos
+#This enables logging in the script.
 import logging
+#Logging disable disables logging in the script. In order to turn on logging, comment out logging disable.
+logging.disable(logging.DEBUG)
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 patterns = aosPatterns()

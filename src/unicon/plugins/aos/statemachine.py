@@ -9,10 +9,12 @@ from unicon.statemachine import State, Path, StateMachine
 from unicon.eal.dialogs import Statement, Dialog
 from .patterns import aosPatterns
 from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine, config_transition
-import logging
 from unicon.plugins.generic.statements import default_statement_list
+#This enables logging in the script.
+import logging
+#Logging disable disables logging in the script. In order to turn on logging, comment out logging disable.
+logging.disable(logging.DEBUG)
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-
 
 class aosSingleRpStateMachine(GenericSingleRpStateMachine):
     logging.debug('***StateMachine aosSingleRpStateMachine class loaded(%s)***')
