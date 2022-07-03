@@ -1,17 +1,9 @@
-"""
-Module:
-    unicon.plugins.junos
-
-Authors:
-M pyATS TEAM (pyats-support@cisco.com, pyats-support-ext@cisco.com)
-
-Description:
-    This module imports connection provider class which has
-    exposes two methods named connect and disconnect. These
-    methods are implemented in such a way so that they can
-    handle majority of platforms and subclassing is seldom
-    required.
-"""
+'''
+Author: Alex Pfeil
+Contact: www.linkedin.com/in/alex-p-352040a0
+Contents largely inspired by sample Unicon repo and Knox Hutchinson:
+https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_example/src/unicon_plugin_example
+'''
 import time
 from unicon.plugins.generic import GenericSingleRpConnectionProvider
 from unicon.bases.routers.connection_provider import \

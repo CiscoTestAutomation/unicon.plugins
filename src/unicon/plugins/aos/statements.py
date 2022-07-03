@@ -22,7 +22,7 @@ from unicon.plugins.utils import (
 import getpass
 import logging
 #Logging disable disables logging in the script. In order to turn on logging, comment out logging disable.
-logging.disable(logging.DEBUG)
+#logging.disable(logging.DEBUG)
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 patterns = aosPatterns()
 
@@ -32,15 +32,14 @@ def escape_char_handler(spawn):
     logging.debug('***Statements escape char handler function called(%s)***')
     # Wait a small amount of time for any chatter to cease from the
     # device before attempting to call sendline.
-
+    time.sleep(.2)
 
 def run_level(spawn):
     logging.debug('***Statements run level function called(%s)***')
     time.sleep(1)
-    print(str(spawn.expect(".*$")))
-    secret = getpass.getpass("Enter secret:")
-    spawn.send(secret + "\r")
-    
+#    secret = getpass.getpass("Enter secret:")
+
+
 
 def ssh_continue_connecting(spawn):
     """ handles SSH new key prompt
@@ -62,16 +61,7 @@ def wait_and_enter(spawn):
 def send_password(spawn):
     logging.debug('***Statements password handler called(%s)***')
     secret = getpass.getpass("Enter secret:")
-    continues="Press any key to continue"
-    t = self.log_buffer.read()
-    if password in t:
-        print(t)
-        con.send(secret + "\r")
-        time.sleep(1)
-        t = self.log_buffer.read()
-        if continues in t:
-            print(t)
-            con.sendline()
+    spawn.send(secret + "\r")
 
 '''
 Example:
@@ -140,7 +130,7 @@ class aosStatements(object):
         self.press_any_key_stmt = Statement(pattern=patterns.press_any_key,
                                             action=wait_and_enter,
                                             args=None,
-                                            loop_continue=False,
+                                            loop_continue=True,
                                             continue_timer=False,
                                             trim_buffer=True,
                                             debug_statement=True)       

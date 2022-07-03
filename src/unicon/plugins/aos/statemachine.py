@@ -15,7 +15,7 @@ import logging
 #Logging disable disables logging in the script. In order to turn on logging, comment out logging disable.
 logging.disable(logging.DEBUG)
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-
+patterns=aosPatterns()
 class aosSingleRpStateMachine(GenericSingleRpStateMachine):
     logging.debug('***StateMachine aosSingleRpStateMachine class loaded(%s)***')
     def create(self):
@@ -27,29 +27,29 @@ class aosSingleRpStateMachine(GenericSingleRpStateMachine):
         ##########################################################
         # State Definition
         ##########################################################
-        executive = State('executive', r'.*#$')
-        config = State('config', r'.*config.*#$')
-        enable = State('enable', r'.*>$')
+        basic_prompt = State('basic_prompt', r'.*>')
+        config = State('config', r'.*config.*#')
+        enable = State('enable', r'.*#')
 
         ##########################################################
         # Path Definition
         ##########################################################
-        enable_to_executive = Path(enable, executive, 'enable', None)
-        executive_to_enable = Path(executive, enable, 'exit', None)
-        executive_to_config = Path(executive, config, 'configure terminal', None)
-        config_to_executive = Path(config, executive, 'exit', None)
+        enable_to_basic_prompt = Path(enable, basic_prompt, 'exit', None)
+        basic_prompt_to_enable = Path(basic_prompt, enable, 'enable', None)
+        basic_prompt_to_config = Path(basic_prompt, config, 'configure terminal', None)
+        config_to_basic_prompt = Path(config, basic_prompt, 'exit', None)
         
 
         # Add State and Path to State Machine
         self.add_state(enable)
-        self.add_state(executive)
+        self.add_state(basic_prompt)
         self.add_state(config)
 
 
-        self.add_path(enable_to_executive)
-        self.add_path(executive_to_enable)
-        self.add_path(executive_to_config)
-        self.add_path(config_to_executive)
+        self.add_path(enable_to_basic_prompt)
+        self.add_path(basic_prompt_to_enable)
+        self.add_path(basic_prompt_to_config)
+        self.add_path(config_to_basic_prompt)
 
         #self.add_path(proxy_to_shell)
         #self.add_path(shell_to_proxy)
