@@ -3,7 +3,7 @@ stack_login:
     commands:
       "cisco":
         new_state: stack_password
-  
+
 stack_password:
   prompt: "Password: "
   commands:

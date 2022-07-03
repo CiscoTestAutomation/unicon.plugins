@@ -31,6 +31,8 @@ class IosXESettings(GenericSettings):
         self.CONFIG_LOCK_RETRIES = 10
 
         self.BOOT_TIMEOUT = 600
+        self.POST_BOOT_TIMEOUT = 300
+        self.BOOT_POSTCHECK_INTERVAL = 30
 
         self.FIND_BOOT_IMAGE = True
         self.MAX_BOOT_ATTEMPTS = 3
