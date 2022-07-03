@@ -6,12 +6,16 @@ https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_e
 '''
 
 from unicon.bases.routers.connection import BaseSingleRpConnection
-from unicon.plugins.aos.statemachine import aosSingleRpStateMachine
+
+from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine
+from unicon.plugins.generic import GenericSingleRpConnectionProvider
+from .connection_provider import aosSingleRpConnectionProvider
 from unicon.plugins.aos.services import aosServiceList
 from unicon.plugins.aos.settings import aosSettings
-from unicon.plugins.aos.connection_provider import aosSingleRpConnectionProvider
+from .statemachine import aosSingleRpStateMachine
 import logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 def wait_and_send_yes(spawn):
     logging.debug('init wait and send yes(%s)')

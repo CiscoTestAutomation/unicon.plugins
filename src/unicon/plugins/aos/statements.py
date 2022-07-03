@@ -4,6 +4,7 @@ Contact: www.linkedin.com/in/alex-p-352040a0
 Contents largely inspired by sample Unicon repo and Knox Hutchinson:
 https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_example/src/unicon_plugin_example
 '''
+
 from unicon.eal.dialogs import Statement
 from unicon.plugins.generic.statements import GenericStatements
 from unicon.plugins.aos.patterns import aosPatterns
@@ -19,6 +20,7 @@ from unicon.plugins.utils import (
     common_cred_password_handler,
 )
 import logging
+import getpass
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 patterns = aosPatterns()
 
@@ -29,20 +31,23 @@ def escape_char_handler(spawn):
     # Wait a small amount of time for any chatter to cease from the
     # device before attempting to call sendline.
 
-def run_level():
+
+def run_level(spawn):
     logging.debug('***Statements run level function called(%s)***')
-    sleep(1)
-    spawn.read_update_buffer()
-    print("I hit the run_level")
-    print(str(spawn.read_update_buffer()))    
+    time.sleep(1)
+    print(str(spawn.expect(".*$")))
+    secret = getpass.getpass("Enter secret:")
+    spawn.send(secret + "\r")
+    
 
 def ssh_continue_connecting(spawn):
     """ handles SSH new key prompt
     """
     logging.debug('***Statements ssh continue connecting function called(%s)***')
-    sleep(0.1)
+    time.sleep(0.1)
     print("I saw the ssh key configuration")
     spawn.sendline('yes')
+
 
 def wait_and_enter(spawn):
     logging.debug('***Statements wait and enter function called(%s)***')
@@ -52,17 +57,19 @@ def wait_and_enter(spawn):
     
     spawn.sendline()
 
-def password_handler(spawn, context, session):
-    """ handles password prompt
-    """
-    logging.debug('***Statements password_handler called(%s)***')
-    credential = get_current_credential(context=context, session=session)
-    if credential:
-        common_cred_password_handler(
-            spawn=spawn, context=context, credential=credential,
-            session=session)
-    else:
-        print("I did not get the password, oh no :(")
+def send_password(spawn):
+    logging.debug('***Statements password handler called(%s)***')
+    secret = getpass.getpass("Enter secret:")
+    continues="Press any key to continue"
+    t = self.log_buffer.read()
+    if password in t:
+        print(t)
+        con.send(secret + "\r")
+        time.sleep(1)
+        t = self.log_buffer.read()
+        if continues in t:
+            print(t)
+            con.sendline()
 
 '''
 Example:
@@ -112,28 +119,28 @@ class aosStatements(object):
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
-                                    trim_buffer=False,
+                                    trim_buffer=True,
                                     debug_statement=True)
-        self.password_stmt = Statement(pattern=r"^password:$",
-                                       action=lambda spawn: spawn.sendline(password),
+        self.password_stmt = Statement(pattern=patterns.password_prompt,
+                                       action=send_password,
                                        args=None,
                                        loop_continue=True,
                                        continue_timer=True,
-                                       trim_buffer=False,
+                                       trim_buffer=True,
                                        debug_statement=True)
         self.ssh_key_check = Statement(pattern=patterns.proxy,
                                     action=ssh_continue_connecting,
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
-                                    trim_buffer=False,
+                                    trim_buffer=True,
                                     debug_statement=True)
         self.press_any_key_stmt = Statement(pattern=patterns.press_any_key,
                                             action=wait_and_enter,
                                             args=None,
-                                            loop_continue=True,
-                                            continue_timer=True,
-                                            trim_buffer=False,
+                                            loop_continue=False,
+                                            continue_timer=False,
+                                            trim_buffer=True,
                                             debug_statement=True)       
 
 #############################################################

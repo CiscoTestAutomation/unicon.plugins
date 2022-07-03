@@ -38,59 +38,16 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
 
 #This funciton must be member of aosSingleRpConnectionProvider    
     def get_connection_dialog(self):
-        """ creates and returns a Dialog to handle all device prompts
-            appearing during initial connection to the device.
-            See statements.py for connnection statement lists  """  
-        logging.debug('***CP get Connection Dialog Function called(%s)***')
         con = self.connection
-        secret = getpass.getpass("Enter secret:")
-        password="assword:"
-        response="yes"
-        fingerprint="(yes/no/[fingerprint])?"
-        continues="Press any key to continue"
-        dialog = None
-        prompt="#"
-        #s = Spawn(spawn_command="ssh alp041@10.119.95.7")
-        d = str(dialog)
-        e =  str(con)
-        print(d)
-        print(e)
-        time.sleep(2)
-        self.result = con.spawn.expect(".*$")
-        time.sleep(2)
-        t = str(self.result)
-        print(t)
-        try:
-            if fingerprint in t:
-                print(t)
-                print("fingerprint")
-                con.send(response + "\r")
-                time.sleep(1)
-                t = str(con.expect([r".*$"]))
-            if password in t:
-                print(t)
-                print("password complete")
-                con.send(secret + "\r")
-                time.sleep(1)
-                t = str(con.expect([r".*$"]))
-            if continues in t:
-                print(t)
-                print("I sent return")
-                con.sendline()
-                time.sleep(1)
-                t = str(con.expect(r".*$"))
-                con.sendline()
-                time.sleep(1)
-                t = str(con.expect(r".*$"))
-                print (t)
-                con.sendline()
-                time.sleep(1)
-                t = str(con.expect(r".*$"))
-                print (t)
-        except:
-            print("error connecting")
-
-        store = [Dialog(aosConnection_statement_list)]
-        print (str(store))
-        print ("I went past the store print here :)")
-        return 
+        custom_auth_stmt = custom_auth_statements(
+                             self.connection.settings.LOGIN_PROMPT,
+                             self.connection.settings.PASSWORD_PROMPT)
+        return con.connect_reply + \
+                    Dialog(custom_auth_stmt + aosConnection_statement_list
+                        if custom_auth_stmt else aosConnection_statement_list)
+    
+    def set_init_commands(self):
+        con = self.connection
+        logging.debug('***CP aosSingleRpConnectionProvider init command function called(%s)***')
+        self.init_exec_commands = []
+        self.init_config_commands = []
