@@ -1,8 +1,14 @@
 '''
 Author: Alex Pfeil
 Contact: www.linkedin.com/in/alex-p-352040a0
-Contents largely inspired by sample Unicon repo and Knox Hutchinson:
+Contents largely inspired by sample Unicon repo, Knox Hutchinson and pyATS TEAM (pyats-support@cisco.com, pyats-support-ext@cisco.com):
 https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_example/src/unicon_plugin_example
+The order of operations is that the init file is accessed, then the connection_provider file makes the connection using the statements file,
+and once the connection is established, the state machine is used. The settings file is where settings can be set. The service implementation file
+and services file are where differnt services can be added to this plugin.
+Today, the plugin can connect to an Aruba device and then run show commands using Genie.
+***This plugin has not been tested for configuring devices, only run show commands.*** 
+There is definitely more work that can be done to this plugin.
 '''
 
 from unicon.bases.routers.connection import BaseSingleRpConnection
@@ -12,6 +18,7 @@ from .connection_provider import aosSingleRpConnectionProvider
 from unicon.plugins.aos.services import aosServiceList
 from unicon.plugins.aos.settings import aosSettings
 from .statemachine import aosSingleRpStateMachine
+
 #This enables logging in the script.
 import logging
 #Logging disable disables logging in the script. In order to turn on logging, comment out logging disable.
@@ -24,6 +31,7 @@ def wait_and_send_yes(spawn):
     time.sleep(0.2)
     spawn.sendline('yes')
 
+#This is the main class which calls in all of the other files.
 class aosSingleRPConnection(BaseSingleRpConnection):
     '''aosSingleRPConnection
     

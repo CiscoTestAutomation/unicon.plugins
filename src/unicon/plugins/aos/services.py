@@ -1,11 +1,9 @@
 '''
-Author: Richard Day
-Contact: https://www.linkedin.com/in/richardday/, https://github.com/rich-day
-
-Contents largely inspired by sample Unicon repo:
+Author: Alex Pfeil
+Contact: www.linkedin.com/in/alex-p-352040a0
+Contents largely inspired by sample Unicon repo, Knox Hutchinson and pyATS TEAM (pyats-support@cisco.com, pyats-support-ext@cisco.com):
 https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_example/src/unicon_plugin_example
 '''
-
 from unicon.plugins.generic.service_implementation import Execute as GenericExec
 from unicon.plugins.ios.iosv import IosvServiceList
 #This enables logging in the script.

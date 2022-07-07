@@ -1,7 +1,7 @@
 '''
 Author: Alex Pfeil
 Contact: www.linkedin.com/in/alex-p-352040a0
-Contents largely inspired by sample Unicon repo and Knox Hutchinson:
+Contents largely inspired by sample Unicon repo and Knox Hutchinson and Cisco Development Team:
 https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_example/src/unicon_plugin_example
 '''
 
@@ -22,7 +22,7 @@ from unicon.plugins.utils import (
 import getpass
 import logging
 #Logging disable disables logging in the script. In order to turn on logging, comment out logging disable.
-#logging.disable(logging.DEBUG)
+logging.disable(logging.DEBUG)
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 patterns = aosPatterns()
 
@@ -37,8 +37,6 @@ def escape_char_handler(spawn):
 def run_level(spawn):
     logging.debug('***Statements run level function called(%s)***')
     time.sleep(1)
-#    secret = getpass.getpass("Enter secret:")
-
 
 
 def ssh_continue_connecting(spawn):
@@ -55,14 +53,17 @@ def wait_and_enter(spawn):
     # wait for 0.5 second and read the buffer
     # this avoids issues where the 'sendline'
     # is somehow lost
-    
+    time.sleep(.5)
     spawn.sendline()
 
-def send_password(spawn):
+def send_password(spawn, password):
     logging.debug('***Statements password handler called(%s)***')
-    secret = getpass.getpass("Enter secret:")
-    spawn.send(secret + "\r")
+    spawn.sendline(password)
+    print("***This is where I printed the " + password + "***")
 
+def complete_login(spawn):
+    logging.debug('***Complete login called(%s)***')
+    spawn.sendline()
 '''
 Example:
 
@@ -107,14 +108,14 @@ class aosStatements(object):
                                     trim_buffer=True,
                                     debug_statement=True)
         self.login_stmt = Statement(pattern=patterns.login_prompt,
-                                    action=login_handler,
+                                    action=wait_and_enter,
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
                                     trim_buffer=True,
                                     debug_statement=True)
         self.password_stmt = Statement(pattern=patterns.password_prompt,
-                                       action=send_password,
+                                       action=password_handler,
                                        args=None,
                                        loop_continue=True,
                                        continue_timer=True,
@@ -131,9 +132,16 @@ class aosStatements(object):
                                             action=wait_and_enter,
                                             args=None,
                                             loop_continue=True,
-                                            continue_timer=False,
+                                            continue_timer=True,
                                             trim_buffer=True,
-                                            debug_statement=True)       
+                                            debug_statement=True)
+        self.press_return_stmt = Statement(pattern=patterns.executive_prompt,
+                                            action=wait_and_enter,
+                                            args=None,
+                                            loop_continue=True,
+                                            continue_timer=True,
+                                            trim_buffer=True,
+                                            debug_statement=True)
 
 #############################################################
 #  Statement lists
@@ -149,6 +157,7 @@ aosAuthentication_statement_list = [aos_statements.start_stmt,
                                     aos_statements.login_stmt,
                                     aos_statements.password_stmt,
                                     aos_statements.press_any_key_stmt,
-                                    aos_statements.ssh_key_check]
+                                    aos_statements.ssh_key_check,
+                                    aos_statements.press_return_stmt]
 
 aosConnection_statement_list = aosAuthentication_statement_list

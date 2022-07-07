@@ -1,7 +1,7 @@
 '''
 Author: Alex Pfeil
 Contact: www.linkedin.com/in/alex-p-352040a0
-Contents largely inspired by sample Unicon repo and Knox Hutchinson:
+Contents largely inspired by sample Unicon repo, Knox Hutchinson and Cisco:
 https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_example/src/unicon_plugin_example
 '''
 import time
@@ -21,6 +21,7 @@ import logging
 logging.disable(logging.DEBUG)
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
+#This is the aos Connection Provider It is called in the __init__.py file.
 class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
     """ Implements Junos singleRP Connection Provider,
         This class overrides the base class with the
