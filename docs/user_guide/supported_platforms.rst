@@ -24,6 +24,7 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
 
     ``apic``
     ``aireos``
+    ``aos``
     ``asa``
     ``asa``, ``asav``
     ``asa``, ``fp2k``
