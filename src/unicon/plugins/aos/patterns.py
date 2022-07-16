@@ -18,7 +18,7 @@ class aosPatterns(UniconCorePatterns):
     def __init__(self):
         logging.debug('***aosPatterns function called(%s)***')
         super().__init__()
-        self.login_prompt = r'.*ogin.*'
+        self.login_prompt = r'^.*[Ll]ogin as( for )?(\\S+)?: ?$'
         self.password_prompt = r'^.*[Pp]assword( for )?(\\S+)?: ?$'
         self.enable_prompt = r'.*>'
         self.config_mode = r'.*config.#'
@@ -28,6 +28,7 @@ class aosPatterns(UniconCorePatterns):
         self.config_prompt = r'.*config.*#'
         self.proxy = r'.*rhome.*'
         self.press_any_key = r'.*any key to conti.*'
+        self.continue_connecting = r'Are you sure you want to continue connecting (yes/no)?'
         self.ssh_key_check = r'.*yes/no/[fingerprint]'
         self.start = r'.*These computing resources are solely owned by the Company. Unauthorized\r\naccess, use or modification is a violation of law and could result in\r\ncriminal prosecution. Users agree not to disclose any company information\r\nexcept as authorized by the Company. Your use of the Company computing\r\nresources is consent to be monitored and authorization to search your\r\ncomputer or device to assure compliance with company policies and/or the law.*'
         self.learn_os_prompt = r'^(.*?([>\$~%]|[^#\s]#|~ #|~/|^admin:|^#)\s?(\x1b\S+)?)$|(^.*This \(D\)RP Node is not ready or active for login \/configuration.*)'

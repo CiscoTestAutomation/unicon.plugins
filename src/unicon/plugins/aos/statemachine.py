@@ -36,8 +36,8 @@ class aosSingleRpStateMachine(GenericSingleRpStateMachine):
         ##########################################################
         enable_to_basic_prompt = Path(enable, basic_prompt, 'exit', None)
         basic_prompt_to_enable = Path(basic_prompt, enable, 'enable', None)
-        basic_prompt_to_config = Path(basic_prompt, config, 'configure terminal', None)
-        config_to_basic_prompt = Path(config, basic_prompt, 'exit', None)
+        enable_to_config = Path(enable, config, 'configure terminal', None)
+        config_to_enable = Path(config, enable, 'exit', None)
         
 
         # Add State and Path to State Machine
@@ -48,8 +48,8 @@ class aosSingleRpStateMachine(GenericSingleRpStateMachine):
 
         self.add_path(enable_to_basic_prompt)
         self.add_path(basic_prompt_to_enable)
-        self.add_path(basic_prompt_to_config)
-        self.add_path(config_to_basic_prompt)
+        self.add_path(enable_to_config)
+        self.add_path(config_to_enable)
 
         #self.add_path(proxy_to_shell)
         #self.add_path(shell_to_proxy)

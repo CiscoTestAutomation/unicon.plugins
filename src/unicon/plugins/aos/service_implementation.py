@@ -54,5 +54,5 @@ settings = Settings()
     
 def __init__(self, connection, context, **kwargs):
     logging.debug('***SP Serivce Implementation called(%s)***')
-    self.start_state = 'executive'
-    self.end_state = 'executive'
+    self.start_state = 'exec'
+    self.end_state = 'exec'

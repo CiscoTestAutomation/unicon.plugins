@@ -79,7 +79,7 @@ def main(args=None):
     if args.state:
         state = args.state
     else:
-        state = 'exec'
+        state = 'enable'
 
     if args.hostname:
         hostname = args.hostname

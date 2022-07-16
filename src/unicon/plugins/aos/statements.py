@@ -38,12 +38,18 @@ def run_level(spawn):
     logging.debug('***Statements run level function called(%s)***')
     time.sleep(1)
 
-
+def continue_connecting(spawn):
+    """ handles SSH new key prompt
+    """
+    logging.debug('***Statements ssh continue connecting function called(%s)***')
+    time.sleep(0.5)
+    print("I saw the ssh key configuration")
+    spawn.sendline('yes')
 def ssh_continue_connecting(spawn):
     """ handles SSH new key prompt
     """
     logging.debug('***Statements ssh continue connecting function called(%s)***')
-    time.sleep(0.1)
+    time.sleep(0.5)
     print("I saw the ssh key configuration")
     spawn.sendline('yes')
 
@@ -64,6 +70,17 @@ def send_password(spawn, password):
 def complete_login(spawn):
     logging.debug('***Complete login called(%s)***')
     spawn.sendline()
+
+def login_handler(spawn, context, session):
+    """ handles login prompt
+    """
+    credential = get_current_credential(context=context, session=session)
+    if credential:
+        common_cred_username_handler(
+            spawn=spawn, context=context, credential=credential)
+    else:
+        spawn.sendline(context['username'])
+        session['tacacs_login'] = 1
 '''
 Example:
 
@@ -108,7 +125,7 @@ class aosStatements(object):
                                     trim_buffer=True,
                                     debug_statement=True)
         self.login_stmt = Statement(pattern=patterns.login_prompt,
-                                    action=wait_and_enter,
+                                    action=login_handler,
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
@@ -121,8 +138,15 @@ class aosStatements(object):
                                        continue_timer=True,
                                        trim_buffer=True,
                                        debug_statement=True)
-        self.ssh_key_check = Statement(pattern=patterns.proxy,
+        self.ssh_key_check = Statement(pattern=patterns.ssh_key_check,
                                     action=ssh_continue_connecting,
+                                    args=None,
+                                    loop_continue=True,
+                                    continue_timer=True,
+                                    trim_buffer=True,
+                                    debug_statement=True)
+        self.continue_connecting_stmt = Statement(pattern=patterns.continue_connecting,
+                                    action=continue_connecting,
                                     args=None,
                                     loop_continue=True,
                                     continue_timer=True,
@@ -136,7 +160,7 @@ class aosStatements(object):
                                             trim_buffer=True,
                                             debug_statement=True)
         self.press_return_stmt = Statement(pattern=patterns.executive_prompt,
-                                            action=wait_and_enter,
+                                            action='sendline(exit)',
                                             args=None,
                                             loop_continue=True,
                                             continue_timer=True,
@@ -158,6 +182,7 @@ aosAuthentication_statement_list = [aos_statements.start_stmt,
                                     aos_statements.password_stmt,
                                     aos_statements.press_any_key_stmt,
                                     aos_statements.ssh_key_check,
-                                    aos_statements.press_return_stmt]
+                                    aos_statements.press_return_stmt,
+                                    aos_statements.continue_connecting_stmt]
 
 aosConnection_statement_list = aosAuthentication_statement_list

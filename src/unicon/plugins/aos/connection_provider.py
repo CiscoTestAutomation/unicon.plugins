@@ -45,5 +45,11 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
     def set_init_commands(self):
         con = self.connection
         logging.debug('***CP aosSingleRpConnectionProvider init command function called(%s)***')
-        self.init_exec_commands = []
-        self.init_config_commands = []
+        if con.init_exec_commands is not None:
+            self.init_exec_commands = con.init_exec_commands
+            self.init_config_commands = con.init_exec_commands
+        else:
+            self.init_exec_commands = [
+                                        'terminal length 1000',
+                                        'terminal width 1000']
+            self.init_config_commands = []
