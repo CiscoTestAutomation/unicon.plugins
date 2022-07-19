@@ -5,14 +5,11 @@ Contents largely inspired by sample Unicon repo, Knox Hutchinson and Cisco:
 https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_example/src/unicon_plugin_example
 '''
 import time
-from unicon.plugins.generic import GenericSingleRpConnectionProvider
+
 from unicon.bases.routers.connection_provider import \
     BaseSingleRpConnectionProvider
-from unicon.bases.routers.services import BaseService
 from unicon.eal.dialogs import Dialog
-from unicon.eal.expect import Spawn
-from unicon.plugins.aos.statements import (aosConnection_statement_list,
-                                           aosStatements)
+from unicon.plugins.aos.statements import (aosConnection_statement_list)
 from unicon.plugins.generic.statements import custom_auth_statements
 import getpass
 #This enables logging in the script.

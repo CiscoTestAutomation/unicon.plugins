@@ -6,14 +6,9 @@ https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_e
 The order of operations is that the init file is accessed, then the connection_provider file makes the connection using the statements file,
 and once the connection is established, the state machine is used. The settings file is where settings can be set. The service implementation file
 and services file are where differnt services can be added to this plugin.
-Today, the plugin can connect to an Aruba device and then run show commands using Genie.
-***This plugin has not been tested for configuring devices, only run show commands.*** 
-There is definitely more work that can be done to this plugin.
 '''
 
 from unicon.bases.routers.connection import BaseSingleRpConnection
-from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine
-from unicon.plugins.generic import GenericSingleRpConnectionProvider
 from .connection_provider import aosSingleRpConnectionProvider
 from unicon.plugins.aos.services import aosServiceList
 from unicon.plugins.aos.settings import aosSettings

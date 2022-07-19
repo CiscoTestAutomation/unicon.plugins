@@ -5,10 +5,9 @@ Contents largely inspired by sample Unicon repo and Knox Hutchinson and Cisco De
 https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_example/src/unicon_plugin_example
 '''
 
-from unicon.statemachine import State, Path, StateMachine
-from unicon.eal.dialogs import Statement, Dialog
+from unicon.statemachine import State, Path
 from .patterns import aosPatterns
-from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine, config_transition
+from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine
 from unicon.plugins.generic.statements import default_statement_list
 #This enables logging in the script.
 import logging

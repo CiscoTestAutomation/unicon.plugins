@@ -6,18 +6,13 @@ https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_e
 '''
 
 from unicon.eal.dialogs import Statement
-from unicon.plugins.generic.statements import GenericStatements
 from unicon.plugins.aos.patterns import aosPatterns
-from unicon.plugins.generic.statements import pre_connection_statement_list
 from unicon.plugins.generic.statements import password_handler
 from unicon.plugins.generic.statements import login_handler
-from unicon.plugins.generic.statements import enable_password_handler
-from unicon.eal.helpers import sendline
 import time
 from unicon.plugins.utils import (
     get_current_credential,
-    common_cred_username_handler,
-    common_cred_password_handler,
+    common_cred_username_handler
 )
 import getpass
 import logging
