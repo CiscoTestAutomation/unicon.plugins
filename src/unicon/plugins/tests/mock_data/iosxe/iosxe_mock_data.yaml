@@ -136,6 +136,8 @@ general_enable:
       new_state: enable_reload_config_dialog
     "reload":
       new_state: ha_reload_proceed
+    "active_install_add":
+       new_state: install_add_commit
     "trim":
       "\r\r\r\r\r\ntest
       abc\r\r\r\r\r\n
@@ -265,7 +267,6 @@ general_enable:
 
     "request platform software system shell switch standby rp active":
       new_state: bash_console_switch_standby_rp_active
-    
     "show log | in BOOTTIME": "*Sep 22 14:46:00.419: %SYS-6-BOOTTIME: Time taken to reboot after reload =  417 seconds"
     "show log | in PLATFORM_SYS-6-UPTIME": "%PLATFORM_SYS-6-UPTIME: Time taken to initialize system =  364 seconds"
 
@@ -273,6 +274,7 @@ general_enable:
 general_config:
   prompt: "%N(conf)#"
   commands: &general_config_cmds
+    "!end indicator for bulk configure": ""
     "config-register 0x2102": ""
     "archive": ""
     "do-exec archive config": ""
@@ -287,6 +289,8 @@ general_config:
     "crypto pki trustpoint test":
       new_state: general_config_crypto_trustpoint
     "no logging console": ""
+    "line vty 0 4":
+      new_state: general_config_line
     "line console 0":
       new_state: general_config_line
     "redundancy":
@@ -344,6 +348,7 @@ general_config_line:
   prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
+    "line vty 0 4": ""
     "end":
       new_state: general_enable
 
@@ -770,6 +775,8 @@ setup_enable_reload_confirm:
 system_config_confirm:
   prompt: "Would you like to enter the initial configuration dialog? [yes/no]: "
   commands:
+    "n":
+      new_state: general_exec
     "yes":
       new_state: confirm_management_setup
 
@@ -1056,11 +1063,15 @@ ctc_config:
     "line console 0":
       new_state:
         ctc_config_line
+    "line vty 0 4":
+      new_state:
+        ctc_config_line
 
 ctc_config_line:
   prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
+    "line vty 0 4": ""
     "end":
       new_state: ctc_enable
 
@@ -1261,4 +1272,25 @@ bash_console_switch_standby_rp_active:
     "stty cols 200": ""
     "stty rows 200": ""
     "exit":
+      new_state: general_enable
+
+breakboot:
+  preface:
+    Initializing Hardware ...
+  keys:
+    ctrl-\]:
+      new_state:
+        breakboot_escape_telnet
+
+breakboot_escape_telnet:
+  prompt: 'telnet>'
+  commands:
+    "send break":
+      new_state: breakboot_rommon
+
+
+breakboot_rommon:
+  prompt: "rommon>"
+  commands:
+    "boot bootflash:asr1000_golden.bin":
       new_state: general_enable

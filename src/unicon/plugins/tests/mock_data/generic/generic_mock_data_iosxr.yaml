@@ -64,6 +64,7 @@ iosxr_line_console:
   prompt: "RP/0/RP0/CPU0:%N(config-line)#"
   commands:
     "exec-timeout 0 0": ""
+    "line vty 0 4": ""
     "absolute-timeout 0": ""
     "session-timeout 0": ""
     "line default": ""

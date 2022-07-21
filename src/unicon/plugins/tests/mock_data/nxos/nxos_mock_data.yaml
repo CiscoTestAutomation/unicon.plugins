@@ -306,7 +306,6 @@ config:
     "exec-timeout 0": ""
     "terminal width 511": ""
     "feature bash": ""
-    "line vty": ""
     "end":
       new_state: exec
     "exit":

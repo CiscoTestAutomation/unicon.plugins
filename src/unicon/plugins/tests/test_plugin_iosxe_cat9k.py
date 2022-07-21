@@ -506,6 +506,21 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
             c.disconnect()
             md.stop()
 
+    def test_no_boot_system(self):
+        d = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe --state c9k_enable4'],
+                       os='iosxe',
+                       platform='cat9k',
+                       credentials=dict(default=dict(username='admin', password='cisco')),
+                       settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+                       log_buffer=True
+                       )
+        d.connect()
+        d.settings.CONFIG_LOCK_RETRY_SLEEP = 1
+        d.configure("no boot system")
+        d.disconnect()
+
+
 class TestIosXeCat9kPluginContainer(unittest.TestCase):
 
     def test_container_exit(self):

@@ -46,6 +46,7 @@ from unicon.logs import UniconStreamHandler, UNICON_LOG_FORMAT
 
 from unicon.plugins.generic.utils import GenericUtils
 from .service_statements import execution_statement_list, configure_statement_list
+from unicon.plugins.generic.statemachine import config_transition
 
 utils = GenericUtils()
 ReloadResult = collections.namedtuple('ReloadResult', ['result', 'output'])
@@ -949,6 +950,13 @@ class Configure(BaseService):
                     sp.sendline(cmd)
                     self.update_hostname_if_needed([cmd])
                     self.process_dialog_on_handle(handle, dialog, timeout)
+                    if handle.context.get('config_session_locked'):
+                        self.connection.log.warning('Config locked, waiting {} seconds'.format(
+                            self.connection.settings.CONFIG_LOCK_RETRY_SLEEP))
+                        sleep(self.connection.settings.CONFIG_LOCK_RETRY_SLEEP)
+                        config_transition(handle.state_machine, handle.spawn, handle.context)
+                        sp.sendline(cmd)
+                        self.process_dialog_on_handle(handle, dialog, timeout)
 
         # store config_result so it can be returned to the user later
         config_result = self.result
@@ -1062,7 +1070,12 @@ class Reload(BaseService):
 
         con = self.connection
         timeout = timeout or self.timeout
-        self.error_pattern= error_pattern or con.settings.ERROR_PATTERN
+
+        if error_pattern is None:
+            self.error_pattern = con.settings.ERROR_PATTERN
+        else:
+            self.error_pattern = error_pattern
+
         if not isinstance(self.error_pattern, list):
             raise ValueError('error_pattern should be a list')
         if append_error_pattern:
@@ -1999,7 +2012,12 @@ class HAReloadService(BaseService):
 
 
         con = self.connection
-        self.error_pattern = error_pattern or con.settings.ERROR_PATTERN
+
+        if error_pattern is None:
+            self.error_pattern = con.settings.ERROR_PATTERN
+        else:
+            self.error_pattern = error_pattern
+
         if not isinstance(self.error_pattern, list):
                 raise ValueError('error_pattern should be a list')
         if append_error_pattern:

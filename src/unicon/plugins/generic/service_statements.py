@@ -26,7 +26,6 @@ from unicon.plugins.utils import (get_current_credential,
     common_cred_username_handler, common_cred_password_handler, )
 
 
-
 generic_statements = GenericStatements()
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
@@ -199,6 +198,9 @@ def reset_failure(error):
 def connection_closed_handler(spawn):
     spawn.close()
 
+def config_session_locked_handler(context):
+    context['config_session_locked'] = True
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 # Reload  Statements
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
@@ -307,6 +309,12 @@ connection_closed_stmt = Statement(pattern=reload_patterns.connection_closed,
                                    args=None,
                                    loop_continue=False,
                                    continue_timer=False)
+
+config_session_locked_stmt = Statement(pattern=reload_patterns.config_session_locked,
+                                       action=config_session_locked_handler,
+                                       args=None,
+                                       loop_continue=False,
+                                       continue_timer=False)
 
 reload_statement_list = [save_env, confirm_reset, reload_confirm,
                          reload_confirm_ios, useracess,
@@ -1145,4 +1153,5 @@ execution_statement_list = [generic_statements.confirm_prompt_y_n_stmt,
                             generic_statements.yes_no_stmt,
                             generic_statements.syslog_msg_stmt]
 
-configure_statement_list = [generic_statements.syslog_msg_stmt]
+configure_statement_list = [generic_statements.syslog_msg_stmt,
+                            config_session_locked_stmt]
