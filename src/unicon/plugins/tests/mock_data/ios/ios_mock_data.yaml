@@ -457,6 +457,8 @@ config:
     "no logging console": ""
     "!end indicator for bulk configure": ""
     "do show version": *SV
+    "line vty 0 4":
+      new_state: config_line
     "line console 0":
       new_state: config_line
     "redundancy":
@@ -473,6 +475,7 @@ config_line:
   prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
+    "line vty 0 4": ""
     "end":
       new_state: enable
 

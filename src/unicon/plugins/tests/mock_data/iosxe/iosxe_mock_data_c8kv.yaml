@@ -78,6 +78,7 @@ c8kv_config_term:
   commands:
     'no logging console': ''
     'line console 0': ''
+    'line vty 0 4': ''
     'exec-timeout 0': ''
     'end':
       new_state: 'c8kv_enable'

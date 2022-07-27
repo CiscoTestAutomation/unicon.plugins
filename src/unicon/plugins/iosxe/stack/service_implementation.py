@@ -210,7 +210,11 @@ class StackReload(BaseService):
         timeout = timeout or self.timeout
         conn = self.connection.active
 
-        self.error_pattern = error_pattern or conn.settings.ERROR_PATTERN
+        if error_pattern is None:
+            self.error_pattern = conn.settings.ERROR_PATTERN
+        else:
+            self.error_pattern = error_pattern
+
         if not isinstance(self.error_pattern, list):
             raise ValueError('error_pattern should be a list')
         if append_error_pattern:

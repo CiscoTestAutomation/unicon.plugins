@@ -189,6 +189,7 @@ cat9k_ha_active_config:
   commands:
     "no logging console": ""
     "line console 0": ""
+    "line vty 0 4": ""
     "exec-timeout 0": ""
     "end":
         new_state: cat9k_ha_active_enable

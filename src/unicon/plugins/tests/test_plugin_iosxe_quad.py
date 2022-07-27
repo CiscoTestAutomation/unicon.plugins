@@ -240,6 +240,7 @@ class TestIosXEQuadReload(unittest.TestCase):
                 self.d.reload('active_install_add',
                           reply=install_add_one_shot_dialog,
                           error_pattern = error_pattern)
+        self.assertEqual(self.d.reload.error_pattern, error_pattern)
 
 if __name__ == "__main__":
     unittest.main()

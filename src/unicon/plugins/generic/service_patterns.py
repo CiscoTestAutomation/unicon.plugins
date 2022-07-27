@@ -29,6 +29,7 @@ class ReloadPatterns(UniconCorePatterns):
         self.reload_confirm_nxos = r'^(.*)This command will reboot the system.\s*\(y\/n\)\?\s*\[n\]\s?$'
         self.connection_closed = r'^(.*?)Connection.*? closed|disconnect: Broken pipe'
         self.press_return = r'Press RETURN to get started.*'
+        self.config_session_locked = r'^.*Config session is locked.*user will be pushed back to exec mode'
 
 
 # Traceroute patterns

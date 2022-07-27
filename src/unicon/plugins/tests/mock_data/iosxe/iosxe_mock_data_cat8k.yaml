@@ -216,6 +216,8 @@ c8k_config:
     prompt: "%N(config)#"
     commands:
       "no logging console": ""
+      "line vty 0 4":
+        new_state: c8k_config_line
       "line console 0":
         new_state: c8k_config_line
       "end":
@@ -225,6 +227,7 @@ c8k_config_line:
   prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
+    "line vty 0 4": ""
     "exit":
       new_state: c8k_config
     "end":

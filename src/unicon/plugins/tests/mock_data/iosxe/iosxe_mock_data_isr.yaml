@@ -200,11 +200,14 @@ config_isr:
     "no logging console": ""
     "line console 0":
       new_state: config_line_isr
+    "line vty 0 4":
+      new_state: config_line_isr
 
 config_line_isr:
   prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
+    "line vty 0 4": ""
     "end":
       new_state: enable_isr
 

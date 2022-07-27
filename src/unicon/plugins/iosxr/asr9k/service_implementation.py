@@ -62,7 +62,11 @@ class Reload(BaseService):
         con = self.connection
         timeout = timeout or self.timeout
 
-        self.error_pattern= error_pattern or con.settings.ERROR_PATTERN
+        if error_pattern is None:
+            self.error_pattern = con.settings.ERROR_PATTERN
+        else:
+            self.error_pattern = error_pattern
+
         if not isinstance(self.error_pattern, list):
             raise ValueError('error_pattern should be a list')
         if append_error_pattern:
@@ -202,7 +206,11 @@ class HAReload(BaseService):
         con = self.connection
         timeout = timeout or self.timeout
 
-        self.error_pattern= error_pattern or con.settings.ERROR_PATTERN
+        if error_pattern is None:
+            self.error_pattern = con.settings.ERROR_PATTERN
+        else:
+            self.error_pattern = error_pattern
+
         if not isinstance(self.error_pattern, list):
             raise ValueError('error_pattern should be a list')
         if append_error_pattern:

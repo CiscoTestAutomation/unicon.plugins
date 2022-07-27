@@ -282,6 +282,7 @@ class TestIosXEStackReload(unittest.TestCase):
                 d.reload('active_install_add',
                           reply=install_add_one_shot_dialog,
                           error_pattern = error_pattern)
+            self.assertEqual(d.reload.error_pattern, error_pattern)
         finally:
              d.disconnect()
              md.stop()
