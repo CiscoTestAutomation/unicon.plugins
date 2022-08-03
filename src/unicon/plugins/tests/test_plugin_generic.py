@@ -18,13 +18,14 @@ from pyats.datastructures import AttrDict
 
 import unicon
 from unicon import Connection
-from unicon.eal.dialogs import Dialog
+from unicon.eal.dialogs import Dialog, Statement
 from unicon.plugins.utils import sanitize
 from unicon.plugins.tests.mock.mock_device_ios import MockDeviceTcpWrapperIOS
 from unicon.mock.mock_device import MockDevice, MockDeviceTcpWrapper
 from unicon.plugins.generic.statements import login_handler, password_handler, passphrase_handler
 from pyats.topology import loader
 from pyats.topology.credentials import Credentials
+
 
 from unicon.core.errors import (SubCommandFailure, StateMachineError,
     SpawnInitError, CredentialsExhaustedError, UniconAuthenticationError,
@@ -1337,6 +1338,32 @@ class TestSwitchTo(unittest.TestCase):
         d.switchto(to_state='disable')
         self.assertEqual(d.state_machine.current_state, 'disable')
 
+class TestGenericReload(unittest.TestCase):
+
+    def test_reload_with_error_pattern(self):
+        d = Connection(hostname='Router',
+                    start=['mock_device_cli --os ios --state exec --hostname R1'],
+                    os='ios', enable_password='cisco',
+                    username='cisco',
+                    tacacs_password='cisco',
+                    learn_hostname=True)
+
+        install_add_one_shot_dialog = Dialog([
+                Statement(pattern=r"FAILED:.* ",
+                          action=None,
+                          loop_continue=False,
+                          continue_timer=False),
+         ])
+
+        error_pattern=[r"FAILED:.* ",]
+
+        try:
+            d.connect()
+            d.settings.STACK_POST_RELOAD_SLEEP = 0
+            d.reload(error_pattern = error_pattern)
+            self.assertEqual(d.reload.error_pattern, error_pattern)
+        finally:
+             d.disconnect()
 
 if __name__ == "__main__":
     unittest.main()

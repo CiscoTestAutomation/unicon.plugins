@@ -102,8 +102,10 @@ class TestIosXeCat3kPlugin(unittest.TestCase):
             c.settings.POST_RELOAD_WAIT = 1
             with self.assertRaises(SubCommandFailure):
                 c.reload('active_install_add',
-                                 reply=install_add_one_shot_dialog,
-                                 error_pattern = error_pattern)
+                          reply=install_add_one_shot_dialog,
+                          error_pattern=error_pattern)
+            self.assertEqual(c.reload.error_pattern, error_pattern)
+
         finally:
             c.disconnect()
             md.stop()

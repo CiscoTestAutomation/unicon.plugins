@@ -144,6 +144,7 @@ ha_asr1k_config:
   prompt: "%N(conf)#"
   commands: &config_cmds
     "no logging console": ""
+    "line vty 0 4": ""
     "line console 0": ""
     "exec-timeout 0": ""
     "redundancy": ""

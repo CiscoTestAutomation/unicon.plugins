@@ -13,7 +13,9 @@ import unittest
 
 import unicon
 from unicon import Connection
+from unicon.eal.dialogs import Statement, Dialog
 from unicon.mock.mock_device import mockdata_path
+from unicon.core.errors import SubCommandFailure
 
 with open(os.path.join(mockdata_path, 'iosxr/iosxr_mock_data.yaml'), 'rb') as datafile:
     mock_data = yaml.safe_load(datafile.read())
@@ -85,6 +87,34 @@ class TestIosXrPlugin(unittest.TestCase):
         state = c.get_rp_state()
         self.assertEqual(state, 'ACTIVE')
 
+
+class TestIosXRAsr9kReload(unittest.TestCase):
+
+    def test_reload_with_error_pattern(self):
+        d = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxr --state asr9k_enable --hostname PE1'],
+            os='iosxr',
+            platform='asr9k'
+        )
+        install_add_one_shot_dialog = Dialog([
+                Statement(pattern=r"FAILED:.* ",
+                          action=None,
+                          loop_continue=False,
+                          continue_timer=False),
+         ])
+        error_pattern=[r"FAILED:.* ",]
+
+        try:
+            d.connect()
+            d.settings.STACK_POST_RELOAD_SLEEP = 0
+            with self.assertRaises(SubCommandFailure):
+                d.reload('active_install_add',
+                          reply=install_add_one_shot_dialog,
+                          error_pattern = error_pattern)
+            self.assertEqual(d.reload.error_pattern, error_pattern)
+        finally:
+             d.disconnect()
 
 if __name__ == "__main__":
     unittest.main()

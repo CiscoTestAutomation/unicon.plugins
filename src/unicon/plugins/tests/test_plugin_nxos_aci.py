@@ -83,6 +83,7 @@ class TestNxosAciPlugin(unittest.TestCase):
              c.reload('active_install_add',
                       dialog=install_add_one_shot_dialog,
                       error_pattern = error_pattern)
+        self.assertEqual(c.reload.error_pattern, error_pattern)
         c.disconnect()
 
     def test_attach_console(self):

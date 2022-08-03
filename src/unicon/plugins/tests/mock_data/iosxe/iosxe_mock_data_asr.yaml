@@ -134,6 +134,8 @@ config_asr:
   prompt: "%N(conf)#"
   commands:
     "no logging console": ""
+    "line vty 0 4":
+      new_state: config_line_asr
     "line console 0":
       new_state: config_line_asr
     "redundancy":
@@ -143,6 +145,7 @@ config_line_asr:
   prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
+    "line vty 0 4": ""
     "end":
       new_state: enable_asr
 

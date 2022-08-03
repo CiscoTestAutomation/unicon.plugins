@@ -432,6 +432,9 @@ config:
     "line console 0":
       new_state:
         line_console
+    "line vty 0 4":
+      new_state:
+        line_console
     "commit":
       new_state: commit_prompt
     "commit force": ""
@@ -465,6 +468,8 @@ config_line:
     "session-timeout 0": ""
     "line console 0":
       new_state: config_line
+    "line vty 0 4":
+      new_state: config_line
     "line default":
       new_state: config_line
     "commit":
@@ -485,6 +490,7 @@ line_console:
   prompt: "RP/0/RP0/CPU0:%N(config-line)#"
   commands:
     "exec-timeout 0": ""
+    "line vty 0 4": ""
     "exec-timeout 0 0": ""
     "absolute-timeout 0": ""
     "session-timeout 0": ""

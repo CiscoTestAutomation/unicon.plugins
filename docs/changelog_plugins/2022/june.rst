@@ -27,3 +27,21 @@ Upgrade Instructions
 
     bash$ pip install --upgrade unicon.plugins
     bash$ pip install --upgrade unicon
+
+Features and Bug Fixes:
+^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+Changelogs
+^^^^^^^^^^
+--------------------------------------------------------------------------------
+                                      New                                       
+--------------------------------------------------------------------------------
+* iosxe
+    * settings:
+        * add POST_BOOT_TIMEOUT and BOOT_POSTCHECK_INTERVAL
+* iosxe/stack
+    * settings:
+        * add STACK_BOOT_TIMEOUT

@@ -28,6 +28,8 @@ class GenericSettings(Settings):
         self.HA_INIT_CONFIG_COMMANDS = [
             'no logging console',
             'line console 0',
+            'exec-timeout 0',
+            'line vty 0 4',
             'exec-timeout 0'
         ]
         self.HA_STANDBY_UNLOCK_COMMANDS = [

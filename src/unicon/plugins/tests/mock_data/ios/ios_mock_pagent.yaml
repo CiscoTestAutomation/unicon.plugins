@@ -117,6 +117,8 @@ pagent_exec:
 pagent_config:
     prompt: "%N(config)#"
     commands:
+        "line vty 0 4":
+          new_state: pagent_config_line
         "line console 0":
           new_state: pagent_config_line
 
@@ -124,6 +126,7 @@ pagent_config_line:
     prompt: "%N(config-line)#"
     commands:
         "exec-timeout 0": ""
+        "line vty 0 4": ""
         "end":
             new_state: pagent_exec
 
