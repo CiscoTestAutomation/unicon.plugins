@@ -125,6 +125,7 @@ ewc_ap_enable:
   prompt: "AP3C57.31C5.7B48#"
   commands:
     "exec-timeout 0": ""
+    "line vty 0 4": ""
     "terminal length 0": ""
     "terminal width 0": ""
     "disable":
@@ -247,6 +248,7 @@ ewc_config:
   commands:
     "no logging console": ""
     "line console 0": ""
+    "line vty 0 4": ""
     "exec-timeout 0": ""
     "end":
       new_state: ewc_enable

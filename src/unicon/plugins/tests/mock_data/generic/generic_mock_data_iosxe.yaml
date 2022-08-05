@@ -14,6 +14,8 @@ iosxe_config:
     prompt: "%N(config)#"
     commands:
       "no logging console": ""
+      "line vty 0 4":
+        new_state: iosxe_config_line
       "line console 0":
         new_state: iosxe_config_line
       "end":
@@ -23,6 +25,7 @@ iosxe_config_line:
   prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
+    "line vty 0 4": ""
     "exit":
       new_state: iosxe_config
     "end":
@@ -104,6 +107,8 @@ iosxe_config2:
     prompt: "%N(config)#"
     commands:
       "no logging console": ""
+      "line vty 0 4":
+        new_state: iosxe_config_line2
       "line console 0":
         new_state: iosxe_config_line2
       "end":
@@ -113,6 +118,7 @@ iosxe_config_line2:
   prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
+    "line vty 0 4": ""
     "exit":
       new_state: iosxe_config2
     "end":

@@ -227,6 +227,8 @@ quad_config:
     "no logging console": ""
     "line console 0":
       new_state: quad_config_line
+    "line vty 0 4":
+      new_state: quad_config_line
     "end":
       new_state: quad_enable
     "redundancy":
@@ -249,6 +251,7 @@ quad_config_line:
   prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
+    "line vty 0 4": ""
     "end":
       new_state: quad_enable
 

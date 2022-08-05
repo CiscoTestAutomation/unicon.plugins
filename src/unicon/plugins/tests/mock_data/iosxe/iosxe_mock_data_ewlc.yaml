@@ -118,6 +118,8 @@ ewlc_config:
   prompt: "%N(config)#"
   commands:
     "no logging console": ""
+    "line vty 0 4":
+      new_state: ewlc_config_line
     "line console 0":
       new_state: ewlc_config_line
     "wlan shutdown":
@@ -137,6 +139,7 @@ ewlc_config_line:
   prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
+    "line vty 0 4": ""
     "end":
       new_state: ewlc_enable
 
