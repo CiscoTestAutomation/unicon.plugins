@@ -1160,9 +1160,9 @@ reload
 
 Service to reload the stack device.
 
-===============           =======================     ========================================
+====================      =======================     ================================================================================
 Argument                  Type                        Description
-===============           =======================     ========================================
+====================      =======================     ================================================================================
 reload_command            str                         reload command to be issued on device.
                                                       default reload_command is "redundancy reload shelf"
 reply                     Dialog                      additional dialogs/new dialogs which are not handled by default.

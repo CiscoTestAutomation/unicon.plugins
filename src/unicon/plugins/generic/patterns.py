@@ -63,7 +63,8 @@ class GenericPatterns(UniconCorePatterns):
         # *Sep 6 23:13:38.188: %PNP-6-PNP_SDWAN_STARTED: PnP SDWAN started (7) via (pnp-sdwan-abort-on-cli) by (pid=3, pname=Exec)
         # *Sep 6 23:18:11.702: %ENVIRONMENTAL-1-ALERT: Temp: Inlet 1, Location: R0, State: Warning, Reading: 45 Celsius
         # *Sep 6 17:43:41.291: %Cisco-SDWAN-RP_0-CFGMGR-4-WARN-300005: New admin password not set yet, waiting for daemons to read initial config.
-        self.syslog_message_pattern = r'^.*?%\w+(-\S+)?-\d+-\w+.*$'
+        # Guestshell destroyed successfully
+        self.syslog_message_pattern = r'^.*?(%\w+(-\S+)?-\d+-\w+|Guestshell destroyed successfully).*$'
 
         self.config_locked = r'Configuration (mode )?(is )?locked|Config mode cannot be entered'
 
@@ -75,7 +76,7 @@ class GenericPatterns(UniconCorePatterns):
 
         self.guestshell_prompt = r'^(.*)\[\S+@guestshell\s+.*\][#\$]\s?$'
 
-        self.press_any_key = r'^.*?Press any key to continue\.\s*$'
+        self.press_any_key = r'^.*?Press any key to continue\..*?$'
 
         # VT100 patterns
         self.get_cursor_position = r'\x1b\[6n'

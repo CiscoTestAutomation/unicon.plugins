@@ -48,10 +48,6 @@ def send_yes_callback(spawn):
     spawn.sendline("y")
 
 
-def escape_char_callback(spawn):
-    sleep(0.5)
-    spawn.sendline()
-
 def login_handler(spawn, context, session):
     """ handles login prompt
     """

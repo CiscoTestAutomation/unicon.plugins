@@ -14,6 +14,8 @@ from unicon.settings import Settings
 from unicon.plugins.generic.patterns import GenericPatterns
 
 genpat = GenericPatterns()
+
+
 class GenericSettings(Settings):
     """" Generic platform settings """
     def __init__(self):
@@ -56,6 +58,14 @@ class GenericSettings(Settings):
         # This may need to be adjusted if the RTT between
         # the execution host and lab device is high.
         self.CONFIG_TRANSITION_WAIT = 0.2
+
+        # If learn_hostname is requested but no hostname was actually learned,
+        # substitute this default hostname when occurances of HOSTNAME_SUBST_PAT
+        # occur in state patterns.
+        self.DEFAULT_LEARNED_HOSTNAME = r'([^# \t\n\r\f\v\(\)]+)'
+
+        # Pattern to avoid sending 'enter' after Escape character pattern is seen
+        self.ESCAPE_CHAR_PROMPT_PATTERN = r'.*(User Access Verification|sername:\s*$|assword:\s*$|login:\s*$|The highlighted entry will)'
 
         # When connecting to a device via telnet, how long (in seconds)
         # to pause before checking the spawn buffer

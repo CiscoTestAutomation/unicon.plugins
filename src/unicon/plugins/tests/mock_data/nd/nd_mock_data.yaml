@@ -585,12 +585,7 @@ exec_ps1:
 exec_ps2:
   prompt: "> "
   commands:
-    "echo $x":
-      response: |
-        > 
-        > 
-      timing:
-        - 0:,0.5,0.5
+    "echo $x": ""
     "done":
       new_state: exec
       response: |

@@ -151,8 +151,11 @@ def escape_char_callback(spawn):
 
     chatty_term_wait(spawn)
 
-    # Device is already asking for authentication
-    if re.search(r'.*(User Access Verification|sername:\s*$|assword:\s*$|login:\s*$)', spawn.buffer):
+    # get from settings or fallback to default
+    escape_char_prompt = getattr(spawn.settings, 'ESCAPE_CHAR_PROMPT_PATTERN',
+        r'.*(User Access Verification|sername:\s*$|assword:\s*$|login:\s*$)')
+    # Device is already showing some kind of prompt
+    if re.search(escape_char_prompt, spawn.buffer):
         return
 
     auth_pat = ''
