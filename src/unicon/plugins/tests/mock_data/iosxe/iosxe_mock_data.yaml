@@ -317,6 +317,16 @@ general_config:
       new_state: config_host_list
     "macro auto execute TEST {":
       new_state: macro_prompt_brace
+    "wsma agent exec":
+      new_state: wsma_agent
+
+wsma_agent:
+  prompt: "%N(wsma-exec-agent)#"
+  commands:
+    "exit":
+      general_config
+    "end":
+      new_state: general_enable
 
 macro_prompt_brace:
   prompt: "{..} >"
@@ -1294,3 +1304,40 @@ breakboot_rommon:
   commands:
     "boot bootflash:asr1000_golden.bin":
       new_state: general_enable
+
+
+guestshell_prompt_obscure_enable:
+  prompt: "%N#"
+  commands:
+    "show version":
+      response:
+        Cisco IOS XE Software, Version BLD_POLARIS_DEV_LATEST_20220726_143256
+      new_state:
+        guestshell_prompt_obscure
+
+
+guestshell_prompt_obscure:
+  prompt: "%N#Guestshell destroyed successfully"
+  commands:
+    "":
+      new_state: guestshell_prompt_obscure_enable
+
+
+enable_slow_config:
+  prompt: "%N#"
+  commands:
+    "config term":
+      new_state:
+        slow_config_prompt
+
+
+slow_config_prompt:
+    preface:
+      response:
+        Enter configuration commands, one per line. End with CNTL/Z.
+      timing:
+        - 0:1,1
+        - 1:,2
+    prompt: "%N(config)#"
+    commands:
+      <<: *general_config_cmds

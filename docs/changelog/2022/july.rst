@@ -31,5 +31,10 @@ Upgrade Instructions
 Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-- No changes
+--------------------------------------------------------------------------------
+                            Fix
+--------------------------------------------------------------------------------
+* Playback
+    * Modified _mock_helper:
+        * Added dictionary to support IOSXR mock data generation
 

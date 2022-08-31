@@ -50,3 +50,6 @@ class IosXESettings(GenericSettings):
         self.GUESTSHELL_ENABLE_VERIFY_PATTERN = r''
 
         self.ROMMON_INIT_COMMANDS = []
+
+        # Regex to match the entries on the grub boot screen
+        self.GRUB_REGEX_PATTERN = r'(?:\x1b\[7m)?\x1b\[\d;3H.*?   '

@@ -20,6 +20,7 @@ class Reload(XEReload):
 
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
+        # Override the service dialog
         self.dialog = Dialog(reload_statement_list + [boot_from_rommon_stmt])
 
     def pre_service(self, *args, **kwargs):

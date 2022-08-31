@@ -76,21 +76,42 @@ def rommon_prompt_handler(spawn, session, context):
 def grub_prompt_handler(spawn, session, context):
     """ handles the grub menu during boot process
     """
-    log.info("Finding an entry that includes the string '{}'".
-             format(context['boot_image']))
-    lines = re.split(r'\s{4,}', spawn.buffer)
+
+    # if grub prompt already handled, return
+    if session.get('grub_handler'):
+        return
+    else:
+        session['grub_handler'] = True
+        # Below is used by the boot_timeout statement
+        # with the `BOOT_TIMEOUT` setting.
+        context['boot_start_time'] = datetime.now()
+        context['boot_prompt_count'] = 1
+
+    grub_boot_image = context.get('grub_boot_image')
+    # if no grub_boot_image, do nothing
+    if not grub_boot_image:
+        return
+
+    spawn.log.info("Finding an entry that includes the string '{}'".
+             format(grub_boot_image))
+
+    # Regex to match grub screen boot entries on cat9kv
+    lines = re.findall(spawn.settings.GRUB_REGEX_PATTERN, spawn.buffer)
+
+    spawn.log.debug(f'Grub lines: {lines}')
 
     selected_line = None
     desired_line = None
 
     # Get index for selected_line and desired_line
     for index, line in enumerate(lines):
-        if '*' in line:
+        # \x1b[7m is reverse video (inverted colors)
+        if '*' in line or '\x1b[7m' in line:
             selected_line = index
-        if context['boot_image'] in line:
+        if grub_boot_image in line:
             desired_line = index
 
-    if not selected_line or not desired_line:
+    if selected_line is None or desired_line is None:
         raise Exception("Cannot figure out which image to select! "
                         "Debug info:\n"
                         "selected_line: {}\n"
@@ -98,21 +119,25 @@ def grub_prompt_handler(spawn, session, context):
                         "lines: {}"
                         .format(selected_line, desired_line, lines))
 
-    log.info("Selecting the entry '{}' now.".format(lines[desired_line]))
+    spawn.log.info("Selecting the entry '{}' now.".format(lines[desired_line]))
 
     num_lines_to_move = desired_line - selected_line
 
+    spawn.log.debug(f'Lines to move: {num_lines_to_move}')
+
+    keys = {
+        'down': '\x1B[B',
+        'up': '\x1B[A'
+    }
     # If positive we want to move down the list.
     # If negative we want to move up the list.
     if num_lines_to_move >= 0:
-        # '\x1B[B' == <down arrow key>
-        key = '\x1B[B'
+        key = 'down'
     else:
-        # '\x1B[A' == <up arrow key>
-        key = '\x1B[A'
+        key = 'up'
 
     for _ in range(abs(num_lines_to_move)):
-        spawn.send(key)
+        spawn.send(keys.get(key))
         time.sleep(0.5)
 
     spawn.sendline()
