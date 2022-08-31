@@ -107,6 +107,13 @@ ewc_ap_password:
       new_state: ewc_ap_exec
 
 ewc_ap_exec:
+  preface:
+    timing:
+    - 0:,0,0.1,0.03
+    response: |
+      # https://www.cisco.com/c/en/us/td/docs/wireless/embedded_wireless_controller_configuration_guide.html #
+      #                                                                                                      #
+      ########################################################################################################
   prompt: "AP3C57.31C5.7B48>"
   commands:
     "exit":

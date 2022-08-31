@@ -467,6 +467,7 @@ class TestIosXEC8KvPluginReload(unittest.TestCase):
          cls.c.disconnect()
 
     def test_reload(self):
+        self.c.settings.POST_RELOAD_WAIT = 1
         self.c.reload(grub_boot_image='GOLDEN')
 
 
@@ -788,6 +789,19 @@ class TestIosXEConfigure(unittest.TestCase):
         )
         self.assertEqual(new_result, 'help\r\nSwitch(ca-trustpoint)#')
 
+    def test_configure_wsma_agent_exec(self):
+        c = Connection(hostname='Switch',
+                       start=['mock_device_cli --os iosxe --state general_enable'],
+                       os='iosxe',
+                       mit=True,
+                       init_exec_commands=[],
+                       init_config_commands=[],
+                       log_buffer=True
+                       )
+        c.connect()
+        c.configure('wsma agent exec')
+        c.disconnect()
+
 
 class TestIosXEEnableSecret(unittest.TestCase):
 
@@ -947,6 +961,21 @@ class TestSyslogHandler(unittest.TestCase):
         finally:
             c.disconnect()
 
+    def test_syslog_handler_guestshell(self):
+        c = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state guestshell_prompt_obscure_enable --hostname PE1'],
+            os='iosxe',
+            mit=True,
+        )
+        try:
+            c.connect()
+            c.execute('show version')
+        except Exception:
+            raise
+        finally:
+            c.disconnect()
+
 
 class TestIosxeAsr1k(unittest.TestCase):
     def test_connect_asr1k_ha(self):
@@ -1062,6 +1091,19 @@ class TestConfigTransition(unittest.TestCase):
         self.assertEqual(c.settings.CONFIG_TRANSITION_WAIT, 1)
         self.assertEqual(c.spawn.settings.CONFIG_TRANSITION_WAIT, 1)
         c.disconnect()
+
+    def test_config_transition_learn_hostname(self):
+        c = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state enable_slow_config --hostname PE1'],
+            os='iosxe',
+            mit=True
+        )
+        c.connect()
+        # Force hostname learning to be enabled so default prompt pattern is used
+        # This was causing issues and should not fail with this test
+        c.state_machine.learn_hostname = True
+        c.configure()
 
 
 if __name__ == "__main__":

@@ -22,4 +22,4 @@ class LinuxPatterns(GenericPatterns):
         # this can result in false prompt matching when output has
         # one of the prompt characters at the end of the line,
         # e.g. XML output or a banner
-        self.prompt = r'^(.*?([>\$~%\]]|[^#\s]#|~ #|~/|^admin:|^#|~\s?#\s?)\s?(\x1b\S+)?)$'
+        self.prompt = r'^(.*?([>\$~%\]]|\] # |[^#\s]#|~ #|~/|^admin:|^#|~\s?#\s?)\s?(\x1b\S+)?)$'

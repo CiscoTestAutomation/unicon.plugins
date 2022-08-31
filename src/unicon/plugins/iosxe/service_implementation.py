@@ -231,6 +231,8 @@ class Reload(GenericReload):
 
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
+        # Add the grub prompt statement
+        self.dialog += Dialog([grub_prompt_stmt])
 
     def pre_service(self, *args, **kwargs):
         self.prompt_recovery = self.connection.prompt_recovery
@@ -252,11 +254,8 @@ class Reload(GenericReload):
                      *args, **kwargs):
         sm = self.get_sm()
 
-        if grub_boot_image:
-            # Add the grub prompt statement
-            self.dialog.insert(index=0, statement=grub_prompt_stmt)
-            # update the context with the boot_image
-            self.context.update({'boot_image': grub_boot_image})
+        # update the context with the boot_image
+        self.context.update({'grub_boot_image': grub_boot_image})
 
         self.context["image_to_boot"] = \
             kwargs.get("image_to_boot", kwargs.get('image', ''))
@@ -275,6 +274,7 @@ class Reload(GenericReload):
             *args, **kwargs)
 
         self.context.pop("image_to_boot", None)
+        self.context.pop("grub_boot_image", None)
 
 
 class Rommon(GenericExecute):
