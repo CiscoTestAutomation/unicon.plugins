@@ -1,0 +1,211 @@
+connect_ssh:
+  preface: |
+    The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
+    RSA key fingerprint is a1:07:ac:9b:8c:c2:db:c5:4c:dc:70:b5:09:2a:a5:b1.
+  prompt: "Are you sure you want to continue connecting (yes/no/[fingerprint])? "
+  commands:
+    "yes":
+      new_state: login_2
+
+login_2:
+  prompt: "login as: "
+  commands:
+    "aruba":
+      new_state: password_2
+
+password_2:
+  prompt: "password: "
+  commands:
+    "aruba":
+      new_state: press_any_key_2
+    
+press_any_key_2:
+  prompt: "Press any key to continue"
+  commands:
+    "":
+      new_state: enable
+
+connect_ssh_passphrase:
+  prompt: "Enter passphrase for key '/home/admin/.ssh/id_rsa': "
+  commands:
+    "this is a secret":
+      new_state: exec
+
+login:
+  prompt: "login as: "
+  commands:
+    "aruba":
+      new_state: password
+
+custom_login:
+  prompt: "Identifier: "
+  commands:
+    "aruba":
+      new_state: custom_password
+
+custom_password:
+  prompt: "passe: "
+  commands:
+    "aruba":
+      new_state: exec
+
+press_any_key:
+  prompt: "Press any key to continue"
+  commands:
+    "":
+      new_state: exec
+
+password:
+  prompt: "password: "
+  commands:
+    "aruba":
+      new_state: press_any_key
+    "abc": &abc
+      response: |2
+
+        % Authentication failed
+         
+      new_state: login
+    "abc1": *abc
+    "abc2": 
+      response: |2
+
+        % Access denied
+         
+      new_state: login
+    "abc3": 
+      response: |2
+
+        % Bad passwords
+         
+      new_state: login
+
+
+
+exec:
+  prompt: "%N#"
+  commands:
+    "terminal width 1000":
+      new_state: exec
+    "teminal length 1000":
+      new_state: exec
+    "exit":
+      new_state: enable
+    "show version": 
+      response: |
+      Image stamp:    /ws/swbuildm/rel_ajanta_qaoff/code/build/bom(swbuildm_rel_ajanta_qaoff_rel_ajanta)
+                Jan 11 1978 00:05:56
+                KB.11.11.1111
+                11
+      Boot Image:     Primary
+
+      Boot ROM Version:    KB.12.12.1213
+      Active Boot ROM:     Primary
+    
+    "show int 1/1":
+      response: |
+        Status and Counters - Port Counters for port 1/1
+        Name  : data
+        MAC Address      : 123456-7890ab
+        Link Status      : Down
+        Port Enabled     : Yes
+        Totals (Since boot or last clear) :
+          Bytes Rx        : 0                    Bytes Tx        : 0
+          Unicast Rx      : 0                    Unicast Tx      : 0
+          Bcast/Mcast Rx  : 0                    Bcast/Mcast Tx  : 0
+        Errors (Since boot or last clear) :
+          FCS Rx          : 0                    Drops Tx        : 0
+          Alignment Rx    : 0                    Collisions Tx   : 0
+          Runts Rx        : 0                    Late Colln Tx   : 0
+          Giants Rx       : 0                    Excessive Colln : 0
+          Total Rx Errors : 0                    Deferred Tx     : 0
+        Others (Since boot or last clear) :
+          Discard Rx      : 0                    Out Queue Len   : 0
+          Unknown Protos  : 0
+        Rates (5 minute weighted average) :
+          Total Rx (bps) : 0                     Total Tx (bps) : 0
+          Unicast Rx (Pkts/sec) : 0              Unicast Tx (Pkts/sec) : 0
+          B/Mcast Rx (Pkts/sec) : 0              B/Mcast Tx (Pkts/sec) : 0
+          Utilization Rx  :     0 %              Utilization Tx  :     0 % 
+    "configure terminal":
+      new_state: config
+    "ping":
+      new_state: ping_proto
+    "ping 1.1.1.1": 
+      response: |
+        1.1.1.1 is alive, time = 9 ms
+    "ping 10.10.10.10":
+      response: |
+        Request timed out.
+      timing:
+        - "0:2,0,0.05"
+        - "2:3,0,0,2"
+        - "3:,0.5"
+
+
+enable:
+  prompt: "%N>"
+  commands:
+    "terminal width 1000":
+      new_state: enable
+    "teminal length 1000":
+      new_state: enable
+    "enable":
+      new_state: exec
+    "show version": 
+      response: |
+      Image stamp:    /ws/swbuildm/rel_ajanta_qaoff/code/build/bom(swbuildm_rel_ajanta_qaoff_rel_ajanta)
+                Jan 11 1978 00:05:56
+                KB.11.11.1111
+                11
+      Boot Image:     Primary
+
+      Boot ROM Version:    KB.12.12.1213
+      Active Boot ROM:     Primary
+    
+    "show int 1/1":
+      response: |
+        Status and Counters - Port Counters for port 1/1
+        Name  : data
+        MAC Address      : 123456-7890ab
+        Link Status      : Down
+        Port Enabled     : Yes
+        Totals (Since boot or last clear) :
+          Bytes Rx        : 0                    Bytes Tx        : 0
+          Unicast Rx      : 0                    Unicast Tx      : 0
+          Bcast/Mcast Rx  : 0                    Bcast/Mcast Tx  : 0
+        Errors (Since boot or last clear) :
+          FCS Rx          : 0                    Drops Tx        : 0
+          Alignment Rx    : 0                    Collisions Tx   : 0
+          Runts Rx        : 0                    Late Colln Tx   : 0
+          Giants Rx       : 0                    Excessive Colln : 0
+          Total Rx Errors : 0                    Deferred Tx     : 0
+        Others (Since boot or last clear) :
+          Discard Rx      : 0                    Out Queue Len   : 0
+          Unknown Protos  : 0
+        Rates (5 minute weighted average) :
+          Total Rx (bps) : 0                     Total Tx (bps) : 0
+          Unicast Rx (Pkts/sec) : 0              Unicast Tx (Pkts/sec) : 0
+          B/Mcast Rx (Pkts/sec) : 0              B/Mcast Tx (Pkts/sec) : 0
+          Utilization Rx  :     0 %              Utilization Tx  :     0 % 
+    "ping":
+      new_state: ping_proto
+    "ping 1.1.1.1": &ping1
+      response: |
+        1.1.1.1 is alive, time = 9 ms
+    "ping 10.10.10.10":
+      response: |
+        Request timed out.
+      timing:
+        - "0:2,0,0.05"
+        - "2:3,0,0,2"
+        - "3:,0.5"
+
+config:
+  prompt: "%N(config)#"
+  commands:
+    "exit":
+      new_state: exec
+    "end":
+      new_state: exec
+
