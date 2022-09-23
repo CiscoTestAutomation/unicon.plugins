@@ -58,7 +58,7 @@ class GenericPatterns(UniconCorePatterns):
 
         self.learn_os_prompt = r'^(.*?([>\$~%]|[^#\s]#|~ #|~/|^admin:|^#)\s?(\x1b\S+)?)$|(^.*This \(D\)RP Node is not ready or active for login \/configuration.*)'
 
-        self.sudo_password_prompt = r'^.*\[sudo\] password for .*?:\s*?'
+        self.sudo_password_prompt = r'^.*(\[sudo\] password for .*?:|This is your UNIX password:)\s*$'
 
         # *Sep 6 23:13:38.188: %PNP-6-PNP_SDWAN_STARTED: PnP SDWAN started (7) via (pnp-sdwan-abort-on-cli) by (pid=3, pname=Exec)
         # *Sep 6 23:18:11.702: %ENVIRONMENTAL-1-ALERT: Temp: Inlet 1, Location: R0, State: Warning, Reading: 45 Celsius

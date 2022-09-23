@@ -25,4 +25,6 @@
 * iosxe/cat9k
     * Updated the container shell prompt pattern
 
+* iosxe/cat8k
+    * Added Reload and HAReload
 

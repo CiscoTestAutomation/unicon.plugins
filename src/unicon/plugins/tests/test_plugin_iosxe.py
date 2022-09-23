@@ -1106,5 +1106,59 @@ class TestConfigTransition(unittest.TestCase):
         c.configure()
 
 
+class TestRommonCommands(unittest.TestCase):
+
+    def test_rommon_command_false_prompt_avoidance(self):
+        c = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state rommon_command_output_not_a_prompt --hostname PE1'],
+            os='iosxe',
+            learn_hostname=True,
+            credentials=dict(default=dict(username='cisco', password='cisco')),
+            settings={'ROMMON_INIT_COMMANDS': ['notaprompt'], 'EXECUTE_STATE_CHANGE_MATCH_RETRY_SLEEP': 3}
+        )
+        try:
+            c.connect()
+        finally:
+            c.disconnect()
+
+    def test_rommon_command_false_prompt(self):
+        c = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state rommon_command_output_not_a_prompt2 --hostname PE1'],
+            os='iosxe',
+            learn_hostname=True,
+            credentials=dict(default=dict(username='cisco', password='cisco')),
+            settings={
+                'ROMMON_INIT_COMMANDS': ['notaprompt'],
+                'EXECUTE_STATE_CHANGE_MATCH_RETRIES': 0,
+                'EXECUTE_STATE_CHANGE_MATCH_RETRY_SLEEP': 1
+            },
+            debug=True
+        )
+        with self.assertRaisesRegex(UniconConnectionError,
+            "Expected device to reach 'rommon' state, but landed on 'enable' state."):
+            try:
+                c.connect()
+            finally:
+                c.disconnect()
+
+
+class TestCopy(unittest.TestCase):
+
+    def test_copy(self):
+        c = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state general_enable --hostname PE1'],
+            os='iosxe',
+            mit=True
+        )
+        c.connect()
+        try:
+            c.copy(source='test.cfg', dest='running-config')
+        finally:
+            c.disconnect()
+
+
 if __name__ == "__main__":
     unittest.main()

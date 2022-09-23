@@ -269,6 +269,12 @@ general_enable:
       new_state: bash_console_switch_standby_rp_active
     "show log | in BOOTTIME": "*Sep 22 14:46:00.419: %SYS-6-BOOTTIME: Time taken to reboot after reload =  417 seconds"
     "show log | in PLATFORM_SYS-6-UPTIME": "%PLATFORM_SYS-6-UPTIME: Time taken to initialize system =  364 seconds"
+    "copy  test.cfg running-config": |
+      Failed to generate persistent self-signed certificate.
+          Secure server will use temporary self-signed certificate.
+      Default AP group (default-group) is not configurable.
+      4177 bytes copied in 0.160 secs (26106 bytes/sec)
+
 
 
 general_config:
@@ -1341,3 +1347,29 @@ slow_config_prompt:
     prompt: "%N(config)#"
     commands:
       <<: *general_config_cmds
+
+
+rommon_command_output_not_a_prompt:
+  prompt: "switch: "
+  commands:
+    "notaprompt":
+      timing:
+      - 0:,0,2
+      response: |2
+        Signature verification failed for key#
+        
+    "boot":
+      new_state: general_exec
+
+rommon_command_output_not_a_prompt2:
+  prompt: "switch: "
+  commands:
+    "notaprompt":
+      timing:
+      - 0:1,0,2
+      - 1:,10
+      response: |2
+        Signature verification failed for key#
+        
+    "boot":
+      new_state: general_exec
