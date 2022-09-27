@@ -136,9 +136,13 @@ class GenericSettings(Settings):
         self.BULK_CONFIG_CHUNK_LINES = 50
         self.BULK_CONFIG_CHUNK_SLEEP = 0.5
 
-        # for execute matched retry on state pattern
+        # for execute matched retry on statement pattern
         self.EXECUTE_MATCHED_RETRIES = 1
         self.EXECUTE_MATCHED_RETRY_SLEEP = 0.05
+
+        # execute statement match retry for state change patterns
+        self.EXECUTE_STATE_CHANGE_MATCH_RETRIES = 1
+        self.EXECUTE_STATE_CHANGE_MATCH_RETRY_SLEEP = 3
 
         # User defined login and password prompt pattern.
         self.LOGIN_PROMPT = None
@@ -275,7 +279,3 @@ class GenericSettings(Settings):
             },
         }
 
-#TODO
-#take addtional dialogs for all service
-#move all commands to settings
-#

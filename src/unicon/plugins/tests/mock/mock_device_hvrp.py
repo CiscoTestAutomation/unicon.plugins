@@ -13,6 +13,7 @@ class MockDeviceHuaweiVrp(MockDevice):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, device_os='hvrp', **kwargs)
+        self.invalid_command_response = "Error: Unrecognized command found "
 
 
 class MockDeviceTcpWrapperHuaweiVrp(MockDeviceTcpWrapper):

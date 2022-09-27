@@ -815,6 +815,13 @@ Arguments:
     * **log_stdout**: Boolean option to enable/disable logging to standard output. Default is True.
       *(Optional)*
 
+    * **log_propagate**: Boolean option to enable/disable propagating logs from connection logger
+      to parent logger (e.g. whether logs for `unicon.N7K-BESTPROD2-SSR-P1.cli.1663541251` logger
+      should propagate to `unicon` logger). Default is False. *(Optional)*
+
+    * **no_pyats_tasklog**: Boolean option to enable/disable logging to pyats tasklog. Default is False.
+      *(Optional)*
+
     * **debug**: Boolean option to enable/disable internal debug logging.
       *(Optional)*
 

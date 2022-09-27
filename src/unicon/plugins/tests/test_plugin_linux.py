@@ -671,7 +671,11 @@ class TestLinuxPluginExecute(unittest.TestCase):
     def test_sudo_handler(self):
         self.c.execute('sudo')
         self.assertEqual(self.c.spawn.match.match_output,
-                         ' sudo_password\r\nLinux# ')
+                         'sudo_password\r\nLinux# ')
+
+        self.c.execute('sudo2')
+        self.assertEqual(self.c.spawn.match.match_output,
+                         'sudo_password\r\nLinux# ')
 
         self.c.context.credentials['sudo']['password'] = 'unknown'
         with self.assertRaises(unicon.core.errors.SubCommandFailure):
@@ -680,7 +684,7 @@ class TestLinuxPluginExecute(unittest.TestCase):
         self.c.context.credentials['sudo']['password'] = 'sudo_password'
         self.c.sudo()
         self.assertEqual(self.c.spawn.match.match_output,
-                         ' sudo_password\r\nLinux# ')
+                         'sudo_password\r\nLinux# ')
         self.c.execute('exit')
         self.assertEqual(self.c.spawn.match.match_output,
                          'exit\r\nLinux$ ')
@@ -692,7 +696,7 @@ class TestLinuxPluginExecute(unittest.TestCase):
         with self.assertRaises(unicon.core.errors.SubCommandFailure):
             self.c.execute('sudo_invalid')
         self.assertEqual(self.c.spawn.match.match_output,
-                         ' invalid\r\nSorry, try again.\r\n[sudo] password for cisco:')
+                         'invalid\r\nSorry, try again.\r\n[sudo] password for cisco: ')
 
 
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)

@@ -124,6 +124,13 @@ ncs5k_enable:
       Template: console
       Capabilities: Timestamp Enabled
       Allowed transports are none.
+    "show platform": |
+      Thu Sep  1 16:03:41.711 UTC
+      Node              Type                     State                    Config state
+      --------------------------------------------------------------------------------
+      0/RP0/CPU0        N540X-16Z4G8Q2C-A(Active) IOS XR RUN               NSHUT
+      0/PM0             N540-PSU-FIXED-A         OPERATIONAL              NSHUT
+      0/FT0             N540-X-BB-FAN            OPERATIONAL              NSHUT
     "active_install_add":
           new_state: install_add_commit_1
 ncs5k_enable_vty:
