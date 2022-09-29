@@ -16,17 +16,11 @@ from datetime import datetime, timedelta
 from unicon.core.errors import TimeoutError
 from unicon.settings import Settings
 from .patterns import aosPatterns
-#This enables logging in the script.
-import logging
-#Logging disable disables logging in the script. In order to turn on logging, comment out logging disable.
-logging.disable(logging.DEBUG)
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 patterns = aosPatterns()
 settings = Settings()
     
     
 def __init__(self, connection, context, **kwargs):
-    logging.debug('***SP Serivce Implementation called(%s)***')
     self.start_state = 'exec'
     self.end_state = 'exec'

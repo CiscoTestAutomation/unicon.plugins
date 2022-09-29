@@ -15,42 +15,33 @@ from unicon.plugins.utils import (
     common_cred_username_handler
 )
 import getpass
-import logging
-#Logging disable disables logging in the script. In order to turn on logging, comment out logging disable.
-logging.disable(logging.DEBUG)
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 patterns = aosPatterns()
 
 def escape_char_handler(spawn):
     """ handles telnet login messages
     """
-    logging.debug('***Statements escape char handler function called(%s)***')
     # Wait a small amount of time for any chatter to cease from the
     # device before attempting to call sendline.
     time.sleep(.2)
 
 def run_level(spawn):
-    logging.debug('***Statements run level function called(%s)***')
     time.sleep(1)
 
 def continue_connecting(spawn):
     """ handles SSH new key prompt
     """
-    logging.debug('***Statements ssh continue connecting function called(%s)***')
     time.sleep(0.5)
     print("I saw the ssh key configuration")
     spawn.sendline('yes')
 def ssh_continue_connecting(spawn):
     """ handles SSH new key prompt
     """
-    logging.debug('***Statements ssh continue connecting function called(%s)***')
     time.sleep(0.5)
     print("I saw the ssh key configuration")
     spawn.sendline('yes')
 
 
 def wait_and_enter(spawn):
-    logging.debug('***Statements wait and enter function called(%s)***')
     # wait for 0.5 second and read the buffer
     # this avoids issues where the 'sendline'
     # is somehow lost
@@ -58,12 +49,10 @@ def wait_and_enter(spawn):
     spawn.sendline()
 
 def send_password(spawn, password):
-    logging.debug('***Statements password handler called(%s)***')
     spawn.sendline(password)
     print("***This is where I printed the " + password + "***")
 
 def complete_login(spawn):
-    logging.debug('***Complete login called(%s)***')
     spawn.sendline()
 
 def login_handler(spawn, context, session):
@@ -110,7 +99,6 @@ Example:
 class aosStatements(object):
     
     def __init__(self):
-        logging.debug('***Statements aosStatements class loaded(%s)***')
 # This is the statements to login to AOS.
         self.start_stmt = Statement(pattern=patterns.start,
                                     action=run_level,

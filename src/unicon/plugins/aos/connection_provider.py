@@ -12,11 +12,6 @@ from unicon.eal.dialogs import Dialog
 from unicon.plugins.aos.statements import (aosConnection_statement_list)
 from unicon.plugins.generic.statements import custom_auth_statements
 import getpass
-#This enables logging in the script.
-import logging
-#Logging disable disables logging in the script. In order to turn on logging, comment out logging disable.
-logging.disable(logging.DEBUG)
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 #This is the aos Connection Provider It is called in the __init__.py file.
 class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
@@ -25,7 +20,6 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         additional dialogs and steps required for
         connecting to any device via generic implementation
     """
-    logging.debug('***CP aosSingleRpConnectionProvider class called(%s)***')
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -41,7 +35,6 @@ class aosSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
     
     def set_init_commands(self):
         con = self.connection
-        logging.debug('***CP aosSingleRpConnectionProvider init command function called(%s)***')
         if con.init_exec_commands is not None:
             self.init_exec_commands = con.init_exec_commands
             self.init_config_commands = con.init_exec_commands

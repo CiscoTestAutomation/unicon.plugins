@@ -7,17 +7,11 @@ https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_e
 
 from unicon.plugins.generic import GenericSettings
 #This enables logging in the script.
-import logging
-#Logging disable disables logging in the script. In order to turn on logging, comment out logging disable.
-logging.disable(logging.DEBUG)
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 from unicon.plugins.generic.settings import GenericSettings
 
 class aosSettings(GenericSettings):
-    logging.debug('***Settings aosSettings class called(%s)***')
     def __init__(self):
-        logging.debug('***Settings init funtion Loaded(%s)***')
         # inherit any parent settings
         super().__init__()
         self.CONNECTION_TIMEOUT = 60

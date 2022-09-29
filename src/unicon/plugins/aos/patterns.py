@@ -7,16 +7,10 @@ https://github.com/CiscoDevNet/pyats-plugin-examples/tree/master/unicon_plugin_e
 
 #This imports the UniconCorePatterns.
 from unicon.patterns import UniconCorePatterns
-#This enables logging in the script.
-import logging
-#Logging disable disables logging in the script. In order to turn on logging, comment out logging disable.
-logging.disable(logging.DEBUG)
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 #Patterns to match different expect statements
 class aosPatterns(UniconCorePatterns):
     def __init__(self):
-        logging.debug('***aosPatterns function called(%s)***')
         super().__init__()
         self.login_prompt = r'^.*[Ll]ogin as( for )?(\\S+)?: ?$'
         self.password_prompt = r'^.*[Pp]assword( for )?(\\S+)?: ?$'

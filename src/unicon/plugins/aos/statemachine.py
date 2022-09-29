@@ -9,20 +9,13 @@ from unicon.statemachine import State, Path
 from .patterns import aosPatterns
 from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine
 from unicon.plugins.generic.statements import default_statement_list
-#This enables logging in the script.
-import logging
-#Logging disable disables logging in the script. In order to turn on logging, comment out logging disable.
-logging.disable(logging.DEBUG)
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 patterns=aosPatterns()
 class aosSingleRpStateMachine(GenericSingleRpStateMachine):
-    logging.debug('***StateMachine aosSingleRpStateMachine class loaded(%s)***')
     def create(self):
         '''
         statemachine class's create() method is its entrypoint. This showcases
         how to setup a statemachine in Unicon. 
         '''
-        logging.debug('***StateMachine aosSingleRpStateMachine create funtion called(%s)***')
         ##########################################################
         # State Definition
         ##########################################################
@@ -54,6 +47,5 @@ class aosSingleRpStateMachine(GenericSingleRpStateMachine):
         #self.add_path(shell_to_proxy)
         self.add_default_statements(default_statement_list)
     def learn_os_state(self):
-        logging.debug('***StateMachine aosSingleRpStateMachine learn_os_state function called(%s)***')
         learn_os = State('learn_os', patterns.learn_os_prompt)
         self.add_state(learn_os)
