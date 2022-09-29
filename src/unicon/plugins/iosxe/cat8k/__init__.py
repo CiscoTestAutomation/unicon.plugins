@@ -15,6 +15,7 @@ class IosXECat8kServiceList(IosXEServiceList):
     def __init__(self):
         super().__init__()
         self.switchover = svc.SwitchoverService
+        self.reload = svc.Reload
 
 
 class IosXECat8kSingleRpConnection(IosXESingleRpConnection):

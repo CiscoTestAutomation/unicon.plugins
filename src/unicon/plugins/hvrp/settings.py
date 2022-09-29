@@ -24,3 +24,5 @@ class HvrpSettings(GenericSettings):
         ]
 
         self.HA_INIT_CONFIG_COMMANDS = []
+        self.ERROR_PATTERN.append("Error:.*")
+        self.CONFIGURE_ERROR_PATTERN.append(r'^Error:.*')

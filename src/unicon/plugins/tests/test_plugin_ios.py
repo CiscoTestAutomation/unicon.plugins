@@ -187,6 +187,44 @@ Success rate is 100 percent (5/5), round-trip min/avg/max = 1/1/1 ms
 
 """.splitlines()))
 
+    def test_ping_options_verbose(self):
+        c = Connection(hostname='Router',
+                       start=['mock_device_cli --os ios --state exec'],
+                       os='ios',
+                       username='cisco',
+                       tacacs_password='cisco',
+                       enable_password='cisco',
+                       mit=True,
+                       log_buffer=True)
+        r = c.ping('1.1.1.1', extended_verbose=True, vrf='mgmt')
+        self.assertEqual(r, "\r\n".join("""ping vrf mgmt
+Protocol [ip]: 
+Target IP address: 1.1.1.1
+Repeat count [5]: 
+Datagram size [100]: 
+Timeout in seconds [2]: 
+Extended commands? [no]: y
+Ingress ping [n]: 
+Source address or interface: 
+DSCP Value [0]: 
+Type of service [0]: 
+Set DF bit in IP header? [no]: 
+Validate reply data? [no]: 
+Data pattern [0x0000ABCD]: 
+Loose, Strict, Record, Timestamp, Verbose[none]: v
+Loose, Strict, Record, Timestamp, Verbose[V]: 
+Sweep range of sizes? [no]: n
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 1.1.1.1, timeout is 2 seconds:
+Reply to request 0 (5 ms)
+Reply to request 1 (2 ms)
+Reply to request 2 (2 ms)
+Reply to request 3 (2 ms)
+Reply to request 4 (8 ms)
+Success rate is 100 percent (5/5), round-trip min/avg/max = 2/3/8 ms
+
+""".splitlines()))
+
 
 class TestIosPluginClear(unittest.TestCase):
 

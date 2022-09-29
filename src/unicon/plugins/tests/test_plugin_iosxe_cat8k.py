@@ -150,6 +150,22 @@ class TestIosXECat8kPluginSwitchover(unittest.TestCase):
         finally:
             c.disconnect()
             md.stop()
+class TestIosXECat8kPluginReload(unittest.TestCase):
+
+    def test_reload_with_image(self):
+        c = Connection(hostname='switch',
+                       start=['mock_device_cli --os iosxe --state cat8k_enable_reload_to_rommon'],
+                       os='iosxe',
+                       platform='cat8k',
+                       mit=True,
+                       credentials=dict(default=dict(username='admin', password='cisco')),
+                       settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+                       log_buffer=True)
+        c.connect()
+        c.settings.POST_RELOAD_WAIT = 1
+        c.reload(image_to_boot='tftp://1.1.1.1/latest.bin', timeout=10)
+        self.assertEqual(c.state_machine.current_state, 'enable')
+        c.disconnect()
 
 if __name__ == '__main__':
     unittest.main()

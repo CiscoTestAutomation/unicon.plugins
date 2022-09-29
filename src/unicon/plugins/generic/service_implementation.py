@@ -599,6 +599,8 @@ class Execute(BaseService):
         self.dialog = Dialog(execution_statement_list)
         self.matched_retries = connection.settings.EXECUTE_MATCHED_RETRIES
         self.matched_retry_sleep = connection.settings.EXECUTE_MATCHED_RETRY_SLEEP
+        self.state_change_matched_retries = connection.settings.EXECUTE_STATE_CHANGE_MATCH_RETRIES
+        self.state_change_matched_retry_sleep = connection.settings.EXECUTE_STATE_CHANGE_MATCH_RETRY_SLEEP
 
     def log_service_call(self):
         pass
@@ -684,16 +686,16 @@ class Execute(BaseService):
                 if allow_state_change:
                     dialog.append(Statement(
                         pattern=state.pattern,
-                        matched_retries=matched_retries,
-                        matched_retry_sleep=matched_retry_sleep
+                        matched_retries=self.state_change_matched_retries,
+                        matched_retry_sleep=self.state_change_matched_retry_sleep
                     ))
                 else:
                     dialog.append(Statement(
                         pattern=state.pattern,
                         action=invalid_state_change_action,
                         args={'err_state': state, 'sm': sm},
-                        matched_retries=matched_retries,
-                        matched_retry_sleep=matched_retry_sleep
+                        matched_retries=self.state_change_matched_retries,
+                        matched_retry_sleep=self.state_change_matched_retry_sleep
                     ))
 
         # store the last used dialog, used by unittest
@@ -950,11 +952,13 @@ class Configure(BaseService):
                     sp.sendline(cmd)
                     self.update_hostname_if_needed([cmd])
                     self.process_dialog_on_handle(handle, dialog, timeout)
+                    # To handle the session
                     if handle.context.get('config_session_locked'):
                         self.connection.log.warning('Config locked, waiting {} seconds'.format(
                             self.connection.settings.CONFIG_LOCK_RETRY_SLEEP))
                         sleep(self.connection.settings.CONFIG_LOCK_RETRY_SLEEP)
                         config_transition(handle.state_machine, handle.spawn, handle.context)
+                        handle.context['config_session_locked'] = False
                         sp.sendline(cmd)
                         self.process_dialog_on_handle(handle, dialog, timeout)
 

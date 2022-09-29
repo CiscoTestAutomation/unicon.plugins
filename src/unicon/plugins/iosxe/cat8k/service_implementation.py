@@ -11,8 +11,15 @@ from unicon.bases.routers.services import BaseService
 from unicon.logs import UniconStreamHandler, UNICON_LOG_FORMAT
 from unicon.plugins.generic.service_implementation import SwitchoverResult
 from unicon.plugins.iosxe.cat8k.service_statements import switchover_statement_list
+from unicon.plugins.generic.service_statements import (
+    reload_statement_list,
+    ha_reload_statement_list)
+from unicon.plugins.generic.service_implementation import (
+    HAReloadService as GenericHAReloadService
+)
 
-
+from ..service_implementation import Reload as XEReload
+from ..statements import boot_from_rommon_stmt
 class SwitchoverService(BaseService):
     """ Service to switchover the device.
 
@@ -159,3 +166,80 @@ class SwitchoverService(BaseService):
             self.result = SwitchoverResult(
                 result=self.result,
                 output=switchover_output)
+class Reload(XEReload):
+
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.dialog = Dialog(reload_statement_list + [boot_from_rommon_stmt])
+
+    def pre_service(self, *args, **kwargs):
+        if "image_to_boot" in kwargs:
+            self.start_state = 'rommon'
+            if 'image_to_boot' in self.context:
+                self.context['orig_image_to_boot'] = self.context['image_to_boot']
+            self.context["image_to_boot"] = kwargs["image_to_boot"]
+            self.connection.log.info("'image_to_boot' specified with reload, transitioning to 'rommon' state")
+        else:
+            if 'image' in kwargs:
+                self.context['image_to_boot'] = kwargs.get('image')
+            self.start_state = 'enable'
+
+        super().pre_service(*args, **kwargs)
+
+    def call_service(self, *args, **kwargs):
+        # assume the device is in rommon if image_to_boot is passed
+        # update reload command to use rommon boot syntax
+        if "image_to_boot" in kwargs:
+            self.context["image_to_boot"] = kwargs["image_to_boot"]
+            reload_command = "boot {}".format(
+                self.context['image_to_boot']).strip()
+            super().call_service(reload_command, *args, **kwargs)
+            self.context.pop("image_to_boot", None)
+        else:
+            super().call_service(*args, **kwargs)
+
+    def post_service(self, *args, **kwargs):
+        if 'orig_image_to_boot' in self.context:
+            self.context['image_to_boot'] = self.context.pop('orig_image_to_boot')
+        super().post_service(*args, **kwargs)
+
+
+class HAReloadService(GenericHAReloadService):
+
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.dialog = Dialog(ha_reload_statement_list + [boot_from_rommon_stmt])
+
+    def pre_service(self, *args, **kwargs):
+        if "image_to_boot" in kwargs:
+            self.start_state = 'rommon'
+            if 'image_to_boot' in self.context:
+                self.context['orig_image_to_boot'] = self.context['image_to_boot']
+            self.context["image_to_boot"] = kwargs["image_to_boot"]
+            self.connection.active.context = self.context
+            self.connection.standby.context = self.context
+            self.connection.log.info("'image_to_boot' specified with reload, transitioning to 'rommon' state")
+        else:
+            if 'image' in kwargs:
+                self.context['image_to_boot'] = kwargs.get('image')
+            self.start_state = 'enable'
+
+        super().pre_service(*args, **kwargs)
+
+    def call_service(self, *args, **kwargs):
+        # assume the device is in rommon if image_to_boot is passed
+        # update reload command to use rommon boot syntax
+        if "image_to_boot" in kwargs:
+            reload_command = "boot {}".format(
+                self.context['image_to_boot']).strip()
+            super().call_service(reload_command, *args, **kwargs)
+            self.context.pop("image_to_boot", None)
+        else:
+            super().call_service(*args, **kwargs)
+
+    def post_service(self, *args, **kwargs):
+        if 'orig_image_to_boot' in self.context:
+            self.context['image_to_boot'] = self.context.pop('orig_image_to_boot')
+        self.connection.active.context.pop('image_to_boot', None)
+        self.connection.standby.context.pop('image_to_boot', None)
+        super().post_service(*args, **kwargs)

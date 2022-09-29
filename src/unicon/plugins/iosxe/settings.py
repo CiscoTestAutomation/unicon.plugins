@@ -27,6 +27,8 @@ class IosXESettings(GenericSettings):
         self.EXECUTE_MATCHED_RETRIES = 1
         self.EXECUTE_MATCHED_RETRY_SLEEP = 0.1
 
+        self.RELOAD_WAIT = 300
+
         self.CONFIG_LOCK_RETRY_SLEEP = 30
         self.CONFIG_LOCK_RETRIES = 10
 
@@ -50,3 +52,6 @@ class IosXESettings(GenericSettings):
         self.GUESTSHELL_ENABLE_VERIFY_PATTERN = r''
 
         self.ROMMON_INIT_COMMANDS = []
+
+        # Regex to match the entries on the grub boot screen
+        self.GRUB_REGEX_PATTERN = r'(?:\x1b\[7m)?\x1b\[\d;3H.*?   '

@@ -162,6 +162,8 @@ exec:
         new_state: exec18
     "prompt19":
         new_state: exec19
+    "prompt20":
+        new_state: exec20
     "ls": |
       /tmp
       /var
@@ -172,6 +174,8 @@ exec:
       /opt
     "sudo":
       new_state: sudo_password
+    "sudo2":
+      new_state: sudo_password2
     "exit":
       new_state: login
 
@@ -368,6 +372,10 @@ exec19:
     prompt: "~ #"
     commands: *cmds
 
+exec20:
+  prompt: "[%N] # "
+  commands: *cmds
+
 
 sma_prompt:
   prompt: "sma03:testuser 1] "
@@ -379,6 +387,12 @@ sma_prompt_1:
 
 sudo_password:
   prompt: "[sudo] password for cisco: "
+  commands:
+    "sudo_password":
+      new_state: sudo
+
+sudo_password2:
+  prompt: "This is your UNIX password: "
   commands:
     "sudo_password":
       new_state: sudo

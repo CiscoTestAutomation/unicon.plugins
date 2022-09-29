@@ -223,7 +223,7 @@ class StackReload(BaseService):
             self.error_pattern += append_error_pattern
         # update all subconnection context with image_to_boot
         if image_to_boot:
-            for subconn in self.connection:
+            for subconn in self.connection.subconnections:
                 subconn.context.image_to_boot = image_to_boot
         reload_dialog = self.dialog
         if reply:

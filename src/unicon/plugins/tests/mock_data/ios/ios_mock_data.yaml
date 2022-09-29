@@ -303,6 +303,8 @@ enable:
         - "3:,0.5"
     "ping vrf management":
       new_state: ping_proto_ios_vrf 
+    "ping vrf mgmt":
+      new_state: ping_proto_ios_verbose
     "sh redundancy stat | inc my state":
         my state = 13 -ACTIVE
     "show redundancy sta |  in my": |

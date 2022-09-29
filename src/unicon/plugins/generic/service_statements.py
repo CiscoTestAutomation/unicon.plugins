@@ -48,10 +48,6 @@ def send_yes_callback(spawn):
     spawn.sendline("y")
 
 
-def escape_char_callback(spawn):
-    sleep(0.5)
-    spawn.sendline()
-
 def login_handler(spawn, context, session):
     """ handles login prompt
     """
@@ -121,6 +117,26 @@ def ping_handler(spawn, context, send_key):
 
 def ping_handler_1(spawn, context, send_key):
     spawn.sendline(context[send_key])
+
+
+def lsrtv_handler(spawn, context):
+    selection = spawn.match.last_match.group(1)
+    if context.get('extended_verbose') and 'V' not in selection:
+        spawn.sendline('v')
+        return
+    if context.get('timestamp_count') and 'T' not in selection:
+        spawn.sendline('t')
+        return
+    if context.get('record_hops') and 'R' not in selection:
+        spawn.sendline('r')
+        return
+    if context.get('src_route_type', '').lower() == 'loose' and 'L' not in selection:
+        spawn.sendline('l')
+        return
+    if context.get('src_route_type', '').lower() == 'strict' and 'S' not in selection:
+        spawn.sendline('s')
+        return
+    spawn.sendline()
 
 
 def send_multicast(spawn, context):
@@ -607,6 +623,39 @@ packet = Statement(pattern=pat.packet,
                    loop_continue=True,
                    continue_timer=False)
 
+lsrtv_stmt = Statement(pattern=pat.lsrtv,
+                       action=lsrtv_handler,
+                       loop_continue=True,
+                       continue_timer=False)
+
+lsrtv_timestamp = Statement(pattern=pat.lsrtv_timestamp_count,
+                            action=ping_handler,
+                            args={'send_key': 'timestamp_count'},
+                            loop_continue=True,
+                            continue_timer=False)
+
+lsrtv_hop_count = Statement(pattern=pat.lsrtv_hop_count,
+                            action=ping_handler,
+                            args={'send_key': 'record_hops'},
+                            loop_continue=True,
+                            continue_timer=False)
+
+lsrtv_source = Statement(pattern=pat.lsrtv_source,
+                         action=ping_handler,
+                         args={'send_key': 'src_route_addr'},
+                         loop_continue=True,
+                         continue_timer=False)
+
+lsrtv_one_allowed = Statement(pattern=pat.lsrtv_one_allowed,
+                              action=ping_invalid_input_handler,
+                              loop_continue=True,
+                              continue_timer=False)
+
+lsrtv_noroom = Statement(pattern=pat.lsrtv_noroom,
+                              action=ping_invalid_input_handler,
+                              loop_continue=True,
+                              continue_timer=False)
+
 ####################################################################
 # Traceroute Statements
 ####################################################################
@@ -732,6 +781,11 @@ invalid_input = Statement(pattern=pat.invalid_command,
 extended_ping_dialog_list = [invalid_input, unkonwn_protocol, protocol, transport,
                              mask, address, vcid, tunnel, repeat, size, verbose,
                              interval, packet_timeout, sending_interval,
+                             # error patterns:
+                             lsrtv_noroom, lsrtv_one_allowed,
+                             # the error patterns need to come before lsrtv_stmt
+                             lsrtv_stmt,
+                             lsrtv_timestamp, lsrtv_hop_count, lsrtv_source,
                              output_interface, novell_echo_type, vrf, ext_cmds,
                              sweep_range, range_interval, range_max, range_min,
                              dest_start, interface, dest_end, increment,
