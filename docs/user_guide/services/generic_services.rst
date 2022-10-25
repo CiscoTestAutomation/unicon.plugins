@@ -478,7 +478,7 @@ This service takes no arguments.
 
 expect_log
 ----------
-This service is removed. Please use Connection logger setLevel API 
+This service is removed. Please use Connection logger setLevel API
 to enable/disable internal debug logging.
 
 .. code-block:: python
@@ -1283,9 +1283,9 @@ reload
 
 Service to reload the quad rp device.
 
-===============         =======================     ========================================
+====================    =======================     ========================================
 Argument                Type                        Description
-===============         =======================     ========================================
+====================    =======================     ========================================
 reload_command          str                         reload command to be issued on device.
                                                     default reload_command is "reload"
 reply                   Dialog                      additional dialogs/new dialogs which are not handled by default.

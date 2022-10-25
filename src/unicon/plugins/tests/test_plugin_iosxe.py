@@ -961,6 +961,18 @@ class TestSyslogHandler(unittest.TestCase):
         finally:
             c.disconnect()
 
+    def test_syslog_handler_error_opening_pattern(self):
+        d = Connection(
+            hostname='Router',
+            start=['mock_device_cli --os iosxe --state error_opening_syslog --hostname Router'],
+            os='iosxe',
+            credentials=dict(default=dict(username='cisco', password='cisco')),
+            log_buffer=True
+        )
+
+        d.connect()
+        d.disconnect()
+
     def test_syslog_handler_guestshell(self):
         c = Connection(
             hostname='PE1',
