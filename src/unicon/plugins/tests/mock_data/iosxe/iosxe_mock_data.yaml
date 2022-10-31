@@ -1205,6 +1205,13 @@ endless_syslog:
     "": "%MY-1-MSG: never ending message"
 
 
+error_opening_syslog:
+  prompt: "%Error opening tftp://255.255.255.255/network-confg (Timed out)"
+  commands:
+    "":
+      new_state: general_exec
+
+
 enable_reload_config_dialog:
   prompt: "%N#"
   commands:

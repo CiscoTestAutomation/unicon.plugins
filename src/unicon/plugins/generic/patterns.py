@@ -64,7 +64,10 @@ class GenericPatterns(UniconCorePatterns):
         # *Sep 6 23:18:11.702: %ENVIRONMENTAL-1-ALERT: Temp: Inlet 1, Location: R0, State: Warning, Reading: 45 Celsius
         # *Sep 6 17:43:41.291: %Cisco-SDWAN-RP_0-CFGMGR-4-WARN-300005: New admin password not set yet, waiting for daemons to read initial config.
         # Guestshell destroyed successfully
-        self.syslog_message_pattern = r'^.*?(%\w+(-\S+)?-\d+-\w+|Guestshell destroyed successfully).*$'
+        # %Error opening tftp://255.255.255.255/network-confg (Timed out)
+        # %Error opening tftp://255.255.255.255/cisconet.cfg (Timed out)
+        # %Error opening tftp://255.255.255.255/switch-confg (Timed out)
+        self.syslog_message_pattern = r'^.*?(%\w+(-\S+)?-\d+-\w+|Guestshell destroyed successfully|%Error opening tftp:\/\/255\.255\.255\.255).*$'
 
         self.config_locked = r'Configuration (mode )?(is )?locked|Config mode cannot be entered'
 

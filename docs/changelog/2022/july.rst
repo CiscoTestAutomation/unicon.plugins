@@ -1,7 +1,7 @@
-›July 2022
+July 2022
 ==========
 
-June 28 - Unicon v22.7 
+July 26 - Unicon v22.7
 ------------------------
 
 
@@ -9,8 +9,8 @@ June 28 - Unicon v22.7
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
 
-        ``unicon.plugins``, v22.7 
-        ``unicon``, v22.7 
+        ``unicon.plugins``, v22.7
+        ``unicon``, v22.7
 
 Install Instructions
 ^^^^^^^^^^^^^^^^^^^^

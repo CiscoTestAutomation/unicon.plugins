@@ -9,7 +9,7 @@ class NxosPatterns(GenericPatterns):
     def __init__(self):
         super().__init__()
         self.enable_prompt = r'^(.*?)([Rr]outer|[Ss]witch|%N)(\(standby\))?(\(maint-mode\))?#\s?$'
-        self.config_prompt = r'^(?P<hostname00>.*)(\(maint-mode\))?\(.*(con|cfg|ipsec-profile)\S*\)#\s?$'
+        self.config_prompt = r'^(?P<hostname00>.*)(\(maint-mode\))?\(.*(con|cfg|ipsec-profile)\S*\)#[\s\x07]*$'
         self.debug_prompt = r'^(.*?)Linux\(debug\)#\s*$'
         self.sqlite_prompt = r'^(.*?)sqlite>\s*$'
         self.reboot = r'This command will reboot the system. \(y\/n\)\?  \[n\]'
