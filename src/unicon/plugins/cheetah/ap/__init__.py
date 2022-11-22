@@ -12,6 +12,7 @@ from unicon.plugins.generic import service_implementation as gsvc
 
 class ApServiceList(ServiceList):
     def __init__(self):
+        super().__init__()
         self.execute = svc.Execute
         self.send = gsvc.Send
         self.sendline = gsvc.Sendline
@@ -19,7 +20,6 @@ class ApServiceList(ServiceList):
         self.enable = gsvc.Enable
         self.disable = gsvc.Disable
         self.reload = gsvc.Reload
-        self.expect_log = gsvc.ExpectLogging
         self.log_user = gsvc.LogUser
 
 
@@ -40,7 +40,6 @@ class ApSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
 
     def init_handle(self):
         con = self.connection
-        con._is_connected = True
         con.state_machine.go_to('enable',
                                 self.connection.spawn,
                                 context=self.connection.context,
@@ -50,7 +49,7 @@ class ApSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
 
 class ApSingleRpConnection(BaseSingleRpConnection):
     os = 'cheetah'
-    series = 'ap'
+    platform = 'ap'
     chassis_type = 'single_rp'
     state_machine_class = GenericSingleRpStateMachine
     connection_provider_class = ApSingleRpConnectionProvider

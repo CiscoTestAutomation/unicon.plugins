@@ -62,10 +62,85 @@ to respond to the password prompt.  Credentials are available in ``rtr.credentia
     cmd = ['sudo su root', 'uname -a', 'whoami', 'exit']
     device.shellexec(cmd, reply=Dialog([password_stmt]))
 
+
+configure
+---------
+
+Service to execute commands on configuration mode.
+
+================  ========================    ====================================================
+Argument          Type                        Description
+================  ========================    ====================================================
+command           list                        list of commands to configure
+reply             Dialog                      additional dialog
+timeout           int                         timeout value for the command execution takes.
+error_pattern     list                        List of regex strings to check output for errors.
+prompt_recovery   bool (default False)        Enable/Disable prompt recovery feature
+target            str (default "active")      Target RP where to execute service, for DualRp only
+mode              str (default: "default")    Mode to configure ("default" or "dual")
+================  ========================    ====================================================
+
+
+.. code-block:: python
+
+    rtr.configure(['feature isis', 'commit'], mode="dual")
+
+    # config dual-stage
+    # Enter configuration commands, one per line. End with CNTL/Z.
+    # R1(config-dual-stage)# feature isis
+    # R1(config-dual-stage)# commit
+    # Verification Succeeded.
+
+    # Proceeding to apply configuration. This might take a while depending on amount of configuration in buffer.
+    # Please avoid other configuration changes during this time.
+    # Configuration committed by user 'admin' using Commit ID : 1000000002
+    # R1(config-dual-stage)# end
+    # R1#
+
+
+If you want to bring device to configure dual stage, you can use the `go_to` function in state machine
+and use `'config_dual': True` as the context. The following is an example to do that.
+
+.. code-block:: python
+
+    rtr.state_machine.go_to('config', rtr.spawn, context={'config_dual': True})
+
+    # config dual-stage
+    # Enter configuration commands, one per line. End with CNTL/Z.
+    # R1(config-dual-stage)#
+
+    # execute command in configure dual stage
+    rtr.execute('no logging console')
+
+    # R1(config-dual-stage)# no logging console
+    # R1(config-dual-stage)# 
+
+
+attach
+------
+
+Service to attach to line card to execute commands in. Returns a
+router-like object to execute commands on using python context managers.
+
+====================    ======================    =================================================
+Argument                Type                      Description
+====================    ======================    =================================================
+module_num              int                       module number to attach to
+timeout                 int (default 60 sec)      timeout in sec for executing commands
+target                  standby/active            by default commands will be executed on active,
+                                                  use target=standby to execute command on standby.
+====================    ======================    =================================================
+
+.. code-block:: python
+
+    with device.attach(1) as lc_1:
+        output1 = lc_1.execute('show interface')
+
+
 attach_console
 --------------
 
-Service to attach to line card console to execute commands in. Returns a 
+Service to attach to line card console to execute commands in. Returns a
 router-like object to execute commands on using python context managers.
 
 ====================    ======================    ========================================
@@ -76,7 +151,7 @@ login_name              str                       name to login with, default: r
 default_escape_chars    str                       default escape char, default: ~,
 change_prompt           str                       new prompt to change to for ez automation
 timeout                 int (default 60 sec)      timeout in sec for executing commands
-prompt                  str                       bash prompt (defaut: bash-\d.\d# )
+prompt                  str                       bash prompt (default: bash-\d.\d# )
 ====================    ======================    ========================================
 
 .. code-block:: python
@@ -96,7 +171,7 @@ Argument                    Description
 addr                        Destination address
 proto                       protocol(ip/ipv6)
 count                       Number of pings to transmit
-src_add                     IP for source field in ping packet
+source                      Source address or interface
 data_pat                    data pattern that would be used to perform ping.
 dest_end                    ending network 127 address
 dest_start                  beginning network 127 address
@@ -115,7 +190,7 @@ tunnel                      Tunnel interface number
 tos                         TOS field value
 multicast                   multicast addr
 udp                         (y/n) enable/disable UDP transmission for ipv6.
-int                         Interface
+interface                   Interface
 vcid                        VC Identifier
 topo                        topology nam
 verbose                     (y/n) enable/disable verbose mode
@@ -279,7 +354,7 @@ Most of the time simply providing the VDC name is just good enough.
     step-n7k-2-vdc1(config-console)# end
     step-n7k-2-vdc1# Out[3]: 'vdc1'
 
-You see a relatively longer output becuase everytime it switches to a new VDC,
+You see a relatively longer output because every time it switches to a new VDC,
 the terminal is reinitialized.
 
 .. note::
@@ -291,7 +366,7 @@ switchback
 -----------
 
 It is just the opposite of `switchto`. It is used to return to the *default*
-VDC. This sevice takes no mandatory arguments.
+VDC. This service takes no mandatory arguments.
 
 ==========   ======================    =============================
 Argument     Type                      Description
@@ -413,31 +488,6 @@ command      str (no vdc)              alternate command.
     in. Isn't is obvious !!
 
 
-guestshell
-----------
-
-Service to execute commands in the Linux "guest shell" available on certain
-Nexus platforms. ``guestshell`` gives you a router-like object to execute
-commands on using a Python context manager.
-
-=================   ========   ===================================================================
-Argument            Type       Description
-=================   ========   ===================================================================
-enable_guestshell   boolean    Explicitly enable the guestshell before attempting to enter.
-timeout             int (10)   Timeout for "guestshell enable", "guestshell", and "exit" commands.
-retries             int (20)   Number of retries (x 5 second interval) to attempt to enable guestshell.
-=================   ========   ===================================================================
-
-.. code-block:: python
-
-    with device.guestshell(enable_guestshell=True, retries=30) as gs:
-        output = gs.execute("ifconfig")
-
-    with device.guestshell() as gs:
-        output1 = gs.execute('pwd')
-        output2 = gs.execute('ls -al')
-
-
 reload
 ------
 
@@ -460,6 +510,7 @@ config_lock_retries       int (default 20)            retry times if config mode
 config_lock_retry_sleep   int (default 9 sec)         sleep between config_lock_retries
 image_to_boot             str                         n9k plugin only: boot from specified image if device goes into loader state
 reload_creds              list or str ('default')     Credentials to use if device prompts for user/pw.
+reconnect_sleep           int (default 60 sec)        sleep time interval before reconnect device
 =======================   =======================     ========================================
 
     return :
@@ -484,3 +535,29 @@ reload_creds              list or str ('default')     Credentials to use if devi
         # using return_output
         result, output = rtr.reload(return_output=True)
 
+
+l2rib_dt
+--------
+
+Layer 2 Routing Information Base (L2RIB) developer tool service.
+
+With this service, the l2rib tool can be used to execute commands. The service
+is intended to be used as a context manager, see example below.
+
+=======================   =======================     ===============================================
+Argument                  Type                        Description
+=======================   =======================     ===============================================
+client_id                 int                         (optional) Client identifier for l2rib_dt tool.
+                                                      By default, a random ID will be used.
+=======================   =======================     ===============================================
+
+
+.. code-block:: python
+
+        # default client ID (random)
+        with rtr.l2rib_dt() as l2rib:
+            l2rib.execute('l2rib command')
+
+        # specific client ID
+        with rtr.l2rib_dt(client_id=1000) as l2rib:
+            l2rib.execute('l2rib command')

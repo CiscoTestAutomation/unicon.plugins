@@ -2,22 +2,76 @@
 
 __author__ = "Myles Dear <pyats-support@cisco.com>"
 
-from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine
+import re
+from datetime import datetime
+from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine, config_transition
 from unicon.plugins.generic.statements import (connection_statement_list,
                                                default_statement_list)
 from unicon.plugins.generic.service_statements import reload_statement_list
-from unicon.plugins.generic.statements import GenericStatements
+from unicon.plugins.generic.statements import GenericStatements, buffer_settled
 from unicon.statemachine import State, Path, StateMachine
-from unicon.eal.dialogs import Dialog
+from unicon.eal.dialogs import Dialog, Statement
 from .patterns import IosXEPatterns
-from .statements import boot_from_rommon_statement_list
+from .statements import (
+    boot_image, boot_timeout_stmt,
+    boot_from_rommon_statement_list)
 
 patterns = IosXEPatterns()
 statements = GenericStatements()
 
+def enable_bash_console_transition(statemachine, spawn, context):
+    ''' Transition from enable mode to bash_console
+
+    Optional arguments are set by bash_console() (switch and rp).
+    '''
+    switch = context.get('_switch')
+    rp = context.get('_rp')
+    cmd = 'request platform software system shell'
+    if switch:
+        cmd += f' switch {switch}'
+    if rp:
+        cmd += f' rp {rp}'
+    spawn.sendline(cmd)
+
+
+def boot_from_rommon(statemachine, spawn, context):
+    context['boot_start_time'] = datetime.now()
+    context['boot_prompt_count'] = 1
+    boot_image(spawn, context, None)
+
+
+def send_break(statemachine, spawn, context):
+    spawn.send('\x03')
+
+
+def config_service_prompt_handler(spawn, config_pattern):
+    """ Check if we need to send the sevice config prompt command.
+    """
+    if hasattr(spawn.settings, 'SERVICE_PROMPT_CONFIG_CMD') and spawn.settings.SERVICE_PROMPT_CONFIG_CMD:
+        # if the config prompt is seen, return
+        if re.search(config_pattern, spawn.buffer):
+            return
+        else:
+            # if no buffer changes for a few seconds, check again
+            if buffer_settled(spawn, spawn.settings.CONFIG_PROMPT_WAIT):
+                if re.search(config_pattern, spawn.buffer):
+                    return
+                else:
+                    spawn.sendline(spawn.settings.SERVICE_PROMPT_CONFIG_CMD)
+
 
 class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
     config_command = 'config term'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.config_transition_statement_list = [
+            Statement(pattern=patterns.config_start,
+                      action=config_service_prompt_handler,
+                      args={'config_pattern': self.get_state('config').pattern},
+                      loop_continue=True,
+                      trim_buffer=False)
+        ]
 
     def create(self):
         super().create()
@@ -32,7 +86,7 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         self.remove_state('config')
         self.remove_state('enable')
         self.remove_state('disable')
-        # incase there is no previous shell state regiestered
+        # incase there is no previous shell state registered
         try:
             self.remove_state('shell')
             self.remove_path('shell', 'enable')
@@ -44,30 +98,52 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         enable = State('enable', patterns.enable_prompt)
         config = State('config', patterns.config_prompt)
         shell = State('shell', patterns.shell_prompt)
+        guestshell = State('guestshell', patterns.guestshell_prompt)
+        rommon = State('rommon', patterns.rommon_prompt)
+        tclsh = State('tclsh', patterns.tclsh_prompt)
+        macro = State('macro', patterns.macro_prompt)
 
-        disable_to_enable = Path(disable, enable, 'enable',
-                                 Dialog([statements.enable_password_stmt, statements.bad_password_stmt]))
+        disable_to_enable = Path(disable, enable, 'enable', Dialog([
+            statements.enable_password_stmt,
+            statements.bad_password_stmt,
+            statements.syslog_stripper_stmt
+        ]))
         enable_to_disable = Path(enable, disable, 'disable', None)
 
-        enable_to_config = Path(enable, config, self.config_command, None)
-        config_to_enable = Path(config, enable, 'end', None)
+        enable_to_config = Path(enable, config, config_transition, Dialog([statements.syslog_msg_stmt]))
+        config_to_enable = Path(config, enable, 'end', Dialog([statements.syslog_msg_stmt]))
+
+        enable_to_guestshell = Path(enable, guestshell, 'guestshell run bash', None)
+        guestshell_to_enable = Path(guestshell, enable, 'exit', None)
+
+        enable_to_tclsh = Path(enable, tclsh, 'tclsh', None)
+        tclsh_to_enable = Path(tclsh, enable, 'exit', None)
+
+        macro_to_config = Path(macro, config, send_break, None)
 
         self.add_state(disable)
         self.add_state(enable)
         self.add_state(config)
+        self.add_state(guestshell)
+        self.add_state(tclsh)
+        self.add_state(macro)
 
         self.add_path(disable_to_enable)
         self.add_path(enable_to_disable)
         self.add_path(enable_to_config)
         self.add_path(config_to_enable)
+        self.add_path(enable_to_guestshell)
+        self.add_path(guestshell_to_enable)
+        self.add_path(enable_to_tclsh)
+        self.add_path(tclsh_to_enable)
+        self.add_path(macro_to_config)
 
+        enable_to_rommon = Path(enable, rommon, 'reload', Dialog(
+            connection_statement_list + reload_statement_list))
 
-        rommon = State('rommon', patterns.rommon_prompt)
-        enable_to_rommon = Path(enable, rommon, 'reload',
-            Dialog(reload_statement_list))
-        rommon_to_disable = \
-            Path(rommon, disable, '\r', Dialog(
-                connection_statement_list + boot_from_rommon_statement_list))
+        rommon_to_disable = Path(rommon, disable, boot_from_rommon, Dialog(
+            boot_from_rommon_statement_list))
+
         self.add_state(rommon)
         self.add_path(enable_to_rommon)
         self.add_path(rommon_to_disable)
@@ -75,7 +151,7 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         # Adding SHELL state to IOSXE platform.
         shell_dialog = Dialog([[patterns.access_shell, 'sendline(y)', None, True, False]])
 
-        enable_to_shell = Path(enable, shell, 'request platform software system shell', shell_dialog)
+        enable_to_shell = Path(enable, shell, enable_bash_console_transition, shell_dialog)
         shell_to_enable = Path(shell, enable, 'exit', None)
 
         # Add State and Path to State Machine
@@ -85,6 +161,8 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
 
 
 class IosXEDualRpStateMachine(StateMachine):
+    config_command = 'config term'
+
     def create(self):
         # States
         disable = State('disable', patterns.disable_prompt)
@@ -93,27 +171,51 @@ class IosXEDualRpStateMachine(StateMachine):
         standby_locked = State('standby_locked', patterns.standby_locked)
         rommon = State('rommon', patterns.rommon_prompt)
         shell = State('shell', patterns.shell_prompt)
+        tclsh = State('tclsh', patterns.tclsh_prompt)
+        macro = State('macro', patterns.macro_prompt)
+
+        def update_cur_state(sm, state):
+            sm._current_state = state
 
         # Paths
-        disable_to_enable = Path(disable, enable, 'enable',
-                                 Dialog([statements.enable_password_stmt, statements.bad_password_stmt]))
-        enable_to_disable = Path(enable, disable, 'disable', None)
+        disable_to_enable = Path(disable, enable, 'enable', Dialog([
+            statements.enable_password_stmt,
+            statements.bad_password_stmt,
+            statements.syslog_stripper_stmt,
+            Statement(
+                pattern=patterns.standby_locked,
+                action=update_cur_state,
+                args={
+                    'sm': self,
+                    'state': 'standby_locked'
+                },
+                loop_continue=False)
+        ]))
 
-        enable_to_config = Path(enable, config, 'config term', None)
+        enable_to_disable = Path(enable, disable, 'disable', Dialog([statements.syslog_msg_stmt]))
 
-        config_to_enable = Path(config, enable, 'end', None)
+        enable_to_config = Path(enable, config, config_transition, Dialog([statements.syslog_msg_stmt]))
 
-        enable_to_rommon = Path(enable, rommon, 'reload',
-            Dialog(reload_statement_list))
+        config_to_enable = Path(config, enable, 'end', Dialog([statements.syslog_msg_stmt]))
+
+        enable_to_rommon = Path(enable, rommon, 'reload', Dialog(
+            connection_statement_list + reload_statement_list))
 
         rommon_to_disable = \
-            Path(rommon, disable, '\r', Dialog(
-                connection_statement_list + boot_from_rommon_statement_list))
+            Path(rommon, disable, boot_from_rommon, Dialog(
+                boot_from_rommon_statement_list))
+
+        enable_to_tclsh = Path(enable, tclsh, 'tclsh', None)
+        tclsh_to_enable = Path(tclsh, enable, 'exit', None)
+
+        macro_to_config = Path(macro, config, send_break, None)
 
         self.add_state(disable)
         self.add_state(enable)
         self.add_state(config)
         self.add_state(rommon)
+        self.add_state(tclsh)
+        self.add_state(macro)
 
         # Ensure that a locked standby is properly detected.
         # This is done by ensuring this is the last state added
@@ -126,11 +228,14 @@ class IosXEDualRpStateMachine(StateMachine):
         self.add_path(config_to_enable)
         self.add_path(enable_to_rommon)
         self.add_path(rommon_to_disable)
+        self.add_path(enable_to_tclsh)
+        self.add_path(tclsh_to_enable)
+        self.add_path(macro_to_config)
 
         # Adding SHELL state to IOSXE platform.
         shell_dialog = Dialog([[patterns.access_shell, 'sendline(y)', None, True, False]])
 
-        enable_to_shell = Path(enable, shell, 'request platform software system shell', shell_dialog)
+        enable_to_shell = Path(enable, shell, enable_bash_console_transition, shell_dialog)
         shell_to_enable = Path(shell, enable, 'exit', None)
 
         # Add State and Path to State Machine

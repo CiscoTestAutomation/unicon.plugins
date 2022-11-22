@@ -43,11 +43,14 @@ if os.environ.get('DEVNET', None) == 'true':
     intersphinx_mapping = {
         'python': ('http://docs.python.org/3.6', None ),
         'pyats':  ('https://pubhub.devnetcloud.com/media/pyats/docs', None ),
+        'unicon':  ('https://pubhub.devnetcloud.com/media/unicon/docs', None ),
     }
 else:
     intersphinx_mapping = {
         'python': ('http://docs.python.org/3.6', None ),
         'pyats':  ('http://wwwin-pyats.cisco.com/documentation/latest', None ),
+        'unicon':  ('http://wwwin-pyats.cisco.com/cisco-shared/unicon/latest',
+             None ),
     }
 
 
@@ -66,7 +69,7 @@ master_doc = 'index'
 # General information about the project.
 project = 'Unicon Plugins'
 
-copyright = '2014-2019, Cisco Systems Inc.'
+copyright = '2014-2020, Cisco Systems Inc.'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

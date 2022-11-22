@@ -3,6 +3,36 @@ Linux
 
 This section lists the services which are supported on Linux.
 
+** Prompt and Shell Prompt overriding **
+
+By default, Unicon is able to detect most variations of the bash shell prompt. However, in
+instances where another shell is being used (such as `zsh` or `fish`) it may have difficulty
+in detecting your prompt thus leaving the connection hanging. In the event this occurs you
+can override your prompt using the `PROMPT` setting in your testbed file like so:
+
+.. code-block:: yaml
+
+    devices:
+      linux_device:
+        connections:
+          cli:
+            settings:
+              PROMPT: '<your_prompt_regex>'
+
+If `learn_hostname` is set to True, Unicon will attempt to learn and store the hostname
+of you device in memory and switch the prompt to accommodate for that. It too can be overridden 
+with the `SHELL_PROMPT` setting like so:
+
+.. code-block:: yaml
+
+    devices:
+      linux_device:
+        connections:
+          cli:
+            settings:
+              SHELL_PROMPT: '<your_prompt_regex>'
+
+Use `%N` in your regex to specify where the hostname should be located. 
 
 execute
 -------
@@ -319,3 +349,65 @@ Example with custom error pattern to trigger exception.
     >>> 
 
 
+.. _linux_sudo:
+
+sudo
+----
+
+This service is used to execute commands using ``sudo`` on the device. This can be
+used to get a root shell by using `device.sudo()`, as `sudo bash` is the default
+command.
+
+===============   ======================    ============================================
+Argument          Type                      Description
+===============   ======================    ============================================
+command           str                       command to execute with sudo (default: bash)
+timeout           int (default 60 sec)      timeout value for the overall interaction.
+reply             Dialog                    additional dialog
+prompt_recovery   bool (default False)      Enable/Disable prompt recovery feature
+===============   ======================    ============================================
+
+The sudo password can be specified in the testbed file under the `sudo` credentials.
+
+.. code-block:: yaml
+
+      lnx:
+        os: linux
+        credentials:
+          default:
+            username: cisco
+            password: cisco
+          sudo:
+            password: sudo_password
+
+
+Example with device.sudo().
+
+.. code-block:: python
+
+      In [3]: dev.sudo()
+
+      2021-08-04 14:36:53,472: %UNICON-INFO: +++ lnx with alias 'cli': executing command 'sudo bash' +++
+      sudo bash
+      [sudo] password for cisco: 
+      Linux# 
+      Out[3]: '[sudo] password for cisco: '
+
+      In [4]: 
+
+
+Example with sudo command argument.
+
+.. code-block:: python
+
+      In [5]: dev.sudo('ls')
+
+      2021-08-04 14:37:58,397: %UNICON-INFO: +++ lnx with alias 'cli': executing command 'sudo ls' +++
+      sudo ls
+      /tmp
+      /var
+      /opt
+      Linux$ 
+      Out[5]: '/tmp\r\n/var\r\n/opt'
+
+      In [6]: 

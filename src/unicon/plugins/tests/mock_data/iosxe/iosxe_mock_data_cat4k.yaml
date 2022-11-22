@@ -1,0 +1,146 @@
+c4k_login:
+  preface: |2
+    User Access Verification
+  prompt: "Username: "
+  commands:
+    "admin":
+      new_state: c4k_password
+
+c4k_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: c4k_enable
+
+c4k_disable:
+  prompt: "%N>"
+  commands:
+    "en":
+      new_state: c4k_enable
+    "enable":
+      new_state: c4k_enable
+
+
+cat4k_locked:
+  prompt: ""
+
+cat4k_exec:
+  prompt: "%N>"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version":
+      response: &SV |
+        Cisco IOS Software, IOS-XE Software, Catalyst 4500 L3 Switch  Software (cat4500es8-UNIVERSALK9-M), Version 03.11.01.E RELEASE SOFTWARE (fc4)
+        Technical Support: http://www.cisco.com/techsupport
+        Copyright (c) 1986-2019 by Cisco Systems, Inc.
+        Compiled Sat 07-Dec-19 12:49 by prod_rel_team
+
+
+
+        Cisco IOS-XE software, Copyright (c) 2005-2015 by cisco Systems, Inc.
+        All rights reserved.  Certain components of Cisco IOS-XE software are
+        licensed under the GNU General Public License ("GPL") Version 2.0.  The
+        software code licensed under GPL Version 2.0 is free software that comes
+        with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+        GPL code under the terms of GPL Version 2.0.
+        (http://www.gnu.org/licenses/gpl-2.0.html) For more details, see the
+        documentation or "License Notice" file accompanying the IOS-XE software,
+        or the applicable URL provided on the flyer accompanying the IOS-XE
+        software.
+
+
+        Last reload reason: reload
+
+
+        License Information for 'WS-X45-SUP8-E'
+            License Level: entservices   Type: Permanent Right-To-Use
+            Next reboot license Level: entservices
+
+        cisco WS-C4507R+E (P5040) processor (revision 2) with 4194304K bytes of physical memory.
+        Processor board ID FXS2102Q0HX
+        P5040 CPU at 2.2GHz, Supervisor 8-E
+        Last reset from Reload
+        1 Virtual Ethernet interface
+        36 Gigabit Ethernet interfaces
+        28 Ten Gigabit Ethernet interfaces
+        511K bytes of non-volatile configuration memory.
+
+        Configuration register is 0x102
+
+    "enable":
+      new_state: c4k_enable
+
+c4k_enable:
+  prompt: "%N#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": *SV
+    "sh redundancy state": &SRS |2
+            my state = 13 -ACTIVE
+            peer state = 8  -STANDBY HOT
+                  Mode = Duplex
+                  Unit = Primary
+              Unit ID = 4
+      
+      Redundancy Mode (Operational) = sso
+      Redundancy Mode (Configured)  = sso
+      Redundancy State              = sso
+            Maintenance Mode = Disabled
+          Manual Swact = enabled
+        Communications = Up
+      
+          client count = 113
+        client_notification_TMR = 30000 milliseconds
+                  RF debug mask = 0x0
+
+    "config term":
+      new_state: cat4k_config
+
+    "disable":
+      new_state: cat4k_exec
+    "reload":
+      new_state: cat4k_system_config_change
+
+cat4k_config:
+  prompt: "%N(config)#"
+  commands:
+    "no logging console": ""
+    "line vty 0 4":
+      new_state: cat4k_config_line
+    "line console 0":
+      new_state: cat4k_config_line
+
+cat4k_config_line:
+  prompt: "%N(config-line)#"
+  commands:
+    "exec-timeout 0": ""
+    "line vty 0 4": ""
+    "end":
+      new_state: c4k_enable
+
+cat4k_system_config_change:
+  prompt: "System configuration has been modified. Save? [yes/no]:"
+  commands:
+    "n":
+      new_state: cat4k_reload_proceed
+
+cat4k_reload_proceed:
+  prompt: "Proceed with reload? [confirm]"
+  commands:
+    "":
+      new_state: cat4k_reload_logs
+
+cat4k_reload_logs:
+  prompt: ""
+  preface: |2
+
+    Please stand by while rebooting the system...
+    estarting system.
+        
+    Press RETURN to get started!
+
+  commands:
+    "":
+      new_state: cat4k_exec

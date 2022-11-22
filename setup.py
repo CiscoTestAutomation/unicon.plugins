@@ -28,7 +28,8 @@ def build_version_range(version):
     for any given version, return the major.minor version requirement range
     eg: for version '3.4.7', return '>=3.4.0, <3.5.0'
     '''
-    req_ver = version.split('.')
+    non_local_version = version.split('+')[0]
+    req_ver = non_local_version.split('.')
     version_range = '>= %s.%s.0, < %s.%s.0' % \
         (req_ver[0], req_ver[1], req_ver[0], int(req_ver[1])+1)
 
@@ -43,8 +44,9 @@ def version_info(*paths):
 # compute version range
 version, version_range = version_info('src', 'unicon', 'plugins', '__init__.py')
 
-install_requires = ['pyyaml',
-                    'unicon {range}'.format(range = version_range)],
+install_requires = ['unicon {range}'.format(range = version_range),
+                    'pyyaml',
+                    'PrettyTable']
 
 # launch setup
 setup(
@@ -105,6 +107,7 @@ setup(
                          'tests/mock_data/*/*.txt',
                          'tests/mock_data/*/*/*.txt',
                          'tests/unittest/ssh_host_key',
+                         'pid_tokens.csv'
                          ]},
 
     # Standalone scripts

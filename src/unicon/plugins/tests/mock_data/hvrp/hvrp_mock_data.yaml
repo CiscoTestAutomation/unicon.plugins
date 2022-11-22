@@ -1,0 +1,84 @@
+connect_ssh:
+  preface: |
+    The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
+    RSA key fingerprint is a1:07:ac:9b:8c:c2:db:c5:4c:dc:70:b5:09:2a:a5:b1.
+  prompt: "Are you sure you want to continue connecting (yes/no)? "
+  commands:
+    "yes":
+      new_state: user_access_veri
+
+exec:
+  prompt: "<ooo-gg-9999zz-99>"
+  commands:
+    "display version" : |
+      Huawei Versatile Routing Platform Software
+       VRP (R) software, Version 5.170 (AR650 V300R019C11SPC200)
+       Copyright (C) 2011-2020 HUAWEI TECH CO., LTD
+       Huawei AR657W Router uptime is 0 week, 0 day, 0 hour, 4 minutes
+
+       MPU 0(Master) : uptime is 0 week, 0 day, 0 hour, 3 minutes
+       SDRAM Memory Size    : 2048    M bytes
+       Flash 0 Memory Size  : 1024    M bytes
+       Flash 1 Memory Size  : 32      M bytes
+       USB Disk0 Memory Size: 14976   M bytes
+       MPU version information :
+       1. PCB      Version  : AR-SRU651 VER.A
+       2. MAB      Version  : 0
+       3. Board    Type     : AR657W
+       4. CPLD0    Version  : 103
+       5. BootROM  Version  : 1
+
+
+    "screen-length 0 temporary": "Info: The configuration takes effect on the current user terminal interface only."
+    "undo terminal alarm": "Info: Current alarm terminal is off."
+    "undo terminal logging": "Info: Current terminal logging is off."
+    "undo terminal debugging": "Info: Current terminal debugging is off."
+    "undo terminal monitor": "Info: Current terminal monitor is off."
+    "system-view":
+        new_state: config
+
+user_access_veri:
+  preface: User Access Verification
+  prompt: "login: "
+  commands:
+    "nielsvanhooy":
+      new_state: user_password
+
+user_password:
+  prompt: "Password: "
+  commands:
+    "kpn":
+      new_state: exec
+
+config:
+  preface: |
+    Enter system view, return user view with return command.
+  prompt: "[~ooo-gg-9999zz-99]"
+  commands:
+    "bgp 65000":
+      new_state: bgp_config
+    "commit": ""
+    "return":
+      new_state: exec
+
+bgp_config:
+  prompt: "[~ooo-gg-9999zz-99-bgp]"
+  commands:
+    "peer 1.1.1.1 as-number 64666":
+      new_state: bgp_config_uncommitted_change
+    "commit": ""
+    "exit":
+      new_state: config
+    "return":
+      new_state: exec
+
+bgp_config_uncommitted_change:
+  prompt: "[*ooo-gg-9999zz-99-bgp]"
+  commands:
+    "commit":
+      response: "Committing....done."
+      timing:
+        - "0:,0,2,0"
+      new_state: bgp_config
+
+

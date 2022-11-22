@@ -9,6 +9,9 @@ ios_setup:
 
 ios_setup_mgmt:
   prompt: "Would you like to enter basic management setup? [yes/no]: "
+  keys:
+    "ctrl-c":
+      new_state: enable
   commands:
     "no":
       new_state: enable
@@ -27,10 +30,16 @@ connect_ssh:
   preface: |
     The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
     RSA key fingerprint is a1:07:ac:9b:8c:c2:db:c5:4c:dc:70:b5:09:2a:a5:b1.
-  prompt: "Are you sure you want to continue connecting (yes/no)? "
+  prompt: "Are you sure you want to continue connecting (yes/no/[fingerprint])? "
   commands:
     "yes":
       new_state: login
+
+connect_ssh_passphrase:
+  prompt: "Enter passphrase for key '/home/admin/.ssh/id_rsa': "
+  commands:
+    "this is a secret":
+      new_state: enable
 
 login:
   prompt: "Username: "
@@ -239,7 +248,7 @@ execHashCharacters:
 # Special state 'exec2' to test statemachine failure
 # test_statemachine.py::TestSMGoTo::test_go_to_failure
 exec2:
-  prompt: Router>
+  prompt: "%N>"
   commands:
     "enable": ""
 
@@ -258,7 +267,7 @@ confirm_prompt:
 
 enable:
   prompt: "%N#"
-  commands:
+  commands: &enable_cmds
     "setup_mgmt":
       new_state: ios_setup_mgmt
     "enable": ""
@@ -275,10 +284,33 @@ enable:
       new_state: config
     "ping":
       new_state: ping_proto
+    "ping 1.1.1.1": &ping1
+      response: |
+        Type escape sequence to abort.
+        Sending 5, 100-byte ICMP Echos to 1.1.1.1, timeout is 2 seconds:
+        !!!!!
+        Success rate is 100 percent (5/5), round-trip min/avg/max = 1/1/1 ms
+    "ping vrf management 1.1.1.1": *ping1
+    "ping 10.10.10.10":
+      response: |
+        Type escape sequence to abort.
+        Sending 5, 100-byte ICMP Echos to 10.10.10.10, timeout is 2 seconds:
+        .....
+        Success rate is 0 percent (0/5)
+      timing:
+        - "0:2,0,0.05"
+        - "2:3,0,0,2"
+        - "3:,0.5"
     "ping vrf management":
       new_state: ping_proto_ios_vrf 
+    "ping vrf mgmt":
+      new_state: ping_proto_ios_verbose
     "sh redundancy stat | inc my state":
         my state = 13 -ACTIVE
+    "show redundancy sta |  in my": |
+             my state = 13 -ACTIVE 
+    "show redundancy sta |  in peer": |
+           peer state = 8  -STANDBY HOT 
 
     "sh redundancy state": |2
              my state = 13 -ACTIVE 
@@ -427,6 +459,8 @@ config:
     "no logging console": ""
     "!end indicator for bulk configure": ""
     "do show version": *SV
+    "line vty 0 4":
+      new_state: config_line
     "line console 0":
       new_state: config_line
     "redundancy":
@@ -435,12 +469,15 @@ config:
       new_state: enable
     "end":
       new_state: enable
+    "crypto pki trustpoint KEYPAIR":
+      new_state: config_ca_trustpoint
 
 
 config_line:
   prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
+    "line vty 0 4": ""
     "end":
       new_state: enable
 
@@ -525,6 +562,19 @@ password_retries:
   commands:
     "cisco": ""
 
+# Special login state to handle differing enable password
+login_enable:
+  prompt: "Username: "
+  commands:
+    "admin":
+      new_state: password_enable
+
+password_enable:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: console_test_enable
+
 console_test_enable:
   preface: *CC
   prompt: "%N> "
@@ -537,6 +587,9 @@ check_enable_passwd:
   commands:
     "enpasswd":
       new_state: enable
+    "enpasswd2":
+      response: "Invalid password."
+      new_state: console_test_enable
 
 ts_login:
   prompt: "login: "
@@ -549,3 +602,12 @@ ts_password:
   commands:
     "lab":
       new_state: exec
+
+config_ca_trustpoint:
+  prompt: "%N(ca-trustpoint)#"
+  commands:
+    "rsakeypair SSHKEYS": ""
+    "exit":
+      new_state: config
+    "end":
+      new_state: enable

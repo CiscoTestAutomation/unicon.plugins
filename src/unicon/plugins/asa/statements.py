@@ -16,6 +16,8 @@ from unicon.bases.routers.connection import ENABLE_CRED_NAME
 from unicon.plugins.utils import (get_current_credential,
     common_cred_password_handler, )
 
+from unicon.plugins.generic.statements import enable_password_handler
+
 from unicon.core.errors import UniconAuthenticationError
 from unicon.utils import to_plaintext
 
@@ -23,19 +25,6 @@ from unicon.utils import to_plaintext
 
 patterns = ASAPatterns()
 settings = ASASettings()
-
-def enable_password_handler(spawn, context, session):
-    credentials = context.get('credentials')
-    enable_credential = credentials[ENABLE_CRED_NAME] if credentials else None
-    if enable_credential:
-        try:
-            spawn.sendline(to_plaintext(enable_credential['password']))
-        except KeyError as exc:
-            raise UniconAuthenticationError("No password has been defined "
-                "for credential {}.".format(ENABLE_CRED_NAME))
-
-    else:
-        spawn.sendline(context['enable_password'])
 
 
 def line_password_handler(spawn, context, session):
@@ -65,6 +54,7 @@ def escape_char_handler(spawn):
             prev_buf_len = cur_buf_len
 
     spawn.sendline()
+
 
 login_password = Statement(pattern=patterns.line_password,
                            action=line_password_handler,
@@ -104,7 +94,42 @@ bad_password_stmt = Statement(pattern=patterns.bad_passwords,
 
 disconnect_error_stmt = Statement(pattern=patterns.disconnect_message,
                                   action=connection_failure_handler,
-                                  args={
-                                  'err': 'received disconnect from router'},
+                                  args=None,
                                   loop_continue=False,
                                   continue_timer=False)
+
+reload_confirm_stmt = Statement(pattern=patterns.reload_confirm,
+                                action='sendline(y)',
+                                args=None,
+                                loop_continue=True,
+                                continue_timer=False)
+
+error_reporting_stmt = Statement(pattern=patterns.error_reporting,
+                                action='sendline(A)',
+                                args=None,
+                                loop_continue=True,
+                                continue_timer=False)
+
+save_config_stmt = Statement(pattern=patterns.save_changes,
+                             action='sendline(S)',
+                             args=None,
+                             loop_continue=True,
+                             continue_timer=False)
+
+begin_replication_stmt = Statement(pattern=patterns.begin_config_replication,
+                             action=sendline,
+                             args=None,
+                             loop_continue=True,
+                             continue_timer=False)
+
+end_replication_stmt = Statement(pattern=patterns.end_config_replication,
+                                 action=sendline,
+                                 args=None,
+                                 loop_continue=True,
+                                 continue_timer=False)
+
+connection_statements = [bad_password_stmt, begin_replication_stmt, end_replication_stmt]
+
+execute_statements = [error_reporting_stmt, save_config_stmt, begin_replication_stmt, end_replication_stmt]
+
+reload_statements = [save_config_stmt, begin_replication_stmt, end_replication_stmt]

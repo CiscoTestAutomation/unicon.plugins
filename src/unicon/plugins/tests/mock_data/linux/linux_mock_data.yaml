@@ -18,6 +18,25 @@ connect_ssh:
     "yes":
       new_state: password
 
+connect_ssh_key_error:
+  preface: |
+    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    @    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+    Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+    It is also possible that a host key has just been changed.
+    The fingerprint for the ECDSA key sent by the remote host is
+    SHA256:zDkX6A76of5LWxP8FQD9dZULQVQCpvYaGcWS4PnyqPE.
+    Please contact your system administrator.
+    Add correct host key in ~/.ssh/known_hosts to get rid of this message.
+    Offending ECDSA key in ~/.ssh/known_hosts:13
+    Password authentication is disabled to avoid man-in-the-middle attacks.
+    Keyboard-interactive authentication is disabled to avoid man-in-the-middle attacks.
+    virl@172.25.192.90: Permission denied (publickey,password).
+  prompt: ""
+  commands: ""
+
 
 connect_sma:
   prompt: "testuser@pod-esa01's password: "
@@ -87,6 +106,19 @@ linux_password3:
     "cisco":
       new_state: exec
 
+linux_password4:
+  prompt: "admin@1.1.1.1's password: "
+  commands:
+    "cisco":
+      response: |
+        Command Line Interface is starting up, please wait ...
+        Welcome to the Platform Command Line Interface
+        VMware Installation:
+                2 vCPU: Intel(R) Xeon(R) CPU E5-2680 0 @ 2.70GHz
+                Disk 1: 110GB, Partitions aligned
+                8192 Mbytes RAM
+      new_state: exec17
+
 exec:
   prompt: "Linux$ "
   commands: &cmds
@@ -120,12 +152,30 @@ exec:
         new_state: exec13
     "prompt14":
         new_state: exec14
+    "prompt15":
+        new_state: exec15
+    "prompt16":
+        new_state: exec16
+    "prompt17":
+        new_state: exec17
+    "prompt18":
+        new_state: exec18
+    "prompt19":
+        new_state: exec19
+    "prompt20":
+        new_state: exec20
     "ls": |
+      /tmp
+      /var
+      /opt
+    "sudo ls": |
       /tmp
       /var
       /opt
     "sudo":
       new_state: sudo_password
+    "sudo2":
+      new_state: sudo_password2
     "exit":
       new_state: login
 
@@ -238,6 +288,10 @@ exec:
         - '1'
         - '0'
         - '2'
+    "sudo_invalid":
+        new_state: sudo_invalid
+    "sudo bash":
+        new_state: sudo_password
 
 exec2:
   prompt: "Linux# "
@@ -268,7 +322,7 @@ exec8:
   commands: *cmds
 
 exec9:
-  prompt: "ESC]0;cisco@dev-server:~^Gcisco@dev-server:3> "
+  prompt: "%1B]0;cisco@dev-server:~^Gcisco@dev-server:3> "
   commands: *cmds
 
 exec10:
@@ -288,8 +342,40 @@ exec13:
   commands: *cmds
 
 exec14:
-  prompt: "ESC]0;rally@rally: /workspace\x07rally@rally:/workspace$ ESC[K"
+  prompt: "%1B]0;rally@rally: /workspace\x07rally@rally:/workspace$ %1B[K"
   commands: *cmds
+
+exec15:
+  prompt: "$ "
+  commands: *cmds
+
+exec16:
+  prompt: "root@sj21-pxe-03.cisco.com:~/"
+  commands: *cmds
+
+exec17:
+  prompt: "admin:"
+  commands: *cmds
+
+exec18:
+  preface:
+    response: |
+      ########################################################################
+
+      <host:root>/root:
+    timing:
+      - 0:,0,0.05
+  prompt: "# "
+  commands: *cmds
+
+exec19:
+    prompt: "~ #"
+    commands: *cmds
+
+exec20:
+  prompt: "[%N] # "
+  commands: *cmds
+
 
 sma_prompt:
   prompt: "sma03:testuser 1] "
@@ -300,16 +386,33 @@ sma_prompt_1:
   commands: *cmds
 
 sudo_password:
-  prompt: "Password: "
+  prompt: "[sudo] password for cisco: "
   commands:
-    "cisco":
+    "sudo_password":
+      new_state: sudo
+
+sudo_password2:
+  prompt: "This is your UNIX password: "
+  commands:
+    "sudo_password":
       new_state: sudo
 
 sudo:
   prompt: "Linux# "
   commands:
+    <<: *cmds
     "exit":
       new_state: exec
+
+sudo_invalid:
+  prompt: "[sudo] password for cisco: "
+  commands:
+    "unknown":
+      response: "cisco is not in the sudoers file.  This incident will be reported."
+      new_state: sudo
+    "invalid": "Sorry, try again."
+    "sudo":
+      new_state: sudo_password
 
 hit_enter:
   prompt: "Hit Enter to proceed: "
@@ -338,13 +441,13 @@ ios_login:
       new_state: ios_exec
 
 ios_exec:
-  prompt: Router>
+  prompt: "%N>"
   commands:
     "enable":
       new_state: ios_enable
 
 ios_enable:
-  prompt: Router#
+  prompt: "%N#"
   commands:
     "term length 0": ""
     "term width 0": ""
@@ -353,10 +456,12 @@ ios_enable:
       new_state: ios_config
 
 ios_config:
-  prompt: "Router(conf)#"
+  prompt: "%N(conf)#"
   commands:
     "no logging console": ""
     "line console 0":
+      new_state: ios_config_line
+    "line vty 0 4":
       new_state: ios_config_line
     "exit":
       new_state: ios_enable
@@ -364,9 +469,10 @@ ios_config:
       new_state: ios_enable
 
 ios_config_line:
-  prompt: "Router(config-line)#"
+  prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
+    "line vty 0 4": ""
     "end":
       new_state: ios_enable
 
@@ -382,7 +488,7 @@ ios_r1_telnet:
      
   prompt: "Password:"
   commands:
-    "cisco":
+    "cisco1":
       new_state: ios_r1_exec
 
 ios_r1_exec:
@@ -396,7 +502,7 @@ ios_r1_exec:
 ios_r1_password:
   prompt: "Password:"
   commands:
-    "cisco":
+    "cisco11":
       new_state: ios_r1_enable
 
 ios_r1_enable:
@@ -404,7 +510,8 @@ ios_r1_enable:
   commands:
     "telnet 2.2.2.2":
       new_state: ios_r2_telnet
-
+    "ssh 2.2.2.2 username user1":
+      new_state: ios_r2_telnet
 
 
 ios_r2_telnet:
@@ -418,7 +525,7 @@ ios_r2_telnet:
      
   prompt: "Password:"
   commands:
-    "cisco":
+    "cisco2":
       new_state: ios_r2_exec
 
 ios_r2_exec:
@@ -430,7 +537,7 @@ ios_r2_exec:
 ios_r2_password:
   prompt: "Password:"
   commands:
-    "cisco":
+    "cisco22":
       new_state: ios_r2_enable
 
 ios_r2_enable:
@@ -438,6 +545,8 @@ ios_r2_enable:
   commands:
     "telnet 10.2.3.3":
       new_state: ios_sw3_telnet
+    "telnet 10.2.3.4":
+      new_state: ios_sw4_telnet
 
 ios_sw3_telnet:
   preface: |
@@ -447,7 +556,7 @@ ios_sw3_telnet:
      
   prompt: "Password:"
   commands:
-    "cisco":
+    "cisco3":
       new_state: ios_sw3_exec
 
 ios_sw3_exec:
@@ -456,8 +565,54 @@ ios_sw3_exec:
     "enable":
       new_state: ios_sw3_enable
 
+ios_sw3_password:
+  prompt: "Password:"
+  commands:
+    "cisco33":
+      new_state: ios_sw03_enable
+
 ios_sw3_enable:
   prompt: "Sw03#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": ""
+
+
+
+
+ios_sw4_telnet:
+  preface: |
+    Trying 10.2.3.4 ... Open
+
+    User Access Verification
+     
+  prompt: "Password:"
+  commands:
+    "cisco4":
+      new_state: ios_sw4_exec
+
+ios_sw4_exec:
+  prompt: "Sw04>"
+  commands:
+    "enable":
+      new_state: ios_sw4_password
+
+ios_sw4_password:
+  prompt: "Password:"
+  commands:
+    "cisco44":
+      new_state: ios_sw4_enable
+
+ios_sw4_enable:
+  prompt: "Sw04#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": ""
+
+
+
 
 exec_ps1:
   prompt: "Linux$ "
@@ -488,11 +643,18 @@ login_ssh_delay:
     response: |
       Last login: Tue Dec 11 16:01:04 2018 from localhost
     timing:
-      - 0:,4
+      - 0:,10
   prompt: "[user@host ~]$ "
   commands: *cmds
 
-
+login_passphrase:
+  preface:
+    response: |
+      Last login: Tue Dec 11 16:01:04 2018 from localhost
+  prompt: "Enter passphrase for key '/home/virl/.ssh/id_rsa': "
+  commands:
+    "cisco":
+      new_state: exec
 
 
 prompt_recovery:

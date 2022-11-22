@@ -1,0 +1,417 @@
+
+
+
+
+
+System will now restart! Creating license client restartability thread
+
+Updating license storage ...  Done.
+
+Exit Called
+Switchdrvr exited!
+Restarting system.
+
+
+WLCNG Boot Loader Version 1.0.20 (Built on Jan  9 2014 at 19:02:44 by cisco)
+Board Revision 1.3 (SN: FCW12345678, Type: AIR-CT5508-K9) (G)
+
+Verifying boot loader integrity... OK.
+
+OCTEON CN5645-NSP pass 2.1, Core clock: 600 MHz, DDR clock: 330 MHz (660 Mhz data rate)
+FPGA Revision 1.7
+Env FW Revision 1.8
+USB Console Revision 2.2
+CPU Cores:  10
+DRAM:  1024 MB
+Flash: 32 MB
+Clearing DRAM........ done
+Network: octeth0', octeth1
+  ' - Active interface
+  E - Environment MAC address override
+CF Bus 0 (IDE): OK 
+IDE device 0:
+ - Model: STEC M2T CF 1.0.0 Firm: K1367MIX Ser#: ST123123123
+ - Type: Hard Disk
+ - Capacity: 977.4 MB = 0.9 GB (2001888 x 512)
+
+
+Press <ESC> now to access the Boot Menu...
+
+Loading primary image (8.5.9.11)
+
+    
+  0%
+    
+  0%
+    
+  1%
+    
+  2%
+    
+  3%
+    
+  4%
+    
+  5%
+    
+  6%
+    
+  7%
+    
+  8%
+    
+  9%
+    
+ 10%
+    
+ 11%
+    
+ 12%
+    
+ 13%
+    
+ 14%
+    
+ 15%
+    
+ 16%
+    
+ 17%
+    
+ 18%
+    
+ 19%
+    
+ 20%
+    
+ 21%
+    
+ 22%
+    
+ 23%
+    
+ 24%
+    
+ 25%
+    
+ 26%
+    
+ 27%
+    
+ 28%
+    
+ 29%
+    
+ 30%
+    
+ 31%
+    
+ 32%
+    
+ 33%
+    
+ 34%
+    
+ 35%
+    
+ 36%
+    
+ 37%
+    
+ 38%
+    
+ 39%
+    
+ 40%
+    
+ 41%
+    
+ 42%
+    
+ 43%
+    
+ 44%
+    
+ 45%
+    
+ 46%
+    
+ 47%
+    
+ 48%
+    
+ 49%
+    
+ 50%
+    
+ 51%
+    
+ 52%
+    
+ 53%
+    
+ 54%
+    
+ 55%
+    
+ 56%
+    
+ 57%
+    
+ 58%
+    
+ 59%
+    
+ 60%
+    
+ 61%
+    
+ 62%
+    
+ 63%
+    
+ 64%
+    
+ 65%
+    
+ 66%
+    
+ 67%
+    
+ 68%
+    
+ 69%
+    
+ 70%
+    
+ 71%
+    
+ 72%
+    
+ 73%
+    
+ 74%
+    
+ 75%
+    
+ 76%
+    
+ 77%
+    
+ 78%
+    
+ 79%
+    
+ 80%
+    
+ 81%
+    
+ 82%
+    
+ 83%
+    
+ 84%
+    
+ 85%
+    
+ 86%
+    
+ 87%
+    
+ 88%
+    
+ 89%
+    
+ 90%
+    
+ 91%
+    
+ 92%
+    
+ 93%
+    
+ 94%
+    
+ 95%
+    
+ 96%
+    
+ 97%
+    
+ 98%
+    
+ 99%
+     
+100%
+
+39518700 bytes read
+Launching...
+
+init started: BusyBox v1.6.0 (2010-05-13 17:50:10 EDT) multi-call binary
+
+starting pid 847, tty '': '/etc/init.d/rcS'
+Decompressing... OK 
+Validating...... OK 
+Set PLX switch MPS settings .............!!!!!!!
+Starting DB Services...
+Detecting Hardware ...
+set smp_affinity for irq 48
+003f
+Starting Web Services ...
+DP from CGE5.0 ...
+Starting NA Connector...
+
+starting pid 1208, tty '/dev/ttyS0': '/usr/bin/gettyOrMwar'
+Setting up ZVM
+Exporting LD_LIBRARY_PATH
+
+
+Cryptographic library self-test....
+Testing SHA1 Short Message 1
+Testing SHA256 Short Message 1
+Testing SHA384 Short Message 1
+SHA1 POST PASSED
+Testing HMAC SHA1 Short Message 1
+Testing HMAC SHA2 Short Message 1
+Testing HMAC SHA384 Short Message 1
+passed!
+
+
+XML config selected
+Validating XML configuration
+octeon_device_init: found 1 DPs
+readCPUConfigData: cardid 0x6070001
+Cisco is a trademark of Cisco Systems, Inc.
+Software Copyright Cisco Systems, Inc. All rights reserved.
+
+Cisco AireOS Version 8.5.9.11
+Firmware Version FPGA 1.7, Env 1.8, USB console 2.2
+Initializing OS Services: ok
+Initializing Serial Services: ok
+Initializing Network Services: ok
+Initializing Licensing Services: ok
+Starting Statistics Service: ok
+
+License daemon start initialization.....
+
+License daemon running.....
+Starting Licensing Services: 
+
+License Request Failed :User failed to accept EULA 
+
+ok
+Starting ARP Services: ok
+Starting Trap Manager: ok
+
+Starting Data Externalization services: ok
+Starting Network Interface Management Services: ok
+Starting System Services: ok
+Starting FIPS Features: ok : Not enabled
+Starting SNMP services: ok
+Starting Fastpath Hardware Acceleration: ok
+Starting Fastpath Console redirect : ok
+Starting Fastpath DP Heartbeat : ok
+Fastpath CPU0.00: Starting Fastpath Application. SDK-Cavium Networks Octeon SDK version 1.8.0, build 269. Flags-[DUTY CYCLE] : ok
+
+Fastpath CPU0.00: Initializing last packet received queue. Num of cores(10)
+
+Fastpath CPU0.00: Init MBUF size: 1856, Subsequent MBUF size: 2041
+
+Fastpath CPU0.00: Core 0 Initialization and FIPS self-test: ok
+
+Fastpath CPU0.00: 10 Cores are being initialized 
+
+Fastpath CPU0.00: Initializing Timer...
+
+Fastpath CPU0.00: Initializing Timer...done.
+
+Fastpath CPU0.00: Initializing Timer...
+
+Fastpath CPU0.00: Initializing NBAR AGING Timer...done.
+
+Fastpath CPU0.00: Received instruction to get link status
+
+Fastpath CPU0.01: Core 1 Initialization and FIPS self-test: ok
+
+Fastpath CPU0.02: Core 2 Initialization and FIPS self-test: ok
+
+Fastpath CPU0.03: Core 3 Initialization and FIPS self-test: ok
+
+Fastpath CPU0.04: Core 4 Initialization and FIPS self-test: ok
+
+Fastpath CPU0.05: Core 5 Initialization and FIPS self-test: ok
+
+Fastpath CPU0.06: Core 6 Initialization and FIPS self-test: ok
+
+Fastpath CPU0.07: Core 7 Initialization and FIPS self-test: ok
+
+Fastpath CPU0.08: Core 8 Initialization and FIPS self-test: ok
+
+Fastpath CPU0.09: Core 9 Initialization and FIPS self-test: ok
+
+Starting Switching Services: ok
+Starting QoS Services: ok
+Starting Policy Manager: ok
+Starting Data Transport Link Layer: ok
+Starting Access Control List Services: ok
+Starting System Interfaces: ok
+Starting Client Troubleshooting Service: ok
+Starting Certificate Database: ok
+Starting VPN Services: ok
+Starting Management Frame Protection: ok
+Starting DNS Services: ok
+ok
+Starting Redundancy: ok 
+
+Start rmgrPingTask: ok
+
+Starting LWAPP: ok
+Starting CAPWAP: ok
+Starting LOCP: ok 
+Starting Security Services: ok
+Starting OpenDNS Services: ok
+Starting Policy Manager: ok
+Starting Authentication Engine: ok
+Starting Mobility Management: ok
+Starting Capwap Ping Component: ok
+Starting AVC Services: ok
+Starting AVC Flex Services: ok
+
+Starting Virtual AP Services: ok
+Starting AireWave Director: ok
+Starting Network Time Services: ok
+Starting Cisco Discovery Protocol: ok
+Starting Broadcast Services: ok
+Starting Logging Services: ok
+Starting DHCP Server: ok
+Starting IDS Signature Manager: ok
+Starting RFID Tag Tracking: ok
+Starting RF Profiles: ok
+Starting Power Supply and Fan Status Monitoring Service: ok
+Starting Mesh Services:  ok
+Starting TSM: ok
+Starting CIDS Services: ok
+Starting DTLS server:  enabled in CAPWAP
+Starting CleanAir: ok
+Starting WIPS: ok 
+Starting SSHPM LSC PROV LIST: ok 
+Starting RRC Services: ok
+Starting SXP Services: ok
+Starting Alarm Services: ok
+Starting FMC HS: ok 
+Starting IPv6 Services: ok
+Starting Config Sync Manager : ok
+Starting Hotspot Services: ok
+Starting Tunnel Services New: ok
+Starting PMIP Services: ok
+Starting Portal Server Services: ok
+Starting mDNS Services: ok
+Starting Management Services: 
+   Web Server:    CLI:    Secure Web: Starting IPSec Profiles component: ok
+ok
+Warning:In SNMPV3 No Defaults Presents.
+Please use command: config snmp v3user create <username>
+
+(Cisco Controller) 
+
+Enter User Name (or 'Recover-Config' this one-time only to reset configuration to factory defaults)

@@ -29,6 +29,12 @@ class JunosSettings(GenericSettings):
 
         # Default error pattern
         self.ERROR_PATTERN=[]
+        self.CONFIGURE_ERROR_PATTERN = [
+            r'.*error: +problem +checking +file:.*',
+            r'.*error: +configuration +check-out +failed.*',
+            r'.*Users +currently +editing +the +configuration:.*',
+            r'.*error: +commit +failed:.*',
+        ]
 
         # Maximum number of retries for password handler
         self.PASSWORD_ATTEMPTS = 3
@@ -51,3 +57,6 @@ class JunosSettings(GenericSettings):
         self.ESCAPE_CHAR_PROMPT_WAIT_RETRIES = 7
         # prompt wait delay
         self.ESCAPE_CHAR_PROMPT_WAIT = 0.25
+        
+        # pattern to replace '---(more)---' or '---(more #%)---'   
+        self.MORE_REPLACE_PATTERN = r'---\(more.*\)---'

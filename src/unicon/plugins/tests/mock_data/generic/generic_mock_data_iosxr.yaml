@@ -1,0 +1,80 @@
+iosxr_login:
+  preface: |
+    User Access Verification
+  prompt: "Username: "
+  commands:
+    "cisco":
+      new_state: iosxr_password
+
+iosxr_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      response: "\n"
+      new_state: iosxr_enable
+
+iosxr_enable:
+  prompt: "RP/0/RP0/CPU0:%N#"
+  commands:
+    "show version": |
+      Thu Jul 27 14:00:42.051 UTC
+
+      Cisco IOS XR Software, Version 5.2.3.12I[Default] LNT
+      Copyright (c) 2014 by Cisco Systems, Inc.
+
+      ROM: GRUB, Version 1.99(0), DEV RELEASE
+
+      iosxrvr1 uptime is 2 hours, 50 minutes
+      System image file is "bootflash:disk0/xrvr-os-mbi-5.2.3.12I/mbixrvr-rp.vm"
+
+      cisco IOS XRv Series (Intel ?86 F15M6S1) processor with 3145335K bytes of memory.
+      Intel ?86 F15M6S1 processor at 2744MHz, Revision 6.50
+      IOS XRv Chassis
+
+      2 Management Ethernet
+      1 GigabitEthernet
+      97070k bytes of non-volatile configuration memory.
+      866M bytes of hard disk.
+      2321392k bytes of disk0: (Sector size 512 bytes).
+
+      Configuration register on node 0/0/CPU0 is 0x2102
+      Boot device on node 0/0/CPU0 is disk0:
+      Package active on node 0/0/CPU0:
+      iosxr-infra, V 5.2.3.12I[Default], Cisco Systems, at disk0:iosxr-infra-5.2.3.12I
+          Built on Fri Nov 21 04:47:18 UTC 2014
+          By iox-lnx-006 in /auto/iox-lnx-006-san2/nightly/ci-523_all_14.11.20A for pie
+    "configure terminal":
+      new_state: iosxr_config
+    "terminal length 0": ""
+    "terminal width 0": ""
+
+iosxr_config:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "no logging console": ""
+    "logging console disable": ""
+    "line console":
+      new_state:
+        iosxr_line_console
+    "end":
+      new_state: iosxr_enable
+
+
+iosxr_line_console:
+  prompt: "RP/0/RP0/CPU0:%N(config-line)#"
+  commands:
+    "exec-timeout 0 0": ""
+    "line vty 0 4": ""
+    "absolute-timeout 0": ""
+    "session-timeout 0": ""
+    "line default": ""
+    "commit":
+      new_state: iosxr_commit_prompt
+    "end":
+      new_state: iosxr_enable
+
+iosxr_commit_prompt:
+  prompt: "Uncommitted changes found, commit them before exiting(yes/no/cancel)? [cancel]:"
+  commands:
+    "yes":
+      new_state: iosxr_config

@@ -16,7 +16,7 @@ class NxosN5kServiceList(NxosServiceList):
 
 class NxosN5kSingleRpConnection(NxosSingleRpConnection):
     os = 'nxos'
-    series = 'n5k'
+    platform = 'n5k'
     chassis_type = 'single_rp'
     state_machine_class = NxosSingleRpStateMachine
     connection_provider_class = NxosSingleRpConnectionProvider

@@ -1,0 +1,52 @@
+copy_to_tftp:
+    prompt: "Address or name of remote host [10.1.6.243]? "
+    commands:
+        "10.1.6.243":
+            new_state: copy_to_tftp_source_filename
+
+copy_to_tftp_source_filename:
+    prompt: "Source filename [test]? "
+    commands:
+        "test":
+            new_state: copy_to_tftp_dest_filename
+
+copy_to_tftp_dest_filename:
+    prompt: "Destination filename [test]? "
+    commands:
+        "test2":
+            new_state: copy_to_tftp_dest_filename_overwrite
+
+copy_to_tftp_dest_filename_overwrite:
+    prompt: "%Warning:There is a file already existing with this name \r\nDo you want to over write? [confirm]'"
+    commands:
+        "y":
+            response: |4
+                Accessing tftp://10.1.6.243/test...
+                Loading test from 10.1.6.243 (via GigabitEthernet0): !
+                [OK - 30 bytes]
+
+                30 bytes copied in 0.035 secs (857 bytes/sec)
+            new_state: enable_isr
+
+copy_from_tftp:
+    prompt: "Source filename [test]? "
+    commands:
+        "test2":
+            new_state: copy_from_tftp_remote_host
+
+copy_from_tftp_remote_host:
+    prompt: "Address or name of remote host []? "
+    commands:
+        "10.1.6.243":
+            new_state: copy_from_tftp_dest_filename
+
+copy_from_tftp_dest_filename:
+    prompt: "Destination filename [test]? "
+    commands:
+        "test":
+            response: |4
+                !!
+                30 bytes copied in 0.020 secs (1500 bytes/sec)
+            new_state: enable_isr
+
+

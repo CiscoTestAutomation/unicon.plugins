@@ -43,9 +43,18 @@ cat3k_password:
   commands:
     "cisco":
       new_state: cat3k_exec
+    "cisco1":
+      response: Password OK
+      new_state: cat3k_password_ok_prompt
+
+cat3k_password_ok_prompt:
+  prompt: ""
+  commands:
+    "":
+      new_state: cat3k_exec
 
 cat3k_exec:
-  prompt: "Router>"
+  prompt: "%N>"
   commands:
     "term length 0": ""
     "term width 0": ""
@@ -164,8 +173,8 @@ cat3k_exec:
 
 
 enable_cat3k:
-  prompt: "Router#"
-  commands:
+  prompt: "%N#"
+  commands: &cat3k_enable_cmds
     "term length 0": ""
     "term width 0": ""
     "show version": *SV
@@ -191,19 +200,24 @@ enable_cat3k:
       new_state: cat3k_exec
     "reload":
       new_state: system_config_change
+    "active_install_add":
+        new_state: cat3k_install_add_commit
 
 
 config_cat3k:
-  prompt: "Router(config)#"
+  prompt: "%N(config)#"
   commands:
     "no logging console": ""
+    "line vty 0 4":
+      new_state: config_line_cat3k
     "line console 0":
       new_state: config_line_cat3k
 
 config_line_cat3k:
-  prompt: "Router(config-line)#"
+  prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
+    "line vty 0 4": ""
     "end":
       new_state: enable_cat3k
 
@@ -352,3 +366,22 @@ reload_cat3k_logs:
   commands:
     "":
       new_state: cat3k_exec
+
+
+cat3k_enable_reload_to_rommon:
+  prompt: "%N#"
+  commands:
+    <<: *cat3k_enable_cmds
+    "reload":
+      new_state: cat3k_rommon
+
+cat3k_install_add_commit:
+   preface: |2
+      Copying image file: bootflash:asr1000rpx86-universalk9.BLD_V166_THROTTLE_LATEST_20171101_090919_2.SSA.bin to standby
+      rsync: write failed on "asr1000rpx86-universalk9.BLD_V166_THROTTLE_LATEST_20171101_090919_2.SSA.bin" (in bootflash): No space left on device (28)
+      rsync error: error in file IO (code 11) at ../rsync-3.1.2/receiver.c(393) [receiver=3.1.2]
+      rsync error: error in file IO (code 11) at ../rsync-3.1.2/io.c(1633) [generator=3.1.2]
+      rsync: read error: Connection reset by peer (104)
+      FAILED: install_add_activate_commit : Copy bootflash:asr1000rpx86-universalk9.BLD_V16
+
+   new_state: enable_cat3k

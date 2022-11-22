@@ -10,8 +10,14 @@ isr_password:
     "cisco":
       new_state: isr_exec
 
+isr_enable_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: enable_isr
+
 isr_exec:
-  prompt: "Router>"
+  prompt: "%N>"
   commands: 
     "show version": &SV |2
       Cisco IOS Software, IOS-XE Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 15.3(2)S1, RELEASE SOFTWARE (fc1)
@@ -80,11 +86,17 @@ isr_exec:
 
 
     "enable":
-      new_state: enable_isr
+      new_state: isr_enable_password
+
+    "enable 7":
+      new_state: isr_enable_password
+
+    "disable":
+      new_state: disable_isr
 
 
 isr_bash:
-  prompt: "[Router:/]$"
+  prompt: "[%N:/]$"
   commands:
     "ls": |
         3pa    dev     init   mount_packages.sh  sys
@@ -110,7 +122,7 @@ act_reply:
       
 
 enable_isr:
-  prompt: "Router#"
+  prompt: "%N#"
   commands:
     "term length 0": ""
     "term width 0": ""
@@ -166,20 +178,38 @@ enable_isr:
                                 ^
         % Invalid i"
 
+    "copy  tftp: bootflash:  vrf Mgmt-intf":
+      new_state: copy_to_tftp
+
+    "copy  bootflash: tftp:  vrf Mgmt-intf":
+      new_state: copy_from_tftp
+    "install remove inactive":
+      new_state: do_you_want_to_remove
+
+disable_isr:
+  prompt: "%N>"
+  commands:
+    "enable":
+      new_state: isr_enable_password
+    "enable 7":
+      new_state: isr_enable_password
+
 config_isr:
-  prompt: "Router(config)#"
+  prompt: "%N(config)#"
   commands:
     "no logging console": ""
     "line console 0":
       new_state: config_line_isr
+    "line vty 0 4":
+      new_state: config_line_isr
 
 config_line_isr:
-  prompt: "Router(config-line)#"
+  prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
+    "line vty 0 4": ""
     "end":
       new_state: enable_isr
-
 
 traceroute_proto_isr:
   prompt: "Protocol [ip]: "
@@ -226,7 +256,7 @@ traceroute_timeout_isr:
 traceroute_probe_isr:
   prompt: "Probe count [3]: "
   commands:
-    "":
+    "30":
       new_state: traceroute_mittl_isr
 
 traceroute_mittl_isr:
@@ -257,9 +287,6 @@ traceroute_loose_isr:
         Tracing the route to 192.0.0.5
         VRF info: (vrf in name/id, vrf out name/id)
           1 192.0.0.5 msec *  1 msec
-
-
-
 
 ping_proto_isr:
   prompt: "Protocol [ip]: "
@@ -355,28 +382,45 @@ ping1_sweep_isr_vrf:
         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         Success rate is 100 percent (30/30), round-trip min/avg/max = 1/1/3 ms
 
-sdwan_enable:
-  prompt: "Router#"
-  commands:
-    "term length 0": ""
-    "term width 0": ""
-    "show sdwan version": "16.12.1.0.533"
-    "show sdwan software": |2
-      VERSION        ACTIVE  DEFAULT  PREVIOUS  CONFIRMED  TIMESTAMP
-      --------------------------------------------------------------------------------
-      16.12.1.0.533  true    true     false     auto       2019-05-21T03:00:31-00:00
-    "show version": *SV
-    "config term": "This command is not supported"
-    "config-transaction":
-      new_state: sdwan_config
+do_you_want_to_remove:
+  preface: |
+    install_remove: START Mon Apr 26 13:25:18 Greenwi 2021
+    Cleaning up unnecessary package files
+    No path specified, will use booted path bootflash:packages.conf
+    Cleaning bootflash:
+      Scanning boot directory for packages ... done.
+      Preparing packages list to delete ...
+        C9800-L-mono-universalk9_wlc.17.03.03.SPA.pkg
+          File is in use, will not delete.
+        C9800-L-rpboot.17.03.03.SPA.pkg
+          File is in use, will not delete.
+        packages.conf
+          File is in use, will not delete.
+      done.
 
-sdwan_config:
-  preface: "admin connected from 127.0.0.1 using console on Router"
-  prompt: "Router(config)#"
+    The following files will be deleted:
+    [chassis 1/R0]:
+    /bootflash/C9800-L-hw-programmables.16.12.04a.SPA.pkg
+    /bootflash/C9800-L-mono-universalk9_wlc.16.12.04a.SPA.pkg
+    /bootflash/C9800-L-rpboot.16.12.04a.SPA.pkg
+    /bootflash/C9800-L-universalk9_wlc.16.12.04a.SPA.bin
+    /bootflash/C9800-L-universalk9_wlc.17.03.03.SPA.conf
+  prompt: Do you want to remove the above files? [y/n]
   commands:
-    "no logging console": ""
-    "line console 0": "syntax error: \"console\" is not a valid value."
-    "exec-timeout 0" : "syntax error: unknown command"
-    "commit": "% No modifications to commit."
-    "end":
-      new_state: sdwan_enable
+    "y":
+      response: |
+        Deleting file bootflash:C9800-L-hw-programmables.16.12.04a.SPA.pkg ... done.
+        Deleting file bootflash:C9800-L-mono-universalk9_wlc.16.12.04a.SPA.pkg ... done.
+        Deleting file bootflash:C9800-L-rpboot.16.12.04a.SPA.pkg ... done.
+        Deleting file bootflash:C9800-L-universalk9_wlc.16.12.04a.SPA.bin ... done.
+        Deleting file bootflash:C9800-L-universalk9_wlc.17.03.03.SPA.conf ... done.
+        SUCCESS: Files deleted.
+        --- Starting Post_Remove_Cleanup ---
+        Performing Post_Remove_Cleanup on all members
+          [1] Post_Remove_Cleanup package(s) on chassis 1/R0
+          [1] Finished Post_Remove_Cleanup on chassis 1/R0
+        Checking status of Post_Remove_Cleanup on [1/R0]
+        Post_Remove_Cleanup: Passed on [1/R0]
+        Finished Post_Remove_Cleanup
+        SUCCESS: install_remove  Mon Apr 26 14:24:33 Greenwi 2021
+      new_state: enable_isr

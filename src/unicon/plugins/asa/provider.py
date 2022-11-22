@@ -9,5 +9,5 @@ class ASAConnectionProvider(GenericSingleRpConnectionProvider):
 
     def get_connection_dialog(self):
         dialog = super().get_connection_dialog()
-        dialog += Dialog([statements.bad_password_stmt])
+        dialog += Dialog(statements.connection_statements)
         return dialog

@@ -1,0 +1,177 @@
+iosxe_login:
+  prompt: "Username: "
+  commands:
+    "cisco":
+      new_state: iosxe_password
+
+iosxe_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: iosxe_enable
+
+iosxe_config:
+    prompt: "%N(config)#"
+    commands:
+      "no logging console": ""
+      "line vty 0 4":
+        new_state: iosxe_config_line
+      "line console 0":
+        new_state: iosxe_config_line
+      "end":
+        new_state: iosxe_enable
+
+iosxe_config_line:
+  prompt: "%N(config-line)#"
+  commands:
+    "exec-timeout 0": ""
+    "line vty 0 4": ""
+    "exit":
+      new_state: iosxe_config
+    "end":
+      new_state: iosxe_enable
+
+iosxe_enable:
+    prompt: "%N#"
+    commands: &iosxe_enable_cmds
+      "config term":
+        new_state: iosxe_config
+      "term length 0": ""
+      "term width 0": ""
+      "show version" :
+        response: |
+          Cisco IOS Software, IOS-XE Software (X86_64_LINUX_IOSD-ADVENTERPRISEK9-M), Experimental Version 15.2(20110615:055721) [mcp_dev-BLD-BLD_MCP_DEV_LATEST_20110615_044519-ios 143]
+          Copyright (c) 1986-2011 by Cisco Systems, Inc.
+          Compiled Wed 15-Jun-11 08:54 by mcpre
+
+
+          Cisco IOS-XE software, Copyright (c) 2005-2011 by cisco Systems, Inc.
+          All rights reserved.  Certain components of Cisco IOS-XE software are
+          licensed under the GNU General Public License ("GPL") Version 2.0.  The
+          software code licensed under GPL Version 2.0 is free software that comes
+          with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+          GPL code under the terms of GPL Version 2.0.  For more details, see the
+          documentation or "License Notice" file accompanying the IOS-XE software,
+          or the applicable URL provided on the flyer accompanying the IOS-XE
+          software.
+
+
+          ROM: IOS-XE ROMMON
+          ROM: Cisco IOS Software, IOS-XE Software (X86_64_LINUX_IOSD-ADVENTERPRISEK9-M), Experimental Version 15.2(20110615:055721) [mcp_dev-BLD-BLD_MCP_DEV_LATEST_20110615_044519-ios 143]
+
+          issu-asr-lns uptime is 1 hour, 16 minutes
+          Uptime for this control processor is 1 hour, 17 minutes
+          System returned to ROM by reload
+          System image file is "harddisk:/general_image.issu-asr-lns"
+          Last reload reason: Reload Command
+
+
+
+          This product contains cryptographic features and is subject to United
+          States and local country laws governing import, export, transfer and
+          use. Delivery of Cisco cryptographic products does not imply
+          third-party authority to import, export, distribute or use encryption.
+          Importers, exporters, distributors and users are responsible for
+          compliance with U.S. and local country laws. By using this product you
+          agree to comply with applicable laws and regulations. If you are unable
+          to comply with U.S. and local laws, return this product immediately.
+
+          A summary of U.S. laws governing Cisco cryptographic products may be found at:
+          http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+          If you require further assistance please contact us by sending email to
+          export@cisco.com.
+
+          cisco ASR1006 (RP2) processor with 4254354K/6147K bytes of memory.
+          3 ATM interfaces
+          32768K bytes of non-volatile configuration memory.
+          8388608K bytes of physical memory.
+          1826815K bytes of eUSB flash at bootflash:.
+          78085207K bytes of SATA hard disk at harddisk:.
+
+          Configuration register is 0x1
+
+iosxe_login2:
+  prompt: "Username: "
+  commands:
+    "cisco":
+      new_state: iosxe_password2
+
+iosxe_password2:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: iosxe_enable2
+
+iosxe_config2:
+    prompt: "%N(config)#"
+    commands:
+      "no logging console": ""
+      "line vty 0 4":
+        new_state: iosxe_config_line2
+      "line console 0":
+        new_state: iosxe_config_line2
+      "end":
+        new_state: iosxe_enable2
+
+iosxe_config_line2:
+  prompt: "%N(config-line)#"
+  commands:
+    "exec-timeout 0": ""
+    "line vty 0 4": ""
+    "exit":
+      new_state: iosxe_config2
+    "end":
+      new_state: iosxe_enable2
+
+iosxe_enable2:
+  prompt: "%N#"
+  commands:
+    <<: *iosxe_enable_cmds
+    "show version":
+      response: |
+        Cisco IOS Software, IOS-XE Software (X86_64_LINUX_IOSD-ADVENTERPRISEK9-M), Experimental Version 15.2(20110615:055721) [mcp_dev-BLD-BLD_MCP_DEV_LATEST_20110615_044519-ios 143]
+    "show inventory":
+      response: |
+        NAME: "Chassis", DESCR: "Cisco WS-C5002 Chassis"
+        PID: WS-C5002     , VID: V01  , SN: FGL221190VF
+
+        NAME: "Power Supply Module 0", DESCR: "External Power Supply Module"
+        PID: PWR-12V           , VID: V01  , SN: JAB0929092D
+                
+        NAME: "module 0", DESCR: "Cisco WS-C5002 Built-In NIM controller"
+        PID: WS-C5002     , VID:      , SN:
+            
+        NAME: "NIM subslot 0/0", DESCR: "Front Panel 2 port Gigabitethernet Module"
+        PID: C1111-2x1GE       , VID: V01  , SN:
+          
+        NAME: "NIM subslot 0/1", DESCR: "C1111-ES-8"
+        PID: C1111-ES-8        , VID: V01  , SN:
+
+        NAME: "NIM subslot 0/2", DESCR: "C1111-LTE Module"
+        PID: C1111-LTE         , VID: V01  , SN:
+
+        NAME: "Modem 0 on Cellular0/2/0", DESCR: "Sierra Wireless EM7455/EM7430"
+        PID: EM7455/EM7430     , VID: 1.0  , SN: 355813070074072
+
+        NAME: "module R0", DESCR: "Cisco WS-C5002 Route Processor"
+        PID: WS-C5002     , VID: V01  , SN: FOC21520MF1
+      new_state:
+        show_inventory_more
+
+show_inventory_more:
+  prompt: " --More-- "
+  commands:
+    "":
+      response: |
+        NAME: "module F0", DESCR: "Cisco WS-C5002Forwarding Processor"
+        PID: WS-C5002    , VID:      , SN:
+      new_state:
+        iosxe_enable2
+  keys:
+    " ":
+      response: |
+        NAME: "module F0", DESCR: "Cisco WS-C5002Forwarding Processor"
+        PID: WS-C5002    , VID:      , SN:
+      new_state:
+        iosxe_enable2

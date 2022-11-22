@@ -16,7 +16,7 @@ from unicon.plugins.generic.service_implementation import BashService, \
                                                           Expect, Execute, \
                                                           Configure ,\
                                                           Enable, Disable, \
-                                                          ExpectLogging, LogUser
+                                                          LogUser
 from unicon.eal.dialogs import Dialog
 
 
@@ -34,13 +34,17 @@ class BashService(BashService):
         def __enter__(self):
             self.conn.log.debug('+++ attaching bash shell +++')
 
-            # please enable this part of code when Junos HA comes to life
-            # if self.conn.is_ha:
-            #     conn = self.conn.active
-            # else:
-            #     conn = self.conn
-
             sm = self.conn.state_machine
             sm.go_to('shell', self.conn.spawn)
 
             return self
+
+
+class Configure(Configure):
+
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.start_state = 'config'
+        self.end_state = 'enable'
+        self.service_name = 'config'
+        self.commit_cmd = 'commit synchronize'

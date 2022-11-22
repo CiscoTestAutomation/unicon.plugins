@@ -54,7 +54,6 @@ class IOSXRV9KSingleRpConnectionProvider(
          after bringing to enable state
         """
         con = self.connection
-        con._is_connected = True
         con.state_machine.go_to('enable',
                                 self.connection.spawn,
                                 context=self.connection.context,
@@ -65,6 +64,7 @@ class IOSXRV9KSingleRpConnectionProvider(
     def establish_connection(self):
         con = self.connection
         settings = con.settings
+        learn_hostname = con.learn_hostname
 
         self.wait_for_launch_complete(
             initial_discovery_wait_sec = \
@@ -72,7 +72,9 @@ class IOSXRV9KSingleRpConnectionProvider(
             initial_wait_sec = settings.INITIAL_LAUNCH_WAIT_SEC,
             post_prompt_wait_sec = settings.POST_PROMPT_WAIT_SEC,
             connection = con, log=con.log, hostname=con.hostname,
-            checkpoint_pattern=patterns.logout_prompt)
+            checkpoint_pattern=patterns.logout_prompt,
+            learn_hostname=learn_hostname
+        )
         super().establish_connection()
 
 """

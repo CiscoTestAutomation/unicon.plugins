@@ -2,9 +2,10 @@ __author__ = "Dave Wapstra <dwapstra@cisco.com>"
 
 from unicon.bases.routers.connection import BaseSingleRpConnection
 
-class SDWANConnection(BaseSingleRpConnection):
-    os = 'sdwan'
-    chassis_type = 'single_rp'
+from .viptela import ViptelaSingleRPConnection
 
-    def __init__(self, *args, **kwargs):
-        raise NotImplementedError('SDWAN plugin needs specified series "viptela" or "iosxe"')
+
+class SDWANConnection(ViptelaSingleRPConnection):
+    os = 'viptela'
+    platform = None
+    chassis_type = 'single_rp'

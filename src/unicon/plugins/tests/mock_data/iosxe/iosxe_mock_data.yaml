@@ -1,0 +1,1382 @@
+
+general_login:
+  prompt: "Username: "
+  commands:
+    "cisco":
+      new_state: general_password
+
+general_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: general_exec
+
+general_exec:
+  prompt: "%N>"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": &SV |2
+      Cisco IOS Software, IOS-XE Software (X86_64_LINUX_IOSD-ADVENTERPRISEK9-M), Experimental Version 15.2(20110615:055721) [mcp_dev-BLD-BLD_MCP_DEV_LATEST_20110615_044519-ios 143]
+      Copyright (c) 1986-2011 by Cisco Systems, Inc.
+      Compiled Wed 15-Jun-11 08:54 by mcpre
+
+
+      Cisco IOS-XE software, Copyright (c) 2005-2011 by cisco Systems, Inc.
+      All rights reserved.  Certain components of Cisco IOS-XE software are
+      licensed under the GNU General Public License ("GPL") Version 2.0.  The
+      software code licensed under GPL Version 2.0 is free software that comes
+      with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+      GPL code under the terms of GPL Version 2.0.  For more details, see the
+      documentation or "License Notice" file accompanying the IOS-XE software,
+      or the applicable URL provided on the flyer accompanying the IOS-XE
+      software.
+
+
+      ROM: IOS-XE ROMMON
+      ROM: Cisco IOS Software, IOS-XE Software (X86_64_LINUX_IOSD-ADVENTERPRISEK9-M), Experimental Version 15.2(20110615:055721) [mcp_dev-BLD-BLD_MCP_DEV_LATEST_20110615_044519-ios 143]
+
+      issu-asr-lns uptime is 1 hour, 16 minutes
+      Uptime for this control processor is 1 hour, 17 minutes
+      System returned to ROM by reload
+      System image file is "harddisk:/general_image.issu-asr-lns"
+      Last reload reason: Reload Command
+
+
+
+      This product contains cryptographic features and is subject to United
+      States and local country laws governing import, export, transfer and
+      use. Delivery of Cisco cryptographic products does not imply
+      third-party authority to import, export, distribute or use encryption.
+      Importers, exporters, distributors and users are responsible for
+      compliance with U.S. and local country laws. By using this product you
+      agree to comply with applicable laws and regulations. If you are unable
+      to comply with U.S. and local laws, return this product immediately.
+
+      A summary of U.S. laws governing Cisco cryptographic products may be found at:
+      http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+      If you require further assistance please contact us by sending email to
+      export@cisco.com.
+
+      cisco ASR1006 (RP2) processor with 4254354K/6147K bytes of memory.
+      3 ATM interfaces
+      32768K bytes of non-volatile configuration memory.
+      8388608K bytes of physical memory.
+      1826815K bytes of eUSB flash at bootflash:.
+      78085207K bytes of SATA hard disk at harddisk:.
+
+      Configuration register is 0x1
+
+
+    "enable":
+      new_state: enable_password
+
+
+enable_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: general_enable
+
+general_enable:
+  prompt: "%N#"
+  commands: &gen_enable_cmds
+    "term length 0": ""
+    "term width 0": ""
+    "show version": *SV
+
+    "disable":
+      new_state: general_exec
+    "enable": ""
+
+    "show version | inc System image file is": |2
+      System image file is "harddisk:/general_image.issu-asr-lns"
+    "dir /all /recursive harddisk:/general_image.issu-asr-lns": |2
+      Directory of harddisk:/general_image.issu-asr-lns
+
+      Directory of harddisk:/
+
+         21  -rw-   439612520  Mar 22 2017 00:16:56 +00:00  general_image.issu-asr-lns
+      78704144384 bytes total (72496394240 bytes free)
+   
+
+    "config term":
+      new_state: general_config
+
+    "request platform software system shell":
+      new_state: general_act_reply
+
+    "show redundancy sta |  in peer": |2
+           peer state = 8  -STANDBY HOT 
+    "show redundancy sta | inc Redundancy State": |2
+      Redundancy State              = sso
+    "sh redundancy stat | inc my state": |2
+             my state = 13 -ACTIVE 
+    "sh redundancy state": |2
+             my state = 13 -ACTIVE 
+           peer state = 8  -STANDBY HOT 
+                 Mode = Duplex
+                 Unit = Primary
+              Unit ID = 48
+
+      Redundancy Mode (Operational) = sso
+      Redundancy Mode (Configured)  = sso
+      Redundancy State              = sso
+           Maintenance Mode = Disabled
+          Manual Swact = enabled
+       Communications = Up
+
+         client count = 84
+       client_notification_TMR = 30000 milliseconds
+                 RF debug mask = 0x0   
+    "redundancy force-switchover":
+      new_state: enable_general_standby
+    "reload_config_dialog":
+      new_state: enable_reload_config_dialog
+    "reload":
+      new_state: ha_reload_proceed
+    "active_install_add":
+       new_state: install_add_commit
+    "trim":
+      "\r\r\r\r\r\ntest
+      abc\r\r\r\r\r\n
+      test trim line\r\r\r\r\n
+      test pass"
+    "badcommand": "% Bad IP address or host name% Unknown command or computer name, or unable to find computer address"
+    "guestshell run bash":
+      new_state: guestshell
+    "show app-hosting list": |
+      App id                           State
+      ------------------------------------------------------
+      guestshell                       RUNNING
+    "show iox-service": |
+      IOx Infrastructure Summary:
+      ---------------------------
+      IOx service (CAF)              : Running
+      IOx service (HA)               : Running 
+      IOx service (IOxman)           : Not Ready 
+      IOx service (Sec storage)      : Running 
+      Libvirtd 5.5.0                 : Running
+      Dockerd 18.03.0                : Running
+      Sync Status                    : Disabled
+    "guestshell enable": |
+      Interface will be selected if configured in app-hosting
+      Please wait for completion
+
+      Guestshell enabled successfully
+
+
+    "show tcp brief | inc .22 |.23": |
+      0160C06C  127.0.0.1.22                127.0.0.1.51363             ESTAB
+    "show tcp brief | inc .22 |.23 ": |
+      0160C06C  127.0.0.1.22                127.0.0.1.51363             ESTAB
+    "copy ftp://myftpserver/myimage.bin flash:/": ""
+    "dir": |
+      Directory of flash:/
+
+      52429131    Apr 05 08:53:17 2021  test.txt
+
+      11353194496 bytes total (1055051776 bytes free)
+
+    "show archive": ""
+    "show policy-map interface tenGigabitEthernet 2/0/11": |
+     TenGigabitEthernet2/0/11 
+
+      Service-policy input: set-exp
+
+        Class-map: dscp-cs1 (match-all)  
+          0 packets
+          Match:  dscp cs1 (8)
+          QoS Set
+            mpls experimental imposition 1
+
+        Class-map: class-default (match-any)  
+          32589133 packets
+          Match: any 
+    "show ip interface brief": |
+      Interface              IP-Address      OK? Method Status                Protocol
+      GigabitEthernet0/0/0   127.0.0.1       YES other  up                    up
+      GigabitEthernet0/0/1   10.174.10.1     YES other  up                    up
+      GigabitEthernet0/0/2   10.64.10.1      YES other  up                    up
+    "copy http://myftpserver/myimage.bin flash:/": ""
+    "show running-config | include ip http client source-interface": |
+      ip http client source-interface GigabitEthernet0/0/1
+    "show running-config": ""
+    "copy running-config nvram:startup-config": ""
+    "write memory": ""
+    "tclsh":
+      new_state: tclsh
+    "delete /force flash:CRFT_*": ""
+    "dir flash:CRFT_*": |
+      Directory of flash:/CRFT_*
+
+
+      No such file
+
+
+      11353194496 bytes total (1055051776 bytes free)
+
+    "dir flash:BTRACE_*": |
+      Directory of flash:/BTRACE_*
+
+
+      No such file
+
+
+      11353194496 bytes total (1055051776 bytes free)
+
+    "dir flash:/CRFT_*":
+      response:
+      - |
+        Directory of flash:/CRFT_*
+
+        34  -rw-      537450  Dec 22 2021 07:05:46 +00:00  CRFT__U1__000001__C8000V_2021-12-22_07-05-46.tar.gz
+
+        11353194496 bytes total (1055051776 bytes free)
+
+      - |
+        Directory of flash:/CRFT_*
+
+
+        No such file
+
+
+        11353194496 bytes total (1055051776 bytes free)
+
+    "dir flash:/BTRACE_*": |
+      Directory of flash:/BTRACE_*
+
+
+      No such file
+
+
+      11353194496 bytes total (1055051776 bytes free)
+
+    "show ntp associations":
+      response:
+        - |2
+            address         ref clock       st   when   poll reach  delay  offset   disp
+          *~127.127.1.1     .LOCL.           0      6     16   377  0.000   0.000  1.204
+           * sys.peer, # selected, + candidate, - outlyer, x falseticker, ~ configured
+        - |2
+            address         ref clock       st   when   poll reach  delay  offset   disp
+          *~127.127.1.1     .LOCL.           0      6     16   377  0.000   0.000  1.204
+           ~10.1.1.1        .INIT.          16      -   1024     0  0.000   0.000 15937.
+           * sys.peer, # selected, + candidate, - outlyer, x falseticker, ~ configured
+
+    "request platform software system shell switch standby rp active":
+      new_state: bash_console_switch_standby_rp_active
+    "show log | in BOOTTIME": "*Sep 22 14:46:00.419: %SYS-6-BOOTTIME: Time taken to reboot after reload =  417 seconds"
+    "show log | in PLATFORM_SYS-6-UPTIME": "%PLATFORM_SYS-6-UPTIME: Time taken to initialize system =  364 seconds"
+    "copy  test.cfg running-config": |
+      Failed to generate persistent self-signed certificate.
+          Secure server will use temporary self-signed certificate.
+      Default AP group (default-group) is not configurable.
+      4177 bytes copied in 0.160 secs (26106 bytes/sec)
+
+
+
+general_config:
+  prompt: "%N(conf)#"
+  commands: &general_config_cmds
+    "!end indicator for bulk configure": ""
+    "config-register 0x2102": ""
+    "archive": ""
+    "do-exec archive config": ""
+    "ip ftp source-interface GigabitEthernet0/0/0": ""
+    "ip http client source-interface GigabitEthernet0/0/0": ""
+    "ip http client source-interface GigabitEthernet0/0/1": ""
+    "no ip http client source-interface GigabitEthernet0/0/0": ""
+    "end":
+      new_state: general_enable
+    "crypto pki profile enrollment test":
+      new_state: general_config_ca_profile
+    "crypto pki trustpoint test":
+      new_state: general_config_crypto_trustpoint
+    "no logging console": ""
+    "line vty 0 4":
+      new_state: general_config_line
+    "line console 0":
+      new_state: general_config_line
+    "redundancy":
+      new_state: config_general_redundancy
+    "crypto key generate rsa general-keys modulus 2048 label ca": |
+        crypto key generate rsa general-keys modulus 2048 label ca
+        % You already have RSA keys defined named ca.
+        % They will be replaced.
+
+        % The key modulus size is 2048 bits
+        % Generating 2048 bit RSA keys, keys will be non-exportable...
+        [OK] (elapsed time was 2 seconds)
+    "crypto pki server ca":
+      new_state: config_general_server
+    "crypto gkm group g1":
+      new_state: iosxe_config_1
+    "ntp server vrf foo 1.2.3.4": "% IP  routing table foo does not exist"
+    "iox": ""
+    "app-hosting appid guestshell": ""
+    "app-vnic management guest-interface 0": ""
+    "service internal": ""
+    "ntp server 10.1.1.1": ""
+    "ip host-list host1":
+      new_state: config_host_list
+    "macro auto execute TEST {":
+      new_state: macro_prompt_brace
+    "wsma agent exec":
+      new_state: wsma_agent
+
+wsma_agent:
+  prompt: "%N(wsma-exec-agent)#"
+  commands:
+    "exit":
+      general_config
+    "end":
+      new_state: general_enable
+
+macro_prompt_brace:
+  prompt: "{..} >"
+  keys:
+    ctrl-c:
+      new_state: general_config
+  commands:
+    "}":
+      new_state: general_config
+    "if [[ $LINKUP == YES ]]":
+      new_state: macro_prompt_then_else_fi
+
+macro_prompt_then_else_fi:
+  prompt: "then.else.fi>"
+  commands:
+    "then conf t": ""
+    "end": ""
+    "fi":
+      new_state: macro_prompt_brace
+
+config_host_list:
+  prompt: "%N(host-list)#"
+  commands:
+    "end":
+      new_state: general_enable
+
+
+general_config_line:
+  prompt: "%N(config-line)#"
+  commands:
+    "exec-timeout 0": ""
+    "line vty 0 4": ""
+    "end":
+      new_state: general_enable
+
+config_general_redundancy:
+    prompt: "%N(config-red)#"
+    commands:
+      "main-cpu":
+        new_state: config_general_redundancy_main_cpu
+      "end":
+        new_state: general_enable
+
+config_general_server:
+    prompt: "%N(cs-server)#"
+    commands:
+      "grant auto": |
+          grant auto
+          % The CS config is locked because it is busy or enabled. You need to shut the server off before changing its configuration.
+      "hash sha256": |
+          hash sha256
+          % The CS config is locked because it is busy or enabled. You need to shut the server off before changing its configuration.
+      "lifetime ca-certificate 3650": |
+          lifetime ca-certificate 3650
+          % The CS config is locked because it is busy or enabled. You need to shut the server off before changing its configuration.
+      "lifetime certificate 3650": |
+          lifetime certificate 3650
+          % The CS config is locked because it is busy or enabled. You need to shut the server off before changing its configuration.
+      "database archive pkcs12 password 0 cisco123": |
+          database archive pkcs12 password 0 cisco123
+          % The CS config is locked because it is busy or enabled. You need to shut the server off before changing its configuration.
+      "no shutdown": |
+          no shutdown
+          Certificate server 'no shut' event has been queued for processing.
+      "end": 
+        new_state: general_enable
+
+config_general_redundancy_main_cpu:
+    prompt: "%N(config-r-mc)#"
+    commands:
+      "standby console enable": ""
+      "end":
+        new_state: general_enable
+
+general_config_ca_profile:
+  prompt: "%N(ca-profile-enroll)#"
+  commands:
+    "end":
+      new_state: general_enable
+
+general_bash:
+  prompt: "[%N_RP_0:/]$"
+  commands:
+    "df /bootflash/": |
+      Filesystem     1K-blocks    Used Available Use% Mounted on
+      /dev/sda1        5974888 3569476   2101900  63% /bootflash
+    "stty cols 200": ""
+    "stty rows 200": ""
+    "exit":
+      new_state: general_enable
+
+general_act_reply:
+  prompt: "Are you sure you want to continue? [y/n] "
+  commands:
+    "y":
+      new_state: general_bash
+
+general_config_crypto_trustpoint:
+  prompt: "%N(ca-trustpoint)#"
+  commands:
+    "no crypto pki trustpoint test":
+      new_state: are_you_sure_ywtdt
+      response: |
+        % Removing an enrolled trustpoint will destroy all certificates
+        received from the related Certificate Authority.
+
+are_you_sure_ywtdt:
+  prompt: "Are you sure you want to do this? [yes/no]: "
+  commands:
+   "yes":
+     new_state: general_config
+
+standby_exec:
+  prompt: "%N-standby# "
+  commands:
+    "cisco": ""
+
+iosxe_config_1:
+  prompt: "%N(conf)#"
+  commands: 
+    "identity number 101":
+      new_state: iosxe_config_2
+    "end": 
+      new_state: general_enable
+
+iosxe_config_2:
+  prompt: "%N(config-gkm-group)#"
+  commands:
+    "server local": 
+        new_state: iosxe_config_3
+    "end": 
+        new_state: iosxe_config_1
+
+iosxe_config_3:
+  prompt: "%N(config-gkm-group)#"
+  commands: 
+    "end":
+      new_state: iosxe_config_2
+diol_exec:
+  prompt: "RouterRP> "
+  commands:
+    "enable": ""
+
+diol_enable:
+  prompt: "RouterRP# "
+  commands:
+    "enable": ""
+
+diol_disable:
+  prompt: "RouterRP-standby> "
+  commands:
+    "enable": ""
+
+
+
+config_with_msgs:
+  prompt: "%N(config)#"
+  commands:
+    "msg":
+       new_state:
+          config_msg
+
+config_with_msgs2:
+  prompt: "%N(config)#"
+  commands:
+    "msg":
+       new_state:
+          config_msg2
+
+
+config_msg:
+  preface:
+    timing:
+    - 0:,0,0.5
+    response: |
+      Router(config)#*Jan 27 20:09:17.549: %SEC_LOGIN-5-LOGIN_SUCCESS: Login Success [user: user1] [Source: LOCAL] [localport: 0] at 20:09:17 UTC Wed Jan 27 2021
+      *Jan 27 20:09:18.103: %SYS-5-LOG_CONFIG_CHANGE: Console logging disabled
+      *Jan 27 20:09:18.341: %SYS-5-LOG_CONFIG_CHANGE: Console logging: level debugging, xml disabled, filtering disabled, discriminator (nosel)
+  prompt: "*Jan 27 20:09:18.839: %SYS-5-CONFIG_I: Configured from console by user1 on console"
+  commands:
+    "":
+      new_state: general_config
+
+
+config_msg2:
+  preface:
+    timing:
+    - 0:,0,0.5
+    response: |
+      Router(config)#*Jan 27 20:09:17.549: %SEC_LOGIN-5-LOGIN_SUCCESS: Login Success [user: user1] [Source: LOCAL] [localport: 0] at 20:09:17 UTC Wed Jan 27 2021
+      *Jan 27 20:09:18.103: %SYS-5-LOG_CONFIG_CHANGE: Console logging disabled
+      *Jan 27 20:09:18.341: %SYS-5-LOG_CONFIG_CHANGE: Console logging: level debugging, xml disabled, filtering disabled, discriminator (nosel)
+      *Jan 27 20:09:18.839: %SYS-5-CONFIG_I: Configured from console by user1 on console
+  prompt: "%N(config)#"
+  commands:
+    "end":
+      new_state: general_enable
+
+
+enable_with_msgs:
+  prompt: "%N#"
+  commands:
+    "msg":
+      new_state: enable_msg
+
+enable_msg:
+  preface: |
+    Router#*Jan 27 20:09:17.549: %SEC_LOGIN-5-LOGIN_SUCCESS: Login Success [user: user1] [Source: LOCAL] [localport: 0] at 20:09:17 UTC Wed Jan 27 2021
+    *Jan 27 20:09:18.103: %SYS-5-LOG_CONFIG_CHANGE: Console logging disabled
+    *Jan 27 20:09:18.341: %SYS-5-LOG_CONFIG_CHANGE: Console logging: level debugging, xml disabled, filtering disabled, discriminator (nosel)
+  prompt: "*Jan 27 20:09:18.839: %SYS-5-CONFIG_I: Configured from console by user1 on console"
+  commands:
+    "":
+      new_state: general_enable
+
+
+disable_to_enable_with_msg:
+  prompt: "Switch>"
+  commands:
+    "enable":
+      new_state: enable_password_with_msg
+
+enable_password_with_msg:
+  preface: "Password: "
+  prompt: "*Feb  8 21:51:23.628: %SELINUX-3-MISMATCH: Switch"
+  commands:
+    "": "% Access denied"
+    "cisco":
+      new_state: general_enable
+
+
+slow_config_mode:
+  prompt: "%N#"
+  commands:
+    "config term":
+      response: ""
+      timing:
+        - 0:,4,0
+      new_state: general_config
+
+
+config_locked:
+  prompt: "%N#"
+  commands:
+    "config term":
+      response: |
+        Config mode cannot be entered during Standby initialization or when switch is in recovery mode
+      timing:
+      - 0:,0,0.1,0.002
+      new_state: config_locked1
+
+config_locked1:
+  prompt: "%N#"
+  commands:
+    "config term":
+      new_state: general_config
+      response: ""
+      timing:
+        - 0:,3,0
+
+
+# Console server
+
+ts_login:
+  preface: |
+    Connected to localhost
+    Escape character is '^]'.
+
+  prompt: "Username: "
+  commands:
+    "ts_user":
+      new_state: ts_password
+
+ts_password:
+  prompt: "Password: "
+  commands:
+    "ts_pw":
+      new_state: console_wait_login
+
+console_wait_login:
+  prompt: ""
+  commands:
+    "":
+      new_state: general_login
+
+
+scp_password:
+  prompt: "Password for test@127.0.0.1: "
+  commands:
+    "test":
+      new_state: general_enable
+
+
+enable_no_service_prompt_config:
+  prompt: "%N#"
+  commands:
+    <<: *gen_enable_cmds
+    "config term":
+      new_state:
+        config_no_prompt
+    "configure terminal":
+      new_state:
+        config_no_prompt
+
+config_no_prompt:
+  preface: "Enter configuration commands, one per line. End with CNTL/Z."
+  prompt: ""
+  keys:
+    ctrl-z:
+      new_state: enable_no_service_prompt_config
+  commands:
+    "service prompt config":
+      new_state: general_config
+
+
+
+initial_config_dialog:
+  preface:
+    timing:
+      - 0:,0,0.01
+    response: |2
+      
+      
+      
+             --- System Configuration Dialog ---
+
+  prompt: "\nWould you like to enter the initial configuration dialog? [yes/no]: "
+  commands:
+    "no": &enable_secret
+      new_state: enter_enable_secret
+      response: |2
+          
+          The enable secret is a password used to protect
+          access to privileged EXEC and configuration modes.
+          This password, after entered, becomes encrypted in
+          the configuration.
+          -------------------------------------------------
+          secret should be of minimum 10 characters with
+          at least 1 upper case, 1 lower case, 1 digit and
+          should not contain [cisco]
+          -------------------------------------------------
+    "n": *enable_secret
+
+enter_enable_secret:
+  prompt: "  Enter enable secret: "
+  commands:
+    "": "Please enter a secret"
+    "badpw":
+      response: "%Password validation failed"
+    "Secret12345":
+      new_state: confirm_enable_secret
+
+confirm_enable_secret:
+  prompt: "  Confirm enable secret: "
+  commands:
+    "": "Please enter a secret"
+    "Secret12345":
+      response: |2
+
+        The following configuration command script was created:
+
+        enable secret 9 $9$gCGcm2IWBJOT5U$p6jqb1plxOJpr3yYwa/3fUSfpQjM.RgfcunyUXhqfRA
+        !
+        end
+
+
+        [0] Go to the IOS command prompt without saving this config.
+        [1] Return back to the setup without saving this config.
+        [2] Save this configuration to nvram and exit.
+
+      new_state: enter_selection
+
+enter_selection:
+  prompt: "Enter your selection [2]: "
+  commands:
+    "":
+      new_state: press_return
+      response: |
+        Building configuration...
+        [OK]
+        Use the enabled mode 'configure' command to modify this configuration.
+    "2":
+      new_state: press_return
+      response: |
+        Building configuration...
+        [OK]
+        Use the enabled mode 'configure' command to modify this configuration.
+
+
+press_return:
+  preface: "\n\nPress RETURN to get started!\n\n"
+  prompt: ""
+  commands:
+    "":
+      new_state: enable_secret_exec
+
+
+enable_secret_exec:
+  prompt: "%N>"
+  commands:
+    "enable":
+      new_state: enable_secret_password
+
+
+enable_secret_password:
+  prompt: "Password: "
+  commands:
+    "Secret12345":
+      new_state: general_enable
+
+guestshell:
+  prompt: "[guestshell@guestshell ~]$ "
+  commands:
+    "exit":
+      new_state: general_enable
+    "pwd": "/home/guestshell"
+
+
+enable_guestshell:
+  prompt: "%N#"
+  commands:
+    <<: *gen_enable_cmds
+    "show app-hosting list": ""
+
+
+setup_enable:
+  prompt: "%N#"
+  commands:
+    <<: *gen_enable_cmds
+    "wr erase":
+      new_state: setup_enable_wr_erase_confirm
+    "reload":
+      new_state: setup_enable_reload_confirm
+
+setup_enable_wr_erase_confirm:
+  preface: |
+    ************************************************************************************************************
+    Erasing Nvram will not clear license trust code.
+    ************************************************************************************************************
+  prompt: "Erasing the nvram filesystem will remove all configuration files! Continue? [confirm] "
+  commands:
+    "":
+      response: |
+        [OK]
+        Erase of nvram: complete
+      new_state: setup_enable
+
+setup_enable_reload_confirm:
+  prompt: "Proceed with reload? [confirm] "
+  commands:
+    "":
+      response: file|mock_data/iosxe/asr1k_reload.txt
+      new_state: system_config_confirm
+
+# System config
+system_config_confirm:
+  prompt: "Would you like to enter the initial configuration dialog? [yes/no]: "
+  commands:
+    "n":
+      new_state: general_exec
+    "yes":
+      new_state: confirm_management_setup
+
+confirm_management_setup:
+  prompt: "Would you like to enter basic management setup? [yes/no]: "
+  commands:
+    "yes":
+      new_state: management_setup_hostname
+
+# Management setup
+management_setup_hostname:
+  prompt: "Enter host name [Router]: "
+  commands:
+    "":
+      new_state: management_setup_enable_secret
+
+management_setup_enable_secret:
+  prompt: "Enter enable secret: "
+  commands:
+    "Secret12345":
+      new_state: management_setup_enable_secret2
+
+management_setup_enable_secret2:
+  prompt: "Confirm enable secret: "
+  commands:
+    "Secret12345":
+      new_state: management_setup_enable_password
+
+management_setup_enable_password:
+  prompt: "Enter enable password: "
+  commands:
+    "cisco":
+        new_state: management_setup_virtual_terminal_password
+
+management_setup_virtual_terminal_password:
+  prompt: "Enter virtual terminal password: "
+  commands:
+    "cisco":
+      new_state: management_setup_username
+
+management_setup_username:
+  prompt: "Username  [admin]: "
+  commands:
+    "":
+      new_state: management_setup_user_password
+
+management_setup_user_password:
+  prompt: "Password  [cisco]: "
+  commands:
+    "":
+      new_state: management_setup_enter_interface
+
+management_setup_enter_interface:
+  preface: |
+    Current interface summary
+
+    Interface              IP-Address      OK? Method Status                Protocol
+    GigabitEthernet0/0/0   unassigned      YES unset  administratively down down    
+    GigabitEthernet0/0/1   unassigned      YES unset  administratively down down    
+    GigabitEthernet0/0/2   unassigned      YES unset  administratively down down    
+    GigabitEthernet0/0/3   unassigned      YES unset  administratively down down    
+    GigabitEthernet0/0/4   unassigned      YES unset  administratively down down    
+    GigabitEthernet0/0/5   unassigned      YES unset  administratively down down    
+    GigabitEthernet0/0/6   unassigned      YES unset  administratively down down    
+    GigabitEthernet0/0/7   unassigned      YES unset  administratively down down    
+    Te0/1/0                unassigned      YES unset  administratively down down    
+    Te0/1/1                unassigned      YES unset  administratively down down    
+    Te0/1/2                unassigned      YES unset  administratively down down    
+    Te0/1/3                unassigned      YES unset  administratively down down    
+    Te0/1/4                unassigned      YES unset  administratively down down    
+    Te0/1/5                unassigned      YES unset  administratively down down    
+    Te0/1/6                unassigned      YES unset  administratively down down    
+    Te0/1/7                unassigned      YES unset  administratively down down    
+    GigabitEthernet0       unassigned      YES unset  administratively down down    
+
+    Enter interface name used to connect to the
+  prompt: "management network from the above interface summary: "
+  commands:
+    "GigabitEthernet0":
+      response: |
+        Configuring interface GigabitEthernet0:
+      new_state: management_setup_config_show
+
+management_setup_config_show:
+  preface: |2
+    
+    The following configuration command script was created:
+
+    hostname Router
+    enable secret 9 $9$orFbtJkJGxCOKE$cwGwPcX1.pN2lQRG8oYVKFSjfMf8cWWIfz9qIgknNsY
+    enable password Corona12345
+    line vty 0 4
+    password Corona12345
+    username admin privilege 15 password Corona12345
+    no snmp-server
+    !
+    !
+    interface GigabitEthernet0/0/0
+    shutdown
+    no ip address
+    !
+    interface GigabitEthernet0/0/1
+    shutdown
+    no ip address
+    !
+    interface GigabitEthernet0/0/2
+    shutdown
+  prompt: " --More-- "
+  keys:
+    " ":
+      new_state: management_setup_config_show1
+
+management_setup_config_show1:
+  preface: |
+    no ip address
+    !
+    interface GigabitEthernet0/0/3
+    shutdown
+    no ip address
+    !
+    interface GigabitEthernet0/0/4
+    shutdown
+    no ip address
+    !
+    interface GigabitEthernet0/0/5
+    shutdown
+    no ip address
+    !
+    interface GigabitEthernet0/0/6
+    shutdown
+    no ip address
+    !
+    interface GigabitEthernet0/0/7
+    shutdown
+    no ip address
+    !
+    interface TenGigabitEthernet0/1/0
+  prompt: " --More-- "
+  keys:
+    " ":
+      new_state: management_setup_config_show2
+
+management_setup_config_show2:
+  preface: |
+    shutdown
+    no ip address
+    !
+    interface TenGigabitEthernet0/1/1
+    shutdown
+    no ip address
+    !
+    interface TenGigabitEthernet0/1/2
+    shutdown
+    no ip address
+    !
+    interface TenGigabitEthernet0/1/3
+    shutdown
+    no ip address
+    !
+    interface TenGigabitEthernet0/1/4
+    shutdown
+    no ip address
+    !
+    interface TenGigabitEthernet0/1/5
+    shutdown
+    no ip address
+    !
+    interface TenGigabitEthernet0/1/6
+    shutdown
+    no ip address
+    !
+    interface TenGigabitEthernet0/1/7
+    shutdown
+    no ip address
+    !
+    interface GigabitEthernet0
+    no shutdown
+    no ip address
+    no mop enabled
+    !
+    end
+
+
+    [0] Go to the IOS command prompt without saving this config.
+    [1] Return back to the setup without saving this config.
+    [2] Save this configuration to nvram and exit.
+
+  prompt: "Enter your selection [2]: "
+  commands:
+    "2":
+      response: |
+        Building configuration...
+
+        [OK]
+        Use the enabled mode 'configure' command to modify this configuration.
+
+        Press RETURN to get started!
+
+      new_state: setup_enable
+    "0":
+      new_state: general_exec
+      response: |
+        % You can enter the setup, by typing setup at IOS command prompt^G
+
+        Press RETURN to get started!
+
+    "1":
+      new_state: management_setup_enable_secret1
+
+
+management_setup_enable_secret1:
+  preface: |
+    The enable secret is a password used to protect
+    access to privileged EXEC and configuration modes.
+    This password, after entered, becomes encrypted in
+    the configuration.
+    -------------------------------------------------
+    secret should be of minimum 10 characters with
+    at least 1 upper case, 1 lower case, 1 digit and
+    should not contain [cisco]
+    -------------------------------------------------
+  prompt: "Enter enable secret: "
+  commands:
+    "Secret12345":
+      new_state: management_setup_enable_secret_confirm1
+
+management_setup_enable_secret_confirm1:
+  prompt: "Confirm enable secret: "
+  commands:
+    "Secret12345":
+      new_state: management_setup_confirm_selection
+
+
+management_setup_confirm_selection:
+  preface: |
+    The following configuration command script was created:
+
+    enable secret 9 $9$ShNXRF5rEGBv3E$JyNy4YmJ2ovJNUdtQdQRYRib4z5Pj9h3oFy31IVgQKU
+    !
+    end
+
+    [0] Go to the IOS command prompt without saving this config.
+    [1] Return back to the setup without saving this config.
+    [2] Save this configuration to nvram and exit.
+
+  prompt: "Enter your selection [2]: "
+  commands:
+    "2":
+      response: |
+        Building configuration...
+
+        [OK]
+        Use the enabled mode 'configure' command to modify this configuration.
+
+        Press RETURN to get started!
+
+      new_state: setup_enable
+
+ctc_enable:
+  prompt: "%N#"
+  commands:
+    <<: *gen_enable_cmds
+    "show version": file|mock_data/iosxe/cat9k_ctc_version.txt
+    "request platform software system shell":
+      new_state: ctc_shell_confirm
+    "mkdir flash:/ctc_ssr-cat9300_2021_06_11_06_25_39_212943":
+      new_state: ctc_mkdir_confirm
+    "copy ctc_ssr-cat9300_2021_06_11_06_25_39_212943.tar.gz ftp://10.1.20.150:36525//tmp/cflow/ vrf Mgmt-vrf":
+      new_state: ctc_copy_address
+    "delete /force /recursive ctc_ssr-cat9300_2021_06_11_06_25_39_212943.tar.gz": ""
+    "config term":
+      new_state: ctc_config
+    "show tcp brief | inc .22 |.23 ": |
+      0160C06C  127.0.0.1.22                127.0.0.1.51363             ESTAB
+
+ctc_config:
+  prompt: "%N(conf)#"
+  commands:
+    <<: *general_config_cmds
+    "end":
+      new_state: ctc_enable
+    "exit":
+      new_state: ctc_enable
+    "line console 0":
+      new_state:
+        ctc_config_line
+    "line vty 0 4":
+      new_state:
+        ctc_config_line
+
+ctc_config_line:
+  prompt: "%N(config-line)#"
+  commands:
+    "exec-timeout 0": ""
+    "line vty 0 4": ""
+    "end":
+      new_state: ctc_enable
+
+ctc_copy_address:
+  prompt: "Address or name of remote host [10.1.20.150]? "
+  commands:
+    "":
+      new_state: ctc_dest_filename
+
+ctc_dest_filename:
+  prompt: "Destination filename [/tmp/cflow/ctc_ssr-cat9300_2021_06_11_06_25_39_212943.tar.gz]? "
+  commands:
+    "":
+      response: |
+        Writing /tmp/cflow/ctc_ssr-cat9300_2021_06_11_06_25_39_212943.tar.gz !
+        134 bytes copied in 0.029 secs (4621 bytes/sec)
+      new_state: ctc_enable
+
+
+ctc_mkdir_confirm:
+  prompt: "Create directory filename [ctc_ssr-cat9300_2021_06_11_06_25_39_212943]? "
+  commands:
+   "":
+     response: Created dir flash:/ctc_ssr-cat9300_2021_06_11_06_25_39_212943
+     new_state: ctc_enable
+
+ctc_shell_confirm:
+  preface: |
+    Activity within this shell can jeopardize the functioning of the system.
+  prompt: "Are you sure you want to continue? [y/n] "
+  commands:
+    "y":
+      new_state: ctc_shell
+
+ctc_shell:
+  preface: |
+    2021/06/11 13:31:33 : Shell access was granted to user <anon>; Trace file: , /crashinfo/tracelogs/system_shell_R0-0.15090_0.20210611133133.bin
+    ********************************************************************** 
+    Activity within this shell can jeopardize the functioning 
+    of the system.
+    Use this functionality only under supervision of Cisco Support.
+
+    Session will be logged to:
+      crashinfo:tracelogs/system_shell_R0-0.15090_0.20210611133133.bin
+    ********************************************************************** 
+    Terminal type 'xterm-256color' unknown.  Assuming vt100
+
+  prompt: "[%N_1_RP_0:/]$ "
+  commands:
+    "stty cols 200": ""
+    "stty rows 200": ""
+    "/usr/bin/cflow ?": |
+      ?
+      Usage: /usr/bin/cflow <target>
+      target takes dump or clear
+      /usr/bin/cflow dump - Collects dat files
+      /usr/bin/cflow clear - removes the collected dat info
+      /usr/bin/cflow autodump  [ time-interval ]  - default interval is 5min
+    "/usr/bin/cflow clear": |
+      clear
+      Calling clear function..
+      Removing generated dat file..
+    "/usr/bin/cflow dump": |
+      dump
+      Calling dump function..
+      Checking for 1013 ...
+    "cd flash":
+      new_state: ctc_shell_flash
+    "exit":
+      response:
+        Session log crashinfo:tracelogs/system_shell_R0-0.15090_0.20210611133133.bin closed.
+      new_state: ctc_enable
+
+
+ctc_shell_flash:
+  prompt: "[%N_1_RP_0:/flash]$ "
+  commands:
+    "mv flash:/* ctc_ssr-cat9300_2021_06_11_06_25_39_212943/": |
+      mv: cannot stat 'flash:/*': No such file or directory
+    "tar cfz ctc_ssr-cat9300_2021_06_11_06_25_39_212943.tar.gz ctc_ssr-cat9300_2021_06_11_06_25_39_212943/": ""
+    "rm -rf ctc_ssr-cat9300_2021_06_11_06_25_39_212943/": ""
+    "exit":
+      response:
+        Session log crashinfo:tracelogs/system_shell_R0-0.15090_0.20210611133133.bin closed.
+      new_state: ctc_enable
+
+ping_fail:
+  preface:
+    response: ""
+    timing:
+      - 0:,0.5
+  prompt: "%N#"
+  commands:
+    <<: *gen_enable_cmds
+    "ping":
+      new_state: ping_protocol_fail
+
+ping_protocol_fail:
+  prompt: "Protocol [ip]: "
+  commands:
+    "":
+      response: |
+        % Unknown protocol - "", type "ping ?" for help
+      timing:
+      - 0:,0,0.015,0.01
+      new_state: ping_fail
+
+
+endless_syslog:
+  prompt: ""
+  keys:
+    ctrl-f:
+      new_state: general_enable
+  commands:
+    "": "%MY-1-MSG: never ending message"
+
+
+error_opening_syslog:
+  prompt: "%Error opening tftp://255.255.255.255/network-confg (Timed out)"
+  commands:
+    "":
+      new_state: general_exec
+
+
+enable_reload_config_dialog:
+  prompt: "%N#"
+  commands:
+    <<: *gen_enable_cmds
+    "reload":
+      new_state: initial_config_dialog
+
+boot_to_rommon:
+  preface: |2
+    Initializing Hardware ...
+
+
+    System integrity status: 9B710000  12030000  A0A00A05
+
+
+    System Bootstrap, Version 17.7(2r), RELEASE SOFTWARE
+    Copyright (c) 1994-2021  by cisco Systems, Inc.
+
+    Current image running: Boot ROM0
+    Last reset cause: LocalSoft
+
+    ASR1000-RP3 platform with 67108864 Kbytes of main memory
+
+  prompt: "rommon1>"
+  commands:
+    "":
+      new_state: general_rommon
+
+
+general_rommon:
+  prompt: "rommon1>"
+  commands:
+    "boot":
+      new_state: general_exec
+
+
+enable_container:
+  prompt: "%N#"
+  commands:
+    <<: *gen_enable_cmds
+    "app-hosting connect appid meraki co":
+      new_state: meraki_container_shell
+
+
+meraki_container_shell:
+  preface: |
+    Connected to appliance. Exit using ^c^c^c
+    Clear existing connection in case of failure
+  prompt: "/ # "
+  commands:
+    "exit":
+      BusyBox v1.32.0 (2021-10-12 10:15:40 UTC) built-in shell (ash)
+  keys:
+    ctrl-c:
+      new_state: meraki_ctrl_c
+
+meraki_ctrl_c:
+  keys:
+    ctrl-c:
+      new_state: meraki_ctrl_c2
+
+meraki_ctrl_c2:
+  keys:
+    ctrl-c:
+      new_state: enable_container
+
+meraki_container_ssh:
+  prompt: "44-b6-be-0e-56-00-SFO-SMK-N-CA-switch:~$"
+
+
+tclsh:
+  prompt: "%N(tcl)#"
+  commands:
+    "exit":
+      new_state: general_enable
+
+bash_console_switch_standby_rp_active:
+  prompt: "[%N_1_RP_0:/]$ "
+  commands:
+    "ls": "test.txt"
+    "stty cols 200": ""
+    "stty rows 200": ""
+    "exit":
+      new_state: general_enable
+
+breakboot:
+  preface:
+    Initializing Hardware ...
+  keys:
+    ctrl-\]:
+      new_state:
+        breakboot_escape_telnet
+
+breakboot_escape_telnet:
+  prompt: 'telnet>'
+  commands:
+    "send break":
+      new_state: breakboot_rommon
+
+
+breakboot_rommon:
+  prompt: "rommon>"
+  commands:
+    "boot bootflash:asr1000_golden.bin":
+      new_state: general_enable
+
+
+guestshell_prompt_obscure_enable:
+  prompt: "%N#"
+  commands:
+    "show version":
+      response:
+        Cisco IOS XE Software, Version BLD_POLARIS_DEV_LATEST_20220726_143256
+      new_state:
+        guestshell_prompt_obscure
+
+
+guestshell_prompt_obscure:
+  prompt: "%N#Guestshell destroyed successfully"
+  commands:
+    "":
+      new_state: guestshell_prompt_obscure_enable
+
+
+enable_slow_config:
+  prompt: "%N#"
+  commands:
+    "config term":
+      new_state:
+        slow_config_prompt
+
+
+slow_config_prompt:
+    preface:
+      response:
+        Enter configuration commands, one per line. End with CNTL/Z.
+      timing:
+        - 0:1,1
+        - 1:,2
+    prompt: "%N(config)#"
+    commands:
+      <<: *general_config_cmds
+
+
+rommon_command_output_not_a_prompt:
+  prompt: "switch: "
+  commands:
+    "notaprompt":
+      timing:
+      - 0:,0,2
+      response: |2
+        Signature verification failed for key#
+        
+    "boot":
+      new_state: general_exec
+
+rommon_command_output_not_a_prompt2:
+  prompt: "switch: "
+  commands:
+    "notaprompt":
+      timing:
+      - 0:1,0,2
+      - 1:,10
+      response: |2
+        Signature verification failed for key#
+        
+    "boot":
+      new_state: general_exec

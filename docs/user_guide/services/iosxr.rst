@@ -125,6 +125,19 @@ Has same arguments as generic configure service.
     output = device.admin_configure('no logging console')
 
 
+configure_exclusive
+-------------------
+
+Service to configure device while locking the
+router configuration. The system configuration can be made
+only from the login terminal.
+Has same arguments as generic configure service.
+
+.. code-block:: python
+
+    output = device.configure_exclusive('logging console disable')
+
+
 Sub-Plugins
 -----------
 
@@ -132,7 +145,6 @@ Spitfire
 ^^^^^^^^
 
 The spitfire sub plugin supports all services provided by :doc `Common Services <generic_services>`.
-It currently doesnt support any of the DUAL RP Services .
 
 In addition to the common services spitfire also supports the following services
 
@@ -140,7 +152,8 @@ attach_console
 """"""""""""""
 
 Service to attach to line card console/Standby RP to execute commands in. Returns a
-router-like object to execute commands on using python context managers.
+router-like object to execute commands on using python context managers.This service is 
+supported in HA as well.
 
 ====================    ======================    ========================================
 Argument                Type                      Description
@@ -159,3 +172,32 @@ prompt                  str                       bash prompt (default # )
         output1 = conn.execute('ls')
         output2 = conn.execute('pwd')
 
+switchto
+""""""""
+
+Service to switch the router console to any state that user needs in order to perform
+his tests. The api becomes a no-op if the console is already at the state user wants 
+to reach. This service is supported in HA as well. 
+
+
+The states available to switch to are :
+
+* enable
+* config
+* bmc
+* xr_bash
+* xr_run
+* xr_env
+
+====================    ======================    ========================================
+Argument                Type                      Description
+====================    ======================    ========================================
+target_state            str                       target state user wants the console at
+timeout                 int (default in None)     timeout in sec for executing commands
+====================    ======================    ========================================
+
+.. code-block:: python
+    
+        device.switchto("xr_env")
+        .... some commands that need to be run in xr_env state ....
+        device.switchto("enable") 

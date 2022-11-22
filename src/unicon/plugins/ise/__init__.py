@@ -6,7 +6,7 @@ Authors:
     pyATS TEAM (pyats-support@cisco.com, pyats-support-ext@cisco.com)
 
 Description:
-    This subpackage implements Ise 
+    This subpackage implements Ise
 """
 
 import time
@@ -30,7 +30,7 @@ class IseSettings(LinuxSettings):
 
 def send_enter(spawn):
     time.sleep(2)
-    spawn.sendline('')
+    spawn.sendline()
 
 def more_handler(spawn):
     time.sleep(0.1)
@@ -93,10 +93,10 @@ class IseServiceList:
         self.send = svc.Send
         self.sendline = svc.Sendline
         self.expect = svc.Expect
-        self.expect_log = svc.ExpectLogging
         self.log_user = svc.LogUser
         self.execute = ise_svc.Execute
         self.configure = ise_svc.Configure
+        self.expect_log = svc.ExpectLogging
 
 
 class IseConnection(BaseLinuxConnection):
@@ -104,7 +104,7 @@ class IseConnection(BaseLinuxConnection):
         Connection class for Ise connections.
     """
     os = 'ise'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     state_machine_class = IseStateMachine
     connection_provider_class = IseConnectionProvider
@@ -117,4 +117,3 @@ class IseConnection(BaseLinuxConnection):
         """
         self.spawn.sendline('exit')
         self.spawn.close()
-        self._is_connected = False

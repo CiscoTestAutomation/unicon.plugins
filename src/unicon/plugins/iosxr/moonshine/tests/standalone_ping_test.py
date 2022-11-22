@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from pyats import aetest
 from pyats.kleenex import BringUp

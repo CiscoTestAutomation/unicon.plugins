@@ -1,0 +1,143 @@
+redundancy reload shelf
+
+System configuration has been modified. Save? [yes/no]: n
+Reload the entire shelf [confirm]
+Preparing to reload this shelf
+reload fp action requested
+process exit with reload stack code
+
+
+watchdog: watchdog0: watchdog did not stop!
+reboot: Restarting system
+
+
+
+Booting...(use SKIP_POST)Up 1000 Mbps Full duplex (port  0) (SGMII)
+
+The system is not configured to boot automatically.  The
+following command will finish loading the operating system
+software:
+
+    boot
+
+
+switch: boot
+Reading full image into memory.............................................................................................................................................................................................................................................................................................................................................................................................................................................................................done
+Bundle Image
+--------------------------------------
+Kernel Address    : 0x53778818
+Kernel Size       : 0x438410/4424720
+Initramfs Address : 0x53bb0c28
+Initramfs Size    : 0x1abc00f/28033039
+Compression Format: mzip
+
+Bootable image at @ ram:0x53778818
+Bootable image segment 0 address range [0x81100000, 0x81da5280] is in range [0x80180000, 0x90000000].
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+File "tftp://10.1.7.250/auto/nostgAuto/USERS/ranautiy/nirmagup/IOSXE/cat3k_caa-universalk9.BLD_V1612_THROTTLE_LATEST_20200403_053502_V16_12_3_6.SSA.bin" uncompressed and installed, entry point: 0x81895bf0
+Loading Linux kernel with entry point 0x81895bf0 ...
+Bootloader: Done loading app on core_mask: 0xf
+
+### Launching Linux Kernel (flags = 0x5)
+
+Linux version 4.9.187 (xelinux@sjc-xelinux2) (gcc version 5.3.0 (GCC) ) #1 SMP Wed Dec 11 09:25:00 PST 2019
+CVMSEG size: 2 cache lines (256 bytes)
+Cavium Inc. SDK-5.1.0
+bootconsole [early0] enabled
+CPU0 revision is: 000d900a (Cavium Octeon II)
+Checking for the multiply/shift bug... no.
+Checking for the daddiu bug... no.
+%IOSXEBOOT-c34ad91569d0f862504bc287a15afe2e-new_cksum: (rp/0): 4
+%IOSXEBOOT-c34ad91569d0f862504bc287a15afe2e-saved_cksum: (rp/0): 4
+
+Final tar file: mcu_ucode_bundle_6_2_0.tar
+
+Waiting for 120 seconds for other switches to boot
+#####
+Switch number is 2
+All switches in the stack have been discovered. Accelerating discovery
+
+              Restricted Rights Legend
+
+Use, duplication, or disclosure by the Government is
+subject to restrictions as set forth in subparagraph
+(c) of the Commercial Computer Software - Restricted
+Rights clause at FAR sec. 52.227-19 and subparagraph
+(c) (1) (ii) of the Rights in Technical Data and Computer
+Software clause at DFARS sec. 252.227-7013.
+
+           Cisco Systems, Inc.
+           170 West Tasman Drive
+           San Jose, California 95134-1706
+
+
+
+Cisco IOS Software [Gibraltar], Catalyst L3 Switch Software (CAT3K_CAA-UNIVERSALK9-M), Experimental Version 16.12.20200403:060733 [S2C-build-v1612_throttle-BLD_V1612_THROTTLE_S2C_20200403_035148-/nobackup/mcpre/BLD-BLD_V1612_THROTTLE_LATEST_20200403_053502 132]
+Copyright (c) 1986-2020 by Cisco Systems, Inc.
+Compiled Fri 03-Apr-20 08:30 by mcpre
+
+
+This software version supports only Smart Licensing as the software licensing mechanism.
+
+
+PLEASE READ THE FOLLOWING TERMS CAREFULLY. INSTALLING THE LICENSE OR
+LICENSE KEY PROVIDED FOR ANY CISCO SOFTWARE PRODUCT, PRODUCT FEATURE,
+AND/OR SUBSEQUENTLY PROVIDED SOFTWARE FEATURES (COLLECTIVELY, THE
+"SOFTWARE"), AND/OR USING SUCH SOFTWARE CONSTITUTES YOUR FULL
+ACCEPTANCE OF THE FOLLOWING TERMS. YOU MUST NOT PROCEED FURTHER IF YOU
+ARE NOT WILLING TO BE BOUND BY ALL THE TERMS SET FORTH HEREIN.
+
+Your use of the Software is subject to the Cisco End User License Agreement
+(EULA) and any relevant supplemental terms (SEULA) found at
+http://www.cisco.com/c/en/us/about/legal/cloud-and-software/software-terms.html.
+
+You hereby acknowledge and agree that certain Software and/or features are
+licensed for a particular term, that the license to such Software and/or
+features is valid only for the applicable term and that such Software and/or
+features may be shut down or otherwise terminated by Cisco after expiration
+of the applicable license term (e.g., 90-day trial period). Cisco reserves
+the right to terminate any such Software feature electronically or by any
+other means available. While Cisco may provide alerts, it is your sole
+responsibility to monitor your usage of any such term Software feature to
+ensure that your systems and networks are prepared for a shutdown of the
+Software feature.
+
+
+
+
+FIPS: Flash Key Check : Begin
+FIPS: Flash Key Check : End, Not Found, FIPS Mode Not Enabled
+
+All TCP AO KDF Tests Pass
+cisco WS-C3850-24P (MIPS) processor (revision T0) with 795156K/6147K bytes of memory.
+Processor board ID FCW1914C0JJ
+2048K bytes of non-volatile configuration memory.
+4194304K bytes of physical memory.
+257008K bytes of Crash Files at crashinfo:.
+257008K bytes of Crash Files at crashinfo-1:.
+257008K bytes of Crash Files at crashinfo-3:.
+257008K bytes of Crash Files at crashinfo-4:.
+257008K bytes of Crash Files at crashinfo-5:.
+1550272K bytes of Flash at flash:.
+1550272K bytes of Flash at flash-1:.
+1550272K bytes of Flash at flash-3:.
+1550272K bytes of Flash at flash-4:.
+1550272K bytes of Flash at flash-5:.
+0K bytes of WebUI ODM Files at webui:.
+
+Base Ethernet MAC Address          : bc:c4:93:46:91:80
+Motherboard Assembly Number        : 73-14441-10
+Motherboard Serial Number          : FOC191448XE
+Model Revision Number              : T0
+Motherboard Revision Number        : A0
+Model Number                       : WS-C3850-24P
+System Serial Number               : FCW1914C0JJ
+
+
+ WARNING: Command has been added to the configuration using a type 0 password. However, type 0 passwords will soon be deprecated. Migrate to a supported password type
+
+
+Press RETURN to get started!
+
+
+Router>

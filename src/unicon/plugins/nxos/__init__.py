@@ -8,8 +8,8 @@ Authors:
 Description:
     This subpackage implements NXOS
 """
-from .bases import BaseNxosDualRpConnection
-from .bases import BaseNxosSingleRpConnection
+from unicon.bases.routers.connection import (BaseSingleRpConnection,
+   BaseDualRpConnection)
 
 from .connection_provider import NxosSingleRpConnectionProvider
 from .connection_provider import NxosDualRpConnectionProvider
@@ -28,7 +28,7 @@ class NxosServiceList(ServiceList):
         super().__init__()
         self.reload = svc.Reload
         self.ping6 = svc.Ping6
-        self.copy =svc.NxosCopy
+        self.copy = svc.NxosCopy
         self.shellexec = svc.ShellExec
         self.list_vdc = svc.ListVdc
         self.switchto = svc.SwitchVdc
@@ -37,7 +37,10 @@ class NxosServiceList(ServiceList):
         self.delete_vdc = svc.DeleteVdc
         self.attach_console = svc.AttachModuleConsole
         self.bash_console = svc.BashService
-        self.guestshell = svc.GuestshellService
+        self.configure = svc.Configure
+        self.configure_dual = svc.ConfigureDual
+        self.execute = svc.NxosExecute
+        self.l2rib_dt = svc.L2ribDtService
 
 
 class HANxosServiceList(HAServiceList):
@@ -57,14 +60,14 @@ class HANxosServiceList(HAServiceList):
         self.delete_vdc = svc.DeleteVdc
         self.attach_console = svc.AttachModuleConsole
         self.bash_console = svc.BashService
-        self.guestshell = svc.GuestshellService
         self.ping6 = svc.Ping6
+        self.configure = svc.Configure
+        self.l2rib_dt = svc.L2ribDtService
 
 
-
-class NxosSingleRpConnection(BaseNxosSingleRpConnection):
+class NxosSingleRpConnection(BaseSingleRpConnection):
     os = 'nxos'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     state_machine_class = NxosSingleRpStateMachine
     connection_provider_class = NxosSingleRpConnectionProvider
@@ -72,9 +75,9 @@ class NxosSingleRpConnection(BaseNxosSingleRpConnection):
     settings = NxosSettings()
 
 
-class NxosDualRPConnection(BaseNxosDualRpConnection):
+class NxosDualRPConnection(BaseDualRpConnection):
     os = 'nxos'
-    series = None
+    platform = None
     chassis_type = 'dual_rp'
     state_machine_class = NxosDualRpStateMachine
     connection_provider_class = NxosDualRpConnectionProvider

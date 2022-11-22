@@ -12,7 +12,9 @@ class LinuxUtils(Utils):
         match = re.findall(pattern, result, re.MULTILINE)
         if match:
             # get the last prompt pattern match line and replace it with ""
-            prompt_line = match[-1][0]
+            prompt_line = match[-1]
+            if isinstance(prompt_line, tuple):
+                prompt_line = prompt_line[0]
             output = result.replace(prompt_line, "")
         else:
             output = result

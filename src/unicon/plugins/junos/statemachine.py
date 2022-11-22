@@ -47,7 +47,7 @@ class JunosSingleRpStateMachine(StateMachine):
         shell_to_enable = Path(shell, enable, 'cli', None)
 
         enable_to_config = Path(enable, config, 'configure', None)
-        config_to_enable = Path(config, enable, 'commit\nexit', config_dialog)
+        config_to_enable = Path(config, enable, 'exit', config_dialog)
 
         # Add State and Path to State Machine
         self.add_state(shell)

@@ -25,6 +25,8 @@ exec:
 config:
   prompt: "root@junos_vmx2#"
   commands:
+    "commit synchronize": "dont know what the response is"
+    "something": ""
     "commit": |
         commit complete
 
@@ -55,3 +57,80 @@ user_password:
   commands:
     "lab":
       new_state: exec
+
+# ================================
+exec2:
+  prompt: "root@junos_vsrx>"
+  commands:
+    "start shell":
+      new_state: shell
+    "set cli screen-length 0": |
+      Screen length set to 0
+    "set cli screen-width 0": |
+      Screen width set to 0
+    "exit":
+      new_state: user_access_veri
+
+shell:
+  prompt: "% "
+  commands:
+    "ls": |
+      :golden_config_snapshot phase3_golden_config
+    "exit":
+      new_state: exec2
+
+# ===============================
+exec3:
+  prompt: "root@junos_dev>"
+  commands:
+    "configure":
+      new_state: config3
+
+config3:
+  prompt: "root@junos_dev#"
+  commands:
+    "commit": |
+        [edit interfaces ge-0/0/0]
+
+          'unit 29'
+
+            Only unit 0 is valid for this encapsulation
+
+        error: configuration check-out failed
+
+        [edit]
+    "exit":
+      new_state: exec3
+
+# ===============================
+exec4:
+  prompt: "root@junos_dev>"
+  commands:
+    "configure":
+      new_state: config4
+
+config4:
+  prompt: "root@junos_dev#"
+  commands:
+    "commit": |
+        [edit interfaces ge-0/0/0]
+
+          Users currently editing the configuration:
+
+        [edit]
+    "exit":
+      new_state: exec4
+
+exec5:
+  prompt: "root@junos_dev>"
+  commands:
+    "configure":
+      new_state: config_exec
+  
+config_exec:
+  prompt: "root@junos_dev#"
+  commands:
+    "commit synchronize": |
+        error: commit failed: (statements constraint check failed)
+    "exit":
+      new_state: exec5
