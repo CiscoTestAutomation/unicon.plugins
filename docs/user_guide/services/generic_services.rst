@@ -225,8 +225,7 @@ target             str (default "active")     Target RP where to execute service
 bulk               bool (default False)       If False, send all commands in one sendline. If True, send commands in chunked mode
 bulk_chunk_lines   int (default 50)           maximum number of commands to send per chunk, 0 means to send all commands in a single chunk
 bulk_chunk_sleep   float (default 0.5 sec)    sleep between sending command chunks
-allow_state_change bool (default False)       Allow state change during the configure.
-                                            
+allow_state_change bool (default False)       Allow state change during the configure.                                            
 ================   =======================    ========================================
 
 
