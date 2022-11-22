@@ -209,24 +209,25 @@ is specified as standby. Use `prompt_recovery` argument for using
 `prompt_recovery` feature. Refer :ref:`prompt_recovery_label`  for details
 on prompt_recovery feature.
 
-
-================  =======================    ========================================
-Argument          Type                       Description
-================  =======================    ========================================
-timeout           int (default 60 sec)       timeout value for the command execution takes.
-error_pattern     list                       List of regex strings to check output for errors.
-reply             Dialog                     additional dialog
-command           list                       list of commands to configure
-prompt_recovery   bool (default False)       Enable/Disable prompt recovery feature
-force             bool (default False)       For XR, run commit force at end of config.
-replace           bool (default False)       For XR, run commit replace at end of config.
-lock_retries      int (default 0)            retry times if config mode is locked
-lock_retry_sleep  int (default 2 sec)        sleep between lock_retries
-target            str (default "active")     Target RP where to execute service, for DualRp only
-bulk              bool (default False)       If False, send all commands in one sendline. If True, send commands in chunked mode
-bulk_chunk_lines  int (default 50)           maximum number of commands to send per chunk, 0 means to send all commands in a single chunk
-bulk_chunk_sleep  float (default 0.5 sec)    sleep between sending command chunks
-================  =======================    ========================================
+================   =======================    ========================================
+Argument           Type                       Description
+================   =======================    ========================================
+timeout            int (default 60 sec)       timeout value for the command execution takes.
+error_pattern      list                       List of regex strings to check output for errors.
+reply              Dialog                     additional dialog
+command            list                       list of commands to configure
+prompt_recovery    bool (default False)       Enable/Disable prompt recovery feature
+force              bool (default False)       For XR, run commit force at end of config.
+replace            bool (default False)       For XR, run commit replace at end of config.
+lock_retries       int (default 0)            retry times if config mode is locked
+lock_retry_sleep   int (default 2 sec)        sleep between lock_retries
+target             str (default "active")     Target RP where to execute service, for DualRp only
+bulk               bool (default False)       If False, send all commands in one sendline. If True, send commands in chunked mode
+bulk_chunk_lines   int (default 50)           maximum number of commands to send per chunk, 0 means to send all commands in a single chunk
+bulk_chunk_sleep   float (default 0.5 sec)    sleep between sending command chunks
+allow_state_change bool (default False)       Allow state change during the configure.
+                                            
+================   =======================    ========================================
 
 
 
