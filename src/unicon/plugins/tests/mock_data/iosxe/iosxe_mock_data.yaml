@@ -82,6 +82,8 @@ enable_password:
 general_enable:
   prompt: "%N#"
   commands: &gen_enable_cmds
+    "start maintenance":
+      new_state: general_maintence_mode_confirm
     "term length 0": ""
     "term width 0": ""
     "show version": *SV
@@ -274,6 +276,58 @@ general_enable:
           Secure server will use temporary self-signed certificate.
       Default AP group (default-group) is not configurable.
       4177 bytes copied in 0.160 secs (26106 bytes/sec)
+
+
+general_maintence_mode_confirm:
+  prompt: "Template default will be applied. Do you want to continue?[confirm] "
+  commands:
+    "":
+      new_state: general_maintenance_mode1
+
+general_maintenance_mode1:
+  prompt: "%N#"
+  commands:
+    <<: *gen_enable_cmds
+    "":
+      new_state: general_maintenance_mode2
+
+
+general_maintenance_mode2:
+  prompt: "%N#"
+  commands:
+    <<: *gen_enable_cmds
+    "":
+      new_state: general_maintenance_mode
+
+
+general_maintenance_mode:
+  prompt: "%N(maint-mode)#"
+  commands:
+    <<: *gen_enable_cmds
+    "help": "help"
+    "stop maintenance":
+      new_state: general_maintenance_mode_stop
+
+general_maintenance_mode_stop:
+  prompt: "WARNING: Please check configured protocol peer status first. If all peers are not fully up and established, GIR may declare a timeout and extend the maintenance window. Do you want to continue?[y/n]? [yes]: "
+  commands:
+    "yes":
+      new_state: general_maintenance_mode_stop1
+
+general_maintenance_mode_stop1:
+  prompt: "%N(maint-mode)#"
+  commands:
+    <<: *gen_enable_cmds
+    "":
+      new_state: general_maintenance_mode_stop2
+
+
+general_maintenance_mode_stop2:
+  prompt: "%N(maint-mode)#"
+  commands:
+    <<: *gen_enable_cmds
+    "":
+      new_state: general_enable
 
 
 

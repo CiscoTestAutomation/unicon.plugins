@@ -17,6 +17,10 @@ from unicon.core.errors import SubCommandFailure
 from pyats.topology import loader
 
 from unicon.plugins.tests.mock.mock_device_iosxr import MockDeviceTcpWrapperIOSXR
+import unicon
+
+unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC=0
+unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC=0.2
 
 
 class TestIOSXRPluginHAConnect(unittest.TestCase):
@@ -44,6 +48,7 @@ class TestIOSXRPluginHAConnect(unittest.TestCase):
                 ip: 127.0.0.1
                 port: {}
                 settings:
+                  POST_RELOAD_WAIT: 2
                   POST_HA_RELOAD_CONFIG_SYNC_WAIT: 30
                   IOSXR_INIT_EXEC_COMMANDS: []
                   IOSXR_INIT_CONFIG_COMMANDS: []
@@ -53,6 +58,7 @@ class TestIOSXRPluginHAConnect(unittest.TestCase):
                 ip: 127.0.0.1
                 port: {}
                 settings:
+                  POST_RELOAD_WAIT: 2
                   POST_HA_RELOAD_CONFIG_SYNC_WAIT: 30
                   IOSXR_INIT_EXEC_COMMANDS: []
                   IOSXR_INIT_CONFIG_COMMANDS: []

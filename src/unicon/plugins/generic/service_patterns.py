@@ -153,7 +153,7 @@ class CopyPatterns():
         self.copy_overwrite = r'^.*Do you want to over\s?write\?? (\(y\/n\)\?)?\[.*\].*$'
         self.copy_nx_vrf = r'^.*Enter vrf \(If no input,.*default.*\):\s*$'
         self.copy_proceed = r'^.*bytes.*proceed\?.*$'
-        self.tftp_addr =r'^.*Address.*$'
+        self.tftp_addr =r'^.*Address or name of remote host \[\]\?\s*$'
         self.copy_complete = r'^.*bank [0-9]+'
         self.copy_error_message = r'fail|timed out|Timed out|Error|Login incorrect|denied|Problem' \
                                   r'|NOT|Invalid|No memory|Failed(?! to generate persistent self-signed certificate)|mismatch|Bad|bogus|lose|abort' \

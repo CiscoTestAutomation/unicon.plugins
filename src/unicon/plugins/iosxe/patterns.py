@@ -7,6 +7,7 @@ from unicon.plugins.generic.service_patterns import ReloadPatterns
 
 
 class IosXEPatterns(GenericPatterns):
+
     def __init__(self):
         super().__init__()
         self.shell_prompt = r'^(.*?)\[(%N|[Ss]witch|[Rr]outer).*?\]\$\s?$'
@@ -20,10 +21,14 @@ class IosXEPatterns(GenericPatterns):
         self.confirm = r'^.*\[confirm\]\s*$'
         self.wish_continue = r'^.*Do you wish to continue\? \[yes\]:\s*$'
         self.want_continue = r'^.*Do you want to continue\? \[no\]:\s*$'
+        self.want_continue_confirm = r'.*Do you want to continue\?\s*\[confirm]\s*$'
+        self.want_continue_yes = r'.*Do you want to continue\?\s*\[y/n]\?\s*\[yes]:\s*$'
         self.disable_prompt = \
             r'^(.*?)(WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(-standby)?(\(boot\))?(\(recovery-mode\))?>\s?$'
         self.enable_prompt = \
             r'^(.*?)(WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(-standby)?(\(boot\))?(\(recovery-mode\))?#[\s\x07]*$'
+        self.maintenance_mode_prompt = \
+            r'^(.*?)(WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(-standby)?(\(boot\))?\(maint-mode\)#[\s\x07]*$'
         self.press_enter = ReloadPatterns().press_enter
         self.config_prompt = r'^(.*)\(.*(con|cfg|ipsec-profile|ca-trustpoint|cs-server|ca-profile|gkm-local-server|cloud|host-list|config-gkm-group|gkm-sa-ipsec|gdoi-coop-ks-config|wsma)\S*\)#\s?$'
         self.are_you_sure_ywtdt = r'Are you sure you want to do this\? \[yes/no\]:\s*$'
@@ -32,6 +37,7 @@ class IosXEPatterns(GenericPatterns):
         self.proceed_confirm = r'^.*Proceed\? \[yes,no\]\s*$'
         self.tclsh_prompt = r'^(.*?)(WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(-standby)?(\(boot\))?(\(recovery-mode\))?\(tcl.*?\)#[\s\x07]*$'
         self.macro_prompt = r'^(.*?)(\{\.\.\}|then.else.fi)\s*>\s*$'
+        self.unable_to_create = r'^(.*?)Unable to create.*$'
 
 
 class IosXEReloadPatterns(ReloadPatterns):

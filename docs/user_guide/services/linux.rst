@@ -411,3 +411,15 @@ Example with sudo command argument.
       Out[5]: '/tmp\r\n/var\r\n/opt'
 
       In [6]: 
+
+trex_console
+------------
+
+In order to use trex_console, the trex has to be installed and must be specified in $PATH. 
+Upon which you can use this service to execute trex-console commands
+
+.. code-block:: python
+
+          with c.trex_console() as trex_cli:
+            output1 = trex_cli.execute('ls')
+            output2 = trex_cli.execute('help')

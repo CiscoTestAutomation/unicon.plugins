@@ -8,6 +8,11 @@ sdwan_banner_password:
     cisco:
       new_state: sdwan_enable
 
+sdwan_ha_standby_escape:
+  commands:
+   "":
+     new_state: sdwan_ha_standby_disable
+     
 sdwan_enable:
   prompt: "Router#"
   commands: &sdwan_enable_cmds
@@ -20,6 +25,24 @@ sdwan_enable:
       16.12.1.0.533  true    true     false     auto       2019-05-21T03:00:31-00:00
     "show version": ""
     "config term": "This command is not supported"
+    "sh redundancy stat | inc my state": |2
+          my state = 13 -ACTIVE 
+    "sh redundancy state": |2
+              my state = 13 -ACTIVE 
+            peer state = 8  -STANDBY HOT 
+                  Mode = Duplex
+                  Unit = Primary
+                Unit ID = 48
+        Redundancy Mode (Operational) = sso
+        Redundancy Mode (Configured)  = sso
+        Redundancy State              = sso
+            Maintenance Mode = Disabled
+            Manual Swact = enabled
+        Communications = Up
+          client count = 84
+        client_notification_TMR = 30000 milliseconds
+                  RF debug mask = 0x0  
+ 
     "config-transaction":
       new_state: sdwan_config
 
@@ -31,8 +54,47 @@ sdwan_config:
     "line console 0": "syntax error: \"console\" is not a valid value."
     "exec-timeout 0" : "syntax error: unknown command"
     "commit": "% No modifications to commit."
+    "redundancy":
+      new_state: config_sdwan_redundancy
     "end":
       new_state: sdwan_enable
+
+
+sdwan_ha_standby_disable:
+    prompt: "%N-stby>"
+    commands:
+      "enable":
+        new_state: sdwan_ha_standby_enable
+
+sdwan_ha_standby_enable:
+  prompt: "%N-stby#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show sdwan version": "16.12.1.0.533"
+    "show sdwan software": |2
+      VERSION        ACTIVE  DEFAULT  PREVIOUS  CONFIRMED  TIMESTAMP
+      --------------------------------------------------------------------------------
+      16.12.1.0.533  true    true     false     auto       2019-05-21T03:00:31-00:00
+    "show version": ""
+    "config term": "This command is not supported"
+
+config_sdwan_redundancy:
+    prompt: "%N(config-red)#"
+    commands:
+      "main-cpu":
+        new_state: config_sdwan_redundancy_main_cpu2
+      "end":
+        new_state: sdwan_enable
+      "commit": "% No modifications to commit."
+
+config_sdwan_redundancy_main_cpu2:
+    prompt: "%N(config-r-mc)#"
+    commands:
+      "standby console enable": ""
+      "commit": "% No modifications to commit."
+      "end":
+        new_state: sdwan_enable
 
 sdwan_enable2:
   prompt: "Router#"

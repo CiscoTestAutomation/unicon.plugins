@@ -140,6 +140,10 @@ class GenericSettings(Settings):
         self.EXECUTE_MATCHED_RETRIES = 1
         self.EXECUTE_MATCHED_RETRY_SLEEP = 0.05
 
+        # for configure matched retry on statement pattern
+        self.CONFIGURE_MATCHED_RETRIES = 1
+        self.CONFIGURE_MATCHED_RETRY_SLEEP = 0.05
+
         # execute statement match retry for state change patterns
         self.EXECUTE_STATE_CHANGE_MATCH_RETRIES = 1
         self.EXECUTE_STATE_CHANGE_MATCH_RETRY_SLEEP = 3

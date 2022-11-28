@@ -383,6 +383,8 @@ enable:
       timing:
         - 0:2,0
         - 2:,10
+    "go to config":
+      new_state: config
 
 show_command_with_more_backspace_first:
   preface: "first"
@@ -452,7 +454,7 @@ yes_no_prompt:
     "y":
       new_state: enable
 
-
+  
 config:
   prompt: "%N(conf)#"
   commands:
@@ -471,7 +473,8 @@ config:
       new_state: enable
     "crypto pki trustpoint KEYPAIR":
       new_state: config_ca_trustpoint
-
+    "go to enable":
+      new_state: enable
 
 config_line:
   prompt: "%N(config-line)#"

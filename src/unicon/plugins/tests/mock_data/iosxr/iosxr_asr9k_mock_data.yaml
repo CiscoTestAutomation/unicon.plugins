@@ -1,14 +1,13 @@
 asr9k_ha_login:
   preface: file|mock_data/iosxr/login_banner_asr9k_ha.txt
-  prompt: "Username:"
   commands:
-    "admin":
-      new_state: asr9k_ha_password
+    "":
+      new_state: login
 
 asr9k_ha_password:
   prompt: "Password:"
   commands:
-    "lab":
+    "admin":
       # response: "\n"
       new_state: asr9k_ha_enable
 

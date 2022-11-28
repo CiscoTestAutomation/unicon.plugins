@@ -202,6 +202,14 @@ enable_cat3k:
       new_state: system_config_change
     "active_install_add":
         new_state: cat3k_install_add_commit
+    "dir bootflash:/core/": |
+        dir bootflash:/core/
+        Directory of flash:/core/
+
+        360468  -rw-                1  Jun 27 2022 19:49:31 +00:00  .callhome
+        360539  -rw-        609625345  May 19 2022 20:52:07 +00:00  kernel.NA_CAT9K_NA_20220519205207.core.gz
+        360538  -rw-            90855  May 19 2022 20:50:59 +00:00  kernel.NA_CAT9K_NA_20220519205207.txt
+        524407  drwx             4096  Nov 10 2021 18:22:12 +00:00  modules
 
 
 config_cat3k:

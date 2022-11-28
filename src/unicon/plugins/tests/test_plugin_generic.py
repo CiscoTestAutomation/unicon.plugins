@@ -593,9 +593,10 @@ class TestConfigureService(unittest.TestCase):
             tacacs_password='cisco',
             enable_password='cisco',
             mit=True,
-            log_buffer=True
+            log_buffer=True,
         )
         cls.d.connect()
+    
 
         cls.ha = MockDeviceTcpWrapperIOS(port=0, state='enable,exec_standby')
         cls.ha.start()
@@ -682,6 +683,13 @@ class TestConfigureService(unittest.TestCase):
         with self.assertRaises(StateMachineError):
             self.d.configure('no logging console', lock_retries=2)
 
+    def test_change_state(self):
+        with self.assertRaises(StateMachineError):
+            self.d.configure(['go to enable','go to config'], allow_state_change = False)
+        self.d.configure(['go to enable','go to config'], allow_state_change = True)
+        self.assertEqual(self.d.state_machine.current_state, 'enable')
+
+
     def test_configure_error_pattern(self):
         with self.assertRaises(SubCommandFailure):
             self.d.configure('Not valid configuration',
@@ -752,7 +760,7 @@ class TestConfigureService(unittest.TestCase):
         c.configure('exit')
         self.assertEqual(c.state_machine.current_state, 'enable')
 
-        with self.assertRaises(SubCommandFailure):
+        with self.assertRaises(StateMachineError):
             c.configure('exitt')
 
         c.configure(['line console', 'exit', 'exit'])

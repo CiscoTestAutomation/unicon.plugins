@@ -55,3 +55,8 @@ class IosXESettings(GenericSettings):
 
         # Regex to match the entries on the grub boot screen
         self.GRUB_REGEX_PATTERN = r'(?:\x1b\[7m)?\x1b\[\d;3H.*?   '
+
+        self.MAINTENANCE_MODE_WAIT_TIME = 30   # 30 seconds
+        self.MAINTENANCE_MODE_TIMEOUT = 60*40  # 40 minutes
+        self.MAINTENANCE_START_COMMAND = 'start maintenance'
+        self.MAINTENANCE_STOP_COMMAND = 'stop maintenance'

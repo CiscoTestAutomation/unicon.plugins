@@ -16,10 +16,12 @@ class LinuxPatterns(GenericPatterns):
         # shell_prompt pattern will be used by the 'shell' state after lean_hostname matches
         # a known hostname pattern this pattern is set for the shell state at transition 
         # from learn_hostname to shell, see statemachine for more details.
-        self.shell_prompt = r'^(.*?%N\s?([-\w\]/~\s:\.\d]+)?[>\$~%#\]]\s?(\x1b\S+)?)$'
+        self.shell_prompt = r'^(.*?(?P<prompt>((\([-\w]+\) |\x1b.*?)?\S+)?%N\s?([-\w\]/~\s:\.\d]+)?[>\$~%#\]]\s?(\x1b\S+)?))$'
 
         # default linux prompt with loose matching of the prompt
         # this can result in false prompt matching when output has
         # one of the prompt characters at the end of the line,
         # e.g. XML output or a banner
         self.prompt = r'^(.*?([>\$~%\]]|\] # |[^#\s]#|~ #|~/|^admin:|^#|~\s?#\s?)\s?(\x1b\S+)?)$'
+
+        self.trex_console = r'^(.*?)(?P<prompt>trex>\s*)$'

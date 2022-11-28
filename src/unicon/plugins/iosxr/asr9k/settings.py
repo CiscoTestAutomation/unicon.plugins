@@ -9,3 +9,4 @@ class IOSXRAsr9kSettings(IOSXRSettings):
 
         # number of retries to reconnect after reloading
         self.RELOAD_RECONNECT_ATTEMPTS = 3
+        self.POST_RELOAD_WAIT = 500

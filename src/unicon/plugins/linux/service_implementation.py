@@ -1,7 +1,8 @@
 import re
 import ipaddress
 
-from unicon.plugins.generic.service_implementation import Execute as GenericExecute
+from unicon.plugins.generic.service_implementation import (
+    Execute as GenericExecute, ContextMgrBaseService)
 from unicon.bases.linux.services import BaseService
 from unicon.core.errors import SubCommandFailure, StateMachineError
 from unicon.eal.dialogs import Dialog, Statement
@@ -263,3 +264,16 @@ class Sudo(Execute):
 
     def call_service(self, command='bash', **kwargs):
         super().call_service('sudo {}'.format(command), **kwargs)
+
+
+class TrexConsole(ContextMgrBaseService):
+
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.context_state = 'trex_console'
+        self.service_name = 'trex_console'
+        self.start_state = "shell"
+        self.end_state = "shell"
+
+        self.__dict__.update(kwargs)
+

@@ -389,11 +389,11 @@ def sudo_password_handler(spawn, context, session):
         raise UniconAuthenticationError("No credentials has been defined for sudo.")
 
 
-def wait_and_enter(spawn):
-    # wait for 0.5 second and read the buffer
+def wait_and_enter(spawn, wait=0.5):
+    # wait and read the buffer
     # this avoids issues where the 'sendline'
     # is somehow lost
-    wait_time = timedelta(seconds=0.5)
+    wait_time = timedelta(seconds=wait)
     settle_time = current_time = datetime.now()
     while (current_time - settle_time) < wait_time:
         spawn.read_update_buffer()

@@ -148,9 +148,45 @@ classiccli_execute:
     "commit": ""
     "environment no more": ""
     "environment no saved-ind-prompt": ""
+    "configure":
+      new_state: classiccli_config
+    "configure lag 800":
+      new_state: classiccli_config_lag
   keys:
     "ctrl-z": ""
     "//":
       response: |
         INFO: CLI #2052: Switching to the MD-CLI engine
       new_state: mdcli_execute
+
+classiccli_config:
+  prompt: "A:%N>config#"
+  commands:
+    "lag 800":
+      new_state: classiccli_config_lag
+  keys:
+    "ctrl-z":
+      new_state: classiccli_execute
+
+classiccli_config_lag:
+  prompt: "A:%N>config>lag#"
+  commands:
+    "no shutdown": ""
+    "mode hybrid": ""
+    "access":
+      new_state: classiccli_config_lag_access
+    "exit":
+      new_state: classiccli_config
+  keys:
+    "ctrl-z":
+      new_state: classiccli_execute
+
+classiccli_config_lag_access:
+  prompt: "A:%N>config>lag>access$"
+  commands:
+    "adapt-qos link": ""
+    "exit":
+      new_state: classiccli_config_lag
+  keys:
+    "ctrl-z":
+      new_state: classiccli_execute

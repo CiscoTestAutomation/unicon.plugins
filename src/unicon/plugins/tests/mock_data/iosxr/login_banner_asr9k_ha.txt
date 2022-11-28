@@ -10,4 +10,4 @@ This may take a few minutes. You will be notified upon completion.
 
 Please do not attempt to reconfigure the device until this process is complete.
 
-User Access Verification
+SYSTEM CONFIGURATION COMPLETED
