@@ -83,11 +83,28 @@ class SrosClassiccliExecute(SrosServiceMixin, Execute):
 
 class SrosClassiccliConfigure(SrosServiceMixin, Configure):
 
+    config_command = "configure"
+
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'classiccli'
         self.end_state = 'classiccli'
         self.commit_cmd = ''
+
+    def starts_with_config_command(self, text):
+        # Entering config mode is possible starting with 'co' and any other possible completion
+        abbr_list = [self.config_command[:i] for i in range(2, len(self.config_command)+1)]
+        first_word = text.split(' ')[0]
+        return any(first_word == abbr for abbr in abbr_list)
+
+    def call_service(self, cmds, **kwargs):
+        # Add config_command if not specified when calling configure service
+        # Simulate same behavior as other cisco configure service but stays backward compatible
+        if isinstance(cmds, str) and not self.starts_with_config_command(cmds):
+            cmds = f"{self.config_command}\n{cmds}"
+        elif isinstance(cmds, list) and not self.starts_with_config_command(cmds[0]):
+            cmds.insert(0, self.config_command)
+        super().call_service(cmds, **kwargs)
 
 
 class SrosExecute(BaseService):

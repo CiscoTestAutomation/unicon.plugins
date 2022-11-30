@@ -29,6 +29,7 @@ class IosXEServiceList(ServiceList):
         self.reload = svc.Reload
         self.rommon = svc.Rommon
         self.tclsh = svc.Tclsh
+        self.maintenance_mode = svc.MaintenanceMode
 
 
 class HAIosXEServiceList(HAServiceList):

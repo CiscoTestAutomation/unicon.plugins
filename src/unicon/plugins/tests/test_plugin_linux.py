@@ -33,10 +33,10 @@ from unicon.mock.mock_device import mockdata_path
 with open(os.path.join(mockdata_path, 'linux/linux_mock_data.yaml'), 'rb') as datafile:
     mock_data = yaml.safe_load(datafile.read())
 
+unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
+unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC = 0
 
 
-@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
-@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0)
 class TestLinuxPluginConnect(unittest.TestCase):
 
     def test_connect_ssh(self):
@@ -759,6 +759,43 @@ class TestLinuxPromptOverride(unittest.TestCase):
                        learn_hostname=True)
         c.connect()
         assert c.state_machine.states[0].pattern == prompt
+
+
+
+class TestTrexConsole(unittest.TestCase):
+
+    def test_trex_console(self):
+        c = Connection(hostname='linux',
+                       start=['mock_device_cli --os linux --state exec'],
+                       os='linux',
+                       platform='trex',
+                       learn_hostname=True
+                       )
+        c.connect()
+        try:
+          c.execute('trex-console', allow_state_change=True)
+          output = c.execute('help')
+          assert output == 'help'
+          c.execute('exit', allow_state_change=True)
+        finally:
+          c.disconnect()
+
+
+    def test_trex_console_context_manager(self):
+        c = Connection(hostname='linux',
+                       start=['mock_device_cli --os linux --state exec'],
+                       os='linux',
+                       platform='trex',
+                       learn_hostname=True
+                       )
+        c.connect()
+        try:
+          with c.trex_console() as trex_cli:
+            output = trex_cli.execute('help')
+            assert output == 'help'
+        finally:
+          c.disconnect()
+
 
 
 if __name__ == "__main__":

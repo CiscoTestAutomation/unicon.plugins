@@ -4,7 +4,7 @@ import unittest
 
 from unicon import Connection
 from unicon.mock.mock_device import MockDevice
-from unicon.plugins.sros import service_implementation
+from unicon.core.errors import SubCommandFailure
 
 
 class TestSrosPlugin(unittest.TestCase):
@@ -148,47 +148,64 @@ class TestInitCommands(unittest.TestCase):
             self.assertTrue(cmd in con.log_buffer)
 
 
-class TestConnect(unittest.TestCase):
-
-    def test_execute_before_connect(self):
-        con = Connection(
+class TestClassisCliExecute(unittest.TestCase):
+    def setUp(self):
+        self.con = Connection(
             os='sros',
             hostname='Router',
-            start=['mock_device_cli --os sros --state connect_ssh'],
-            credentials={'default': {'username': 'grpc', 'password': 'nokia'}}
-        )
-        con.execute('show version')
-
-
-class TestInitCommands(unittest.TestCase):
-
-    def test_connect_classiccli_init_commands(self):
-        con = Connection(
-            os='sros',
-            hostname='CR1-LOC-1',
-            start=['mock_device_cli --os sros --state classiccli_execute --hostname CR1-LOC-1'],
-            learn_hostname=True,
+            start=['mock_device_cli --os sros --state classiccli_execute'],
             settings=dict(DEFAULT_CLI_ENGINE='classiccli'),
             log_buffer=True
         )
-        con.connect()
-        for cmd in ["executing command 'environment no more'",
-                    "executing command 'environment no saved-ind-prompt'"]:
-            self.assertTrue(cmd in con.log_buffer)
+        self.con.connect()
+        self.joined = lambda string: '\n'.join(string.splitlines())
+        self.md = MockDevice(device_os='sros', state='classiccli_execute')
 
-    def test_connect_mdcli_init_commands(self):
-        con = Connection(
+    def test_execute(self):
+        cmd = "show version"
+        out = self.con.execute(cmd)
+        expect = self.md.mock_data['classiccli_execute']['commands'][cmd]
+        self.assertEqual(self.joined(out), self.joined(expect))
+
+    def test_unsupported_execute(self):
+        self.assertRaises(SubCommandFailure, self.con.execute, "show vresion")
+
+    def tearDown(self):
+        self.con.disconnect()
+
+
+class TestClassicCliConfigure(unittest.TestCase):
+
+    def setUp(self):
+        self.con = Connection(
             os='sros',
-            hostname='CR1-LOC-1',
-            start=['mock_device_cli --os sros --state mdcli_execute --hostname CR1-LOC-1'],
-            learn_hostname=True,
-            settings=dict(DEFAULT_CLI_ENGINE='mdcli'),
+            hostname='Router',
+            start=['mock_device_cli --os sros --state classiccli_execute'],
+            settings=dict(DEFAULT_CLI_ENGINE='classiccli'),
             log_buffer=True
         )
-        con.connect()
-        for cmd in ["executing command 'environment console length 512'",
-                    "executing command 'environment console width 512'"]:
-            self.assertTrue(cmd in con.log_buffer)
+        self.con.connect()
+
+    def test_configure_full(self):
+        self.con.configure(["configure",
+                            "lag 800",
+                            "no shutdown",
+                            "mode hybrid",
+                            "access",
+                            "adapt-qos link"])
+
+    def test_configure_short(self):
+        self.con.configure(["lag 800",
+                            "no shutdown",
+                            "mode hybrid",
+                            "access",
+                            "adapt-qos link"])
+
+    def test_configure_unsupported(self):
+        self.assertRaises(SubCommandFailure, self.con.configure, ["laag 800"])
+
+    def tearDown(self):
+        self.con.disconnect()
 
 
 if __name__ == '__main__':

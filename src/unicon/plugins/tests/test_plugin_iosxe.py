@@ -8,6 +8,7 @@ Uses the unicon.plugins.tests.mock.mock_device_ios script to test IOSXE plugin.
 __author__ = "Myles Dear <mdear@cisco.com>"
 
 import re
+import time
 import unittest
 from unittest.mock import patch
 
@@ -1170,6 +1171,40 @@ class TestCopy(unittest.TestCase):
             c.copy(source='test.cfg', dest='running-config')
         finally:
             c.disconnect()
+
+
+
+class TestMaintenanceMode(unittest.TestCase):
+
+    def test_maintenance_mode_context_manager(self):
+        c = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state general_enable --hostname PE1'],
+            os='iosxe',
+            mit=True
+        )
+        c.connect()
+        c.settings.MAINTENANCE_MODE_WAIT_TIME = 1
+        c.settings.MAINTENANCE_MODE_TIMEOUT = 10
+        with c.maintenance_mode() as m:
+            output = m.execute('help')
+            self.assertEqual(output, 'help')
+        c.disconnect()
+
+    def test_switchto_maintenance(self):
+        c = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state general_enable --hostname PE1'],
+            os='iosxe',
+            mit=True
+        )
+        c.connect()
+        c.settings.MAINTENANCE_MODE_WAIT_TIME = 1
+        c.settings.MAINTENANCE_MODE_TIMEOUT = 10
+        c.switchto('maintenance')
+        c.switchto('enable')
+        c.disconnect()
+
 
 
 if __name__ == "__main__":

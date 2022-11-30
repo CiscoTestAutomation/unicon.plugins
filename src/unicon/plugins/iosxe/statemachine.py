@@ -6,7 +6,7 @@ import re
 from datetime import datetime
 from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine, config_transition
 from unicon.plugins.generic.statements import (connection_statement_list,
-                                               default_statement_list)
+                                               default_statement_list, wait_and_enter)
 from unicon.plugins.generic.service_statements import reload_statement_list
 from unicon.plugins.generic.statements import GenericStatements, buffer_settled
 from unicon.statemachine import State, Path, StateMachine
@@ -60,6 +60,38 @@ def config_service_prompt_handler(spawn, config_pattern):
                     spawn.sendline(spawn.settings.SERVICE_PROMPT_CONFIG_CMD)
 
 
+def enable_to_maintenance_transition(statemachine, spawn, context):
+
+    dialog = Dialog([
+        [patterns.want_continue_confirm, 'sendline()', None, True, False],
+        [patterns.enable_prompt, wait_and_enter,
+            {'wait': spawn.settings.MAINTENANCE_MODE_WAIT_TIME}, True, False],
+        [patterns.maintenance_mode_prompt, None, None, False, False],
+        [patterns.unable_to_create, 'sendline()', None, True, False]
+    ])
+
+    spawn.sendline(spawn.settings.MAINTENANCE_START_COMMAND)
+    dialog.process(spawn, timeout=spawn.settings.MAINTENANCE_MODE_TIMEOUT)
+
+    spawn.sendline()
+
+
+def maintenance_to_enable_transition(statemachine, spawn, context):
+
+    dialog = Dialog([
+        [patterns.want_continue_yes, 'sendline(yes)', None, True, False],
+        [patterns.maintenance_mode_prompt,  wait_and_enter,
+            {'wait': spawn.settings.MAINTENANCE_MODE_WAIT_TIME}, True, False],
+        [patterns.enable_prompt, None, None, False, False],
+        [patterns.unable_to_create, 'sendline()', None, True, False]
+    ])
+
+    spawn.sendline(spawn.settings.MAINTENANCE_STOP_COMMAND)
+    dialog.process(spawn, timeout=spawn.settings.MAINTENANCE_MODE_TIMEOUT)
+
+    spawn.sendline()
+
+
 class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
     config_command = 'config term'
 
@@ -102,6 +134,7 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         rommon = State('rommon', patterns.rommon_prompt)
         tclsh = State('tclsh', patterns.tclsh_prompt)
         macro = State('macro', patterns.macro_prompt)
+        maintenance = State('maintenance', patterns.maintenance_mode_prompt)
 
         disable_to_enable = Path(disable, enable, 'enable', Dialog([
             statements.enable_password_stmt,
@@ -121,12 +154,16 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
 
         macro_to_config = Path(macro, config, send_break, None)
 
+        enable_to_maintanance = Path(enable, maintenance, enable_to_maintenance_transition, None)
+        maintenance_to_enable = Path(maintenance, enable, maintenance_to_enable_transition, None)
+
         self.add_state(disable)
         self.add_state(enable)
         self.add_state(config)
         self.add_state(guestshell)
         self.add_state(tclsh)
         self.add_state(macro)
+        self.add_state(maintenance)
 
         self.add_path(disable_to_enable)
         self.add_path(enable_to_disable)
@@ -137,6 +174,8 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         self.add_path(enable_to_tclsh)
         self.add_path(tclsh_to_enable)
         self.add_path(macro_to_config)
+        self.add_path(enable_to_maintanance)
+        self.add_path(maintenance_to_enable)
 
         enable_to_rommon = Path(enable, rommon, 'reload', Dialog(
             connection_statement_list + reload_statement_list))

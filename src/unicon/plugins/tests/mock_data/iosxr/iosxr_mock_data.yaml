@@ -626,6 +626,7 @@ enable1:
 
     "clear logg":
       new_state: half_confirm_prompt
+      
 
 admin1:
   prompt: "sysadmin-vm:0_RP0#"

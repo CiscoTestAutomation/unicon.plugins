@@ -40,6 +40,7 @@ class TestIosXrNcs5kPlugin(unittest.TestCase):
                        platform='ncs5k',
                        username='lab')
         c.connect()
+        c.settings.POST_RELOAD_WAIT = 1
         c.reload()
         self.assertIn('\r\nRP/0/RP0/CPU0:Router#', c.spawn.match.match_output)
 
@@ -75,6 +76,7 @@ class TestIosXrNcs5kPlugin(unittest.TestCase):
                        platform='ncs5k',
                        credentials=dict(default=dict(username='lab', password='lab')))
         c.connect()
+        c.settings.POST_RELOAD_WAIT = 1
         c.reload()
         self.assertIn('\r\nRP/0/RP0/CPU0:Router#', c.spawn.match.match_output)
 
@@ -86,6 +88,7 @@ class TestIosXrNcs5kPlugin(unittest.TestCase):
                        credentials=dict(default=dict(username='lab', password='lab'),
                                         alt=dict(username='lab2', password='lab2')))
         c.connect()
+        c.settings.POST_RELOAD_WAIT = 1
         c.reload(reload_command="reload2", reload_creds='alt')
         self.assertIn('\r\nRP/0/RP0/CPU0:Router#', c.spawn.match.match_output)
 

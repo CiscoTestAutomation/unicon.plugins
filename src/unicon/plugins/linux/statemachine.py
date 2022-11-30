@@ -34,14 +34,23 @@ class LinuxStateMachine(StateMachine):
     def create(self):
         self.prompt = self.prompt if hasattr(self, 'prompt') else None
         self.shell_prompt = self.shell_prompt if hasattr(self, 'shell_prompt') else None
-        
+
+        trex_console = State('trex_console', pattern=p.trex_console)
+
         shell = State('shell', self.prompt or p.prompt)
         learn_hostname = State('learn_hostname', p.learn_hostname)
         learn_hostname_to_shell = Path(learn_hostname, shell, set_update_shell_prompt_pattern(self.shell_prompt), None)
 
+        trex_console_to_shell = Path(trex_console, shell, 'exit', None)
+        shell_to_trex_console = Path(shell, trex_console, 'trex-console', None)
+
         self.add_state(shell)
+        self.add_state(trex_console)
 
         # the learn_hostname state must be added as the last state entry, this will make it first
         # in the pattern list when using learn_hostname = True.
         self.add_state(learn_hostname)
         self.add_path(learn_hostname_to_shell)
+
+        self.add_path(trex_console_to_shell)
+        self.add_path(shell_to_trex_console)

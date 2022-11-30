@@ -10,10 +10,12 @@ __author__ = "Takashi Higashimura <tahigash@cisco.com>"
 
 import re
 from time import sleep
+from datetime import datetime, timedelta
 
 from unicon.bases.routers.services import BaseService
 from unicon.core.errors import SubCommandFailure, TimeoutError
 from unicon.eal.dialogs import Dialog
+from unicon.plugins.generic.statements import buffer_settled
 
 from .service_statements import reload_statement_list, reload_statement_list_vty
 
@@ -58,8 +60,10 @@ class Reload(BaseService):
                      reload_creds=None,
                      error_pattern=None,
                      append_error_pattern=None,
+                     raise_on_error=True,
                      *args, **kwargs):
         con = self.connection
+        self.context = con.context
         timeout = timeout or self.timeout
 
         if error_pattern is None:
@@ -112,10 +116,6 @@ class Reload(BaseService):
                 if self.result:
                     self.result = self.result.match_output
                     self.get_service_result()
-                con.state_machine.go_to('any',
-                                        con.spawn,
-                                        prompt_recovery=self.prompt_recovery,
-                                        context=self.context)
             except Exception as err:
                 raise SubCommandFailure("Reload failed %s" % err)
 
@@ -124,6 +124,29 @@ class Reload(BaseService):
             # only strip first newline and leave formatting intact
             output = re.sub(r"^\r?\r\n", "", output, 1)
             output = output.rstrip()
+
+            # Bring standby to good state.
+            con.log.info('Reconnecting to device after reload')
+            wait_time = timedelta(seconds=con.settings.POST_RELOAD_WAIT)
+            settle_time = current_time = datetime.now()
+            con.disconnect()
+            while (current_time - settle_time) < wait_time:
+                try:
+                    con.connect()
+                except Exception as e:
+                    current_time = datetime.now()
+                    if (current_time - settle_time) < wait_time:
+                        con.log.info('Could not connect to device. Try again!')
+                        continue
+                    else:
+                        if raise_on_error:
+                            raise
+                        else:
+                            con.log.exception('Connection to {} failed'.format(con.hostname))
+                            self.result = False
+                else:
+                    con.log.info('Connected to device after reload')
+                    break
         else:
             con.log.warning('Did not detect a console session, will try to reconnect...')
             dialog = Dialog(reload_statement_list_vty)
@@ -201,9 +224,11 @@ class HAReload(BaseService):
                      reload_creds=None,
                      error_pattern=None,
                      append_error_pattern=None,
+                     raise_on_error=True,
                      *args, **kwargs):
 
         con = self.connection
+        self.context = con.active.context
         timeout = timeout or self.timeout
 
         if error_pattern is None:
@@ -251,7 +276,6 @@ class HAReload(BaseService):
             try:
                 try:
                     self.result = dialog.process(con.active.spawn,
-                                   timeout=timeout,
                                    prompt_recovery=self.prompt_recovery,
                                    context=context)
                     if self.result:
@@ -269,12 +293,29 @@ class HAReload(BaseService):
                     con.settings.CONNECTION_TIMEOUT = timeout
                     con.connect()
                     con.settings.CONNECTION_TIMEOUT = original_connection_timeout
-
-                con.active.state_machine.go_to('any',
-                                        con.active.spawn,
-                                        prompt_recovery=self.prompt_recovery,
-                                        context=self.context)
                 # Bring standby to good state.
+                con.log.info('Reconnecting to device after reload')
+                wait_time = timedelta(seconds=con.settings.POST_RELOAD_WAIT)
+                settle_time = current_time = datetime.now()
+                con.disconnect()
+                while (current_time - settle_time) < wait_time:
+                    try:
+                        con.connect()
+                    except Exception as e:
+                        current_time = datetime.now()
+                        if (current_time - settle_time) < wait_time:
+                            con.log.info('Could not connect to device. Try again!')
+                            continue
+                        else:
+                            if raise_on_error:
+                                raise
+                            else:
+                                con.log.exception('Connection to {} failed'.format(con.hostname))
+                                self.result = False
+                    else:
+                        con.log.info('Connected to device after reload')
+                        break
+
                 con.log.info('Waiting for config sync to finish')
                 standby_wait_time = con.settings.POST_HA_RELOAD_CONFIG_SYNC_WAIT
                 standby_wait_interval = 50
@@ -300,11 +341,12 @@ class HAReload(BaseService):
                 raise SubCommandFailure("Reload failed %s" % err)
 
             output = self.result
-            output = output.replace(reload_command, "", 1)
-            # only strip first newline and leave formatting intact
-            output = re.sub(r"^\r?\r\n", "", output, 1)
-            output = output.rstrip()
         else:
             raise Exception("Console is not used.")
+
+        if self.result:
+            con.log.info('--- Reload of device {} completed ---'.format(con.hostname))
+        else:
+            con.log.info('--- Reload of device {} failed ---'.format(con.hostname))
 
         self.result = output

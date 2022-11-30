@@ -54,3 +54,31 @@ prompt_recovery   bool (default False)        Enable/Disable prompt recovery fea
         rtr.enable()
         # boot with specified image
         rtr.enable(image='flash:packages.conf')
+
+
+maintenance_mode
+----------------
+
+Service to bring the device to maintenance mode.
+The service is intended to be used as a context manager.
+see example below.
+
+
+.. code-block:: python
+
+        # using a context manager
+        with uut.maintenance_mode() as m:
+            m.execute('help'):
+
+        # using switchto command
+        uut.switchto('maintenance')
+        uut.execute('help')
+        uut.switchto('enable')
+
+*Settings*
+
+You can adjust the following timer settings for the maintenance service:
+
+* `MAINTENANCE_MODE_WAIT_TIME` (default: 30) # How long to wait before sending enter to check the prompt
+* `MAINTENANCE_MODE_TIMEOUT` (default: 2400) # Overall timeout for maintenance mode
+

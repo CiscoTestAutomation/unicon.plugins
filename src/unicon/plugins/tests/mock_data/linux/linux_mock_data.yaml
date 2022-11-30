@@ -292,6 +292,15 @@ exec:
         new_state: sudo_invalid
     "sudo bash":
         new_state: sudo_password
+    "trex-console":
+        new_state: trex_console
+
+trex_console:
+  prompt: "trex> "
+  commands:
+    "help": "help"
+    "exit":
+      new_state: exec
 
 exec2:
   prompt: "Linux# "
