@@ -842,6 +842,7 @@ timeout      int (default 60 sec)      timeout in sec for executing commands
 target       str                       'standby' to bring standby console to bash.
 switch       str                       switch to connect to (optional)
 rp           str                       rp to connect to (optional)
+chassis      str                       chassis to connect to (optional)
 ==========   ======================    ========================================
 
 .. code-block:: python
@@ -858,6 +859,16 @@ rp           str                       rp to connect to (optional)
     # connect bash console on standby RP
     with device.bash_console(switch='standby', rp='active') as bash:
         output1 = bash.execute('ls')
+
+    # connect bash console on active chassis
+    with device.bash_console(chassis='active r0') as bash:
+        output1 = bash.execute('ls')
+        output2 = bash.execute('pwd')
+
+    # connect bash console on standby chassis
+    with device.bash_console(chassis='standby r0') as bash:
+        output1 = bash.execute('ls')
+        output2 = bash.execute('pwd')
 
 
 guestshell

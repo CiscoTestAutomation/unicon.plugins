@@ -1,4 +1,4 @@
-__version__ = '22.11'
+__version__ = '23.1'
 
 supported_chassis = [
     'single_rp',
@@ -39,5 +39,6 @@ supported_os = [
     'nd',
     'viptela',
     'dnos6',
-    'dnos10'
+    'dnos10',
+    'ons',
 ]

@@ -1189,13 +1189,19 @@ switchover_cmd_issued = Statement(pattern=pat.switchover_cmd_issued,
                                   loop_continue=False,
                                   continue_timer=False)
 
+switchover_proceed = Statement(
+    pattern=pat.switchover_proceed,
+    action='sendline()', args=None, loop_continue=True, continue_timer=False
+)
+
 switchover_statement_list = [save_config, build_config, prompt_switchover,
                              switchover_init, switchover_reason,
                              switchover_fail1, switchover_fail2,
                              switchover_fail3, switchover_fail4,
                              press_enter, login_stmt, password_stmt,
                              generic_statements.password_ok_stmt,
-                             generic_statements.syslog_msg_stmt
+                             generic_statements.syslog_msg_stmt,
+                             switchover_proceed
                              ]
 
 ############################################################

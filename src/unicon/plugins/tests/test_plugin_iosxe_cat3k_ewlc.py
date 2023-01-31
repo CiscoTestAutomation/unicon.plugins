@@ -96,5 +96,29 @@ class TestIosXeCat3kEwlcPluginRecoveryMode(unittest.TestCase):
         d.connect()
 
 
+class TestIosXECat3kEwlcBash(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.d = Connection(hostname='Router',
+                           start=['mock_device_cli --os iosxe --state ewlc_enable'],
+                           os='iosxe',
+                           platform='cat3k',
+                           model='ewlc',
+                           username='cisco',
+                           tacacs_password='cisco')
+        cls.d.connect()
+
+    def test_bash_console(self):
+        with self.d.bash_console() as bash:
+            bash.execute('ls')
+
+    @classmethod
+    @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+    @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
+    def tearDownClass(cls):
+        cls.d.disconnect()
+
+
 if __name__ == '__main__':
     unittest.main()
