@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
                             New
 --------------------------------------------------------------------------------
-* IOSXE
+* iosxe
     * Added Configure Error Patterns
         * "% SR feature is not configured yet, please enable Segment-routing first."
         * "% {address} overlaps with {interfaces}"
@@ -16,6 +16,6 @@
 --------------------------------------------------------------------------------
                                 Fix
 --------------------------------------------------------------------------------
-* iosxe
+* IOSXE
     * Add support for chassis keyword argument for bash console service
     
