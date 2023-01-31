@@ -32,7 +32,7 @@ switchover_pat = StackIosXESwitchoverPatterns()
 save_config = Statement(pattern=switchover_pat.save_config,
                         action='sendline(yes)',
                         loop_continue=True, continue_timer=False)
-proceed_sw = Statement(pattern=switchover_pat.proceed_switchover,
+proceed_sw = Statement(pattern=switchover_pat.switchover_proceed,
                         action='sendline()',
                         loop_continue=True, continue_timer=False)
 commit_changes = Statement(pattern=switchover_pat.cisco_commit_changes_prompt,

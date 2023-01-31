@@ -161,6 +161,10 @@ class BashService(GenericBashService):
             handle.context['_rp'] = kwargs.get('rp')
         else:
             handle.context.pop('_rp', None)
+        if kwargs.get('chassis'):
+            handle.context['_chassis'] = kwargs.get('chassis')
+        else:
+            handle.context.pop('_chassis', None)
         super().pre_service(*args, **kwargs)
 
     class ContextMgr(GenericBashService.ContextMgr):

@@ -187,7 +187,7 @@ class HaReloadPatterns(UniconCorePatterns):
 class SwitchoverPatterns:
     def __init__(self):
         self.save_config = r'^.*System configuration has been modified\.\s*Save\s?\?.*$'
-        self.build_config= r'Building configuration'
+        self.build_config = r'Building configuration'
         self.prompt_switchover = r'This will reload the active unit and force switchover to standby\[confirm\]'
         self.switchover_init = r'Preparing for switchover|LOGGER_FLUSHING|RELOAD|Reload'
         self.switchover_reason = r'^(.*)Reset Reason'
@@ -196,6 +196,8 @@ class SwitchoverPatterns:
         self.switchover_fail3 = r'% There is no STANDBY present\.?'
         self.switchover_fail4 = r'Failed to switchover'
         self.switchover_cmd_issued = r'Resetting ...(.*)'
+        self.switchover_proceed = r'^.*Proceed with switchover to standby RP\? \[confirm\]'
+
 
 class ResetStandbyPatterns:
     def __init__(self):

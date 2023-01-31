@@ -1,0 +1,11 @@
+
+tl1:
+  prompt: ">"
+  commands:
+    "help": |
+      command help
+    "ACT-USER:ONS:admin:100::admin;": |2
+        TID-000 1998-06-20 14:30:00
+      M 001 COMPLD
+        DXT:2003-01-02 14-04-49,0;
+    "ACT-USER:ONS:admin:100::test;": "login failure"

@@ -406,6 +406,29 @@ class TestIosXEluginBashService(unittest.TestCase):
         self.assertIn('R1#', c.spawn.match.match_output)
         c.disconnect()
 
+    def test_bash_chassis_active(self):
+        c = Connection(hostname='WLC1',
+                       start=['mock_device_cli --os iosxe --state general_enable --hostname WLC1'],
+                       os='iosxe',
+                       credentials=dict(default=dict(username='cisco', password='cisco')),
+                       log_buffer=True)
+        with c.bash_console(chassis='active r0') as console:
+            console.execute('ls')
+        self.assertIn('exit', c.spawn.match.match_output)
+        self.assertIn('WLC1#', c.spawn.match.match_output)
+        c.disconnect()
+
+    def test_bash_chassis_standby(self):
+        c = Connection(hostname='WLC1',
+                       start=['mock_device_cli --os iosxe --state general_enable --hostname WLC1'],
+                       os='iosxe',
+                       credentials=dict(default=dict(username='cisco', password='cisco')),
+                       log_buffer=True)
+        with c.bash_console(chassis='standby r0') as console:
+            console.execute('ls')
+        self.assertIn('exit', c.spawn.match.match_output)
+        self.assertIn('WLC1#', c.spawn.match.match_output)
+        c.disconnect()
 
 class TestIosXESDWANConfigure(unittest.TestCase):
 

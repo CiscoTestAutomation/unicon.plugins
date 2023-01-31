@@ -6,7 +6,6 @@ class StackIosXESwitchoverPatterns(SwitchoverPatterns):
     def __init__(self):
         super().__init__()
         self.save_config = r'^.*System configuration has been modified. Save\? \[yes\/no\]'
-        self.proceed_switchover = r'^.*Proceed with switchover to standby RP\? \[confirm\]'
         self.useracess   = r'^.*User Access Verification'
         self.cisco_commit_changes_prompt = r'^(.*)Uncommitted changes found.*'
         self.terminal_state = r'.* Terminal state reached for \(SSO\).*'
