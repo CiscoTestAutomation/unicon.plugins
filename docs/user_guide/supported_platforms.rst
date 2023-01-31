@@ -74,7 +74,8 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
     ``nxos``, ``n9k``
     ``nxos``, ``nxosv``
     ``nxos``, ``aci``
-    ``nso``
+    ``nso``,,, "Network Service Orchestrator"
+    ``ons``,,, "Optical Networking System"
     ``sdwan``, ``viptela``,,"Identical to os=viptela."
     ``sros``
     ``staros``

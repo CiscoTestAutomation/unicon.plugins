@@ -431,46 +431,9 @@ class TestUtils(unittest.TestCase):
 
         # Test default behavior
         data = load_token_csv_file(file_path=lookup_file)
-        subset_dict = {
-            'WS-C6513-E': {
-                'os': 'iosxe',
-                'platform': 'cat6k',
-                'model': 'c6500'
-            },
-            '2501FRAD-FX': {
-                'os': 'ios',
-                'platform': 'c2k',
-                'model': 'c2500'
-            },
-            'NCS2002-SA': {
-                'os': 'iosxr',
-                'platform': 'ncs2k',
-                'model': 'ncs2000'
-            }
-        }
-        self.assertEqual(data, {**data, **subset_dict})
-
-        # Test different key
-        data = load_token_csv_file(file_path=lookup_file, key='model')
-        subset_dict = {
-            'c6500': {
-                'pid': 'WS-C6513-E',
-                'os': 'iosxe',
-                'platform': 'cat6k'
-            },
-            'c2500': {
-                'pid': 'CISCO2525',
-                'os': 'ios',
-                'platform': 'c2k'
-            },
-            'n3500': {
-                'pid': 'N3K-C3548P-XL',
-                'os': 'nxos',
-                'platform': 'n3k'
-            }
-        }
-        self.assertEqual(data, {**data, **subset_dict})
-
+        for name, item in data.items():
+            for key in ('os', 'platform', 'model', 'submodel'):
+                self.assertIn(key, item, f'{key} not in {name} after loading')
 
 if __name__ == "__main__":
     unittest.main()

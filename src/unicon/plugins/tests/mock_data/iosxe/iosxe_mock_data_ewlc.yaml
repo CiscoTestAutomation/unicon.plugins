@@ -113,6 +113,8 @@ ewlc_enable:
       new_state: ewlc_copy_tftp_flash_vrf_remote
     "redundancy reload peer":
       response: file|mock_data/iosxe/iosxe_reset_standby.txt
+    "request platform software system shell":
+      new_state: ewlc_act_reply
 
 ewlc_config:
   prompt: "%N(config)#"
@@ -266,3 +268,18 @@ ewlc_enable_recovery_mode:
     "show version": *show
     "disable":
       new_state: ewlc_exec_recovery_mode
+
+ewlc_act_reply:
+  prompt: "Are you sure you want to continue? [y/n] "
+  commands:
+    "y":
+      new_state: bash_console_ewlc
+
+bash_console_ewlc:
+  prompt: "[eWLC_1_RP_0:/]$ "
+  commands:
+    "ls": "test.txt"
+    "stty cols 200": ""
+    "stty rows 200": ""
+    "exit":
+      new_state: ewlc_enable

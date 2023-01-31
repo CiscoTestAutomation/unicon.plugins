@@ -109,7 +109,7 @@ ewc_ap_password:
 ewc_ap_exec:
   preface:
     timing:
-    - 0:,0,0.1,0.03
+    - 0:,0,0.1,0.01
     response: |
       # https://www.cisco.com/c/en/us/td/docs/wireless/embedded_wireless_controller_configuration_guide.html #
       #                                                                                                      #

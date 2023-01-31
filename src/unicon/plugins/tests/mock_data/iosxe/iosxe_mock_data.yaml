@@ -277,6 +277,63 @@ general_enable:
       Default AP group (default-group) is not configurable.
       4177 bytes copied in 0.160 secs (26106 bytes/sec)
 
+    "request platform software system shell chassis active r0":
+      new_state: bash_console_chassis_active_r0
+
+    "request platform software system shell chassis standby r0":
+      new_state: bash_console_chassis_standby_r0
+
+general_maintence_mode_confirm:
+  prompt: "Template default will be applied. Do you want to continue?[confirm] "
+  commands:
+    "":
+      new_state: general_maintenance_mode1
+
+general_maintenance_mode1:
+  prompt: "%N#"
+  commands:
+    <<: *gen_enable_cmds
+    "":
+      new_state: general_maintenance_mode2
+
+
+general_maintenance_mode2:
+  prompt: "%N#"
+  commands:
+    <<: *gen_enable_cmds
+    "":
+      new_state: general_maintenance_mode
+
+
+general_maintenance_mode:
+  prompt: "%N(maint-mode)#"
+  commands:
+    <<: *gen_enable_cmds
+    "help": "help"
+    "stop maintenance":
+      new_state: general_maintenance_mode_stop
+
+general_maintenance_mode_stop:
+  prompt: "WARNING: Please check configured protocol peer status first. If all peers are not fully up and established, GIR may declare a timeout and extend the maintenance window. Do you want to continue?[y/n]? [yes]: "
+  commands:
+    "yes":
+      new_state: general_maintenance_mode_stop1
+
+general_maintenance_mode_stop1:
+  prompt: "%N(maint-mode)#"
+  commands:
+    <<: *gen_enable_cmds
+    "":
+      new_state: general_maintenance_mode_stop2
+
+
+general_maintenance_mode_stop2:
+  prompt: "%N(maint-mode)#"
+  commands:
+    <<: *gen_enable_cmds
+    "":
+      new_state: general_enable
+
 
 general_maintence_mode_confirm:
   prompt: "Template default will be applied. Do you want to continue?[confirm] "
@@ -1344,6 +1401,24 @@ tclsh:
 
 bash_console_switch_standby_rp_active:
   prompt: "[%N_1_RP_0:/]$ "
+  commands:
+    "ls": "test.txt"
+    "stty cols 200": ""
+    "stty rows 200": ""
+    "exit":
+      new_state: general_enable
+
+bash_console_chassis_active_r0:
+  prompt: "[%N:/]$ "
+  commands:
+    "ls": "test.txt"
+    "stty cols 200": ""
+    "stty rows 200": ""
+    "exit":
+      new_state: general_enable
+
+bash_console_chassis_standby_r0:
+  prompt: "[%N:/]$ "
   commands:
     "ls": "test.txt"
     "stty cols 200": ""

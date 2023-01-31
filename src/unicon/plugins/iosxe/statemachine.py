@@ -26,11 +26,14 @@ def enable_bash_console_transition(statemachine, spawn, context):
     '''
     switch = context.get('_switch')
     rp = context.get('_rp')
+    chassis = context.get('_chassis')
     cmd = 'request platform software system shell'
     if switch:
         cmd += f' switch {switch}'
     if rp:
         cmd += f' rp {rp}'
+    if chassis:
+        cmd += f' chassis {chassis}'
     spawn.sendline(cmd)
 
 

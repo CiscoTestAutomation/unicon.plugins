@@ -21,7 +21,15 @@ class IosXESettings(GenericSettings):
         ]
         self.CONFIGURE_ERROR_PATTERN = [
             r'^%\s*[Ii]nvalid (command|input|number)',
-            r'routing table \S+ does not exist'
+            r'routing table \S+ does not exist',
+            r'^%\s*SR feature is not configured yet, please enable Segment-routing first.',
+            r'^%\s*\S+ overlaps with \S+',
+            r'^%\S+ is linked to a VRF. Enable \S+ on that VRF first.',
+            r'% VRF \S+ not configured',
+            r'% Incomplete command.',
+            r'%CLNS: System ID (\S+) must not change when defining additional area addresses',
+            r'% Specify remote-as or peer-group commands first',
+            r'% Policy commands not allowed without an address family'
         ]
 
         self.EXECUTE_MATCHED_RETRIES = 1
