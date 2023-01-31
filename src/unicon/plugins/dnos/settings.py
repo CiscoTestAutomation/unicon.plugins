@@ -18,6 +18,8 @@ class DnosSettings(GenericSettings):
 
         # and modify some for our own
         self.CONNECTION_TIMEOUT = 60*3
+        self.HA_INIT_EXEC_COMMANDS = []
+        self.HA_INIT_CONFIG_COMMANDS = []
 
         # and we could add more - to be used in plugins if needed
         # self.<keyword> = <value>

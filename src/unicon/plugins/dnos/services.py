@@ -21,10 +21,10 @@ logger = logging.getLogger(__name__)
 
 class Execute(GenericExecute):
 
-    def __init__(self, connection, context, **kwargs):
-        super().__init__(connection, context, **kwargs)
-        self.start_state = 'operation'
-        self.end_state = 'operation'
+    # def __init__(self, connection, context, **kwargs):
+    #     super().__init__(connection, context, **kwargs)
+    #     self.start_state = 'operation'
+    #     self.end_state = 'operation'
 
     '''
     Demonstrating how to augment an existing service by updating its call
