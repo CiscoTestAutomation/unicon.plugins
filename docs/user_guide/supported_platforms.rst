@@ -17,6 +17,17 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
   The priority to pick up which plugin is: chassis_type > os > platform > model.
 
 
+.. important::
+
+  The specific device definitions are being added in a `PID tokens`_ file to
+  explicitly match a device PID with the expected os, platform, model. Please
+  ensure that devices you are using are accurately represented as this will
+  serve as the source of truth for `Genie Abstract`_ as well in a near future
+  update.
+
+.. _PID tokens: https://github.com/CiscoTestAutomation/unicon.plugins/blob/master/src/unicon/plugins/pid_tokens.csv
+.. _Genie Abstract: https://pubhub.devnetcloud.com/media/genie-docs/docs/abstract/index.html
+
 .. csv-table:: Unicon Supported Platforms
     :align: center
     :widths: 20, 20, 20, 40

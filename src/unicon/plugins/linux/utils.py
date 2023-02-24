@@ -1,6 +1,10 @@
 import re
+import logging
 
 from unicon.utils import Utils
+
+logger = logging.getLogger(__name__)
+
 
 class LinuxUtils(Utils):
 
@@ -15,6 +19,7 @@ class LinuxUtils(Utils):
         match = re.search(pattern, result, re.S)
         if match:
             prompt = match.groupdict().get('prompt')
+            logger.debug(f'Prompt match: {prompt!r}')
             if prompt:
                 output = result.replace(prompt, "")
                 return output.strip()
