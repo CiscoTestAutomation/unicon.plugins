@@ -164,6 +164,8 @@ exec:
         new_state: exec19
     "prompt20":
         new_state: exec20
+    "prompt21":
+        new_state: exec21
     "ls": |
       /tmp
       /var
@@ -294,6 +296,7 @@ exec:
         new_state: sudo_password
     "trex-console":
         new_state: trex_console
+    "uname": "\x1b[?2004l\rLinux\r\r\n\x1b[?2004h"
 
 trex_console:
   prompt: "trex> "
@@ -383,6 +386,10 @@ exec19:
 
 exec20:
   prompt: "[%N] # "
+  commands: *cmds
+
+exec21:
+  prompt: "cxta@mock-server:~$ "
   commands: *cmds
 
 

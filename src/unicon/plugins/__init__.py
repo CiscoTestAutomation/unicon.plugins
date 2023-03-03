@@ -1,4 +1,4 @@
-__version__ = '23.1'
+__version__ = '23.2'
 
 supported_chassis = [
     'single_rp',

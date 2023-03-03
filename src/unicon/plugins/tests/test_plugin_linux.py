@@ -316,6 +316,8 @@ class TestLearnHostname(unittest.TestCase):
           'sma_prompt' : 'sma03',
           'sma_prompt_1' : 'pod-esa01',
           'exec18': LinuxSettings().DEFAULT_LEARNED_HOSTNAME,
+          'exec20': 'Router',
+          'exec21': 'mock-server',
         }
 
         for state in states:
@@ -348,6 +350,8 @@ class TestLearnHostname(unittest.TestCase):
                 self.assertEqual(x.replace('\r', ''), mock_data['exec']['commands']['banner1']['response'].strip())
                 x = c.execute('banner2')
                 self.assertEqual(x.replace('\r', ''), mock_data['exec']['commands']['banner2']['response'].strip())
+                x = c.execute('uname')
+                self.assertEqual(x, '\r\nLinux')
 
     def test_connect_disconnect_without_learn_hostname(self):
         testbed = """

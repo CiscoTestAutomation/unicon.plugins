@@ -545,6 +545,7 @@ class TestIosXeCat9kPluginContainer(unittest.TestCase):
                        platform='cat9k',
                        log_buffer=True,
                        init_config_commands=[])
+        c.settings.CONTAINER_EXIT_CMDS = ['exit\r', '\x03', '\x03', '\x03']
         c.connect()
         c.disconnect()
 
