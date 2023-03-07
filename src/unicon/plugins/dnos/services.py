@@ -12,7 +12,6 @@ ServiceList class as attributes.
 import logging
 
 from unicon.bases.routers.services import BaseService
-from unicon.plugins.generic import ServiceList
 from unicon.plugins.generic.service_implementation import (Execute as GenericExecute,
                                                            Configure as GenericConfigure)
 
@@ -29,15 +28,3 @@ class Execute(GenericExecute):
         # call parent
         super().call_service(*args, **kwargs)
 
-
-class DnosServiceList(ServiceList):
-    '''
-    class aggregating all service lists for this platform
-    '''
-
-    def __init__(self):
-        # use the parent services
-        super().__init__()
-        # overwrite and add our own
-        self.execute = Execute
-        
