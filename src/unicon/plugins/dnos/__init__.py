@@ -18,10 +18,21 @@ Note:
 from unicon.bases.routers.connection import BaseSingleRpConnection
 from unicon.plugins.generic import GenericSingleRpConnectionProvider
 from unicon.plugins.dnos.statemachine import DnosSingleRpStateMachine
-from unicon.plugins.dnos.services import DnosServiceList
 from unicon.plugins.dnos.settings import DnosSettings
 from unicon.plugins.generic import ServiceList
 
+
+class DnosServiceList(ServiceList):
+    '''
+    class aggregating all service lists for this platform
+    '''
+
+    def __init__(self):
+        # use the parent services
+        super().__init__()
+        # overwrite and add our own
+        self.execute = Execute
+        
 
 class DnosSingleRPConnection(BaseSingleRpConnection):
     '''DnosSingleRPConnection
@@ -54,16 +65,3 @@ class DnosSingleRPConnection(BaseSingleRpConnection):
 
     # any key/value setting pairs goes here
     settings = DnosSettings()
-
-
-class DnosServiceList(ServiceList):
-    '''
-    class aggregating all service lists for this platform
-    '''
-
-    def __init__(self):
-        # use the parent services
-        super().__init__()
-        # overwrite and add our own
-        self.execute = Execute
-        
