@@ -7,7 +7,7 @@ regex patterns that matches dialogs, statements & the likes into one location.
 
 '''
 
-unicon.plugin.generic.patterns import GenericPatterns
+from unicon.plugin.generic.patterns import GenericPatterns
 
 
 class DnosPatterns(GenericPatterns):
