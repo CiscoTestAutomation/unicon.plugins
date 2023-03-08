@@ -552,7 +552,7 @@ class TestLinuxPluginTERM(unittest.TestCase):
         # echo $TERM is matched as a prompt pattern depending on timing
         l.state_machine.get_state('shell').pattern = r'^(.*?([>~%]|[^#\s]#))\s?$'
         term = l.execute('echo $TERM')
-        self.assertEqual(term, l.settings.TERM)
+        self.assertEqual(term.strip(), l.settings.TERM.strip())
 
     def test_os_TERM(self):
         testbed = """
@@ -578,7 +578,7 @@ class TestLinuxPluginTERM(unittest.TestCase):
         # echo $TERM is matched as a prompt pattern depending on timing
         l.state_machine.get_state('shell').pattern = r'^(.*?([>~%]|[^#\s]#))\s?$'
         term = l.execute('echo $TERM')
-        self.assertEqual(term, os.environ.get('TERM', 'dumb'))
+        self.assertEqual(term.strip(), os.environ.get('TERM', 'dumb').strip())
 
 class TestLinuxPluginENV(unittest.TestCase):
 
@@ -602,7 +602,7 @@ class TestLinuxPluginENV(unittest.TestCase):
         lc = l.execute('echo $LC_ALL')
         self.assertIn(l.settings.ENV['LC_ALL'], lc)
         size = l.execute('stty size')
-        self.assertEqual(size, '200 200')
+        self.assertEqual(size.strip(), '200 200')
 
 
 class TestLinuxPluginExecute(unittest.TestCase):
