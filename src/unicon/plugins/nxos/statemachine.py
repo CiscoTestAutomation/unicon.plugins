@@ -1,11 +1,32 @@
+from datetime import datetime
 from unicon.eal.dialogs import Dialog, Statement
 from unicon.plugins.generic.statements import default_statement_list
 from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine, config_transition
 from unicon.plugins.nxos.patterns import NxosPatterns
 from unicon.statemachine import State, Path
 
+from .statements import boot_image, boot_prompt_stmt, boot_statement_list
 
 patterns = NxosPatterns()
+
+
+def boot_from_rommon(statemachine, spawn, context):
+    context['boot_start_time'] = datetime.now()
+    context['boot_prompt_count'] = 1
+    boot_image(spawn, context, None)
+    dialog = Dialog([
+        boot_prompt_stmt,
+        Statement(
+            pattern=patterns.enable_prompt,
+            loop_continue = False,
+            trim_buffer=False
+        )] + boot_statement_list)
+    dialog.process(spawn=spawn, context=context)
+
+
+def boot_from_boot(statemachine, spawn, context):
+    context['boot_start_time'] = datetime.now()
+    spawn.sendline('load-nxos')
 
 
 def attach_module(state_machine, spawn, context):
@@ -27,7 +48,7 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         enable = State('enable', patterns.enable_prompt)
         config = State('config', patterns.config_prompt)
         shell = State('shell', patterns.shell_prompt)
-        loader = State('loader', patterns.loader_prompt)
+        loader = State('rommon', patterns.loader_prompt)
         guestshell = State('guestshell', patterns.guestshell_prompt)
         module = State('module', patterns.module_prompt)
         module_elam = State('module_elam', patterns.module_elam_prompt)
@@ -35,6 +56,11 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         debug = State('debug', patterns.debug_prompt)
         sqlite = State('sqlite', patterns.sqlite_prompt)
         l2rib_dt = State('l2rib_dt', patterns.l2rib_dt_prompt)
+        boot = State('boot', patterns.boot_prompt)
+        boot_config = State('boot_config', patterns.boot_config_prompt)
+
+        loader_to_enable = Path(loader, enable, boot_from_rommon, Dialog(
+            boot_statement_list))
 
         enable_to_config = Path(enable, config, send_config_cmd, None)
         config_to_enable = Path(config, enable, 'end', Dialog([
@@ -60,6 +86,14 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         shell_to_l2rib_dt = Path(shell, l2rib_dt, shell_to_l2rib_dt_transition, None)
         l2rib_dt_to_shell = Path(l2rib_dt, shell, 'exit', None)
 
+        boot_to_boot_config = Path(boot, boot_config, 'config terminal', None)
+        boot_config_to_boot = Path(boot_config, boot, 'end', None)
+
+        boot_to_enable = Path(boot, enable, boot_from_boot, Dialog(boot_statement_list))
+
+        boot_to_shell = Path(boot, shell, 'start', None)
+        shell_to_boot = Path(shell, boot, 'exit', None)
+
         # Add State and Path to State Machine
         self.add_state(enable)
         self.add_state(config)
@@ -72,7 +106,10 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         self.add_state(debug)
         self.add_state(sqlite)
         self.add_state(l2rib_dt)
+        self.add_state(boot)
+        self.add_state(boot_config)
 
+        self.add_path(loader_to_enable)
         self.add_path(enable_to_config)
         self.add_path(config_to_enable)
         self.add_path(enable_to_shell)
@@ -87,6 +124,11 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         self.add_path(sqlite_to_debug)
         self.add_path(shell_to_l2rib_dt)
         self.add_path(l2rib_dt_to_shell)
+        self.add_path(boot_to_boot_config)
+        self.add_path(boot_config_to_boot)
+        self.add_path(boot_to_enable)
+        self.add_path(boot_to_shell)
+        self.add_path(shell_to_boot)
 
         self.add_default_statements(default_statement_list)
 

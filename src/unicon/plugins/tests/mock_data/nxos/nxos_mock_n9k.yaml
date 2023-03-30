@@ -1,0 +1,487 @@
+
+n9k_exec2:
+  prompt: "%N#"
+  commands: &n9k_exec2_commands
+    "term length 0": ""
+    "term width 511": ""
+    "terminal session-timeout 0": ""
+    "config term":
+      new_state: n9k_config2
+
+    "show inventory": |
+      NAME: "Chassis",  DESCR: "Nexus9000 C93180YC-FX Chassis"
+      PID: N9K-C93180YC-FX     ,  VID: V07 ,  SN: FLM260403C6
+
+      NAME: "Slot 1",  DESCR: "48x10/25G/32G + 6x40/100G Ethernet/FC Module"
+      PID: N9K-C93180YC-FX     ,  VID: V07 ,  SN: FLM260403C6
+
+      NAME: "Power Supply 1",  DESCR: "Nexus9000 C93180YC-FX Chassis Power Supply"
+      PID: NXA-PAC-500W-PI     ,  VID: V01 ,  SN: LIT2540CHN9
+
+      NAME: "Power Supply 2",  DESCR: "Nexus9000 C93180YC-FX Chassis Power Supply"
+      PID: NXA-PAC-500W-PI     ,  VID: V01 ,  SN: LIT2540CGJ6
+
+      NAME: "Fan 1",  DESCR: "Nexus9000 C93180YC-FX Chassis Fan Module"
+      PID: NXA-FAN-30CFM-B     ,  VID: V01 ,  SN: N/A
+
+      NAME: "Fan 2",  DESCR: "Nexus9000 C93180YC-FX Chassis Fan Module"
+      PID: NXA-FAN-30CFM-B     ,  VID: V01 ,  SN: N/A
+
+      NAME: "Fan 3",  DESCR: "Nexus9000 C93180YC-FX Chassis Fan Module"
+      PID: NXA-FAN-30CFM-B     ,  VID: V01 ,  SN: N/A
+
+      NAME: "Fan 4",  DESCR: "Nexus9000 C93180YC-FX Chassis Fan Module"
+      PID: NXA-FAN-30CFM-B     ,  VID: V01 ,  SN: N/A
+
+    "show vdc detail": |
+      vdc id: 1
+      vdc name: leaf4
+      vdc state: active
+      vdc mac address: 18:59:f5:64:c7:c7
+      vdc ha policy: RELOAD
+      vdc dual-sup ha policy: SWITCHOVER
+      vdc boot Order: 1
+      vdc create time: Thu Jan  5 22:38:04 2023
+      vdc reload count: 0
+      vdc restart count: 0
+      vdc type: Ethernet
+      vdc supported linecards: None
+
+    "show vdc membership status": |
+      Flags : b - breakout port
+      ---------------------------------
+
+      vdc_id: 0 vdc_name: Unallocated interfaces:
+      Port        Status
+      ----        ----------
+
+      vdc_id: 1 vdc_name: leaf4 interfaces:
+      Port        Status
+      ----        ----------
+      Eth1/1      OK
+      Eth1/2      OK
+      Eth1/3      OK
+      Eth1/4      OK
+      Eth1/5      OK
+      Eth1/6      OK
+      Eth1/7      OK
+      Eth1/8      OK
+      Eth1/9      OK
+      Eth1/10     OK
+      Eth1/11     OK
+      Eth1/12     OK
+      Eth1/13     OK
+      Eth1/14     OK
+      Eth1/15     OK
+      Eth1/16     OK
+      Eth1/17     OK
+      Eth1/18     OK
+      Eth1/19     OK
+      Eth1/20     OK
+      Eth1/21     OK
+      Eth1/22     OK
+      Eth1/23     OK
+      Eth1/24     OK
+      Eth1/25     OK
+      Eth1/26     OK
+      Eth1/27     OK
+      Eth1/28     OK
+      Eth1/29     OK
+      Eth1/30     OK
+      Eth1/31     OK
+      Eth1/32     OK
+      Eth1/33     OK
+      Eth1/34     OK
+      Eth1/35     OK
+      Eth1/36     OK
+      Eth1/37     OK
+      Eth1/38     OK
+      Eth1/39     OK
+      Eth1/40     OK
+      Eth1/41     OK
+      Eth1/42     OK
+      Eth1/43     OK
+      Eth1/44     OK
+      Eth1/45     OK
+      Eth1/46     OK
+      Eth1/47     OK
+      Eth1/48     OK
+      Eth1/49     OK
+      Eth1/50     OK
+      Eth1/51     OK
+      Eth1/52     OK
+      Eth1/53     OK
+      Eth1/54     OK
+
+    "show module": |
+      Mod Ports             Module-Type                      Model            Status
+      --- ----- --------------------------------------- --------------------- --------
+      1    54   48x10/25G/32G + 6x40/100G Ethernet/FC M N9K-C93180YC-FX       active *
+
+      Mod  Sw                       Hw    Slot
+      ---  ----------------------- ------ ----
+      1    10.3(1.5)                2.2    NA
+
+
+      Mod  MAC-Address(es)                         Serial-Num
+      ---  --------------------------------------  ----------
+      1    18-59-f5-64-c7-c0 to 18-59-f5-64-c8-1f  FLM260403C6
+
+      Mod  Online Diag Status
+      ---  ------------------
+      1    Pass
+
+      * this terminal session
+
+
+    "dir": |2
+            4096    Dec 06 02:41:31 2022  .rpmstore/
+            4096    Jan 31 20:17:24 2022  .swtam/
+            11984    Dec 13 21:42:14 2022  CC.CFG
+            2656    Jul 14 20:27:54 2022  EASY-SW-RUNNING-CONFIG
+            4973    Jul 14 20:28:03 2022  EASY_SW_INTF_BRIEF
+              744    Sep 28 22:08:18 2022  TEST1
+            11984    Dec 15 18:16:11 2022  acfg_base_running_cfg_vdc1
+                0    Jul 14 17:27:34 2022  admin.rc.cli
+            1738    Dec 06 02:39:33 2022  bios_daemon.dbg
+            4096    Jan 31 20:17:25 2022  eem_snapshots/
+            2436    Jul 14 20:28:11 2022  ef-minimum-config
+            4096    Dec 10 04:03:07 2022  evt_log_snapshot/
+            4096    Dec 07 05:03:03 2022  home/
+            4096    Jan 05 22:39:55 2023  intersight/
+            12596    May 05 00:44:14 2022  intersight.log
+            11905    Oct 13 18:11:10 2022  leaf4-NR2F
+            11939    Oct 13 21:12:42 2022  leaf4-NR2F-new
+            11881    Jul 14 20:55:49 2022  leaf4-underlay
+            2562    Jan 05 22:37:34 2023  log_profile.yaml
+            4096    Dec 10 03:56:05 2022  lost+found/
+              952    Jan 31 20:39:32 2022  lpssutil_lpss_log
+            4096    Dec 06 02:44:18 2022  nexuscloud/
+      1981867008    Jan 31 20:20:47 2022  nxos.10.1.2.bin
+      2298080768    Dec 10 02:29:45 2022  nxos64-cs.10.3.1.5.F.bin
+      2298523136    Dec 10 03:55:49 2022  nxos64-cs.10.3.1.5.F.bin.upg
+                0    Dec 10 04:02:15 2022  nxosport
+            43234    Oct 18 23:22:05 2022  oci-jfab-nxos.cfg
+                0    Jan 31 20:19:58 2022  platform-sdk.cmd
+            4096    Dec 10 04:03:31 2022  scripts/
+            4096    Jul 14 20:30:44 2022  virt_strg_pool_bf_vdc_1/
+            4096    Jul 14 20:30:43 2022  virtual-instance/
+
+      Usage for bootflash://
+      6638399488 bytes used
+      109485674496 bytes free
+      116124073984 bytes total
+
+    "show version":
+      response:
+      - |
+        Cisco Nexus Operating System (NX-OS) Software
+        TAC support: http://www.cisco.com/tac
+        Copyright (C) 2002-2022, Cisco and/or its affiliates.
+        All rights reserved.
+        The copyrights to certain works contained in this software are
+        owned by other third parties and used and distributed under their own
+        licenses, such as open source.  This software is provided "as is," and unless
+        otherwise stated, there is no warranty, express or implied, including but not
+        limited to warranties of merchantability and fitness for a particular purpose.
+        Certain components of this software are licensed under
+        the GNU General Public License (GPL) version 2.0 or
+        GNU General Public License (GPL) version 3.0  or the GNU
+        Lesser General Public License (LGPL) Version 2.1 or
+        Lesser General Public License (LGPL) Version 2.0.
+        A copy of each such license is available at
+        http://www.opensource.org/licenses/gpl-2.0.php and
+        http://opensource.org/licenses/gpl-3.0.html and
+        http://www.opensource.org/licenses/lgpl-2.1.php and
+        http://www.gnu.org/licenses/old-licenses/library.txt.
+
+        Software
+          BIOS: version 05.47
+          NXOS: version 10.3(2uu)I9(1uu) [build 10.3(1.5)] [Feature Release]
+          BIOS compile time:  04/28/2022
+          NXOS image file is: bootflash:///nxos64-cs.10.3.1.5.F.bin.upg
+          NXOS compile time:  12/25/2050 12:00:00 [12/04/2022 18:04:52]
+
+        Hardware
+          cisco Nexus9000 C93180YC-FX Chassis
+          Intel(R) Xeon(R) CPU D-1528 @ 1.90GHz with 32802132 kB of memory.
+          Processor Board ID FLM260403C6
+          Device name: leaf4
+          bootflash:  115805708 kB
+
+        Kernel uptime is 0 day(s), 0 hour(s), 25 minute(s), 46 second(s)
+
+        Last reset at 243180 usecs after Thu Jan  5 22:35:37 2023
+          Reason: Reset Requested by CLI command reload
+          System version: 10.3(2u)I9(1u)
+          Service:
+
+        plugin
+          Core Plugin, Ethernet Plugin
+
+        Active Package(s):
+
+      - |
+        Cisco Nexus Operating System (NX-OS) Software
+        TAC support: http://www.cisco.com/tac
+        Copyright (C) 2002-2022, Cisco and/or its affiliates.
+        All rights reserved.
+        The copyrights to certain works contained in this software are
+        owned by other third parties and used and distributed under their own
+        licenses, such as open source.  This software is provided "as is," and unless
+        otherwise stated, there is no warranty, express or implied, including but not
+        limited to warranties of merchantability and fitness for a particular purpose.
+        Certain components of this software are licensed under
+        the GNU General Public License (GPL) version 2.0 or
+        GNU General Public License (GPL) version 3.0  or the GNU
+        Lesser General Public License (LGPL) Version 2.1 or
+        Lesser General Public License (LGPL) Version 2.0.
+        A copy of each such license is available at
+        http://www.opensource.org/licenses/gpl-2.0.php and
+        http://opensource.org/licenses/gpl-3.0.html and
+        http://www.opensource.org/licenses/lgpl-2.1.php and
+        http://www.gnu.org/licenses/old-licenses/library.txt.
+
+        Software
+          BIOS: version 05.47
+          NXOS: version 10.3(2uu)I9(1uu) [build 10.3(1.5)] [Feature Release]
+          BIOS compile time:  04/28/2022
+          NXOS image file is: bootflash:///nxos64-cs.10.3.1.5.F.bin.upg
+          NXOS compile time:  12/25/2050 12:00:00 [12/04/2022 18:04:52]
+
+        Hardware
+          cisco Nexus9000 C93180YC-FX Chassis
+          Intel(R) Xeon(R) CPU D-1528 @ 1.90GHz with 32802132 kB of memory.
+          Processor Board ID FLM260403C6
+          Device name: leaf4
+          bootflash:  115805708 kB
+
+        Kernel uptime is 0 day(s), 0 hour(s), 0 minute(s), 45 second(s)
+
+        Last reset at 243180 usecs after Thu Jan  5 22:35:37 2023
+          Reason: Reset Requested by CLI command reload
+          System version: 10.3(2u)I9(1u)
+          Service:
+
+        plugin
+          Core Plugin, Ethernet Plugin
+
+        Active Package(s):
+
+    "show install active": |
+        Boot Image:
+                NXOS Image: bootflash:///nxos64-cs.10.3.1.5.F.bin.upg
+
+        Active Packages:
+
+        Active Base Packages:
+                app_hosting-1.0.0.0-10.3.2.lib32_64_n9000
+                bfd-2.0.0.0-10.3.2.lib32_64_n9000
+                bgp-2.0.0.0-10.3.2.lib32_64_n9000
+                cfg_cmp-0.2.0.1-1.x86_64
+                cnmi-0.2.0.11-1.x86_64
+                container-tracker-2.0.0.0-10.3.2.lib32_64_n9000
+                dcgrpc-1.0.3-1.x86_64
+                dme-2.0.0.0-10.3.2.lib32_64_n9000
+                eigrp-2.0.0.0-10.3.2.lib32_64_n9000
+                ext-eth-2.0.0.0-10.3.2.lib32_64_n9000
+                fcoe-2.0.0.0-10.3.2.lib32_64_n9000
+                fex-2.0.0.0-10.3.2.lib32_64_n9000
+                fex_images-2.0.0.0-10.3.2.lib32_64_n9000
+                fhrp-2.0.0.0-10.3.2.lib32_64_n9000
+                guestshell-2.0.0.0-10.3.2.lib32_64_n9000
+                hw_telemetry-2.0.0.0-10.3.2.lib32_64_n9000
+                icam-2.0.0.0-10.3.2.lib32_64_n9000
+                intersight_64-1.0.0.0-10.3.2.lib32_64_n9000
+                isis-2.0.0.0-10.3.2.lib32_64_n9000
+                lacp-2.0.0.0-10.3.2.lib32_64_n9000
+                libnxsdk-2.0.0.0-10.3.2.lib32_64_n9000
+                lldp-2.0.0.0-10.3.2.lib32_64_n9000
+                mcast-2.0.0.0-10.3.2.lib32_64_n9000
+                mpls-2.0.0.0-10.3.2.lib32_64_n9000
+                mtx-device-2.0.0.0-10.3.2.lib32_64_n9000
+                mtx-grpc-agent-2.1.0.0-10.3.2.lib32_64_n9000
+                mtx-grpctunnel-2.1.0.0-10.3.2.lib32_64_n9000
+                mtx-infra-2.0.0.0-10.3.2.lib32_64_n9000
+                mtx-netconf-agent-2.0.0.0-10.3.2.lib32_64_n9000
+                mtx-openconfig-agent-1.0.0.0-10.3.2.lib32_64_n9000
+                mtx-restconf-agent-2.0.0.0-10.3.2.lib32_64_n9000
+                mtx-telemetry-2.0.0.0-10.3.2.lib32_64_n9000
+                nae-6.2.0.386-1.x86_64
+                nbproxy-2.0.0.0-10.3.2.lib32_64_n9000
+                nia-2.2.1.1-10.3.2.lib32_64_n9000
+                ntp-2.0.0.0-10.3.2.lib32_64_n9000
+                nxos-connector-1.0.11.537-1.el7.x86_64
+                nxos-ssh-2.0.0.0-10.3.2.lib32_64_n9000
+                nxsdk-2.0.0.0-10.3.2.lib32_64_n9000
+                nxsdk_rpc_server-1.0-2.5.0.x86_64
+                ospf-2.0.0.0-10.3.2.lib32_64_n9000
+                rip-2.0.0.0-10.3.2.lib32_64_n9000
+                sdaa-2.0.0.0-10.3.2.lib32_64_n9000
+                services-2.0.0.0-10.3.2.lib32_64_n9000
+                snmp-2.0.0.0-10.3.2.lib32_64_n9000
+                sr-2.0.0.0-10.3.2.lib32_64_n9000
+                svi-2.0.0.0-10.3.2.lib32_64_n9000
+                tacacs-2.0.0.0-10.3.2.lib32_64_n9000
+                telemetry-2.3.4.0-10.3.2.lib32_64_n9000
+                virtualization-2.0.0.0-10.3.2.lib32_64_n9000
+                vmtracker-2.0.0.0-10.3.2.lib32_64_n9000
+                vtp-2.0.0.0-10.3.2.lib32_64_n9000
+                vxlan-2.0.0.0-10.3.2.lib32_64_n9000
+
+    "show redundancy status": |
+      Redundancy mode
+      ---------------
+            administrative:   HA
+              operational:   None
+
+      This supervisor (sup-1)
+      -----------------------
+          Redundancy state:   Active, SC not present
+          Supervisor state:   Active
+            Internal state:   Active with no standby
+
+      Other supervisor (sup-1)
+      ------------------------
+          Redundancy state:   N/A
+
+          Supervisor state:   N/A
+            Internal state:   N/A
+
+      System start time:          Thu Jan  5 22:38:04 2023
+      System uptime:              0 days, 0 hours, 0 minutes, 30 seconds
+      Kernel uptime:              0 days, 0 hours, 0 minutes, 55 seconds
+      Active supervisor uptime:   0 days, 0 hours, 0 minutes, 30 seconds
+
+    "show boot": |
+      Current Boot Variables:
+      sup-1
+      NXOS variable = bootflash:/nxos64-cs.10.3.1.5.F.bin.upg
+      Boot POAP Disabled
+      System-wide POAP is disabled  using exec command 'system no poap'
+
+
+      Boot Variables on next reload:
+      sup-1
+      NXOS variable = bootflash:/nxos64-cs.10.3.1.5.F.bin.upg
+      Boot POAP Disabled
+      System-wide POAP is disabled  using exec command 'system no poap'
+    "reload":
+      new_state: n9k_reload2_confirm
+
+
+n9k_config2:
+  prompt: "%N(config)#"
+  commands: &n9k_config2_commands
+    "no logging console": ""
+    "line vty": ""
+    "line console": ""
+    "exec-timeout 0": ""
+    "terminal width 511": ""
+    'feature bash': ""
+    "end":
+      new_state: n9k_exec2
+
+
+n9k_reload2_confirm:
+  preface: "!!!WARNING! there is unsaved configuration!!!"
+  prompt: "This command will reboot the system. (y/n)?  [n] "
+  commands:
+    "y":
+      response: file|mock_data/nxos/n9k_reload.txt
+      new_state: n9k_reload2_login
+
+n9k_reload2_login:
+  prompt: "leaf4 login: "
+  commands:
+    "admin":
+      new_state: n9k_reload2_password
+
+n9k_reload2_password:
+  prompt: "Password: "
+  commands:
+    "lab":
+      response: |
+        Cisco Nexus Operating System (NX-OS) Software
+        TAC support: http://www.cisco.com/tac
+        Copyright (C) 2002-2022, Cisco and/or its affiliates.
+        All rights reserved.
+        The copyrights to certain works contained in this software are
+        owned by other third parties and used and distributed under their own
+        licenses, such as open source.  This software is provided "as is," and unless
+        otherwise stated, there is no warranty, express or implied, including but not
+        limited to warranties of merchantability and fitness for a particular purpose.
+        Certain components of this software are licensed under
+        the GNU General Public License (GPL) version 2.0 or
+        GNU General Public License (GPL) version 3.0  or the GNU
+        Lesser General Public License (LGPL) Version 2.1 or
+        Lesser General Public License (LGPL) Version 2.0.
+        A copy of each such license is available at
+        http://www.opensource.org/licenses/gpl-2.0.php and
+        http://opensource.org/licenses/gpl-3.0.html and
+        http://www.opensource.org/licenses/lgpl-2.1.php and
+        http://www.gnu.org/licenses/old-licenses/library.txt.
+
+      new_state: n9k_exec2
+
+
+
+n9k_loader:
+  prompt: "loader > "
+  commands:
+    "cmdline recoverymode=1": ""
+    "boot sanity-golden.gbin":
+      new_state: n9k_boot
+
+n9k_boot:
+  prompt: "switch(boot)# "
+  commands:
+    "config terminal":
+      new_state: n9k_boot_config
+    "start":
+      new_state: n9k_boot_shell
+    "write erase":
+      response: "Warning: This command will erase the startup-configuration."
+      new_state:
+        n9k_boot_erase_proceed
+    "reload":
+      new_state: n9k_boot_reload_confirm
+
+n9k_boot_reload_confirm:
+  prompt: "This command will reboot this supervisor module. (y/n) ? "
+  commands:
+    "y":
+      new_state: n9k_loader
+
+n9k_boot_erase_proceed:
+  prompt: "Do you wish to proceed anyway? (y/n) [N] "
+  commands:
+    "y":
+      new_state: n9k_boot
+
+n9k_boot_config:
+  prompt: "switch(boot)(config)# "
+  commands:
+    "interface mgmt0":
+      new_state: n9k_boot_config_intf
+    "exit":
+      new_state: n9k_boot
+
+n9k_boot_config_intf:
+  prompt: "switch(boot)(config-if)# "
+  commands:
+    "ip address 192.168.1.2 255.255.255.0": ""
+    "no shutdown": ""
+    "ip default 192.168.1.1": ""
+    "end":
+      new_state: n9k_boot
+    "exit":
+      new_state: n9k_boot_config
+
+n9k_boot_shell:
+  prompt: "bash-4.3# "
+  commands:
+    "ls -l": |
+      drwxrwxrwx  2 root root    40 Feb 20 00:51 vsh
+    "exit":
+      new_state: n9k_boot

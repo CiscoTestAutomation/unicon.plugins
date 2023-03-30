@@ -8,8 +8,10 @@ from unicon.plugins.generic.patterns import GenericPatterns
 class NxosPatterns(GenericPatterns):
     def __init__(self):
         super().__init__()
-        self.enable_prompt = r'^(.*?)([Rr]outer|[Ss]witch|%N)(\(standby\))?(\(maint-mode\))?#\s?$'
-        self.config_prompt = r'^(?P<hostname00>.*)(\(maint-mode\))?\(.*(con|cfg|ipsec-profile)\S*\)#[\s\x07]*$'
+        self.enable_prompt = r'^(.*?)([Rr]outer|[Ss]witch|%N)(?!\(boot\))(\(standby\))?(\(maint-mode\))?#\s?$'
+        self.boot_prompt = r'^(.*?)([Rr]outer|[Ss]witch|%N)\(boot\)#\s?$'
+        self.boot_config_prompt = r'^(.*?)([Rr]outer|[Ss]witch|%N)\(boot\)\(con\S*\)#\s?$'
+        self.config_prompt = r'^(?P<hostname00>.*?(?<!\(boot\)))(\(maint-mode\))?(?!\(boot\))\(.*?(con|cfg|ipsec-profile)\S*\)#[\s\x07]*$'
         self.debug_prompt = r'^(.*?)Linux\(debug\)#\s*$'
         self.sqlite_prompt = r'^(.*?)sqlite>\s*$'
         self.reboot = r'This command will reboot the system. \(y\/n\)\?  \[n\]'
@@ -20,7 +22,7 @@ class NxosPatterns(GenericPatterns):
         self.snmp_port = r'^.*Enable the SNMP port\? \(yes\/no\) \[y\]:'
         self.boot_vdc = r'^.*Boot up system with default vdc \(yes\/no\) \[y\]\:'
         self.reload_proceed = r'^(.*)Proceed with reload\? \[confirm\]$'
-        self.loader_prompt = r'^(.*)loader\s*>'
+        self.loader_prompt = r'^(.*)[Ll]oader\s*>'
         self.redundant = r'^.*REDUNDANCY mode is (RPR|SSO).*'
         self.config_byte = r'Uncompressed configuration from [0-9]+ bytes to [0-9]+ bytes'
         self.login_notready = r'^.*is not ready or active for login.*'

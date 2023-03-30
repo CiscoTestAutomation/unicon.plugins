@@ -24,6 +24,36 @@ class NxosSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
         dialog += Dialog(additional_connection_dialog)
         return dialog
 
+    def init_handle(self):
+        con = self.connection
+
+        if con.state_machine.current_state == 'boot_config':
+            con.state_machine.go_to('boot',
+                self.connection.spawn,
+                context=self.connection.context,
+                prompt_recovery=self.prompt_recovery)
+
+        if con.state_machine.current_state == 'boot':
+            if con.settings.BOOT_INIT_EXEC_COMMANDS:
+                for command in con.settings.BOOT_INIT_EXEC_COMMANDS:
+                    con.execute(command, prompt_recovery = self.prompt_recovery)
+
+            if con.settings.BOOT_INIT_CONFIG_COMMANDS:
+                con.state_machine.go_to('boot_config',
+                    self.connection.spawn,
+                    context=self.connection.context,
+                    prompt_recovery=self.prompt_recovery,
+                    timeout=self.connection.connection_timeout)
+
+                for command in con.settings.BOOT_INIT_CONFIG_COMMANDS:
+                    con.execute(command, prompt_recovery = self.prompt_recovery)
+
+                con.state_machine.go_to('boot',
+                    self.connection.spawn,
+                    context=self.connection.context,
+                    prompt_recovery=self.prompt_recovery)
+
+        return super().init_handle()
 
 class NxosDualRpConnectionProvider(GenericDualRpConnectionProvider):
 

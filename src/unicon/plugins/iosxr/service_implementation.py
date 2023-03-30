@@ -8,7 +8,7 @@ from unicon.plugins.generic import service_implementation as svc
 from unicon.bases.routers.services import BaseService
 from unicon.core.errors import SubCommandFailure
 from unicon.eal.dialogs import Dialog, Statement
-from unicon.plugins.generic.service_implementation import BashService
+from unicon.plugins.generic.service_implementation import BashService as GenericBashService
 from unicon.plugins.generic.service_implementation import GetRPState as GenericGetRPState
 
 from .service_statements import (switchover_statement_list,
@@ -347,69 +347,35 @@ class AdminAttachModuleConsole(AttachModuleConsole):
             return super().__exit__(exc_type, exc_val, exc_tb)
 
 
-class AdminService(BashService):
+class AdminService(GenericBashService):
 
-    class ContextMgr(BashService.ContextMgr):
-        def __init__(self, connection,
-                           enable_bash = False,
-                           timeout = None):
-            # overwrite the prompt
-            super().__init__(connection=connection,
-                             enable_bash=enable_bash,
-                             timeout=timeout)
+    class ContextMgr(GenericBashService.ContextMgr):
 
         def __enter__(self):
             self.conn.log.debug('+++ attaching admin shell +++')
-
             sm = self.conn.state_machine
             sm.go_to('admin', self.conn.spawn)
-
             return self
 
 
-class BashService(BashService):
+class BashService(GenericBashService):
 
-    class ContextMgr(BashService.ContextMgr):
-        def __init__(self, connection,
-                           enable_bash = False,
-                           timeout = None):
-            # overwrite the prompt
-            super().__init__(connection=connection,
-                             enable_bash=enable_bash,
-                             timeout=timeout)
+    class ContextMgr(GenericBashService.ContextMgr):
 
         def __enter__(self):
             self.conn.log.debug('+++ attaching bash shell +++')
-
             sm = self.conn.state_machine
-
-            if hasattr(self.conn, 'platform') and \
-                self.conn.platform == 'spitfire':
-                # In case of spitfire plugin
-                sm.go_to('xr_run', self.conn.spawn)
-            else:
-                sm.go_to('run', self.conn.spawn)
-
+            sm.go_to('run', self.conn.spawn)
             return self
 
-class AdminBashService(BashService):
+class AdminBashService(GenericBashService):
 
-    class ContextMgr(BashService.ContextMgr):
-        def __init__(self, connection,
-                           enable_bash = False,
-                           timeout = None):
-            # overwrite the prompt
-            super().__init__(connection=connection,
-                             enable_bash=enable_bash,
-                             timeout=timeout)
+    class ContextMgr(GenericBashService.ContextMgr):
 
         def __enter__(self):
             self.conn.log.debug('+++ attaching bash shell +++')
-
-
             sm = self.conn.state_machine
             sm.go_to('admin_run', self.conn.spawn)
-
             return self
 
 

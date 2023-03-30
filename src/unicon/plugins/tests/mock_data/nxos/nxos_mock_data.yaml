@@ -288,8 +288,31 @@ vdc2_config_line:
 loader:
   prompt: "loader > "
   commands:
+    "recoverymode=1": ""
+    "dir bootflash:": ""
+    "boot test.bin":
+      new_state: exec
     "boot":
       new_state: exec
+    "boot new.bin":
+      new_state: boot
+
+boot:
+  prompt: "switch(boot)# "
+  commands:
+    "config terminal":
+      new_state: boot_config
+    "load-nxos":
+      new_state: exec
+
+boot_config:
+  prompt: "switch(boot)(config)# "
+  commands:
+    "admin-password secret": ""
+    "exit":
+      new_state: boot
+    "end":
+      new_state: boot
 
 config:
   prompt: "%N(config)#"

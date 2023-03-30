@@ -43,6 +43,7 @@ class GenericSettings(Settings):
             'stty cols 200',
             'stty rows 200'
         ]
+        self.ROMMON_INIT_COMMANDS = []
 
         self.SWITCHOVER_COUNTER = 50
         self.SWITCHOVER_TIMEOUT = 500
@@ -52,6 +53,13 @@ class GenericSettings(Settings):
         self.POST_RELOAD_WAIT = 60
         self.RELOAD_RECONNECT_ATTEMPTS = 3
         self.CONSOLE_TIMEOUT = 60
+        self.BOOT_TIMEOUT = 600
+        self.MAX_BOOT_ATTEMPTS = 3
+
+        # for rommon boot, try to find image on flash
+        self.FIND_BOOT_IMAGE = True
+        self.BOOT_FILESYSTEM = 'bootflash:'
+        self.BOOT_FILE_REGEX = r'(\S+\.bin)'
 
         # Wait for the config prompt to appear
         # before checking for the config prompt.
@@ -282,4 +290,5 @@ class GenericSettings(Settings):
                 'os': ['windows'],
             },
         }
+
 
