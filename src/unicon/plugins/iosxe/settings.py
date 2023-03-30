@@ -40,14 +40,8 @@ class IosXESettings(GenericSettings):
         self.CONFIG_LOCK_RETRY_SLEEP = 30
         self.CONFIG_LOCK_RETRIES = 10
 
-        self.BOOT_TIMEOUT = 600
         self.POST_BOOT_TIMEOUT = 300
         self.BOOT_POSTCHECK_INTERVAL = 30
-
-        self.FIND_BOOT_IMAGE = True
-        self.MAX_BOOT_ATTEMPTS = 3
-        self.BOOT_FILESYSTEM = 'bootflash:'
-        self.BOOT_FILE_REGEX = r'(\S+\.bin)'
 
         self.SERVICE_PROMPT_CONFIG_CMD = 'service prompt config'
         self.CONFIG_PROMPT_WAIT = 2
@@ -58,8 +52,6 @@ class IosXESettings(GenericSettings):
         self.GUESTSHELL_ENABLE_CMDS = 'guestshell enable'
         self.GUESTSHELL_ENABLE_VERIFY_CMDS = []
         self.GUESTSHELL_ENABLE_VERIFY_PATTERN = r''
-
-        self.ROMMON_INIT_COMMANDS = []
 
         # Regex to match the entries on the grub boot screen
         self.GRUB_REGEX_PATTERN = r'(?:\x1b\[7m)?\x1b\[\d;3H.*?   '

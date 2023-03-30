@@ -7,7 +7,8 @@ from datetime import datetime, timedelta
 from unicon.eal.dialogs import Statement
 from unicon.plugins.generic.service_statements import\
     admin_password as admin_password_stmt
-from unicon.plugins.generic.statements import connection_statement_list
+from unicon.plugins.generic.statements import (
+    connection_statement_list, boot_timeout_stmt)
 
 from .patterns import IosXEReloadPatterns, IosXEPatterns
 
@@ -173,33 +174,6 @@ def boot_image(spawn, context, session):
         context['boot_prompt_count'] += 1
     else:
         raise Exception("Too many failed boot attempts have been detected.")
-
-
-def boot_timeout_handler(spawn, context, session):
-    '''Special handler for dialog timeouts that occur during boot.
-    Based on start_boot_time set in the rommon->disable
-    transition handler, determine if boot is taking too
-    long and raise an exception.
-    '''
-    boot_timeout_time = timedelta(seconds=spawn.settings.BOOT_TIMEOUT)
-    boot_start_time = context.get('boot_start_time')
-    if boot_start_time:
-        current_time = datetime.now()
-        delta_time = current_time - boot_start_time
-        if delta_time > boot_timeout_time:
-            context.pop('boot_start_time', None)
-            raise TimeoutError('Boot timeout')
-        return True
-    else:
-        return False
-
-
-boot_timeout_stmt = Statement(
-    pattern='__timeout__',
-    action=boot_timeout_handler,
-    args=None,
-    loop_continue=True,
-    continue_timer=False)
 
 
 boot_from_rommon_stmt = Statement(

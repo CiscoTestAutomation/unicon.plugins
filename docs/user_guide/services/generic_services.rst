@@ -835,15 +835,20 @@ Service to execute commands in the router Bash. ``bash_console``
 gives you a router-like object to execute commands on using python context
 managers.
 
-==========   ======================    ========================================
-Argument     Type                      Description
-==========   ======================    ========================================
-timeout      int (default 60 sec)      timeout in sec for executing commands
-target       str                       'standby' to bring standby console to bash.
-switch       str                       switch to connect to (optional)
-rp           str                       rp to connect to (optional)
-chassis      str                       chassis to connect to (optional)
-==========   ======================    ========================================
+===========   ======================    ========================================
+Argument      Type                      Description
+===========   ======================    ========================================
+timeout       int (default 60 sec)      timeout in sec for executing commands
+target        str                       'standby' to bring standby console to bash.
+enable_bash   bool (default: True)      enable bash service on device.
+switch        str                       switch to connect to (optional)
+rp            str                       rp to connect to (optional)
+chassis       str                       chassis to connect to (optional)
+===========   ======================    ========================================
+
+Bash service will be enabled by default on devices that require the service to
+be configured (e.g. NXOS). Bash configuration will be done on first invocation
+of the bash_console service.
 
 .. code-block:: python
 

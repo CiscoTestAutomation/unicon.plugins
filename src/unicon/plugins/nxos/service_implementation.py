@@ -111,6 +111,15 @@ class Configure(GenericConfigure):
     def pre_service(self, *args, **kwargs):
         target = kwargs.get('target', None)
         handle = self.get_handle(target)
+
+        # store start/end states
+        self.orig_state_state = self.start_state
+        self.orig_end_state = self.end_state
+        # transition to boot config if in boot mode
+        if handle.state_machine.current_state == 'boot':
+            self.start_state = 'boot_config'
+            self.end_state = 'boot'
+
         mode = kwargs.get('mode') or self.mode
         if mode == 'dual':
             self.commit_cmd = 'commit'
@@ -146,6 +155,9 @@ class Configure(GenericConfigure):
     def post_service(self, *args, **kwargs):
         self.commit_cmd = ''
         super().post_service(*args, **kwargs)
+        # restore original start and end state
+        self.end_state = self.orig_end_state
+        self.start_state = self.orig_state_state
 
 
 class ConfigureDual(Configure):
@@ -1586,12 +1598,27 @@ class AttachModuleConsole(BaseService):
 
 class BashService(GenericBashService):
 
+    def pre_service(self, *args, **kwargs):
+        if 'target' in kwargs:
+            handle = self.get_handle(kwargs['target'])
+        else:
+            handle = self.get_handle()
+
+        self.orig_state_state = self.start_state
+        self.orig_end_state = self.end_state
+        if handle.state_machine.current_state == 'boot':
+            self.start_state = 'boot'
+            self.end_state = 'boot'
+        super().pre_service(*args, **kwargs)
+
+    def call_service(self, enable_bash=True, **kwargs):
+        super().call_service(enable_bash=enable_bash, **kwargs)
+
+    def post_service(self, *args, **kwargs):
+        self.start_state = self.orig_state_state
+        self.end_state = self.orig_end_state
+
     class ContextMgr(GenericBashService.ContextMgr):
-        def __init__(self, connection, enable_bash=False, timeout=None):
-            # overwrite the prompt
-            super().__init__(connection=connection,
-                             enable_bash=enable_bash,
-                             timeout=timeout)
 
         def __enter__(self):
             self.conn.log.debug('+++ attaching bash shell +++')

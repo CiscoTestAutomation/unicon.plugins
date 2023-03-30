@@ -11,6 +11,7 @@ from time import sleep
 from unicon.bases.routers.services import BaseService
 from unicon.core.errors import SubCommandFailure, TimeoutError
 from unicon.eal.dialogs import Dialog
+from unicon.plugins.generic.service_implementation import BashService as GenericBashService
 
 from .service_statements import reload_statement_list, reload_statement_list_vty
 from .statements import SpitfireStatements
@@ -386,3 +387,14 @@ class HAReload(BaseService):
             self.result = ReloadResult(self.result, reload_output)
         else:
             self.result = reload_output
+
+
+class BashService(GenericBashService):
+
+    class ContextMgr(GenericBashService.ContextMgr):
+
+        def __enter__(self):
+            self.conn.log.debug('+++ attaching bash shell +++')
+            sm = self.conn.state_machine
+            sm.go_to('xr_run', self.conn.spawn)
+            return self

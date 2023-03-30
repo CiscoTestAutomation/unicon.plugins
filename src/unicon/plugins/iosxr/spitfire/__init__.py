@@ -22,7 +22,7 @@ class SpitfireServiceList(IOSXRServiceList):
         super().__init__()
         self.configure = svc.Configure
         self.attach_console = svc.AttachModuleConsole
-        self.bash_console = svc.BashService
+        self.bash_console = spitfire_svc.BashService
         self.ping = IosXePing
         self.switchto = Switchto
         self.reload = spitfire_svc.Reload
@@ -35,7 +35,7 @@ class SpitfireHAServiceList(IOSXRHAServiceList):
         self.configure = svc.HaConfigureService
         self.attach_console = svc.AttachModuleConsole
         self.switchover = svc.Switchover
-        self.bash_console = svc.BashService
+        self.bash_console = spitfire_svc.BashService
         self.switchto = Switchto
         self.reload = spitfire_svc.HAReload
 

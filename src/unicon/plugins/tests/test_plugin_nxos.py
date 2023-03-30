@@ -401,7 +401,7 @@ class TestNxosCrash(unittest.TestCase):
         self.c.enable()
         with self.assertRaises(StateMachineError):
             self.c.execute('crash command')
-        self.assertEqual(self.c.state_machine.current_state, 'loader')
+        self.assertEqual(self.c.state_machine.current_state, 'rommon')
 
 
 class TestNxosPluginReloadService(unittest.TestCase):
@@ -834,6 +834,195 @@ class TestNxosL2ribClient(unittest.TestCase):
     def tearDownClass(cls):
         cls.dev.disconnect()
 
+
+class TestNxosRommonBoot(unittest.TestCase):
+
+    def test_loader_init(self):
+        dev = Connection(hostname='switch',
+                         start=['mock_device_cli --os nxos --state loader'],
+                         os='nxos',
+                         username='cisco',
+                         tacacs_password='cisco',
+                         init_exec_commands=[],
+                         init_config_commands=[],
+                         log_buffer=True,
+                         settings={'BOOT_TIMEOUT': 10},
+                         mit=True)
+        try:
+            dev.connect()
+            self.assertEqual(dev.state_machine.current_state, 'rommon')
+        finally:
+            dev.disconnect()
+
+    def test_loader_state(self):
+        dev = Connection(hostname='switch',
+                         start=['mock_device_cli --os nxos --state loader'],
+                         os='nxos',
+                         username='cisco',
+                         tacacs_password='cisco',
+                         init_exec_commands=[],
+                         init_config_commands=[],
+                         settings={'BOOT_TIMEOUT': 10},
+                         log_buffer=True)
+        try:
+            dev.connect()
+            self.assertEqual(dev.state_machine.current_state, 'enable')
+        finally:
+            dev.disconnect()
+
+    def test_loader_init_commands(self):
+        dev = Connection(hostname='switch',
+                         start=['mock_device_cli --os nxos --state loader'],
+                         os='nxos',
+                         username='cisco',
+                         tacacs_password='cisco',
+                         init_exec_commands=[],
+                         init_config_commands=[],
+                         log_buffer=True,
+                         settings={
+                            'ROMMON_INIT_COMMANDS': ['recoverymode=1'],
+                            'BOOT_TIMEOUT': 10}
+                         )
+        try:
+            output = dev.connect()
+            assert 'recoverymode' in output
+            self.assertEqual(dev.state_machine.current_state, 'enable')
+        finally:
+            dev.disconnect()
+
+    def test_loader_boot_image_from_loader(self):
+        dev = Connection(hostname='switch',
+                         start=['mock_device_cli --os nxos --state loader'],
+                         os='nxos',
+                         username='cisco',
+                         tacacs_password='cisco',
+                         init_exec_commands=[],
+                         init_config_commands=[],
+                         log_buffer=True,
+                         settings={'BOOT_TIMEOUT': 10},
+                         image_to_boot='test.bin'
+                         )
+        try:
+            dev.connect()
+            self.assertEqual(dev.state_machine.current_state, 'enable')
+        finally:
+            dev.disconnect()
+
+    def test_loader_boot_image_from_boot(self):
+        dev = Connection(hostname='switch',
+                         start=['mock_device_cli --os nxos --state boot'],
+                         os='nxos',
+                         username='cisco',
+                         tacacs_password='cisco',
+                         init_exec_commands=[],
+                         init_config_commands=[],
+                         log_buffer=True,
+                         settings={'BOOT_TIMEOUT': 10},
+                         image_to_boot='test.bin'
+                         )
+        try:
+            dev.connect()
+            self.assertEqual(dev.state_machine.current_state, 'enable')
+        finally:
+            dev.disconnect()
+
+    def test_loader_boot_image_via_boot(self):
+        dev = Connection(hostname='switch',
+                         start=['mock_device_cli --os nxos --state loader'],
+                         os='nxos',
+                         username='cisco',
+                         tacacs_password='cisco',
+                         init_exec_commands=[],
+                         init_config_commands=[],
+                         log_buffer=True,
+                         settings={'BOOT_TIMEOUT': 10},
+                         image_to_boot='new.bin'
+                         )
+        try:
+            dev.connect()
+            self.assertEqual(dev.state_machine.current_state, 'enable')
+        finally:
+            dev.disconnect()
+
+    def test_loader_boot_image_via_boot_with_config_init_cmds(self):
+        dev = Connection(hostname='switch',
+                         start=['mock_device_cli --os nxos --state loader'],
+                         os='nxos',
+                         username='cisco',
+                         tacacs_password='cisco',
+                         init_exec_commands=[],
+                         init_config_commands=[],
+                         log_buffer=True,
+                         image_to_boot='new.bin',
+                         settings={
+                            'BOOT_INIT_CONFIG_COMMANDS': ['admin-password secret'],
+                            'BOOT_TIMEOUT': 10}
+                         )
+        try:
+            dev.connect()
+            self.assertEqual(dev.state_machine.current_state, 'enable')
+        finally:
+            dev.disconnect()
+
+    def test_connect_in_boot(self):
+        dev = Connection(hostname='switch',
+                         start=['mock_device_cli --os nxos --state boot'],
+                         os='nxos',
+                         username='cisco',
+                         tacacs_password='cisco',
+                         init_exec_commands=[],
+                         init_config_commands=[],
+                         log_buffer=True,
+                         image_to_boot='new.bin',
+                         settings={
+                            'BOOT_INIT_CONFIG_COMMANDS': ['admin-password secret'],
+                            'BOOT_TIMEOUT': 10}
+                         )
+        try:
+            output = dev.connect()
+            assert 'admin-password secret' in output
+            self.assertEqual(dev.state_machine.current_state, 'enable')
+        finally:
+            dev.disconnect()
+
+    def test_connect_in_boot_config(self):
+        dev = Connection(hostname='switch',
+                         start=['mock_device_cli --os nxos --state boot_config'],
+                         os='nxos',
+                         username='cisco',
+                         tacacs_password='cisco',
+                         init_exec_commands=[],
+                         init_config_commands=[],
+                         log_buffer=True,
+                         image_to_boot='new.bin',
+                         settings={
+                            'BOOT_INIT_CONFIG_COMMANDS': ['admin-password secret'],
+                            'BOOT_TIMEOUT': 10}
+                         )
+        try:
+            output = dev.connect()
+            assert 'admin-password secret' in output
+            self.assertEqual(dev.state_machine.current_state, 'enable')
+        finally:
+            dev.disconnect()
+
+    def test_configure_in_boot(self):
+        dev = Connection(hostname='switch',
+                         start=['mock_device_cli --os nxos --state boot'],
+                         os='nxos',
+                         username='cisco',
+                         tacacs_password='cisco',
+                         init_exec_commands=[],
+                         init_config_commands=[],
+                         log_buffer=True,
+                         settings={'BOOT_TIMEOUT': 10},
+                         mit=True
+                         )
+        try:
+            dev.connect()
+            dev.configure('admin-password secret')
+        finally:
+            dev.disconnect()
 
 if __name__ == "__main__":
     unittest.main()

@@ -23,13 +23,6 @@ from unicon.eal.dialogs import Dialog
 class BashService(BashService):
 
     class ContextMgr(BashService.ContextMgr):
-        def __init__(self, connection,
-                           enable_bash = False,
-                           timeout = None):
-            # overwrite the prompt
-            super().__init__(connection=connection,
-                             enable_bash=enable_bash,
-                             timeout=timeout)
 
         def __enter__(self):
             self.conn.log.debug('+++ attaching bash shell +++')

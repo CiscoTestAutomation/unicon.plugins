@@ -17,6 +17,9 @@ class NxosSettings(GenericSettings):
             'exec-timeout 0',
             'terminal width 511'
         ]
+        self.BOOT_INIT_EXEC_COMMANDS = []
+        self.BOOT_INIT_CONFIG_COMMANDS = []
+
         self.SWITCHOVER_TIMEOUT = 700
         self.SWITCHOVER_COUNTER = 50
         self.HA_RELOAD_TIMEOUT = 700
