@@ -433,6 +433,34 @@ def update_context(spawn, context, session, **kwargs):
     context.update(kwargs)
 
 
+def boot_timeout_handler(spawn, context, session):
+    '''Special handler for dialog timeouts that occur during boot.
+    Based on start_boot_time set in the rommon->disable
+    transition handler, determine if boot is taking too
+    long and raise an exception.
+    '''
+    boot_timeout_time = timedelta(seconds=spawn.settings.BOOT_TIMEOUT)
+    boot_start_time = context.get('boot_start_time')
+    if boot_start_time:
+        current_time = datetime.now()
+        delta_time = current_time - boot_start_time
+        if delta_time > boot_timeout_time:
+            context.pop('boot_start_time', None)
+            raise TimeoutError('Boot timeout')
+        return True
+    else:
+        return False
+
+
+boot_timeout_stmt = Statement(
+    pattern='__timeout__',
+    action=boot_timeout_handler,
+    args=None,
+    loop_continue=True,
+    continue_timer=False)
+
+
+
 #############################################################
 #  Generic statements
 #############################################################

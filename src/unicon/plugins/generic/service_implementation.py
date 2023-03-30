@@ -2515,24 +2515,23 @@ class BashService(BaseService):
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         self.start_state = "enable"
         self.end_state = "enable"
         self.bash_enabled = False
 
     def pre_service(self, *args, **kwargs):
-        """ Common pre_service procedure for all Services """
         self.prompt_recovery = kwargs.get('prompt_recovery', False)
-        if self.connection.is_connected:
-            return
-        elif self.connection.reconnect:
-            self.connection.connect()
-        else:
-            raise ConnectionError("Connection is not established to device")
+        if not self.connection.is_connected:
+            if self.connection.reconnect:
+                self.connection.connect()
+            else:
+                raise ConnectionError("Connection is not established to device")
+
         if 'target' in kwargs:
             handle = self.get_handle(kwargs['target'])
         else:
             handle = self.get_handle()
+
         handle.state_machine.go_to(
             self.start_state,
             handle.spawn,
@@ -2541,30 +2540,33 @@ class BashService(BaseService):
         )
 
     def call_service(self, target=None, **kwargs):
+        enable_bash = kwargs.pop('enable_bash', False)
         handle = self.get_handle(target)
-        self.result = self.__class__.ContextMgr(connection=handle, enable_bash=not self.bash_enabled, **kwargs)
+        self.result = self.__class__.ContextMgr(
+            connection=handle,
+            enable_bash=enable_bash and not self.bash_enabled,
+            end_state=self.end_state,
+            **kwargs)
 
         # if bash wasn't enabled, it is now!
-        if not self.bash_enabled:
+        if enable_bash:
             self.bash_enabled = True
 
     def post_service(self, *args, **kwargs):
-        if 'target' in kwargs:
-            handle = self.get_handle(kwargs['target'])
-        else:
-            handle = self.get_handle()
-        handle.state_machine.go_to(
-            self.start_state,
-            handle.spawn,
-            context=self.connection.context,
-            prompt_recovery=self.prompt_recovery
-        )
+        # context manager will transition to end_state
+        # no need to do anything post service
+        pass
 
     class ContextMgr(object):
-        def __init__(self, connection, enable_bash=False, timeout=None, **kwargs):
+        def __init__(self, connection,
+                enable_bash=False,
+                end_state=None,
+                timeout=None,
+                **kwargs):
             self.conn = connection
             # Specific platforms has its own prompt
             self.enable_bash = enable_bash
+            self.end_state = end_state
             self.timeout = timeout or connection.settings.CONSOLE_TIMEOUT
 
         def __enter__(self):
@@ -2574,7 +2576,7 @@ class BashService(BaseService):
             self.conn.log.debug('--- detaching console ---')
 
             sm = self.conn.state_machine
-            sm.go_to('enable', self.conn.spawn)
+            sm.go_to(self.end_state, self.conn.spawn)
 
             # do not suppress
             return False
