@@ -316,7 +316,7 @@ class TestLearnHostname(unittest.TestCase):
           'sma_prompt' : 'sma03',
           'sma_prompt_1' : 'pod-esa01',
           'exec18': LinuxSettings().DEFAULT_LEARNED_HOSTNAME,
-          'exec20': 'Router',
+          'exec20': 'Linux',
           'exec21': 'mock-server',
         }
 

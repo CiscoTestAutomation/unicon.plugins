@@ -120,7 +120,7 @@ linux_password4:
       new_state: exec17
 
 exec:
-  prompt: "Linux$ "
+  prompt: "%N$ "
   commands: &cmds
     "stty cols 200": ""
     "stty rows 200": ""
@@ -298,6 +298,12 @@ exec:
         new_state: trex_console
     "uname": "\x1b[?2004l\rLinux\r\r\n\x1b[?2004h"
 
+    "ls -ltr":
+        response: "ls -ltr\r\n\x1b[?2004l\rtotal 35828\r\ndrwxr-xr-x 11 root     root         4096 Feb 22 14:21 \x1b[01;34mdata\x1b[0m\r\n\x1b[?2004hndfc-web:~ # "
+        timing:
+        - 0:,0,0.1,0.01
+
+
 trex_console:
   prompt: "trex> "
   commands:
@@ -457,13 +463,13 @@ ios_login:
       new_state: ios_exec
 
 ios_exec:
-  prompt: "%N>"
+  prompt: "Router>"
   commands:
     "enable":
       new_state: ios_enable
 
 ios_enable:
-  prompt: "%N#"
+  prompt: "Router#"
   commands:
     "term length 0": ""
     "term width 0": ""
@@ -472,7 +478,7 @@ ios_enable:
       new_state: ios_config
 
 ios_config:
-  prompt: "%N(conf)#"
+  prompt: "Router(conf)#"
   commands:
     "no logging console": ""
     "line console 0":
@@ -485,7 +491,7 @@ ios_config:
       new_state: ios_enable
 
 ios_config_line:
-  prompt: "%N(config-line)#"
+  prompt: "Router(config-line)#"
   commands:
     "exec-timeout 0": ""
     "line vty 0 4": ""
