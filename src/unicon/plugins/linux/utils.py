@@ -16,7 +16,9 @@ class LinuxUtils(Utils):
         output = result
 
         # logic for updated prompts with named capture group
-        match = re.search(pattern, result, re.S)
+        # Note: using re.M/re.MULTILINE here instead of re.S (dot matches all)
+        # to avoid grabbing more than just the prompt.
+        match = re.search(pattern, result, re.M)
         if match:
             prompt = match.groupdict().get('prompt')
             logger.debug(f'Prompt match: {prompt!r}')
