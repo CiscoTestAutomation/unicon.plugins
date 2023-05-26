@@ -134,3 +134,18 @@ config_exec:
         error: commit failed: (statements constraint check failed)
     "exit":
       new_state: exec5
+
+exec6:
+  prompt: "root@thisisaverylonghostname>"
+  commands:
+    "show interfaces terse | match fxp0" : |
+      fxp0                    up    up
+      fxp0.0                  up    up   inet     172.25.192.115/24
+    "set cli screen-length 0": |
+      Screen length set to 0
+    "set cli screen-width 0": |
+      Screen width set to 0
+    "configure":
+      new_state: config
+    "exit":
+      new_state: ssh

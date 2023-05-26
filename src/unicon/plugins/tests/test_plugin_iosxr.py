@@ -191,13 +191,6 @@ class TestIosXrConfigPrompts(unittest.TestCase):
             os='iosxr',
         )
         self._conn.connect()
-        self._moonshine_conn = Connection(
-            hostname='Router',
-            start=['mock_device_cli --os iosxr --state moonshine_enable'],
-            os='iosxr',
-            platform='moonshine',
-        )
-        self._moonshine_conn.connect()
 
     def test_failed_config(self):
         """Check that we can successfully return to an enable prompt after entering failed config."""
@@ -205,13 +198,6 @@ class TestIosXrConfigPrompts(unittest.TestCase):
         self._conn.execute("test failed")
         self._conn.spawn.timeout = 60
         self._conn.enable()
-
-    def test_failed_config_moonshine(self):
-        """Check that we can successfully return to an enable prompt after entering failed config on moonshine."""
-        self._moonshine_conn.execute("configure terminal", allow_state_change=True)
-        self._moonshine_conn.execute("test failed")
-        self._moonshine_conn.spawn.timeout = 60
-        self._moonshine_conn.enable()
 
 
 class TestIosXrPluginAdminService(unittest.TestCase):

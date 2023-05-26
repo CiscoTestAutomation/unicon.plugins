@@ -10,6 +10,7 @@ __author__ = "Dave Wapstra <dwapstra@cisco.com>"
 
 import os
 import re
+import time
 import yaml
 import unittest
 from unittest.mock import patch
@@ -37,6 +38,19 @@ class TestJunosPluginConnect(unittest.TestCase):
         c.connect()
         self.assertIn('set cli screen-width 0', c.spawn.match.match_output)
         self.assertIn('root@junos_vmx2>', c.spawn.match.match_output)
+        c.disconnect()
+
+    def test_login_connect_long_hostname(self):
+        c = Connection(hostname='thisisaverylonghostname',
+                        start=['mock_device_cli --os junos --state exec6'],
+                        os='junos',
+                        username='root',
+                        mit=True)
+        now = time.time()
+        c.connect()
+        later = time.time()
+        self.assertTrue((later - now) < 10, 'Connection too slow')
+        self.assertIn('root@thisisaverylonghostname>', c.spawn.match.match_output)
         c.disconnect()
 
     def test_login_connect_ssh(self):

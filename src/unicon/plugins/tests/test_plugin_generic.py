@@ -1373,5 +1373,80 @@ class TestGenericReload(unittest.TestCase):
         finally:
              d.disconnect()
 
+
+class TestGenericConnectionRefused(unittest.TestCase):
+
+    def test_connection_refused_handler_with_peripheral(self):
+        md = MockDeviceTcpWrapper(device_os='iosxe', hostname='R1',
+            port=0, state='connection_refused')
+        md.start()
+        template_testbed = """
+        devices:
+          R1:
+            os: iosxe
+            credentials:
+                default:
+                    username: cisco
+                    password: cisco
+            connections:
+              defaults:
+                class: unicon.Unicon
+              a:
+                protocol: telnet
+                ip: 127.0.0.1
+                port: {}
+            peripherals:
+                terminal_server:
+                    ts: [20]
+          ts:
+            os: ios
+            credentials:
+                default:
+                    username: cisco
+                    password: cisco
+            connections:
+                cli:
+                    command: mock_device_cli --os ios --state exec --hostname ts
+        """.format(md.ports[0])
+        t = loader.load(template_testbed)
+        d = t.devices.R1
+        try:
+            d.connect()
+        finally:
+            d.disconnect()
+            md.stop()
+
+    def test_connection_refused_handler_without_peripheral(self):
+        md = MockDeviceTcpWrapper(device_os='iosxe', hostname='R1',
+            port=0, state='connection_refused')
+        md.start()
+        template_testbed = """
+        devices:
+          R1:
+            os: iosxe
+            credentials:
+                default:
+                    username: cisco
+                    password: cisco
+            connections:
+              defaults:
+                class: unicon.Unicon
+              a:
+                protocol: telnet
+                ip: 127.0.0.1
+                port: {}
+        """.format(md.ports[0])
+        t = loader.load(template_testbed)
+        d = t.devices.R1
+        with self.assertRaisesRegex(unicon.core.errors.ConnectionError,
+            'failed to connect to R1'):
+            try:
+                d.connect()
+            finally:
+                d.disconnect()
+                md.stop()
+
+
+
 if __name__ == "__main__":
     unittest.main()

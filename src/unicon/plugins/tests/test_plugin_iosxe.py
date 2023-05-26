@@ -1108,6 +1108,18 @@ class TestIosxeTclsh(unittest.TestCase):
         c.enable()
         c.disconnect()
 
+    def test_tclsh_long_hostname(self):
+        c = Connection(
+            hostname='very-very-long-hostname',
+            start=['mock_device_cli --os iosxe --state general_enable --hostname very-very-long-hostname'],
+            os='iosxe',
+            mit=True
+        )
+        c.connect()
+        c.execute('long_hostname')
+        c.tclsh()
+        c.enable()
+        c.disconnect()
 
 class TestConfigTransition(unittest.TestCase):
 

@@ -535,6 +535,30 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
                      "no boot system"])
         d.disconnect()
 
+    def test_quick_reload(self):
+        md = MockDeviceTcpWrapperIOSXE(port=0, state='c9k_enable')
+        md.start()
+
+        c = Connection(
+            hostname='switch',
+            start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
+            os='iosxe',
+            platform='cat9k',
+            settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+            credentials=dict(default=dict(username='cisco', password='cisco'),
+                             alt=dict(username='admin', password='lab')),
+            mit=True
+        )
+        try:
+            c.connect()
+            c.settings.POST_RELOAD_WAIT = 1
+            c.execute('quick reload') # prepare state
+            c.reload(timeout=10)
+            self.assertEqual(c.state_machine.current_state, 'enable')
+        finally:
+            c.disconnect()
+            md.stop()
+
 
 class TestIosXeCat9kPluginContainer(unittest.TestCase):
 

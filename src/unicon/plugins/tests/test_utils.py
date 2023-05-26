@@ -186,7 +186,7 @@ devices:
             log_contents = f.read()
         self.assertRegexpMatches(
             log_contents,
-            r'\+\+\+ Unicon plugin linux( \(unicon\.plugins\.linux\))? \+\+\+'
+            r'\+\+\+ Unicon plugin linux( \(unicon(\.internal)?\.plugins\.linux\))? \+\+\+'
         )
 
 

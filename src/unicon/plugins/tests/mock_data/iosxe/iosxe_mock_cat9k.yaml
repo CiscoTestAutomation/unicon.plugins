@@ -29,11 +29,13 @@ c9k_enable_password:
 
 c9k_enable:
     prompt: "%N#"
-    commands:
+    commands: &c9k_enable_cmds
       "config term":
         new_state: c9k_config
       "term length 0": ""
       "term width 0": ""
+      "quick reload":
+        new_state: c9k_enable_quick_reload
       "reload":
         new_state: c9k_reload_proceed
       "show version" :
@@ -141,6 +143,13 @@ c9k_enable:
           - 0:,0,0.002
         new_state:
           log_message
+
+
+c9k_enable_quick_reload:
+  commands:
+    <<: *c9k_enable_cmds
+    "reload":
+      new_state: c9k_quick_reload_proceed
 
 
 c9k_config:
@@ -864,6 +873,14 @@ c9k_reload_proceed:
         - 0:,0,0.005
       new_state: c9k_login4
 
+c9k_quick_reload_proceed:
+  prompt: "Proceed with quick reload? [confirm]"
+  commands:
+    "":
+      response: file|mock_data/iosxe/cat9k_reload_logs.txt
+      timing:
+        - 0:,0,0.005
+      new_state: c9k_login4
 
 cat9k_install_add_commit:
   preface: |2
