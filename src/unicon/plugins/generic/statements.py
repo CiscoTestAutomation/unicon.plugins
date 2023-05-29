@@ -44,6 +44,10 @@ def terminal_position_handler(spawn, session, context):
 def connection_refused_handler(spawn):
     """ handles connection refused scenarios
     """
+    if spawn.device:
+        spawn.device.api.execute_clear_line()
+        spawn.device.connect()
+        return
     raise Exception('Connection refused to device %s' % (str(spawn)))
 
 

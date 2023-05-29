@@ -16,7 +16,7 @@ from unicon.bases.routers.services import BaseService
 from unicon.core.errors import SubCommandFailure, TimeoutError
 from unicon.eal.dialogs import Dialog
 from unicon.plugins.generic.statements import buffer_settled
-from genie.utils.timeout import Timeout
+
 
 from .service_statements import reload_statement_list, reload_statement_list_vty
 
@@ -293,20 +293,23 @@ class HAReload(BaseService):
                     original_connection_timeout = con.settings.CONNECTION_TIMEOUT
                     con.settings.CONNECTION_TIMEOUT = timeout
 
-                    timeout = Timeout(max_time = con.settings.CONNECTION_TIMEOUT, interval = 10, disable_log = False)
                     con.log.info(f"Connecting to the {self.connection.hostname} within {con.settings.CONNECTION_TIMEOUT} seconds")
-                    while timeout.iterate():
+                    reconnect_attempts = con.settings.RELOAD_RECONNECT_ATTEMPTS
                     
+                    for x in range(reconnect_attempts):
+                        
+                        con.log.info('Waiting for {} seconds'.format(con.settings.CONNECTION_TIMEOUT / reconnect_attempts))
+                        sleep(con.settings.CONNECTION_TIMEOUT / reconnect_attempts)
                         try:
+                            con.log.info('Trying to connect... attempt #{}'.format(x + 1))
                             con.connect()
                             break
                         except:
-                            con.log.info(f'Trying to connect to device at an interval of 10 seconds')
-                            timeout.sleep()
+                            con.log.info(f'Reconnecting to the device')
                             continue
                     else:
                         con.log.exception(f'Could not connect to the device post reload. \
-                                            Waited for {con.settings.CONNECTION_TIMEOUT} seconds')
+                                          Waited for {con.settings.CONNECTION_TIMEOUT} seconds')
 
                     con.settings.CONNECTION_TIMEOUT = original_connection_timeout
                 # Bring standby to good state.

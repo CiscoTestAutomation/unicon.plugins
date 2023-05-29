@@ -54,3 +54,6 @@ class IOSXRSettings(GenericSettings):
 
         self.CONFIG_LOCK_RETRIES = 5
         self.CONFIG_LOCK_RETRY_SLEEP = 30
+
+        self.SHOW_REDUNDANCY_CMD = 'show redundancy | inc ^Node'
+        self.REDUNDANCY_STATE_PATTERN = r'^Node \S+ is in (.*?) role'

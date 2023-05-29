@@ -277,6 +277,8 @@ enable:
     "term width 0": ""
     "clear line  35":
       new_state: confirm_prompt
+    "clear line 20":
+      new_state: confirm_prompt
     "show version": *SV
     "pwd":
       new_state: messup_prompt

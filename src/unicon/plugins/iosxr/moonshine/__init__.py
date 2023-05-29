@@ -45,12 +45,12 @@ class MoonshineDualRpConnection(IOSXRDualRpConnection):
         """
 
         # Spawn each handle
-        self.a.spawn = MoonshineSpawn(self.parse_spawn_command(self.a.start),
+        self.a.spawn = MoonshineSpawn(self.parse_spawn_command(self.a.start[0]),
                                       target='{}.a'.format(self.hostname),
                                       hostname=self.hostname,
                                       settings=self.settings,
                                       logger=self.log)
-        self.b.spawn = MoonshineSpawn(self.parse_spawn_command(self.b.start),
+        self.b.spawn = MoonshineSpawn(self.parse_spawn_command(self.b.start[0]),
                                       target='{}.b'.format(self.hostname),
                                       hostname=self.hostname,
                                       settings=self.settings,

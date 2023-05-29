@@ -111,6 +111,9 @@ class GenericSettings(Settings):
         self.GUESTSHELL_RETRIES = 20
         self.GUESTSHELL_RETRY_SLEEP = 5
 
+        self.SHOW_REDUNDANCY_CMD = 'sh redundancy stat | inc my state'
+        self.REDUNDANCY_STATE_PATTERN = r'my state = (.*?)\s*$'
+
         # Default error pattern
         self.ERROR_PATTERN = [r"% Invalid command at",
                               r"% Invalid input detected at",
@@ -290,5 +293,3 @@ class GenericSettings(Settings):
                 'os': ['windows'],
             },
         }
-
-

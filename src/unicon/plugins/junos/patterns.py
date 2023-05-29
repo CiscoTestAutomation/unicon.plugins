@@ -22,18 +22,18 @@ class JunosPatterns(UniconCorePatterns):
         super().__init__()
         self.username = r'^.*[Ll]ogin: ?$'
         self.password = r'^.*[Pp]assword: ?$'
-        
-        # root@junos_vmx1:~ # 
-        self.shell_prompt = r'^(.*)?(%N)(-RE[01])?\:\~ *\#\s?$|^%\s*$'
+
+        # root@junos_vmx1:~ #
+        self.shell_prompt = r'^(.*)?(%N)(-[RrEe01])?\:\~ *\#\s?$|^%\s*$'
 
         # root@junos_vmx1>
-        self.enable_prompt = r'^(.*?)([-\.\w]+@(%N)+(-RE[01])?>)\s*$'
+        self.enable_prompt = r'^(.*?)([-\.\w]+@(%N)(-[RrEe01])?>)\s*$'
 
-        # root@junos_vmx1:~ # 
-        self.disable_prompt = r'^(.*)?(%N)(-RE[01])?\:\~ *\#\s?$'
+        # root@junos_vmx1:~ #
+        self.disable_prompt = r'^(.*)?(%N)(-[RrEe01])?\:\~ *\#\s?$'
 
         # root@junos_vmx1#
-        self.config_prompt = r'^(.*?)([-\.\w]+@(%N)+(-RE[01])?[\%\#])\s*$'
+        self.config_prompt = r'^(.*?)([-\.\w]+@(%N)(-[RrEe01])?[\%\#])\s*$'
 
         # Exit with uncommitted changes? [yes,no] (yes)
         self.commit_changes_prompt = r'Exit with uncommitted changes?'

@@ -209,6 +209,8 @@ general_enable:
     "write memory": ""
     "tclsh":
       new_state: tclsh
+    "long_hostname":
+      new_state: general_enable_long_hostname
     "delete /force flash:CRFT_*": ""
     "dir flash:CRFT_*": |
       Directory of flash:/CRFT_*
@@ -1393,8 +1395,21 @@ meraki_container_ssh:
   prompt: "44-b6-be-0e-56-00-SFO-SMK-N-CA-switch:~$"
 
 
+general_enable_long_hostname:
+  commands:
+    <<: *gen_enable_cmds
+    "tclsh":
+      new_state: tclsh_long_hostname
+
+
 tclsh:
   prompt: "%N(tcl)#"
+  commands:
+    "exit":
+      new_state: general_enable
+
+tclsh_long_hostname:
+  prompt: "very-very-long-hostn(tcl)#"
   commands:
     "exit":
       new_state: general_enable
@@ -1509,3 +1524,18 @@ rommon_command_output_not_a_prompt2:
         
     "boot":
       new_state: general_exec
+
+
+connection_refused:
+  commands:
+    "":
+      response:
+      - |
+        telnet: connect to address 127.0.0.1: Connection refused
+      - ""
+      new_state: transition_to_general_enable
+
+transition_to_general_enable:
+  commands:
+    "":
+      new_state: general_enable

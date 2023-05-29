@@ -24,7 +24,7 @@ class ReloadPatterns(UniconCorePatterns):
         self.secure_passwd_std = r'^.*Do you want to enforce secure password standard(\?)?\s*\(yes\/no\)(\s*\[[yn]\])?\:\s*'
         self.admin_password = r'^.*(Enter|Confirm) the password for .*admin'
         self.auto_provision = r'Abort( Power On)? Auto Provisioning .*:'
-        self.reload_confirm_ios = r'^.*Proceed( with reload)?\?\s*\[confirm\]'
+        self.reload_confirm_ios = r'^.*Proceed( with( quick)? reload)?\?\s*\[confirm\]'
         self.reload_confirm = r'^.*Reload node\s*\?\s*\[no,yes\]\s?$'
         self.reload_confirm_nxos = r'^(.*)This command will reboot the system.\s*\(y\/n\)\?\s*\[n\]\s?$'
         self.connection_closed = r'^(.*?)Connection.*? closed|disconnect: Broken pipe'
@@ -170,7 +170,7 @@ class HaReloadPatterns(UniconCorePatterns):
     def __init__(self):
         super().__init__()
         self.savenv = r'^.*System configuration has been modified\. Save.*$'
-        self.reload_proceed = r'^(.*)Proceed with reload\?\s*\[confirm\]$|^.*Escape character is.*\n'
+        self.reload_proceed = r'^(.*)Proceed with( quick)? reload\?\s*\[confirm\]\s*$'
         self.reload_entire_shelf = r'Reload the entire shelf\s*\[confirm\]'
         self.reload_this_shelf = r'Reload this shelf\s*\[confirm\]'
         self.default_prompts = r'(Router|Switch|ios|Switch-standby)(\\(boot\\))?(>|#)'
