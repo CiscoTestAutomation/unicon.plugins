@@ -1529,13 +1529,18 @@ rommon_command_output_not_a_prompt2:
 connection_refused:
   commands:
     "":
-      response:
-      - |
+      response: |
         telnet: connect to address 127.0.0.1: Connection refused
-      - ""
-      new_state: transition_to_general_enable
+      new_state: transition_to_general_enable1
 
-transition_to_general_enable:
+transition_to_general_enable1:
+  commands:
+    "":
+      response: |
+        telnet: connect to address 127.0.0.1: Connection refused
+      new_state: transition_to_general_enable2
+
+transition_to_general_enable2:
   commands:
     "":
       new_state: general_enable
