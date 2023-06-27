@@ -107,10 +107,119 @@ in the testbed YAML connection block:
 .. _settings_control:
 
 A connection, once created, has a ``settings`` parameter whose contents and
-defaults are plugin-dependent.  It is possible to override these settings
-from the testbed YAML file via the ``settings`` key.
+defaults are plugin-dependent.  It is possible to override these settings in the
+testbed YAML file via the ``settings`` key or by setting the values of the
+connection object `settings` attribute.
 
-Settings can be accessed :ref:`here<controlled_settings>`.
+.. _controlled_settings:
+
+**Backend implementation**
+
+Unicon uses `telnetlib` for telnet connection and `ssh` unix client for telnet
+and SSH connections respectively. This was changed from release 23.6 onwards.
+Previous release would use `telnet` unix client by default. To switch to the
+unix telnet client instead of using telnetlib, set the ``BACKEND`` setting to
+`unicon.eal.backend.pty_backend` in the testbed yaml file.
+
+.. code-block:: yaml
+
+    devices:
+        <name>:
+            connections:
+                <name>:
+                    settings:
+                        BACKEND: unicon.eal.backend.pty_backend  # default is "auto"
+
+
+**Error pattern handling**
+
+If you want to execute services that could fail to execute properly and you want to verify
+this automatically using a specific error pattern, you can specify the `error_pattern`
+option with a list of regular expressions to match on the output. This option is available
+for the execute service.
+
+The regex pattern is matched using the python multiline option (re.M) so you can use
+the start of line (`^`) character to match specific line output.
+
+.. code-block:: python
+
+    >>> c.execute('show interface invalid', error_pattern=['^% Invalid'])
+
+If you want to avoid errors being detected with any command, you can set the settings object
+`ERROR_PATTERN` to an empty list. The current generic default is an empty list.
+
+.. code-block:: python
+
+    >>> from pyats.topology import loader
+    >>>
+    >>> tb = loader.load('testbed.yaml')
+    >>> ncs = tb.devices.ncs
+    >>>
+    >>> ncs.connect(via='cli')
+    >>> ncs.settings.ERROR_PATTERN=[]
+
+The default error patterns can be seen by printing the settings.ERROR_PATTERN attribute.
+
+.. code-block:: python
+
+    >>> ncs.settings.ERROR_PATTERN
+    ['Error:', 'syntax error', 'Aborted', 'result false']
+
+Alternatively, you can pass an empty list when executing a command to avoid error pattern checking.
+
+.. code-block:: python
+
+    >>> c.execute('show command error', error_pattern=[])
+
+You can also append a pattern to the existing patterns defined in the settings when executing a command
+(e.g. to add an error pattern for a specific command to execute).
+
+.. code-block:: python
+
+    >>> c.execute('show command error', append_error_pattern=['^specific error pattern'])
+
+**Environment variables**
+
+If you want to set environment variables for the connection, you can set them
+by adding key-value pairs to the `ENV` dictionary.
+
+.. code-block:: python
+
+    >>> uut.settings.ENV = {'MYENV': 'mystring'}
+
+**Terminal size settings**
+
+To set the terminal size (rows, cols) you can use the `ROWS` and `COLUMNS`
+environment variables. The default terminal size is 24 x 80. Some plugins
+like linux and nxos/aci have their own defaults.
+
+.. code-block:: python
+
+    >>> uut.settings.ENV = {'ROWS': 200, 'COLUMNS': 200}
+
+**Printing matched patterns**
+
+If you want to print the dialog statements matched patterns during the run,
+you need to set the log level to logging.DEBUG or connect with debug=True.
+
+Default value is False.
+
+.. code-block:: python
+
+    >>> from pyats.topology import loader
+    >>>
+    >>> tb = loader.load('testbed.yaml')
+    >>> uut = tb.devices['uut']
+    >>>
+    >>> uut.connect()
+    >>> uut.log.setLevel(logging.DEBUG)
+
+Alternative:
+
+    >>> uut.connect(debug=True)
+
+
+**Service attributes**
 
 A connection is assigned a plugin-dependent list of services when it is created.
 It is possible to override any service attribute from the testbed YAML file
@@ -189,6 +298,26 @@ you can set the ``EXEC_TIMEOUT`` and ``CONFIG_TIMEOUT`` in the testbed file:
           settings:
             EXEC_TIMEOUT: 120
             CONFIG_TIMEOUT: 120
+
+
+**EOF Exception handling**
+
+If device connection is closed/terminated unexpectedly during service calling, we can reconnect
+to device. EOF exception is raised by Spawn when connection is not available.
+
+Sample usage:
+
+.. code-block:: python
+
+    from unicon.core.errors import EOF, SubCommandFailure
+    try:
+      d.execute(cmd) # or any service call.
+    except SubCommandFailure as e:
+      if isinstance(e.__cause__, EOF):
+        print('Connection closed, try reconnect')
+        d.disconnect()
+        d.connect()
+
 
 
 Example: Single NXOS
