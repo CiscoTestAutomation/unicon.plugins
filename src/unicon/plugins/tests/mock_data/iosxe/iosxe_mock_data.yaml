@@ -285,6 +285,9 @@ general_enable:
     "request platform software system shell chassis standby r0":
       new_state: bash_console_chassis_standby_r0
 
+    "copy  somefile.bin flash:":
+      new_state: confirm_abort_copy
+
 general_maintence_mode_confirm:
   prompt: "Template default will be applied. Do you want to continue?[confirm] "
   commands:
@@ -1542,5 +1545,19 @@ transition_to_general_enable1:
 
 transition_to_general_enable2:
   commands:
+    "":
+      new_state: general_enable
+
+
+confirm_abort_copy:
+  preface: |
+    %Warning: File not a valid executable for this system
+  prompt: "Abort Copy? [confirm]"
+  commands:
+    "n":
+      response: |
+        Loading somefile.bin from 127.0.0.1 (via GigabitEthernet0/0): !!
+        [OK - 5581609 bytes]
+      new_state: general_enable
     "":
       new_state: general_enable

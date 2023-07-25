@@ -165,6 +165,7 @@ class CopyPatterns():
         self.remote_param ='ftp:|tftp:|http:|rcp:|scp:'
         self.remote_in_dest = r'(ftp:|sftp:|tftp:|http:|rcp:|scp:)/*$'
         self.addr_in_remote = r'(ftp:|tftp:|http:|rcp:|scp:)\/*([\w\.\:]+)'
+        self.abort_copy = r'Abort Copy\? \[confirm\]\s*$'
 
 class HaReloadPatterns(UniconCorePatterns):
     def __init__(self):

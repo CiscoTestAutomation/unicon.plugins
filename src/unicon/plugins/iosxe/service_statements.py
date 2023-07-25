@@ -18,7 +18,7 @@ delete_filename = Statement(pattern=patterns.delete_filename,
                             loop_continue=True,
                             continue_timer=False)
 
-confirm = Statement(pattern=patterns.confirm,
+confirm = Statement(pattern=patterns.confirm_prompt,
                     action='sendline()',
                     loop_continue=True,
                     continue_timer=False)

@@ -795,8 +795,8 @@ class Configure(BaseService):
         reply: Addition Dialogs for interactive config commands.
         timeout : Timeout value in sec, Default Value is 30 sec
         error_pattern: list of regex to detect command errors
-        allow_state_change: If True allow the state change during the 
-               configuration otherwise raise state machine error if the state 
+        allow_state_change: If True allow the state change during the
+               configuration otherwise raise state machine error if the state
                changes during configuration.
         target: Target RP where to execute service, for DualRp only
         lock_retries: retry times if config mode is locked, default is 0
@@ -2192,7 +2192,7 @@ class HAReloadService(BaseService):
         con.log.info("+++ Reload Completed Successfully +++")
         self.result = True
         if return_output:
-            self.result = ReloadResult(self.result, reload_output.match_output.replace(command, '', 1))
+            self.result = ReloadResult(self.result, reload_output)
 
 
 class SwitchoverService(BaseService):
@@ -2606,6 +2606,11 @@ class AttachModuleService(BaseService):
             with rtr.attach(1) as m:
                 m.execute('show interface')
                 m.execute(['show interface 1', 'show interface 2'])
+            # if we want to go to module_debug state
+            with rtr.attach(1, debug=True) as m:
+                m.execute('show interface')
+                m.execute(['show interface 1', 'show interface 2'])
+
 
     """
     def __init__(self, *args, **kwargs):
@@ -2625,9 +2630,10 @@ class AttachModuleService(BaseService):
             raise ConnectionError("Connection is not established to device")
         self.context._module_num = module_num
 
-    def call_service(self, module_num, **kwargs):
+    def call_service(self, module_num, debug=False, **kwargs):
         self.result = self.__class__.ContextMgr(self.connection,
                                                 module_num,
+                                                debug,
                                                 context=self.context,
                                                 **kwargs)
 
@@ -2635,6 +2641,7 @@ class AttachModuleService(BaseService):
         def __init__(self,
                      connection,
                      module_num,
+                     debug=False,
                      target='active',
                      context=None,
                      timeout=None):
@@ -2643,6 +2650,7 @@ class AttachModuleService(BaseService):
             self.timeout = timeout
             self.target = target
             self.context = context
+            self.debug = debug
             self.timeout = timeout or connection.settings.CONSOLE_TIMEOUT
             self.context._module_num = module_num
 
@@ -2659,7 +2667,7 @@ class AttachModuleService(BaseService):
                 raise NotImplementedError('Attach module state not implemented')
 
             self.conn.log.debug('+++ attaching module +++')
-            conn.state_machine.go_to('module',
+            conn.state_machine.go_to('module_debug' if self.debug else 'module',
                                      conn.spawn,
                                      context=self.context,
                                      timeout=self.timeout)

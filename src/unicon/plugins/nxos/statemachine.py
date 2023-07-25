@@ -1,6 +1,6 @@
 from datetime import datetime
 from unicon.eal.dialogs import Dialog, Statement
-from unicon.plugins.generic.statements import default_statement_list
+from unicon.plugins.generic.statements import default_statement_list, generic_statements
 from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine, config_transition
 from unicon.plugins.nxos.patterns import NxosPatterns
 from unicon.statemachine import State, Path
@@ -75,7 +75,7 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         enable_to_guestshell = Path(enable, guestshell, 'guestshell', None)
         guestshell_to_enable = Path(guestshell, enable, 'exit', None)
 
-        enable_to_module = Path(enable, module, attach_module, None)
+        enable_to_module = Path(enable, module, attach_module, Dialog([generic_statements.login_stmt]))
         module_to_enable = Path(module, enable, 'exit', None)
         module_elam_to_module = Path(module_elam, module, 'exit', None)
         module_elam_insel_to_module = Path(module_elam_insel, module_elam, 'exit', None)
@@ -94,6 +94,7 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         boot_to_shell = Path(boot, shell, 'start', None)
         shell_to_boot = Path(shell, boot, 'exit', None)
 
+
         # Add State and Path to State Machine
         self.add_state(enable)
         self.add_state(config)
@@ -108,6 +109,7 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         self.add_state(l2rib_dt)
         self.add_state(boot)
         self.add_state(boot_config)
+
 
         self.add_path(loader_to_enable)
         self.add_path(enable_to_config)
@@ -129,6 +131,7 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         self.add_path(boot_to_enable)
         self.add_path(boot_to_shell)
         self.add_path(shell_to_boot)
+
 
         self.add_default_statements(default_statement_list)
 

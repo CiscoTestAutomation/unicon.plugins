@@ -317,7 +317,7 @@ class TestHAGenericReloadOutput(unittest.TestCase):
                                             prompt_recovery=True,
                                             timeout=5)
         self.assertTrue(res)
-        self.assertIn(self.expected_output, '\n'.join(output.splitlines()))
+        self.assertIn(self.expected_output, '\n'.join(output.match_output.splitlines()))
 
 
 class TestIosxrHAReloadOutput(unittest.TestCase):
@@ -353,7 +353,7 @@ class TestIosxrHAReloadOutput(unittest.TestCase):
                                             target_standby_state='STANDBY',
                                             timeout=30)
         self.assertTrue(res)
-        self.assertIn(self.expected_output, '\n'.join(output.splitlines()))
+        self.assertIn(self.expected_output, '\n'.join(output.match_output.splitlines()))
 
 
 class TestNxosReloadOutput(unittest.TestCase):
@@ -436,6 +436,7 @@ class TestIosXECat3kReloadOutput(unittest.TestCase):
         self.assertTrue(res)
         self.assertIn(expected_output.strip('\n'),
                       '\n'.join(output.splitlines()))
+
 
 if __name__ == "__main__":
     unittest.main()

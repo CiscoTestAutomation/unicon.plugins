@@ -1,7 +1,5 @@
 
 from unicon.bases.routers.services import BaseService
-
-
 class Tie(BaseService):
 
     def __init__(self, *args, **kwargs):
