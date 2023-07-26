@@ -1,7 +1,7 @@
 July 2023
 ==========
 
-July 24 - Unicon v23.7 
+July 25 - Unicon v23.7 
 ------------------------
 
 
@@ -43,19 +43,9 @@ Changelogs
 * patterns
     * Modified confirm prompt patterns to support Abort Copy
 
-
---------------------------------------------------------------------------------
-                                      New                                       
---------------------------------------------------------------------------------
-
 * generic
     * attach_mdoule
         * add a debug flag to attach_mdoule for going to debug mode
-
-
---------------------------------------------------------------------------------
-                                      Fix                                       
---------------------------------------------------------------------------------
 
 * iosxe
     * Change the regex for sw_num to ' \d '.
