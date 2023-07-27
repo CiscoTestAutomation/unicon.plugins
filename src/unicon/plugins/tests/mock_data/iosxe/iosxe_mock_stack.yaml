@@ -26,6 +26,7 @@ stack_exec:
        3       Member   bcc4.9346.7a00     1      V04     Ready
        4       Standby  bcc4.9346.6780     1      V04     Ready
        5       Member   bcc4.9346.7280     1      V04     Ready
+       10      Standby  e069.ba68.5900     13     PP      Ready
 
     "show version": &SV |2
       Cisco IOS XE Software, Version BLD_V1612_THROTTLE_LATEST_20200403_053502_V16_12_3_6

@@ -39,7 +39,7 @@ class StackUtils(Utils):
         #  1       Member   bcc4.9346.7880     1      V01     Ready
         # *2       Active   bcc4.9346.9180     3      V04     Ready
         #  4       Standby  d8b1.9009.bf80     1      V01     HA sync in progress
-        p = re.compile(r'^(\*)?(?P<sw_num>[0-9])\s+(?P<role>Member|Active|Standby)\s+'
+        p = re.compile(r'^(\*)?(?P<sw_num>\d+)\s+(?P<role>Member|Active|Standby)\s+'
                        r'(?P<mac>[\w\.]+)\s+\d+\s+\w+\s+(?P<state>[\S\s]+)$')
 
         output = connection.execute("show switch", timeout=timeout)

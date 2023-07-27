@@ -1015,6 +1015,12 @@ dest_directory = Statement(pattern=pat.dest_directory,
                            loop_continue=True,
                            continue_timer=False)
 
+abort_copy_stmt = Statement(pattern=pat.abort_copy,
+                            action=send_response,
+                            args={'response': 'n'},
+                            loop_continue=True,
+                            continue_timer=False)
+
 copy_statement_list = [copy_retry_message, copy_error_message, source_filename,
                        copy_file, src_file, hostname, dest_file, dest_directory,
                        host, nx_hostname, partition, config, writeto,
@@ -1023,7 +1029,7 @@ copy_statement_list = [copy_retry_message, copy_error_message, source_filename,
                        copy_confirm_yes, copy_reconfirm, copy_reconfirm,
                        copy_progress, rcp_confirm, copy_overwrite, copy_nx_vrf,
                        copy_proceed, tftp_addr, copy_continue, copy_complete,
-                       copy_other]
+                       copy_other, abort_copy_stmt]
 
 
 #############################################################################

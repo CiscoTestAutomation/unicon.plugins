@@ -29,7 +29,9 @@ class IosXESettings(GenericSettings):
             r'% Incomplete command.',
             r'%CLNS: System ID (\S+) must not change when defining additional area addresses',
             r'% Specify remote-as or peer-group commands first',
-            r'% Policy commands not allowed without an address family'
+            r'% Policy commands not allowed without an address family',
+            r'% Color set already. Deconfigure first',
+            r'Invalid policy name, \S+ does not exist'
         ]
 
         self.EXECUTE_MATCHED_RETRIES = 1

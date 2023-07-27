@@ -1194,19 +1194,25 @@ class TestRommonCommands(unittest.TestCase):
 
 class TestCopy(unittest.TestCase):
 
-    def test_copy(self):
-        c = Connection(
+    @classmethod
+    def setUpClass(cls):
+        cls.c = Connection(
             hostname='PE1',
             start=['mock_device_cli --os iosxe --state general_enable --hostname PE1'],
             os='iosxe',
             mit=True
         )
-        c.connect()
-        try:
-            c.copy(source='test.cfg', dest='running-config')
-        finally:
-            c.disconnect()
+        cls.c.connect()
 
+    @classmethod
+    def tearDownClass(cls):
+        cls.c.disconnect()
+
+    def test_copy(self):
+        self.c.copy(source='test.cfg', dest='running-config')
+
+    def test_copy_abort_n(self):
+        self.c.copy(source='somefile.bin', dest='flash:')
 
 
 class TestMaintenanceMode(unittest.TestCase):
