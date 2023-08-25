@@ -848,7 +848,7 @@ class TestIosXEEnableSecret(unittest.TestCase):
                        os='iosxe',
                        init_exec_commands=[],
                        init_config_commands=[],
-                       credentials=dict(default=dict(password='badpw')),
+                       credentials=dict(default=dict(password='veryverybadpw')),
                        log_buffer=True
                        )
         with self.assertRaisesRegex(UniconConnectionError, 'failed to connect to R1'):
@@ -891,8 +891,43 @@ class TestIosXEEnableSecret(unittest.TestCase):
                   init_config_commands: []
         """)
         dev = tb.devices.R1
-        dev.connect()
-        dev.disconnect()
+        try:
+            output = dev.connect()
+            self.assertIn('Enter your selection [2]: 2\r\n', output)
+        finally:
+            dev.disconnect()
+
+    def test_enable_secret_no_password(self):
+        self.maxDiff = None
+        c = Connection(hostname='R1',
+                       start=['mock_device_cli --os iosxe --state initial_config_dialog --hostname R1'],
+                       os='iosxe',
+                       init_exec_commands=[],
+                       init_config_commands=[],
+                       credentials=dict(default=dict(password='')),
+                       log_buffer=True
+                       )
+        try:
+            output = c.connect()
+            self.assertIn('Enter your selection [2]: \n0', output)
+        finally:
+            c.disconnect()
+
+    def test_enable_secret_short_password(self):
+        self.maxDiff = None
+        c = Connection(hostname='R1',
+                       start=['mock_device_cli --os iosxe --state initial_config_dialog --hostname R1'],
+                       os='iosxe',
+                       init_exec_commands=[],
+                       init_config_commands=[],
+                       credentials=dict(default=dict(password='lab')),
+                       log_buffer=True
+                       )
+        try:
+            output = c.connect()
+            self.assertIn('Enter your selection [2]: \n0', output)
+        finally:
+            c.disconnect()
 
 
 class TestIosXEluginGuestShellService(unittest.TestCase):

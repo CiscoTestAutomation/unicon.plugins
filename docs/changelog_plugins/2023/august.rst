@@ -1,7 +1,7 @@
-July 2023
+August 2023
 ==========
 
-July 24 - Unicon.Plugins v23.7 
+August 29 - Unicon.Plugins v23.8
 ------------------------
 
 
@@ -9,8 +9,8 @@ July 24 - Unicon.Plugins v23.7
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
 
-        ``unicon.plugins``, v23.7 
-        ``unicon``, v23.7 
+        ``unicon.plugins``, v23.8
+        ``unicon``, v23.8
 
 Install Instructions
 ^^^^^^^^^^^^^^^^^^^^
@@ -37,11 +37,13 @@ Features and Bug Fixes:
 Changelogs
 ^^^^^^^^^^
 --------------------------------------------------------------------------------
-                                      Fix                                       
+                                      Fix
 --------------------------------------------------------------------------------
 
 * iosxe
-    * Update confirm pattern and statements to support Abort Copy
-    * Added configuration error patterns
+    * Update enable secret setup dialog logic to support devices without password or with short password
+
+* cheetah
+    * Add support for devshell in cheetah OS based wireless access points
 
 

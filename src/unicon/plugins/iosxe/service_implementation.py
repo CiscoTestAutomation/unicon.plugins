@@ -24,7 +24,7 @@ from unicon.plugins.generic.service_implementation import (
 
 from .service_statements import execute_statement_list, configure_statement_list, confirm
 
-from .statements import grub_prompt_stmt
+from .statements import grub_prompt_stmt, boot_from_rommon_stmt
 
 from unicon.plugins.generic.utils import GenericUtils
 from unicon.plugins.generic.service_implementation import BashService as GenericBashService
@@ -237,7 +237,7 @@ class Reload(GenericReload):
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
         # Add the grub prompt statement
-        self.dialog += Dialog([grub_prompt_stmt])
+        self.dialog += Dialog([grub_prompt_stmt, boot_from_rommon_stmt])
 
     def pre_service(self, *args, **kwargs):
         self.prompt_recovery = self.connection.prompt_recovery
