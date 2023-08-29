@@ -56,6 +56,15 @@ class GenericSettings(Settings):
         self.BOOT_TIMEOUT = 600
         self.MAX_BOOT_ATTEMPTS = 3
 
+        # Temporary enable secret used during setup
+        # this is used if no password is available
+        # and would not be saved by default
+        self.TEMP_ENABLE_SECRET = 'Secret12345'
+        # Minimum length for enable secret password:
+        # if the password specified is shorter,
+        # use the TEMP_ENABLE_SECRET instead.
+        self.ENABLE_SECRET_MIN_LENGTH = 10
+
         # for rommon boot, try to find image on flash
         self.FIND_BOOT_IMAGE = True
         self.BOOT_FILESYSTEM = 'bootflash:'

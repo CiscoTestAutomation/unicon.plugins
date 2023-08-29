@@ -1,7 +1,7 @@
-July 2023
+August 2023
 ==========
 
-July 24 - Unicon v23.7 
+August 29 - Unicon v23.8
 ------------------------
 
 
@@ -9,8 +9,8 @@ July 24 - Unicon v23.7
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
 
-        ``unicon.plugins``, v23.7 
-        ``unicon``, v23.7 
+        ``unicon.plugins``, v23.8
+        ``unicon``, v23.8
 
 Install Instructions
 ^^^^^^^^^^^^^^^^^^^^
@@ -37,27 +37,32 @@ Features and Bug Fixes:
 Changelogs
 ^^^^^^^^^^
 --------------------------------------------------------------------------------
-                                      Fix                                       
+                                      New
 --------------------------------------------------------------------------------
 
-* patterns
-    * Modified confirm prompt patterns to support Abort Copy
+* unicon.bases.linux
+    * Added init_connection to connection provider
+        * added init_connection method for initializing the device
 
-
---------------------------------------------------------------------------------
-                                      New                                       
---------------------------------------------------------------------------------
-
-* generic
-    * attach_mdoule
-        * add a debug flag to attach_mdoule for going to debug mode
+* unicon
+    * Added support for `os_flavor` as plugin selector attribute
 
 
 --------------------------------------------------------------------------------
-                                      Fix                                       
+                                      Fix
 --------------------------------------------------------------------------------
 
 * iosxe
-    * Change the regex for sw_num to ' \d '.
+    * stack
+        * Update  mock data for stack devices for standby lock.
+
+
+--------------------------------------------------------------------------------
+                                      New
+--------------------------------------------------------------------------------
+
+* generic
+    * Added recovery for Reload and HaRelaod
+        * Recover device using golden image if reload is failed with an exception
 
 

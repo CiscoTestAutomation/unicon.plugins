@@ -13,7 +13,7 @@ general_password:
 
 general_exec:
   prompt: "%N>"
-  commands:
+  commands: &gen_exec_cmds
     "term length 0": ""
     "term width 0": ""
     "show version": &SV |2
@@ -71,6 +71,14 @@ general_exec:
 
     "enable":
       new_state: enable_password
+
+
+general_exec_no_password:
+  prompt: "%N>"
+  commands:
+    <<: *gen_exec_cmds
+    "enable":
+      new_state: general_enable
 
 
 enable_password:
@@ -796,7 +804,7 @@ enter_enable_secret:
   prompt: "  Enter enable secret: "
   commands:
     "": "Please enter a secret"
-    "badpw":
+    "veryverybadpw":
       response: "%Password validation failed"
     "Secret12345":
       new_state: confirm_enable_secret
@@ -836,6 +844,8 @@ enter_selection:
         Building configuration...
         [OK]
         Use the enabled mode 'configure' command to modify this configuration.
+    "0":
+      new_state: general_exec_no_password
 
 
 press_return:
@@ -1561,3 +1571,10 @@ confirm_abort_copy:
       new_state: general_enable
     "":
       new_state: general_enable
+
+general_enable_reload_to_rommon:
+  prompt: "%N#"
+  commands:
+    <<: *gen_enable_cmds
+    "reload":
+      new_state: press_return

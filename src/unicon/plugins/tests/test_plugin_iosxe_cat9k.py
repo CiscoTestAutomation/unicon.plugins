@@ -3,6 +3,8 @@ Unittests for iosxe/cat9k plugin
 """
 
 import unittest
+from unittest import mock
+
 
 import unicon
 from unicon import Connection
@@ -11,6 +13,7 @@ from unicon.plugins.tests.mock.mock_device_iosxe import MockDeviceTcpWrapperIOSX
 from unicon.plugins.tests.mock.mock_device_iosxe_cat9k import MockDeviceTcpWrapperIOSXECat9k
 from unicon.core.errors import SubCommandFailure
 
+from pyats.topology import loader
 
 unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
 unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC = 0.2
@@ -304,13 +307,61 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
         try:
             c.connect()
             c.settings.POST_RELOAD_WAIT = 1
-            with self.assertRaises(SubCommandFailure):
+            with self.assertRaises(Exception):
                 c.reload('active_install_add',
                                 reply=install_add_one_shot_dialog,
                                 error_pattern = error_pattern)
         finally:
             c.disconnect()
             md.stop()
+
+    def test_reload_with_boot_recovery(self):
+        md = MockDeviceTcpWrapperIOSXE(port=0, state='c9k_login4', hostname='switch')
+        md.start()
+
+        testbed = """
+        devices:
+          R1:
+            os: iosxe
+            type: cat9k
+            credentials:
+                default:
+                    username: cisco
+                    password: cisco
+            connections:
+              defaults:
+                class: unicon.Unicon
+              a:
+                protocol: telnet
+                ip: 127.0.0.1
+                port: {}
+            clean:
+                device_recovery:
+                    golden_image: bootflash:cat9k_iosxe.SSA.bin
+
+        """.format(md.ports[0])
+
+        install_add_one_shot_dialog = Dialog([
+                Statement(pattern=r"FAILED:.* ",
+                          action=None,
+                          loop_continue=False,
+                          continue_timer=False),
+        ])
+        error_pattern=[r"FAILED:.* ",]
+        try:
+            tb = loader.load(testbed)
+            device = tb.devices.R1
+            device.api.device_recovery_boot = mock.Mock()
+            device.connect()
+            with self.assertRaises(Exception):
+                device.reload('active_install_add',
+                                reply=install_add_one_shot_dialog,
+                                error_pattern=error_pattern)
+            device.api.device_recovery_boot.assert_called_once_with(golden_image='bootflash:cat9k_iosxe.SSA.bin')
+        finally:
+            device.disconnect()
+            md.stop()
+
 
     def test_rommon(self):
         c = Connection(hostname='switch',
@@ -504,6 +555,62 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
             self.assertEqual(c.state_machine.current_state, 'enable')
         finally:
             c.disconnect()
+            md.stop()
+
+    def test_reload_ha_with_boot_recovery(self):
+        md = MockDeviceTcpWrapperIOSXECat9k(port=0, state='cat9k_ha_active_escape,cat9k_ha_standby_escape', hostname='switch')
+        md.start()
+        testbed = """
+        devices:
+          R1:
+            os: iosxe
+            type: cat9k
+            credentials:
+                default:
+                    username: cisco
+                    password: cisco
+            connections:
+              defaults:
+                class: unicon.Unicon
+              a:
+                protocol: telnet
+                ip: 127.0.0.1
+                port: {0}
+              b:
+                protocol: telnet
+                ip: 127.0.0.1
+                port: {1}
+            clean:
+                device_recovery:
+                    golden_image: bootflash:cat9k_iosxe.SSA.bin
+
+        """.format(md.ports[0],md.ports[1])
+
+        install_add_one_shot_dialog = Dialog([
+                Statement(pattern=r".*reload of the system\. "
+                                  r"Do you want to proceed\? \[y\/n\]",
+                          action='sendline(y)',
+                          loop_continue=True,
+                          continue_timer=False),
+
+                Statement(pattern=r"FAILED:.* ",
+                          action=None,
+                          loop_continue=False,
+                          continue_timer=False),
+        ])
+        error_pattern=[r"FAILED:.* ",]
+        try:
+            tb = loader.load(testbed)
+            device = tb.devices.R1
+            device.api.device_recovery_boot = mock.Mock()
+            device.connect()
+            with self.assertRaises(Exception):
+                device.reload('install add file activate commit_1',
+                                reply=install_add_one_shot_dialog,
+                                error_pattern=error_pattern)
+            device.api.device_recovery_boot.assert_called_once_with(golden_image='bootflash:cat9k_iosxe.SSA.bin')
+        finally:
+            device.disconnect()
             md.stop()
 
     def test_no_boot_system(self):

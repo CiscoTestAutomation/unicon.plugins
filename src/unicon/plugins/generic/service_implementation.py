@@ -1152,13 +1152,18 @@ class Reload(BaseService):
                             context=context)
             self.result = reload_output.match_output
             self.get_service_result()
-        except TimeoutError:
-            if raise_on_error:
+        except Exception as e:
+            if hasattr(con.device, 'clean') and hasattr(con.device.clean, 'device_recovery') and\
+                con.device.clean.device_recovery.get('golden_image'):
+                    con.log.error(f'Reload failed booting device using golden image: {con.device.clean.device_recovery["golden_image"]}')
+                    con.device.api.device_recovery_boot(golden_image=con.device.clean.device_recovery['golden_image'])
+                    con.log.info('Successfully booted the device using golden_image.')
+                    raise
+            elif raise_on_error:
                 raise
             else:
-                con.log.exception('Reload timed out')
+                con.log.exception(f'Reload failed: {e}')
                 self.result = False
-
         if not con.connected:
             con.disconnect()
             for x in range(con.settings.RELOAD_RECONNECT_ATTEMPTS):
@@ -2096,6 +2101,7 @@ class HAReloadService(BaseService):
                                            prompt_recovery=self.prompt_recovery,
                                            timeout=timeout)
             self.result=reload_output.match_output
+
             self.get_service_result()
 
             con.active.state_machine.go_to('any',
@@ -2139,7 +2145,12 @@ class HAReloadService(BaseService):
                 )
 
         except Exception as err:
-            raise SubCommandFailure("Reload failed : %s" % err) from err
+            if hasattr(con.device, 'clean') and hasattr(con.device.clean, 'device_recovery') and\
+                con.device.clean.device_recovery.get('golden_image'):
+                con.log.error(f'Reload failed booting device using golden image: {con.device.clean.device_recovery["golden_image"]}')
+                con.device.api.device_recovery_boot(golden_image=con.device.clean.device_recovery['golden_image'])
+                con.log.info(f'Successfully booted the device using golden image.')
+            raise SubCommandFailure(f"Reload failed : {err}")
 
         # Re-designate handles before applying config.
         # Roles could have switched as a result of the reload.

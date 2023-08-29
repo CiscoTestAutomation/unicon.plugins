@@ -259,7 +259,7 @@ def get_enable_credential_password(context):
         for cred_name, key in enable_pw_checks:
             if cred_name:
                 candidate_enable_pw = credentials.get(cred_name, {}).get(key)
-                if candidate_enable_pw:
+                if candidate_enable_pw is not None:
                     enable_credential_password = candidate_enable_pw
                     break
         else:
@@ -281,6 +281,35 @@ def enable_password_handler(spawn, context, session):
         spawn.sendline(enable_credential_password)
     else:
         spawn.sendline(context['enable_password'])
+
+
+def enable_secret_handler(spawn, context, session):
+    if 'password_attempts' not in session:
+        session['password_attempts'] = 1
+    else:
+        session['password_attempts'] += 1
+    if session.password_attempts > spawn.settings.PASSWORD_ATTEMPTS:
+        raise UniconAuthenticationError('Too many enable password retries')
+
+    enable_credential_password = get_enable_credential_password(context=context)
+    if enable_credential_password and len(enable_credential_password) >= \
+            spawn.settings.ENABLE_SECRET_MIN_LENGTH:
+        spawn.sendline(enable_credential_password)
+    else:
+        spawn.log.warning('Using enable secret from TEMP_ENABLE_SECRET setting')
+        enable_secret = spawn.settings.TEMP_ENABLE_SECRET
+        context['setup_selection'] = 0
+        spawn.sendline(enable_secret)
+
+
+def setup_enter_selection(spawn, context):
+    selection = context.get('setup_selection')
+    if selection is not None:
+        if str(selection) == '0':
+            spawn.log.warning('Not saving setup configuration')
+        spawn.sendline(f'{selection}')
+    else:
+        spawn.sendline('2')
 
 
 def ssh_tacacs_handler(spawn, context):
@@ -533,7 +562,7 @@ class GenericStatements():
                                               loop_continue=True,
                                               continue_timer=False)
         self.enable_secret_stmt = Statement(pattern=pat.enable_secret,
-                                            action=enable_password_handler,
+                                            action=enable_secret_handler,
                                             args=None,
                                             loop_continue=True,
                                             continue_timer=False)
@@ -632,7 +661,7 @@ class GenericStatements():
                                               continue_timer=False)
 
         self.enter_your_selection_stmt = Statement(pattern=pat.enter_your_selection_2,
-                                                   action='sendline(2)',
+                                                   action=setup_enter_selection,
                                                    args=None,
                                                    loop_continue=True,
                                                    continue_timer=True)

@@ -67,7 +67,7 @@ class GenericPatterns(UniconCorePatterns):
         # %Error opening tftp://255.255.255.255/network-confg (Timed out)
         # %Error opening tftp://255.255.255.255/cisconet.cfg (Timed out)
         # %Error opening tftp://255.255.255.255/switch-confg (Timed out)
-        self.syslog_message_pattern = r'^.*?(%\w+(-\S+)?-\d+-\w+|Guestshell destroyed successfully|%Error opening tftp:\/\/255\.255\.255\.255).*$'
+        self.syslog_message_pattern = r'^.*?(%\w+(-\S+)?-\d+-\w+|Guestshell destroyed successfully|%Error opening tftp:\/\/255\.255\.255\.255|Autoinstall trying).*$'
 
         self.config_locked = r'Configuration (mode )?(is )?locked|Config mode cannot be entered'
 
