@@ -30,8 +30,12 @@ def build_version_range(version):
     '''
     non_local_version = version.split('+')[0]
     req_ver = non_local_version.split('.')
-    version_range = '>= %s.%s.0rc0, < %s.%s.0' % \
-        (req_ver[0], req_ver[1], req_ver[0], int(req_ver[1])+1)
+    if 'rc' in version:
+        version_range = '>= %s.%s.0rc0, < %s.%s.0' % \
+            (req_ver[0], req_ver[1], req_ver[0], int(req_ver[1])+1)
+    else:
+        version_range = '>= %s.%s.0, < %s.%s.0' % \
+            (req_ver[0], req_ver[1], req_ver[0], int(req_ver[1])+1)
 
     return version_range
 

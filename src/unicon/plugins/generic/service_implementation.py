@@ -490,6 +490,7 @@ class Enable(BaseService):
         handle = self.get_handle(target)
         spawn = self.get_spawn(target)
         sm = self.get_sm(target)
+        timeout = kwargs.get('timeout', None)
 
         # If the device is in rommon, enable() will use the
         # image_to_boot info to boot the image specified
@@ -507,7 +508,8 @@ class Enable(BaseService):
         try:
             sm.go_to(self.start_state,
                      spawn,
-                     context=handle.context)
+                     context=handle.context, 
+                     timeout=timeout)
         except Exception as err:
             raise SubCommandFailure("Failed to Bring device to Enable State",
                                     err) from err
@@ -1089,6 +1091,7 @@ class Reload(BaseService):
                      raise_on_error=True,
                      error_pattern=None,
                      append_error_pattern=None,
+                     post_reload_wait_time = None,
                      *args, **kwargs):
 
 
@@ -1099,6 +1102,11 @@ class Reload(BaseService):
             self.error_pattern = con.settings.ERROR_PATTERN
         else:
             self.error_pattern = error_pattern
+
+        if post_reload_wait_time is None:
+            self.post_reload_wait_time = con.settings.POST_RELOAD_WAIT
+        else:
+            self.post_reload_wait_time = post_reload_wait_time
 
         if not isinstance(self.error_pattern, list):
             raise ValueError('error_pattern should be a list')
@@ -1180,12 +1188,12 @@ class Reload(BaseService):
                     break
         else:
             con.log.info('Waiting for boot messages to settle for {} seconds'.format(
-                con.settings.POST_RELOAD_WAIT
+                self.post_reload_wait_time
             ))
-            wait_time = timedelta(seconds=con.settings.POST_RELOAD_WAIT)
+            wait_time = timedelta(seconds=self.post_reload_wait_time)
             settle_time = current_time = datetime.now()
             while (current_time - settle_time) < wait_time:
-                if buffer_settled(con.spawn, con.settings.POST_RELOAD_WAIT):
+                if buffer_settled(con.spawn, self.post_reload_wait_time):
                     con.log.info('Buffer settled, accessing device..')
                     break
                 current_time = datetime.now()

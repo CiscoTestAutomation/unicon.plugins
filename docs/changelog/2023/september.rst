@@ -1,7 +1,7 @@
-July 2023
+September 2023
 ==========
 
-July 24 - Unicon.Plugins v23.7
+September 26 - Unicon v23.9 
 ------------------------
 
 
@@ -9,8 +9,8 @@ July 24 - Unicon.Plugins v23.7
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
 
-        ``unicon.plugins``, v23.7
-        ``unicon``, v23.7
+        ``unicon.plugins``, v23.9 
+        ``unicon``, v23.9 
 
 Install Instructions
 ^^^^^^^^^^^^^^^^^^^^
@@ -37,11 +37,10 @@ Features and Bug Fixes:
 Changelogs
 ^^^^^^^^^^
 --------------------------------------------------------------------------------
-                                      Fix
+                                      New                                       
 --------------------------------------------------------------------------------
 
-* iosxe
-    * Update confirm pattern and statements to support Abort Copy
-    * Added configuration error patterns
+* unicon.routers.bases
+    * Add device alias to service log
 
 

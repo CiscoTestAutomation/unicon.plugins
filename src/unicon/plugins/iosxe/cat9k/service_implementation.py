@@ -115,10 +115,10 @@ class Rommon(GenericExecute):
                  con.spawn,
                  context=self.context)
         boot_info = con.execute('show boot')
-        m = re.search(r'Enable Break = (yes|no)', boot_info)
+        m = re.search(r'Enable Break = (yes|no)|ENABLE_BREAK variable (= yes|does not exist)', boot_info)
         if m:
-            break_enabled = m.group(1)
-            if break_enabled == 'no':
+            break_enabled = m.group()
+            if 'yes' not in break_enabled:
                 con.configure('boot enable-break')
         else:
             raise SubCommandFailure('Could not determine if break is enabled, cannot transition to rommon')

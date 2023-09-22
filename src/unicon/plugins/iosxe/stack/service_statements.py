@@ -2,6 +2,7 @@
 import time
 from unicon.eal.dialogs import Statement
 from unicon.plugins.generic.service_statements import reload_statement_list
+from unicon.plugins.iosxe.service_statements import factory_reset_confirm, are_you_sure_confirm
 from .service_patterns import StackIosXESwitchoverPatterns, StackIosXEReloadPatterns
 
 def update_curr_state(spawn, context, state):
@@ -118,11 +119,19 @@ reload_shelf = Statement(pattern=reload_pat.reload_entire_shelf,
                          loop_continue=True,
                          continue_timer=False)
 
+reload_fast = Statement(pattern=reload_pat.reload_fast,
+                         action='sendline()',
+                         loop_continue=True,
+                         continue_timer=False)
+
 stack_reload_stmt_list = list(reload_statement_list)
 
 stack_reload_stmt_list.extend([en_state, dis_state])
 stack_reload_stmt_list.insert(0, press_return)
 stack_reload_stmt_list.insert(0, reload_shelf)
+stack_reload_stmt_list.insert(0, reload_fast)
+
+stack_factory_reset_stmt_list = [factory_reset_confirm, are_you_sure_confirm]
 
 send_boot = Statement(pattern=switchover_pat.rommon_prompt,
                       action=send_boot_cmd, loop_continue=False,

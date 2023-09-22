@@ -1,16 +1,18 @@
 """ Stack based IOS-XE service implementations. """
 from time import sleep, time
 from collections import namedtuple
-
+from datetime import datetime, timedelta
+import re
 from unicon.eal.dialogs import Dialog
 from unicon.core.errors import SubCommandFailure
 from unicon.bases.routers.services import BaseService
 
 from .utils import StackUtils
-from unicon.plugins.generic.statements import custom_auth_statements
+from unicon.plugins.generic.statements import custom_auth_statements, buffer_settled
 from .service_statements import (switch_prompt,
                                  stack_reload_stmt_list,
-                                 stack_switchover_stmt_list)
+                                 stack_switchover_stmt_list, stack_factory_reset_stmt_list)
+from unicon.plugins.generic.service_implementation import Enable as GenericEnable, Execute as GenericExecute
 
 utils = StackUtils()
 
@@ -200,12 +202,13 @@ class StackReload(BaseService):
                      member=None,
                      error_pattern = None,
                      append_error_pattern= None,
+                     post_reload_wait_time=None,
                      *args,
                      **kwargs):
 
         self.result = False
         if member:
-            self.reload_command = f'reload slot {member}'
+            reload_command = f'reload slot {member}'
         reload_cmd = reload_command or self.reload_command
         timeout = timeout or self.timeout
         conn = self.connection.active
@@ -214,6 +217,11 @@ class StackReload(BaseService):
             self.error_pattern = conn.settings.ERROR_PATTERN
         else:
             self.error_pattern = error_pattern
+
+        if post_reload_wait_time is None:
+            self.post_reload_wait_time = conn.settings.POST_RELOAD_WAIT
+        else:
+            self.post_reload_wait_time = post_reload_wait_time
 
         if not isinstance(self.error_pattern, list):
             raise ValueError('error_pattern should be a list')
@@ -237,6 +245,8 @@ class StackReload(BaseService):
         reload_dialog += Dialog([switch_prompt])
 
         conn.log.info('Processing on active rp %s-%s' % (conn.hostname, conn.alias))
+        start_time = current_time = datetime.now()
+        timeout_time = timedelta(seconds=timeout)
         conn.sendline(reload_cmd)
         try:
             reload_cmd_output = reload_dialog.process(conn.spawn,
@@ -268,6 +278,19 @@ class StackReload(BaseService):
                 self.connection.log.error(e)
                 raise SubCommandFailure('Reload failed.', e) from e
         else:
+            conn.log.info('Waiting for boot messages to settle for {} seconds'.format(
+                self.post_reload_wait_time
+            ))
+            wait_time = timedelta(seconds=self.post_reload_wait_time)
+            settle_time = current_time = datetime.now()
+            while (current_time - settle_time) < wait_time:
+                if buffer_settled(conn.spawn, self.post_reload_wait_time):
+                    conn.log.info('Buffer settled, accessing device..')
+                    break
+                current_time = datetime.now()
+                if (current_time - start_time) > timeout_time:
+                    conn.log.info('Time out, trying to acces device..')
+                    break
             try:
                 # bring device to enable mode
                 conn.state_machine.go_to('any', conn.spawn, timeout=timeout,
@@ -313,3 +336,125 @@ class StackReload(BaseService):
         if return_output:
             Result = namedtuple('Result', ['result', 'output'])
             self.result = Result(self.result, reload_cmd_output.match_output.replace(reload_cmd, '', 1))
+
+
+class StackRommon(GenericExecute):
+    """ Brings device to the Rommon prompt and executes commands specified
+    """
+    def __init__(self, connection, context, **kwargs):
+        # Connection object will have all the received details
+        super().__init__(connection, context, **kwargs)
+        self.start_state = 'rommon'
+        self.end_state = 'rommon'
+        self.service_name = 'rommon'
+        self.dialog = Dialog(stack_reload_stmt_list)
+        self.timeout = 200
+        self.__dict__.update(kwargs)
+
+    def pre_service(self, reload_command=None, timeout=None, *args, **kwargs):
+        con = self.connection
+        sm = self.get_sm()
+        con = self.connection
+        sm.go_to('enable',
+                 con.spawn,
+                 context=self.context)
+        boot_info = con.execute('show boot')
+        m = re.search(r'Enable Break = (yes|no)', boot_info)
+        if m:
+            break_enabled = m.group(1)
+            if break_enabled == 'no':
+                con.configure('boot enable-break')
+        else:
+            raise SubCommandFailure('Could not determine if break is enabled, cannot transition to rommon')
+
+        if reload_command:
+            reload_dialog = self.dialog
+            reload_dialog += Dialog([switch_prompt] + stack_factory_reset_stmt_list)
+            timeout = timeout or self.timeout
+            con.sendline(reload_command)
+            try:
+                reload_cmd_output = reload_dialog.process(con.spawn,
+                                                        timeout=timeout,
+                                                        prompt_recovery=con.prompt_recovery,
+                                                        context=con.context)
+                self.result=reload_cmd_output.match_output
+                self.get_service_result()
+            except Exception as e:
+                raise SubCommandFailure('Error during reload', e) from e
+            sleep(self.connection.settings.STACK_ROMMON_SLEEP)
+
+            for subconn in con._subconnections.values():
+                subconn.sendline()
+                subconn.state_machine.go_to(
+                    'any',
+                    subconn.spawn,
+                    context=subconn.context,
+                    prompt_recovery=subconn.prompt_recovery,
+                    timeout=subconn.settings.STACK_SWITCHOVER_TIMEOUT,
+                )
+                self.connection.log.debug('{} in state: {}'.format(subconn.alias, subconn.state_machine.current_state))
+
+        super().pre_service(*args, **kwargs)
+        
+        # send boot command for each subconnection
+        for subconn in con._subconnections.values():
+            subconn.sendline()
+            subconn.state_machine.go_to(
+                'any',
+                subconn.spawn,
+                context=subconn.context,
+                prompt_recovery=subconn.prompt_recovery,
+                timeout=subconn.connection_timeout,
+            )
+            self.connection.log.debug('{} in state: {}'.format(subconn.alias, subconn.state_machine.current_state))
+
+
+class StackEnable(GenericEnable):
+    """ Brings device to enable
+
+    Service to change the device mode to enable from any state.
+    Brings the standby handle to enable state, if standby is passed as input.
+
+    Arguments:
+        target= Target connection, Defaults to active
+
+    Returns:
+        True on Success, raise SubCommandFailure on failure
+
+    Example:
+        .. code-block:: python
+
+            rtr.enable()
+            rtr.enable(target='standby')
+    """
+
+    def __init__(self, connection, context, **kwargs):
+        # Connection object will have all the received details
+        super().__init__(connection, context, **kwargs)
+
+    def pre_service(self, *args, **kwargs):
+        super().pre_service(*args, **kwargs)
+
+    def call_service(self, target=None, command='', *args, **kwargs):
+        if target is not None:
+            super().call_service(target, command, *args, **kwargs)
+        else:
+            subconnections = self.connection._subconnections
+            timeout = self.connection.settings.STACK_BOOT_TIMEOUT
+            for subconn in subconnections.values():
+                subconn.sendline()
+                subconn.state_machine.go_to(
+                    'any',
+                    subconn.spawn,
+                    context=subconn.context,
+                    prompt_recovery=subconn.prompt_recovery,
+                    timeout=subconn.connection_timeout,
+                )
+
+            for subconn_name, subconn in subconnections.items():
+                if subconn.state_machine.current_state != 'enable':
+                    if kwargs.get('timeout', None) is None and subconn.state_machine.current_state == 'rommon':
+                        kwargs['timeout'] = timeout
+                    super().call_service(target=subconn_name, command=command, *args, **kwargs)
+            
+            self.result = True

@@ -494,6 +494,29 @@ class TestIosXEC8KvPluginReload(unittest.TestCase):
         self.c.settings.POST_RELOAD_WAIT = 1
         self.c.reload(grub_boot_image='GOLDEN')
 
+class TestIosXECat9kPluginReload(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.c = Connection(
+            hostname='switch',
+            start=['mock_device_cli --os iosxe --state general_enable --hostname switch'],
+            os='iosxe',
+            platform='cat9k',
+            credentials=dict(default=dict(
+                username='cisco', password='cisco', enable_password='Secret12345')),
+            log_buffer=True,
+            mit=True
+            )
+        cls.c.connect()
+
+    @classmethod
+    def tearDownClass(cls):
+         cls.c.disconnect()
+
+    def test_reload1(self):
+         self.c.reload(reload_command='reload1', post_reload_wait_time=1)
+         self.assertEqual(self.c.reload.post_reload_wait_time, 1)
 
 class TestIosXECat3kPluginReload(unittest.TestCase):
 

@@ -40,12 +40,11 @@ Changelogs
                                       New
 --------------------------------------------------------------------------------
 
-* unicon.bases.linux
-    * Added init_connection to connection provider
-        * added init_connection method for initializing the device
-
 * unicon
-    * Added support for `os_flavor` as plugin selector attribute
+    * Added support for os_flavor as plugin selector attribute
+* unicon.bases.linux
+    * Added init_connection to connection provider:
+        * added init_connection method for initializing the device
 
 
 --------------------------------------------------------------------------------
@@ -53,16 +52,12 @@ Changelogs
 --------------------------------------------------------------------------------
 
 * iosxe
-    * stack
+    * stack:
         * Update  mock data for stack devices for standby lock.
-
-
---------------------------------------------------------------------------------
-                                      New
---------------------------------------------------------------------------------
-
-* generic
-    * Added recovery for Reload and HaRelaod
+* cheetah
+    * Add support for devshell in cheetah OS based wireless access points
+* iosxe
+    * Update enable secret setup dialog logic to support devices without password or with short password
+* Generic
+    * Added recovery for Reload and HaRelaod:
         * Recover device using golden image if reload is failed with an exception
-
-

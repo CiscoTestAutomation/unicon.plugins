@@ -29,7 +29,7 @@ class IosXEPatterns(GenericPatterns):
         self.maintenance_mode_prompt = \
             r'^(.*?)(WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(-standby)?(\(boot\))?\(maint-mode\)#[\s\x07]*$'
         self.press_enter = ReloadPatterns().press_enter
-        self.config_prompt = r'^(.*)\(.*(con|cfg|ipsec-profile|ca-trustpoint|cs-server|ca-profile|gkm-local-server|cloud|host-list|config-gkm-group|gkm-sa-ipsec|gdoi-coop-ks-config|wsma)\S*\)#\s?$'
+        self.config_prompt = r'^(.*)\(.*(con|cfg|ipsec-profile|ca-trustpoint|cs-server|ca-profile|gkm-local-server|cloud|host-list|config-gkm-group|gkm-sa-ipsec|gdoi-coop-ks-config|wsma|enforce-rule)\S*\)#\s?$'
         self.are_you_sure_ywtdt = r'Are you sure you want to do this\? \[yes/no\]:\s*$'
         self.do_you_want_to = r'^.*Do you want to remove the above files\? \[y\/n]\s*$'
         self.confirm_uncommited_changes = r'Uncommitted changes found, commit them\? \[yes\/no\/CANCEL\]\s*$'
@@ -59,3 +59,8 @@ class IosXEReloadPatterns(ReloadPatterns):
         # The uniclean package expects these patterns to be here.
         self.enable_prompt = IosXEPatterns().enable_prompt
         self.disable_prompt = IosXEPatterns().disable_prompt
+
+class FactoryResetPatterns:
+    def __init__(self):
+        self.factory_reset_confirm = r'factory reset operation is irreversible for all operations\. Are you sure\? \[confirm\]'
+        self.are_you_sure_confirm = r'Are you sure you want to continue\? \[confirm\]'

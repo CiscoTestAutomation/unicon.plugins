@@ -25,6 +25,7 @@ class ReloadPatterns(UniconCorePatterns):
         self.admin_password = r'^.*(Enter|Confirm) the password for .*admin'
         self.auto_provision = r'Abort( Power On)? Auto Provisioning .*:'
         self.reload_confirm_ios = r'^.*Proceed( with( quick)? reload)?\?\s*\[confirm\]'
+        self.reload_confirm_iosxe = r'^.*Do you wish to proceed with reload anyway\s*\[confirm\]\s*'
         self.reload_confirm = r'^.*Reload node\s*\?\s*\[no,yes\]\s?$'
         self.reload_confirm_nxos = r'^(.*)This command will reboot the system.\s*\(y\/n\)\?\s*\[n\]\s?$'
         self.connection_closed = r'^(.*?)Connection.*? closed|disconnect: Broken pipe'

@@ -393,6 +393,21 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
         self.assertEqual(c.state_machine.current_state, 'rommon')
         c.disconnect()
 
+    def test_rommon_enable_break2(self):
+        c = Connection(hostname='switch',
+                       start=['mock_device_cli --os iosxe --state cat9k_enable_reload_to_rommon_break2'],
+                       os='iosxe',
+                       platform='cat9k',
+                       mit=True,
+                       credentials=dict(default=dict(username='cisco', password='cisco'),
+                                        alt=dict(username='admin', password='lab')),
+                       settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+                       log_buffer=True)
+        c.connect()
+        c.rommon()
+        self.assertEqual(c.state_machine.current_state, 'rommon')
+        c.disconnect()
+
     def test_reload_with_image(self):
         c = Connection(hostname='switch',
                        start=['mock_device_cli --os iosxe --state cat9k_enable_reload_to_rommon'],

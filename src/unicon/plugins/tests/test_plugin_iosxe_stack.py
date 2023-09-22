@@ -288,6 +288,25 @@ class TestIosXEStackReload(unittest.TestCase):
              d.disconnect()
              md.stop()
 
+    def test_reload_member_with_post_reload_wait_time(self):
+
+        md = MockDeviceTcpWrapperIOSXE(port=0, state='stack_enable' + ',stack_enable'*4, stack=True)
+        md.start()
+        d = Connection(hostname='Router',
+                       start = ['telnet 127.0.0.1 ' + str(i) for i in md.ports[:]],
+                       os='iosxe',
+                       chassis_type='stack',
+                       username='cisco',
+                       tacacs_password='cisco',
+                       enable_password='cisco',
+                       post_reload_wait_time='120')
+        d.settings.STACK_POST_RELOAD_SLEEP = 0
+        d.connect()
+        self.assertTrue(d.active.alias == 'peer_1')
+
+        d.reload(member=1)
+        d.disconnect()
+        md.stop()
 
 
 class TestIosXEluginBashService(unittest.TestCase):
