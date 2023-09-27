@@ -256,6 +256,7 @@ class Reload(GenericReload):
                      return_output=False,
                      reload_creds=None,
                      grub_boot_image=None,
+                     post_reload_wait_time=None,
                      *args, **kwargs):
         sm = self.get_sm()
 
@@ -276,6 +277,7 @@ class Reload(GenericReload):
             timeout=timeout,
             return_output=return_output,
             reload_creds=reload_creds,
+            post_reload_wait_time=post_reload_wait_time,
             *args, **kwargs)
 
         self.context.pop("image_to_boot", None)

@@ -3,7 +3,18 @@
 __author__ = "Myles Dear <pyats-support@cisco.com>"
 
 from unicon.eal.dialogs import Statement
-from .patterns import IosXEPatterns
+from .patterns import IosXEPatterns, FactoryResetPatterns
+from unicon.plugins.generic.statements import chatty_term_wait
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+#           Service handlers
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+
+
+def send_response(spawn, response=""):
+    chatty_term_wait(spawn)
+    spawn.sendline(response)
+
 
 patterns = IosXEPatterns()
 
@@ -79,3 +90,19 @@ execute_statement_list = [
     want_continue,
     do_you_want_to
 ]
+
+#############################################################################
+# Factory Reset Command Statement
+#############################################################################
+pat = FactoryResetPatterns()
+
+
+factory_reset_confirm = Statement(pattern=pat.factory_reset_confirm,
+                        action=send_response, args={'response': ''},
+                        loop_continue=True,
+                        continue_timer=False)
+
+are_you_sure_confirm = Statement(pattern=pat.are_you_sure_confirm,
+                        action=send_response, args={'response': ''},
+                        loop_continue=True,
+                        continue_timer=False)

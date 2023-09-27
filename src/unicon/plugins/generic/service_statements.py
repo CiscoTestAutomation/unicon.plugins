@@ -242,6 +242,11 @@ reload_confirm_ios = Statement(pattern=reload_patterns.reload_confirm_ios,
                                loop_continue=True,
                                continue_timer=False)
 
+reload_confirm_iosxe = Statement(pattern=reload_patterns.reload_confirm_iosxe,
+                               action=send_response, args={'response': ''},
+                               loop_continue=True,
+                               continue_timer=False)
+
 useracess = Statement(pattern=reload_patterns.useracess,
                       action=None, args=None,
                       loop_continue=True,
@@ -333,7 +338,7 @@ config_session_locked_stmt = Statement(pattern=reload_patterns.config_session_lo
                                        continue_timer=False)
 
 reload_statement_list = [save_env, confirm_reset, reload_confirm,
-                         reload_confirm_ios, useracess,
+                         reload_confirm_ios, reload_confirm_iosxe, useracess,
                          confirm_config, setup_dialog, auto_install_dialog,
                          module_reload, save_module_cfg, reboot_confirm,
                          secure_passwd_std, admin_password, auto_provision,

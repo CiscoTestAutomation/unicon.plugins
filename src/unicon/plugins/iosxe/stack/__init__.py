@@ -8,7 +8,7 @@ from unicon.bases.routers.connection import BaseStackRpConnection
 from .settings import IosXEStackSettings
 from .statemachine import StackIosXEStateMachine
 from .connection_provider import StackRpConnectionProvider
-from .service_implementation import StackGetRPState, StackSwitchover, StackReload
+from .service_implementation import StackGetRPState, StackSwitchover, StackReload, StackRommon, StackEnable
 
 class StackIosXEServiceList(HAServiceList):
     def __init__(self):
@@ -20,6 +20,8 @@ class StackIosXEServiceList(HAServiceList):
         self.reload = StackReload
         self.switchover = StackSwitchover
         self.get_rp_state = StackGetRPState
+        self.rommon = StackRommon
+        self.enable = StackEnable
 
 
 class IosXEStackRPConnection(BaseStackRpConnection):

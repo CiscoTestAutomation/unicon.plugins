@@ -109,7 +109,7 @@ general_enable:
 
          21  -rw-   439612520  Mar 22 2017 00:16:56 +00:00  general_image.issu-asr-lns
       78704144384 bytes total (72496394240 bytes free)
-   
+
 
     "config term":
       new_state: general_config
@@ -118,14 +118,14 @@ general_enable:
       new_state: general_act_reply
 
     "show redundancy sta |  in peer": |2
-           peer state = 8  -STANDBY HOT 
+           peer state = 8  -STANDBY HOT
     "show redundancy sta | inc Redundancy State": |2
       Redundancy State              = sso
     "sh redundancy stat | inc my state": |2
-             my state = 13 -ACTIVE 
+             my state = 13 -ACTIVE
     "sh redundancy state": |2
-             my state = 13 -ACTIVE 
-           peer state = 8  -STANDBY HOT 
+             my state = 13 -ACTIVE
+           peer state = 8  -STANDBY HOT
                  Mode = Duplex
                  Unit = Primary
               Unit ID = 48
@@ -139,13 +139,15 @@ general_enable:
 
          client count = 84
        client_notification_TMR = 30000 milliseconds
-                 RF debug mask = 0x0   
+                 RF debug mask = 0x0
     "redundancy force-switchover":
       new_state: enable_general_standby
     "reload_config_dialog":
       new_state: enable_reload_config_dialog
     "reload":
       new_state: ha_reload_proceed
+    "reload1":
+      new_state: reload_proceed_confirm
     "active_install_add":
        new_state: install_add_commit
     "trim":
@@ -164,9 +166,9 @@ general_enable:
       IOx Infrastructure Summary:
       ---------------------------
       IOx service (CAF)              : Running
-      IOx service (HA)               : Running 
-      IOx service (IOxman)           : Not Ready 
-      IOx service (Sec storage)      : Running 
+      IOx service (HA)               : Running
+      IOx service (IOxman)           : Not Ready
+      IOx service (Sec storage)      : Running
       Libvirtd 5.5.0                 : Running
       Dockerd 18.03.0                : Running
       Sync Status                    : Disabled
@@ -191,19 +193,19 @@ general_enable:
 
     "show archive": ""
     "show policy-map interface tenGigabitEthernet 2/0/11": |
-     TenGigabitEthernet2/0/11 
+     TenGigabitEthernet2/0/11
 
       Service-policy input: set-exp
 
-        Class-map: dscp-cs1 (match-all)  
+        Class-map: dscp-cs1 (match-all)
           0 packets
           Match:  dscp cs1 (8)
           QoS Set
             mpls experimental imposition 1
 
-        Class-map: class-default (match-any)  
+        Class-map: class-default (match-any)
           32589133 packets
-          Match: any 
+          Match: any
     "show ip interface brief": |
       Interface              IP-Address      OK? Method Status                Protocol
       GigabitEthernet0/0/0   127.0.0.1       YES other  up                    up
@@ -521,7 +523,7 @@ config_general_server:
       "no shutdown": |
           no shutdown
           Certificate server 'no shut' event has been queued for processing.
-      "end": 
+      "end":
         new_state: general_enable
 
 config_general_redundancy_main_cpu:
@@ -576,23 +578,23 @@ standby_exec:
 
 iosxe_config_1:
   prompt: "%N(conf)#"
-  commands: 
+  commands:
     "identity number 101":
       new_state: iosxe_config_2
-    "end": 
+    "end":
       new_state: general_enable
 
 iosxe_config_2:
   prompt: "%N(config-gkm-group)#"
   commands:
-    "server local": 
+    "server local":
         new_state: iosxe_config_3
-    "end": 
+    "end":
         new_state: iosxe_config_1
 
 iosxe_config_3:
   prompt: "%N(config-gkm-group)#"
-  commands: 
+  commands:
     "end":
       new_state: iosxe_config_2
 diol_exec:
@@ -778,9 +780,9 @@ initial_config_dialog:
     timing:
       - 0:,0,0.01
     response: |2
-      
-      
-      
+
+
+
              --- System Configuration Dialog ---
 
   prompt: "\nWould you like to enter the initial configuration dialog? [yes/no]: "
@@ -788,7 +790,7 @@ initial_config_dialog:
     "no": &enable_secret
       new_state: enter_enable_secret
       response: |2
-          
+
           The enable secret is a password used to protect
           access to privileged EXEC and configuration modes.
           This password, after entered, becomes encrypted in
@@ -913,6 +915,13 @@ setup_enable_reload_confirm:
       response: file|mock_data/iosxe/asr1k_reload.txt
       new_state: system_config_confirm
 
+reload_proceed_confirm:
+  prompt: "Do you wish to proceed with reload anyway[confirm]"
+  commands:
+    "":
+      response: file|mock_data/iosxe/asr1k_reload.txt
+      new_state: press_return
+
 # System config
 system_config_confirm:
   prompt: "Would you like to enter the initial configuration dialog? [yes/no]: "
@@ -976,23 +985,23 @@ management_setup_enter_interface:
     Current interface summary
 
     Interface              IP-Address      OK? Method Status                Protocol
-    GigabitEthernet0/0/0   unassigned      YES unset  administratively down down    
-    GigabitEthernet0/0/1   unassigned      YES unset  administratively down down    
-    GigabitEthernet0/0/2   unassigned      YES unset  administratively down down    
-    GigabitEthernet0/0/3   unassigned      YES unset  administratively down down    
-    GigabitEthernet0/0/4   unassigned      YES unset  administratively down down    
-    GigabitEthernet0/0/5   unassigned      YES unset  administratively down down    
-    GigabitEthernet0/0/6   unassigned      YES unset  administratively down down    
-    GigabitEthernet0/0/7   unassigned      YES unset  administratively down down    
-    Te0/1/0                unassigned      YES unset  administratively down down    
-    Te0/1/1                unassigned      YES unset  administratively down down    
-    Te0/1/2                unassigned      YES unset  administratively down down    
-    Te0/1/3                unassigned      YES unset  administratively down down    
-    Te0/1/4                unassigned      YES unset  administratively down down    
-    Te0/1/5                unassigned      YES unset  administratively down down    
-    Te0/1/6                unassigned      YES unset  administratively down down    
-    Te0/1/7                unassigned      YES unset  administratively down down    
-    GigabitEthernet0       unassigned      YES unset  administratively down down    
+    GigabitEthernet0/0/0   unassigned      YES unset  administratively down down
+    GigabitEthernet0/0/1   unassigned      YES unset  administratively down down
+    GigabitEthernet0/0/2   unassigned      YES unset  administratively down down
+    GigabitEthernet0/0/3   unassigned      YES unset  administratively down down
+    GigabitEthernet0/0/4   unassigned      YES unset  administratively down down
+    GigabitEthernet0/0/5   unassigned      YES unset  administratively down down
+    GigabitEthernet0/0/6   unassigned      YES unset  administratively down down
+    GigabitEthernet0/0/7   unassigned      YES unset  administratively down down
+    Te0/1/0                unassigned      YES unset  administratively down down
+    Te0/1/1                unassigned      YES unset  administratively down down
+    Te0/1/2                unassigned      YES unset  administratively down down
+    Te0/1/3                unassigned      YES unset  administratively down down
+    Te0/1/4                unassigned      YES unset  administratively down down
+    Te0/1/5                unassigned      YES unset  administratively down down
+    Te0/1/6                unassigned      YES unset  administratively down down
+    Te0/1/7                unassigned      YES unset  administratively down down
+    GigabitEthernet0       unassigned      YES unset  administratively down down
 
     Enter interface name used to connect to the
   prompt: "management network from the above interface summary: "
@@ -1004,7 +1013,7 @@ management_setup_enter_interface:
 
 management_setup_config_show:
   preface: |2
-    
+
     The following configuration command script was created:
 
     hostname Router
@@ -1251,14 +1260,14 @@ ctc_shell_confirm:
 ctc_shell:
   preface: |
     2021/06/11 13:31:33 : Shell access was granted to user <anon>; Trace file: , /crashinfo/tracelogs/system_shell_R0-0.15090_0.20210611133133.bin
-    ********************************************************************** 
-    Activity within this shell can jeopardize the functioning 
+    **********************************************************************
+    Activity within this shell can jeopardize the functioning
     of the system.
     Use this functionality only under supervision of Cisco Support.
 
     Session will be logged to:
       crashinfo:tracelogs/system_shell_R0-0.15090_0.20210611133133.bin
-    ********************************************************************** 
+    **********************************************************************
     Terminal type 'xterm-256color' unknown.  Assuming vt100
 
   prompt: "[%N_1_RP_0:/]$ "
@@ -1521,7 +1530,7 @@ rommon_command_output_not_a_prompt:
       - 0:,0,2
       response: |2
         Signature verification failed for key#
-        
+
     "boot":
       new_state: general_exec
 
@@ -1534,7 +1543,7 @@ rommon_command_output_not_a_prompt2:
       - 1:,10
       response: |2
         Signature verification failed for key#
-        
+
     "boot":
       new_state: general_exec
 

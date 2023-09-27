@@ -678,6 +678,8 @@ return_output             bool (default False)         Return namedtuple with re
 image_to_boot             str                          Image to boot from rommon. Available for iosxe/cat3k and iosxe/cat9k
 error_pattern             list                         List of regex strings to check output for errors.
 append_error_pattern      list                         List of regex strings append to error_pattern.
+post_reload_wait_time     int (default 60)             Number of seconds to wait after reload, before reconnecting, 
+                                                       Default Value is 60 sec
 ====================      =======================      ================================================================================
 
     return :
