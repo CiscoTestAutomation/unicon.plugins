@@ -3,9 +3,10 @@ Password Handling
 
 Passwords are defined in the testbed YAML file. This document describes the
 password handling logic used by the different plugins.
-For understanding the password handling first we need to understand credentials on pyATS.
+Passwords are managed through device credentials in pyATS,
+the next section explains how credentials are handled in pyATS.
 
-.. _credentails:
+.. _credentials:
 
 Credentials
 -----------
@@ -28,7 +29,7 @@ raised.
 
 Credentials are not retried, any username or password failure causes a
 `UniconAuthenticationError<unicon.core.errors.UniconAuthenticationError>`
-to be raised.
+to be raised, unless fallback credentials are defined. See :ref:`fallback_credentials`.
 
 It is possible to specify the password to use for routing devices to enter
 enable mode.  This may be done via the ``enable_password`` entry under the
@@ -216,7 +217,7 @@ specified by the specific plugin).
 
 ``login_creds`` is used to describe the order of credentials to use on
 initial login.  If not specified, the ``default`` credential is used.
-Please see :ref:`credentails` for more details.
+Please see :ref:`credentials` for more details.
 
 .. code-block:: yaml
 
@@ -319,16 +320,17 @@ The following response pattern generates a bad password exception:
 
     bad_passwords = r'^.*?% (Bad passwords|Access denied|Authentication failed)'
 
+.. _fallback_credentials:
+
 Fallback Credentials
 --------------------
 
-In case of authentication failure,
- you could use fallback credentials before erroring out.
-you could have a couple of login credentials and define them using fallback credentials.
-These login credentials will be used in sequence. If none of the combination works on the device
-we get the bad password exception.
+In case of authentication failure, fallback credentials are used to try and login to the device
+when they are defined for the connection.  You can define one or more device credentials and define
+them as fallback credentials by adding them to the fallback credentials list under the `defaults` section or under the connection.
+The fallback credentials credentials will be used in sequence. If none of the combinations work on the device a bad password exception is raised.
 
-you could have a default list for all the connections in the testbed:
+Below an example of a testbed with fallback credentials defined.
 
 .. code-block:: yaml
 
@@ -364,7 +366,7 @@ you could have a default list for all the connections in the testbed:
               port: 23
               protocol: telnet
 
-or you could define fallback credentails per connection:
+Example of fallback credentials per connection:
 
 .. code-block:: yaml
 
