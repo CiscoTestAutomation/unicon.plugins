@@ -38,6 +38,7 @@ supported_os = [
     'slxos',
     'nd',
     'viptela',
+    'dnos',
     'dnos6',
     'dnos10',
     'ons',

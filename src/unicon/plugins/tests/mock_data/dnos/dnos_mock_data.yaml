@@ -1,0 +1,23 @@
+connect_ssh:
+  preface: |
+    The authenticity of host 'thishostname (127.0.0.1)' can't be established.
+    ECDSA key fingerprint is SHA256:jXpupHE7KJf/ddn4VR/qbVrIHIxXTqO/z3tlQ9EMrXU.
+  prompt: "Are you sure you want to continue connecting (yes/no/[fingerprint])? "
+  commands:
+    "yes":
+      new_state: user_password
+
+user_password:
+  prompt: "username@thishostname's password: "
+  commands:
+    "arandompassword":
+      new_state: exec
+
+exec:
+  prompt: "%N# "
+  commands:
+    "show system version" : |
+
+      System Name: thishostname
+      Version: DNOS [x.x.x.x], Copyright xxxx DRIVENETS LTD.
+
