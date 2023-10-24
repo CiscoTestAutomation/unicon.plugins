@@ -1,10 +1,160 @@
 Password Handling
 =================
-Please see :ref:`unicon_credentials` for details on how credentials are
-specified and on credential sequencing.
 
 Passwords are defined in the testbed YAML file. This document describes the
 password handling logic used by the different plugins.
+Passwords are managed through device credentials in pyATS,
+the next section explains how credentials are handled in pyATS.
+
+.. _credentials:
+
+Credentials
+-----------
+
+The ``credentials`` connection parameter defines a dictionary of named
+credentials.  A credential is a dictionary typically containing both
+``username`` and ``password`` keys.
+
+The ``login_creds`` connection parameter defines an optional sequence of
+credential names to try.  Each time the device prompts for a username or
+password, the current credential is set to the next credential in the sequence
+if a current credential has not already been set.
+When a password is sent, the current credential is unset.  The one exception
+is when entering an administrator's password on a routing device coming up
+without configuration, in this case the current credential is reused.
+If the sequence has been exhausted and no more credentials are available to
+satisfy a username/password prompt, a
+`CredentialsExhaustedError<unicon.core.errors.CredentialsExhaustedError>` is
+raised.
+
+Credentials are not retried, any username or password failure causes a
+`UniconAuthenticationError<unicon.core.errors.UniconAuthenticationError>`
+to be raised, unless fallback credentials are defined. See :ref:`fallback_credentials`.
+
+It is possible to specify the password to use for routing devices to enter
+enable mode.  This may be done via the ``enable_password`` entry under the
+current credential, or via a separate credential called ``enable``.
+Please see :ref:`unicon_enable_password_handling` for details.
+
+Passwords specified as a :ref:`secret_strings` are automatically decoded prior
+to being sent to the device.
+
+In pyATS Testbed YAML
+"""""""""""""""""""""
+
+Credentials may be specified on a per-testbed, per-device or per-connection
+basis, as documented in :ref:`topology_credential_password_modeling`.
+
+
+.. code-block:: python
+
+    from pyats.topology import loader
+    tb = loader.load("""
+        devices:
+            my_device:
+                type: router
+                credentials:
+                    default:
+                        username: admin
+                        password: Cisc0123
+                    alternate:
+                        username: alt_username
+                        password: alt_password
+                    termserv:
+                        username: tsuser
+                        password: tspw
+                    enable:
+                        password: enablepw
+                connections:
+                    defaults: {class: 'unicon.Unicon'}
+                    a:
+                      protocol: ssh
+                      ip: 10.64.70.11
+                      port: 2042
+                      login_creds: [termserv, default]
+                      ssh_options: "-v -i /path/to/identityfile"
+
+    """)
+    dev = tb.devices.my_device
+    dev.connect()
+
+    # To connect using different credentials than is contained in the
+    # testbed YAML ``login_creds`` key:
+    dev.destroy()
+    dev.connect(login_creds=['termserv', 'alternate'])
+
+
+In Python
+"""""""""
+
+.. code-block:: python
+
+    dev = Connnection(hostname=uut_hostname,
+                       start=[uut_start_cmd],
+                       credentials={\
+                           {'default': {'username': 'admin', 'password': 'Cisc0123'}},\
+                           {'enable': {'password': 'enablepw'}},\
+                           {'termserv': {'username': 'tsuser', 'password': 'tspw'}},\
+                       },
+                       login_creds = ['termserv', 'default'],
+                     )
+
+
+Post credential action
+""""""""""""""""""""""
+
+In certain cases, e.g. when using a serial console server, an action is needed to get a response
+from the device connected to the serial port. There are two ways to configure this action.
+The first one is using a setting, the second one is using a post credential action.
+The post credential action takes precedence over the setting.
+
+Example credentials for a device.
+
+.. code-block:: yaml
+
+      my_device:
+          type: router
+          credentials:
+              default:
+                  username: admin
+                  password: Cisc0123
+              terminal_server:
+                  username: tsuser
+                  password: tspw
+
+
+Setting the credential action via `settings` in python.
+
+.. code-block:: python
+
+    # Name of the credential after which a "sendline()" should be executed
+    dev.settings.SENDLINE_AFTER_CRED = 'terminal_server'
+
+
+Settings can also be specified for the connection in the topology file as shown below.
+
+.. code-block:: yaml
+
+    connections:
+      cli:
+        settings:
+          SENDLINE_AFTER_CRED: terminal_server
+
+
+The post credential action supports ``send`` and ``sendline``, you can specify a string to be sent,
+e.g. `send( )` to send a space or `send(\\x03)` to send Ctrl-C. Quotes should not be specified.
+
+.. code-block:: yaml
+
+    connections:
+      cli:
+        login_creds: [terminal_server, default]
+        arguments:
+          cred_action:
+            terminal_server:
+              post: sendline()
+
+
 
 Unicon supports passwords specified in encrypted form.  Please see
 :ref:`topology_credential_password_modeling` for details.
@@ -67,7 +217,7 @@ specified by the specific plugin).
 
 ``login_creds`` is used to describe the order of credentials to use on
 initial login.  If not specified, the ``default`` credential is used.
-Please see :ref:`unicon_credentials` for more details.
+Please see :ref:`credentials` for more details.
 
 .. code-block:: yaml
 
@@ -169,6 +319,95 @@ The following response pattern generates a bad password exception:
 .. code-block:: python
 
     bad_passwords = r'^.*?% (Bad passwords|Access denied|Authentication failed)'
+
+.. _fallback_credentials:
+
+Fallback Credentials
+--------------------
+
+In case of authentication failure, fallback credentials are used to try and login to the device
+when they are defined for the connection.  You can define one or more device credentials and define
+them as fallback credentials by adding them to the fallback credentials list under the `defaults` section or under the connection.
+The fallback credentials credentials will be used in sequence. If none of the combinations work on the device a bad password exception is raised.
+
+Below an example of a testbed with fallback credentials defined.
+
+.. code-block:: yaml
+
+    devices:
+      my_device:
+        type: router
+        os: ios
+        credentials:
+            default:
+                username: cisco
+                password: secret
+            enable:
+                password: enable
+            set_1:
+              password: lab
+              username: lab
+            set_2:
+              password: admin
+              username: admin
+        connections:
+            defaults:
+              class: unicon.Unicon
+              fallback_credentials:
+                - set1
+                - set2
+            netconf:
+              class: yang.connector.Netconf
+              ip: 1.2.3.4
+              port: 830
+              protocol: netconf
+            telnet:
+              ip: 1.2.3.4
+              port: 23
+              protocol: telnet
+
+Example of fallback credentials per connection:
+
+.. code-block:: yaml
+
+    devices:
+      my_device:
+        type: router
+        os: ios
+        credentials:
+            default:
+                username: cisco
+                password: secret
+            enable:
+                password: enable
+        connections:
+            netconf:
+              class: yang.connector.Netconf
+              ip: 1.2.3.4
+              port: 830
+              protocol: netconf
+              fallback_credentials:
+                  - set_1
+              credentials:
+                  default:
+                      username: cisco
+                      password: secret
+                  set_1:
+                    password: lab
+                    username: lab
+            telnet:
+              ip: 1.2.3.4
+              port: 23
+              protocol: telnet
+              fallback_credentials:
+                - set_2
+              credentials:
+                  default:
+                      username: cisco
+                      password: secret
+                  set_2:
+                    password: admin
+                    username: admin
 
 
 Environment variables
