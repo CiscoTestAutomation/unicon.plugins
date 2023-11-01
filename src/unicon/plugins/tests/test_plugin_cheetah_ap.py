@@ -1,4 +1,3 @@
-
 import unittest
 
 import unicon
@@ -29,3 +28,18 @@ class TestCheetahAp(unittest.TestCase):
             self.assertIn(f'{hostname}#', c.spawn.match.match_output)
         finally:
             c.disconnect()
+
+
+# class TestCheetanApReloadService(unittest.TestCase):
+    def test_reload(self):
+        dev = Connection(
+            hostname = '',
+            start = ['mock_device_cli --os cheetah --state ap_enable'],
+            os='cheetah',
+            platform='ap',
+        )
+        dev.connect()
+        dev.settings.POST_RELOAD_WAIT = 1
+        dev.reload(timeout=1800)
+        dev.disconnect()
+

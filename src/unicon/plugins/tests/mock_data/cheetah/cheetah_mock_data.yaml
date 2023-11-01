@@ -32,6 +32,9 @@ ap_enable:
     "devshell":
       new_state: ap_devshell
 
+    "reload":
+      new_state: ap_reload
+
 ap_devshell:
   prompt: "AP2C57:/#"
   commands:
@@ -39,4 +42,19 @@ ap_devshell:
     "stty rows 200": ""
     "pwd": "/tmp"
     "exit":
+      new_state: ap_enable
+
+ap_reload:
+  prompt: "Proceed with reload command (cold)? [confirm]"
+  commands:
+    "":
+      response: file|mock_data/cheetah/cheetah_reload.txt
+      timing:
+        - 0:,5,0.005
+      new_state: ap_reload_console_password
+
+ap_reload_console_password:
+  prompt: "Password:"
+  commands:
+    "lab":
       new_state: ap_enable
