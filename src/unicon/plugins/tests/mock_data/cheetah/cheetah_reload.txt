@@ -1,0 +1,107 @@
+[*10/06/2023 13:45:25.0718] ...Vendor SubType: PHY_HT_CONTROL_PAYLOAD(29) len: 30 vendId 409600
+
+[*10/06/2023 13:45:25.0718] ...Vendor SubType: PHY_HT_CONTROL_PAYLOAD(29) len: 30 vendId 409600
+
+[*10/06/2023 13:45:25.0718] ...Vendor SubType: PHY_HT_CONTROL_PAYLOAD(29) len: 30 vendId 409600
+
+[*10/06/2023 13:45:25.0718] Dropping msg CAPWAP_WTP_EVENT_REQUEST, type = 34, len = 87, eleLen = 95, sendSeqNum = 19
+
+[*10/06/2023 13:45:25.0718] Dropping msg CAPWAP_WTP_EVENT_REQUEST, type = 34, len = 102, eleLen = 110, sendSeqNum = 19
+
+[*10/06/2023 13:45:25.0718] ...Vendor SubType: PHY_HT_CONTROL_PAYLOAD(29) len: 30 vendId 409600
+
+[*10/06/2023 13:45:25.0718] ...Vendor SubType: PHY_HT_CONTROL_PAYLOAD(29) len: 30 vendId 409600
+
+[*10/06/2023 13:45:25.0718] ...Vendor SubType: PHY_HT_CONTROL_PAYLOAD(29) len: 30 vendId 409600
+
+[*10/06/2023 13:45:25.0718] Dropping msg CAPWAP_WTP_EVENT_REQUEST, type = 34, len = 87, eleLen = 95, sendSeqNum = 19
+
+[*10/06/2023 13:45:25.0721] GOING BACK TO DISCOVER MODE
+
+[*10/06/2023 13:45:25.1328] 
+
+[*10/06/2023 13:45:25.1328] CAPWAP State: DTLS Teardown
+
+[*10/06/2023 13:45:25.1333] mkdir -p /tmp/ap/v1/managed-wifi-config
+
+[*10/06/2023 13:45:25.1751] CLEANAIR: Slot 0 CAPWAP down
+
+[*10/06/2023 13:45:25.3108] status 'upgrade.sh: Script called with args:[CANCEL]'
+
+[*10/06/2023 13:45:25.3523] do CANCEL, part1 is active part
+
+[*10/06/2023 13:45:25.3815] status 'upgrade.sh: Cleanup tmp files ...'
+
+[*10/06/2023 13:45:25.4237] Discarding msg CAPWAP_WTP_EVENT_REQUEST(type 9) in CAPWAP state: DTLS Teardown(4).
+
+[*10/06/2023 13:45:25.4237] Discarding msg CAPWAP_WTP_EVENT_REQUEST(type 9) in CAPWAP state: DTLS Teardown(4).
+
+[*10/06/2023 13:45:26.0288] CRIT-MeshLink: Set Root port Mac: 0C:75:BD:05:04:B1 BH Id: 3 Port:70 Device:DEVNO_BH_R1
+
+[*10/06/2023 13:45:27.4049] ERROR-MeshSecurity: Timer expired, set IDLE to Parent CTX(0C:75:BD:05:04:B1)(3) state=0 ticker=0 seq=6 retry=3 fc=Y msn=Y rsn=Y qos=Y sn=N an=N pmk=N prov_psk=0 mic=N
+
+[*10/06/2023 13:45:27.4049] CRIT-MeshSecurity: Mesh Security failed to authenticate with parent 0C:75:BD:05:04:B1, informing Mesh Link
+
+[*10/06/2023 13:45:27.4050] CRIT-MeshAwppAdj[1][0C:75:BD:05:04:B1]: Remove as Parent
+
+[*10/06/2023 13:45:28.4129] CRIT-MeshAwppAdj[1][0C:75:BD:05:04:B1]: Remove as Parent
+
+[*10/06/2023 13:45:28.4130] CRIT-MeshAwppAdj[1][0C:75:BD:05:04:B1]: Set as Parent - (New) channel(165) width(20)
+
+[*10/06/2023 13:45:30.1201] dtls_queue_first: Nothing to extract!
+
+[*10/06/2023 13:45:30.1201] 
+
+[*10/06/2023 13:45:30.1315] 
+
+[*10/06/2023 13:45:30.1315] CAPWAP State: Discovery
+
+[*10/06/2023 13:45:30.1372] Discovery Request sent to 110.0.0.1, discovery type STATIC_CONFIG(1)
+
+[*10/06/2023 13:45:30.1588] Discovery Request sent to 255.255.255.255, discovery type UNKNOWN(0)
+
+[*10/06/2023 13:45:30.4134] CRIT-MeshLink: Set Root port Mac: 0C:75:BD:05:04:B1 BH Id: 3 Port:70 Device:DEVNO_BH_R1
+
+[*10/06/2023 13:45:31.7264] ERROR-MeshSecurity: Timer expired, set IDLE to Parent CTX(0C:75:BD:05:04:B1)(3) state=0 ticker=0 seq=7 retry=3 fc=Y msn=Y rsn=Y qos=Y sn=N an=N pmk=N prov_psk=0 mic=N
+
+[*10/06/2023 13:45:31.7265] CRIT-MeshSecurity: Mesh Security 0C:75:BD:05:04:B1 timed out 6 times. Blocklist instead of invalidate.
+
+[*10/06/2023 13:45:31.7265] CRIT-MeshSecurity: Mesh Security failed to authenticate with parent 0C:75:BD:05:04:B1, informing Mesh Link
+
+[*10/06/2023 13:45:31.7267] CRIT-MeshAwppAdj[1][0C:75:BD:05:04:B1]: Blocklisting Adjacency due to AUTH FAILURE
+
+[*10/06/2023 13:45:31.7267] CRIT-MeshAwppAdj[1][0C:75:BD:05:04:B1]: Remove as Parent
+
+[*10/06/2023 13:45:31.7272] CRIT-MeshAwppAdj[1][0C:75:BD:05:04:B1]: Remove as Parent
+
+[*10/06/2023 13:45:31.7273] CRIT-MeshAwppAdj[1][90:E9:5E:DB:12:B1]: Set as Parent - (New) channel(165) width(20)
+
+[*10/06/2023 13:45:33.7277] CRIT-MeshLink: Set Root port Mac: 90:E9:5E:DB:12:B1 BH Id: 3 Port:70 Device:DEVNO_BH_R1
+
+[*10/06/2023 13:45:33.8917] CRIT-MeshSecurity: Mesh Security successful authenticating parent 90:E9:5E:DB:12:B1, informing Mesh Link
+
+[*10/06/2023 13:45:33.9116] wlan: [7664:I:ANY] ieee80211_ucfg_setparam_util: adding local peer 
+
+[*10/06/2023 13:45:38.3931] CRIT-MeshLink: Notify Capwap Link Up: mac: 90:E9:5E:DB:12:B1 BH Id: 3 GW_reachable: No Roam: false
+
+[*10/06/2023 13:45:38.3932] CRIT-MeshRadioBackhaul[0]: Broadcast uplink backhaul RLOC IP 0.0.0.0
+
+[*10/06/2023 13:45:38.3935] CRIT-MeshRadioBackhaul[1]: Broadcast uplink backhaul RLOC IP 0.0.0.0
+
+[*10/06/2023 13:45:38.3936] CRIT-MeshRadioBackhaul[2]: Broadcast uplink backhaul RLOC IP 0.0.0.0
+
+[*10/06/2023 13:45:38.3936] DOT11_DRV[2]: vendor_send_awpp_frame VAP 17 is not up as expected
+
+[*10/06/2023 13:45:40.0858] 
+
+[*10/06/2023 13:45:40.0858] CAPWAP State: Discovery
+
+[*10/06/2023 13:45:40.0901] Discovery Request sent to 110.0.0.1, discovery type STATIC_CONFIG(1)
+
+[*10/06/2023 13:45:40.1096] Discovery Request sent to 255.255.255.255, discovery type UNKNOWN(0)
+
+
+
+Username: lab
+
+Password: 

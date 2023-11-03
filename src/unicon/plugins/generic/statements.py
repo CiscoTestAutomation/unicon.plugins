@@ -15,12 +15,14 @@ from datetime import datetime, timedelta
 from unicon.eal.dialogs import Statement
 from unicon.eal.helpers import sendline
 from unicon.core.errors import UniconAuthenticationError
+from unicon.core.errors import CredentialsExhaustedError
 from unicon.core.errors import ConnectionError as UniconConnectionError
 from unicon.utils import Utils
 
 from unicon.plugins.generic.patterns import GenericPatterns
 from unicon.plugins.utils import (
     get_current_credential,
+    _get_creds_to_try,
     common_cred_username_handler,
     common_cred_password_handler,
 )
@@ -282,6 +284,55 @@ def enable_password_handler(spawn, context, session):
     else:
         spawn.sendline(context['enable_password'])
 
+def set_new_password(spawn, context, session):
+    '''setting up the new password on the device.
+
+        For setting up the password we need to do these 2 steps
+        to make sure we don't get CredentialsExhaustedError:
+            1- remove the current_credential(this is the last credential used for login into device)
+               from session.
+            2- remove the cred_iter(an iterable of login credentials) from session.
+        after removing these 2 we reset credentials and we could use the default password from the default credentials
+        for setting up the password on the device.
+    '''
+    # remove the current credential from session
+    if session.get('current_credential'):
+        session.pop('current_credential')
+    # remove the cred_iter from session
+    if session.get('cred_iter'):
+        session.pop('cred_iter')
+    # calling the password handler for sending the passowrd.
+    password_handler(spawn, context, session )
+
+
+def enable_secret_handler(spawn, context, session):
+    if 'password_attempts' not in session:
+        session['password_attempts'] = 1
+    else:
+        session['password_attempts'] += 1
+    if session.password_attempts > spawn.settings.PASSWORD_ATTEMPTS:
+        raise UniconAuthenticationError('Too many enable password retries')
+
+    enable_credential_password = get_enable_credential_password(context=context)
+    if enable_credential_password and len(enable_credential_password) >= \
+            spawn.settings.ENABLE_SECRET_MIN_LENGTH:
+        spawn.sendline(enable_credential_password)
+    else:
+        spawn.log.warning('Using enable secret from TEMP_ENABLE_SECRET setting')
+        enable_secret = spawn.settings.TEMP_ENABLE_SECRET
+        context['setup_selection'] = 0
+        spawn.sendline(enable_secret)
+
+
+def setup_enter_selection(spawn, context):
+    selection = context.get('setup_selection')
+    if selection is not None:
+        if str(selection) == '0':
+            spawn.log.warning('Not saving setup configuration')
+        spawn.sendline(f'{selection}')
+    else:
+        spawn.sendline('2')
+
 
 def enable_secret_handler(spawn, context, session):
     if 'password_attempts' not in session:
@@ -369,10 +420,28 @@ def passphrase_handler(spawn, context, session):
                                         "for credential {}.".format(credential))
 
 
-def bad_password_handler(spawn):
+def bad_password_handler(spawn, context, session):
     """ handles bad password prompt
     """
-    raise UniconAuthenticationError('Bad Password sent to device %s' % (str(spawn),))
+    # check if there is a fallback credential
+    if context['fallback_creds']:
+        spawn.log.info('Using fallback credentials for logging in to the device!')
+        # Update the session with fallback credentials
+        if not session.get('fallback_creds'):
+            session['fallback_creds'] = iter(context['fallback_creds'])
+            # this list keep track of the fallback credentials being used
+            session['cred_list'] = []
+        try:
+            # update the current credential with the next fallback credential
+            session['current_credential'] = next(session['fallback_creds'])
+            spawn.log.info(f"Using {session['current_credential']} from fallback credential list.")
+            # update the list of fallback credentials
+            session['cred_list'].append(session['current_credential'])
+        except StopIteration:
+            raise CredentialsExhaustedError(
+                creds_tried= _get_creds_to_try(context) + (session['cred_list']))
+    else:
+        raise UniconAuthenticationError('Bad Password sent to device %s' % (str(spawn),))
 
 
 def incorrect_login_handler(spawn, context, session):
@@ -527,7 +596,7 @@ class GenericStatements():
         self.bad_password_stmt = Statement(pattern=pat.bad_passwords,
                                            action=bad_password_handler,
                                            args=None,
-                                           loop_continue=False,
+                                           loop_continue=True,
                                            continue_timer=False)
 
         self.login_incorrect = Statement(pattern=pat.login_incorrect,
@@ -556,6 +625,11 @@ class GenericStatements():
                                        args=None,
                                        loop_continue=True,
                                        continue_timer=False)
+        self.new_password_stmt = Statement(pattern=pat.new_password,
+                                           action=set_new_password,
+                                           args=None,
+                                           loop_continue=True,
+                                           continue_timer=False)
         self.enable_password_stmt = Statement(pattern=pat.password,
                                               action=enable_password_handler,
                                               args=None,
@@ -715,6 +789,7 @@ authentication_statement_list = [generic_statements.bad_password_stmt,
                                  generic_statements.login_incorrect,
                                  generic_statements.login_stmt,
                                  generic_statements.useraccess_stmt,
+                                 generic_statements.new_password_stmt,
                                  generic_statements.password_stmt,
                                  generic_statements.clear_kerberos_no_realm,
                                  generic_statements.password_ok_stmt,

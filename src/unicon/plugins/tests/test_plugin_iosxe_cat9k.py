@@ -86,6 +86,43 @@ class TestIosXeCat9kPlugin(unittest.TestCase):
             c.disconnect()
             md.stop()
 
+    def test_connect_fallback(self):
+        md = MockDeviceTcpWrapperIOSXE(port=0, state='c9k_login5', hostname='switch')
+        md.start()
+
+        testbed = """
+        devices:
+          R1:
+            os: iosxe
+            type: cat9k
+            credentials:
+                default:
+                    username: admin
+                    password: cisco
+                set1:
+                    username: cisco
+                    password: cisco
+            connections:
+              defaults:
+                class: unicon.Unicon
+                debug: True
+                fallback_credentials:
+                    - set1
+              a:
+                protocol: telnet
+                ip: 127.0.0.1
+                port: {}
+        """.format(md.ports[0])
+
+        tb = loader.load(testbed)
+        device = tb.devices.R1
+        try:
+            device.connect()
+            self.assertEqual(device.state_machine.current_state, 'enable')
+        finally:
+            device.disconnect()
+            md.stop()
+
     def test_reload_image_from_rommon(self):
         md = MockDeviceTcpWrapperIOSXE(port=0, state='cat9k_rommon')
         md.start()

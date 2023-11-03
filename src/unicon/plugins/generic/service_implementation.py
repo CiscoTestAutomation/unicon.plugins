@@ -1200,7 +1200,7 @@ class Reload(BaseService):
                 if (current_time - start_time) > timeout_time:
                     con.log.info('Time out, trying to acces device..')
                     break
-
+            con.sendline()
         try:
             con.context = context
             con.connection_provider.connect()

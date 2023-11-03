@@ -83,3 +83,5 @@ class GenericPatterns(UniconCorePatterns):
 
         # VT100 patterns
         self.get_cursor_position = r'\x1b\[6n'
+
+        self.new_password = r'^(Enter new password|Confirm password):\s*$'

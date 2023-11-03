@@ -8,4 +8,4 @@ class IosXECat9kPatterns(IosXEPatterns):
         super().__init__()
         self.boot_interrupt_prompt = r'Preparing to autoboot. \[Press Ctrl-C to interrupt\]'
         self.container_shell_prompt = r'^(.*?)\n(/(\S+)?)+\s+#\s*$'
-        self.container_ssh_prompt = r'^(.*?)(\w+-){6,}.*?[\$#]\s*$'
+        self.container_ssh_prompt = r'^(.*?)(\w\w-){6,}.*?[\$#]\s*$'

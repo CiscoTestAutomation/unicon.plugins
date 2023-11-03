@@ -130,6 +130,8 @@ n5k_user_password:
   commands:
     "lab":
       new_state: n5k_exec
+    "lab2":
+      new_state: n5k_exec
 
 n5k_config:
   prompt: "switch(config)#"

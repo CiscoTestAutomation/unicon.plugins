@@ -1,8 +1,8 @@
-c9k_login: 
+c9k_login:
   preface: |2
-    
+
     User Access Verification
-        
+
   prompt: "Username: "
   commands:
     "admin":
@@ -85,14 +85,14 @@ c9k_enable:
           export@cisco.com.
 
 
-          Technology Package License Information: 
+          Technology Package License Information:
 
           ------------------------------------------------------------------------------
           Technology-package                                     Technology-package
-          Current                        Type                       Next reboot  
+          Current                        Type                       Next reboot
           ------------------------------------------------------------------------------
-          network-advantage       Smart License                    network-advantage   
-          dna-advantage           Subscription Smart License       dna-advantage                 
+          network-advantage       Smart License                    network-advantage
+          dna-advantage           Subscription Smart License       dna-advantage
 
 
           Smart Licensing Status: UNREGISTERED/EVAL EXPIRED
@@ -119,15 +119,15 @@ c9k_enable:
           System Serial Number               : FCW212345678
 
 
-          Switch Ports Model              SW Version        SW Image              Mode   
-          ------ ----- -----              ----------        ----------            ----   
+          Switch Ports Model              SW Version        SW Image              Mode
+          ------ ----- -----              ----------        ----------            ----
           *    1 50    C9500-40X          16.9.2            CAT9K_IOSXE           INSTALL
                2 50    C9500-40X          16.9.2            CAT9K_IOSXE           INSTALL
 
 
           Switch 02
           ---------
-          Switch uptime                      : 12 minutes 
+          Switch uptime                      : 12 minutes
 
           Base Ethernet MAC Address          : 00:3c:10:be:ee:ff
           Motherboard Assembly Number        : 73-18140-03
@@ -209,7 +209,7 @@ c9k_enable2:
   commands:
     "term length 0": ""
     "term width 0": ""
-    "show version": 
+    "show version":
       new_state: c9k_show_ver
 
 
@@ -260,14 +260,14 @@ c9k_show_ver:
       export@cisco.com.
 
 
-      Technology Package License Information: 
+      Technology Package License Information:
 
       ------------------------------------------------------------------------------
       Technology-package                                     Technology-package
-      Current                        Type                       Next reboot  
+      Current                        Type                       Next reboot
       ------------------------------------------------------------------------------
-      network-advantage   	Smart License                 	 network-advantage   
-      dna-advantage       	Subscription Smart License    	 dna-advantage                 
+      network-advantage   	Smart License                 	 network-advantage
+      dna-advantage       	Subscription Smart License    	 dna-advantage
       AIR License Level: AIR DNA Advantage
       Next reload AIR license Level: AIR DNA Advantage
 
@@ -297,15 +297,15 @@ c9k_show_ver:
       System Serial Number               : FCW2228A4DV
 
 
-      Switch Ports Model              SW Version        SW Image              Mode   
-      ------ ----- -----              ----------        ----------            ----   
+      Switch Ports Model              SW Version        SW Image              Mode
+      ------ ----- -----              ----------        ----------            ----
       *    1 50    C9500-40X          16.12.1           CAT9K_IOSXE           INSTALL
           2 50    C9500-40X          16.12.1           CAT9K_IOSXE           INSTALL
 
 
       Switch 02
       ---------
-      Switch uptime                      : 17 minutes 
+      Switch uptime                      : 17 minutes
 
       Base Ethernet MAC Address          : 00:3c:10:52:93:80
       Motherboard Assembly Number        : 73-18140-03
@@ -534,14 +534,14 @@ enable_c9k2:
     "config term":
       new_state: config_c9k2
     "show redundancy sta |  in peer": |2
-           peer state = 8  -STANDBY HOT 
+           peer state = 8  -STANDBY HOT
     "show redundancy sta | inc Redundancy State": |2
       Redundancy State              = sso
     "sh redundancy stat | inc my state": |2
-             my state = 13 -ACTIVE 
+             my state = 13 -ACTIVE
     "sh redundancy state": |2
-             my state = 13 -ACTIVE 
-           peer state = 8  -STANDBY HOT 
+             my state = 13 -ACTIVE
+           peer state = 8  -STANDBY HOT
                  Mode = Duplex
                  Unit = Primary
               Unit ID = 48
@@ -605,6 +605,7 @@ switchover:
 
 # ========================
 c9k_login4:
+
   prompt: "Username: "
   commands:
     "cisco":
@@ -615,6 +616,22 @@ c9k_password4:
   commands:
     "cisco":
       new_state: c9k_exec
+
+c9k_login5:
+  prompt: "Username: "
+  commands:
+    "admin":
+      new_state: c9k_password5
+
+c9k_password5:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      response: |
+        % Authentication failed
+      timing:
+        - 0:,0,3,0
+      new_state: c9k_login4
 
 c9k_exec:
   prompt: "%N>"
@@ -667,14 +684,14 @@ c9k_exec:
           export@cisco.com.
 
 
-          Technology Package License Information: 
+          Technology Package License Information:
 
           ------------------------------------------------------------------------------
           Technology-package                                     Technology-package
-          Current                        Type                       Next reboot  
+          Current                        Type                       Next reboot
           ------------------------------------------------------------------------------
-          network-advantage       Smart License                    network-advantage   
-          dna-advantage           Subscription Smart License       dna-advantage                 
+          network-advantage       Smart License                    network-advantage
+          dna-advantage           Subscription Smart License       dna-advantage
 
 
           Smart Licensing Status: UNREGISTERED/EVAL EXPIRED
@@ -701,15 +718,15 @@ c9k_exec:
           System Serial Number               : FCW212345678
 
 
-          Switch Ports Model              SW Version        SW Image              Mode   
-          ------ ----- -----              ----------        ----------            ----   
+          Switch Ports Model              SW Version        SW Image              Mode
+          ------ ----- -----              ----------        ----------            ----
           *    1 50    C9500-40X          16.9.2            c9k_IOSXE           INSTALL
                2 50    C9500-40X          16.9.2            c9k_IOSXE           INSTALL
 
 
           Switch 02
           ---------
-          Switch uptime                      : 12 minutes 
+          Switch uptime                      : 12 minutes
 
           Base Ethernet MAC Address          : 00:3c:10:be:ee:ff
           Motherboard Assembly Number        : 73-18140-03
@@ -776,14 +793,14 @@ enable_c9k:
       export@cisco.com.
 
 
-      Technology Package License Information: 
+      Technology Package License Information:
 
       ------------------------------------------------------------------------------
       Technology-package                                     Technology-package
-      Current                        Type                       Next reboot  
+      Current                        Type                       Next reboot
       ------------------------------------------------------------------------------
-      network-advantage       Smart License                    network-advantage   
-      dna-advantage           Subscription Smart License       dna-advantage                 
+      network-advantage       Smart License                    network-advantage
+      dna-advantage           Subscription Smart License       dna-advantage
 
 
       Smart Licensing Status: UNREGISTERED/EVAL EXPIRED
@@ -810,15 +827,15 @@ enable_c9k:
       System Serial Number               : FCW212345678
 
 
-      Switch Ports Model              SW Version        SW Image              Mode   
-      ------ ----- -----              ----------        ----------            ----   
+      Switch Ports Model              SW Version        SW Image              Mode
+      ------ ----- -----              ----------        ----------            ----
       *    1 50    C9500-40X          16.9.2            c9k_IOSXE           INSTALL
           2 50    C9500-40X          16.9.2            c9k_IOSXE           INSTALL
 
 
       Switch 02
       ---------
-      Switch uptime                      : 12 minutes 
+      Switch uptime                      : 12 minutes
 
       Base Ethernet MAC Address          : 00:3c:10:be:ee:ff
       Motherboard Assembly Number        : 73-18140-03
