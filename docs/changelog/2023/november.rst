@@ -1,16 +1,16 @@
-February 2023
-=============
+November 2023
+==========
 
-February 24 - Unicon.Plugins v23.2 
-----------------------------------
+November 27 - Unicon v23.11
+------------------------
 
 
 
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
 
-        ``unicon.plugins``, v23.2 
-        ``unicon``, v23.2 
+        ``unicon.plugins``, v23.11
+        ``unicon``, v23.11
 
 Install Instructions
 ^^^^^^^^^^^^^^^^^^^^
@@ -36,15 +36,15 @@ Features and Bug Fixes:
 
 Changelogs
 ^^^^^^^^^^
-
 --------------------------------------------------------------------------------
                                       Fix                                       
 --------------------------------------------------------------------------------
 
-* iosxe/cat9k
-    * Update container exit commands
+* unicon
+    * Modified test_init_commands
+        * Added SONiC as a valid OS
 
-* linux
-    * Update linux pattern to work with RADkit interactive connections.
+* pluginmanager
+    * Modified get_plugin method to allow missing keys in lookup
 
 

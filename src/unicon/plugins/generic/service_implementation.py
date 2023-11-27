@@ -2310,14 +2310,8 @@ class SwitchoverService(BaseService):
         except SubCommandFailure as err:
             raise SubCommandFailure("Switchover Failed %s" % str(err)) from err
 
-        # Initialise Standby
-        try:
-            con.standby.spawn.sendline("\r")
-            con.standby.spawn.expect(".*")
-            con.swap_roles()
-        except Exception as err:
-            raise SubCommandFailure("Failed to initialise the standby",
-                                    err) from err
+        # swap roles after switchover
+        con.swap_roles()
 
         counter = 0
         if not sync_standby:
@@ -2367,16 +2361,21 @@ class SwitchoverService(BaseService):
             config_commands = self.connection.settings.HA_INIT_CONFIG_COMMANDS
             con.configure(config_commands, prompt_recovery=self.prompt_recovery)
 
-            # Determine standby state
-            con.standby.spawn.sendline()
-            try:
-                con.standby.state_machine.go_to('any',
-                                                con.standby.spawn,
-                                                context=con.standby.context,
-                                                dialog=con.connection_provider.get_connection_dialog())
-            except Exception:
-                con.log.error("Failed to bring standby rp to any state")
-                raise
+            # Try to determine state for to standby node,
+            # if first attempt fails, sendline and check again
+            for _ in range(2):
+                # Determine standby state
+                try:
+                    con.standby.state_machine.go_to('any',
+                                                    con.standby.spawn,
+                                                    context=con.standby.context,
+                                                    dialog=con.connection_provider.get_connection_dialog())
+                    break
+                except Exception:
+                    con.log.error("Failed to bring standby rp to any state")
+                    con.standby.spawn.sendline()
+            else:
+                raise Exception("Failed to bring standby rp to any state")
 
             con.enable(target='standby')
         # Verify switchover is Successful
