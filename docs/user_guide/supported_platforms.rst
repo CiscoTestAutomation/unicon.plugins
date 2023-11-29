@@ -95,7 +95,7 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
     ``eos``
     ``sros``
     ``viptela``,,,"Identical to os=sdwan, platform=viptela."
-    ``windows``
+    ``windows``,,,"Only command shell (cmd) is supported. Powershell is not supported"
 
 To use this table - locate your device's os/platform/model information, and fill
 your pyATS testbed YAML with it:

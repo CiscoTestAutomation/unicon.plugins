@@ -290,14 +290,13 @@ The following command connects to the router and enters enable mode using
     device.connect()
 
 How enable password is chosen
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------------
 
 When a router asks for an enable password, the password sent is determined
 by the following checks.  If all checks are done and still no enable password
 is found then an exception is raised.
 
-#. The ``enable_password`` field of the credential specified by the
-   ``login_creds`` in the connect call.
+#. The ``enable_password`` field of the credential specified by the ``login_creds`` in the connect call.
 #. The ``default`` credential ``enable_password``
 #. The ``enable`` credential ``password`` (legacy)
 #. The ``default`` credential ``password`` (legacy)

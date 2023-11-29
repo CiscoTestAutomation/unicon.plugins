@@ -398,7 +398,7 @@ Example with device.sudo().
 
 Example with sudo command argument.
 
-.. code-block:: python
+.. code-block::
 
       In [5]: dev.sudo('ls')
 

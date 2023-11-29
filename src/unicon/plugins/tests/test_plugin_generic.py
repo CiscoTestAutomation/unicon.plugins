@@ -487,7 +487,7 @@ class TestGenericServices(unittest.TestCase):
         cmd = 'do show version'
         cmd_list = ['do show version', 'do show version']
         ret = self.ha_device.configure(cmd_list)
-        test_output =  ret.replace('\r\n', '\n')
+        test_output =  ret.replace('\r', '')
         single_cmd_output = cmd + '\n' + self.md.mock_data['exec']['commands']['show version']
         self.maxDiff = None
         expected_output = single_cmd_output + single_cmd_output

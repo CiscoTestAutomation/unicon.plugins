@@ -664,9 +664,9 @@ due to console messages over terminal and this results in reload timeout.
 In such a case `prompt_recovery` can be used to recover the device.
 Refer :ref:`prompt_recovery_label` for details on prompt_recovery feature.
 
-====================      =======================      ================================================================================
+=====================     =======================      ====================================================================================
 Argument                  Type                         Description
-====================      =======================      ================================================================================
+=====================     =======================      ====================================================================================
 reload_command            str                          reload command to be issued on device.
                                                        default reload_command is "reload"
 reply                     Dialog                       additional dialogs/new dialogs which are not handled by default.
@@ -678,9 +678,9 @@ return_output             bool (default False)         Return namedtuple with re
 image_to_boot             str                          Image to boot from rommon. Available for iosxe/cat3k and iosxe/cat9k
 error_pattern             list                         List of regex strings to check output for errors.
 append_error_pattern      list                         List of regex strings append to error_pattern.
-post_reload_wait_time     int (default 60)             Number of seconds to wait after reload, before reconnecting, 
+post_reload_wait_time     int (default 60)             Number of seconds to wait after reload, before reconnecting,
                                                        Default Value is 60 sec
-====================      =======================      ================================================================================
+=====================     =======================      ====================================================================================
 
     return :
         * True on Success

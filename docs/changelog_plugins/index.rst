@@ -4,6 +4,7 @@ Plugins Changelog
 .. toctree::
    :maxdepth: 2
 
+   2023/november
    2023/october
    2023/september
    2023/august
@@ -26,6 +27,7 @@ Plugins Changelog
    2022/february
    2022/january
    2021/december
+   2021/october
    2021/september
    2021/august
    2021/july
