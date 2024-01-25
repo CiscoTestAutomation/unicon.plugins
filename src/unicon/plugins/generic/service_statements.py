@@ -268,7 +268,7 @@ confirm_config = Statement(pattern=reload_patterns.confirm_config,
                            continue_timer=False)
 
 setup_dialog = Statement(pattern=reload_patterns.setup_dialog,
-                         action=send_response, args={'response': 'n'},
+                         action=send_response, args={'response': 'no'},
                          loop_continue=True,
                          continue_timer=False)
 

@@ -1,5 +1,6 @@
-
+from unicon.utils import ANSI_REGEX
 from unicon.plugins.generic.patterns import GenericPatterns
+
 
 class LinuxPatterns(GenericPatterns):
     def __init__(self):
@@ -11,7 +12,7 @@ class LinuxPatterns(GenericPatterns):
         # The reason for using the learn_hostname pattern instead of the shell_prompt pattern
         # to learn the hostname, is that the regex in the router implementation matches \S
         # which is not exact enough for the known linux prompts.
-        self.learn_hostname = r'^.*?(?P<hostname>[-\w]+)\s?([-\w\]/~:\.\d ]+)?([>\$~%#\]])\s*(\x1b\S+)?$'
+        self.learn_hostname = r'^.*?({a})?(?P<hostname>[-\w]+)\s?([-\w\]/~:\.\d ]+)?([>\$~%#\]])\s*(\x1b\S+)?$'.format(a=ANSI_REGEX)
 
         # shell_prompt pattern will be used by the 'shell' state after lean_hostname matches
         # a known hostname pattern this pattern is set for the shell state at transition

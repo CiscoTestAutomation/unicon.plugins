@@ -67,12 +67,22 @@ class HAReloadService(GenericHAReloadService):
             if 'image_to_boot' in self.context:
                 self.context['orig_image_to_boot'] = self.context['image_to_boot']
             self.context["image_to_boot"] = kwargs["image_to_boot"]
-            self.connection.active.context = self.context
-            self.connection.standby.context = self.context
+            self.connection.active.context.update({
+                "image_to_boot": self.context["image_to_boot"]
+            })
+            self.connection.standby.context.update({
+                "image_to_boot": self.context["image_to_boot"]
+            })
             self.connection.log.info("'image_to_boot' specified with reload, transitioning to 'rommon' state")
         else:
             if 'image' in kwargs:
                 self.context['image_to_boot'] = kwargs.get('image')
+                self.connection.active.context.update({
+                "image_to_boot": self.context["image_to_boot"]
+                })
+                self.connection.standby.context.update({
+                    "image_to_boot": self.context["image_to_boot"]
+                })
             self.start_state = 'enable'
 
         super().pre_service(*args, **kwargs)

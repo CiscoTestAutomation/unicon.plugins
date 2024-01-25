@@ -491,6 +491,10 @@ class AbstractTokenDiscovery():
 
 
     def learn_device_tokens(self, overwrite_testbed_tokens=False):
+        if not self.con.device:
+            self.con.log.debug('No device object, cannot learn tokens')
+            return
+
         if overwrite_testbed_tokens:
             self.con.log.info('+++ Learning device tokens +++')
         else:

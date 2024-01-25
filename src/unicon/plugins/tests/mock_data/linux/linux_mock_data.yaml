@@ -685,3 +685,7 @@ prompt_recovery:
     "":
       new_state: exec
 
+
+ansi_prompt:
+  prompt: "\x1b[37mapc>"
+  commands: *cmds

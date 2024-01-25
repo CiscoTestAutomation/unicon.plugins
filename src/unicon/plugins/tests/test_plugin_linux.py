@@ -318,6 +318,7 @@ class TestLearnHostname(unittest.TestCase):
           'exec18': LinuxSettings().DEFAULT_LEARNED_HOSTNAME,
           'exec20': 'Linux',
           'exec21': 'mock-server',
+          'ansi_prompt': 'apc'
         }
 
         for state in states:

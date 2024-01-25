@@ -23,15 +23,12 @@ class GenericPatterns(UniconCorePatterns):
         """ initialises all generic patterns
         """
         super().__init__()
-        # self.enable_prompt = r'.*%N#\s?$'
         self.default_hostname_pattern = r'WLC|RouterRP|Router|[Ss]witch|Controller|ios'
 
         self.enable_prompt = r'^(.*?)(Router|Router-stby|Router-sdby|RouterRP|RouterRP-standby|%N-standby|%N\(standby\)|%N-sdby|%N-stby|(S|s)witch|(S|s)witch\(standby\)|Controller|ios|-Slot[0-9]+|%N)(\(boot\))*#\s?$'
 
-        # self.disable_prompt = r'.*%N>\s?$'
         self.disable_prompt = r'^(.*?)(Router|Router-stby|Router-sdby|RouterRP|RouterRP-standby|%N-standby|%N-sdby|%N-stby|(S|s)witch|s(S|s)witch\(standby\)|Controller|ios|-Slot[0-9]+|%N)(\(boot\))*>\s?$'
 
-        # self.config_prompt = r'.*%N\(config.*\)#\s?$'
         self.config_prompt = r'^(.*)\(.*(con|cfg|ipsec-profile|ca-trustpoint|gkm-local-server)\S*\)#\s?$'
         self.rommon_prompt = r'^(.*?)(rommon[\s\d]*>|switch:)\s?$'
         # self.standby_enable_prompt = r'^(.*?)(RouterRP-standby|%N-standby|%N-sdby|%N\(standby\))#\s?$'
@@ -71,7 +68,7 @@ class GenericPatterns(UniconCorePatterns):
 
         self.config_locked = r'Configuration (mode )?(is )?locked|Config mode cannot be entered'
 
-        self.config_start = r'Enter configuration commands, one per line\.\s+End with CNTL/Z\.\s*$'
+        self.config_start = r'\nEnter configuration commands, one per line\.\s+End with CNTL/Z\.\s*$'
 
         self.enable_secret = r'^.*?(Enter|Confirm) enable secret:\s*$'
 

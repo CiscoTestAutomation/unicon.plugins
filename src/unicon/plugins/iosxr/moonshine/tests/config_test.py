@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from pyats import aetest
-from pyats.kleenex import BringUp
+from pyats.bringup import BringUp
 import re, logging
 
 # NOTE: uut1 device must be Moonshine for this test to work.

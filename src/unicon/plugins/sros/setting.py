@@ -24,5 +24,7 @@ class SrosSettings(GenericSettings):
         self.CLASSIC_INIT_CONFIG_COMMANDS = []
 
         self.DEFAULT_LEARNED_HOSTNAME = r'([^@# \t\n\r\f\v]+)'
+        self.LEARN_PATTERN = r'([^@# \t\n\r\f\v]+)'
+
         self.ERROR_PATTERN.append("^Error: .*")
         self.CONFIGURE_ERROR_PATTERN.append("^Error: .*")

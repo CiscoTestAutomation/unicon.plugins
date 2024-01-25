@@ -1094,9 +1094,11 @@ class Reload(BaseService):
                      post_reload_wait_time = None,
                      *args, **kwargs):
 
-
         con = self.connection
         timeout = timeout or self.timeout
+
+        syslog_wait = con.settings.SYSLOG_WAIT
+        con.settings.SYSLOG_WAIT = con.settings.RELOAD_SYSLOG_WAIT
 
         if error_pattern is None:
             self.error_pattern = con.settings.ERROR_PATTERN
@@ -1200,7 +1202,13 @@ class Reload(BaseService):
                 if (current_time - start_time) > timeout_time:
                     con.log.info('Time out, trying to acces device..')
                     break
-            con.sendline()
+
+            # ! This line was added to resolve an issue with HA devices, but was
+            # ! found to cause further issues with other devices on reload
+            # TODO Need to find a better way to implement a fix for HA devices
+            # TODO that does not cause issues with other devices. Likely need to
+            # TODO modify the state machine and/or dialog processing.
+            # con.sendline()
         try:
             con.context = context
             con.connection_provider.connect()
@@ -1211,6 +1219,8 @@ class Reload(BaseService):
             else:
                 con.log.exception('Connection to {} failed'.format(con.hostname))
                 self.result = False
+
+        con.settings.SYSLOG_WAIT = syslog_wait
 
         self.log_buffer.seek(0)
         reload_output = self.log_buffer.read()
