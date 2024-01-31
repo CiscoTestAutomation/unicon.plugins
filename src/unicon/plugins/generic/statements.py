@@ -806,13 +806,15 @@ initial_statement_list = [generic_statements.init_conf_stmt,
                           generic_statements.enter_your_selection_stmt
                           ]
 
-connection_statement_list = \
-    authentication_statement_list + \
-    initial_statement_list + \
-    pre_connection_statement_list
 
 ############################################################
 # Default pattern Statement
 #############################################################
 
 default_statement_list = [generic_statements.more_prompt_stmt]
+
+connection_statement_list = \
+    default_statement_list + \
+    authentication_statement_list + \
+    initial_statement_list + \
+    pre_connection_statement_list

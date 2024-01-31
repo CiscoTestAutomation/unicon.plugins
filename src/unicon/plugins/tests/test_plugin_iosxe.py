@@ -1189,8 +1189,8 @@ class TestConfigTransition(unittest.TestCase):
             mit=True
         )
         c.connect()
-        self.assertEqual(c.settings.CONFIG_TRANSITION_WAIT, 0.2)
-        self.assertEqual(c.spawn.settings.CONFIG_TRANSITION_WAIT, 0.2)
+        self.assertEqual(c.settings.CONFIG_TRANSITION_WAIT, 15)
+        self.assertEqual(c.spawn.settings.CONFIG_TRANSITION_WAIT, 15)
         c.configure()
         c.settings.CONFIG_TRANSITION_WAIT = 1
         c.configure()
@@ -1203,12 +1203,10 @@ class TestConfigTransition(unittest.TestCase):
             hostname='PE1',
             start=['mock_device_cli --os iosxe --state enable_slow_config --hostname PE1'],
             os='iosxe',
-            mit=True
+            mit=True,
+            learn_hostname=True
         )
         c.connect()
-        # Force hostname learning to be enabled so default prompt pattern is used
-        # This was causing issues and should not fail with this test
-        c.state_machine.learn_hostname = True
         c.configure()
 
 
@@ -1304,6 +1302,74 @@ class TestMaintenanceMode(unittest.TestCase):
         c.switchto('enable')
         c.disconnect()
 
+
+class TestSpecialHostname(unittest.TestCase):
+
+    def test_special_hostname1(self):
+        con = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state general_enable --hostname PE1'],
+            os='iosxe',
+            mit=True
+        )
+        con.connect()
+        try:
+            con.configure('hostname 163-67-30(118)', timeout=3)
+            self.assertEqual(con.hostname, '163-67-30(118)')
+            self.assertEqual(con.state_machine.hostname, r'163\-67\-30\(118\)')
+        finally:
+            con.disconnect()
+
+    def test_special_hostname2(self):
+        con = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state general_enable --hostname PE1'],
+            os='iosxe',
+            mit=True
+        )
+        con.connect()
+        try:
+            con.hostname = '163-67-30(118)'
+            self.assertEqual(con.hostname, '163-67-30(118)')
+            self.assertEqual(con.state_machine.hostname, r'163\-67\-30\(118\)')
+        finally:
+            con.disconnect()
+
+    def test_special_hostname_learn1(self):
+        con = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state general_password --hostname "163-67-30(118)"'],
+            credentials=dict(default=dict(username='cisco', password='cisco')),
+            os='generic',
+            mit=True,
+            learn_hostname=True,
+            learn_tokens=True,
+            connection_timeout=3,
+            debug=True
+        )
+        try:
+            con.connect()
+            self.assertEqual(con.hostname, '163-67-30(118)')
+            self.assertEqual(con.state_machine.hostname, r'163\-67\-30\(118\)')
+        finally:
+            con.disconnect()
+
+    def test_special_hostname_learn2(self):
+        con = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state general_password --hostname "cannot learn this "'],
+            credentials=dict(default=dict(username='cisco', password='cisco')),
+            os='iosxe',
+            mit=True,
+            debug=True,
+            learn_hostname=True,
+            connection_timeout=3
+        )
+        try:
+            with self.assertRaises(unicon.core.errors.ConnectionError):
+                con.connect()
+        finally:
+            con.disconnect()
 
 
 if __name__ == "__main__":

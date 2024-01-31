@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from pyats import aetest
-from pyats.kleenex import BringUp
+from pyats.bringup import BringUp
 
 class common_setup(aetest.CommonSetup):
     @aetest.subsection

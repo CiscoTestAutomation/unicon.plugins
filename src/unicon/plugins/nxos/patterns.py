@@ -14,7 +14,7 @@ class NxosPatterns(GenericPatterns):
         self.config_prompt = r'^(?P<hostname00>.*?(?<!\(boot\)))(\(maint-mode\))?(?!\(boot\))\(.*?(con|cfg|ipsec-profile)\S*\)#[\s\x07]*$'
         self.debug_prompt = r'^(.*?)Linux\(debug\)#\s*$'
         self.sqlite_prompt = r'^(.*?)sqlite>\s*$'
-        self.reboot = r'This command will reboot the system. \(y\/n\)\?  \[n\]'
+        self.reboot = r'(.*?)This command will reboot the system. \(y\/n\)\?  \[n\]'
         self.secure_password = r'^.*Do you want to enforce secure password standard \(yes\/no\) \[y\]\:'
         self.auto_provision = r'Abort( Power On)? Auto Provisioning and continue with normal setup \?\(yes\/no\)\[n\]\:'
         self.enable_vdc = r'Do you want to enable admin vdc\s?\(yes\/no\)\s?\[n\]\:'

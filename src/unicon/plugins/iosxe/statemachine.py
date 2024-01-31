@@ -4,7 +4,8 @@ __author__ = "Myles Dear <pyats-support@cisco.com>"
 
 import re
 from datetime import datetime
-from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine, config_transition
+from unicon.plugins.generic.statemachine import (GenericSingleRpStateMachine, config_transition,
+                                                 config_service_prompt_handler)
 from unicon.plugins.generic.statements import (connection_statement_list,
                                                default_statement_list, wait_and_enter)
 from unicon.plugins.generic.service_statements import reload_statement_list
@@ -45,22 +46,6 @@ def boot_from_rommon(statemachine, spawn, context):
 
 def send_break(statemachine, spawn, context):
     spawn.send('\x03')
-
-
-def config_service_prompt_handler(spawn, config_pattern):
-    """ Check if we need to send the sevice config prompt command.
-    """
-    if hasattr(spawn.settings, 'SERVICE_PROMPT_CONFIG_CMD') and spawn.settings.SERVICE_PROMPT_CONFIG_CMD:
-        # if the config prompt is seen, return
-        if re.search(config_pattern, spawn.buffer):
-            return
-        else:
-            # if no buffer changes for a few seconds, check again
-            if buffer_settled(spawn, spawn.settings.CONFIG_PROMPT_WAIT):
-                if re.search(config_pattern, spawn.buffer):
-                    return
-                else:
-                    spawn.sendline(spawn.settings.SERVICE_PROMPT_CONFIG_CMD)
 
 
 def enable_to_maintenance_transition(statemachine, spawn, context):

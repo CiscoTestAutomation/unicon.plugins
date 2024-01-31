@@ -35,15 +35,17 @@ def config_service_prompt_handler(spawn, config_pattern):
     """ Check if we need to send the sevice config prompt command.
     """
     if hasattr(spawn.settings, 'SERVICE_PROMPT_CONFIG_CMD') and spawn.settings.SERVICE_PROMPT_CONFIG_CMD:
+        spawn.log.debug('Waiting for config prompt')
         # if the config prompt is seen, return
         if re.search(config_pattern, spawn.buffer):
             return
         else:
-            # if no buffer changes for a few seconds, check again
-            if buffer_settled(spawn, spawn.settings.CONFIG_PROMPT_WAIT):
+            # if no buffer changes for (config timout) seconds, check again
+            if buffer_settled(spawn, spawn.settings.CONFIG_TRANSITION_WAIT):
                 if re.search(config_pattern, spawn.buffer):
                     return
                 else:
+                    spawn.log.debug('Config prompt not seen, enabling service prompt config')
                     spawn.sendline(spawn.settings.SERVICE_PROMPT_CONFIG_CMD)
 
 
@@ -66,7 +68,6 @@ def config_transition(statemachine, spawn, context):
 
     for attempt in range(max_attempts + 1):
         spawn.sendline(statemachine.config_command)
-        buffer_wait(spawn, spawn.settings.CONFIG_TRANSITION_WAIT)
         dialog.process(spawn, timeout=spawn.settings.CONFIG_TIMEOUT, context=context)
 
         statemachine.detect_state(spawn)
