@@ -290,6 +290,7 @@ class AbstractTokenDiscovery():
         Update learned tokens when new token values are found
         """
         device = self.device
+        controller_mode = None
 
         discovery_prompt_stmt = \
             Statement(pattern=self.con.state_machine\
@@ -319,6 +320,9 @@ class AbstractTokenDiscovery():
                     self.con.log.debug(f"Failed to parse command '{cmd}' on "
                                        f"{device}. Reason: {e}")
                 else:
+                    # this controller will be se to true if device is in controller mode.
+                    if parsed_output.get('operating_mode', '') == 'Controller-Managed':
+                        controller_mode = True
                     self.update_learned_tokens(parsed_output,
                                                overwrite_existing_values=False)
 
@@ -348,7 +352,14 @@ class AbstractTokenDiscovery():
                 if self.all_tokens_learned():
                     self.con.log.debug(
                         "All tokens discovered, ending token discovery early")
+                    # if the controller is True device is in controller mode set the
+                    # platform to sdwan
+                    if controller_mode:
+                        self.update_learned_tokens({'platform':'sdwan'})
                     break
+        if controller_mode:
+            self.update_learned_tokens({'platform':'sdwan'})
+
 
     def standardize_token_values(self, tokens):
         """
@@ -502,7 +513,6 @@ class AbstractTokenDiscovery():
 
         # Parse commands using generic parsers to get device abstraction tokens
         self.discover_tokens()
-
         # Force tokens to be same format
         self.predefined_tokens = \
             self.standardize_token_values(self.predefined_tokens)

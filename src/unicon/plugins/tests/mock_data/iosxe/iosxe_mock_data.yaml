@@ -406,8 +406,6 @@ general_maintenance_mode_stop2:
 general_config:
   prompt: "%N(conf)#"
   commands: &general_config_cmds
-    "hostname 163-67-30(118)":
-      new_state: special_hostname_config1
     "!end indicator for bulk configure": ""
     "config-register 0x2102": ""
     "archive": ""
@@ -1591,14 +1589,3 @@ general_enable_reload_to_rommon:
     <<: *gen_enable_cmds
     "reload":
       new_state: press_return
-      
-special_hostname_config1:
-  prompt: "163-67-30(118)(config)#"
-  commands:
-    <<: *gen_enable_cmds
-    "end":
-      new_state: special_hostname_enable1
-
-special_hostname_enable1:
-  prompt: "163-67-30(118)#"
-  commands: *gen_enable_cmds

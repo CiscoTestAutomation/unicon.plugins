@@ -70,8 +70,11 @@ class GenericSettings(Settings):
         self.BOOT_FILESYSTEM = 'bootflash:'
         self.BOOT_FILE_REGEX = r'(\S+\.bin)'
 
-        # Time to wait for the config prompt to appear
-        self.CONFIG_TRANSITION_WAIT = 15
+        # Wait for the config prompt to appear
+        # before checking for the config prompt.
+        # This may need to be adjusted if the RTT between
+        # the execution host and lab device is high.
+        self.CONFIG_TRANSITION_WAIT = 0.2
 
         # If learn_hostname is requested but no hostname was actually learned,
         # substitute this default hostname when occurances of HOSTNAME_SUBST_PAT
