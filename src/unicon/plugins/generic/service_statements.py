@@ -337,6 +337,12 @@ config_session_locked_stmt = Statement(pattern=reload_patterns.config_session_lo
                                        loop_continue=False,
                                        continue_timer=False)
 
+eof_statement = Statement(pattern='__eof__',
+                          action=connection_closed_handler,
+                          args=None,
+                          loop_continue=False,
+                          continue_timer=False)
+
 reload_statement_list = [save_env, confirm_reset, reload_confirm,
                          reload_confirm_ios, reload_confirm_iosxe, useracess,
                          confirm_config, setup_dialog, auto_install_dialog,
@@ -348,7 +354,7 @@ reload_statement_list = [save_env, confirm_reset, reload_confirm,
                          generic_statements.syslog_msg_stmt,
                          # Below statements have loop_continue=False
                          password_stmt, press_enter, press_return,
-                         connection_closed_stmt
+                         connection_closed_stmt, eof_statement
                          ]
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#

@@ -60,7 +60,7 @@ devices:
         # Test that connection was redirected to the corresponding plugin
         with open(self.dev.logfile) as f:
             log_contents = f.read()
-        self.assertRegexpMatches(
+        self.assertRegex(
             log_contents,
             r'\+\+\+ Unicon plugin asa( \(unicon\.plugins\.asa\))? \+\+\+'
         )
@@ -81,7 +81,7 @@ devices:
         # Test that connection was redirected to the corresponding plugin
         with open(self.dev.logfile) as f:
             log_contents = f.read()
-        self.assertRegexpMatches(
+        self.assertRegex(
             log_contents,
             r'\+\+\+ Unicon plugin ios( \(unicon\.plugins\.ios\))? \+\+\+'
         )
@@ -104,10 +104,23 @@ devices:
         # Test that connection was redirected to the corresponding plugin
         with open(self.dev.logfile) as f:
             log_contents = f.read()
-        self.assertRegexpMatches(
+        self.assertRegex(
             log_contents,
             r'\+\+\+ Unicon plugin iosxe( \(unicon\.(internal\.)?plugins\.iosxe\))? \+\+\+'
         )
+    # test for controller mode for sdwan
+    def test_iosxe_learn_tokens_from_show_version_sdwan(self):
+        # Set up device to use correct mock_device data
+        self.dev.connections.cli.command = \
+            "mock_device_cli --os generic --state iosxe_login3"
+
+        # Test connection succeeds and tokens learned
+        self.dev.connect(learn_tokens=True)
+        self.assertEqual(self.dev.os, 'iosxe')
+        self.assertEqual(self.dev.version, '17.14')
+        self.assertEqual(self.dev.platform, 'sdwan')
+        self.assertEqual(self.dev.model, 'c5000')
+        self.assertEqual(self.dev.pid, 'WS-C5002')
 
     def test_iosxr_learn_tokens_from_show_version(self):
         # Set up device to use correct mock_device data
@@ -124,7 +137,7 @@ devices:
         # Test that connection was redirected to the corresponding plugin
         with open(self.dev.logfile) as f:
             log_contents = f.read()
-        self.assertRegexpMatches(
+        self.assertRegex(
             log_contents,
             r'\+\+\+ Unicon plugin iosxr/iosxrv( \(unicon\.plugins\.iosxr\.iosxrv\))? \+\+\+'
         )
@@ -146,7 +159,7 @@ devices:
         # Test that connection was redirected to the corresponding plugin
         with open(self.dev.logfile) as f:
             log_contents = f.read()
-        self.assertRegexpMatches(
+        self.assertRegex(
             log_contents,
             r'\+\+\+ Unicon plugin nxos/n5k( \(unicon\.plugins\.nxos\.n5k\))? \+\+\+'
         )
@@ -167,7 +180,7 @@ devices:
         # Test that connection was redirected to the corresponding plugin
         with open(self.dev.logfile) as f:
             log_contents = f.read()
-        self.assertRegexpMatches(
+        self.assertRegex(
             log_contents,
             r'\+\+\+ Unicon plugin iosxe( \(unicon\.(internal\.)?plugins\.iosxe\))? \+\+\+'
         )
@@ -184,7 +197,7 @@ devices:
         # Test that connection was redirected to the corresponding plugin
         with open(self.dev.logfile) as f:
             log_contents = f.read()
-        self.assertRegexpMatches(
+        self.assertRegex(
             log_contents,
             r'\+\+\+ Unicon plugin linux( \(unicon(\.internal)?\.plugins\.linux\))? \+\+\+'
         )

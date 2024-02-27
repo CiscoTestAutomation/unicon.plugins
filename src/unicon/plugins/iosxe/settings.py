@@ -20,7 +20,7 @@ class IosXESettings(GenericSettings):
             r'% Unknown command or computer name, or unable to find computer address'
         ]
         self.CONFIGURE_ERROR_PATTERN = [
-            r'^%\s*[Ii]nvalid (command|input|number)',
+            r'^%\s*[Ii]nvalid (command|input|number|address)',
             r'routing table \S+ does not exist',
             r'^%\s*SR feature is not configured yet, please enable Segment-routing first.',
             r'^%\s*\S+ overlaps with \S+',
@@ -31,7 +31,8 @@ class IosXESettings(GenericSettings):
             r'% Specify remote-as or peer-group commands first',
             r'% Policy commands not allowed without an address family',
             r'% Color set already. Deconfigure first',
-            r'Invalid policy name, \S+ does not exist'
+            r'Invalid policy name, \S+ does not exist',
+            r'% Deletion of RD in progress; wait for it to complete'
         ]
 
         self.EXECUTE_MATCHED_RETRIES = 1
