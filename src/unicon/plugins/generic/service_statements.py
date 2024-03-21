@@ -354,7 +354,8 @@ reload_statement_list = [save_env, confirm_reset, reload_confirm,
                          generic_statements.syslog_msg_stmt,
                          # Below statements have loop_continue=False
                          password_stmt, press_enter, press_return,
-                         connection_closed_stmt, eof_statement
+                         connection_closed_stmt, eof_statement,
+                         generic_statements.enter_your_encryption_selection_stmt
                          ]
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#

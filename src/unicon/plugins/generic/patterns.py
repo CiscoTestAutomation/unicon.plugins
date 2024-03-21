@@ -85,3 +85,5 @@ class GenericPatterns(UniconCorePatterns):
         self.get_cursor_position = r'\x1b\[6n'
 
         self.new_password = r'^(Enter new password|Confirm password):\s*$'
+
+        self.enter_your_encryption_selection_2 = r'^.*?Enter your encryption selection( \[2])?:\s*$'

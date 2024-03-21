@@ -15,6 +15,7 @@ asr_exec:
   commands:
     "term length 0": ""
     "term width 0": ""
+    "show version | include operating mode" : ""
     "show version": &SV |2
       Cisco IOS Software, IOS-XE Software (X86_64_LINUX_IOSD-ADVENTERPRISEK9-M), Experimental Version 15.2(20110615:055721) [mcp_dev-BLD-BLD_MCP_DEV_LATEST_20110615_044519-ios 143]
       Copyright (c) 1986-2011 by Cisco Systems, Inc.
@@ -78,6 +79,7 @@ enable_asr:
     "term length 0": ""
     "term width 0": ""
     "show version": *SV
+    "show version | include operating mode" : ""
 
     "disable":
       new_state: asr_exec

@@ -5,12 +5,16 @@ import time
 from random import randint
 
 from unicon.eal.dialogs import Dialog
+from unicon.statemachine import State
+
 from unicon.core.errors import TimeoutError
 from unicon.bases.routers.connection_provider \
     import BaseSingleRpConnectionProvider, BaseDualRpConnectionProvider
 
 from unicon.plugins.generic.statements import custom_auth_statements
 from unicon.plugins.generic.statements import pre_connection_statement_list
+from unicon.plugins.generic.patterns import GenericPatterns
+
 
 from unicon.plugins.iosxr.patterns import IOSXRPatterns
 from unicon.plugins.iosxr.errors import RpNotRunningError
@@ -119,8 +123,16 @@ class IOSXRDualRpConnectionProvider(BaseDualRpConnectionProvider):
 
         for subconnection in con.subconnections:
             con.log.info('+++ connection to %s +++' % str(subconnection.spawn))
+        if con.learn_tokens or con.settings.LEARN_DEVICE_TOKENS:
+            # Add learn tokens state to state machine so it can use a looser
+            # prompt pattern to match. Required for at least some Linux prompts
+            for subconnection in con.subconnections:
+                if 'learn_tokens_state' not in \
+                        [str(s) for s in subconnection.state_machine.states]:
+                    self.learn_tokens_state = State('learn_tokens_state',
+                                            GenericPatterns().learn_os_prompt)
+                    subconnection.state_machine.add_state(self.learn_tokens_state)
         self.establish_connection()
-
         # Maintain initial state
         if not con.mit:
             con.log.info('+++ designating handles +++')

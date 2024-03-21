@@ -216,6 +216,15 @@ def load_token_csv_file(file_path, key='pid'):
 
     return ret_dict
 
+def get_device_mode(con):
+        '''Check the mode of device 
+        '''
+        output = con.execute('show version | include operating mode')
+        if output:
+            pattern = re.compile(r'.*operating mode:\s*(?P<mode>[\w-]+).*', re.DOTALL)
+            m = pattern.match(output)
+            return m.groupdict().get('mode')
+
 
 class AbstractTokenDiscovery():
 
@@ -289,13 +298,16 @@ class AbstractTokenDiscovery():
         Loop through the commands one at a time and parse the output (if any).
         Update learned tokens when new token values are found
         """
+        # import is done here to avoid circular import error
+        from unicon.plugins.generic.statements import generic_statements
+
         device = self.device
         controller_mode = None
 
         discovery_prompt_stmt = \
             Statement(pattern=self.con.state_machine\
                 .get_state('learn_tokens_state').pattern)
-        dialog = Dialog([discovery_prompt_stmt]) + self.con.state_machine.default_dialog
+        dialog = Dialog([discovery_prompt_stmt, generic_statements.more_prompt_stmt])
 
         # Execute the command on the device
         for cmd in self.commands_and_classes:
@@ -306,7 +318,9 @@ class AbstractTokenDiscovery():
                     f"Failed to execute command '{cmd}' on {self}. Reason: {e}")
                 continue
             else:
-                outcome = dialog.process(self.con.spawn)
+                outcome = dialog.process(self.con.spawn,
+                                         timeout=self.con.spawn.settings.EXEC_TIMEOUT,
+                                         prompt_recovery=True)
 
                 if not outcome.match_output:
                     continue
@@ -524,3 +538,5 @@ class AbstractTokenDiscovery():
         # Show the results of the process
         self.show_results()
         return self.learned_tokens
+    
+    

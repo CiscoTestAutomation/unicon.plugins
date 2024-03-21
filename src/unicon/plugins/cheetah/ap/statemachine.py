@@ -1,5 +1,5 @@
 from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine
-from unicon.plugins.generic.statements import GenericStatements
+from unicon.plugins.generic.statements import GenericStatements, default_statement_list
 from unicon.statemachine import State, Path, StateMachine
 from unicon.eal.dialogs import Dialog, Statement
 from unicon.plugins.generic.patterns import GenericPatterns
@@ -46,3 +46,5 @@ class ApSingleRpStateMachine(GenericSingleRpStateMachine):
         self.add_path(enable_to_shell)
         self.add_path(shell_to_enable)
         self.add_path(enable_to_disable)
+
+        self.add_default_statements(default_statement_list)

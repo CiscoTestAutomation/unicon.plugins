@@ -23,7 +23,7 @@ quad_exec:
       -------------------------------------------------------------------------------------
       *1       Active   00be.7574.6b0c     0      V02     Ready
        2       Standby  2cf8.9bb9.5648     0      V02     Ready
-
+    "show version | include operating mode" : ""
     "show version": &SV |2
       Cisco IOS XE Software, Version BLD_POLARIS_DEV_LATEST_20200626_002523
       Cisco IOS Software [Amsterdam], Catalyst L3 Switch Software (CAT9K_IOSXE), Experimental Version 17.4.20200626:005355 [S2C-build-polaris_dev-116581-/nobackup/mcpre/BLD-BLD_POLARIS_DEV_LATEST_20200626_002523 144]
@@ -153,6 +153,7 @@ quad_enable:
     "term length 0": ""
     "term width 0": ""
     "show version": *SV
+    "show version | include operating mode" : ""
     "show switch": *SS
     "sh redundancy state": *SRS
     "show redundancy states | in peer": |
@@ -470,6 +471,7 @@ quad_stby_exec:
        1       Active   00be.7574.6b0c     0      V02     Ready
       *2       Standby  2cf8.9bb9.5648     0      V02     Ready
     "show version": *SV
+    "show version | include operating mode" : ""
     "sh redundancy state": *SRS
     "enable":
       new_state: quad_stby_enable_pwd
@@ -485,6 +487,7 @@ quad_stby_enable:
   commands:
     "term length 0": ""
     "term width 0": ""
+    "show version | include operating mode" : ""
     "show version": *SV
     "show switch": *SSS
     "sh redundancy state": *SRS

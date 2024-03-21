@@ -15,6 +15,7 @@ stack_exec:
   commands:
     "term length 0": ""
     "term width 0": ""
+    "show version | include operating mode" : ""
     "show switch": &SS |2
       Switch/Stack Mac Address : bcc4.9346.9180 - Local Mac Address
       Mac persistency wait time: Indefinite
@@ -209,6 +210,7 @@ stack_enable:
     "term length 0": ""
     "term width 0": ""
     "show version": *SV
+    "show version | include operating mode" : ""
     "show switch": *SS
     "sh redundancy state": *SRS
     "disable":

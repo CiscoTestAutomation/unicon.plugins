@@ -29,6 +29,7 @@ cat4k_exec:
   commands:
     "term length 0": ""
     "term width 0": ""
+    "show version | include operating mode" : ""
     "show version":
       response: &SV |
         Cisco IOS Software, IOS-XE Software, Catalyst 4500 L3 Switch  Software (cat4500es8-UNIVERSALK9-M), Version 03.11.01.E RELEASE SOFTWARE (fc4)
@@ -77,6 +78,7 @@ c4k_enable:
     "term length 0": ""
     "term width 0": ""
     "show version": *SV
+    "show version | include operating mode" : ""
     "sh redundancy state": &SRS |2
             my state = 13 -ACTIVE
             peer state = 8  -STANDBY HOT

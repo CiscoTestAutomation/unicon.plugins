@@ -58,6 +58,7 @@ cat3k_exec:
   commands:
     "term length 0": ""
     "term width 0": ""
+    "show version | include operating mode" : ""
     "show version": &SV |2
       Cisco IOS XE Software, Version BLD_POLARIS_DEV_LATEST_20170430_051046
       Cisco IOS Software [Everest], Catalyst L3 Switch Software (CAT3K_CAA-UNIVERSALK9-M), Experimental Version 16.7.20170430:042622 [polaris_dev-/scratch/mcpre/BLD-BLD_POLARIS_DEV_LATEST_20170430_051046 121]
@@ -178,6 +179,7 @@ enable_cat3k:
     "term length 0": ""
     "term width 0": ""
     "show version": *SV
+    "show version | include operating mode" : ""
 
     # The following commands are for uniclean testing.
     "show version | inc System image file is": |2

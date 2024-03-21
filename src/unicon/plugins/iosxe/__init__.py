@@ -9,8 +9,8 @@ from unicon.plugins.generic import ServiceList, HAServiceList
 from unicon.bases.routers.connection import BaseSingleRpConnection
 from unicon.plugins.iosxe.statemachine import IosXESingleRpStateMachine
 from unicon.plugins.iosxe.statemachine import IosXEDualRpStateMachine
-from unicon.plugins.generic import GenericSingleRpConnectionProvider,\
-    GenericDualRPConnection
+from unicon.plugins.iosxe.connection_provider import  IosxeSingleRpConnectionProvider
+from unicon.plugins.generic import GenericDualRPConnection
 from unicon.plugins.iosxe.settings import IosXESettings
 
 from unicon.plugins.iosxe import service_implementation as svc
@@ -55,7 +55,7 @@ class IosXESingleRpConnection(BaseSingleRpConnection):
     platform = None
     chassis_type = 'single_rp'
     state_machine_class = IosXESingleRpStateMachine
-    connection_provider_class = GenericSingleRpConnectionProvider
+    connection_provider_class = IosxeSingleRpConnectionProvider
     subcommand_list = IosXEServiceList
     settings = IosXESettings()
 

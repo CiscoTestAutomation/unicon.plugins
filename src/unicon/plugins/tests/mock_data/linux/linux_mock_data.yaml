@@ -617,6 +617,7 @@ ios_sw4_telnet:
 ios_sw4_exec:
   prompt: "Sw04>"
   commands:
+    "show version | include operating mode": ""
     "enable":
       new_state: ios_sw4_password
 

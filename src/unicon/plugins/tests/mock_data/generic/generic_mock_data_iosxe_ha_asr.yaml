@@ -1,6 +1,7 @@
 asr_exec_standby:
   prompt: "%N-stby>"
   commands:
+    "show version | include operating mode": ""
     "show version": &SV |2
       Cisco IOS XE Software, Version BLD_POLARIS_DEV_LATEST_20170913_031230_2
       Cisco IOS Software [Fuji], ASR1000 Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Experimental Version 16.7.20170913:022807 [polaris_dev-/scratch/mcpre/BLD-BLD_POLARIS_DEV_LATEST_20170913_031230 164]
@@ -139,6 +140,7 @@ asr_password:
 asr_exec:
   prompt: "%N>"
   commands:
+    "show version | include operating mode": ""
     "term length 0": ""
     "term width 0": ""
     "show version": *SV

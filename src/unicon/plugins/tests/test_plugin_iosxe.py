@@ -36,6 +36,36 @@ class TestIosXEPluginConnect(unittest.TestCase):
         c.connect()
         self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
 
+    def test_isr_controller_mode_connect(self):
+        testbed = '''
+            devices:
+                Router:
+                    type: router
+                    os: iosxe
+                    platform: isr
+                    credentials:
+                        default:
+                            username: cisco
+                            password: cisco
+                    connections:
+                        defaults:
+                            class: 'unicon.Unicon'
+                        cli:
+                            command: mock_device_cli --os iosxe --state isr_exec_1 --hostname Router
+        '''
+        t = loader.load(testbed)
+        d = t.devices.Router
+        try:
+            d.connect()
+        finally:
+            d.disconnect()
+        self.assertEqual(d.os, 'iosxe')
+        self.assertEqual(d.version, '17.14')
+        self.assertEqual(d.platform, 'sdwan')
+        self.assertEqual(d.model, 'isr4200')
+        self.assertEqual(d.pid, 'ISR4221/K9')
+
+
     def test_isr_login_connect(self):
         c = Connection(hostname='Router',
                        start=['mock_device_cli --os iosxe --state isr_login --hostname Router'],

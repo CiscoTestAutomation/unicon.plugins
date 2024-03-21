@@ -3,6 +3,7 @@ c8kv_enable:
   commands:
     'term length 0': ''
     'term width 0': ''
+    'show version | include operating mode' : ''
     'show version': |2
       Cisco IOS XE Software, Version BLD_POLARIS_DEV_LATEST_20200803_053108
       Cisco IOS Software [Bengaluru], Virtual XE Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Experimental Version 17.4.20200803:054658 [S2C-build-polaris_dev-119012-/nobackup/mcpre/BLD-BLD_POLARIS_DEV_LATEST_20200803_053108 218]
@@ -218,6 +219,7 @@ c8kv_grub_boot_image:
 c8kv_exec:
   prompt: '%N>'
   commands:
+    'show version | include operating mode': ''
     'enable':
       new_state: 'c8kv_enable'
 
