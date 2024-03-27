@@ -743,6 +743,43 @@ class TestIosXeCat9kPluginContainer(unittest.TestCase):
         c.connect()
         c.disconnect()
 
+class TestIosXECat9kEnableSecret(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.md = MockDeviceTcpWrapperIOSXE(port=0, state='enable_secret_password_state')
+        cls.md.start()
+
+        cls.testbed = """
+        devices:
+          Router:
+            os: iosxe
+            type: router
+            credentials:
+                default:
+                    username: cisco
+                    password: cisco
+                enable:
+                    password: Secret12345
+            connections:
+              defaults:
+                class: unicon.Unicon
+              a:
+                protocol: telnet
+                ip: 127.0.0.1
+                port: {}
+        """.format(cls.md.ports[0])
+        tb = loader.load(cls.testbed)
+        cls.r = tb.devices.Router
+        cls.r.connect(init_config_commands=[])
+
+    @classmethod
+    def tearDownClass(self):
+        self.md.stop()
+
+    def test_reload_enable_secret(self):
+        self.r.reload()
+        self.r.disconnect()
 
 if __name__ == '__main__':
     unittest.main()

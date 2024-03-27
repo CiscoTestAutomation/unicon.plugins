@@ -15,6 +15,7 @@ ewlc_exec:
   commands:
     "term length 0": ""
     "term width 0": ""
+    "show version | include operating mode" : ""
     "show version": &SV |2
       Cisco IOS Software [Denali], Catalyst L3 Switch Software (CAT3K_CAA-UNIVERSALK9-M), Experimental Version 16.3.20190723:152036 [v163_mr_throttle-BLD-BLD_V163_MR_THROTTLE_LATEST_20190723_150815 107]
       Copyright (c) 1986-2019 by Cisco Systems, Inc.
@@ -103,6 +104,7 @@ ewlc_enable:
     "term length 0": ""
     "term width 0": ""
     "show version": *SV
+    "show version | include operating mode" : ""
     "config term":
       new_state: ewlc_config
     "disable":
@@ -193,6 +195,7 @@ ewlc_exec_recovery_mode:
   commands:
     "term length 0": ""
     "term width 0": ""
+    "show version | include operating mode" : ""
     "show version": &show |2
       '''
       Cisco IOS XE Software, Version BLD_V173_THROTTLE_LATEST_20200525_074127_2
@@ -266,6 +269,7 @@ ewlc_enable_recovery_mode:
     "term length 0": ""
     "term width 0": ""
     "show version": *show
+    "show version | include operating mode" : ""
     "disable":
       new_state: ewlc_exec_recovery_mode
 

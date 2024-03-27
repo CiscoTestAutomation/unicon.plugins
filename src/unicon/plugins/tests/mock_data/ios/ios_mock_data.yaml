@@ -88,6 +88,7 @@ password:
 exec:
   prompt: "%N>"
   commands:
+    "show version | include operating mode": ""
     "show version": &SV |
       Cisco IOS Software, 7200 Software (C7200P-ADVENTERPRISEK9-M), Experimental Version 15.0(20100325:222114) [scube_alto-gclendon-alto_precollapse 221]
       Copyright (c) 1986-2010 by Cisco Systems, Inc.
@@ -268,6 +269,7 @@ confirm_prompt:
 enable:
   prompt: "%N#"
   commands: &enable_cmds
+    "show version | include operating mode": ""
     "setup_mgmt":
       new_state: ios_setup_mgmt
     "enable": ""

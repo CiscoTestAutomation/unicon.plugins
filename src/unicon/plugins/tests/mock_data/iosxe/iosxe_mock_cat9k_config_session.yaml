@@ -5,6 +5,7 @@ c9k_enable4:
         new_state: c9k_config4
       "term length 0": ""
       "term width 0": ""
+      "show version | include operating mode" : ""
       "show version" :
         response: |
           Cisco IOS XE Software, Version 16.09.02

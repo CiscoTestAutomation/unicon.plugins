@@ -202,6 +202,26 @@ devices:
             r'\+\+\+ Unicon plugin linux( \(unicon(\.internal)?\.plugins\.linux\))? \+\+\+'
         )
 
+    def test_iosxr_learn_tokens(self):
+        # Set up device to use correct mock_device data
+        self.dev.connections.cli.command = \
+            "mock_device_cli --os generic --state iosxr_login"
+
+        # Test connection succeeds and tokens learned
+        self.dev.connect(learn_tokens=True, learn_hostname=True)
+        self.assertEqual(self.dev.os, 'iosxr')
+        self.assertEqual(self.dev.os_flavor, 'lnt')
+        self.assertEqual(self.dev.version, '5.2.3.12i')
+        self.assertEqual(self.dev.platform, 'iosxrv')
+
+        # Test that connection was redirected to the corresponding plugin
+        with open(self.dev.logfile) as f:
+            log_contents = f.read()
+        self.assertRegex(
+            log_contents,
+            r'\+\+\+ Unicon plugin iosxr/iosxrv( \(unicon\.plugins\.iosxr\.iosxrv\))? \+\+\+'
+        )
+
 
 class TestAbstractTokenDiscoveryStandardization(unittest.TestCase):
     """ Run unit testing on AbstractTokenDiscovery.standardize_tokens()

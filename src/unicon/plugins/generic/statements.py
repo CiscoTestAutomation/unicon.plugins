@@ -131,15 +131,16 @@ def syslog_wait_send_return(spawn, session):
     session['buffer_len'] = len(spawn.buffer)
 
 
-def chatty_term_wait(spawn, trim_buffer=False):
+def chatty_term_wait(spawn, trim_buffer=False, wait_time=None):
     """ Wait some time for any chatter to cease from the device.
     """
+    chatty_wait_time = wait_time or spawn.settings.ESCAPE_CHAR_CHATTY_TERM_WAIT
     for retry_number in range(spawn.settings.ESCAPE_CHAR_CHATTY_TERM_WAIT_RETRIES):
 
-        if buffer_settled(spawn, spawn.settings.ESCAPE_CHAR_CHATTY_TERM_WAIT):
+        if buffer_settled(spawn, chatty_wait_time):
             break
         else:
-            buffer_wait(spawn, spawn.settings.ESCAPE_CHAR_CHATTY_TERM_WAIT * (retry_number + 1))
+            buffer_wait(spawn, chatty_wait_time * (retry_number + 1))
 
     else:
         spawn.log.warning('The buffer has not settled because the device is chatty. '
@@ -303,35 +304,6 @@ def set_new_password(spawn, context, session):
         session.pop('cred_iter')
     # calling the password handler for sending the passowrd.
     password_handler(spawn, context, session )
-
-
-def enable_secret_handler(spawn, context, session):
-    if 'password_attempts' not in session:
-        session['password_attempts'] = 1
-    else:
-        session['password_attempts'] += 1
-    if session.password_attempts > spawn.settings.PASSWORD_ATTEMPTS:
-        raise UniconAuthenticationError('Too many enable password retries')
-
-    enable_credential_password = get_enable_credential_password(context=context)
-    if enable_credential_password and len(enable_credential_password) >= \
-            spawn.settings.ENABLE_SECRET_MIN_LENGTH:
-        spawn.sendline(enable_credential_password)
-    else:
-        spawn.log.warning('Using enable secret from TEMP_ENABLE_SECRET setting')
-        enable_secret = spawn.settings.TEMP_ENABLE_SECRET
-        context['setup_selection'] = 0
-        spawn.sendline(enable_secret)
-
-
-def setup_enter_selection(spawn, context):
-    selection = context.get('setup_selection')
-    if selection is not None:
-        if str(selection) == '0':
-            spawn.log.warning('Not saving setup configuration')
-        spawn.sendline(f'{selection}')
-    else:
-        spawn.sendline('2')
 
 
 def enable_secret_handler(spawn, context, session):
@@ -758,6 +730,12 @@ class GenericStatements():
                                                 loop_continue=True,
                                                 continue_timer=False)
 
+        self.enter_your_encryption_selection_stmt = Statement(pattern=pat.enter_your_encryption_selection_2,
+                                                   action=setup_enter_selection,
+                                                   args=None,
+                                                   loop_continue=True,
+                                                   continue_timer=True)
+
 #############################################################
 #  Statement lists
 #############################################################
@@ -803,7 +781,8 @@ authentication_statement_list = [generic_statements.bad_password_stmt,
 
 initial_statement_list = [generic_statements.init_conf_stmt,
                           generic_statements.mgmt_setup_stmt,
-                          generic_statements.enter_your_selection_stmt
+                          generic_statements.enter_your_selection_stmt,
+                          generic_statements.enter_your_encryption_selection_stmt
                           ]
 
 
@@ -818,3 +797,4 @@ connection_statement_list = \
     authentication_statement_list + \
     initial_statement_list + \
     pre_connection_statement_list
+

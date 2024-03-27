@@ -19,6 +19,7 @@ sdwan_enable:
     "term length 0": ""
     "term width 0": ""
     "show sdwan version": "16.12.1.0.533"
+    "show version | include operating mode": "" 
     "show sdwan software": |2
       VERSION        ACTIVE  DEFAULT  PREVIOUS  CONFIRMED  TIMESTAMP
       --------------------------------------------------------------------------------
@@ -63,6 +64,7 @@ sdwan_config:
 sdwan_ha_standby_disable:
     prompt: "%N-stby>"
     commands:
+      "show version | include operating mode": ""
       "enable":
         new_state: sdwan_ha_standby_enable
 

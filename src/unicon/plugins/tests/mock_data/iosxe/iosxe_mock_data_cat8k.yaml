@@ -20,6 +20,7 @@ c8k_password:
 c8k_disable:
   prompt: "%N>"
   commands:
+    "show version | include operating mode": ""
     "en":
       new_state: c8k_enable_password
     "enable":
@@ -110,6 +111,7 @@ c8k_enable:
         RANDOM_NUM = 124228915
     "sh romvar":
       response: *show_romvar_cmd1
+    "show version | include operating mode" : ""
     "show version" :
       response: |
         Cisco IOS XE Software, Version 16.09.02
@@ -214,6 +216,7 @@ c8k_enable:
 cat8k_enable_reload_to_rommon:
   prompt: "switch1#"
   commands:
+    "show version | include operating mode" : ""
     "show boot": |
       ---------------------------
       Switch 1
@@ -303,6 +306,7 @@ c8k_password2:
 c8k_disable2:
   prompt: "%N>"
   commands:
+    "show version | include operating mode" : ""
     "en":
       new_state: c8k_enable_password2
     "enable":

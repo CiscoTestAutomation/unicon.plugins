@@ -1,24 +1,26 @@
 
 cat9k_ha_active_escape:
   commands:
-   "":
-     new_state: cat9k_ha_active_disable
+    "":
+      new_state: cat9k_ha_active_disable
 
 
 cat9k_ha_standby_escape:
   commands:
-   "":
-     new_state: cat9k_ha_standby_disable
+    "":
+      new_state: cat9k_ha_standby_disable
 
 cat9k_ha_active_disable:
   prompt: "%N>"
   commands:
-   "enable":
-     new_state: cat9k_ha_active_enable
+    "show version | include operating mode": ""
+    "enable":
+      new_state: cat9k_ha_active_enable
 
 cat9k_ha_active_enable:
   prompt: "%N#"
   commands:
+    "show version | include operating mode" : ""
     "term length 0": ""
     "term width 0": ""
     "sh redundancy stat | inc my state": |
@@ -218,6 +220,7 @@ cat9k_ha_standby_disable_locked:
 cat9k_ha_standby_disable:
     prompt: "%N-stby>"
     commands:
+      "show version | include operating mode": ""
       "enable":
         new_state: cat9k_ha_standby_enable
 
@@ -229,6 +232,7 @@ cat9k_ha_standby_enable:
     "term width 0": ""
     "sh redundancy stat | inc my state": |
         my state = 8  -STANDBY HOT
+    "show version | include operating mode" : ""
     "show version": |
         Cisco IOS XE Software, Version BLD_POLARIS_DEV_LATEST_20210709_153157_2
         Cisco IOS Software [Bengaluru], Catalyst L3 Switch Software (CAT9K_IOSXE), Experimental Version 17.7.20210709:154156 [S2C-build-polaris_dev-141820-/nobackup/mcpre/BLD-BLD_POLARIS_DEV_LATEST_20210709_153157 121]

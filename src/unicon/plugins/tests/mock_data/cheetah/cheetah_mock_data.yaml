@@ -35,6 +35,27 @@ ap_enable:
     "reload":
       new_state: ap_reload
 
+    "show command with more":
+      new_state: show_command_with_more_first
+
+
+show_command_with_more_first:
+  preface: "first"
+  prompt: " --More-- "
+  commands:
+    "":
+      new_state: show_command_with_more_second
+
+
+show_command_with_more_second:
+  preface: "second"
+  prompt: " -- More -- "
+  commands:
+    "":
+      response: "third"
+      new_state: ap_enable
+
+
 ap_devshell:
   prompt: "AP2C57:/#"
   commands:

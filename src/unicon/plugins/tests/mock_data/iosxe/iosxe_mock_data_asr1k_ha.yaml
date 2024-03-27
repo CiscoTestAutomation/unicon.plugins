@@ -30,6 +30,7 @@ ha_asr1k_boot_to_rommon:
 ha_asr1k_exec:
   prompt: "%N>"
   commands:
+    "show version | include operating mode": ""
     "enable":
       new_state: ha_asr1k_enable_password
 
@@ -44,6 +45,7 @@ ha_asr1k_enable:
   commands:
     "term length 0": ""
     "term width 0": ""
+    "show version | include operating mode" : ""
     "show version": |
       Cisco IOS XE Software, Version BLD_V177_THROTTLE_LATEST_20210903_031009_V17_7_0_94
       Cisco IOS Software [Bengaluru], ASR1000 Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Experimental Version 17.7.20210903:032925 [S2C-build-v177_throttle-475-/nobackup/mcpre/BLD-BLD_V177_THROTTLE_LATEST_20210903_031009 163]
@@ -192,6 +194,7 @@ ha_asr1k_boot_to_rommon_stdby:
 ha_asr1k_stby_exec:
   prompt: "%N-stby>"
   commands:
+    "show version | include operating mode": ""
     "enable":
       new_state: "ha_asr1k_stby_enable_password"
 
@@ -208,3 +211,4 @@ ha_asr1k_stby_enable:
     "term width 0": ""
     "show version": |
       Cisco IOS XE Software, Version BLD_V177_THROTTLE_LATEST_20210903_031009_V17_7_0_94
+    "show version | include operating mode" : ""

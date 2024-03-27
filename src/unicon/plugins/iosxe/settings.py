@@ -40,6 +40,9 @@ class IosXESettings(GenericSettings):
 
         self.RELOAD_WAIT = 300
 
+        # wait time for buffer to settle down
+        self.CONTROLLER_MODE_CHATTY_WAIT_TIME = 5
+
         self.CONFIG_LOCK_RETRY_SLEEP = 30
         self.CONFIG_LOCK_RETRIES = 10
 

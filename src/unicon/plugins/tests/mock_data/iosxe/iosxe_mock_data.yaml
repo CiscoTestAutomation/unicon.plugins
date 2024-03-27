@@ -16,6 +16,7 @@ general_exec:
   commands: &gen_exec_cmds
     "term length 0": ""
     "term width 0": ""
+    "show version | include operating mode" : ""
     "show version": &SV |2
       Cisco IOS Software, IOS-XE Software (X86_64_LINUX_IOSD-ADVENTERPRISEK9-M), Experimental Version 15.2(20110615:055721) [mcp_dev-BLD-BLD_MCP_DEV_LATEST_20110615_044519-ios 143]
       Copyright (c) 1986-2011 by Cisco Systems, Inc.
@@ -94,6 +95,7 @@ general_enable:
       new_state: general_maintence_mode_confirm
     "term length 0": ""
     "term width 0": ""
+    "show version | include operating mode" : ""
     "show version": *SV
 
     "disable":
@@ -573,7 +575,9 @@ are_you_sure_ywtdt:
 
 standby_exec:
   prompt: "%N-standby# "
+  
   commands:
+    "show version | include operating mode": ""
     "cisco": ""
 
 iosxe_config_1:
@@ -600,16 +604,19 @@ iosxe_config_3:
 diol_exec:
   prompt: "RouterRP> "
   commands:
+    "show version | include operating mode": ""
     "enable": ""
 
 diol_enable:
   prompt: "RouterRP# "
   commands:
+    "show version | include operating mode": ""
     "enable": ""
 
 diol_disable:
   prompt: "RouterRP-standby> "
   commands:
+    "show version | include operating mode": ""
     "enable": ""
 
 
@@ -661,6 +668,7 @@ config_msg2:
 enable_with_msgs:
   prompt: "%N#"
   commands:
+    "show version | include operating mode" : ""
     "msg":
       new_state: enable_msg
 
@@ -678,6 +686,7 @@ enable_msg:
 disable_to_enable_with_msg:
   prompt: "Switch>"
   commands:
+    "show version | include operating mode" : ""
     "enable":
       new_state: enable_password_with_msg
 
@@ -693,6 +702,7 @@ enable_password_with_msg:
 slow_config_mode:
   prompt: "%N#"
   commands:
+    "show version | include operating mode": ""
     "config term":
       response: ""
       timing:
@@ -703,6 +713,7 @@ slow_config_mode:
 config_locked:
   prompt: "%N#"
   commands:
+    "show version | include operating mode" : ""
     "config term":
       response: |
         Config mode cannot be entered during Standby initialization or when switch is in recovery mode
@@ -861,6 +872,7 @@ press_return:
 enable_secret_exec:
   prompt: "%N>"
   commands:
+    "show version | include operating mode": ""  
     "enable":
       new_state: enable_secret_password
 
@@ -1204,6 +1216,7 @@ ctc_enable:
       new_state: ctc_config
     "show tcp brief | inc .22 |.23 ": |
       0160C06C  127.0.0.1.22                127.0.0.1.51363             ESTAB
+    "show version | include operating mode" : ""
 
 ctc_config:
   prompt: "%N(conf)#"
@@ -1399,6 +1412,7 @@ meraki_container_shell:
     Clear existing connection in case of failure
   prompt: "/ # "
   commands:
+    "show version | include operating mode": ""
     "exit":
       BusyBox v1.32.0 (2021-10-12 10:15:40 UTC) built-in shell (ash)
   keys:
@@ -1417,6 +1431,8 @@ meraki_ctrl_c2:
 
 meraki_container_ssh:
   prompt: "44-b6-be-0e-56-00-SFO-SMK-N-CA-switch:~$"
+  commands:
+    "show version | include operating mode": ""
 
 
 general_enable_long_hostname:
@@ -1490,6 +1506,7 @@ breakboot_rommon:
 guestshell_prompt_obscure_enable:
   prompt: "%N#"
   commands:
+    "show version | include operating mode" : ""
     "show version":
       response:
         Cisco IOS XE Software, Version BLD_POLARIS_DEV_LATEST_20220726_143256
@@ -1507,6 +1524,7 @@ guestshell_prompt_obscure:
 enable_slow_config:
   prompt: "%N#"
   commands:
+    "show version | include operating mode" : ""
     "config term":
       new_state:
         slow_config_prompt
