@@ -9,6 +9,7 @@ from unicon.bases.routers.services import BaseService
 
 from .utils import StackUtils
 from unicon.plugins.generic.statements import custom_auth_statements, buffer_settled
+from unicon.plugins.generic.service_statements import standby_reset_rp_statement_list
 from .service_statements import (switch_prompt,
                                  stack_reload_stmt_list,
                                  stack_switchover_stmt_list, stack_factory_reset_stmt_list)
@@ -457,4 +458,155 @@ class StackEnable(GenericEnable):
                         kwargs['timeout'] = timeout
                     super().call_service(target=subconn_name, command=command, *args, **kwargs)
             
+            self.result = True
+
+class StackResetStandbyRP(BaseService):
+    """ Service to reset the standby rp.
+
+    Arguments:
+
+        command: command to reset standby, default is"redundancy reload peer"
+        reply: Dialog which include list of Statements for
+                 additional dialogs prompted by standby reset command,
+                 in-case it is not in the current list.
+        timeout: Timeout value in sec, Default Value is 500 sec
+        delay_before_check: Delay in secs before checking stack readiness. Default is 20 secs
+
+    Returns:
+        True on Success, raise SubCommandFailure on failure.
+
+    Example:
+        .. code-block:: python
+
+            rtr.reset_standby_rp()
+            # If command is other than 'redundancy reload peer'
+            rtr.reset_standby_rp(command="command which will reset standby rp",
+            timeout=600)
+
+    """
+
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.start_state = 'enable'
+        self.end_state = 'enable'
+        self.timeout = connection.settings.HA_RELOAD_TIMEOUT
+        self.dialog = Dialog(standby_reset_rp_statement_list)
+        self.__dict__.update(kwargs)
+
+    def pre_service(self, *args, **kwargs):
+        self.prompt_recovery = kwargs.get('prompt_recovery', False)
+        if self.connection.is_connected:
+            return
+        elif self.connection.reconnect:
+            self.connection.connect()
+        else:
+            raise ConnectionError("Connection is not established to device")
+        state_machine = self.connection.active.state_machine
+        state_machine.go_to(self.start_state,
+                            self.connection.active.spawn,
+                            context=self.connection.context)
+
+    def post_service(self, *args, **kwargs):
+        state_machine = self.connection.active.state_machine
+        state_machine.go_to(self.end_state,
+                            self.connection.active.spawn,
+                            context=self.connection.context)
+
+    def call_service(self, command='redundancy reload peer',  # noqa: C901
+                     reply=Dialog([]),
+                     timeout=None,
+                     delay_before_check=20,
+                     *args,
+                     **kwargs):
+        # create an alias for connection.
+        con = self.connection
+        timeout = timeout or self.timeout
+        # resetting the standby rp for
+        con.log.debug("+++ Issuing reset on  %s  with "
+                      "reset_command %s and timeout is %s +++"
+                      % (con.hostname, command, timeout))
+
+        # Check is it possible to reset the standby?
+        rp_state = con.get_rp_state(target='standby', timeout=100)
+
+        if re.search('DISABLED', rp_state):
+            raise SubCommandFailure("No Standby found")
+
+        if 'standby_check' in kwargs and not re.search(kwargs['standby_check'], rp_state):
+            raise SubCommandFailure("Standby found but not in the expected state")
+
+        dialog = self.service_dialog(handle=con.active,
+                                     service_dialog=self.dialog+reply)
+
+        # Issue standby reset command
+        con.active.spawn.sendline(command)
+        try:
+            dialog.process(con.active.spawn,
+                           timeout=30,
+                           context=con.active.context)
+        except TimeoutError:
+            pass
+        except SubCommandFailure as err:
+            raise SubCommandFailure("Failed to reset standby rp %s" % str(err)) from err
+
+        con.log.info(f'Sleep {delay_before_check} seconds before checking standby readiness')
+        sleep(delay_before_check)
+        # get current time before checking stack readiness
+        start_time = time()
+        if not utils.is_all_member_ready(con, timeout=timeout):
+            self.result = False
+        else:
+            # make sure standby reload/reset has been done
+            # get current time
+            end_time = time()
+            # calculate the time taken to reload the standby
+            time_taken = end_time - start_time
+            con.log.info("Time taken to reload Standby RP: %s seconds" % time_taken)
+            if time_taken < 60:
+                raise SubCommandFailure("Reload time is too short. Standby RP reload/reset did not happen")
+
+            # check mac address of 0000.0000.0000 which is the temporary value before standby is really ready
+            con.log.info('Make sure no invalid mac address 0000.0000.0000')
+
+            def _check_invalid_mac(con):
+                ''' Check if there is any invalid mac address 0000.0000.0000
+                    Return True if no invalid mac address found
+                '''
+                parsed = utils.get_redundancy_details(con)
+                for sw in parsed:
+                    if parsed[sw]['mac'] == '0000.0000.0000':
+                        return True
+                return False
+
+            from genie.utils.timeout import Timeout
+            exec_timeout = Timeout(timeout, 15)
+            found_invalid_mac = False
+            while exec_timeout.iterate():
+                con.log.info('Make sure no invalid mac address 0000.0000.0000')
+                if not _check_invalid_mac(con):
+                    con.log.info('Did not find invalid mac as 0000.0000.0000')
+                    found_invalid_mac = False
+                    break
+                else:
+                    con.log.warning('Found 0000.0000.0000 mac address')
+                    found_invalid_mac = True
+                    exec_timeout.sleep()
+                    continue
+            else:
+                if found_invalid_mac:
+                    raise SubCommandFailure('Found 0000.0000.0000 mac address. Stack is not really ready')
+                else:
+                    con.log.info('Did not find invalid mac as 0000.0000.0000. Stack is ready')
+
+            con.log.info("Successfully reloaded Standby RP")
+            con.log.info("Reconnecting to the device, to make sure console is ready")
+
+            try:
+                con.disconnect()
+                con.connect()
+            except Exception as err:
+                raise SubCommandFailure("Failed to reconnect to the device: %s" % str(err)) from err
+
+            con.log.info("Successfully reloaded Standby RP")
+
             self.result = True

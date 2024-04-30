@@ -7,6 +7,11 @@ All rights reserved.
 from unicon.bases.routers.services import BaseService
 from unicon.eal.dialogs import Dialog
 from unicon.plugins.iosxe.service_implementation import BashService as IosXEBashService
+from unicon.plugins.generic.service_implementation import \
+    Execute as GenericExecute
+from unicon.eal.dialogs import Dialog
+from unicon.plugins.iosxe.service_statements import confirm
+
 from .patterns import IosXEEWCBashShellPatterns, IosXEEWCAPShellPatterns
 from .service_statements import enter_bash_shell_statement_list
 from .settings import IosXEEWCBashShellSettings, IosXEEWCAPShellSettings
@@ -16,6 +21,15 @@ from .settings import IosXEEWCBashShellSettings, IosXEEWCAPShellSettings
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 bash_shell_settings = IosXEEWCBashShellSettings()
 bash_shell_patterns = IosXEEWCBashShellPatterns()
+
+
+class Execute(GenericExecute):
+    def call_service(self, command=None, reply=Dialog([]), timeout=None, *args,
+                     **kwargs):
+        command = list() if command is None else command
+        super().call_service(command,
+                             reply=reply + Dialog([confirm,]),
+                             timeout=timeout, *args, **kwargs)
 
 
 class IosXEEWCBashService(IosXEBashService):

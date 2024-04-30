@@ -86,13 +86,13 @@ class GenericSettings(Settings):
 
         # When connecting to a device via telnet, how long (in seconds)
         # to pause before checking the spawn buffer
-        self.ESCAPE_CHAR_CHATTY_TERM_WAIT = 0.25
+        self.ESCAPE_CHAR_CHATTY_TERM_WAIT = 0.5
 
         # number of cycles to wait for if the terminal is still chatty
         self.ESCAPE_CHAR_CHATTY_TERM_WAIT_RETRIES = 12
 
         # prompt wait delay
-        self.ESCAPE_CHAR_PROMPT_WAIT = 0.5
+        self.ESCAPE_CHAR_PROMPT_WAIT = 1
 
         # prompt wait retries
         # (wait time: 0.5, 1, 1.5, 2, 2.5, 3, 3.5 == total wait: 14.0s)

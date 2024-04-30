@@ -73,6 +73,7 @@ devices:
 
         # Test connection succeeds and tokens learned
         self.dev.connect(learn_tokens=True, learn_hostname=True)
+        self.assertEqual(self.dev.state_machine.current_state, 'enable')
         self.assertEqual(self.dev.os, 'ios')
         self.assertEqual(self.dev.version, '15')
         self.assertEqual(self.dev.platform, 'c7200p')

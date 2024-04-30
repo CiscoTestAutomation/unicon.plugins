@@ -59,6 +59,41 @@ exec:
 enable:
   prompt: "RP/0/RP0/CPU0:%N#"
   commands: &enable_cmds
+    "show ipv4 virtual address status": |
+      Thu Mar 14 21:41:47.627 UTC
+      VRF Name: default
+      Virtual IP: 5.2.21.22/16
+      Active Interface Name: MgmtEth0/RP0/CPU0/0
+      Active Interface MAC Address: 88fc.5dc4.9d90
+
+      VRF Node Create Timestamp   : .7337
+      ARP Add Timestamp           : Sat Jul 01 2002241054 16:32:19.1471
+      RIB Add Timestamp           : .7337
+      SNMAC Add Timestamp         : N/A
+
+    "show route ipv4 next-hop MgmtEth0/RP0/CPU0/0": |
+      Thu Mar 14 22:20:54.077 UTC
+
+      Codes: C - connected, S - static, R - RIP, B - BGP, (>) - Diversion path
+            D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
+            N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+            E1 - OSPF external type 1, E2 - OSPF external type 2, E - EGP
+            i - ISIS, L1 - IS-IS level-1, L2 - IS-IS level-2
+            ia - IS-IS inter area, su - IS-IS summary null, * - candidate default
+            U - per-user static route, o - ODR, L - local, G  - DAGR, l - LISP
+            A - access/subscriber, a - Application route
+            M - mobile route, r - RPL, t - Traffic Engineering, (!) - FRR Backup path
+
+      Gateway of last resort is not set
+
+      S    5.0.0.0/8 [1/0] via 5.2.0.1, 06:27:16
+      C    5.2.0.0/16 is directly connected, 06:27:16, MgmtEth0/RP0/CPU0/0
+      L    5.2.21.20/32 is directly connected, 06:27:16, MgmtEth0/RP0/CPU0/0
+      L    5.2.21.22/32 [0/0] via 5.2.21.22, 06:27:16, MgmtEth0/RP0/CPU0/0
+      S    5.255.253.6/32 [1/0] via 5.2.0.1, 06:27:16
+      S    10.0.0.0/8 [1/0] via 5.2.0.1, 06:27:16
+      S    223.255.254.254/32 [1/0] via 5.2.0.1, 06:27:16
+
     "end":
       new_state: enable
     "exit":
@@ -440,9 +475,14 @@ config:
     "commit force": ""
     "commit replace":
       new_state: commit_replace
+    "commit best-effort":
+      new_state: commit_best_effort
     "test failed":
       new_state:
         failed_config
+    "test failed2":
+      new_state:
+        failed_config2
     "redundancy":
       new_state: config_redundancy
 
@@ -529,6 +569,13 @@ commit_replace:
     "yes":
       new_state: config
 
+commit_best_effort:
+  preface: "This commit will replace or remove the entire running configuration. This\noperation can be service affecting.\n"
+  prompt: "Do you wish to proceed? [no]:"
+  commands:
+    "yes":
+      new_state: config
+
 failed_config:
   prompt: "RP/0/RP0/CPU0:%N(config)#"
   commands:
@@ -536,18 +583,7 @@ failed_config:
     "end":
       response: "Uncommitted changes found, commit them before exiting(yes/no/cancel)? [cancel]:"
       new_state: failed_config_uncommitted
-
-failed_config_uncommitted:
-  prompt: ""
-  commands:
-    "yes":
-      response: "% Failed to commit one or more configuration items during a pseudo-atomic operation. All changes made have been reverted. Please issue 'show configuration failed [inheritance]' from this session to view the errors"
-      new_state: failed_config_show
-
-failed_config_show:
-  prompt: "RP/0/RP0/CPU0:%N(config)#"
-  commands:
-    "show configuration failed": |2
+    "show configuration failed": &show_conf_failed |2
       Fri Aug  3 15:34:40.336 UTC
       !! SEMANTIC ERRORS: This configuration was rejected by
       !! the system due to semantic errors. The individual
@@ -561,6 +597,27 @@ failed_config_show:
       !
       end
 
+failed_config2:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "commit": |
+      % Failed to commit one or more configuration items during a pseudo-atomic operation. All changes made have been reverted. Please issue 'show configuration failed [inheritance]' from this session to view the errors
+    "end":
+      response: "Uncommitted changes found, commit them before exiting(yes/no/cancel)? [cancel]:"
+      new_state: failed_config_uncommitted
+    "show configuration failed": *show_conf_failed
+
+failed_config_uncommitted:
+  prompt: ""
+  commands:
+    "yes":
+      response: "% Failed to commit one or more configuration items during a pseudo-atomic operation. All changes made have been reverted. Please issue 'show configuration failed [inheritance]' from this session to view the errors"
+      new_state: failed_config_show
+
+failed_config_show:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "show configuration failed": *show_conf_failed
     "abort":
       new_state: enable
 

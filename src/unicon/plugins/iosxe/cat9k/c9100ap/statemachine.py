@@ -1,7 +1,7 @@
 
 import re
 
-from unicon.plugins.iosxe.c9800.statemachine import IosXEc9800SingleRpStateMachine
+from unicon.plugins.iosxe.cat9k.c9800.statemachine import IosXEc9800SingleRpStateMachine
 from unicon.statemachine import State, Path
 from unicon.eal.dialogs import Dialog, Statement
 from unicon.utils import AttributeDict

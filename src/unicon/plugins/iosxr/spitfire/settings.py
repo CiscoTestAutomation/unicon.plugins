@@ -28,3 +28,6 @@ class SpitfireSettings(IOSXRSettings):
         ]
         self.CONFIG_TIMEOUT = 600
         self.STANDBY_STATE_REGEX = r'Standby node .* is (.*)'
+
+        # Default commands: Enter key , Ctrl-C, Enter Key
+        self.PROMPT_RECOVERY_COMMANDS = ['\r', '\x03', '\r']

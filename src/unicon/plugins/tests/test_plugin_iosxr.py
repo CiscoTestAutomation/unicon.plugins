@@ -199,6 +199,16 @@ class TestIosXrConfigPrompts(unittest.TestCase):
         self._conn.spawn.timeout = 60
         self._conn.enable()
 
+    def test_failed_config_error_message1(self):
+        """Check that we can successfully return to an enable prompt after entering failed config."""
+        with self.assertRaisesRegex(unicon.core.errors.SubCommandFailure, "% Invalid config"):
+            self._conn.configure("test failed")
+
+    def test_failed_config_error_message2(self):
+        """Check that we can successfully return to an enable prompt after entering failed config."""
+        with self.assertRaisesRegex(unicon.core.errors.SubCommandFailure, "% Invalid config"):
+            self._conn.configure("test failed2")
+
 
 class TestIosXrPluginAdminService(unittest.TestCase):
     def test_admin(self):
@@ -526,6 +536,12 @@ class TestIosxrConfigCommitCommands(unittest.TestCase):
         self.ha_dev.configure('no logging console', replace=True)
         self.assertEqual(self.conn.configure.commit_cmd, 'commit replace')
         self.assertEqual(self.ha_dev.configure.commit_cmd, 'commit replace')
+
+    def test_config_commit_best_effort(self):
+        self.conn.configure('no logging console', best_effort=True)
+        self.ha_dev.configure('no logging console', best_effort=True)
+        self.assertEqual(self.conn.configure.commit_cmd, 'commit best-effort')
+        self.assertEqual(self.ha_dev.configure.commit_cmd, 'commit best-effort')
 
     def test_config_commit_force(self):
         self.conn.configure('no logging console', force=True)

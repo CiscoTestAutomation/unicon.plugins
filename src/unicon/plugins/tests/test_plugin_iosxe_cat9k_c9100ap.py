@@ -8,14 +8,14 @@ unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
 unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC = 0.2
 
 
-class TestPluginIosXeEwc(unittest.TestCase):
+class TestPluginIosXeCat9kC9100AP(unittest.TestCase):
 
     def test_connect(self):
         conn = Connection(
             hostname='EWC',
             os='iosxe',
-            platform='c9800',
-            model='ewc_ap',
+            platform='cat9k',
+            model='c9100ap',
             start=['mock_device_cli --os iosxe --state ewc_enable'],
             learn_hostname=True)
         conn.connect()
@@ -25,8 +25,8 @@ class TestPluginIosXeEwc(unittest.TestCase):
         conn = Connection(
             hostname='EWC',
             os='iosxe',
-            platform='c9800',
-            model='ewc_ap',
+            platform='cat9k',
+            model='c9100ap',
             start=['mock_device_cli --os iosxe --state ewc_enable'],
             credentials=dict(ap=dict(username='lab', password='lab', enable_password='lab')),
             learn_hostname=True)
@@ -41,8 +41,8 @@ class TestPluginIosXeEwc(unittest.TestCase):
         conn = Connection(
             hostname='EWC',
             os='iosxe',
-            platform='c9800',
-            model='ewc_ap',
+            platform='cat9k',
+            model='c9100ap',
             start=['mock_device_cli --os iosxe --state ewc_enable'],
             credentials=dict(ap=dict(username='lab', password='lab', enable_password='lab')),
             learn_hostname=True)

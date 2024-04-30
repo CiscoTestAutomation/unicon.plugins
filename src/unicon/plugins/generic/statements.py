@@ -349,6 +349,9 @@ def ssh_tacacs_handler(spawn, context):
 def password_handler(spawn, context, session):
     """ handles password prompt
     """
+    if 'enable' in spawn.last_sent:
+        return enable_password_handler(spawn, context, session)
+
     credential = get_current_credential(context=context, session=session)
     if credential:
         common_cred_password_handler(
@@ -478,7 +481,12 @@ def wait_and_enter(spawn, wait=0.5):
 def more_prompt_handler(spawn):
     output = utils.remove_backspace(spawn.match.match_output)
     all_more = re.findall(spawn.settings.MORE_REPLACE_PATTERN, output)
-    spawn.match.match_output = ''.join(output.rsplit(all_more[-1], 1))
+    if all_more:
+        spawn.match.match_output = ''.join(output.rsplit(all_more[-1], 1))
+        spawn.buffer = ''.join(spawn.buffer.rsplit(all_more[-1], 1))
+    else:
+        spawn.match.match_output = output
+        spawn.buffer = utils.remove_backspace(spawn.buffer)
     spawn.send(spawn.settings.MORE_CONTINUE)
 
 
@@ -602,7 +610,7 @@ class GenericStatements():
                                            args=None,
                                            loop_continue=True,
                                            continue_timer=False)
-        self.enable_password_stmt = Statement(pattern=pat.password,
+        self.enable_password_stmt = Statement(pattern=pat.enable_password,
                                               action=enable_password_handler,
                                               args=None,
                                               loop_continue=True,
@@ -621,7 +629,8 @@ class GenericStatements():
                                           action=more_prompt_handler,
                                           args=None,
                                           loop_continue=True,
-                                          continue_timer=False)
+                                          continue_timer=False,
+                                          trim_buffer=False)
         self.confirm_prompt_stmt = Statement(pattern=pat.confirm_prompt,
                                              action=sendline,
                                              args=None,

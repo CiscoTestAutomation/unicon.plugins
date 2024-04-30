@@ -15,7 +15,7 @@ Description:
 import re
 from time import sleep
 
-from unicon.core.errors import StateMachineError
+from unicon.core.errors import StateMachineError, TimeoutError as UniconTimeoutError
 from unicon.plugins.generic.statements import GenericStatements
 from unicon.plugins.generic.patterns import GenericPatterns
 
@@ -68,7 +68,10 @@ def config_transition(statemachine, spawn, context):
 
     for attempt in range(max_attempts + 1):
         spawn.sendline(statemachine.config_command)
-        dialog.process(spawn, timeout=spawn.settings.CONFIG_TIMEOUT, context=context)
+        try:
+            dialog.process(spawn, timeout=spawn.settings.CONFIG_TIMEOUT, context=context)
+        except UniconTimeoutError:
+            pass
 
         statemachine.detect_state(spawn)
         if statemachine.current_state == 'config':
@@ -78,6 +81,11 @@ def config_transition(statemachine, spawn, context):
             spawn.log.warning('*** Could not enter config mode, waiting {} seconds. Retry attempt {}/{} ***'.format(
                               wait_time, attempt + 1, max_attempts))
             sleep(wait_time)
+            spawn.sendline()
+            statemachine.go_to('any', spawn)
+            if statemachine.current_state == 'config':
+                spawn.sendline()
+                return
 
     raise StateMachineError('Unable to transition to config mode')
 
@@ -116,7 +124,8 @@ class GenericSingleRpStateMachine(StateMachine):
         enable_to_rommon = Path(enable, rommon, 'reload', None)
         enable_to_config = Path(enable, config, config_transition, Dialog([statements.syslog_msg_stmt]))
         disable_to_enable = Path(disable, enable, 'enable',
-                                 Dialog([statements.enable_password_stmt,
+                                 Dialog([statements.password_stmt,
+                                         statements.enable_password_stmt,
                                          statements.bad_password_stmt,
                                          statements.syslog_stripper_stmt]))
         config_to_enable = Path(config, enable, 'end', Dialog([statements.syslog_msg_stmt]))
@@ -135,6 +144,10 @@ class GenericSingleRpStateMachine(StateMachine):
         self.add_path(config_to_enable)
         self.add_path(enable_to_disable)
         self.add_default_statements(default_statement_list)
+
+        standby_locked = State('standby_locked', patterns.standby_locked)
+
+        self.add_state(standby_locked)
 
     def learn_os_state(self):
         learn_os = State('learn_os', patterns.learn_os_prompt)
@@ -157,6 +170,3 @@ class GenericDualRpStateMachine(GenericSingleRpStateMachine):
         ##########################################################
         # State Definition
         ##########################################################
-        standby_locked = State('standby_locked', patterns.standby_locked)
-
-        self.add_state(standby_locked)

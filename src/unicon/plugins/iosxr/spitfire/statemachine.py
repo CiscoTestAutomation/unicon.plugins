@@ -1,6 +1,7 @@
 __author__ = "Sritej K V R <skanakad@cisco.com>"
 
 from unicon.plugins.iosxr.statemachine import IOSXRSingleRpStateMachine
+from unicon.plugins.iosxr.statements import handle_failed_config
 from unicon.plugins.iosxr.spitfire.patterns import SpitfirePatterns
 from unicon.plugins.iosxr.spitfire.statements import SpitfireStatements
 from unicon.statemachine import State, Path
@@ -69,8 +70,7 @@ class SpitfireSingleRpStateMachine(IOSXRSingleRpStateMachine):
         config_dialog = Dialog([
            [patterns.commit_changes_prompt, 'sendline(yes)', None, True, False],
            [patterns.commit_replace_prompt, 'sendline(yes)', None, True, False],
-           [patterns.configuration_failed_message,
-            self.handle_failed_config, None, True, False]
+           [patterns.configuration_failed_message, handle_failed_config, None, True, False]
            ])
 
         xr_to_bmc = Path(xr, bmc, switch_console, login_dialog)

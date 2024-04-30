@@ -3,7 +3,7 @@ from unicon.eal.dialogs import Statement
 from .service_patterns import (IOSXRSwitchoverPatterns,
                                IOSXRReloadPatterns)
 from unicon.plugins.iosxr.patterns import IOSXRPatterns
-
+from unicon.plugins.iosxr.statements import handle_failed_config
 
 pat = IOSXRSwitchoverPatterns()
 
@@ -39,6 +39,12 @@ confirm_y_prompt_stmt = Statement(pattern=pat.confirm_y_prompt,
                                   loop_continue=True,
                                   continue_timer=False)
 
+failed_config_statement = Statement(pattern=pat.configuration_failed_message,
+                                    action=handle_failed_config,
+                                    args={'abort': False},
+                                    loop_continue=True,
+                                    continue_timer=False)
+
 pat = IOSXRReloadPatterns()
 confirm_module_reload_stmt = Statement(pattern=pat.reload_module_prompt,
                                        action='sendline(yes)',
@@ -60,3 +66,5 @@ execution_statement_list = [commit_replace_stmt,
 
 reload_statement_list = [confirm_module_reload_stmt]
 
+
+configure_statement_list = [failed_config_statement]
