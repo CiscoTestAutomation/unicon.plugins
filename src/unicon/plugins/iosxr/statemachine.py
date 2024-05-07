@@ -2,7 +2,7 @@ __author__ = "Syed Raza <syedraza@cisco.com>"
 
 from unicon.statemachine import StateMachine
 from unicon.plugins.iosxr.patterns import IOSXRPatterns
-from unicon.plugins.iosxr.statements import IOSXRStatements
+from unicon.plugins.iosxr.statements import IOSXRStatements, handle_failed_config
 from unicon.plugins.generic.statemachine import config_transition
 from unicon.statemachine import State, Path
 from unicon.eal.dialogs import Statement, Dialog
@@ -49,8 +49,7 @@ class IOSXRSingleRpStateMachine(StateMachine):
         config_dialog = Dialog([
            [patterns.commit_changes_prompt, 'sendline(yes)', None, True, False],
            [patterns.commit_replace_prompt, 'sendline(yes)', None, True, False],
-           [patterns.configuration_failed_message,
-            self.handle_failed_config, None, True, False]
+           [patterns.configuration_failed_message, handle_failed_config, None, True, False]
            ])
 
         enable_to_exclusive = Path(enable, exclusive, 'configure exclusive', None)
@@ -81,10 +80,13 @@ class IOSXRSingleRpStateMachine(StateMachine):
 
         self.add_default_statements(default_commands)
 
+        standby_locked = State('standby_locked', patterns.standby_prompt)
+        self.add_state(standby_locked)
+
     @staticmethod
     def handle_failed_config(spawn):
         spawn.read_update_buffer()
-        spawn.sendline('show configuration failed')
+        spawn.sendline(spawn.settings.SHOW_CONFIG_FAILED_CMD)
         spawn.expect([patterns.config_prompt])
         spawn.sendline('abort')
 
@@ -96,6 +98,3 @@ class IOSXRDualRpStateMachine(IOSXRSingleRpStateMachine):
 
     def create(self):
         super().create()
-
-        standby_locked = State('standby_locked', patterns.standby_prompt)
-        self.add_state(standby_locked)

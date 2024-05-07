@@ -76,6 +76,9 @@ class TestIosPluginConnect(unittest.TestCase):
 
         c.setup_connection = Mock()
         c.state_machine = Mock()
+        mock_state = Mock()
+        mock_state.pattern = 'Router#'
+        c.state_machine.get_state = Mock(return_value=mock_state)
         c.state_machine.states = []
         c._get_learned_hostname = Mock(return_value='Router')
         c.connection_provider = c.connection_provider_class(c)

@@ -36,7 +36,7 @@ class GenericPatterns(UniconCorePatterns):
         self.rommon_prompt = r'^(.*?)(rommon[\s\d]*>|switch:)\s?$'
         # self.standby_enable_prompt = r'^(.*?)(RouterRP-standby|%N-standby|%N-sdby|%N\(standby\))#\s?$'
         # self.standby_disable_prompt = r'^(.*?)(RouterRP-standby|%N-standby|%N-sdby|%N\(standby\))>\s?$'
-        self.standby_locked = r'[S|s]tandby console disabled'
+        self.standby_locked = r'^.*?([S|s]tandby console disabled|This \(D\)RP Node is not ready or active for login \/configuration.*)'
         self.shell_prompt = r'^(.*)%N\(shell\)>\s?'
 
         self.disconnect_message = r'Received disconnect from .*:'
@@ -56,7 +56,7 @@ class GenericPatterns(UniconCorePatterns):
 
         self.passphrase_prompt = r'^.*Enter passphrase for key .*?:\s*?'
 
-        self.learn_os_prompt = r'^(.*?([>\$~%]|[^#\s]#|~ #|~/|^admin:|^#)\s?(\x1b\S+)?)$|(^.*This \(D\)RP Node is not ready or active for login \/configuration.*)'
+        self.learn_os_prompt = r'^(.*?([>\$~%]|[^#\s]#|~ #|~/|^admin:|^#)\s?(\x1b\S+)?)$'
 
         self.sudo_password_prompt = r'^.*(\[sudo\] password for .*?:|This is your UNIX password:)\s*$'
 
@@ -74,6 +74,7 @@ class GenericPatterns(UniconCorePatterns):
         self.config_start = r'Enter configuration commands, one per line\.\s+End with CNTL/Z\.\s*$'
 
         self.enable_secret = r'^.*?(Enter|Confirm) enable secret:\s*$'
+        self.enable_password = r'^.*?enable[\r\n]*.*?[Pp]assword( for )?(\S+)?: ?$'
 
         self.enter_your_selection_2 = r'^.*?Enter your selection( \[2])?:\s*$'
 

@@ -13,7 +13,8 @@ from unicon.plugins.generic.service_implementation import GetRPState as GenericG
 
 from .service_statements import (switchover_statement_list,
                                  config_commit_stmt_list,
-                                 execution_statement_list)
+                                 execution_statement_list,
+                                 configure_statement_list)
 
 from .utils import IosxrUtils
 
@@ -24,6 +25,8 @@ def get_commit_cmd(**kwargs):
         commit_cmd = 'commit force'
     elif 'replace' in kwargs and kwargs['replace'] is True:
         commit_cmd = 'commit replace'
+    elif 'best_effort' in kwargs and kwargs['best_effort'] is True:
+        commit_cmd = 'commit best-effort'
     else:
         commit_cmd = 'commit'
     return commit_cmd
@@ -41,13 +44,16 @@ class Configure(svc.Configure):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'config'
         self.end_state = 'enable'
+        self.dialog += Dialog(configure_statement_list)
 
     def call_service(self, command=[], reply=Dialog([]),
                      timeout=None, *args, **kwargs):
         self.commit_cmd = get_commit_cmd(**kwargs)
         super().call_service(command,
                              reply=reply + Dialog(config_commit_stmt_list),
-                             timeout=timeout, *args, **kwargs)
+                             timeout=timeout,
+                             result_check_per_command=False,
+                             *args, **kwargs)
 
 
 class ConfigureExclusive(Configure):

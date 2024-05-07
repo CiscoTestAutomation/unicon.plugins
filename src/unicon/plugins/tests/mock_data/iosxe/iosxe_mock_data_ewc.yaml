@@ -3,6 +3,10 @@
 ewc_enable:
   prompt: "WLC3C57.31C5.7BC8#"
   commands:
+    "exec-timeout 0": ""
+    "terminal length 0": ""
+    "terminal width 0": ""
+    "logging console disable": ""
     "term length 0": ""
     "term width 0": ""
     "show version | include operating mode" : ""

@@ -51,7 +51,7 @@ class IosxeSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
                 con.spawn.sendline('pnpa service discovery stop')
                 # The device may reload after the command we get the dialog statements from reload service and try to handle that
                 dialog = con.reload.dialog
-                dialog.append(Statement(pattern=GenericPatterns().enable_prompt,action=None,
+                dialog.append(Statement(con.state_machine.get_state('enable').pattern, action=None,
                                         args=None, loop_continue=False, continue_timer=False))
                 dialog.process(con.spawn,
                                 context=con.context,
@@ -66,5 +66,5 @@ class IosxeSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
                                         con.spawn,
                                         context=con.context,
                                         prompt_recovery=con.prompt_recovery)
-                super().learn_tokens()
+        super().learn_tokens()
 

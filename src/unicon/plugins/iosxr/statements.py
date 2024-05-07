@@ -11,6 +11,14 @@ from unicon.plugins.utils import (get_current_credential,
 patterns = IOSXRPatterns()
 
 
+def handle_failed_config(spawn, abort=True):
+    spawn.read_update_buffer()
+    spawn.sendline('show configuration failed')
+    if abort:
+        spawn.expect([patterns.config_prompt])
+        spawn.sendline('abort')
+
+
 def password_handler(spawn, context, session):
     """ handles password prompt
     """

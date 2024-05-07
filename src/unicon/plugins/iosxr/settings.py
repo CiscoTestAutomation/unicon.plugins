@@ -57,3 +57,5 @@ class IOSXRSettings(GenericSettings):
 
         self.SHOW_REDUNDANCY_CMD = 'show redundancy | inc ^Node'
         self.REDUNDANCY_STATE_PATTERN = r'^Node \S+ is in (.*?) role'
+
+        self.SHOW_CONFIG_FAILED_CMD = 'show configuration failed'

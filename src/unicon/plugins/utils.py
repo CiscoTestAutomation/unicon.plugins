@@ -217,13 +217,14 @@ def load_token_csv_file(file_path, key='pid'):
     return ret_dict
 
 def get_device_mode(con):
-        '''Check the mode of device 
+        '''Check the mode of device
         '''
         output = con.execute('show version | include operating mode')
         if output:
             pattern = re.compile(r'.*operating mode:\s*(?P<mode>[\w-]+).*', re.DOTALL)
             m = pattern.match(output)
-            return m.groupdict().get('mode')
+            if m:
+                return m.groupdict().get('mode')
 
 
 class AbstractTokenDiscovery():
@@ -307,7 +308,23 @@ class AbstractTokenDiscovery():
         discovery_prompt_stmt = \
             Statement(pattern=self.con.state_machine\
                 .get_state('learn_tokens_state').pattern)
-        dialog = Dialog([discovery_prompt_stmt, generic_statements.more_prompt_stmt])
+        dialog = Dialog([
+            discovery_prompt_stmt,
+            generic_statements.more_prompt_stmt,
+            generic_statements.syslog_msg_stmt
+        ])
+
+        # Try to get to enable mode, ignore failure
+        from unicon.plugins.generic.statements import generic_statements
+        enable_dialog = dialog + Dialog([
+            generic_statements.enable_password_stmt,
+            generic_statements.syslog_msg_stmt
+        ])
+        try:
+            self.con.sendline('enable')
+            enable_dialog.process(self.con.spawn, context=self.con.context)
+        except Exception:
+            pass
 
         # Execute the command on the device
         for cmd in self.commands_and_classes:
@@ -319,8 +336,8 @@ class AbstractTokenDiscovery():
                 continue
             else:
                 outcome = dialog.process(self.con.spawn,
-                                         timeout=self.con.spawn.settings.EXEC_TIMEOUT,
-                                         prompt_recovery=True)
+                                         timeout=self.con.spawn.settings.EXEC_TIMEOUT
+                                        )
 
                 if not outcome.match_output:
                     continue
@@ -538,5 +555,3 @@ class AbstractTokenDiscovery():
         # Show the results of the process
         self.show_results()
         return self.learned_tokens
-    
-    

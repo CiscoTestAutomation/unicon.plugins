@@ -811,6 +811,8 @@ class Configure(BaseService):
                           0 means to send all commands in a single chunk
         bulk_chunk_sleep: sleep between sending command chunks,
                           default is 0.5 sec
+        result_check_per_command: boolean option, check results after
+                                  each command (default: True)
 
     Returns:
         command output on Success, raise SubCommandFailure on failure
@@ -835,6 +837,7 @@ class Configure(BaseService):
         self.bulk_chunk_lines = connection.settings.BULK_CONFIG_CHUNK_LINES
         self.bulk_chunk_sleep = connection.settings.BULK_CONFIG_CHUNK_SLEEP
         self.valid_transition_commands = ['end', 'exit']
+        self.valid_transition_states = ['config_pki_hexmode']
         self.state_change_matched_retries = connection.settings.EXECUTE_STATE_CHANGE_MATCH_RETRIES
         self.state_change_matched_retry_sleep = connection.settings.EXECUTE_STATE_CHANGE_MATCH_RETRY_SLEEP
         self.__dict__.update(kwargs)
@@ -877,9 +880,11 @@ class Configure(BaseService):
                      bulk=None,
                      bulk_chunk_lines=None,
                      bulk_chunk_sleep=None,
+                     result_check_per_command=True,
                      *args,
                      **kwargs):
 
+        self.result_check_per_command = result_check_per_command
         con = self.connection
         sm = self.get_sm()
         handle = self.get_handle(target)
@@ -910,7 +915,9 @@ class Configure(BaseService):
 
         def config_state_change(spawn, from_state, sm):
             last_cmd = spawn.last_sent.strip()
-            if last_cmd not in self.valid_transition_commands:
+            # check if the last command is not in the list of valid commands and the state is not in the list of valid states
+            # for transition
+            if last_cmd not in self.valid_transition_commands and from_state.name not in self.valid_transition_states:
                 invalid_state_change_action(
                     spawn, err_state=from_state, sm=sm)
             else:
@@ -1018,14 +1025,15 @@ class Configure(BaseService):
             hostname=handle.hostname,
             result_match=cmd_result)
         self.result += cmd_result
-        try:
-            self.get_service_result()
-        except SubCommandFailure:
-            # Go to end state after command failure,
-            handle.state_machine.go_to(self.end_state,
-                                       handle.spawn,
-                                       context=self.context)
-            raise
+        if self.result_check_per_command:
+            try:
+                self.get_service_result()
+            except SubCommandFailure:
+                # Go to end state after command failure,
+                handle.state_machine.go_to(self.end_state,
+                                        handle.spawn,
+                                        context=self.context)
+                raise
 
     def update_hostname_if_needed(self, cmd_list):
         for cmd in cmd_list:
@@ -2471,7 +2479,8 @@ class ResetStandbyRP(BaseService):
             raise SubCommandFailure("Standby found but not in the expected state")
 
         dialog = self.service_dialog(handle=con.active,
-                                     service_dialog=self.dialog)
+                                     service_dialog=self.dialog+reply)
+
         # Issue standby reset command
         con.active.spawn.sendline(command)
         try:

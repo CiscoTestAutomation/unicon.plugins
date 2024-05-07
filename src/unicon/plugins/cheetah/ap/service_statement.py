@@ -1,10 +1,8 @@
 """
 Module:
     unicon.plugins.generic
-
 Authors:
     pyATS TEAM (pyats-support@cisco.com, pyats-support-ext@cisco.com)
-
 Description:
     Module for defining all Services Statement, handlers(callback) and Statement
     list for service dialog would be defined here.
@@ -35,4 +33,3 @@ ap_shell_prompt = Statement(pattern=pat.ap_shell_prompt,
 
 ap_reload_list = list(reload_statement_list)
 ap_reload_list.insert(0,ap_shell_prompt)
-

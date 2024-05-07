@@ -4,8 +4,21 @@ Copyright (c) 2019-2020 by cisco Systems, Inc.
 All rights reserved.
 """
 
-from unicon.plugins.cheetah.ap.settings import ApSettings
 from unicon.plugins.iosxe.settings import IosXESettings
+from unicon.plugins.generic.settings import GenericSettings
+
+
+class ApSettings(GenericSettings):
+    def __init__(self):
+        super().__init__()
+
+        self.HA_INIT_EXEC_COMMANDS = [
+            'exec-timeout 0',
+            'terminal length 0',
+            'terminal width 0',
+            'show version',
+            'logging console disable',
+        ]
 
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#

@@ -123,8 +123,10 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         tclsh = State('tclsh', patterns.tclsh_prompt)
         macro = State('macro', patterns.macro_prompt)
         maintenance = State('maintenance', patterns.maintenance_mode_prompt)
+        config_pki_hexmode = State('config_pki_hexmode', patterns.config_pki_prompt)
 
         disable_to_enable = Path(disable, enable, 'enable', Dialog([
+            statements.password_stmt,
             statements.enable_password_stmt,
             statements.bad_password_stmt,
             statements.syslog_stripper_stmt
@@ -145,6 +147,8 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         enable_to_maintanance = Path(enable, maintenance, enable_to_maintenance_transition, None)
         maintenance_to_enable = Path(maintenance, enable, maintenance_to_enable_transition, None)
 
+        config_pki_hexmode_to_config = Path(config_pki_hexmode, config, 'quit', None)
+
         self.add_state(disable)
         self.add_state(enable)
         self.add_state(config)
@@ -152,6 +156,7 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         self.add_state(tclsh)
         self.add_state(macro)
         self.add_state(maintenance)
+        self.add_state(config_pki_hexmode)
 
         self.add_path(disable_to_enable)
         self.add_path(enable_to_disable)
@@ -164,6 +169,7 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         self.add_path(macro_to_config)
         self.add_path(enable_to_maintanance)
         self.add_path(maintenance_to_enable)
+        self.add_path(config_pki_hexmode_to_config)
 
         enable_to_rommon = Path(enable, rommon, 'reload', Dialog(
             connection_statement_list + reload_statement_list))
