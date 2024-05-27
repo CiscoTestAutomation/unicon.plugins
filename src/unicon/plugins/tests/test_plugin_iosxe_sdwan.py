@@ -76,9 +76,29 @@ class TestIosXESdwanConnect(unittest.TestCase):
         finally:
             d.disconnect()
 
-    @classmethod
-    def tearDownClass(self):
-        self.md.stop()
+    def test_iosxe_sdwan_controller_mode_connect(self):
+        testbed = '''
+            devices:
+              Router:
+                type: router
+                os: iosxe
+                platform: sdwan
+                credentials:
+                    default:
+                        username: cisco
+                        password: cisco
+                connections:
+                  defaults:
+                    class: 'unicon.Unicon'
+                  cli:
+                    command: mock_device_cli --os iosxe --state sdwan_controller_mode
+        '''
+        t = loader.load(testbed)
+        d = t.devices.Router
+        try:
+            d.connect()
+        finally:
+            d.disconnect()
 
 class TestIosXESDWANConfigure(unittest.TestCase):
 

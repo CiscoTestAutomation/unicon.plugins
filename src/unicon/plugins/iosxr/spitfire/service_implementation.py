@@ -312,10 +312,10 @@ class HAReload(BaseService):
             line_type = line_type[1]
 
         if reload_creds:
-            context = self.context.copy()
+            context = con.active.context.copy()
             context.update(cred_list=reload_creds)
         else:
-            context = self.context
+            context = con.active.context
 
         if line_type != 'Console':
             raise Exception("Console is not used.")

@@ -87,6 +87,52 @@ cat9k_enable_reload_to_rommon_break2:
     "reload":
       new_state: cat9k_boot_to_rommon
 
+
+cat9k_enable_reload_to_rommon_break3:
+  prompt: "switch1#"
+  commands:
+    "show version | include operating mode": ""
+    "show boot": |
+      ---------------------------
+      Switch 1
+      ---------------------------
+      Current Boot Variables:
+      BOOT variable does not exist
+
+      Boot Variables on next reload:
+      BOOT variable does not exist
+      Manual Boot = yes
+      Enable Break = 1
+      Boot Mode = DEVICE
+      iPXE Timeout = 0
+    "config term":
+      new_state: cat9k_enable_reload_to_rommon_break_config
+    "reload":
+      new_state: cat9k_boot_to_rommon
+
+
+cat9k_enable_reload_to_rommon_break4:
+  prompt: "switch1#"
+  commands:
+    "show version | include operating mode": ""
+    "show boot": |
+      ---------------------------
+      Switch 1
+      ---------------------------
+      Current Boot Variables:
+      BOOT variable does not exist
+
+      Boot Variables on next reload:
+      BOOT variable does not exist
+      Manual Boot = yes
+      Enable Break = 0
+      Boot Mode = DEVICE
+      iPXE Timeout = 0
+    "config term":
+      new_state: cat9k_enable_reload_to_rommon_break_config
+    "reload":
+      new_state: cat9k_boot_to_rommon
+
 cat9k_enable_reload_to_rommon_break_config:
   prompt: "%N(config)#"
   commands:

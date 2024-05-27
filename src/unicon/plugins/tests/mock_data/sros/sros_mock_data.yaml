@@ -42,6 +42,13 @@ mdcli_execute:
       new_state: mdcli_configure_global
     "environment console length 512": ""
     "environment console width 512": ""
+    "show port description": |
+      1/1/c1         QSFP28 Connector
+      1/1/c1/1       IMO1CRIP002:1/1/c22/1 C00235986 [I]
+      1/1/c2         QSFP28 Connector
+      1/1/c2/1       IMO1CRIP002:1/1/c23/1 C00235987 [I]
+
+      2024-03-18 17:25:17 WEST
   keys:
     'ctrl-z': ""
     "//":
@@ -190,3 +197,4 @@ classiccli_config_lag_access:
   keys:
     "ctrl-z":
       new_state: classiccli_execute
+
