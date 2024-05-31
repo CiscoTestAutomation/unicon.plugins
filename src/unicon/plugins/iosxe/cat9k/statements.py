@@ -1,7 +1,7 @@
 
 from unicon.eal.dialogs import Statement
 from unicon.plugins.generic.service_statements import (
-    save_env, confirm_reset, reload_confirm, reload_confirm_ios)
+    save_env, confirm_reset, reload_confirm, reload_confirm_ios, reload_confirm_iosxe)
 
 from .patterns import IosXECat9kPatterns
 
@@ -20,4 +20,5 @@ reload_to_rommon_statement_list = [save_env,
                                    confirm_reset,
                                    reload_confirm,
                                    reload_confirm_ios,
+                                   reload_confirm_iosxe,
                                    boot_interrupt_stmt]

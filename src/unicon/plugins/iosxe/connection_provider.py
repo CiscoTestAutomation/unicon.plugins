@@ -47,6 +47,13 @@ class IosxeSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
                                         GenericPatterns().learn_os_prompt)
                     con.state_machine.add_state(self.learn_tokens_state)
 
+                # Change to enable state before sending stop PnP disovery
+                con.state_machine.go_to('enable',
+                                        con.spawn,
+                                        context=con.context,
+                                        timeout=con.connection_timeout,
+                                        prompt_recovery=con.prompt_recovery)
+
                 # The first thing we need to is to send stop PnP discovery otherwise device will not execute any command.
                 con.spawn.sendline('pnpa service discovery stop')
                 # The device may reload after the command we get the dialog statements from reload service and try to handle that

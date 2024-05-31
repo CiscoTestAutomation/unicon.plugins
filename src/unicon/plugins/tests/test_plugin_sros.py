@@ -29,6 +29,12 @@ class TestSrosPlugin(unittest.TestCase):
         expect = self.md.mock_data['mdcli_execute']['commands'][cmd]
         self.assertEqual(self.joined(output), self.joined(expect))
 
+    def test_mdcli_1_execute(self):
+        cmd = "show port description"
+        out = self.con.mdcli_execute(cmd)
+        expect = self.md.mock_data['mdcli_execute']['commands'][cmd]
+        self.assertEqual(self.joined(out), self.joined(expect))
+
     def test_mdcli_configure(self):
         cmd = 'router interface coreloop ipv4 primary address 1.1.1.1 prefix-length 32'
         output = self.con.mdcli_configure(cmd, mode='global')
