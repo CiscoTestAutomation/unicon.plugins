@@ -33,7 +33,7 @@ class GenericPatterns(UniconCorePatterns):
 
         # self.config_prompt = r'.*%N\(config.*\)#\s?$'
         self.config_prompt = r'^(.*)\(.*(con|cfg|ipsec-profile|ca-trustpoint|gkm-local-server)\S*\)#\s?$'
-        self.rommon_prompt = r'^(.*?)(rommon[\s\d]*>|switch:)\s?$'
+        self.rommon_prompt = r'^(.*?)(rommon[\s\d]*>|switch:|grub>)\s?$'
         # self.standby_enable_prompt = r'^(.*?)(RouterRP-standby|%N-standby|%N-sdby|%N\(standby\))#\s?$'
         # self.standby_disable_prompt = r'^(.*?)(RouterRP-standby|%N-standby|%N-sdby|%N\(standby\))>\s?$'
         self.standby_locked = r'^.*?([S|s]tandby console disabled|This \(D\)RP Node is not ready or active for login \/configuration.*)'

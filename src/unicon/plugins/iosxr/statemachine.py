@@ -37,6 +37,7 @@ class IOSXRSingleRpStateMachine(StateMachine):
         admin = State('admin', patterns.admin_prompt)
         admin_conf = State('admin_conf', patterns.admin_conf_prompt)
         admin_run = State('admin_run', patterns.admin_run_prompt)
+        admin_host = State('admin_host', patterns.admin_host_prompt)
 
         self.add_state(enable)
         self.add_state(config)
@@ -45,6 +46,7 @@ class IOSXRSingleRpStateMachine(StateMachine):
         self.add_state(admin)
         self.add_state(admin_conf)
         self.add_state(admin_run)
+        self.add_state(admin_host)
 
         config_dialog = Dialog([
            [patterns.commit_changes_prompt, 'sendline(yes)', None, True, False],
@@ -64,6 +66,7 @@ class IOSXRSingleRpStateMachine(StateMachine):
         run_to_enable = Path(run, enable, 'exit', None)
         config_to_enable = Path(config, enable, 'end', config_dialog)
         exclusive_to_enable = Path(exclusive, enable, 'end', config_dialog)
+        admin_host_to_admin_run = Path(admin_host, admin_run, 'exit', None)
 
         self.add_path(config_to_enable)
         self.add_path(enable_to_config)
@@ -77,6 +80,7 @@ class IOSXRSingleRpStateMachine(StateMachine):
         self.add_path(admin_to_admin_run)
         self.add_path(admin_conf_to_admin)
         self.add_path(admin_run_to_admin)
+        self.add_path(admin_host_to_admin_run)
 
         self.add_default_statements(default_commands)
 

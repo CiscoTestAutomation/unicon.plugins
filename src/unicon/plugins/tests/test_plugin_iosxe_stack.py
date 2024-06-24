@@ -385,6 +385,26 @@ class TestIosXEStackUtils(unittest.TestCase):
                                     "state": "Ready"
                                 }
                             }, rd)
+        
+    def test_wait_for_any_state(self):
+        '''Test wait_for_any_state with positive timeout'''
+        su = StackUtils()
+        su.wait_for_any_state(connection=self.c, timeout=2, interval=1)
+
+    def test_wait_for_any_state2(self):
+        '''Test wait_for_any_state with negative timeout and auto_timeout_extend=True'''
+        su = StackUtils()
+        su.wait_for_any_state(connection=self.c, timeout=-10, interval=1, auto_timeout_extend=True, auto_extend_secs=2)
+
+    def test_is_all_member_ready(self):
+        '''Test is_all_member_ready'''
+        su = StackUtils()
+        self.assertTrue(su.is_all_member_ready(connection=self.c, timeout=2, interval=1))
+
+    def test_is_active_standby_ready(self):
+        '''Test is_active_standby_ready'''
+        su = StackUtils()
+        self.assertTrue(su.is_active_standby_ready(connection=self.c, timeout=2, interval=1))
 
 
 if __name__ == "__main__":

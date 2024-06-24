@@ -442,7 +442,6 @@ admin:
       0/PM4/SP        A9K-3KW-AC                READY            PWR,NSHUT,MON
       0/PM5/SP        A9K-3KW-AC                FAILED           PWR,NSHUT,MON
 
-
 config:
   prompt: "RP/0/RP0/CPU0:%N(config)#"
   commands: &config_cmds
@@ -1395,3 +1394,36 @@ bash_console5:
   prompt: "[xr-vm_nodeD0_CB0_CPU0:~]$"
   commands:
     <<: *bash_commands
+
+enable6:
+  prompt: "RP/0/RP0/CPU0:%N#"
+  commands:
+    "admin":
+      new_state: bash_console6
+
+bash_console6:
+  preface: |
+    Tue Jun  6 07:50:51.753 UTC
+    Last login: Mon Jun  5 15:09:57 2023 from 192.0.0.4
+    admin connected from 192.0.0.4 using ssh on sysadmin-vm:0_RP0
+  prompt: sysadmin-vm:0_RP0#
+  commands:
+    "run":
+      new_state: admin_bash_console6
+    "exit":
+      new_state: enable6
+
+admin_bash_console6:
+  preface: "Tue Jun  6  07:50:55.337 UTC+00:00"
+  prompt: "[sysadmin-vm:0_RP0:~]$"
+  commands:
+    "ssh 10.0.2.16":
+      new_state: admin_host6
+    "exit":
+      new_state: bash_console6
+
+admin_host6:
+  prompt: "[host:0_RP0:~]$"
+  commands:
+    "exit":
+      new_state: admin_bash_console6
