@@ -225,6 +225,16 @@ class TestIosXrPluginAdminService(unittest.TestCase):
         self.assertIn('exit', ret)
         self.assertIn('Router#', ret)
 
+    def test_admin_host(self):
+        conn = Connection(hostname='Router',
+                          start=['mock_device_cli --os iosxr --state enable6'],
+                          os='iosxr',
+                          enable_password='cisco',
+                          mit=True)
+        
+        conn.connect()
+        with conn.admin_bash_console() as console:
+            console.execute('ssh 10.0.2.16', allow_state_change=True)
 
 class TestIosXrPluginBashService(unittest.TestCase):
 

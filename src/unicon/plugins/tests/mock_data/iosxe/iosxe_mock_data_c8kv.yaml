@@ -223,3 +223,8 @@ c8kv_exec:
     'enable':
       new_state: 'c8kv_enable'
 
+c8kv_rommon:
+  prompt: "grub>"
+  commands:
+    'boot':
+      new_state: 'c8kv_enable'

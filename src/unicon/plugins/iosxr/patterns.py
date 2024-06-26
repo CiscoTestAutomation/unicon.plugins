@@ -31,6 +31,8 @@ class IOSXRPatterns(GenericPatterns):
         self.admin_prompt = r'^(.*?)(?:sysadmin-vm:0_(.*)\s?#\s?$|RP/\S+\(admin\)\s?#\s?)$'
         self.admin_conf_prompt = r'^(.*?)(?:sysadmin-vm:0_(.*)\(config.*\)\s?#\s?|RP/\S+\(admin-config(\S+)?\)\s?#\s?)$'
         self.admin_run_prompt = r'^(.*?)(?:\[sysadmin-vm:0_.*:([\s\S]+)?\]\s?\$\s?|[\r\n]+\s?#\s?)$'
+        # [host:0_RP0:~]$
+        self.admin_host_prompt = r'^(.*?)(?:\[host:0_.*:([\s\S]+)?\]\s?\$\s?)$'
         self.unreachable_prompt = r'apples are green but oranges are red'
         self.configuration_failed_message = r'^.*Please issue \'show configuration failed \[inheritance\].*[\r\n]*'
         self.standby_prompt = r'^.*This \(D\)RP Node is not ready or active for login \/configuration.*'
