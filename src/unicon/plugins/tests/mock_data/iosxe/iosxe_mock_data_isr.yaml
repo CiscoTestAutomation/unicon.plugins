@@ -168,6 +168,18 @@ enable_isr:
     "traceroute vrf MG501":
       new_state: traceroute_proto_isr
       
+    "set platform software selinux permissive":
+      response:
+      - |2
+                                ^
+        % Invalid input detected at '^' marker."
+
+    "set platform software selinux default":
+      response:
+      - |2
+                                ^
+        % Invalid input detected at '^' marker."
+
     "not a real command":
       response:
       - |2

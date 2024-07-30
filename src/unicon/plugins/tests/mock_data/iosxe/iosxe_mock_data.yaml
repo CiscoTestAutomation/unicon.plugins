@@ -300,6 +300,10 @@ general_enable:
     "copy  somefile.bin flash:":
       new_state: confirm_abort_copy
 
+    "set platform software selinux permissive": ""
+
+    "set platform software selinux default": ""
+
 general_maintence_mode_confirm:
   prompt: "Template default will be applied. Do you want to continue?[confirm] "
   commands:

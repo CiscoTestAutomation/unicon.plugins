@@ -117,6 +117,17 @@ class TestCopyService(unittest.TestCase):
                         timeout=9)
         self.assertEqual(err.exception.args[0], 'Copy failed')
 
+    def test_copy_to_usb(self):
+        test_output = self.d.copy(source = 'bootflash:', dest = 'usb:',
+                          source_file = '/c8000aep-universalk9.17.12.04.0.4708.SSA.bin',
+                          dest_file = 'test/c8000aep-universalk9.17.12.04.0.4708.SSA.bin',
+                          sleep_time = 10)
+        expected_output = self.md.mock_data['dest_file_name']['commands']\
+                              ['test/c8000aep-universalk9.17.12.04.0.4708.SSA.bin']['response']
+        test_output = '\n'.join(test_output.splitlines())
+        expected_output = '\n'.join(expected_output.splitlines())
+        self.assertIn(expected_output, test_output)
+
 
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
 @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)

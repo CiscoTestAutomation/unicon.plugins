@@ -20,6 +20,7 @@ import logging
 import collections
 import ipaddress
 from itertools import chain
+import time
 import warnings
 from datetime import datetime, timedelta
 
@@ -1666,6 +1667,9 @@ class Copy(BaseService):
         for retry_num in range(self.max_attempts):
             spawn.sendline(copy_string)
             try:
+                if (sleep_time := kwargs.get('sleep_time')):
+                    con.log.info(f"sleep for {sleep_time} seconds")
+                    time.sleep(sleep_time)
                 self.result = dialog.process(spawn,
                                              context=copy_context,
                                              timeout=timeout)

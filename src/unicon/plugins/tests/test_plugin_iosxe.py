@@ -529,6 +529,34 @@ class TestIosXEluginBashService(unittest.TestCase):
         self.assertIn('WLC1#', c.spawn.match.match_output)
         c.disconnect()
 
+    def test_bash_disable_selinux(self):
+        c = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe --state general_enable --hostname Router'],
+                       os='iosxe',
+                       credentials=dict(default=dict(username='cisco', password='cisco')),
+                       log_buffer=True
+                       )
+        with c.bash_console(disable_selinux=True) as console:
+            self.assertIn('[Router_RP_0:/]$', c.spawn.match.match_output)
+            console.execute('df /bootflash/')
+        self.assertIn('set platform software selinux default', c.spawn.match.match_output)
+        self.assertIn('Router#', c.spawn.match.match_output)
+        c.disconnect()
+
+    def test_bash_disable_selinux_invalid_cmds(self):
+        c = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe --state enable_isr --hostname Router'],
+                       os='iosxe',
+                       credentials=dict(default=dict(username='cisco', password='cisco')),
+                       log_buffer=True
+                       )
+        with c.bash_console(disable_selinux=True) as console:
+            self.assertIn('[Router:/]$', c.spawn.match.match_output)
+            console.execute('ls')
+        self.assertIn('set platform software selinux default', c.spawn.match.match_output)
+        self.assertIn('Router#', c.spawn.match.match_output)
+        c.disconnect()
+
 class TestIosXESDWANConfigure(unittest.TestCase):
 
     def test_config_transaction(self):

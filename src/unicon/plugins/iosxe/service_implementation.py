@@ -165,6 +165,12 @@ class BashService(GenericBashService):
             handle.context['_chassis'] = kwargs.get('chassis')
         else:
             handle.context.pop('_chassis', None)
+        if kwargs.get('disable_selinux') is not None:
+            handle.context['_disable_selinux'] = kwargs.get('disable_selinux')
+        elif hasattr(self, 'disable_selinux'):
+            handle.context['_disable_selinux'] = self.disable_selinux
+        else:
+            handle.context.pop('_disable_selinux', None)
         super().pre_service(*args, **kwargs)
 
     class ContextMgr(GenericBashService.ContextMgr):
@@ -175,6 +181,12 @@ class BashService(GenericBashService):
                              **kwargs)
 
         def __enter__(self):
+
+            if self.conn.context.get('_disable_selinux'):
+                try:
+                    self.conn.execute('set platform software selinux permissive')
+                except SubCommandFailure:
+                    pass
 
             self.conn.log.debug('+++ attaching bash shell +++')
             # enter shell prompt
@@ -190,6 +202,16 @@ class BashService(GenericBashService):
 
             return self
 
+        def __exit__(self, type, value, traceback):
+            res = super().__exit__(type, value, traceback)
+
+            if self.conn.context.get('_disable_selinux'):
+                try:
+                    self.conn.execute('set platform software selinux default')
+                except SubCommandFailure:
+                    pass
+
+            return res
 
 class ResetStandbyRP(GenericResetStandbyRP):
     """ Service to reset the standby rp.
