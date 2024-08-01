@@ -1,10 +1,11 @@
 
 from unicon.plugins.iosxe.cat9k.c9800 import IosXEc9800ServiceList, IosXEc9800SingleRpConnection, IosXEc9800DualRPConnection
-
+from unicon.plugins.iosxe import service_implementation as svc
 
 class IosXEc9800CLServiceList(IosXEc9800ServiceList):
     def __init__(self):
         super().__init__()
+        self.rommon = svc.Rommon
 
 
 

@@ -70,3 +70,18 @@ wait_for_recovery:
       new_state: enable
       response: |
         sending keyboard interrupt
+
+copy_src_bootflash:
+  prompt: "Source filename []? "
+  commands:
+    "/c8000aep-universalk9.17.12.04.0.4708.SSA.bin":
+      new_state: dest_file_name
+
+dest_file_name:
+  prompt: "Destination filename [c8000aep-universalk9.17.12.04.0.4708.SSA.bin]? "
+  commands:
+    "test/c8000aep-universalk9.17.12.04.0.4708.SSA.bin":
+      new_state: enable
+      response: |
+        Copy in progress...CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+        787557605 bytes copied in 71.982 secs (10941035 bytes/sec)
