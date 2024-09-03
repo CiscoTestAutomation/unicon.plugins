@@ -13,7 +13,7 @@ import unittest
 from pyats.topology import loader
 import unicon
 from unicon import Connection
-from unicon.core.errors import ConnectionError as UniconConnectionError
+from unicon.core.errors import ConnectionError as UniconConnectionError, UniconAuthenticationError
 from unicon.eal.dialogs import Dialog
 from unicon.mock.mock_device import mockdata_path
 
@@ -142,7 +142,7 @@ class TestSonicPluginConnect(unittest.TestCase):
                        os='sonic',
                        username='cisco',
                        password='wrong_password')
-        with self.assertRaisesRegex(UniconConnectionError, 'failed to connect to agent-lab11-pm'):
+        with self.assertRaisesRegex(UniconAuthenticationError, 'Login failure, either wrong username or password'):
             c.connect()
 
     def test_bad_connect_ssh_key(self):

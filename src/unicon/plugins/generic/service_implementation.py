@@ -720,14 +720,10 @@ class Execute(BaseService):
 
         command_output = {}
         for command in commands:
-            via = con.via
-            alias = con.alias if hasattr(con, 'alias') and con.alias != 'cli' else None
-            if alias and via:
-                con.log.info("+++ %s with via '%s' and alias '%s': executing command '%s' +++" % (con.hostname, via, alias, command))
-            elif via:
-                con.log.info("+++ %s with via '%s': executing command '%s' +++" % (con.hostname, via, command))
-            else:
-                con.log.info("+++ %s: executing command '%s' +++" % (con.hostname, command))
+
+            message = f"executing command '{command}'"
+            super().log_service_call(message)
+
             con.sendline(command)
             try:
                 dialog_match = dialog.process(

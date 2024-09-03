@@ -4,7 +4,7 @@ from collections import namedtuple
 from datetime import datetime, timedelta
 import re
 from unicon.eal.dialogs import Dialog
-from unicon.core.errors import SubCommandFailure, StateMachineError
+from unicon.core.errors import SubCommandFailure
 from unicon.bases.routers.services import BaseService
 
 from .exception import StackMemberReadyException
@@ -114,8 +114,6 @@ class StackSwitchover(BaseService):
         connect_dialog = self.connection.connection_provider.get_connection_dialog()
         dialog += connect_dialog
 
-        start_time = datetime.now()
-
         conn.log.info('Processing on active rp %s-%s' % (conn.hostname, conn.alias))
         conn.sendline(switchover_cmd)
         try:
@@ -144,11 +142,10 @@ class StackSwitchover(BaseService):
         sleep(self.connection.settings.POST_SWITCHOVER_SLEEP)
 
         # check all members are ready
-        recheck_sleep_interval = self.connection.settings.SWITCHOVER_POSTCHECK_INTERVAL
-        recheck_max = timeout - (datetime.now() - start_time).seconds
+        conn.state_machine.detect_state(conn.spawn, context=conn.context)
 
-        self.connection.log.info('Wait for all members to be ready.')
-        if utils.is_all_member_ready(conn, timeout=recheck_max, interval=recheck_sleep_interval):
+        interval = self.connection.settings.SWITCHOVER_POSTCHECK_INTERVAL
+        if utils.is_all_member_ready(conn, timeout=timeout, interval=interval):
             self.connection.log.info('All members are ready.')
         else:
             self.connection.log.info('Timeout in %s secs. '
@@ -252,7 +249,6 @@ class StackReload(BaseService):
         conn.context['post_reload_timeout'] = timedelta(seconds= self.post_reload_wait_time)
 
         conn.log.info('Processing on active rp %s-%s' % (conn.hostname, conn.alias))
-        start_time = current_time = datetime.now()
         conn.sendline(reload_cmd)
         try:
             reload_cmd_output = reload_dialog.process(conn.spawn,
@@ -288,38 +284,39 @@ class StackReload(BaseService):
                 self.connection.log.error(e)
                 raise SubCommandFailure('Reload failed.', e) from e
         else:
-            self.connection.log.info('Processing autoboot on rp %s-%s' % (conn.hostname, conn.alias))
-        
-        
-        self.connection.log.info('Sleeping for %s secs.' % \
-                self.connection.settings.STACK_POST_RELOAD_SLEEP)
-        sleep(self.connection.settings.STACK_POST_RELOAD_SLEEP)
-
-        # make sure detect_state is good to reduce the chance of timeout later
-        recheck_sleep_interval = self.connection.settings.RELOAD_POSTCHECK_INTERVAL
-        recheck_max = timeout - (datetime.now() - start_time).seconds
-
+            try:
+                # bring device to enable mode
+                conn.state_machine.go_to('any', conn.spawn, timeout=timeout,
+                                        prompt_recovery=self.prompt_recovery,
+                                        context=conn.context)
+                conn.state_machine.go_to('enable', conn.spawn, timeout=timeout,
+                                        prompt_recovery=self.prompt_recovery,
+                                        context=conn.context)
+            except Exception as e:
+                raise SubCommandFailure('Failed to bring device to disable mode.', e) from e
         # check active and standby rp is ready
         self.connection.log.info('Wait for Standby RP to be ready.')
-
-        if utils.is_active_standby_ready(conn, timeout=recheck_max, interval=recheck_sleep_interval):
+        interval = self.connection.settings.RELOAD_POSTCHECK_INTERVAL
+        if utils.is_active_standby_ready(conn, timeout=timeout, interval=interval):
             self.connection.log.info('Active and Standby RPs are ready.')
         else:
             self.connection.log.info('Timeout in %s secs. '
                 'Standby RP is not in Ready state. Reload failed' % timeout)
             self.result = False
             return
-        
-        self.connection.log.info('Start checking state of all members')
-        recheck_max = timeout - (datetime.now() - start_time).seconds
-        if utils.is_all_member_ready(conn, timeout=recheck_max, interval=recheck_sleep_interval):
-            self.connection.log.info('All Members are ready.')
-        else:
-            self.connection.log.info(f'Timeout in {recheck_max} secs. '
-                f'Not all members are in Ready state. Reload failed')
-            self.result = False
-            return
 
+        if member:
+            if utils.is_all_member_ready(conn, timeout=timeout, interval=interval):
+                self.connection.log.info('All Members are ready.')
+            else:
+                self.connection.log.info(f'Timeout in {timeout} secs. '
+                    f'Member{member} is not in Ready state. Reload failed')
+                self.result = False
+                return
+
+        self.connection.log.info('Sleeping for %s secs.' % \
+                self.connection.settings.STACK_POST_RELOAD_SLEEP)
+        sleep(self.connection.settings.STACK_POST_RELOAD_SLEEP)
 
         self.connection.log.info('Disconnecting and reconnecting')
         self.connection.disconnect()
@@ -572,12 +569,10 @@ class StackResetStandbyRP(BaseService):
                         return True
                 return False
 
-            chk_interval = con.settings.RELOAD_POSTCHECK_INTERVAL
+            from genie.utils.timeout import Timeout
+            exec_timeout = Timeout(timeout, 15)
             found_invalid_mac = False
-            start_time2 = time()
-            while (time() - start_time2) < timeout:
-                t_left = timeout - (time() - start_time2)
-                con.log.info('-- checking time left: %0.1f secs' % t_left)
+            while exec_timeout.iterate():
                 con.log.info('Make sure no invalid mac address 0000.0000.0000')
                 if not _check_invalid_mac(con):
                     con.log.info('Did not find invalid mac as 0000.0000.0000')
@@ -586,8 +581,7 @@ class StackResetStandbyRP(BaseService):
                 else:
                     con.log.warning('Found 0000.0000.0000 mac address')
                     found_invalid_mac = True
-                    con.log.info(f'Sleep {chk_interval} secs')
-                    sleep(chk_interval)
+                    exec_timeout.sleep()
                     continue
             else:
                 if found_invalid_mac:

@@ -31,7 +31,7 @@ def stack_press_return(spawn, context, session):
     # to make sure that we get out of the process dialog when all the members are ready we 
     # make sure first we match "All switches in the stack have been discovered. Accelerating discovery" in the
     # buffer then we raise the StackMemberReadyException to end the process.
-    if session.get('apply_config_on_all_members') or session.get('bp_console'):
+    if session.get('apply_config_on_all_members'):
         spawn.log.info('Waiting for buffer to settle')
         timeout_time = context.get('post_reload_wait_time', 60)
         if not isinstance(timeout_time, timedelta):
@@ -43,7 +43,7 @@ def stack_press_return(spawn, context, session):
                 break
             current_time = datetime.now()
             if (current_time - start_time) > timeout_time:
-                spawn.log.info('Time out, trying to access device..')
+                spawn.log.info('Time out, trying to acces device..')
                 break
         spawn.sendline()
         raise StackMemberReadyException
@@ -53,12 +53,6 @@ def apply_config_on_all_switch(spawn, session):
     """ Handles the number of apply configure message seen after install image """
     session["apply_config_on_all_members"] = True
 
-def bp_console_handler(spawn, session):
-    ''' strack_press_return will not wait for session["apply_config_on_all_members"] to be set
-        However, this pattern "All switches in the stack have been discovered. Accelerating discovery"
-        will never be seen for new stack design, which will cause the stack_press_return to wait forever.
-        Therefore, also checking bp-console prompt to make sure the reload process dialog will stop.'''
-    session["bp_console"] = True
 
 
 # switchover service statements
@@ -164,11 +158,6 @@ apply_config = Statement(pattern=reload_pat.apply_config,
                          continue_timer=False)
 
 
-bp_console = Statement(pattern=reload_pat.bp_console,
-                          action=bp_console_handler,
-                          loop_continue=True,
-                          continue_timer=False)
-
 stack_reload_stmt_list = list(reload_statement_list)
 
 stack_reload_stmt_list.extend([en_state, dis_state])
@@ -176,7 +165,6 @@ stack_reload_stmt_list.insert(0, press_return_stack)
 stack_reload_stmt_list.insert(0, reload_shelf)
 stack_reload_stmt_list.insert(0, reload_fast)
 stack_reload_stmt_list.insert(0, apply_config)
-stack_reload_stmt_list.insert(0, bp_console)
 
 
 stack_factory_reset_stmt_list = [factory_reset_confirm, are_you_sure_confirm]

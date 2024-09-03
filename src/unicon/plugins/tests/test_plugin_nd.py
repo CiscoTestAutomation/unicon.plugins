@@ -24,7 +24,7 @@ from pyats.topology import loader
 
 import unicon
 from unicon import Connection
-from unicon.core.errors import SubCommandFailure, ConnectionError as UniconConnectionError
+from unicon.core.errors import SubCommandFailure, ConnectionError as UniconConnectionError, UniconAuthenticationError
 from unicon.plugins.linux.patterns import LinuxPatterns
 from unicon.plugins.linux.settings import LinuxSettings
 from unicon.eal.dialogs import Dialog
@@ -153,7 +153,7 @@ class TestNDPluginConnect(unittest.TestCase):
                        os='nd',
                        username='cisco',
                        password='wrong_password')
-        with self.assertRaisesRegex(UniconConnectionError, 'failed to connect to agent-lab11-pm'):
+        with self.assertRaisesRegex(UniconAuthenticationError, 'Login failure, either wrong username or password'):
             c.connect()
 
     def test_connect_hit_enter(self):

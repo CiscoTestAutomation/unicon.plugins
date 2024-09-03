@@ -8,6 +8,7 @@ __author__ = "Dave Wapstra <dwapstra@cisco.com>"
 import os
 import re
 import time
+import logging
 import unittest
 from unittest.mock import Mock, call, patch
 from concurrent.futures import ThreadPoolExecutor
@@ -293,7 +294,7 @@ class TestCredentialLoginPasswordHandlers(unittest.TestCase):
                        connection_timeout=15,
                        credentials=credentials
                        )
-        with self.assertRaises(ConnectionError):
+        with self.assertRaises(CredentialsExhaustedError):
             d.connect()
 
         d = Connection(hostname='Router',
@@ -302,7 +303,7 @@ class TestCredentialLoginPasswordHandlers(unittest.TestCase):
                        connection_timeout=15,
                        credentials=credentials
                        )
-        with self.assertRaises(ConnectionError):
+        with self.assertRaises(CredentialsExhaustedError):
             d.connect()
 
     def test_enable_password_explicit(self):
@@ -386,7 +387,7 @@ class TestCredentialLoginPasswordHandlers(unittest.TestCase):
                        connection_timeout=15,
                        credentials=credentials,
                        login_creds='mycred')
-        with self.assertRaises(ConnectionError):
+        with self.assertRaises(CredentialsExhaustedError):
             d.connect()
 
         d = Connection(hostname='Router',
@@ -395,7 +396,7 @@ class TestCredentialLoginPasswordHandlers(unittest.TestCase):
                        connection_timeout=15,
                        credentials=credentials,
                        login_creds='mycred')
-        with self.assertRaises(ConnectionError):
+        with self.assertRaises(CredentialsExhaustedError):
             d.connect()
 
     def test_connect_ssh_passphrase(self):
@@ -426,7 +427,7 @@ class TestCredentialLoginPasswordHandlers(unittest.TestCase):
                        init_exec_commands=[],
                        init_config_commands=[])
 
-        with self.assertRaises(ConnectionError):
+        with self.assertRaises(UniconAuthenticationError):
             d.connect()
 
 
@@ -867,6 +868,36 @@ class TestExecuteService(unittest.TestCase):
         finally:
             self.d.execute.matched_retry_sleep = \
                 self.d.settings.EXECUTE_MATCHED_RETRY_SLEEP
+
+
+class TestServiceLogging(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        testbed = """
+        devices:
+          R1:
+            os: iosxe
+            alias: uut
+            connections:
+              defaults:
+                class: unicon.Unicon
+              a:
+                command: mock_device_cli --os iosxe --state general_enable --hostname R1
+        """
+        t = loader.load(testbed)
+        cls.d = t.devices.uut
+        cls.d.connect(mit=True)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.d.disconnect()
+
+    def test_execute_logging(self):
+        self.maxDiff = None
+        with self.assertLogs(self.d.log.name, logging.INFO) as cm:
+            self.d.execute('show version')
+            self.assertIn("R1(alias=uut) with via 'a'", cm.output[0])
 
 
 class TestTransmitReceive(unittest.TestCase):

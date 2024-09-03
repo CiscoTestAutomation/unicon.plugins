@@ -40,3 +40,17 @@ class IOSXRPatterns(GenericPatterns):
         self.confirm_y_prompt = r"\[confirm( with only 'y' or 'n')?\]\s*\[y/n\].*$"
         self.reload_module_prompt = r"^(.*)?Reload hardware module ? \[no,yes\].*$"
         self.proceed_config_mode = r'Would you like to proceed in configuration mode\? \[no\]:\s*$'
+
+        # when changing more_prompt, please also change plugins/iosxr/settings.py MORE_REPLACE_PATTERN
+        # ESC[7m--More--ESC[27m
+        # ESC[7m(END)ESC[27m
+        self.more_prompt = r'^.*(--\s?[Mm]ore\s?--|\(END\)).*$'
+
+        # Brief='b', Detail='d', Protocol(IPv4/IPv6)='r'
+        # Brief='b', Detail='d', Protocol(IPv4/IPv6)='r'\x1b[K\r\n\x1b[K\r\n
+        # (General='g', IPv4 Uni='4u', IPv4 Multi='4m', IPv6 Uni='6u', IPv6 Multi='6m')
+        self.monitor_prompt = r"^(.*?)(Brief='b', Detail='d', Protocol\(IPv4/IPv6\)='r'|\(General='g', IPv4 Uni='4u', IPv4 Multi='4m', IPv6 Uni='6u', IPv6 Multi='6m'\))(\x1b\S+[\r\n]+)*$"
+        # r1          Monitor Time: 00:00:06          SysUptime: 15:48:49
+        self.monitor_time_regex = r'(?P<hostname>\S+).*?Monitor Time: (?P<time>\d+:\d+:\d+).*?SysUptime: (?P<uptime>\S+)'
+        # Quit='q', Freeze='f', Thaw='t', Clear='c', Interface='i',
+        self.monitor_command_pattern = r"(?P<command>\S+)='(?P<key>\w)'"

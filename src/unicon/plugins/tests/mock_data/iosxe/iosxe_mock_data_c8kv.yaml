@@ -74,6 +74,12 @@ c8kv_enable:
     'config term':
       new_state: 'c8kv_config_term'
 
+c8kv_enable_autoboot_disabled:
+  prompt: '%N#'
+  commands:
+    'reload':
+      new_state: 'c8kv_rommon'
+
 c8kv_config_term:
   prompt: "%N(config)#"
   commands:
@@ -83,6 +89,14 @@ c8kv_config_term:
     'exec-timeout 0': ''
     'end':
       new_state: 'c8kv_enable'
+    'config-register 0x40':
+      new_state: 'c8kv_config_term_autoboot_disabled'
+
+c8kv_config_term_autoboot_disabled:
+  prompt: "%N(config)#"
+  commands:
+    'end':
+      new_state: 'c8kv_enable_autoboot_disabled'
 
 c8kv_system_config_modified:
   prompt: 'System configuration has been modified. Save? [yes/no]:'
