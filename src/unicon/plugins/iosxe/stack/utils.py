@@ -6,7 +6,6 @@ from time import sleep, time
 
 from unicon.eal.dialogs import Dialog
 from unicon.utils import Utils, AttributeDict
-from unicon.core.errors import StateMachineError
 
 from .exception import StackMemberReadyException
 from .service_statements import send_boot
@@ -115,23 +114,9 @@ class StackUtils(Utils):
         """
         active = standby = ''
         start_time = time()
-        end_time = start_time + timeout
 
-        
-        
         while (time() - start_time) < timeout:
-            # double check the connection state
-            self.wait_for_any_state(connection, timeout=end_time - time(), interval=interval)
-            try:
-                # one connection reached a known state does not mean all connections are in the same state
-                # so cli execution can still fail
-                details = self.get_redundancy_details(connection)
-            except Exception as e:
-                connection.log.warning('Failed to get redundancy details. Stack might not be ready yet')
-                connection.log.info('Sleeping for %s secs.' % interval)
-                sleep(interval)
-                continue
-
+            details = self.get_redundancy_details(connection)
             for sw_num, info in details.items():
                 if info['role'] == 'Active':
                     active = info.get('state')
@@ -180,20 +165,9 @@ class StackUtils(Utils):
         """
         ready = active = standby = False
         start_time = time()
-        end_time = start_time + timeout
 
         while (time() - start_time) < timeout:
-            # double check the console state. 
-            self.wait_for_any_state(connection, timeout=end_time - time(), interval=interval)
-            try:
-                # one connection reached a known state does not mean all connections are in the same state
-                # so cli execution can still fail
-                details = self.get_redundancy_details(connection)
-            except Exception as e:
-                connection.log.warning('Failed to get redundancy details. Stack might not be ready yet')
-                connection.log.info('Sleeping for %s secs.' % interval)
-                sleep(interval)
-                continue
+            details = self.get_redundancy_details(connection)
             for sw_num, info in details.items():
                 state = info.get('state')
                 if state != 'Ready':
@@ -232,47 +206,3 @@ class StackUtils(Utils):
                 standby = int(sw_num)
 
         return standby
-    
-    
-    def wait_for_any_state(self, connection, timeout=180, interval=15, auto_timeout_extend=True, auto_extend_secs=180):
-        ''' use this method to wait for any state or bypass possible timing issue which could cause state detection failure
-            use this where false failure is seen due to timing issue
-            Args:
-                connection (`obj`): connection object
-                timeout (`int`): timeout value, default is 180 secs
-                interval (`int`): check interval, default is 15 secs
-                auto_timeout_extend (`bool`): auto extend timeout if less than 0
-                                              This is useful when the timeout is calculated based on an estimated total timeout
-                auto_extend_secs (`int`): Extend timeout to this vaule when auto_timeout_extend is True. Default is 180 secs
-            Returns:
-                None
-                raises StateMachineError if state detection fails and timeout is reached
-
-        '''
-        start_time = time()
-        good_state = False
-        if timeout <= 0 and auto_timeout_extend:
-            connection.log.warning(f'wait_for_any_state: given timeout is less than 0. Extend it to {auto_extend_secs} seconds')
-            timeout = auto_extend_secs
-        elif timeout <= 0:
-            connection.log.warning(f'wait_for_any_state: given timeout is less than 0. No auto extend. set timeout to 10 seconds')
-            timeout = 10 # set it to 10 seconds to check at least once
-        else:
-            connection.log.warning(f'wait_for_any_state: given timeout={timeout} seconds. No auto extend')
-            
-        connection.log.info(f'Looking for known state (detect_state) on {connection.alias} -- timeout={timeout} seconds')
-        while (time() - start_time) < timeout:
-            t_left = timeout - (time() - start_time)
-            connection.log.info('-- checking time left: %0.1f secs' % t_left)
-            try:
-                connection.state_machine.detect_state(connection.spawn, context=connection.context)
-                good_state = True
-                break
-            except Exception as e:
-                connection.log.warning(f'Fail to detect any state on {connection.alias}')
-                connection.log.info(f'Sleep {interval} secs')
-                sleep(interval)
-        if not good_state:
-            raise StateMachineError(f'wait_for_any_state: Timeout reached on {connection.alias}')
-        else:
-            connection.log.info(f'detect_state on {connection.alias} is successful')

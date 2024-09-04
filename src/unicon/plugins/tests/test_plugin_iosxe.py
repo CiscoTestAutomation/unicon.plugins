@@ -630,6 +630,9 @@ class TestIosXEC8KvPluginReload(unittest.TestCase):
         self.c.settings.POST_RELOAD_WAIT = 1
         self.c.reload(grub_boot_image='GOLDEN')
 
+    def test_rommon(self):
+        self.c.rommon(config_register="0x40")
+
 class TestIosXECat9kPluginReload(unittest.TestCase):
 
     @classmethod
@@ -1038,7 +1041,7 @@ class TestIosXEEnableSecret(unittest.TestCase):
                        credentials=dict(default=dict(password='veryverybadpw')),
                        log_buffer=True
                        )
-        with self.assertRaisesRegex(UniconConnectionError, 'failed to connect to R1'):
+        with self.assertRaisesRegex(UniconAuthenticationError, 'Too many enable password retries'):
             c.connect()
         c.disconnect()
 

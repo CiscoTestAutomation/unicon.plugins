@@ -376,7 +376,13 @@ enable:
     "copy  harddisk: tftp:":
       new_state: copy_harddisk_wildcard_tftp
     "active_install_add":
-           new_state: install_add_commit
+      new_state: install_add_commit
+    "show command with more":
+      new_state: show_command_with_escape_more
+    "monitor interface":
+      new_state: monitor_interface
+    "monitor interface eth0":
+      new_state: monitor_interface_iface
 
 half_confirm_prompt:
   prompt: "Clear logging buffer [confirm] [y"
@@ -1427,3 +1433,58 @@ admin_host6:
   commands:
     "exit":
       new_state: admin_bash_console6
+
+
+show_command_with_escape_more:
+  prompt: "\x1b[7m--More--\x1b[27m"
+  keys:
+    " ":
+      response: output1
+      new_state: show_command_with_escape_end
+
+show_command_with_escape_end:
+  prompt: "\x1b[7m(END)\x1b[27m"
+  keys:
+    " ":
+      response: output2
+      new_state: enable
+
+
+monitor_interface:
+  preface: |
+    R1                   Monitor Time: 00:00:02          SysUptime: 22:48:09
+
+    Quit='q',     Clear='c',    Freeze='f', Thaw='t',
+    Next set='n', Prev set='p', Bytes='y',  Packets='k'
+  prompt: "(General='g', IPv4 Uni='4u', IPv4 Multi='4m', IPv6 Uni='6u', IPv6 Multi='6m')"
+  keys:
+    "c": ""
+    "q":
+      new_state: enable
+  commands:
+    "q":
+      new_state: enable
+
+
+monitor_interface_iface:
+  preface: |
+    R1                   Monitor Time: 00:00:02          SysUptime: 22:48:09
+
+    FourHundredGigE0/0/0/2 is up, line protocol is up
+    Encapsulation ARPA
+
+    Traffic Stats:(2 second rates)                                     Delta
+      Input  Packets:                      2733                            0
+
+    Quit='q', Freeze='f', Thaw='t', Clear='c', Interface='i',
+    Next='n', Prev='p'
+
+
+  prompt: "Brief='b', Detail='d', Protocol(IPv4/IPv6)='r'"
+  keys:
+    "c": ""
+    "q":
+      new_state: enable
+  commands:
+    "q":
+      new_state: enable

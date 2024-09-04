@@ -1,13 +1,17 @@
 __author__ = "Syed Raza <syedraza@cisco.com>"
 
+import io
 import re
+import logging
 from time import sleep
 from datetime import datetime, timedelta
 
 from unicon.plugins.generic import service_implementation as svc
 from unicon.bases.routers.services import BaseService
-from unicon.core.errors import SubCommandFailure
+from unicon.core.errors import SubCommandFailure, StateMachineError
 from unicon.eal.dialogs import Dialog, Statement
+from unicon.logs import UniconStreamHandler
+from unicon.plugins.utils import slugify
 from unicon.plugins.generic.service_implementation import BashService as GenericBashService
 from unicon.plugins.generic.service_implementation import GetRPState as GenericGetRPState
 
@@ -17,8 +21,11 @@ from .service_statements import (switchover_statement_list,
                                  configure_statement_list)
 
 from .utils import IosxrUtils
+from .patterns import IOSXRPatterns
 
 utils = IosxrUtils()
+patterns = IOSXRPatterns()
+
 
 def get_commit_cmd(**kwargs):
     if 'force' in kwargs and kwargs['force'] is True:
@@ -418,3 +425,149 @@ class GetRPState(GenericGetRPState):
 
         """send the command on the right rp and return the output"""
         return super().call_service(target=target, timeout=timeout, utils=utils, *args, **kwargs)
+
+
+class Monitor(BaseService):
+
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.service_name = 'monitor'
+        self.start_state = 'any'
+        self.end_state = 'any'
+        self.monitor_state = {}
+        self.timeout = connection.settings.EXEC_TIMEOUT
+        self.dialog = Dialog()
+        self.log_buffer = io.StringIO()
+        lb = UniconStreamHandler(self.log_buffer)
+        lb.setFormatter(logging.Formatter(fmt='[%(asctime)s] %(message)s'))
+        self.connection.log.addHandler(lb)
+
+    @property
+    def running(self):
+        return self.connection.state_machine.current_state == 'monitor'
+
+    def call_service(self, command, reply=Dialog(), timeout=None, **kwargs):
+        conn = self.connection
+        if not isinstance(command, str):
+            raise ValueError('command must be a string')
+        command = command.strip()
+        timeout = timeout or self.timeout
+
+        monitor_action = re.search('(?:mon\S* )?(?P<action>\S+)', command)
+        if monitor_action:
+            action = monitor_action.groupdict().get('action')
+            if monitor_action in ['stop', 'quit']:
+                return self.stop()
+
+            if action != 'interface':
+                # grab last 250 bytes
+                monitor_output = self.get_buffer()[-250:]
+                m = re.finditer(patterns.monitor_command_pattern, monitor_output)
+                for item in m:
+                    group = item.groupdict()
+                    monitor_command = slugify(group.get('command'))
+                    command_key = group.get('key')
+                    if action == monitor_command:
+                        conn.send(command_key)
+                        return self._process_dialog(reply=reply, timeout=timeout)
+                else:
+                    raise SubCommandFailure(f'Monitor command {command} is not supported')
+
+        if command:
+            if not re.match('^mon', command):
+                command = 'monitor ' + command
+
+            # Clear log buffer
+            self.log_buffer.seek(0)
+            self.log_buffer.truncate()
+
+            conn.sendline(command)
+            return self._process_dialog(reply=reply, timeout=timeout)
+
+    def _process_dialog(self, reply=None, timeout=None):
+        conn = self.connection
+        sm = conn.state_machine
+        dialog = self.dialog + self.service_dialog()
+        for state in sm.states:
+            if state.name != sm.current_state:
+                dialog.append(Statement(pattern=state.pattern))
+
+        try:
+            dialog_match = dialog.process(
+                conn.spawn,
+                timeout=timeout,
+                prompt_recovery=self.prompt_recovery,
+                context=conn.context
+            )
+            if dialog_match:
+                self.result = utils.remove_ansi_escape_codes(dialog_match.match_output)
+                self.result = self.get_service_result()
+            sm.detect_state(conn.spawn, conn.context)
+        except StateMachineError:
+            raise
+        except Exception as err:
+            raise SubCommandFailure("Command execution failed", err) from err
+
+        m = re.search(patterns.monitor_time_regex, self.result)
+        if m:
+            for k, v in m.groupdict().items():
+                self.monitor_state[k] = v
+
+        return self.result
+
+    def get_buffer(self, truncate=False):
+        """
+        Return log buffer contents and clear log buffer if truncate is true
+        """
+        self.log_buffer.seek(0)
+        output = self.log_buffer.read()
+        if truncate:
+            self.log_buffer.seek(0)
+            self.log_buffer.truncate()
+        return output
+
+    def tail(self, timeout=30, reply=None):
+        """
+        Monitor the 'monitor' output up to 'timeout' seconds or if a reply statement matches.
+
+        :Parameters:
+            :param timeout: (int) Timeout in seconds. Default: 30
+            :param reply: (Dialog) reply dialog (optional)
+
+        :Returns:
+            Returns the current buffer contents.
+        """
+        conn = self.connection
+
+        dialog = Dialog()
+        if reply:
+            dialog += reply
+        try:
+            dialog.process(conn.spawn, timeout=timeout, context=self.context)
+        except TimeoutError:
+            pass
+
+        return self.get_buffer()
+
+    def stop(self):
+        """ Stop the monitor session and return to enable mode.
+        """
+        conn = self.connection
+
+        if not self.running:
+            conn.log.info('Monitor not running')
+            return
+
+        # Grab output before stoppig monitor
+        output = self.get_buffer(truncate=True)
+        output = utils.remove_ansi_escape_codes(output)
+
+        conn.log.info('Stopping monitor...')
+        conn.state_machine.go_to('enable', conn.spawn)
+        return output
+
+    def log_service_call(self):
+        pass
+
+    def post_service(self, *args, **kwargs):
+        pass

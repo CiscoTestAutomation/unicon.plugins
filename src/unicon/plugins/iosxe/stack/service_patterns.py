@@ -25,5 +25,3 @@ class StackIosXEReloadPatterns(ReloadPatterns):
         self.reload_entire_shelf = r'^.*?Reload the entire shelf \[confirm\]'
         self.reload_fast = r'^.*Proceed with reload fast\? \[confirm\]'
         self.apply_config = r'.*All switches in the stack have been discovered. Accelerating discovery.*'
-        self.bp_console = r'^.*sw\..*-bp>'
-        self.bp_console_enable = r'^.*sw\..*-bp#'

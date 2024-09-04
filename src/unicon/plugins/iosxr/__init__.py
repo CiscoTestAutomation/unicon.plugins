@@ -27,6 +27,7 @@ class IOSXRServiceList(ServiceList):
         self.admin_bash_console = svc.AdminBashService
         self.ping = IosXePing
         self.reload = svc.Reload
+        self.monitor = svc.Monitor
 
 
 class IOSXRHAServiceList(HAServiceList):
@@ -45,7 +46,7 @@ class IOSXRHAServiceList(HAServiceList):
         self.admin_attach_console = svc.AdminAttachModuleConsole
         self.admin_bash_console = svc.AdminBashService
         self.get_rp_state = svc.GetRPState
-
+        self.monitor = svc.Monitor
 
 class IOSXRSingleRpConnection(BaseSingleRpConnection):
     os = 'iosxr'

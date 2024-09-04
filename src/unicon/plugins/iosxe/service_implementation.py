@@ -349,7 +349,8 @@ class Rommon(GenericExecute):
         sm.go_to('enable',
                  con.spawn,
                  context=self.context)
-        con.configure('config-register 0x0')
+        confreg = kwargs.get('config_register', "0x0")
+        con.configure('config-register {}'.format(confreg))
         super().pre_service(*args, **kwargs)
 
 
