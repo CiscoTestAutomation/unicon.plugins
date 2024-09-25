@@ -9,6 +9,12 @@ apic_connect:
 apic_exec:
   prompt: APC#
   commands: &exec_commands
+    "show firmware upgrade status": |
+      \r\r\n ID Pod ID Name Serial Number IP Address Role State LastUpdMsgId\r\n
+      -------------------------------------------------------------------------------------
+      \r\n 101 1 reg2_leaf1 FDO241909ZG 10.0.120.64/32 leaf active 0\r\n 102 1 reg2_leaf2 
+      FDO20510HAS 10.0.120.66/32 leaf active 0\r\n 201 1 reg2_spine1 FDO26450SH4 10.0.120.65/32 spine 
+      active 0\r\n\r\nTotal 3 nodes\r\n\r\n%
     "terminal length 0": ""
     "terminal width 0": ""
     "show version": |2
@@ -37,6 +43,10 @@ apic_exec_ssh:
 
 apic_hostname_with_escape_codes:
   prompt: "%1B[0m%1B[27m%1B[24m%1B[JAPC-0001-2001# "
+  commands: *exec_commands
+
+apic_hostname_with_escape_codes2:
+  prompt: "\x1b[0m\x00\x00\x1b[m\x00\x00\x1b[m\x00\x00\x1b[J\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00apic1# \x1b[K\x00\x00\x00\x1b[?1h\x1b=\x1b[?2004h"
   commands: *exec_commands
 
 

@@ -18,13 +18,14 @@ from unicon.core.errors import SubCommandFailure
 
 from unicon.mock.mock_device import MockDeviceSSHWrapper
 
+APIC_MOCK_DEVICE_CLI = 'mock_device_cli --os apic --state apic_connect'
 
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
 @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
 class TestAciApicPlugin(unittest.TestCase):
     def test_login_connect(self):
         c = Connection(hostname='APC',
-                       start=['mock_device_cli --os apic --state apic_connect'],
+                       start=[APIC_MOCK_DEVICE_CLI],
                        os='apic',
                        username='cisco',
                        tacacs_password='cisco')
@@ -33,7 +34,7 @@ class TestAciApicPlugin(unittest.TestCase):
 
     def test_login_connect_credentials(self):
         c = Connection(hostname='APC',
-                       start=['mock_device_cli --os apic --state apic_connect'],
+                       start=[APIC_MOCK_DEVICE_CLI],
                        os='apic',
                        credentials={'default': {
                            'username': 'admin',
@@ -52,9 +53,22 @@ class TestAciApicPlugin(unittest.TestCase):
         c.connect()
         c.disconnect()
 
+    def test_connect_escape_codes_learn_hostname2(self):
+        c = Connection(hostname='APC',
+                       start=['mock_device_cli --os apic --state apic_hostname_with_escape_codes2'],
+                       os='apic',
+                       username='cisco',
+                       tacacs_password='cisco',
+                       debug=True,
+                       learn_hostname=True)
+        try:
+            c.connect()
+        finally:
+            c.disconnect()
+
     def test_reload(self):
         c = Connection(hostname='APC',
-                       start=['mock_device_cli --os apic --state apic_connect'],
+                       start=[APIC_MOCK_DEVICE_CLI],
                        os='apic',
                        username='admin',
                        tacacs_password='cisco123')
@@ -66,7 +80,7 @@ class TestAciApicPlugin(unittest.TestCase):
 
     def test_reload_credentails(self):
         c = Connection(hostname='APC',
-                       start=['mock_device_cli --os apic --state apic_connect'],
+                       start=[APIC_MOCK_DEVICE_CLI],
                        os='apic',
                        credentials={'default': {
                            'username': 'admin',
@@ -79,7 +93,7 @@ class TestAciApicPlugin(unittest.TestCase):
 
     def test_config_prompt(self):
         c = Connection(hostname='APC',
-                       start=['mock_device_cli --os apic --state apic_connect'],
+                       start=[APIC_MOCK_DEVICE_CLI],
                        os='apic',
                        credentials={'default': {
                            'username': 'admin',
@@ -91,7 +105,7 @@ class TestAciApicPlugin(unittest.TestCase):
 
     def test_execute_error_pattern(self):
         c = Connection(hostname='APC',
-                       start=['mock_device_cli --os apic --state apic_connect'],
+                       start=[APIC_MOCK_DEVICE_CLI],
                        os='apic',
                        username='cisco',
                        tacacs_password='cisco')
@@ -112,6 +126,15 @@ class TestAciApicPlugin(unittest.TestCase):
         self.assertEqual(out, '/root')
         c.disconnect()
 
+    def test_execute_output(self):
+        c = Connection(hostname='APC',
+                       start=[APIC_MOCK_DEVICE_CLI],
+                       os='apic',
+                       username='cisco',
+                       tacacs_password='cisco')
+        c.connect()
+        c.execute("show firmware upgrade status")
+        c.disconnect()
 
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
 @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
