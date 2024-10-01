@@ -28,7 +28,7 @@ from time import sleep
 
 from unicon.bases.routers.services import BaseService
 from unicon.core.errors import SubCommandFailure, StateMachineError, \
-    CopyBadNetworkError, TimeoutError
+    CopyBadNetworkError, TimeoutError, UniconBackendDecodeError
 from unicon.eal.dialogs import Dialog
 from unicon.eal.dialogs import Statement
 from unicon.plugins.generic.statements import (
@@ -509,7 +509,7 @@ class Enable(BaseService):
         try:
             sm.go_to(self.start_state,
                      spawn,
-                     context=handle.context, 
+                     context=handle.context,
                      timeout=timeout)
         except Exception as err:
             raise SubCommandFailure("Failed to Bring device to Enable State",
@@ -736,7 +736,7 @@ class Execute(BaseService):
                     self.result = dialog_match.match_output
                     self.result = self.get_service_result()
                 sm.detect_state(con.spawn, con.context)
-            except StateMachineError:
+            except (StateMachineError, UniconBackendDecodeError):
                 raise
             except Exception as err:
                 raise SubCommandFailure("Command execution failed", err) from err
@@ -2617,6 +2617,20 @@ class BashService(BaseService):
 
             # do not suppress
             return False
+
+        def parse(self, *args, **kwargs):
+            abstract_args = kwargs.setdefault('abstract', {})
+            device = getattr(self.conn, 'device', None)
+            if device:
+                abstract_args.update(dict(
+                    os=[device.os, 'linux'],
+                    platform=device.platform,
+                    model=device.model,
+                    pid=device.pid,
+                ))
+                return self.conn.device.parse(*args, **kwargs)
+            else:
+                self.conn.log.warning('No device object, parse method unavailable')
 
         def __getattr__(self, attr):
             if attr in ('execute', 'sendline', 'send', 'expect'):

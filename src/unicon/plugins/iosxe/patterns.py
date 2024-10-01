@@ -29,7 +29,7 @@ class IosXEPatterns(GenericPatterns):
         self.maintenance_mode_prompt = \
             r'^(.*?)(WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(-standby)?(\(boot\))?\(maint-mode\)#[\s\x07]*$'
         self.press_enter = ReloadPatterns().press_enter
-        self.config_prompt = r'^(.*)\((?!.*pki-hexmode).*(con|cfg|ipsec-profile|ca-trustpoint|cs-server|ca-profile|gkm-local-server|cloud|host-list|config-gkm-group|gkm-sa-ipsec|gdoi-coop-ks-config|wsma|enforce-rule)\S*\)#\s?$'
+        self.config_prompt = r'^(.*)\((?!.*pki-hexmode).*(con|cfg|ipsec-profile|ca-trustpoint|ca-certificate-map|cs-server|ca-profile|gkm-local-server|cloud|host-list|config-gkm-group|gkm-sa-ipsec|gdoi-coop-ks-config|wsma|enforce-rule)\S*\)#\s?$'
 
 
         self.config_pki_prompt = r'^(.*)\(config-pki-hexmode\)#\s?$'

@@ -185,6 +185,18 @@ class TestIosXEPluginConnect(unittest.TestCase):
         finally:
             c.disconnect()
 
+    def test_general_config_ca_cert_map(self):
+        c = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe --state general_config_certificate_map --hostname Router'],
+                       os='iosxe',
+                       credentials=dict(default=dict(username='cisco', password='cisco')))
+
+        try:
+            c.connect()
+            self.assertEqual(c.state_machine.current_state, 'enable')
+        finally:
+            c.disconnect()
+
     def test_gkm_local_server(self):
         c = Connection(hostname='Router',
                        start=['mock_device_cli --os iosxe --state general_login --hostname Router'],
@@ -556,6 +568,51 @@ class TestIosXEluginBashService(unittest.TestCase):
         self.assertIn('set platform software selinux default', c.spawn.match.match_output)
         self.assertIn('Router#', c.spawn.match.match_output)
         c.disconnect()
+
+    def test_bash_parse(self):
+        testbed = '''
+            devices:
+                R1:
+                    os: iosxe
+                    connections:
+                        defaults:
+                            class: 'unicon.Unicon'
+                        cli:
+                            command: mock_device_cli --os iosxe --state general_enable --hostname R1
+        '''
+        tb = loader.load(testbed)
+        dev = tb.devices.R1
+        try:
+            dev.connect(mit=True, log_buffer=True)
+            with dev.bash_console() as console:
+                output = console.parse('ls -l')
+            expected_output = {
+                'files': {'bin': {'day': 10,
+                    'filename': 'bin',
+                    'group': 'root',
+                    'linked_filename': 'usr/bin',
+                    'links': 1,
+                    'mode': 'lrwxrwxrwx.',
+                    'month': 'Sep',
+                    'size': 7,
+                    'user': 'root',
+                    'year': 2024},
+                'boot': {'day': 9,
+                        'filename': 'boot',
+                        'group': 'root',
+                        'hour': 20,
+                        'links': 2,
+                        'minute': 41,
+                        'mode': 'drwxr-xr-x.',
+                        'month': 'Jan',
+                        'size': 60,
+                        'user': 'root'}},
+                'total': 55000
+            }
+            self.assertEqual(output, expected_output)
+        finally:
+            dev.disconnect()
+
 
 class TestIosXESDWANConfigure(unittest.TestCase):
 

@@ -567,6 +567,10 @@ config_pki_hexmode:
 general_bash:
   prompt: "[%N_RP_0:/]$"
   commands:
+    "ls -l": |
+      total 55000
+      lrwxrwxrwx.   1 root root        7 Sep 10  2024 bin -> usr/bin
+      drwxr-xr-x.   2 root root       60 Jan  9 20:41 boot
     "df /bootflash/": |
       Filesystem     1K-blocks    Used Available Use% Mounted on
       /dev/sda1        5974888 3569476   2101900  63% /bootflash
@@ -580,6 +584,14 @@ general_act_reply:
   commands:
     "y":
       new_state: general_bash
+
+
+general_config_certificate_map:
+  prompt: "%N(ca-certificate-map)#"
+  commands:
+    "end":
+      new_state: general_enable
+
 
 general_config_crypto_trustpoint:
   prompt: "%N(ca-trustpoint)#"

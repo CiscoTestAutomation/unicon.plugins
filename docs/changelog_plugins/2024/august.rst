@@ -36,32 +36,3 @@ Features and Bug Fixes:
 
 Changelogs
 ^^^^^^^^^^
---------------------------------------------------------------------------------
-                                      Add                                       
---------------------------------------------------------------------------------
-
-* pid_tokens
-    * add pid entry for ir1800 device
-
-
---------------------------------------------------------------------------------
-                                      Fix                                       
---------------------------------------------------------------------------------
-
-* generic
-    * Update execute() service log message to include device alias
-    * Update unittests to handle authentication exceptions
-    * Update unittests for token learning
-
-* iosxr
-    * Update more prompt handling to support (END) prompt
-
-
---------------------------------------------------------------------------------
-                                      New                                       
---------------------------------------------------------------------------------
-
-* iosxr
-    * New `monitor` service for IOS-XR with support for "monitor interface" command.
-
-

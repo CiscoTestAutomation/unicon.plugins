@@ -51,7 +51,9 @@ class Execute(GenericExecute):
                 output = self.result
                 output = utils.remove_ansi_escape_codes(output)
                 output = re.sub('.\x08', '', output)
-                output = re.sub(r'%\s+\r ', '', output)
+                output = re.sub(r'\x00+', '', output)
+                output = re.sub(r'%(\s+\r )?', '', output)
+                output = re.sub(r'[\r\n]+', '', output)
                 self.result = output
 
 
