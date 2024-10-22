@@ -1034,9 +1034,9 @@ class Configure(BaseService):
 
     def update_hostname_if_needed(self, cmd_list):
         for cmd in cmd_list:
-            m = re.match(r'^\s*hostname (\S+)', cmd)
+            m = re.match(r'^\s*(hostname|switchname) (\S+)', cmd)
             if m:
-                self.connection.hostname = m.group(1)
+                self.connection.hostname = m.group(2)
                 return
 
 

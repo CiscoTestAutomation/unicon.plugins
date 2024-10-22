@@ -8,6 +8,7 @@ Uses the mock_device.py script to test the plugin.
 __author__ = "karmoham"
 
 import unittest
+import sys
 from unittest.mock import patch
 
 from pyats.topology import loader
@@ -135,6 +136,19 @@ class TestAciApicPlugin(unittest.TestCase):
         c.connect()
         c.execute("show firmware upgrade status")
         c.disconnect()
+
+    def test_configure_output(self):
+        c = Connection(hostname='APC',
+                       start=[APIC_MOCK_DEVICE_CLI],
+                       os='apic',
+                       username='cisco',
+                       tacacs_password='cisco')
+        c.connect()
+        output = c.configure("switch-group")
+        expected_output = "switch-group\n\n\nError: Invalid argument ''. Please check syntax in command reference guide\n \n \n\n\n"
+        self.assertEqual(output, expected_output)
+        c.disconnect()
+
 
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
 @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
