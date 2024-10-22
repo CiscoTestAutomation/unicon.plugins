@@ -486,7 +486,11 @@ class TestIosXrSpitfireConfigure(unittest.TestCase):
         self._conn.execute("test failed")
         self._conn.spawn.timeout = 60
         self._conn.enable()
-
+    
+    def test_learn_hostname(self):
+        self.assertEqual('Router', self._conn.hostname)
+        self._conn.configure('hostname R2')
+        self.assertEqual('R2', self._conn.hostname)
 
 class TestIosXrSpitfireSyslogHandler(unittest.TestCase):
     """Tests for syslog message handling."""

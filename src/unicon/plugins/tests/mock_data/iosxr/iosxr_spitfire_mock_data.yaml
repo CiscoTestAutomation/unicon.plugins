@@ -26,7 +26,7 @@ spitfire_pw:
 
 spitfire_enable:
   prompt: RP/0/RP0/CPU0:%N#
-  commands:
+  commands: &spitfire_enable_cmds
     "ctrl":
       new_state: spitfire_bmc
     "terminal length 0": ""
@@ -442,7 +442,9 @@ spitfire_xr_env:
 
 spitfire_config:
   prompt: "RP/0/RP0/CPU0:%N(config)#"
-  commands: &config_cmds
+  commands: &spitfire_config_cmds
+    "hostname R2":
+      new_state: spitfire_config_r2
     "end":
       new_state: spitfire_enable
     "hostname Router": ""
@@ -635,3 +637,26 @@ spitfire_showtech_syslog:
         - 4:5,0.5,0.1
         - 5:8,5,3
         - 8:,3
+
+
+spitfire_commit_prompt_r2:
+  prompt: "Uncommitted changes found, commit them before exiting(yes/no/cancel)? [cancel]:"
+  commands:
+    "yes":
+      new_state: spitfire_config_r2
+
+
+spitfire_enable_r2:
+  prompt: "RP/0/RP0/CPU0:R2#"
+  commands:
+   <<: *spitfire_enable_cmds
+
+
+spitfire_config_r2:
+  prompt: "RP/0/RP0/CPU0:R2(config)#"
+  commands:
+    <<: *spitfire_config_cmds
+    commit:
+      new_state: spitfire_commit_prompt_r2
+    end:
+      new_state: spitfire_enable_r2

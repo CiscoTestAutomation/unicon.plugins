@@ -210,6 +210,12 @@ class TestIosXrConfigPrompts(unittest.TestCase):
         with self.assertRaisesRegex(unicon.core.errors.SubCommandFailure, "% Invalid config"):
             self._conn.configure("test failed2")
 
+    def test_update_hostname(self):
+        self.assertEqual('Router', self._conn.hostname)
+        self._conn.configure('hostname R2')
+        self.assertEqual('R2', self._conn.hostname)
+        
+
 
 class TestIosXrPluginAdminService(unittest.TestCase):
     def test_admin(self):

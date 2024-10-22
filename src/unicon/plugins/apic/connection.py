@@ -1,7 +1,7 @@
 from unicon.plugins.generic import GenericSingleRpConnection
 from unicon.plugins.generic.connection_provider import GenericSingleRpConnectionProvider
 
-from unicon.plugins.generic import ServiceList, service_implementation as svc
+from unicon.plugins.generic import ServiceList
 from unicon.eal.dialogs import Statement
 
 from . import service_implementation as aci_svc
@@ -44,7 +44,7 @@ class AciApicServiceList(ServiceList):
     def __init__(self):
         super().__init__()
         self.execute = aci_svc.Execute
-        self.configure = svc.Configure
+        self.configure = aci_svc.Configure
         self.reload = aci_svc.Reload
 
 

@@ -7,10 +7,6 @@ class SpitfirePatterns(IOSXRPatterns):
         super().__init__()
         # Always have the first match group (.*?) as this is the data
         # returned as the cli output .
-        self.enable_prompt = \
-            r'^(.*?)RP/\d+/RP[01]/CPU\d+:(%N|ios)\s*#\s*?$'
-        self.config_prompt = \
-            r'^(.*?)RP/\d+/RP[01]/CPU\d+:(%N|ios)\s*\(config.*\)\s*#\s*?$'
         self.bmc_prompt = \
             r'^(.*?)root@spitfire-arm:.+?#\s*?$'
         self.xr_bash_prompt = \
