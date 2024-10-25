@@ -718,7 +718,9 @@ class TestNxosPluginConfigure(unittest.TestCase):
         c.configure('')
 
         c.disconnect()
-
+        
+    def test_configure_update_hostname(self):
+        self.dev.configure('switchname Router')
 
 class TestNxosConfigureDual(unittest.TestCase):
     @classmethod

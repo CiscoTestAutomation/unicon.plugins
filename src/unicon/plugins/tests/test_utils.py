@@ -106,7 +106,7 @@ devices:
             self.assertEqual(self.dev.os, 'iosxe')
             self.assertEqual(self.dev.version, '15.2')
             self.assertEqual(self.dev.platform, 'asr1k')
-            self.assertEqual(self.dev.model, 'asr1000')
+            self.assertEqual(self.dev.model, 'asr1006')
             self.assertEqual(self.dev.pid, 'ASR1006')
         finally:
             self.dev.disconnect()
@@ -407,7 +407,7 @@ devices:
             'pid': 'ASR1001-2XOC3POS',
             'os': 'iosxe',
             'platform': 'asr1k',
-            'model': 'asr1000'
+            'model': 'asr1001'
         },
         tokens)
 
@@ -486,7 +486,7 @@ class TestAbstractTokenDiscoveryHAConnection(unittest.TestCase):
             self.assertEqual(dev.os, 'iosxe')
             self.assertEqual(dev.version, '16.7')
             self.assertEqual(dev.platform, 'asr1k')
-            self.assertEqual(dev.model, 'asr1000')
+            self.assertEqual(dev.model, 'asr1006')
             self.assertEqual(dev.pid, 'ASR1006')
 
 

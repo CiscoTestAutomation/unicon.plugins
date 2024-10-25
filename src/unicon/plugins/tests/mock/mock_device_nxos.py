@@ -65,6 +65,11 @@ class MockDeviceNXOS(MockDevice):
             self.set_state(self.transport_handles[transport], 'scp_password')
             return True
 
+    def config(self, transport, cmd):
+        m = re.match(r'\s*(hostname|switchname) (\S+)', cmd)
+        if m:
+            self.hostname = m.group(2)
+            return True
 
 class MockDeviceTcpWrapperNXOS(MockDeviceTcpWrapper):
 

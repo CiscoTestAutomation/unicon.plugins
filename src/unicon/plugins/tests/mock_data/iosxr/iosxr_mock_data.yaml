@@ -363,7 +363,7 @@ enable:
       - |2
                           ^
         % Invalid input detected at '^' marker."
-      
+
     "not a real command partial":
       response:
       - |2
@@ -438,8 +438,8 @@ admin:
       -----------------------------------------------------------------------------
       0/RSP0/CPU0     A9K-RSP-4G(Active)        IOS XR RUN       PWR,NSHUT,MON
       0/RSP1/CPU0     A9K-RSP-4G(Standby)       IOS XR RUN       PWR,NSHUT,MON
-      0/FT0/SP        FAN TRAY                  READY            
-      0/FT1/SP        FAN TRAY                  READY            
+      0/FT0/SP        FAN TRAY                  READY
+      0/FT1/SP        FAN TRAY                  READY
       0/0/CPU0        A9K-MOD80-SE              IOS XR RUN       PWR,NSHUT,MON
       0/0/0           A9K-MPA-20X1GE            OK               PWR,NSHUT,MON
       0/0/1           A9K-MPA-20X1GE            OK               PWR,NSHUT,MON
@@ -451,6 +451,8 @@ admin:
 config:
   prompt: "RP/0/RP0/CPU0:%N(config)#"
   commands: &config_cmds
+    "hostname R2":
+      new_state: config_r2
     "end":
       new_state: enable
     "exit":
@@ -490,6 +492,26 @@ config:
         failed_config2
     "redundancy":
       new_state: config_redundancy
+
+commit_prompt_r2:
+  prompt: "Uncommitted changes found, commit them before exiting(yes/no/cancel)? [cancel]:"
+  commands:
+    "yes":
+      new_state: config_r2
+
+config_r2:
+  prompt: "RP/0/RP0/CPU0:R2(config)#"
+  commands:
+    <<: *config_cmds
+    commit:
+      new_state: commit_prompt_r2
+    end:
+      new_state: enable_r2
+
+enable_r2:
+  prompt: "RP/0/RP0/CPU0:R2#"
+  commands:
+   <<: *enable_cmds
 
 config_redundancy:
   prompt: "RP/0/RP0/CPU0:%N(config)#"
@@ -688,7 +710,7 @@ enable1:
 
     "clear logg":
       new_state: half_confirm_prompt
-      
+
 
 admin1:
   prompt: "sysadmin-vm:0_RP0#"
@@ -712,8 +734,8 @@ admin1:
       -----------------------------------------------------------------------------
       0/RSP0/CPU0     A9K-RSP-4G(Active)        IOS XR RUN       PWR,NSHUT,MON
       0/RSP1/CPU0     A9K-RSP-4G(Standby)       IOS XR RUN       PWR,NSHUT,MON
-      0/FT0/SP        FAN TRAY                  READY            
-      0/FT1/SP        FAN TRAY                  READY            
+      0/FT0/SP        FAN TRAY                  READY
+      0/FT1/SP        FAN TRAY                  READY
       0/0/CPU0        A9K-MOD80-SE              IOS XR RUN       PWR,NSHUT,MON
       0/0/0           A9K-MPA-20X1GE            OK               PWR,NSHUT,MON
       0/0/1           A9K-MPA-20X1GE            OK               PWR,NSHUT,MON
@@ -990,17 +1012,17 @@ asr9k_enable:
       Process Redundancy Partner (0/RSP1/CPU0) is in BACKUP role
       Backup node in 0/RSP1/CPU0 is ready
       Backup node in 0/RSP1/CPU0 is NSR-not-configured
-      
-      Group            Primary         Backup          Status         
-      ---------        ---------       ---------       ---------      
-      v6-routing       0/RSP0/CPU0     0/RSP1/CPU0     Ready          
-      mcast-routing    0/RSP0/CPU0     0/RSP1/CPU0     Ready          
-      netmgmt          0/RSP0/CPU0     0/RSP1/CPU0     Ready          
-      v4-routing       0/RSP0/CPU0     0/RSP1/CPU0     Ready          
-      central-services 0/RSP0/CPU0     0/RSP1/CPU0     Ready          
-      dsc              0/RSP0/CPU0     0/RSP1/CPU0     Ready          
-      dlrsc            0/RSP0/CPU0     0/RSP1/CPU0     Ready          
-      
+
+      Group            Primary         Backup          Status
+      ---------        ---------       ---------       ---------
+      v6-routing       0/RSP0/CPU0     0/RSP1/CPU0     Ready
+      mcast-routing    0/RSP0/CPU0     0/RSP1/CPU0     Ready
+      netmgmt          0/RSP0/CPU0     0/RSP1/CPU0     Ready
+      v4-routing       0/RSP0/CPU0     0/RSP1/CPU0     Ready
+      central-services 0/RSP0/CPU0     0/RSP1/CPU0     Ready
+      dsc              0/RSP0/CPU0     0/RSP1/CPU0     Ready
+      dlrsc            0/RSP0/CPU0     0/RSP1/CPU0     Ready
+
       Reload and boot info
       ----------------------
       A9K-RSP440-SE reloaded Thu May 21 17:12:33 2020: 1 hour, 41 minutes ago
@@ -1010,7 +1032,7 @@ asr9k_enable:
       Standby node last went not ready Thu May 21 18:05:59 2020: 47 minutes ago
       Standby node last went ready Thu May 21 18:06:59 2020: 46 minutes ago
       There have been 2 switch-overs since reload
-      
+
       Active node reload "Cause: User Initiated reload"
       Standby node reload "Cause: User Initiated reload"
 
@@ -1031,11 +1053,11 @@ asr9k_config:
     "commmit": ""
     "line console":
       new_state:
-        asr9k_line_console        
+        asr9k_line_console
 
 asr9k_config_line:
   prompt: "RP/0/RSP1/CPU0:PE1(config-line)#"
-  commands: 
+  commands:
     "exec-timeout 0 0": ""
     "clock timezone UTC 0 0": ""
     "commit": ""
@@ -1066,7 +1088,7 @@ asr9k_admin:
     "exit":
       new_state: asr9k_enable
 
-# ---    iosxrv  ----- 
+# ---    iosxrv  -----
 iosxrv_enable:
   prompt: "RP/0/0/CPU0:iosxrv-1#"
   commands:

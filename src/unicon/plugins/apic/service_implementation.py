@@ -6,7 +6,8 @@ import logging
 from time import sleep
 from unicon.logs import UniconStreamHandler, UNICON_LOG_FORMAT
 from unicon.bases.routers.services import BaseService
-from unicon.plugins.generic.service_implementation import Execute as GenericExecute
+from unicon.plugins.generic.service_implementation import (Execute as GenericExecute,
+                                                           Configure as GenericConfigure)
 from unicon.plugins.generic import GenericUtils
 from unicon.core.errors import SubCommandFailure
 from unicon.eal.dialogs import Dialog
@@ -14,6 +15,16 @@ from unicon.eal.dialogs import Dialog
 from .service_statements import reload_statement_list
 
 utils = GenericUtils()
+
+
+def clean_command_output(output):
+    """ Function to clean command output by removing unwanted characters """
+    output = utils.remove_ansi_escape_codes(output)
+    output = re.sub('.\x08', '', output)
+    output = re.sub(r'%\s+\r ', '', output)
+    output = re.sub(r'\x00+', '', output)
+    output = re.sub(r'[\r%]+', '', output)
+    return output
 
 
 class Execute(GenericExecute):
@@ -27,7 +38,6 @@ class Execute(GenericExecute):
         command: exec command
         reply: Additional Dialog patterns for interactive exec commands.
         timeout : Timeout value in sec, Default Value is 60 sec
-        lines: number of lines to capture when paging is active. Default: 100
 
     Returns:
         True on Success, raise SubCommandFailure on failure
@@ -46,15 +56,39 @@ class Execute(GenericExecute):
     def post_service(self, *args, clean_output=True, **kwargs):
         super().post_service(*args, **kwargs)
 
-        if clean_output:
-            if isinstance(self.result, str):
-                output = self.result
-                output = utils.remove_ansi_escape_codes(output)
-                output = re.sub('.\x08', '', output)
-                output = re.sub(r'\x00+', '', output)
-                output = re.sub(r'%(\s+\r )?', '', output)
-                output = re.sub(r'[\r\n]+', '', output)
-                self.result = output
+        if clean_output and isinstance(self.result, str):
+            self.result = clean_command_output(self.result)
+
+
+class Configure(GenericConfigure):
+    """ Configure Service implementation
+
+    Service to execute configuration commands on the device and return the
+    console output. The `reply` option can be passed for interactive configuration commands.
+
+    Arguments:
+        commands : list/single config command
+        reply: Addition Dialogs for interactive config commands.
+        timeout : Timeout value in sec, Default Value is 30 sec
+
+    Returns:
+        True on Success, raises SubCommandFailure on failure
+
+    Example:
+        .. code-block:: python
+              output = rtr.configure('no logging console')
+              cmd =['hostname si-tvt-7200-28-41', 'no logging console']
+              output = dev.configure(cmd)
+    """
+    def __init__(self, connection, context, **kwargs):
+        # Connection object will have all the received details
+        super().__init__(connection, context, **kwargs)
+
+    def post_service(self, *args, clean_output=True, **kwargs):
+        super().post_service(*args, **kwargs)
+
+        if clean_output and isinstance(self.result, str):
+            self.result = clean_command_output(self.result)
 
 
 class Reload(BaseService):
