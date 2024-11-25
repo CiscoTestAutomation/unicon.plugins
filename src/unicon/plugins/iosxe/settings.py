@@ -12,6 +12,8 @@ class IosXESettings(GenericSettings):
         # A single cycle of retries wasn't enough to recover an iosxe device
         # just rebooted after a "write erase".
         self.PROMPT_RECOVERY_RETRIES = 2
+        self.PROMPT_RECOVERY_COMMANDS = ['\r', '\x1e', '\x03']
+
         self.ERROR_PATTERN = [
             r'^%\s*[Ii]nvalid (command|input)',
             r'^%\s*[Ii]ncomplete (command|input)',

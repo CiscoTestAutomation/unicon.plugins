@@ -1,0 +1,118 @@
+
+
+           Cisco Systems, Inc.
+
+           170 West Tasman Drive
+
+           San Jose, California 95134-1706
+
+
+
+
+Cisco IOS Software [IOSXE], C9800-CL Software (C9800-CL-K9_IOSXE), Experimental Version 17.17.20240919:014147 [BLD_POLARIS_DEV_LATEST_20240919_003342:/nobackup/mcpre/s2c-build-ws 101]
+
+Copyright (c) 1986-2024 by Cisco Systems, Inc.
+
+Compiled Wed 18-Sep-24 18:42 by mcpre
+
+
+
+This software version supports only Smart Licensing as the software licensing mechanism.
+
+
+
+Please read the following carefully before proceeding. By downloading,
+
+installing, and/or using any Cisco software product, application, feature,
+
+license, or license key (collectively, the "Software"), you accept and
+
+agree to the following terms. If you do not agree, do not proceed and do not
+
+use this Software.
+
+
+This Software and its use are governed by Cisco's General Terms and any 
+
+relevant supplemental terms found at
+
+https://www.cisco.com/site/us/en/about/legal/contract-experience/index.html.
+
+If you have a negotiated agreement with Cisco that includes this Software, the
+
+terms of that agreement apply as well. In the event of a conflict, the order 
+
+of precedence stated in your negotiated agreement controls.
+
+
+Cisco Software is licensed on a term and/or subscription-basis. The license to
+
+the Software is valid only for the duration of the specified term, or in the
+
+case of a subscription-based license, only so long as all required subscription
+
+payments are current and fully paid-up. While Cisco may provide you
+
+licensing-related alerts, it is your sole responsibility to monitor your usage.
+
+Using Cisco Software without a valid license is not permitted and may result in
+
+fees charged to your account. Cisco reserves the right to terminate access to,
+
+or restrict the functionality of, any Cisco Software, or any features thereof,
+
+that are being used without a valid license.
+
+
+
+% Failed to initialize nvram
+
+
+Database already initialized
+
+FIPS: Flash Key Check : Key Not Found, FIPS Mode Not Enabled
+
+platform initcisco C9800-CL (VXE) processor (revision VXE) with 4016588K/3075K bytes of memory.
+
+Processor board ID 9U9NBR9CPLO
+
+Router operating mode: Autonomous
+
+1 Virtual Ethernet interface
+
+3 Gigabit Ethernet interfaces
+
+32768K bytes of non-volatile configuration memory.
+
+8084084K bytes of physical memory.
+
+6201343K bytes of virtual hard disk at bootflash:.
+
+0K bytes of Cloud S3 Storage at cloudfs:.
+
+Installation mode is BUNDLE 
+
+
+
+No startup-config, starting autoinstall/pnp/ztp...
+
+
+Autoinstall will terminate if any input is detected on console
+
+
+Autoinstall trying DHCPv4 on Vlan1
+
+
+--------------------------------------------------
+
+ System is booted with ASCII based startup configuration 
+
+ due to missing binary configuration or previous condition.
+
+ Please perform "write mem" to generate binary
+
+ configuration. System uses binary-config internally to
+
+ reduce overall bootime significantly.
+
+--------------------------------------------------

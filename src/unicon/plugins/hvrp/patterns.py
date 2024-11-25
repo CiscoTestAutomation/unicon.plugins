@@ -21,12 +21,12 @@ class HvrpPatterns(UniconCorePatterns):
         self.username = r'^.*[Ll]ogin:'
         self.password = r'^.*[Pp]assword:'
 
-        # <HOSTNAME-01> | <HOSTNAME>#
+        # <HOSTNAME>
         self.enable_prompt = r'^(.*)\<%N.*\>$'
 
-
-        # [~HOSTNAME] | <HOSTNAME-01> # # breaks on [\y\n] # Warning: All the configuration will be saved to the next startup configuration. Continue? [y/n]:
-        self.config_prompt = r'^.*\[(~|\*)%N.*\]'
+        # [~HOSTNAME] # two-stage config mode
+        # [HOSTNAME]  # immediate config mode
+        self.config_prompt = r'^.*\[(?P<two_stage>~|\*)?%N.*\]'
 
         # Exit with uncommitted changes? [yes,no] (yes)
         self.commit_changes_prompt = r'Exit with uncommitted changes? [yes,no] (yes)\s*'

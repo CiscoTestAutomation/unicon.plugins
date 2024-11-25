@@ -73,7 +73,7 @@ class GenericPatterns(UniconCorePatterns):
 
         self.config_start = r'Enter configuration commands, one per line\.\s+End with CNTL/Z\.\s*$'
 
-        self.enable_secret = r'^.*?(Enter|Confirm) enable secret:\s*$'
+        self.enable_secret = r'^.*?(Enter|Confirm) enable secret( \[<Use current secret>\])?:\s*$'
         self.enable_password = r'^.*?enable[\r\n]*.*?[Pp]assword( for )?(\S+)?: ?$'
 
         self.enter_your_selection_2 = r'^.*?Enter your selection( \[2])?:\s*$'
