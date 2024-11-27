@@ -81,4 +81,15 @@ bgp_config_uncommitted_change:
         - "0:,0,2,0"
       new_state: bgp_config
 
+exec2:
+  prompt: <%N>
+  commands:
+    "system-view":
+      new_state: config2
 
+config2:
+  prompt: "[%N]"
+  commands:
+    "bgp 65000": ""
+    "return":
+      new_state: exec2

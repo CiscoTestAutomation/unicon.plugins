@@ -108,6 +108,22 @@ class TestIosXEQuadConnect(unittest.TestCase):
         d.disconnect()
         md.stop()
 
+    def test_quad_connect4(self):
+        d = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe --state quad_login --hostname Router',
+                              'mock_device_cli --os iosxe --state quad_ics_login --hostname Router',
+                              'mock_device_cli --os iosxe --state quad_stby_locked_login --hostname Router',
+                              'mock_device_cli --os iosxe --state quad_ics_login --hostname Router'],
+                       os='iosxe',
+                       chassis_type='quad',
+                       username='cisco',
+                       tacacs_password='cisco',
+                       enable_password='cisco')
+        d.connect()
+        d.execute('term width 0')
+        self.assertEqual(d.spawn.match.match_output, 'term width 0\r\nRouter#')
+        d.disconnect()
+
 
 class TestIosXEQuadDisableEnable(unittest.TestCase):
 

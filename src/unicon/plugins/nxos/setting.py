@@ -42,8 +42,8 @@ class NxosSettings(GenericSettings):
             r'^%\s*[Nn]ot supported.*',
             r'^%\s*[Ff]ail.*',
             r'^%\s*[Aa]bort.*'
-            r'^%\s*[Ee](RROR|rror).*',
-            r'^%\s*Ambiguous command'
+            r'^%?\s*[Ee](RROR|rror).*',
+            r'^%\s*Ambiguous command',
         ]
 
         self.GUESTSHELL_CONFIG_CMDS = []

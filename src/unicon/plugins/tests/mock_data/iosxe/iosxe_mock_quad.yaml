@@ -804,3 +804,23 @@ quad_install_add_commit:
      FAILED: install_add_activate_commit : Copy bootflash:asr1000rpx86-universalk9.BLD_V16
 
   new_state: quad_enable
+
+quad_stby_locked_login:
+  prompt: "Username: "
+  commands:
+    "cisco":
+      new_state: quad_stby_locked_password
+
+quad_stby_locked_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: quad_stby_locked_exec
+
+quad_stby_locked_exec:
+  prompt: "%N-stby>"
+  preface: |
+    Standby console disabled
+  commands:
+    "enable":
+      new_state: quad_stby_enable_pwd

@@ -368,6 +368,8 @@ def password_handler(spawn, context, session):
         if context.get('username', '') == spawn.last_sent.rstrip() or ssh_tacacs_handler(spawn, context):
             if (tacacs_password := context.get('tacacs_password')):
                 spawn.sendline(tacacs_password)
+            elif context.get('password'):
+                spawn.sendline(context['password'])
         else:
             spawn.sendline(context['line_password'])
 
