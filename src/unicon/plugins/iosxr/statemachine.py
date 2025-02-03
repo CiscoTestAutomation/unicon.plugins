@@ -6,10 +6,12 @@ from unicon.plugins.iosxr.statements import IOSXRStatements, handle_failed_confi
 from unicon.plugins.generic.statemachine import config_transition
 from unicon.statemachine import State, Path
 from unicon.eal.dialogs import Statement, Dialog
+from unicon.plugins.generic.statements import GenericStatements
 
 
 patterns = IOSXRPatterns()
 statements = IOSXRStatements()
+generic_statements = GenericStatements()
 
 default_commands = [statements.more_prompt_stmt]
 
@@ -53,7 +55,8 @@ class IOSXRSingleRpStateMachine(StateMachine):
         config_dialog = Dialog([
            [patterns.commit_changes_prompt, 'sendline(yes)', None, True, False],
            [patterns.commit_replace_prompt, 'sendline(yes)', None, True, False],
-           [patterns.configuration_failed_message, handle_failed_config, None, True, False]
+           [patterns.configuration_failed_message, handle_failed_config, None, True, False],
+           generic_statements.syslog_msg_stmt,
            ])
 
         enable_to_exclusive = Path(enable, exclusive, 'configure exclusive', None)

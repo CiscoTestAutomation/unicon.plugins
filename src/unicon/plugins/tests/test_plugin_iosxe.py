@@ -1293,6 +1293,18 @@ class TestSyslogHandler(unittest.TestCase):
             raise
         finally:
             c.disconnect()
+    
+    def test_handler_ddns_pattern(self):
+        d = Connection(
+            hostname='Router',
+            start=['mock_device_cli --os iosxe --state ip_ddns_update_method --hostname Router'],
+            os='iosxe',
+            credentials=dict(default=dict(username='cisco', password='cisco')),
+            log_buffer=True
+        )
+
+        d.connect()
+        d.disconnect()
 
 
 class TestIosxeAsr1k(unittest.TestCase):

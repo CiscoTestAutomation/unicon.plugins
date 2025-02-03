@@ -736,8 +736,10 @@ class Execute(BaseService):
                     self.result = dialog_match.match_output
                     self.result = self.get_service_result()
                 sm.detect_state(con.spawn, con.context)
-            except (StateMachineError, UniconBackendDecodeError):
+            except StateMachineError:
                 raise
+            except UniconBackendDecodeError:
+                pass
             except Exception as err:
                 raise SubCommandFailure("Command execution failed", err) from err
 
@@ -1579,7 +1581,9 @@ class Copy(BaseService):
             elif a == "erase":
                 copy_context[a] = "n"
             elif a == 'overwrite':
-                copy_context[a] = True
+                # To Handle overwrite = False condition 
+                overwrite = kwargs.get('overwrite', True)
+                copy_context[a] = overwrite
             elif a == 'vrf':
                 copy_context[a] = "Mgmt-intf"
             elif a == 'timeout':

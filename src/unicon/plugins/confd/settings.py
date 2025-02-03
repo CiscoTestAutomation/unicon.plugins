@@ -27,7 +27,7 @@ class ConfdSettings(GenericSettings):
         self.JUNIPER_INIT_CONFIG_COMMANDS = []
 
         # Prompt prefixes will be removed from the output by the configure() and execute() services
-        self.JUNIPER_PROMPT_PREFIX = "\[edit\]"
+        self.JUNIPER_PROMPT_PREFIX = r"\[edit\]"
 
         self.ERROR_PATTERN = [
             'Error:',

@@ -88,6 +88,8 @@ enable:
     "show version": *SV
     "config term":
       new_state: config
+    "show inventory": ""
+    "uname -a": ""
 
 config:
   prompt: "%N(conf)#"
@@ -97,6 +99,8 @@ config:
       new_state: config_line
     "line console 0":
       new_state: config_line
+    "end":
+      new_state: enable
 
 config_line:
   prompt: "%N(config-line)#"

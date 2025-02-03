@@ -49,8 +49,10 @@ class IOSXRPatterns(GenericPatterns):
         # Brief='b', Detail='d', Protocol(IPv4/IPv6)='r'
         # Brief='b', Detail='d', Protocol(IPv4/IPv6)='r'\x1b[K\r\n\x1b[K\r\n
         # (General='g', IPv4 Uni='4u', IPv4 Multi='4m', IPv6 Uni='6u', IPv6 Multi='6m')
-        self.monitor_prompt = r"^(.*?)(Brief='b', Detail='d', Protocol\(IPv4/IPv6\)='r'|\(General='g', IPv4 Uni='4u', IPv4 Multi='4m', IPv6 Uni='6u', IPv6 Multi='6m'\))(\x1b\S+[\r\n]+)*$"
+        # This pattern does not end with $ on purpose as the prompt is part of the 'live' output
+        # and the output is updated frequently
+        self.monitor_prompt = r"^(.*?)(Brief='b', Detail='d', Protocol\(IPv4/IPv6\)='r'|\(General='g', IPv4 Uni='4u', IPv4 Multi='4m', IPv6 Uni='6u', IPv6 Multi='6m'\))(\x1b\S+[\r\n]+)*"
         # r1          Monitor Time: 00:00:06          SysUptime: 15:48:49
         self.monitor_time_regex = r'(?P<hostname>\S+).*?Monitor Time: (?P<time>\d+:\d+:\d+).*?SysUptime: (?P<uptime>\S+)'
         # Quit='q', Freeze='f', Thaw='t', Clear='c', Interface='i',
-        self.monitor_command_pattern = r"(?P<command>\S+)='(?P<key>\w)'"
+        self.monitor_command_pattern = r"\s*(?P<command>[\w\s]+)='(?P<key>\w+)'"

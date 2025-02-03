@@ -592,6 +592,11 @@ general_config_certificate_map:
     "end":
       new_state: general_enable
 
+ip_ddns_update_method:
+  prompt: "%N(DDNS-update-method)#"
+  commands:
+    "end":
+      new_state: general_enable
 
 general_config_crypto_trustpoint:
   prompt: "%N(ca-trustpoint)#"
@@ -610,7 +615,7 @@ are_you_sure_ywtdt:
 
 standby_exec:
   prompt: "%N-standby# "
-  
+
   commands:
     "show version | include operating mode": ""
     "cisco": ""
@@ -662,6 +667,9 @@ config_with_msgs:
     "msg":
        new_state:
           config_msg
+    "end":
+      new_state:
+          enable_with_msgs
 
 config_with_msgs2:
   prompt: "%N(config)#"
@@ -669,6 +677,9 @@ config_with_msgs2:
     "msg":
        new_state:
           config_msg2
+    "end":
+      new_state:
+          enable_with_msgs2
 
 
 config_msg:
@@ -706,6 +717,17 @@ enable_with_msgs:
     "show version | include operating mode" : ""
     "msg":
       new_state: enable_msg
+    "config term":
+      new_state: config_with_msgs
+
+enable_with_msgs2:
+  prompt: "%N#"
+  commands:
+    "show version | include operating mode" : ""
+    "msg":
+      new_state: enable_msg
+    "config term":
+      new_state: config_with_msgs2
 
 enable_msg:
   preface: |
@@ -917,7 +939,7 @@ press_return:
 enable_secret_exec:
   prompt: "%N>"
   commands:
-    "show version | include operating mode": ""  
+    "show version | include operating mode": ""
     "enable":
       new_state: enable_secret_password
 

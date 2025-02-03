@@ -27,6 +27,9 @@ copy_to_tftp_dest_filename_overwrite:
 
                 30 bytes copied in 0.035 secs (857 bytes/sec)
             new_state: enable_isr
+        "n":
+            response: ""
+            new_state: enable_isr 
 
 copy_from_tftp:
     prompt: "Source filename [test]? "
@@ -49,4 +52,17 @@ copy_from_tftp_dest_filename:
                 30 bytes copied in 0.020 secs (1500 bytes/sec)
             new_state: enable_isr
 
+copy_from_tftp_remote_host:
+    prompt: "Address or name of remote host []? "
+    commands:
+        "10.1.6.243":
+            new_state: copy_from_tftp_dest_filename_with_failure
 
+copy_from_tftp_dest_filename_with_failure:
+    prompt: "Destination filename [TC_16_mount_failure_2024_10_01_12_38_20_audit]? "
+    commands:
+        "test":
+            response: |4
+                !!
+                30 bytes copied in 0.020 secs (1500 bytes/sec)
+            new_state: enable_isr

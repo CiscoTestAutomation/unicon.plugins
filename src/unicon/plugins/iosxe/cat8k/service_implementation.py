@@ -87,7 +87,7 @@ class SwitchoverService(BaseService):
         # Check if switchover is possible by checking if "IOSXE_DUAL_IOS = 1" is
         # in the output of 'sh romvar'
         output = con.execute('show romvar')
-        if not re.search('IOSXE_DUAL_IOS\s*=\s*1', output):
+        if not re.search(r'IOSXE_DUAL_IOS\s*=\s*1', output):
             raise SubCommandFailure(
                 "Switchover can't be issued if IOSXE_DUAL_IOS is not activated")
 
@@ -147,7 +147,7 @@ class SwitchoverService(BaseService):
                     sleep(sleep_per_interval)
                     continue
                 else:
-                    if not re.search('R\d+/\d+\s+init,\s*standby.*', output):
+                    if not re.search(r'R\d+/\d+\s+init,\s*standby.*', output):
                         break
                     elif interval * sleep_per_interval < standby_wait_time:
                         con.log.info(

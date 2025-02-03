@@ -811,5 +811,26 @@ class TestIosXECat9kEnableSecret(unittest.TestCase):
         self.r.reload()
         self.r.disconnect()
 
+class TestIosXECat9kGrubConnect(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.device = Connection(
+            hostname='switch',
+            start=['mock_device_cli --os iosxe --state grub_connect'],
+            os='iosxe',
+            platform='cat9k',
+            log_buffer=True,
+            init_config_commands=[],
+            credentials=dict(default=dict(username='cisco', password='cisco'))
+        )
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.device.disconnect()
+
+    def test_connect_grub(self):
+        self.device.connect()
+
 if __name__ == '__main__':
     unittest.main()

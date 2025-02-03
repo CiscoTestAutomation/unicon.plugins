@@ -172,6 +172,8 @@ Example:
     # send an action to the device
     rtr.monitor('clear')
     rtr.monitor('bytes')
+    rtr.monitor('general')
+    rtr.monitor('IPv4 uni')  # this can be called with 'ipv4 uni' or 'ipv4uni' as well.
 
 
 monitor.get_buffer

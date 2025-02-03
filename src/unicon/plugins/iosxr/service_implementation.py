@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 from unicon.plugins.generic import service_implementation as svc
 from unicon.bases.routers.services import BaseService
-from unicon.core.errors import SubCommandFailure, StateMachineError
+from unicon.core.errors import SubCommandFailure, StateMachineError, SwitchoverDisallowedError
 from unicon.eal.dialogs import Dialog, Statement
 from unicon.logs import UniconStreamHandler
 from unicon.plugins.utils import slugify
@@ -18,7 +18,8 @@ from unicon.plugins.generic.service_implementation import GetRPState as GenericG
 from .service_statements import (switchover_statement_list,
                                  config_commit_stmt_list,
                                  execution_statement_list,
-                                 configure_statement_list)
+                                 configure_statement_list,
+                                 reload_statement_list)
 
 from .utils import IosxrUtils
 from .patterns import IOSXRPatterns
@@ -81,6 +82,10 @@ class HaConfigureService(svc.HaConfigureService):
 
 
 class Reload(svc.Reload):
+
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.dialog += Dialog(reload_statement_list)
 
     def call_service(self, reload_command='reload', *args, **kwargs):
         super().call_service(reload_command, *args, **kwargs)
@@ -194,6 +199,8 @@ class Switchover(BaseService):
                            context=con.active.context)
         except SubCommandFailure as err:
             raise SubCommandFailure("Switchover Failed %s" % str(err))
+        except SwitchoverDisallowedError as err:
+            raise SwitchoverDisallowedError("Switchover Failed with error: %s" % str(err))
 
         output = ""
         if self.result:
@@ -453,19 +460,24 @@ class Monitor(BaseService):
         command = command.strip()
         timeout = timeout or self.timeout
 
-        monitor_action = re.search('(?:mon\S* )?(?P<action>\S+)', command)
+        monitor_action = re.search(r'(?:mon\S* )?(?P<command>(?P<action>\S+).*)', command)
         if monitor_action:
             action = monitor_action.groupdict().get('action')
+            action_command = monitor_action.groupdict().get('command')
             if monitor_action in ['stop', 'quit']:
                 return self.stop()
 
             if action != 'interface':
+                # command could be "IPv4 Uni", action would be "IPv4", using
+                # action command match to grab full command.
+                action = slugify(action_command.replace(' ', ''))
                 # grab last 250 bytes
                 monitor_output = self.get_buffer()[-250:]
                 m = re.finditer(patterns.monitor_command_pattern, monitor_output)
+                # try to find the command in the output
                 for item in m:
                     group = item.groupdict()
-                    monitor_command = slugify(group.get('command'))
+                    monitor_command = slugify(group.get('command').replace(' ', ''))
                     command_key = group.get('key')
                     if action == monitor_command:
                         conn.send(command_key)
@@ -474,6 +486,7 @@ class Monitor(BaseService):
                     raise SubCommandFailure(f'Monitor command {command} is not supported')
 
         if command:
+            conn.state_machine.go_to('enable', conn.spawn)
             if not re.match('^mon', command):
                 command = 'monitor ' + command
 
@@ -558,12 +571,16 @@ class Monitor(BaseService):
             conn.log.info('Monitor not running')
             return
 
-        # Grab output before stoppig monitor
+        conn.state_machine.go_to('enable', conn.spawn)
+
+        # Grab output after stopping monitor
         output = self.get_buffer(truncate=True)
         output = utils.remove_ansi_escape_codes(output)
+        output = utils.truncate_trailing_prompt(
+            conn.state_machine.get_state(conn.state_machine.current_state),
+            output)
+        conn.log.info('Stopped monitor...')
 
-        conn.log.info('Stopping monitor...')
-        conn.state_machine.go_to('enable', conn.spawn)
         return output
 
     def log_service_call(self):

@@ -247,7 +247,38 @@ class TestIosXeCopyService(unittest.TestCase):
         expected_output = '\n'.join(expected_output.splitlines())
         self.assertIn(expected_output, output)
 
+    def test_from_tftp_testcase_name_pattern_issue(self):
+            output = self.d.copy(
+                source='bootflash:',
+                dest='tftp:',
+                source_file='test2',
+                dest_file='test',
+                server='10.1.6.243',
+                vrf='Mgmt-intf',
+            )
+            output = '\n'.join(output.splitlines())
+            expected_output = \
+                self.md.mock_data['copy_from_tftp_dest_filename_with_failure']\
+                ['commands']['test']['response']
+            expected_output = '\n'.join(expected_output.splitlines())
+            self.assertIn(expected_output, output)
 
+    def test_to_tftp_overwrite_False(self):
+        output = self.d.copy(
+            source='tftp:',
+            dest='bootflash:',
+            source_file='test',
+            dest_file='test2',
+            server='10.1.6.243',
+            vrf='Mgmt-intf',
+            overwrite=False,
+        )
+        output = '\n'.join(output.splitlines())
+        expected_output = \
+            self.md.mock_data['copy_to_tftp_dest_filename_overwrite']\
+            ['commands']['n']['response']
+        expected_output = '\n'.join(expected_output.splitlines())
+        self.assertIn(expected_output, output) 
 
 class TestMaxAttempts(unittest.TestCase):
     def setUp(self):

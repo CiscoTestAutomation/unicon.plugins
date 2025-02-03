@@ -227,6 +227,19 @@ devices:
             r'\+\+\+ Unicon plugin linux( \(unicon(\.internal)?\.plugins\.linux\))? \+\+\+'
         )
 
+    def test_learn_tokens_conf_state(self):
+        self.dev.connections.cli.command = \
+            "mock_device_cli --os generic --state config"
+
+        # If this manages to connect, it was able to recover from the config
+        # state and learn tokens
+        try:
+            self.dev.connect(learn_tokens=True)
+        finally:
+            self.dev.disconnect()
+
+        self.assertEqual(self.dev.state_machine.current_state, "enable")
+
     def test_iosxr_learn_tokens(self):
         # Set up device to use correct mock_device data
         self.dev.connections.cli.command = \

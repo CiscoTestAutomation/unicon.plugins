@@ -59,6 +59,8 @@ exec:
 enable:
   prompt: "RP/0/RP0/CPU0:%N#"
   commands: &enable_cmds
+    "config_syslog":
+      new_state: config_syslog
     "show ipv4 virtual address status": |
       Thu Mar 14 21:41:47.627 UTC
       VRF Name: default
@@ -1481,6 +1483,9 @@ monitor_interface:
   prompt: "(General='g', IPv4 Uni='4u', IPv4 Multi='4m', IPv6 Uni='6u', IPv6 Multi='6m')"
   keys:
     "c": ""
+    "g": ""
+    "n": ""
+    "4u": ""
     "q":
       new_state: enable
   commands:
@@ -1509,4 +1514,35 @@ monitor_interface_iface:
       new_state: enable
   commands:
     "q":
+      new_state: enable
+
+
+enable7:
+  prompt: "RP/0/RP0/CPU0:%N#"
+  commands:
+    <<: *enable_cmds
+    "reload":
+      new_state: reload_confirm_prompt1
+
+reload_confirm_prompt1:
+  prompt: "Do you wish to continue? [confirm(y/n)]"
+  commands:
+    "y":
+      response: "Press RETURN to get started"
+      new_state: enable7
+    "":
+      response: "Press RETURN to get started"
+      new_state: enable7
+
+config_syslog:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "commit": ""
+    "end":
+      new_state: config_syslog_message
+
+config_syslog_message:
+  prompt: "LC/0/2/CPU0:Nov 14 04:31:46.191 PST: qos_ma[199]: "
+  commands:
+    "":
       new_state: enable
