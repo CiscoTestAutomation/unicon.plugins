@@ -23,7 +23,7 @@ class OnsSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
             con.log.warning('Password is possibly too long')
 
         con.sendline(f'ACT-USER:{hostname}:{username}:100::{password};')
-        output = con.expect('(.*)>\s*$')
+        output = con.expect(r'(.*)>\s*$')
         if output and isinstance(output.match_output, str):
             if 'COMPLD' not in output.match_output:
                 raise ValueError('Login failed')

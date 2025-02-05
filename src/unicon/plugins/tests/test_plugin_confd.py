@@ -427,7 +427,7 @@ class TestConfdPluginErrorPattern(unittest.TestCase):
                             tacacs_password='admin')
         c.connect()
         with self.assertRaisesRegex(SubCommandFailure, 'sub_command failure, patterns matched in the output'):
-            c.execute('show command error', error_pattern=['---\^'])
+            c.execute('show command error', error_pattern=[r'---\^'])
 
 
     def test_ignore_error_pattern(self):
@@ -459,7 +459,7 @@ class TestConfdPluginErrorPattern(unittest.TestCase):
         ncs = tb.devices.ncs
 
         ncs.connect(via='cli')
-        ncs.settings.ERROR_PATTERN=['---\^']
+        ncs.settings.ERROR_PATTERN=[r'---\^']
 
         with self.assertRaisesRegex(SubCommandFailure, 'sub_command failure, patterns matched in the output'):
             ncs.execute('show command error')

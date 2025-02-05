@@ -89,7 +89,7 @@ class GenericSettings(Settings):
         self.ESCAPE_CHAR_CHATTY_TERM_WAIT = 0.5
 
         # number of cycles to wait for if the terminal is still chatty
-        self.ESCAPE_CHAR_CHATTY_TERM_WAIT_RETRIES = 12
+        self.ESCAPE_CHAR_CHATTY_TERM_WAIT_RETRIES = 6
 
         # prompt wait delay
         self.ESCAPE_CHAR_PROMPT_WAIT = 1

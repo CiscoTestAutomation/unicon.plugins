@@ -190,6 +190,8 @@ class TestIosXrConfigPrompts(unittest.TestCase):
             hostname='Router',
             start=['mock_device_cli --os iosxr --state enable'],
             os='iosxr',
+            mit=True,
+            log_buffer=True
         )
         self._conn.connect()
 
@@ -214,7 +216,10 @@ class TestIosXrConfigPrompts(unittest.TestCase):
         self.assertEqual('Router', self._conn.hostname)
         self._conn.configure('hostname R2')
         self.assertEqual('R2', self._conn.hostname)
-        
+
+    def test_config_syslog(self):
+        self._conn.execute('config_syslog', allow_state_change=True)
+        self._conn.enable()
 
 
 class TestIosXrPluginAdminService(unittest.TestCase):
@@ -686,6 +691,19 @@ class TestIosXrPluginReload(unittest.TestCase):
             c.disconnect()
             md.stop()
 
+    def test_reload_wish_continue(self):
+        conn = Connection(hostname='Router',
+                          start=['mock_device_cli --os iosxr --state enable7'],
+                          os='iosxr',
+                          enable_password='cisco',
+                          mit=True,
+                          settings=dict(POST_RELOAD_WAIT=1))
+        try:
+            conn.connect()
+            conn.reload()
+        finally:
+            conn.disconnect()
+
 
 class TestMorePrompt(unittest.TestCase):
 
@@ -746,7 +764,8 @@ class TestXRMonitorCommand(unittest.TestCase):
             Next='n', Prev='p'
             Brief='b', Detail='d', Protocol(IPv4/IPv6)='r'
             c
-            Brief='b', Detail='d', Protocol(IPv4/IPv6)='r'"""))
+            Brief='b', Detail='d', Protocol(IPv4/IPv6)='r'
+            q"""))
 
     def test_monitor_interface(self):
         conn = self.conn
@@ -759,7 +778,8 @@ class TestXRMonitorCommand(unittest.TestCase):
 
             Quit='q',     Clear='c',    Freeze='f', Thaw='t',
             Next set='n', Prev set='p', Bytes='y',  Packets='k'
-            (General='g', IPv4 Uni='4u', IPv4 Multi='4m', IPv6 Uni='6u', IPv6 Multi='6m')"""))
+            (General='g', IPv4 Uni='4u', IPv4 Multi='4m', IPv6 Uni='6u', IPv6 Multi='6m')
+            q"""))
 
     def test_monitor_not_supported(self):
         conn = self.conn
@@ -777,6 +797,26 @@ class TestXRMonitorCommand(unittest.TestCase):
             Quit='q',     Clear='c',    Freeze='f', Thaw='t',
             Next set='n', Prev set='p', Bytes='y',  Packets='k'
             (General='g', IPv4 Uni='4u', IPv4 Multi='4m', IPv6 Uni='6u', IPv6 Multi='6m')"""))
+
+    def test_monitor_general(self):
+        conn = self.conn
+        conn.monitor('interface')
+        output = conn.monitor('next set')
+        expected_output = "n\r\n(General='g', IPv4 Uni='4u', IPv4 Multi='4m', IPv6 Uni='6u', IPv6 Multi='6m')"
+        self.assertEqual(output, expected_output)
+
+        output = conn.monitor('general')
+        expected_output = "g\r\n(General='g', IPv4 Uni='4u', IPv4 Multi='4m', IPv6 Uni='6u', IPv6 Multi='6m')"
+        self.assertEqual(output, expected_output)
+
+        output = conn.monitor('IPv4 Uni')
+        expected_output = "4u\r\n(General='g', IPv4 Uni='4u', IPv4 Multi='4m', IPv6 Uni='6u', IPv6 Multi='6m')"
+        self.assertEqual(output, expected_output)
+
+        output = conn.monitor('ipv4uni')
+        expected_output = "4u\r\n(General='g', IPv4 Uni='4u', IPv4 Multi='4m', IPv6 Uni='6u', IPv6 Multi='6m')"
+        self.assertEqual(output, expected_output)
+
 
 
 if __name__ == "__main__":

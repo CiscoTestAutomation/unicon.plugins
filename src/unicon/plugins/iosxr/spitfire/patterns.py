@@ -25,5 +25,7 @@ class SpitfirePatterns(IOSXRPatterns):
             r'^.*([Uu]sername|[Ll]ogin):\s*?$'
         self.password_prompt = \
             r'^.*[Pp]assword:\s*?$'
+        self.showtech_graceful_exit = \
+            r'^(.*?)[Dd]o [Yy]ou [Ww]ish [Tt]o [Tt]erminate\?\s*\((Y|y|YES|Yes|yes)\/(N|n|NO|No|no)\)\s*:\s*?$'
 
         self.xr_module_prompt = r'(?m)(.*?)^#\s*$'

@@ -255,7 +255,10 @@ class Reload(GenericReload):
                 raise TypeError('append_error_pattern must be a list')
             self.error_pattern += append_error_pattern
 
-        reconnect_sleep = reconnect_sleep or con.settings.RELOAD_RECONNECT_WAIT
+        
+        if reconnect_sleep is None:
+            reconnect_sleep = max(con.settings.RELOAD_RECONNECT_WAIT, con.settings.POST_RELOAD_WAIT)
+
         config_lock_retries = config_lock_retries \
                               or con.settings.CONFIG_POST_RELOAD_MAX_RETRIES
         config_lock_retry_sleep = config_lock_retry_sleep \
@@ -323,7 +326,7 @@ class Reload(GenericReload):
                     if con.is_connected:
                         break
             else:
-                seconds = reconnect_sleep or con.settings.POST_RELOAD_WAIT
+                seconds = reconnect_sleep
                 con.log.info('Waiting for boot messages to settle for {} '
                              'seconds'.format(seconds))
                 wait_time = timedelta(seconds=seconds)

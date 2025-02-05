@@ -166,6 +166,11 @@ def copy_handler_1(spawn, context, send_key):
     else:
         raise SubCommandFailure("%s is not specified" % context[send_key])
 
+def copy_overwrite_handler(spawn, context):
+    if context['overwrite'] == 'False':
+        spawn.sendline('n')
+    else:
+        spawn.sendline('y')
 
 def copy_error_handler(context, retry=False):
     if retry:
@@ -961,8 +966,8 @@ rcp_confirm = Statement(pattern=pat.rcp_confirm,
                         continue_timer=True)
 # Recheck this
 copy_overwrite = Statement(pattern=pat.copy_overwrite,
-                           action=send_response,
-                           args={'response': 'y'},
+                           action=copy_overwrite_handler,
+                           args=None,
                            loop_continue=True,
                            continue_timer=True)
 

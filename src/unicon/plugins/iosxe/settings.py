@@ -34,7 +34,9 @@ class IosXESettings(GenericSettings):
             r'% Policy commands not allowed without an address family',
             r'% Color set already. Deconfigure first',
             r'Invalid policy name, \S+ does not exist',
-            r'% Deletion of RD in progress; wait for it to complete'
+            r'% Deletion of RD in progress; wait for it to complete',
+            r'% VLAN \[\d+\] already in use',
+            r'% VNI \d+ is either already in use or exceeds the maximum allowable VNIs.'
         ]
 
         self.EXECUTE_MATCHED_RETRIES = 1

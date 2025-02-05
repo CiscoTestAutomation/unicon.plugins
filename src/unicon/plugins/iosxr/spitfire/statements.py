@@ -62,6 +62,11 @@ def bmc_login_handler(spawn, context, session):
     else:
         spawn.sendline(context['bmc_username'])
 
+def showtech_graceful_exit_handler(spawn, context, session):
+    """ handles showtech graceful exit prompt
+    """
+    spawn.sendline('Y')
+
 
 class SpitfireStatements(GenericStatements):
     def __init__(self):
@@ -90,6 +95,12 @@ class SpitfireStatements(GenericStatements):
                                               args={'reuse_current_credential': True},
                                               loop_continue=True,
                                               continue_timer=False)
+
+        self.showtech_graceful_exit_stmt = Statement(pattern=patterns.showtech_graceful_exit,
+                                                     action=showtech_graceful_exit_handler,
+                                                     args=None,
+                                                     loop_continue=True,
+                                                     continue_timer=False)
 
 
 spitfire_statements = SpitfireStatements()

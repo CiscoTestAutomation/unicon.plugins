@@ -4,6 +4,7 @@ from unicon.plugins.generic.statements import GenericStatements, more_prompt_han
 from unicon.plugins.iosxr.patterns import IOSXRPatterns
 from unicon.eal.dialogs import Statement, Dialog
 from unicon.eal.helpers import sendline
+from unicon.core.errors import SubCommandFailure, SwitchoverDisallowedError
 
 from unicon.plugins.utils import (
     get_current_credential,
@@ -20,6 +21,10 @@ def handle_failed_config(spawn, abort=True):
     if abort:
         spawn.expect([patterns.config_prompt])
         spawn.sendline("abort")
+
+
+def switchover_disallowed_handler(error):
+    raise SwitchoverDisallowedError(error)
 
 
 def password_handler(spawn, context, session):
