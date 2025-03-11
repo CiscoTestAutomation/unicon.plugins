@@ -38,9 +38,6 @@ Changelogs
                                       New                                       
 --------------------------------------------------------------------------------
 
-* iosxe/vpagent
-    * Add connection provider for vpagent
-
 * iosxe
     * Added to Configure Error Patterns
         * Added the regex to match error pattern "127.0 / 255.0 is an invalid network."
