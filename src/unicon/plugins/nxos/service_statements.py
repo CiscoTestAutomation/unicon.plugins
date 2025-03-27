@@ -41,6 +41,8 @@ def admin_password_handler(spawn, context, session):
     """
     credential = get_current_credential(context=context, session=session)
     if credential:
+        if credential != 'default':
+            spawn.log.info(f'Using {credential} credential set for login into devices')
         common_cred_password_handler(
             spawn=spawn, context=context, credential=credential,
             session=session, reuse_current_credential=True)

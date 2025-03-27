@@ -217,7 +217,7 @@ auto_install_stmt = \
 boot_from_rommon_statement_list = [
     please_reset_stmt, admin_password_stmt,
     setup_dialog_stmt, auto_install_stmt,
-    boot_timeout_stmt
+    boot_timeout_stmt, grub_prompt_stmt
 ]
 
 

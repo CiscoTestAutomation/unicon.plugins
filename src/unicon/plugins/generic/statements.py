@@ -216,6 +216,8 @@ def login_handler(spawn, context, session):
     """
     credential = get_current_credential(context=context, session=session)
     if credential:
+        if credential != 'default':
+            spawn.log.info(f'Using {credential} credential set for login into device')
         common_cred_username_handler(
             spawn=spawn, context=context, credential=credential)
     else:

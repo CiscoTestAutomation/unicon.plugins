@@ -31,8 +31,12 @@ PID_TOKEN_FILE = Path(__file__).parent / 'pid_tokens.csv'
 
 
 def _fallback_cred(context):
-    return [context['default_cred_name']] \
+    creds = [context['default_cred_name']] \
         if 'default_cred_name' in context else []
+    if context.get('fallback_creds'):
+        creds.extend(context['fallback_creds'])
+    return creds
+
 
 def _get_creds_to_try(context):
     """ Get list of credentials to try. """

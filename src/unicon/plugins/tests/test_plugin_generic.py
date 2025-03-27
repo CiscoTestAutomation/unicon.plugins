@@ -160,6 +160,7 @@ class TestCredentialLoginPasswordHandlers(unittest.TestCase):
             print("Sendline called with: %s %s" % (args, kwargs))
 
         self.spawn = MockSpawn()
+        self.spawn.log = Mock()
         self.spawn.spawn_command = 'ssh -l cisco@router'
         self.spawn.last_sent = 'ssh -l cisco@router'
         self.spawn.sendline = Mock(side_effect=mock_sendline)
