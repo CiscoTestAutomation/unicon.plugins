@@ -28,7 +28,9 @@ class LinuxUtils(Utils):
 
         # existing logic for patterns without named capture group
         match = re.findall(pattern, result, re.MULTILINE)
-        prompt_line = match[-1]
+        prompt_line = ""
+        if match:
+            prompt_line = match[-1]
         if isinstance(prompt_line, tuple):
             prompt_line = prompt_line[0]
         output = result.replace(prompt_line, "")

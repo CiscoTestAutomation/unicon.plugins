@@ -99,6 +99,9 @@ class GenericSettings(Settings):
         # (wait time: 0.5, 1, 1.5, 2, 2.5, 3, 3.5 == total wait: 14.0s)
         self.ESCAPE_CHAR_PROMPT_WAIT_RETRIES = 7
 
+        # commands to get a prompt, default to "enter"
+        self.ESCAPE_CHAR_PROMPT_COMMANDS = ['\r']
+
         # syslog message handling timers
         self.SYSLOG_WAIT = 1
         # syslog wait time for reload service

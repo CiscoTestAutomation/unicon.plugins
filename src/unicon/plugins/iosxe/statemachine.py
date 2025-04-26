@@ -128,6 +128,7 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         disable_to_enable = Path(disable, enable, 'enable', Dialog([
             statements.password_stmt,
             statements.enable_password_stmt,
+            statements.no_password_set_stmt,
             statements.bad_password_stmt,
             statements.syslog_stripper_stmt
         ]))

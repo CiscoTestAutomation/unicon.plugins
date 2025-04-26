@@ -753,7 +753,7 @@ class Execute(BaseService):
                 output = self.extra_output_process(output)
                 output = output.replace(command, "", 1)
                 # only strip first newline and leave formatting intact
-                output = re.sub(r"^\r?\r\n", "", output, 1)
+                output = re.sub(r"^\r?\r\n", "", output, count=1)
                 output = output.rstrip()
 
                 if command in command_output:
@@ -1083,9 +1083,6 @@ class Reload(BaseService):
         self.timeout = connection.settings.RELOAD_TIMEOUT
         self.dialog = Dialog(reload_statement_list + default_statement_list)
         self.log_buffer = io.StringIO()
-        lb = UniconStreamHandler(self.log_buffer)
-        lb.setFormatter(logging.Formatter(fmt=UNICON_LOG_FORMAT))
-        self.connection.log.addHandler(lb)
         self.__dict__.update(kwargs)
 
     def call_service(self,
@@ -1123,6 +1120,10 @@ class Reload(BaseService):
             if not isinstance(append_error_pattern, list):
                 raise ValueError('append_error_pattern should be a list')
             self.error_pattern += append_error_pattern
+
+        lb = UniconStreamHandler(self.log_buffer)
+        lb.setFormatter(logging.Formatter(fmt=UNICON_LOG_FORMAT))
+        self.connection.log.addHandler(lb)
 
         # Clear log buffer
         self.log_buffer.seek(0)
@@ -1234,6 +1235,8 @@ class Reload(BaseService):
         reload_output = self.log_buffer.read()
         # clear buffer
         self.log_buffer.truncate()
+
+        self.connection.log.removeHandler(lb)
 
         if return_output:
             self.result = ReloadResult(self.result, reload_output)
@@ -2053,6 +2056,7 @@ class HAReloadService(BaseService):
         self.timeout = connection.settings.HA_RELOAD_TIMEOUT
         self.dialog = Dialog(ha_reload_statement_list + default_statement_list)
         self.command = 'reload'
+        self.log_buffer = io.StringIO()
         self.__dict__.update(kwargs)
 
     def call_service(self,  # noqa: C901
@@ -2084,6 +2088,14 @@ class HAReloadService(BaseService):
             if not isinstance(append_error_pattern, list):
                 raise ValueError('append_error_pattern should be a list')
             self.error_pattern += append_error_pattern
+
+        lb = UniconStreamHandler(self.log_buffer)
+        lb.setFormatter(logging.Formatter(fmt=UNICON_LOG_FORMAT))
+        self.connection.log.addHandler(lb)
+
+        # Clear log buffer
+        self.log_buffer.seek(0)
+        self.log_buffer.truncate()
 
         if reply:
             if dialog:
@@ -2232,6 +2244,13 @@ class HAReloadService(BaseService):
                 counter += 1
 
         con.log.info("+++ Reload Completed Successfully +++")
+        self.log_buffer.seek(0)
+        reload_output = self.log_buffer.read()
+        # clear buffer
+        self.log_buffer.truncate()
+
+        self.connection.log.removeHandler(lb)
+
         self.result = True
         if return_output:
             self.result = ReloadResult(self.result, reload_output)

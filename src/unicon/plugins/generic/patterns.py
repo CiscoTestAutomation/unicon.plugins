@@ -90,3 +90,5 @@ class GenericPatterns(UniconCorePatterns):
         self.new_password = r'^(Enter new password|Confirm password):\s*$'
 
         self.enter_your_encryption_selection_2 = r'^.*?Enter your encryption selection( \[2])?:\s*$'
+
+        self.no_password_set = r'^.*% (No password set|Error in authentication.).*'

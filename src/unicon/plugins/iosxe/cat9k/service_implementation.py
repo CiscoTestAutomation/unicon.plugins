@@ -133,3 +133,30 @@ class Rommon(GenericExecute):
         else:
             raise SubCommandFailure('Could not determine if break is enabled, cannot transition to rommon')
         super().pre_service(*args, **kwargs)
+
+
+class HARommon(Rommon):
+    """ Brings device to the Rommon prompt and executes commands specified
+    """
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+
+    def pre_service(self, *args, **kwargs):
+        con = self.connection
+
+        # call pre_service to reload to rommon
+        super().pre_service(*args, **kwargs)
+
+        # check connection states
+        subcon1, subcon2 = list(con._subconnections.values())
+
+        # Check current state
+        for subcon in [subcon1, subcon2]:
+            subcon.sendline()
+            subcon.state_machine.go_to(
+                'any',
+                subcon.spawn,
+                context=subcon.context,
+                prompt_recovery=subcon.prompt_recovery,
+                timeout=subcon.connection_timeout,
+            )

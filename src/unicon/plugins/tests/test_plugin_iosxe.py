@@ -8,6 +8,7 @@ Uses the unicon.plugins.tests.mock.mock_device_ios script to test IOSXE plugin.
 __author__ = "Myles Dear <mdear@cisco.com>"
 
 import re
+import os 
 import time
 import unittest
 from unittest.mock import patch
@@ -256,6 +257,45 @@ class TestIosXEPluginConnect(unittest.TestCase):
             c.disconnect()
             md.stop()
 
+    def test_connect_learn_os_version(self):
+        md = MockDeviceTcpWrapperIOSXE(port=0, state='ewc_enable', hostname='EWC')
+        md.start()
+
+        testbed = """
+        devices:
+          EWC:
+            os: iosxe
+            type: cat9k
+            credentials:
+                default:
+                    username: admin
+                    password: cisco
+                set1:
+                    username: cisco
+                    password: cisco
+            connections:
+              defaults:
+                class: unicon.Unicon
+                fallback_credentials:
+                    - set1
+              a:
+                protocol: telnet
+                ip: 127.0.0.1
+                port: {}
+        """.format(md.ports[0])
+
+        tb = loader.load(testbed)
+        device = tb.devices.EWC
+        try:
+            os.environ.pop('LEARN_OS_VERSION',None)  
+            device.connect(learn_hostname=True)
+            self.assertEqual(device.version, '17.06.01.0.129467')
+            self.assertEqual(device.state_machine.current_state, 'enable')
+            os.environ['LEARN_OS_VERSION'] = 'False'
+        finally:
+            device.disconnect()
+            md.stop()
+
     def test_operating_mode_check(self):
         c = Connection(hostname='Router',
                        start=['mock_device_cli --os iosxe --state general_enable_no_operating_mode --hostname Router'],
@@ -358,6 +398,18 @@ class TestIosXEPluginDisableEnable(unittest.TestCase):
                        log_buffer=True
                        )
         c.connect()
+        c.disconnect()
+
+    def test_disable_to_enable_no_passwd(self):
+        c = Connection(
+            hostname='Router',
+            start=['mock_device_cli --os iosxe --state disable_to_enable_no_passwd'],
+            os='iosxe',
+            credentials=dict(default=dict(password='cisco')),
+            log_buffer=True
+        )
+        with self.assertRaisesRegex(UniconAuthenticationError, "No password set on this device"):
+            c.connect()
         c.disconnect()
 
 

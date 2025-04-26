@@ -141,6 +141,17 @@ class TestIosXrPlugin(unittest.TestCase):
         self.assertEqual(c.spawn.match.match_output, 'end\r\nRP/B0/CB0/CPU0:KLMER02-SU1#')
         c.disconnect()
 
+    def test_connect_unresponsive(self):
+        con = Connection(
+                hostname='R1',
+                os='iosxr',
+                start=['mock_device_cli --os iosxr --state unresponsive_prompt --hostname R1'],
+                credentials=dict(default=dict(username='admin', password='admin')))
+        try:
+            con.connect()
+        finally:
+            con.disconnect()
+
 
 class TestIosXRPluginExecute(unittest.TestCase):
     @classmethod
@@ -356,6 +367,20 @@ class TestIosXrPluginBashService(unittest.TestCase):
         self.assertIn('exit', ret)
         self.assertIn('Router#', ret)
         conn.disconnect()
+
+    def test_admin_host_ios(self):
+        conn = Connection(hostname='Router',
+                          start=['mock_device_cli --os iosxr --state bash_console7'],
+                          os='iosxr',
+                          mit=True,
+                          log_buffer=True)
+
+        conn.connect()
+        try:
+            conn.execute('run ssh 10.0.2.16', allow_state_change=True)
+            self.assertEqual(conn.state_machine.current_state, 'admin_host')
+        finally:
+            conn.disconnect()
 
 
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
