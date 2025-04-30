@@ -328,6 +328,31 @@ class TestIosXeCat9kPlugin(unittest.TestCase):
             c.disconnect()
             md.stop()
 
+    def test_connect_cat9k_ha_rommon(self):
+        md = MockDeviceTcpWrapperIOSXECat9k(hostname='R1', port=0, state='cat9k_ha_active_enable,cat9k_ha_standby_enable')
+        md.start()
+
+        c = Connection(
+            hostname='switch',
+            start=[
+                'telnet 127.0.0.1 {}'.format(md.ports[0]),
+                'telnet 127.0.0.1 {}'.format(md.ports[1]),
+            ],
+            os='iosxe',
+            platform='cat9k',
+            log_buffer=True,
+            credentials=dict(default=dict(username='cisco', password='cisco'),
+                             alt=dict(username='admin', password='lab')),
+            learn_hostname=True,
+        )
+        try:
+            c.connect()
+            c.rommon.timeout = 30
+            c.rommon()
+        finally:
+            c.disconnect()
+            md.stop()
+
 
 class TestIosXECat9kPluginReload(unittest.TestCase):
 

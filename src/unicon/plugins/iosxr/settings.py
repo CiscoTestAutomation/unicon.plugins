@@ -65,3 +65,7 @@ class IOSXRSettings(GenericSettings):
 
         # more prompt pattern is defined in plugins/iosxr/patterns.py as more_prompt
         self.MORE_REPLACE_PATTERN = r'( *--\s?[Mm]ore\s?-- *|\(END\))'
+
+        # commands to send to get the device to respond
+        # for XR devices, use Ctrl-Q (\x11) as alternative command
+        self.ESCAPE_CHAR_PROMPT_COMMANDS = ['\r', '\x11']

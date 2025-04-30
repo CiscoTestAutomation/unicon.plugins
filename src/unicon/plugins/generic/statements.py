@@ -186,9 +186,21 @@ def escape_char_callback(spawn):
     # store current know buffer
     known_buffer = len(spawn.buffer.strip())
 
+    # list of commands to iterate through
+    cmds = spawn.settings.ESCAPE_CHAR_PROMPT_COMMANDS
+    iter_cmds = iter(cmds)
+
     for retry_number in range(spawn.settings.ESCAPE_CHAR_PROMPT_WAIT_RETRIES):
-        # hit enter
-        spawn.sendline()
+
+        # iterate through the commands
+        try:
+            cmd = next(iter_cmds)
+        except StopIteration:
+            iter_cmds = iter(cmds)
+            cmd = next(iter(iter_cmds))
+
+        # send command (typically "\r")
+        spawn.send(cmd)
 
         # incremental wait logic
         buffer_wait(spawn, spawn.settings.ESCAPE_CHAR_PROMPT_WAIT * (retry_number + 1))
@@ -453,6 +465,10 @@ def incorrect_login_handler(spawn, context, session):
         raise UniconAuthenticationError(
             'Login failure, either wrong username or password')
 
+def no_password_handler(spawn, context, session):
+    """ handles no password prompt
+    """
+    raise UniconAuthenticationError('No password set on this device')
 
 def sudo_password_handler(spawn, context, session):
     """ Password handler for sudo command
@@ -592,6 +608,12 @@ class GenericStatements():
                                          args=None,
                                          loop_continue=True,
                                          continue_timer=False)
+
+        self.no_password_set_stmt = Statement(pattern=pat.no_password_set,
+                                         action=no_password_handler,
+                                         args=None,
+                                         loop_continue=True,
+                                        continue_timer=False)
 
         self.disconnect_error_stmt = Statement(pattern=pat.disconnect_message,
                                                action=connection_failure_handler,
@@ -782,6 +804,7 @@ pre_connection_statement_list = [generic_statements.escape_char_stmt,
 
 authentication_statement_list = [generic_statements.bad_password_stmt,
                                  generic_statements.login_incorrect,
+                                 generic_statements.no_password_set_stmt,
                                  generic_statements.login_stmt,
                                  generic_statements.useraccess_stmt,
                                  generic_statements.new_password_stmt,

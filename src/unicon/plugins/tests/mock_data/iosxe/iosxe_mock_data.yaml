@@ -96,6 +96,17 @@ general_enable:
     "term length 0": ""
     "term width 0": ""
     "show version | include operating mode" : ""
+    "show install summary": |
+      [ Chassis 1/R0 ] Installed Package(s) Information:
+      State (St): I - Inactive, U - Activated & Uncommitted,
+                  C - Activated & Committed, D - Deactivated & Uncommitted
+      --------------------------------------------------------------------------------
+      Type  St   Filename/Version
+      --------------------------------------------------------------------------------
+      IMG   C    17.06.01.0.129467
+      --------------------------------------------------------------------------------
+      Auto abort timer: inactive
+      --------------------------------------------------------------------------------  
     "show version": *SV
 
     "disable":
@@ -746,6 +757,14 @@ disable_to_enable_with_msg:
     "show version | include operating mode" : ""
     "enable":
       new_state: enable_password_with_msg
+
+disable_to_enable_no_passwd:
+  prompt: "Switch>"
+  commands:
+    "show version | include operating mode" : ""
+    "enable":
+      response: "% No password set"
+
 
 enable_password_with_msg:
   preface: "Password: "

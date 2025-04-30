@@ -1544,6 +1544,19 @@ To make use of this feature, you can choose from the following actions:
             arguments:
               learn_tokens: True
 
+4. Use a pyats.conf file
+
+.. code-block:: ini
+
+    [unicon]
+    learn_tokens = True
+
+5. Use an environment variable
+
+.. code-block:: bash
+
+    export UNICON_LEARN_TOKENS=1
+
 By default, token discovery will not overwrite tokens that you have already defined in your testbed file.
 It will only assign discovered tokens to the device object if the token does not yet exist or if the value is generic. For example: `platform: generic`.
 
@@ -1588,3 +1601,17 @@ This flag can be set in the same way as `learn_tokens`:
               learn_tokens: True
               overwrite_testbed_tokens: True
 
+4. Use a pyats.conf file
+
+.. code-block:: ini
+
+    [unicon]
+    learn_tokens = True
+    overwrite_testbed_tokens = True
+
+5. Use an environment variable
+
+.. code-block:: bash
+
+    export UNICON_LEARN_TOKENS=1
+    export UNICON_OVERWRITE_TESTBED_TOKENS=1

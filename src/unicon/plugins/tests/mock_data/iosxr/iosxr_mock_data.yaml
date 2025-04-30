@@ -1458,6 +1458,19 @@ admin_host6:
     "exit":
       new_state: admin_bash_console6
 
+bash_console7:
+  preface: "Tue Jun  6  07:50:55.337 UTC+00:00"
+  prompt: sysadmin-vm:0_RP0#
+  commands:
+    "run ssh 10.0.2.16":
+      new_state: admin_host7
+
+admin_host7:
+  prompt: "[ios:~]$ "
+  commands:
+    "exit":
+      new_state: admin_bash_console7
+
 
 show_command_with_escape_more:
   prompt: "\x1b[7m--More--\x1b[27m"
@@ -1546,3 +1559,14 @@ config_syslog_message:
   commands:
     "":
       new_state: enable
+
+unresponsive_prompt:
+  preface: Escape character is '^]'.
+  prompt: ""
+  keys:
+    ctrl-q:
+      response: |
+          R1 con0/RP0/CPU0 is now available
+      new_state: login
+  commands:
+    "": ""

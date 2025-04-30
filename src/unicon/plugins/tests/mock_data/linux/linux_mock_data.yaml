@@ -690,3 +690,12 @@ prompt_recovery:
 ansi_prompt:
   prompt: "\x1b[37mapc>"
   commands: *cmds
+
+
+slow_connection_exec:
+  preface:
+    response: ""
+    timing:
+     - 0:,15
+  prompt: "%N$ "
+  commands: *cmds

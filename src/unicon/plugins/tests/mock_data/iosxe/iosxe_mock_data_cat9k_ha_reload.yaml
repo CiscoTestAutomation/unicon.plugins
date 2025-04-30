@@ -146,6 +146,21 @@ cat9k_ha_active_enable:
     "config term":
         new_state: cat9k_ha_active_config
 
+    "show boot": |
+      ---------------------------
+      Switch 1
+      ---------------------------
+      Current Boot Variables:
+      BOOT variable = flash:cat9k_iosxe.2019-06-21_17.21_sdcunha.SSA.bin;
+
+      Boot Variables on next reload:
+      BOOT variable = flash:cat9k_iosxe.2019-06-21_17.21_sdcunha.SSA.bin;
+      Manual Boot = no
+      Enable Break = yes
+      Boot Mode = DEVICE
+      iPXE Timeout = 0
+
+
 cat9k_ha_active_enable_reload_confirm:
     prompt: "System configuration has been modified. Save? [yes/no]: "
     commands:
