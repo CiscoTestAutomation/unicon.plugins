@@ -2093,6 +2093,10 @@ class HAReloadService(BaseService):
         lb.setFormatter(logging.Formatter(fmt=UNICON_LOG_FORMAT))
         self.connection.log.addHandler(lb)
 
+        # logging the output to subconnections
+        for subcon in con.subconnections:
+            subcon.log.addHandler(lb)
+
         # Clear log buffer
         self.log_buffer.seek(0)
         self.log_buffer.truncate()
@@ -2250,6 +2254,8 @@ class HAReloadService(BaseService):
         self.log_buffer.truncate()
 
         self.connection.log.removeHandler(lb)
+        for subcon in con.subconnections:
+            subcon.log.removeHandler(lb)
 
         self.result = True
         if return_output:
@@ -2681,7 +2687,7 @@ class AttachModuleService(BaseService):
             with rtr.attach(1) as m:
                 m.execute('show interface')
                 m.execute(['show interface 1', 'show interface 2'])
-            # if we want to go to module_debug state
+            # if we want to go to lc_shell state
             with rtr.attach(1, debug=True) as m:
                 m.execute('show interface')
                 m.execute(['show interface 1', 'show interface 2'])
@@ -2742,7 +2748,7 @@ class AttachModuleService(BaseService):
                 raise NotImplementedError('Attach module state not implemented')
 
             self.conn.log.debug('+++ attaching module +++')
-            conn.state_machine.go_to('module_debug' if self.debug else 'module',
+            conn.state_machine.go_to('lc_shell' if self.debug else 'module',
                                      conn.spawn,
                                      context=self.context,
                                      timeout=self.timeout)

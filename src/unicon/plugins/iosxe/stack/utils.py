@@ -7,7 +7,6 @@ from time import sleep, time
 from unicon.eal.dialogs import Dialog
 from unicon.utils import Utils, AttributeDict
 
-from .exception import StackMemberReadyException
 from .service_statements import send_boot
 
 logger = logging.getLogger(__name__)
@@ -87,13 +86,12 @@ class StackUtils(Utils):
             None
         """
         connection.spawn.sendline()
-        try:
-            dialog.process(connection.spawn, timeout=timeout,
-                            prompt_recovery=prompt_recovery,
-                            context=connection.context)
-        except StackMemberReadyException as e:
-            logger.debug('This is an expected exception for getting out of the dialog proceess')
-            pass
+
+        # reload dialog is expected to passed here
+        dialog.process(connection.spawn, timeout=timeout,
+                        prompt_recovery=prompt_recovery,
+                        context=connection.context)
+
         connection.state_machine.go_to('any', connection.spawn, timeout=timeout,
                                     prompt_recovery=prompt_recovery,
                                     context=connection.context)

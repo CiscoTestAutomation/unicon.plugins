@@ -3,16 +3,18 @@ from time import sleep, time
 from collections import namedtuple
 from datetime import datetime, timedelta
 import re
+from concurrent.futures import ThreadPoolExecutor, wait as wait_futures, ALL_COMPLETED
+
 from unicon.eal.dialogs import Dialog
 from unicon.core.errors import SubCommandFailure
 from unicon.bases.routers.services import BaseService
 
-from .exception import StackMemberReadyException
 from .utils import StackUtils
 from unicon.plugins.generic.statements import custom_auth_statements, buffer_settled
 from unicon.plugins.generic.service_statements import standby_reset_rp_statement_list
 from .service_statements import (switch_prompt,
                                  stack_reload_stmt_list,
+                                 stack_reload_stmt_list_1,
                                  stack_switchover_stmt_list, stack_factory_reset_stmt_list)
 from unicon.plugins.generic.service_implementation import Enable as GenericEnable, Execute as GenericExecute
 
@@ -216,12 +218,12 @@ class StackReload(BaseService):
         conn = self.connection.active
 
         if error_pattern is None:
-            self.error_pattern = conn.settings.ERROR_PATTERN
+            self.error_pattern = self.connection.settings.ERROR_PATTERN
         else:
             self.error_pattern = error_pattern
 
         if post_reload_wait_time is None:
-            self.post_reload_wait_time = conn.settings.POST_RELOAD_WAIT
+            self.post_reload_wait_time = self.connection.settings.POST_RELOAD_WAIT
         else:
             self.post_reload_wait_time = post_reload_wait_time
 
@@ -246,45 +248,119 @@ class StackReload(BaseService):
 
         reload_dialog += Dialog([switch_prompt])
 
-        conn.context['post_reload_timeout'] = timedelta(seconds= self.post_reload_wait_time)
+        conn.context['post_reload_wait_time'] = timedelta(seconds= self.post_reload_wait_time)
 
-        conn.log.info('Processing on active rp %s-%s' % (conn.hostname, conn.alias))
+        conn.log.info('Processing on active rp %s-%s with timeout %s' % (conn.hostname, conn.alias, timeout))
         conn.sendline(reload_cmd)
-        try:
-            reload_cmd_output = reload_dialog.process(conn.spawn,
-                                                     timeout=timeout,
-                                                     prompt_recovery=self.prompt_recovery,
-                                                     context=conn.context)
-            self.result=reload_cmd_output.match_output
+
+        conn_list = self.connection.subconnections
+
+        reload_cmd_output = None
+
+        reload_dialog2 = Dialog(stack_reload_stmt_list_1)
+
+        def task(con):
+
+            # The purpose of this dialog is to manage the initial interaction
+            # with the device during the reload process. The dialog handles
+            # the startup sequence until the device either displays the ROMMON
+            # prompt or "All switches in the stack have been discovered.
+            # Accelerating discovery" message indicating readiness. At this
+            # point, the dialog exits to proceed with subsequent operations.
+            reload_cmd_output = reload_dialog2.process(con.spawn,
+                                                       timeout=timeout,
+                                                       prompt_recovery=self.prompt_recovery,
+                                                       context=con.context)
+
+            # A sendline command is necessary when the device is configured
+            # for manual boot or when device is in enable/disable state
+            # during the member reload to ensure the subsequent dialog can
+            # proceed seamlessly.
+            con.sendline()
+
+            # The dialog process outlined below manages the
+            # "Press RETURN to get started" prompt for each subconnection.
+            # This ensures that the reload process is completed successfully
+            # across all connections.
+            reload_cmd_output2 = reload_dialog.process(con.spawn,
+                                                       timeout=timeout,
+                                                       prompt_recovery=self.prompt_recovery,
+                                                       context=con.context)
+
+            self.result = reload_cmd_output.match_output + reload_cmd_output2.match_output
             self.get_service_result()
-        except StackMemberReadyException as e:
-            conn.log.debug('This is an expected exception for getting out of the dialog process')
-            pass  
-        except Exception as e:
-            raise SubCommandFailure('Error during reload', e) from e
+
+        futures = []
+        executor = ThreadPoolExecutor(max_workers=len(conn_list))
+
+        for con in conn_list:
+            futures.append(executor.submit(task, con))
+
+        # Log the output from threading
+        future_results = wait_futures(futures, timeout=timeout, return_when=ALL_COMPLETED)
+
+        # Splitting it to done and not done specifically
+        # because future result is a tuple
+
+        # Logs the completed output
+        done = list(future_results.done)
+
+        # Logs the error traceback
+        not_done = list(future_results.not_done)
+
+        for future in done + not_done:
+            try:
+                result = future.result()
+                conn.log.info(f"Reload result: {result}")
+
+            except Exception as e:
+                raise SubCommandFailure('Error during reload', e) from e
 
         if 'state' in conn.context and conn.context.state == 'rommon':
+            conn.log.info(f"Waiting {self.connection.settings.STACK_ROMMON_SLEEP} seconds for all peers to come to boot state ")
             # If manual boot enabled wait for all peers to come to boot state.
             sleep(self.connection.settings.STACK_ROMMON_SLEEP)
 
             conn.context.pop('state')
-            try:
+
+            def boot(con):
+
                 # send boot command for each subconnection
-                for subconn in self.connection.subconnections:
-                    utils.send_boot_cmd(subconn, timeout, self.prompt_recovery, reply)
+                utils.send_boot_cmd(con, timeout, self.prompt_recovery, reply)
 
+                self.connection.log.info('Processing on rp %s-%s' % (con.hostname, con.alias))
+                con.context['post_reload_timeout'] = timedelta(seconds= self.post_reload_wait_time)
                 # process boot up for each subconnection
-                for subconn in self.connection.subconnections:
-                    self.connection.log.info('Processing on rp '
-                        '%s-%s' % (conn.hostname, subconn.alias))
-                    subconn.context['post_reload_timeout'] = timedelta(seconds= self.post_reload_wait_time)
-                    utils.boot_process(subconn, timeout, self.prompt_recovery, reload_dialog)
+                utils.boot_process(con, timeout, self.prompt_recovery, reload_dialog)
 
-            except Exception as e:
-                self.connection.log.error(e)
-                raise SubCommandFailure('Reload failed.', e) from e
+            futures = []
+            executor = ThreadPoolExecutor(max_workers=len(conn_list))
+
+            for con in conn_list:
+                futures.append(executor.submit(boot, con))
+
+            # Log the output from threading
+            future_results = wait_futures(futures, timeout=timeout, return_when=ALL_COMPLETED)
+
+            # Splitting it to done and not done specifically
+            # because future result is a tuple
+
+            # Logs the completed output
+            done = list(future_results.done)
+
+            # Logs the error traceback
+            not_done = list(future_results.not_done)
+
+            for future in done + not_done:
+                try:
+                    result = future.result()
+                    conn.log.info(f"Reload result: {result}")
+
+                except Exception as e:
+                    raise SubCommandFailure('Error during reload', e) from e
         else:
             try:
+                conn.log.info("Bring device to any state")
                 # bring device to enable mode
                 conn.state_machine.go_to('any', conn.spawn, timeout=timeout,
                                         prompt_recovery=self.prompt_recovery,

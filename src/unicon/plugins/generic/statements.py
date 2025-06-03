@@ -451,6 +451,11 @@ def incorrect_login_handler(spawn, context, session):
         # If credentials have been supplied, there are no login retries.
         # The user must supply appropriate credentials to ensure login
         # does not fail. Skip it for the first attempt
+
+        # Attempt fallback credentials if available
+        if session['current_credential']:
+            return
+
         raise UniconAuthenticationError(
             'Login failure, either wrong username or password')
     if 'incorrect_login_attempts' not in session:

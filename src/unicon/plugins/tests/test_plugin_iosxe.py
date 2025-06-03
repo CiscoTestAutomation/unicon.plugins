@@ -1479,6 +1479,51 @@ class TestIosxeTclsh(unittest.TestCase):
         c.enable()
         c.disconnect()
 
+class TestIosxeAcmConfigure(unittest.TestCase):
+
+    def test_acm_configure(self):
+        c = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state general_enable --hostname PE1'],
+            os='iosxe',
+            mit=True
+        )
+        c.connect()
+        config_txt = [
+            'interface loopback 1',
+            'description test'
+        ]
+        c.configure(config_txt, acm_configlet='my_config')
+        c.disconnect()
+
+    def test_ha_acm_configure(self):
+        md = MockDeviceTcpWrapperIOSXE(port=0, state='ha_cat9k_exec,ha_cat9k_stby_exec', hostname='R1')
+        md.start()
+
+        c = Connection(
+            hostname='R1',
+            start=[
+                'telnet 127.0.0.1 {}'.format(md.ports[0]),
+                'telnet 127.0.0.1 {}'.format(md.ports[1])
+            ],
+            os='iosxe',
+            connection_timeout=10,
+            credentials=dict(default=dict(password='lab'))
+        )
+        try:
+            c.connect()
+            config_txt = [
+            'interface loopback 1',
+            'description test'
+            ]
+            c.configure(config_txt, acm_configlet='my_config')
+        except Exception:
+            raise
+        finally:
+            c.disconnect()
+            md.stop()
+
+
 class TestConfigTransition(unittest.TestCase):
 
     def test_config_transition_setting(self):

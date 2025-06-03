@@ -227,6 +227,16 @@ class MockDeviceStackIOSXE(MockDevice):
             if len(ports):
                 for port in ports:
                     self.set_state(port, 'stack_rommon')
+                for other in self.transport_handles:
+                    prompt = self.get_prompt(other)
+                    self._write('\n{}'.format(prompt), other)
+        if cmd == "reload slot 1":
+            ports = [p for p in self.transport_ports.keys() \
+                if p != self.transport_handles[transport]]
+            if len(ports):
+                for other in self.transport_handles:
+                    prompt = self.get_prompt(other)
+                    self._write('\n{}'.format(prompt), other)
 
     def update_show_switch(self, transport):
         port = self.transport_handles[transport]
@@ -286,6 +296,7 @@ def main(args=None):
         parser.add_argument('--state', help='initial state')
         parser.add_argument('--ha', action='store_true', help='HA mode')
         parser.add_argument('--hostname', help='Device hostname (default: Switch')
+        parser.add_argument('--stack', action='store_true', help='Stack mode')
         parser.add_argument('-d', action='store_true', help='Debug')
         args = parser.parse_args()
 
@@ -304,7 +315,7 @@ def main(args=None):
         hostname = 'Switch'
 
     if args.ha:
-        md = MockDeviceTcpWrapperIOSXE(hostname=hostname, state=state)
+        md = MockDeviceTcpWrapperIOSXE(hostname=hostname, state=state, stack=args.stack)
         md.run()
     else:
         md = MockDeviceIOSXE(hostname=hostname, state=state)

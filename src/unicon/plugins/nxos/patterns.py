@@ -41,4 +41,5 @@ class NxosPatterns(GenericPatterns):
         self.module_elam_insel_prompt = r'^(.*?)module-\d+(\(\w+-elam-insel\d+\))?#\s*?$'
         self.commit_changes_prompt = r'Uncommitted changes found, commit them before exiting \(yes/no/cancel\)\? \[cancel\]\s*$'
         self.nxos_module_reload = r'This command will reload module \S+ Proceed\[y\/n]\?'
-        self.l2rib_dt_prompt = r'^(.*?)L2RIBCLIENT-\d+>'
+        self.l2rib_dt_prompt = r'^(.*?)L2RIBCLIENT-.+>\s*?$'
+        self.lc_bash_prompt = r'(.*?)root@lc\d+:\S+#\s*?$'
