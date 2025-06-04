@@ -231,10 +231,12 @@ class TestIosXEStackReload(unittest.TestCase):
                        tacacs_password='cisco',
                        enable_password='cisco')
         d.settings.STACK_POST_RELOAD_SLEEP = 0
+        d.settings.STACK_ROMMON_SLEEP = 1
+        d.settings.POST_RELOAD_WAIT = 1
         d.connect()
         self.assertTrue(d.active.alias == 'peer_1')
 
-        d.reload()
+        d.reload(timeout=10)
         d.disconnect()
         md.stop()
 
@@ -250,10 +252,12 @@ class TestIosXEStackReload(unittest.TestCase):
                        tacacs_password='cisco',
                        enable_password='cisco')
         d.settings.STACK_POST_RELOAD_SLEEP = 0
+        d.settings.STACK_ROMMON_SLEEP = 1
+        d.settings.POST_RELOAD_WAIT = 1
         d.connect()
         self.assertTrue(d.active.alias == 'peer_1')
 
-        d.reload(member=1)
+        d.reload(member=1, timeout=10)
         d.disconnect()
         md.stop()
 
@@ -279,10 +283,13 @@ class TestIosXEStackReload(unittest.TestCase):
         try:
             d.connect()
             d.settings.STACK_POST_RELOAD_SLEEP = 0
+            d.settings.STACK_ROMMON_SLEEP = 1
+            d.settings.POST_RELOAD_WAIT = 1
             with self.assertRaises(SubCommandFailure):
                 d.reload('active_install_add',
                           reply=install_add_one_shot_dialog,
-                          error_pattern = error_pattern)
+                          error_pattern = error_pattern,
+                          timeout=10)
             self.assertEqual(d.reload.error_pattern, error_pattern)
         finally:
              d.disconnect()
@@ -301,10 +308,12 @@ class TestIosXEStackReload(unittest.TestCase):
                        enable_password='cisco',
                        post_reload_wait_time='120')
         d.settings.STACK_POST_RELOAD_SLEEP = 0
+        d.settings.STACK_ROMMON_SLEEP = 1
+        d.settings.POST_RELOAD_WAIT = 1
         d.connect()
         self.assertTrue(d.active.alias == 'peer_1')
 
-        d.reload(member=1)
+        d.reload(member=1, timeout=10)
         d.disconnect()
         md.stop()
 

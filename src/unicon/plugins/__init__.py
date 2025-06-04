@@ -1,10 +1,11 @@
-__version__ = '25.4'
+__version__ = "25.5"
 
 supported_chassis = [
     'single_rp',
     'dual_rp',
     'stack',
     'quad',
+    'stackwise_virtual'
 ]
 
 supported_os = [

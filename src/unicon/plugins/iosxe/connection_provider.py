@@ -32,6 +32,12 @@ class IosxeSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
                                     con.spawn,
                                     context=con.context,
                                     prompt_recovery=con.prompt_recovery)
+            if con.state_machine.current_state in ['acm', 'config']:
+                con.state_machine.go_to('enable',
+                                        con.spawn,
+                                        context=con.context,
+                                        timeout=con.connection_timeout,
+                                        prompt_recovery=con.prompt_recovery)
             # If the learn token is not enabled we need to see if the device is in Controller-Managed mode 
             # or it's in autonomous mode. If the device is in Controller-Managed mode, enable token discovery.
             if get_device_mode(con) == 'Controller-Managed':

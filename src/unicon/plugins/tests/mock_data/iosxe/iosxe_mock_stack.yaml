@@ -369,14 +369,14 @@ stack_rommon_1:
     "boot":
       response: |
         Booting...(use SKIP_POST)Up 1000 Mbps Full duplex (port  0) (SGMII)
-        
+
         The system is not configured to boot automatically.  The
         following command will finish loading the operating system
         software:
-        
+
             boot
-        
-        
+
+
         switch: boot
         Reading full image into memory.............................................................................................................................................................................................................................................................................................................................................................................................................................................................................done
         Bundle Image
@@ -412,21 +412,9 @@ stack_rommon_1:
         #####
         Switch number is 2
         All switches in the stack have been discovered. Accelerating discovery
+        This software version supports only Smart Licensing as the software licensing mechanism.
+
+        Press RETURN to get started!
       timing:
         - 0:,0,0.005
-      new_state: stack_press_return
-
-
-
-stack_press_return:
-  prompt: "This software version supports only Smart Licensing as the software licensing mechanism."
-  commands:
-    "": 
-      new_state: stack_press_return_1
-
-
-stack_press_return_1:
-  prompt: "Press RETURN to get started!"
-  commands:
-    "": 
       new_state: stack_exec

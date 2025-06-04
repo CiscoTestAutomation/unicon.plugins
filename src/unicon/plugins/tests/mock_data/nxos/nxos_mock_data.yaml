@@ -371,7 +371,7 @@ config_dual:
 
 bash:
   prompt: "bash-4.2$ "
-  commands:
+  commands: &bash_commands
     "ls": |
       bootflash                  system                  bin
     "sudo yum list installed | grep n9000": |
@@ -383,6 +383,26 @@ bash:
         new_state: nxos_l2rib_dt
     "exit":
       new_state: exec
+    "rlogin lc1":
+      new_state: lc_shell
+    "sudo su":
+      new_state: bash_root
+
+bash_root:
+  prompt: "bash-4.2# "
+  commands:
+    <<: *bash_commands
+    "exit":
+      new_state: bash
+
+
+lc_shell:
+  prompt: "root@lc1:~# "
+  commands:
+    "ls": |
+      bootflash                  system                  bin
+    exit:
+      new_state: bash
 
 guestshell:
   prompt: "[admin@guestshell ~]$"

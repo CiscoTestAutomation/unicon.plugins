@@ -22,13 +22,16 @@ class AciStateMachine(StateMachine):
         enable = State('enable', patterns.enable_prompt)
         config = State('config', patterns.config_prompt)
         shell = State('shell', patterns.shell_prompt)
+        learn_hostname = State('learn_hostname', patterns.learn_hostname)
         setup = State('setup', list(setup_patterns.__dict__.values()))
 
         self.add_state(enable)
         self.add_state(config)
+        self.add_state(learn_hostname)
         self.add_state(setup)
         self.add_state(shell)
 
+        self.add_path(Path(learn_hostname, enable, None, None))
         enable_to_config = Path(enable, config, 'configure', None)
         config_to_enable = Path(config, enable, 'end', None)
 

@@ -13,11 +13,55 @@ For list of all the other service please refer this:
     * mandatory arguments are marked with `*`.
 
 
+bash_console
+------------
+
+Service to execute commands in the router Bash. ``bash_console``
+gives you a router-like object to execute commands on using python context
+managers.
+
+===========   ======================    ===========================================
+Argument      Type                      Description
+===========   ======================    ===========================================
+timeout       int (default 60 sec)      timeout in sec for executing commands
+target        str                       'standby' to bring standby console to bash.
+enable_bash   bool (default: True)      enable bash service on device.
+module        str                       module to connect to (optional)
+command       str                       command to use with `run bash {command}`
+                                        (optional)
+===========   ======================    ===========================================
+
+Bash service will be enabled by default on devices that require the service to
+be configured. Bash configuration will be done on first invocation of the
+bash_console service.
+
+You can specify the module name to use rlogin from the bash (root) shell to
+connect to the module shell. The command will default to `sudo su`.
+
+.. code-block:: python
+
+    with device.bash_console() as bash:
+        output1 = bash.execute('ls')
+        output2 = bash.execute('pwd')
+
+    with device.bash_console(module='lc1') as bash:
+        output1 = bash.execute('ls')
+        output2 = bash.execute('pwd')
+
+To run commands in the root shell, use `command="sudo su"`.
+
+.. code-block:: python
+
+    with device.bash_console(command='sudo su') as bash:
+        output1 = bash.execute('ls')
+        output2 = bash.execute('pwd')
+
+
 shellexec
 ---------
 
-Service to execute commands on the Bourne-Again SHell (Bash).
-
+Service to execute commands on the Bourne-Again SHell (Bash). Similar to
+``bash_console``.
 
 ==========   ======================    ========================================
 Argument     Type                      Description

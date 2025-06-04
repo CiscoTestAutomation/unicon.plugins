@@ -144,6 +144,23 @@ class TestNxosPluginBashService(unittest.TestCase):
         finally:
             ha.stop()
 
+    def test_bash_module(self):
+        c = Connection(hostname='switch',
+                       start=['mock_device_cli --os nxos --state exec'],
+                       os='nxos',
+                       username='cisco',
+                       tacacs_password='cisco')
+
+        try:
+            c.connect()
+            with c.bash_console(module='lc1') as console:
+                output = console.execute('ls')
+            self.assertEqual(output, 'bootflash                  system                  bin')
+            self.assertIn('exit', c.spawn.match.match_output)
+            self.assertIn('switch#', c.spawn.match.match_output)
+        finally:
+            c.disconnect()
+
 
 class TestNxosPluginGuestshellService(unittest.TestCase):
 

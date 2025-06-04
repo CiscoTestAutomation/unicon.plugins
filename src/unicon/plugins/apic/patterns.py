@@ -1,11 +1,13 @@
 __author__ = "dwapstra"
 
+from unicon.utils import ANSI_REGEX
 from unicon.plugins.generic.patterns import GenericPatterns
 
 
 class ApicPatterns(GenericPatterns):
     def __init__(self):
         super().__init__()
+        self.learn_hostname = r'^.*?({a})?(?P<hostname>[-\w]+)\s?([-\w\]/~:\.\d ]+)?([>\$~%#\]])\s*(\x1b\S+)?$'.format(a=ANSI_REGEX)
         self.enable_prompt = r'^(.*?)((\x1b\S+)?\x00)*(%N)#\s*(\x1b\S+)?$'
         self.config_prompt = r'^(.*?)((\x1b\S+)?\x00)*(%N)\(config.*\)#\s*(\x1b\S+)?$'
         self.shell_prompt = r'^(.*?)((\x1b\S+)?\x00)*\[[-\.\w]+@((%N)\s+.*?\]#)\s*(\x1b\S+)?$'

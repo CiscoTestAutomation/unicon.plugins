@@ -14,7 +14,7 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
 
 .. tip::
 
-  The priority to pick up which plugin is: chassis_type > os > platform > model.
+  The priority to pick up which plugin is: chassis_type > os > platform > model > submodel.
 
 
 .. important::
@@ -30,8 +30,8 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
 
 .. csv-table:: Unicon Supported Platforms
     :align: center
-    :widths: 20, 20, 20, 40
-    :header: "os", "platform", "model", "Comments"
+    :widths: 20, 20, 20, 20, 40
+    :header: "os", "platform", "model", "submodel", "Comments"
 
     ``apic``
     ``aireos``
@@ -46,21 +46,22 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
     ``confd``, ``nfvis``
     ``dnos6``
     ``dnos10``
-    ``fxos``,,,"Tested with FP2K."
+    ``fxos``,,,,"Tested with FP2K."
     ``fxos``, ``fp4k``
     ``fxos``, ``fp9k``
-    ``fxos``, ``ftd``,,"Deprecated, please use one of the other fxos plugins."
-    ``gaia``, , , "Check Point Gaia OS"
+    ``fxos``, ``ftd``,,,"Deprecated, please use one of the other fxos plugins."
+    ``gaia``, , , , "Check Point Gaia OS"
     ``hvrp``
     ``ios``, ``ap``
     ``ios``, ``iol``
     ``ios``, ``iosv``
-    ``ios``, ``pagent``,,"See example below."
+    ``ios``, ``pagent``,,,"See example below."
     ``iosxe``
     ``iosxe``, ``cat3k``
     ``iosxe``, ``cat3k``, ``ewlc``
     ``iosxe``, ``cat8k``
-    ``iosxe``, ``cat9k``
+    ``iosxe``, ``cat9k``,
+    ``iosxe``, ``cat9k``, ``c9500``, ``c9500x``, "See example below."
     ``iosxe``, ``c9800``
     ``iosxe``, ``c9800``, ``ewc_ap``
     ``iosxe``, ``csr1000v``
@@ -76,8 +77,8 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
     ``iosxr``, ``spitfire``
     ``ironware``
     ``ise``
-    ``linux``, , , "Generic Linux server with bash prompts"
-    ``nd``, , , "Nexus Dashboard (ND) Linux server. identical to os: linux"
+    ``linux``, , , , "Generic Linux server with bash prompts"
+    ``nd``, , , , "Nexus Dashboard (ND) Linux server. identical to os: linux"
     ``nxos``
     ``nxos``, ``mds``
     ``nxos``, ``n5k``
@@ -85,17 +86,17 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
     ``nxos``, ``n9k``
     ``nxos``, ``nxosv``
     ``nxos``, ``aci``
-    ``nso``,,, "Network Service Orchestrator"
-    ``ons``,,, "Optical Networking System"
-    ``sdwan``, ``viptela``,,"Identical to os=viptela."
+    ``nso``,,,, "Network Service Orchestrator"
+    ``ons``,,,, "Optical Networking System"
+    ``sdwan``, ``viptela``,,,"Identical to os=viptela."
     ``sros``
     ``staros``
     ``vos``
     ``junos``
     ``eos``
     ``sros``
-    ``viptela``,,,"Identical to os=sdwan, platform=viptela."
-    ``windows``,,,"Only command shell (cmd) is supported. Powershell is not supported"
+    ``viptela``,,,,"Identical to os=sdwan, platform=viptela."
+    ``windows``,,,,"Only command shell (cmd) is supported. Powershell is not supported"
 
 To use this table - locate your device's os/platform/model information, and fill
 your pyATS testbed YAML with it:
@@ -222,6 +223,35 @@ Example: Stack router
             port: 2003
             member: 3    <<< peer rp id
 
+Example: Stackwise Virtual Router
+---------------------------------
+
+.. code-block:: yaml
+
+    devices:
+      router_hostname:
+        os: iosxe
+        platform: cat9k
+        model: c9500
+        submodel: c9500x
+        chassis_type: stackwise_virtual  <<< define the chassis_type as 'stackwise_virtual'
+        credentials:
+          default:
+            username: xxx
+            password: yyy
+          enable:
+            password: zzz
+        connections:
+          defaults:
+            class: unicon.Unicon
+          a:
+            protocol: telnet
+            ip: 1.1.1.1
+            port: 2001
+          b:
+            protocol: telnet
+            ip: 1.1.1.1
+            port: 2002
 
 Example: Quad Sup router
 ------------------------

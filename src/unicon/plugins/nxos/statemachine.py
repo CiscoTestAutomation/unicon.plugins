@@ -42,6 +42,16 @@ def shell_to_l2rib_dt_transition(state_machine, spawn, context):
     spawn.sendline('/isan/bin/l2rib_dt %s' % context.get('_client_id', '-r'))
 
 
+def shell_to_lc_shell_transition(state_machine, spawn, context):
+    spawn.sendline('rlogin %s' % context.get('_module', ''))
+
+
+def enable_to_shell_transition(state_machine, spawn, context):
+    command = context.get('_bash_command')
+    run_command = 'run bash' + (f' {command}' if command else '')
+    spawn.sendline(run_command)
+
+
 class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
 
     def create(self):
@@ -58,6 +68,7 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         l2rib_dt = State('l2rib_dt', patterns.l2rib_dt_prompt)
         boot = State('boot', patterns.boot_prompt)
         boot_config = State('boot_config', patterns.boot_config_prompt)
+        lc_shell = State('lc_shell', patterns.lc_bash_prompt)
 
         loader_to_enable = Path(loader, enable, boot_from_rommon, Dialog(
             boot_statement_list))
@@ -69,7 +80,7 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
                       loop_continue=True)
         ]))
 
-        enable_to_shell = Path(enable, shell, 'run bash', None)
+        enable_to_shell = Path(enable, shell, enable_to_shell_transition, None)
         shell_to_enable = Path(shell, enable, 'exit', None)
 
         enable_to_guestshell = Path(enable, guestshell, 'guestshell', None)
@@ -94,6 +105,8 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         boot_to_shell = Path(boot, shell, 'start', None)
         shell_to_boot = Path(shell, boot, 'exit', None)
 
+        shell_to_lc_shell = Path(shell, lc_shell, shell_to_lc_shell_transition, None)
+        lc_shell_to_shell = Path(lc_shell, shell, 'exit', None)
 
         # Add State and Path to State Machine
         self.add_state(enable)
@@ -109,7 +122,7 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         self.add_state(l2rib_dt)
         self.add_state(boot)
         self.add_state(boot_config)
-
+        self.add_state(lc_shell)
 
         self.add_path(loader_to_enable)
         self.add_path(enable_to_config)
@@ -131,7 +144,8 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         self.add_path(boot_to_enable)
         self.add_path(boot_to_shell)
         self.add_path(shell_to_boot)
-
+        self.add_path(shell_to_lc_shell)
+        self.add_path(lc_shell_to_shell)
 
         self.add_default_statements(default_statement_list)
 

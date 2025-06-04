@@ -1,17 +1,3 @@
-redundancy reload shelf
-
-System configuration has been modified. Save? [yes/no]: n
-Reload the entire shelf [confirm]
-Preparing to reload this shelf
-reload fp action requested
-process exit with reload stack code
-
-
-watchdog: watchdog0: watchdog did not stop!
-reboot: Restarting system
-
-
-
 Booting...(use SKIP_POST)Up 1000 Mbps Full duplex (port  0) (SGMII)
 
 The system is not configured to boot automatically.  The

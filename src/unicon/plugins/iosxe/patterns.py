@@ -23,9 +23,9 @@ class IosXEPatterns(GenericPatterns):
         self.want_continue_confirm = r'.*Do you want to continue\?\s*\[confirm]\s*$'
         self.want_continue_yes = r'.*Do you want to continue\?\s*\[y/n]\?\s*\[yes]:\s*$'
         self.disable_prompt = \
-            r'^(.*?)(\(unlicensed\))?(WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(-standby)?(\(boot\))?(\(recovery-mode\))?>\s?$'
+            r'^(.*?)(\(unlicensed\))?(WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(recovery-mode\))?(\(rp-rec-mode\))?(\(standby\))?(-stby)?(-standby)?(\(boot\))?>\s?$'
         self.enable_prompt = \
-            r'^(.*?)(\(unlicensed\))?(WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(recovery-mode\))?(\(standby\))?(-stby)?(-standby)?(\(boot\))?#[\s\x07]*$'
+            r'^(.*?)(\(unlicensed\))?(WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(recovery-mode\))?(\(rp-rec-mode\))?(\(standby\))?(-stby)?(-standby)?(\(boot\))?#[\s\x07]*$'
         self.maintenance_mode_prompt = \
             r'^(.*?)(\(unlicensed\))?(WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(-standby)?(\(boot\))?\(maint-mode\)#[\s\x07]*$'
         self.press_enter = ReloadPatterns().press_enter
@@ -41,6 +41,7 @@ class IosXEPatterns(GenericPatterns):
         self.tclsh_prompt = r'^(.*?)\(tcl.*?\)#[\s\x07]*$'
         self.macro_prompt = r'^(.*?)(\{\.\.\}|then.else.fi)\s*>\s*$'
         self.unable_to_create = r'^(.*?)Unable to create.*$'
+        self.acm_prompt = r'^(.*?)\(acm.*?\)#[\s\x07]*$'
 
 
 class IosXEReloadPatterns(ReloadPatterns):

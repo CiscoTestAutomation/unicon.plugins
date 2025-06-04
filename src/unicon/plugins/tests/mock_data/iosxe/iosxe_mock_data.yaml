@@ -232,6 +232,12 @@ general_enable:
     "write memory": ""
     "tclsh":
       new_state: tclsh
+    "acm configlet create my_config":
+      response:
+        - |
+          advanced configuration mode started.
+          enter configuration commands, one per line.  end with cntl/z.
+      new_state: acm_configlet
     "long_hostname":
       new_state: general_enable_long_hostname
     "delete /force flash:CRFT_*": ""
@@ -1532,6 +1538,19 @@ tclsh:
   prompt: "%N(tcl)#"
   commands:
     "exit":
+      new_state: general_enable
+
+acm_configlet:
+  prompt: "%N(acm)#"
+  commands:
+    "interface loopback 1":
+      new_state: acm_if
+
+acm_if:
+  prompt: "%N(acm-if)#"
+  commands:
+    "description test": ""
+    "end":
       new_state: general_enable
 
 tclsh_long_hostname:
