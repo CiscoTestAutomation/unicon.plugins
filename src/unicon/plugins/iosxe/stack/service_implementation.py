@@ -213,6 +213,7 @@ class StackReload(BaseService):
         self.result = False
         if member:
             reload_command = f'reload slot {member}'
+
         reload_cmd = reload_command or self.reload_command
         timeout = timeout or self.timeout
         conn = self.connection.active
@@ -233,10 +234,16 @@ class StackReload(BaseService):
             if not isinstance(append_error_pattern, list):
                 raise ValueError('append_error_pattern should be a list')
             self.error_pattern += append_error_pattern
+
         # update all subconnection context with image_to_boot
         if image_to_boot:
             for subconn in self.connection.subconnections:
                 subconn.context.image_to_boot = image_to_boot
+            
+            # Update the reload command to use the image_to_boot
+            self.context["image_to_boot"] = image_to_boot
+            reload_cmd = f"boot {image_to_boot.strip()}"
+            
         reload_dialog = self.dialog
         if reply:
             reload_dialog = reply + reload_dialog

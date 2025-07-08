@@ -817,7 +817,7 @@ class TestNxosPluginSwitchtoVdc(unittest.TestCase):
         self.c.switchback()
 
 
-class TestNxosL2ribClient(unittest.TestCase):
+class TestNxosL2ribPyClient(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -831,23 +831,186 @@ class TestNxosL2ribClient(unittest.TestCase):
                              log_buffer=True)
         cls.dev.connect()
 
-    def test_l2rib_client(self):
+    def test_001_l2rib_pycl_cmd_no_arg(self):
+        self.dev.execute('run bash sudo su', allow_state_change=True)
+        self.dev.execute('/isan/bin/l2rib_pycl', allow_state_change=True)
+        self.dev.execute('help')
+        self.dev.enable()
+
+    def test_002_l2rib_pycl_cxt_mgr_no_arg(self):
+        with self.dev.l2rib_pycl() as l2rib_pycl:
+            l2rib_pycl.execute('help')
+
+    def test_003_l2rib_pycl_service_no_arg(self):
+        self.dev.l2rib_pycl()
+        self.dev.execute('help')
+        self.dev.execute('exit', allow_state_change=True)
+        self.dev.enable()
+
+    def test_004_l2rib_pycl_cmd_random(self):
+        self.dev.execute('run bash sudo su', allow_state_change=True)
+        self.dev.execute('/isan/bin/l2rib_pycl -r', allow_state_change=True)
+        self.dev.execute('help')
+        self.dev.enable()
+
+    def test_005_l2rib_pycl_cxt_mgr_random(self):
+        with self.dev.l2rib_pycl(client_id="-r") as l2rib_pycl:
+            l2rib_pycl.execute('help')
+
+    def test_006_l2rib_pycl_service_random(self):
+        self.dev.l2rib_pycl(client_id="-r")
+        self.dev.execute('help')
+        self.dev.execute('exit', allow_state_change=True)
+        self.dev.enable()
+
+    def test_007_l2rib_pycl_cmd_client_id(self):
+        self.dev.execute('run bash sudo su', allow_state_change=True)
+        self.dev.execute('/isan/bin/l2rib_pycl 1000', allow_state_change=True)
+        self.dev.execute('help')
+        self.dev.enable()
+
+    def test_008_l2rib_pycl_ctx_mgr_client_id(self):
+        with self.dev.l2rib_pycl(client_id=1000) as l2rib_pycl:
+            l2rib_pycl.execute('help')
+
+    def test_009_l2rib_pycl_service_client_id(self):
+        self.dev.l2rib_pycl(client_id=1000)
+        self.dev.execute('help')
+        self.dev.execute('exit', allow_state_change=True)
+        self.dev.enable()
+
+    def test_010_l2rib_pycl_cmd_client_name(self):
+        self.dev.execute('run bash sudo su', allow_state_change=True)
+        self.dev.execute('/isan/bin/l2rib_pycl CONSUMER', allow_state_change=True)
+        self.dev.execute('help')
+        self.dev.enable()
+
+    def test_011_l2rib_pycl_ctx_mgr_client_name(self):
+        with self.dev.l2rib_pycl(client_id='CONSUMER') as l2rib_pycl:
+            l2rib_pycl.execute('help')
+
+    def test_012_l2rib_pycl_service_client_name(self):
+        self.dev.l2rib_pycl(client_id='CONSUMER')
+        self.dev.execute('help')
+        self.dev.execute('exit', allow_state_change=True)
+        self.dev.enable()
+
+    def test_013_l2rib_pycl_ctx_mgr_execute(self):
+        self.dev.l2rib_pycl().execute('help')
+        self.dev.enable()
+
+    def test_014_l2rib_pycl_prompt_delay_default(self):
+        with self.dev.l2rib_pycl(client_id='PROMPT_DELAY_DEFAULT') as l2rib_pycl:
+            l2rib_pycl.execute('help')
+
+    def test_015_l2rib_pycl_prompt_delay_custom(self):
+        with self.dev.l2rib_pycl(
+            client_id='PROMPT_DELAY_CUSTOM',
+            timeout=75) as l2rib_pycl:
+            l2rib_pycl.execute('help')
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.dev.disconnect()
+
+
+class TestNxosL2ribDtClient(unittest.TestCase):
+    '''
+    This is a replica class of TestNxosL2ribPyClient.
+    It has been created to test now deprecated serive "l2rib_dt"
+    This class should be removed once the service is removed from the codebase.
+    Also, related mock data entries also should be removed from the nxos_mock_data.yaml file.
+    '''
+
+    @classmethod
+    def setUpClass(cls):
+        cls.dev = Connection(hostname='switch',
+                             start=['mock_device_cli --os nxos --state exec'],
+                             os='nxos',
+                             username='cisco',
+                             tacacs_password='cisco',
+                             init_exec_commands=[],
+                             init_config_commands=[],
+                             log_buffer=True)
+        cls.dev.connect()
+
+    def test_001_l2rib_dt_cmd_no_arg(self):
+        self.dev.execute('run bash sudo su', allow_state_change=True)
+        self.dev.execute('/isan/bin/l2rib_dt', allow_state_change=True)
+        self.dev.execute('help')
+        self.dev.enable()
+
+    def test_002_l2rib_dt_cxt_mgr_no_arg(self):
+        with self.dev.l2rib_dt() as l2rib_dt:
+            l2rib_dt.execute('help')
+
+    def test_003_l2rib_dt_service_no_arg(self):
+        self.dev.l2rib_dt()
+        self.dev.execute('help')
+        self.dev.execute('exit', allow_state_change=True)
+        self.dev.enable()
+
+    def test_004_l2rib_dt_cmd_random(self):
         self.dev.execute('run bash sudo su', allow_state_change=True)
         self.dev.execute('/isan/bin/l2rib_dt -r', allow_state_change=True)
         self.dev.execute('help')
         self.dev.enable()
 
-    def test_l2rib_client_context_manager(self):
-        with self.dev.l2rib_dt() as rib:
-            rib.execute('help')
+    def test_005_l2rib_dt_cxt_mgr_random(self):
+        with self.dev.l2rib_dt(client_id="-r") as l2rib_dt:
+            l2rib_dt.execute('help')
 
-    def test_l2rib_client_execute(self):
+    def test_006_l2rib_dt_service_random(self):
+        self.dev.l2rib_dt(client_id="-r")
+        self.dev.execute('help')
+        self.dev.execute('exit', allow_state_change=True)
+        self.dev.enable()
+
+    def test_007_l2rib_dt_cmd_client_id(self):
+        self.dev.execute('run bash sudo su', allow_state_change=True)
+        self.dev.execute('/isan/bin/l2rib_dt 1000', allow_state_change=True)
+        self.dev.execute('help')
+        self.dev.enable()
+
+    def test_008_l2rib_dt_ctx_mgr_client_id(self):
+        with self.dev.l2rib_dt(client_id=1000) as l2rib_dt:
+            l2rib_dt.execute('help')
+
+    def test_009_l2rib_dt_service_client_id(self):
+        self.dev.l2rib_dt(client_id=1000)
+        self.dev.execute('help')
+        self.dev.execute('exit', allow_state_change=True)
+        self.dev.enable()
+
+    def test_010_l2rib_dt_cmd_client_name(self):
+        self.dev.execute('run bash sudo su', allow_state_change=True)
+        self.dev.execute('/isan/bin/l2rib_dt CONSUMER', allow_state_change=True)
+        self.dev.execute('help')
+        self.dev.enable()
+
+    def test_011_l2rib_dt_ctx_mgr_client_name(self):
+        with self.dev.l2rib_dt(client_id='CONSUMER') as l2rib_dt:
+            l2rib_dt.execute('help')
+
+    def test_012_l2rib_dt_service_client_name(self):
+        self.dev.l2rib_dt(client_id='CONSUMER')
+        self.dev.execute('help')
+        self.dev.execute('exit', allow_state_change=True)
+        self.dev.enable()
+
+    def test_013_l2rib_dt_ctx_mgr_execute(self):
         self.dev.l2rib_dt().execute('help')
         self.dev.enable()
 
-    def test_l2rib_client_id(self):
-        with self.dev.l2rib_dt(client_id=1000) as rib:
-            rib.execute('help')
+    def test_014_l2rib_dt_prompt_delay_default(self):
+        with self.dev.l2rib_dt(client_id='PROMPT_DELAY_DEFAULT') as l2rib_dt:
+            l2rib_dt.execute('help')
+
+    def test_015_l2rib_dt_prompt_delay_custom(self):
+        with self.dev.l2rib_dt(
+            client_id='PROMPT_DELAY_CUSTOM',
+            timeout=75) as l2rib_dt:
+            l2rib_dt.execute('help')
 
     @classmethod
     def tearDownClass(cls):

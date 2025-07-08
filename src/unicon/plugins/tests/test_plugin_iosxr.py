@@ -92,7 +92,10 @@ class TestIosXrPlugin(unittest.TestCase):
                            enable_password='cisco',
                            init_exec_commands=[],
                            init_config_commands=[])
-            c.connect()
+            try:
+                c.connect()
+            finally:
+                c.disconnect()
 
     def test_configure_root_system_username(self):
         c = Connection(hostname='Router',
@@ -151,6 +154,19 @@ class TestIosXrPlugin(unittest.TestCase):
             con.connect()
         finally:
             con.disconnect()
+
+    def test_connect_ztp(self):
+        c = Connection(hostname='Router',
+                        start=['mock_device_cli --os iosxr --state spitfire_enable2'],
+                        os='iosxr',
+                        platform='spitfire',
+                        enable_password='cisco',
+                        init_exec_commands=[],
+                        init_config_commands=[])
+        try:
+            c.connect()
+        finally:
+            c.disconnect()
 
 
 class TestIosXRPluginExecute(unittest.TestCase):

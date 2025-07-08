@@ -318,7 +318,6 @@ class TestIosXEPluginConnect(unittest.TestCase):
         finally:
             c.disconnect()
 
-
 class TestIosXEPluginExecute(unittest.TestCase):
 
     @classmethod
@@ -1138,6 +1137,7 @@ class TestIosXEConfigure(unittest.TestCase):
             c.configure(['crypto pki certificate chain SLA-TrustPoint', 'certificate ca 01'])
         finally:
             c.disconnect()
+                   
 class TestIosXEEnableSecret(unittest.TestCase):
 
     def test_enable_secret(self):
@@ -1522,6 +1522,24 @@ class TestIosxeAcmConfigure(unittest.TestCase):
         finally:
             c.disconnect()
             md.stop()
+
+class TestIosxeAcmRulesConfigure(unittest.TestCase):
+
+    def test_acm_rules_configure(self):
+        c = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state general_enable --hostname PE1'],
+            os='iosxe',
+            mit=True
+        )
+        c.connect()
+        config_txt = [
+            'match mode mdt-subscription-mode command no',
+            'match mode interface command no ip address 10.43.188.58 255.255.255.192',
+            'action pre-apply'
+        ]
+        c.configure(config_txt, rules=True)
+        c.disconnect()
 
 
 class TestConfigTransition(unittest.TestCase):

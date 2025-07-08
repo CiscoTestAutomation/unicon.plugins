@@ -377,10 +377,38 @@ bash:
     "sudo yum list installed | grep n9000": |
       base-files.n9000                        3.0.14-r74.2                   installed
       bfd.lib32_n9000                         1.0.0-r0                       installed
-    "/isan/bin/l2rib_dt 1000":
-        new_state: nxos_l2rib_dt
+    "/isan/bin/l2rib_pycl":
+        new_state: nxos_l2rib_pycl_random
+    "/isan/bin/l2rib_pycl -r":
+        new_state: nxos_l2rib_pycl_random
+    "if test -f /isan/bin/l2rib_pycl; then /isan/bin/l2rib_pycl -r ; else /isan/bin/l2rib_dt -r ; fi":
+        new_state: nxos_l2rib_pycl_random
+    "/isan/bin/l2rib_pycl 1000":
+        new_state: nxos_l2rib_pycl_client_id
+    "if test -f /isan/bin/l2rib_pycl; then /isan/bin/l2rib_pycl 1000 ; else /isan/bin/l2rib_dt 1000 ; fi":
+        new_state: nxos_l2rib_pycl_client_id
+    "/isan/bin/l2rib_pycl CONSUMER":
+        new_state: nxos_l2rib_pycl_consumer
+    "if test -f /isan/bin/l2rib_pycl; then /isan/bin/l2rib_pycl CONSUMER ; else /isan/bin/l2rib_dt CONSUMER ; fi":
+        new_state: nxos_l2rib_pycl_consumer
+    "if test -f /isan/bin/l2rib_pycl; then /isan/bin/l2rib_pycl PROMPT_DELAY_DEFAULT ; else /isan/bin/l2rib_dt PROMPT_DELAY_DEFAULT ; fi":
+      response: ''
+      timing:
+        - 0:,55,0
+      new_state: nxos_l2rib_pycl_prompt_delay_default
+    "if test -f /isan/bin/l2rib_pycl; then /isan/bin/l2rib_pycl PROMPT_DELAY_CUSTOM ; else /isan/bin/l2rib_dt PROMPT_DELAY_CUSTOM ; fi":
+        response: ''
+        timing:
+          - 0:,65,0
+        new_state: nxos_l2rib_pycl_prompt_delay_custom
+    "/isan/bin/l2rib_dt":
+        new_state: nxos_l2rib_pycl_random
     "/isan/bin/l2rib_dt -r":
-        new_state: nxos_l2rib_dt
+        new_state: nxos_l2rib_pycl_random
+    "/isan/bin/l2rib_dt 1000":
+        new_state: nxos_l2rib_pycl_client_id
+    "/isan/bin/l2rib_dt CONSUMER":
+        new_state: nxos_l2rib_pycl_consumer
     "exit":
       new_state: exec
     "rlogin lc1":
@@ -554,8 +582,36 @@ bash_n3k:
     "exit":
       new_state: exec_n3k
 
-nxos_l2rib_dt:
+nxos_l2rib_pycl_random:
+  prompt: "L2RIBCLIENT-90001>"
+  commands:
+    "help": "help"
+    "exit" :
+      new_state: bash
+
+nxos_l2rib_pycl_client_id:
   prompt: "L2RIBCLIENT-1000>"
+  commands:
+    "help": "help"
+    "exit" :
+      new_state: bash
+
+nxos_l2rib_pycl_consumer:
+  prompt: "L2RIBCLIENT-CONSUMER>"
+  commands:
+    "help": "help"
+    "exit" :
+      new_state: bash
+
+nxos_l2rib_pycl_prompt_delay_default:
+  prompt: "L2RIBCLIENT-PROMPT_DELAY_DEFAULT>"
+  commands:
+    "help": "help"
+    "exit" :
+      new_state: bash
+
+nxos_l2rib_pycl_prompt_delay_custom:
+  prompt: "L2RIBCLIENT-PROMPT_DELAY_CUSTOM>"
   commands:
     "help": "help"
     "exit" :

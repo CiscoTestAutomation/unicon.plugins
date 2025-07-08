@@ -32,7 +32,7 @@ class IosxeSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
                                     con.spawn,
                                     context=con.context,
                                     prompt_recovery=con.prompt_recovery)
-            if con.state_machine.current_state in ['acm', 'config']:
+            if con.state_machine.current_state in ['acm', 'config','rules']:
                 con.state_machine.go_to('enable',
                                         con.spawn,
                                         context=con.context,

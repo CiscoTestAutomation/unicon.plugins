@@ -56,18 +56,29 @@ class Configure(GenericConfigure):
         self.utils = ConfigUtils()
 
     def pre_service(self, *args, **kwargs):
+
         self.acm_configlet = kwargs.pop('acm_configlet', None)
+        self.rules = kwargs.pop('rules', False)
         self.prompt_recovery = kwargs.get('prompt_recovery', True)
 
         if self.acm_configlet:
             self.connection.state_machine.go_to('acm', self.connection.spawn,context={'acm_configlet': self.acm_configlet})
             self.start_state = 'acm'
             self.end_state = 'acm'
+
+        elif self.rules:
+            if self.connection.connected:
+                self.connection.state_machine.go_to('rules', self.connection.spawn)
+                self.start_state = 'rules'
+                self.end_state = 'rules'
+
         else:
             super().pre_service(*args, **kwargs)
 
     def post_service(self, *args, **kwargs):
         if self.acm_configlet:
+            self.connection.state_machine.go_to('enable', self.connection.spawn)
+        elif self.rules:
             self.connection.state_machine.go_to('enable', self.connection.spawn)
         else:
             super().post_service(*args, **kwargs)
@@ -115,17 +126,25 @@ class HAConfigure(GenericHAConfigure):
 
     def pre_service(self, *args, **kwargs):
         self.acm_configlet = kwargs.pop('acm_configlet', None)
+        self.rules = kwargs.pop('rules', False)
         self.prompt_recovery = kwargs.get('prompt_recovery', True)
 
         if self.acm_configlet:
             self.connection.state_machine.go_to('acm', self.connection.spawn,context={'acm_configlet': self.acm_configlet})
             self.start_state = 'acm'
             self.end_state = 'acm'
+        elif self.rules:
+            if self.connection.connected:
+                self.connection.state_machine.go_to('rules', self.connection.spawn)
+                self.start_state = 'rules'
+                self.end_state = 'rules'
         else:
             super().pre_service(*args, **kwargs)
 
     def post_service(self, *args, **kwargs):
         if self.acm_configlet:
+            self.connection.state_machine.go_to('enable', self.connection.spawn)
+        elif self.rules:
             self.connection.state_machine.go_to('enable', self.connection.spawn)
         else:
             super().post_service(*args, **kwargs)

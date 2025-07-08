@@ -238,6 +238,11 @@ general_enable:
           advanced configuration mode started.
           enter configuration commands, one per line.  end with cntl/z.
       new_state: acm_configlet
+    "acm rules":
+      response:
+        - |
+          Enter configuration rules mode, End with CNTL/Z.
+      new_state: acm_rules
     "long_hostname":
       new_state: general_enable_long_hostname
     "delete /force flash:CRFT_*": ""
@@ -320,6 +325,10 @@ general_enable:
     "set platform software selinux permissive": ""
 
     "set platform software selinux default": ""
+
+    "exit":
+      new_state: press_return
+
 
 general_maintence_mode_confirm:
   prompt: "Template default will be applied. Do you want to continue?[confirm] "
@@ -1553,6 +1562,28 @@ acm_if:
     "end":
       new_state: general_enable
 
+acm_rules:
+  prompt: "%N(rules)#"
+  commands:
+    "match mode mdt-subscription-mode command no":
+      response: "Match Rule exists with given submode: mdt-subscription-mode and cli_sring:no"
+      new_state: rules_match
+
+rules_match:
+  prompt: "%N(rules-match)#"
+  commands:
+    "match mode interface command no ip address 10.43.188.58 255.255.255.192":
+      response: "Match Rule exists with given submode: interface and cli_sring:no ip address 10.43.188.58 255.255.255.192"
+    "action pre-apply":
+      new_state: rules_match_action
+
+rules_match_action:
+  prompt: "%N(rules-match-action)#"
+  commands:
+    "end":
+      new_state: general_enable
+
+
 tclsh_long_hostname:
   prompt: "very-very-long-hostn(tcl)#"
   commands:
@@ -1625,7 +1656,6 @@ guestshell_prompt_obscure:
     "":
       new_state: guestshell_prompt_obscure_enable
 
-
 enable_slow_config:
   prompt: "%N#"
   commands:
@@ -1633,7 +1663,6 @@ enable_slow_config:
     "config term":
       new_state:
         slow_config_prompt
-
 
 slow_config_prompt:
     preface:
@@ -1645,7 +1674,6 @@ slow_config_prompt:
     prompt: "%N(config)#"
     commands:
       <<: *general_config_cmds
-
 
 rommon_command_output_not_a_prompt:
   prompt: "switch: "
@@ -1672,7 +1700,6 @@ rommon_command_output_not_a_prompt2:
     "boot":
       new_state: general_exec
 
-
 connection_refused:
   commands:
     "":
@@ -1698,7 +1725,6 @@ connection_refused_loop:
       response: |
         telnet: connect to address 127.0.0.1: Connection refused
 
-
 confirm_abort_copy:
   preface: |
     %Warning: File not a valid executable for this system
@@ -1718,7 +1744,6 @@ general_enable_reload_to_rommon:
     <<: *gen_enable_cmds
     "reload":
       new_state: press_return
-
 
 general_enable_no_operating_mode:
   prompt: "%N#"

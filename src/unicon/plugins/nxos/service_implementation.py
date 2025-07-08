@@ -1651,8 +1651,8 @@ class BashService(GenericBashService):
             return self
 
 
-class L2ribDtService(BaseService):
-    """ Service to provide an console to do l2rib commands
+class L2ribPyClService(BaseService):
+    """ Service to provide an console to do l2rib pycl commands
 
     Arguments:
         client_id: Client Id used for the client connection
@@ -1661,18 +1661,23 @@ class L2ribDtService(BaseService):
     Example:
         .. code-block:: python
 
-            with rtr.l2rib_dt(client_id=1000) as l2rib:
-                l2rib.execute('help')
+            with rtr.l2rib_pycl(client_id=1000) as l2rib_pycl:
+                l2rib_pycl.execute('help')
 
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.start_state = "l2rib_dt"
-        self.end_state = "l2rib_dt"
+        self.start_state = "l2rib_pycl"
+        self.end_state = "l2rib_pycl"
 
     def pre_service(self, *args, **kwargs):
         if kwargs.get('client_id'):
             self.context['_client_id'] = kwargs.get('client_id')
+
+        if kwargs.get('timeout'):
+            self.timeout = kwargs.get('timeout')
+        else:
+            self.timeout = 60 # default timeout
 
         super().pre_service(self,args,kwargs)
 
@@ -1686,10 +1691,6 @@ class L2ribDtService(BaseService):
 
         def __enter__(self):
             self.conn.log.debug('--- attaching l2rib console ---')
-
-            sm = self.conn.state_machine
-            sm.go_to('l2rib_dt', self.conn.spawn)
-
             return self
 
         def __exit__(self, exc_type, exc_value, exc_tb):
