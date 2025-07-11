@@ -117,6 +117,12 @@ c8kv_grub_menu:
     '':
       new_state: 'c8kv_grub_boot_image'
 
+c8kv_config_ca_trustpool:
+  prompt: "%N(ca-trustpool)#"
+  commands:
+    "end":
+      new_state: general_enable
+
 c8kv_grub_boot_image:
   prompt: |2
 

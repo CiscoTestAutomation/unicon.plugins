@@ -69,8 +69,15 @@ class GenericPatterns(UniconCorePatterns):
         # %Error opening tftp://255.255.255.255/switch-confg (Timed out)
         # LC/0/2/CPU0:Sep 10 00:54:42.841
         # RP/0/0/CPU0:Oct  9 01:44:47.875
-        self.syslog_message_pattern = r'^.*?(%\w+(-\S+)?-\d+-\w+|Guestshell destroyed successfully|%Error opening tftp:\/\/255\.255\.255\.255|Autoinstall trying|audit: kauditd hold queue overflow|(LC|RP)/\d+/\d+/CPU\d+:\w+\s+\d+\s+\d{2}:\d{2}:\d{2}).*\s*$'
-
+        # *May 28 09:01:05.136: yang-infra: Default hostkey created (NETCONF_SSH_RSA_KEY.server)
+        # *May 28 09:01:11.975: PKI_SSL_IPC: SUDI certificate chain and key pair are invalid
+        self.syslog_message_pattern = (
+            r"^.*?(%\w+(-\S+)?-\d+-\w+|"
+            r"yang-infra:|PKI_SSL_IPC:|Guestshell destroyed successfully|"
+            r"%Error opening tftp:\/\/255\.255\.255\.255|Autoinstall trying|"
+            r"audit: kauditd hold queue overflow|"
+            r"(LC|RP)/\d+/\d+/CPU\d+:\w+\s+\d+\s+\d{2}:\d{2}:\d{2}).*\s*$"
+        )
         self.config_locked = r'Configuration (mode )?(is )?locked|Config mode cannot be entered'
 
         self.config_start = r'Enter configuration commands, one per line\.\s+End with CNTL/Z\.\s*$'

@@ -580,8 +580,38 @@ reconnect_sleep           int (default 60 sec)        sleep time interval before
         result, output = rtr.reload(return_output=True)
 
 
+l2rib_pycl
+----------
+
+Layer 2 Routing Information Base (L2RIB) pyclient service.
+
+With this service, the l2rib tool can be used to execute l2rib_pycl commands.
+The service is intended to be used as a context manager, see example below.
+
+=======================   =======================     ===============================================
+Argument                  Type                        Description
+=======================   =======================     ===============================================
+client_id                 int or str                  (optional) Client identifier for l2rib_pycl tool.
+                                                      By default, a random ID will be used.
+=======================   =======================     ===============================================
+
+
+.. code-block:: python
+
+        # default client ID (random)
+        with rtr.l2rib_pycl() as l2rib_pycl:
+            l2rib_pycl.execute('l2rib command')
+
+        # specific client ID
+        with rtr.l2rib_pycl(client_id=1000) as l2rib_pycl:
+            l2rib_pycl.execute('l2rib command')
+
 l2rib_dt
 --------
+
+This service is similar to the l2rib_pycl service.
+It will be deprecated in the future and users are encouraged to use the
+l2rib_pycl service instead.
 
 Layer 2 Routing Information Base (L2RIB) developer tool service.
 

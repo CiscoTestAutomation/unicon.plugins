@@ -29,7 +29,7 @@ class IosXEPatterns(GenericPatterns):
         self.maintenance_mode_prompt = \
             r'^(.*?)(\(unlicensed\))?(WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(-standby)?(\(boot\))?\(maint-mode\)#[\s\x07]*$'
         self.press_enter = ReloadPatterns().press_enter
-        self.config_prompt = r'^(.*)\((?!.*pki-hexmode).*(con|cfg|ipsec-profile|ca-trustpoint|ca-certificate-map|cs-server|ca-profile|gkm-local-server|cloud|host-list|config-gkm-group|gkm-sa-ipsec|gdoi-coop-ks-config|wsma|enforce-rule|DDNS)\S*\)#\s?$'
+        self.config_prompt = r'^(.*)\((?!.*pki-hexmode).*(con|cfg|ipsec-profile|ca-trustpoint|ca-certificate-map|cs-server|ca-profile|gkm-local-server|cloud|host-list|config-gkm-group|gkm-sa-ipsec|gdoi-coop-ks-config|wsma|enforce-rule|DDNS|ca-trustpool)\S*\)#\s?$'
 
 
         self.config_pki_prompt = r'^(.*)\(config-pki-hexmode\)#\s?$'
@@ -42,6 +42,7 @@ class IosXEPatterns(GenericPatterns):
         self.macro_prompt = r'^(.*?)(\{\.\.\}|then.else.fi)\s*>\s*$'
         self.unable_to_create = r'^(.*?)Unable to create.*$'
         self.acm_prompt = r'^(.*?)\(acm.*?\)#[\s\x07]*$'
+        self.rules_prompt = r'^(.*?)\(rules.*?\)#[\s\x07]*$'
 
 
 class IosXEReloadPatterns(ReloadPatterns):

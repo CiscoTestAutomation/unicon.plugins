@@ -17,6 +17,7 @@ class StackIosXESwitchoverPatterns(SwitchoverPatterns):
         self.enable_prompt = IosXEPatterns().enable_prompt
         self.disable_prompt = IosXEPatterns().disable_prompt
         self.rommon_prompt = r'(.*)switch:\s?$'
+        self.fastreload_iosxeswitch = r'^.*Proceed with fast reload\? \[confirm\]'
         
 
 class StackIosXEReloadPatterns(ReloadPatterns):

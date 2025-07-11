@@ -151,6 +151,26 @@ spitfire_enable:
     "reload":
       new_state: spitfire_reload_confirm
 
+
+spitfire_enable2:
+  prompt: RP/0/RP0/CPU0:%N#
+  commands:
+    <<BR: *spitfire_enable_cmds
+    "show configuration lock":
+      response:
+        - |2
+          Thu Sep 19 14:50:51.247 UTC
+          Not exactly sure what the cli output is like as we only see it sometimes right after reimage and immediate login
+          For now putting some random data and will update once we capture the right cli output.
+        - |2
+          Thu Sep 19 14:50:51.247 UTC
+    "show ztp log | i 'SUCCESSFULLY'":
+      response:
+        - ""
+        - |2
+          Binary file (standard input) matches
+
+
 spitfire_reload_confirm:
   preface: |
     Fri Apr 22 01:29:55.844 UTC

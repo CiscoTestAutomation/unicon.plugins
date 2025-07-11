@@ -38,8 +38,14 @@ def send_config_cmd(state_machine, spawn, context):
     config_transition(state_machine, spawn, context)
 
 
-def shell_to_l2rib_dt_transition(state_machine, spawn, context):
-    spawn.sendline('/isan/bin/l2rib_dt %s' % context.get('_client_id', '-r'))
+def shell_to_l2rib_pycl_transition(state_machine, spawn, context):
+    l2rib_pycl_args = context.get('_client_id', '-r')
+    script = "if test -f /isan/bin/l2rib_pycl; then "\
+                f"/isan/bin/l2rib_pycl {l2rib_pycl_args} ; "\
+             "else "\
+                f"/isan/bin/l2rib_dt {l2rib_pycl_args} ; "\
+             "fi"
+    spawn.sendline(script)
 
 
 def shell_to_lc_shell_transition(state_machine, spawn, context):
@@ -65,7 +71,7 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         module_elam_insel = State('module_elam_insel', patterns.module_elam_insel_prompt)
         debug = State('debug', patterns.debug_prompt)
         sqlite = State('sqlite', patterns.sqlite_prompt)
-        l2rib_dt = State('l2rib_dt', patterns.l2rib_dt_prompt)
+        l2rib_pycl = State('l2rib_pycl', patterns.l2rib_pycl_prompt)
         boot = State('boot', patterns.boot_prompt)
         boot_config = State('boot_config', patterns.boot_config_prompt)
         lc_shell = State('lc_shell', patterns.lc_bash_prompt)
@@ -94,8 +100,8 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         debug_to_enable = Path(debug, enable, 'exit', None)
         sqlite_to_debug = Path(sqlite, debug, '.exit', None)
 
-        shell_to_l2rib_dt = Path(shell, l2rib_dt, shell_to_l2rib_dt_transition, None)
-        l2rib_dt_to_shell = Path(l2rib_dt, shell, 'exit', None)
+        shell_to_l2rib_pycl = Path(shell, l2rib_pycl, shell_to_l2rib_pycl_transition, None)
+        l2rib_pycl_to_shell = Path(l2rib_pycl, shell, 'exit', None)
 
         boot_to_boot_config = Path(boot, boot_config, 'config terminal', None)
         boot_config_to_boot = Path(boot_config, boot, 'end', None)
@@ -119,7 +125,7 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         self.add_state(module_elam_insel)
         self.add_state(debug)
         self.add_state(sqlite)
-        self.add_state(l2rib_dt)
+        self.add_state(l2rib_pycl)
         self.add_state(boot)
         self.add_state(boot_config)
         self.add_state(lc_shell)
@@ -137,8 +143,8 @@ class NxosSingleRpStateMachine(GenericSingleRpStateMachine):
         self.add_path(module_elam_insel_to_module)
         self.add_path(debug_to_enable)
         self.add_path(sqlite_to_debug)
-        self.add_path(shell_to_l2rib_dt)
-        self.add_path(l2rib_dt_to_shell)
+        self.add_path(shell_to_l2rib_pycl)
+        self.add_path(l2rib_pycl_to_shell)
         self.add_path(boot_to_boot_config)
         self.add_path(boot_config_to_boot)
         self.add_path(boot_to_enable)

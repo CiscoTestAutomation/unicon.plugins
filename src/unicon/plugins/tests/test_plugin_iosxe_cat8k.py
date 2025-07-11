@@ -41,7 +41,22 @@ class TestIosXeCat8kPlugin(unittest.TestCase):
         d.connect()
         d.disconnect()
 
-
+    def test_configure_ca_trustpool(self):
+        d = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe --state c8k_login --hostname WLC'],
+                       os='iosxe',
+                       platform='cat8k',
+                       credentials=dict(default=dict(username='admin', password='cisco')),
+                       settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+                       learn_hostname=True,
+                       log_buffer=True
+        )
+        try:
+            cmd = ['crypto pki trustpool policy', 'no crypto pki trustpool policy', 'end']
+            d.configure(cmd, timeout=60, error_pattern=[], service_dialogue=None)
+            self.assertEqual(d.state_machine.current_state, 'enable')
+        finally:
+            d.disconnect()
 
 class TestIosXECat8kPluginSwitchover(unittest.TestCase):
 

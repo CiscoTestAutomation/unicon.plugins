@@ -20,7 +20,7 @@ class SpitfireSingleRpConnectionProvider(IOSXRSingleRpConnectionProvider):
         """ Initializes the generic connection provider
         """
         super().__init__(*args, **kwargs)
-    
+
     def set_init_commands(self):
         con = self.connection
 
@@ -59,19 +59,19 @@ class SpitfireSingleRpConnectionProvider(IOSXRSingleRpConnectionProvider):
 
         for command in self.init_exec_commands:
             con.execute(command, prompt_recovery = self.prompt_recovery)
-    
+
         self.check_config_lock()
-        
+
         if not standby and len(self.init_config_commands):
             con.configure(self.init_config_commands, prompt_recovery = self.prompt_recovery)
 
     def check_config_lock(self,standby=False):
-        """ Check if config lock is held by anyone during initial 
+        """ Check if config lock is held by anyone during initial
         connect, as this can cause initial config set to fail.
         """
         con = self.connection
-        print("Checking for config lock") 
-        
+        print("Checking for config lock")
+
         t_out = SpitfireSettings.CONFIG_LOCK_TIMEOUT
         # Wait upto 10 mins for config lock to be cleared
         t_end = time.time() + t_out
@@ -82,14 +82,14 @@ class SpitfireSingleRpConnectionProvider(IOSXRSingleRpConnectionProvider):
             break
         else:
             raise Exception("Config lock not released even after 10 mins")
-        
+
         # Wait upto 10 mins for ztp configuration lock to be done
         t_end = time.time() + t_out
         while time.time() < t_end:
-            if len(con.execute("show ztp log | i 'SUCCESSFULLY'", prompt_recovery = self.prompt_recovery).strip().splitlines()) < 2:
-                time.sleep(10)
-                continue
-            break
+            output = con.execute("show ztp log | i 'SUCCESSFULLY'", prompt_recovery = self.prompt_recovery)
+            if ('Exiting SUCCESSFULLY' in output) or ('Binary file (standard input) matches' in output):
+                break
+            time.sleep(10)
         else:
             raise Exception("ZTP lock not exited even after 10 mins")
 
@@ -105,7 +105,7 @@ class SpitfireDualRpConnectionProvider(IOSXRDualRpConnectionProvider):
         """ Initializes the generic connection provider
         """
         super().__init__(*args, **kwargs)
-    
+
     def set_init_commands(self):
         con = self.connection
 
