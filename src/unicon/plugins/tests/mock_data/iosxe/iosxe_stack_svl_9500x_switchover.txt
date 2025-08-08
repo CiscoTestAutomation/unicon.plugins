@@ -1,0 +1,277 @@
+    Manual Swact = enabled
+Jul 11 19:53:05.729: %PMAN-3-RELOAD_RP: R0/0: pvp: Reloading: RP switchover initiated. This RP will be reloaded
+
+
+
+Initializing Hardware...
+
+Initializing Hardware......
+
+System Bootstrap, Version 17.12.1r[FC1], RELEASE SOFTWARE (P)
+Compiled Tue May  2 23:11:01 2023 by rel
+
+
+Current ROMMON image : Primary
+Last reset cause     : PowerCycleRequest
+
+C9500X-28C8D platform with 33554432 Kbytes of main memory
+
+Preparing to autoboot. [Press Ctrl-C to interrupt]  0
+boot: attempting to boot from [bootflash:packages.conf]
+boot: reading file packages.conf
+#
+##############################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################
+
+
+
+
+*Jul 11 19:55:25.086: %IOSXEBOOT-4-SMART_LOG: (local/local): Fri Jul 11 19:55:25 Universal 2025 INFO: Starting SMART daemon
+
+              Restricted Rights Legend
+
+Use, duplication, or disclosure by the Government is
+subject to restrictions as set forth in subparagraph
+(c) of the Commercial Computer Software - Restricted
+Rights clause at FAR sec. 52.227-19 and subparagraph
+(c) (1) (ii) of the Rights in Technical Data and Computer
+Software clause at DFARS sec. 252.227-7013.
+
+           Cisco Systems, Inc.
+           170 West Tasman Drive
+           San Jose, California 95134-1706
+
+
+
+Cisco IOS Software [Dublin], Catalyst L3 Switch Software (CAT9K_IOSXE), Version 17.12.6prd2, RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2025 by Cisco Systems, Inc.
+Compiled Wed 09-Jul-25 14:28 by mcpre
+
+
+This software version supports only Smart Licensing as the software licensing mechanism.
+
+
+PLEASE READ THE FOLLOWING TERMS CAREFULLY. INSTALLING THE LICENSE OR
+LICENSE KEY PROVIDED FOR ANY CISCO SOFTWARE PRODUCT, PRODUCT FEATURE,
+AND/OR SUBSEQUENTLY PROVIDED SOFTWARE FEATURES (COLLECTIVELY, THE
+"SOFTWARE"), AND/OR USING SUCH SOFTWARE CONSTITUTES YOUR FULL
+ACCEPTANCE OF THE FOLLOWING TERMS. YOU MUST NOT PROCEED FURTHER IF YOU
+ARE NOT WILLING TO BE BOUND BY ALL THE TERMS SET FORTH HEREIN.
+
+Your use of the Software is subject to Cisco's General Terms and any
+relevant supplemental terms found at
+https://www.cisco.com/site/us/en/about/legal/contract-experience/index.html.
+
+You hereby acknowledge and agree that certain Software and/or features are
+licensed for a particular term, that the license to such Software and/or
+features is valid only for the applicable term and that such Software and/or
+features may be shut down or otherwise terminated by Cisco after expiration
+of the applicable license term (e.g., 90-day trial period). Cisco reserves
+the right to terminate any such Software feature electronically or by any
+other means available. While Cisco may provide alerts, it is your sole
+responsibility to monitor your usage of any such term Software feature to
+ensure that your systems and networks are prepared for a shutdown of the
+Software feature.
+
+
+
+FIPS key on Standby is not configured.
+If Active is  FIPS configured, please make sure to configure FIPS on Standby also.
+Else switch is in non-standard operating mode.
+cisco C9500X-28C8D (X86) processor (revision V00) with 241011K bytes of memory.
+Processor board ID FDO25401712
+0 Virtual Ethernet interface
+28 Hundred Gigabit Ethernet interfaces
+8 Four Hundred Gigabit Ethernet interfaces
+8192K bytes of non-volatile configuration memory.
+33554432K bytes of physical memory.
+11161600K bytes of Bootflash at bootflash:.
+1638400K bytes of Crash Files at crashinfo:.
+234430023K bytes of SATA hard disk at disk0:.
+
+Base Ethernet MAC Address          : 80:24:8f:24:24:00
+Motherboard Assembly Number        : 4DBE
+Motherboard Serial Number          : FDO25390VQT
+Model Revision Number              : V02
+Motherboard Revision Number        : 3
+Model Number                       : C9500X-28C8D
+System Serial Number               : FDO25401712
+
+SETUP: new interface Vlan1 placed in "shutdown" state
+
+
+Press RETURN to get started!
+
+
+*Jul 11 19:56:05.476: %CRYPTO-5-SELF_TEST_START: Crypto algorithms release (Rel5a), Entropy release (3.4.1)
+       begin self-test
+*Jul 11 19:56:05.866: %CRYPTO-5-SELF_TEST_END: Crypto algorithms self-test completed successfully
+       All tests passed.
+*Jul 11 19:56:08.424: %CRYPTO-4-AUDITWARN: Encryption audit check could not be performed
+*Jul 11 19:56:08.424: %CRYPTO_ENGINE-4-CSDL_COMPLIANCE_DISABLED: Cisco PSB security compliance has been disabled by platform
+*Jul 11 19:56:09.481: %LINEPROTO-5-UPDOWN: Line protocol on Interface Loopback999999, changed state to up
+*Jul 11 19:56:09.486: %SYS-7-NVRAM_INIT_WAIT_TIME: Waited 0 seconds for NVRAM to be available
+*Jul 11 19:56:09.552: %CLNS-6-DFT_OPT: Protocol timers for fast convergence are Enabled.
+*Jul 11 19:56:09.836: %LINK-3-UPDOWN: Interface LIIN27/2, changed state to up
+*Jul 11 19:56:10.829: %LINK-3-UPDOWN: Interface , changed state to up
+*Jul 11 19:56:10.835: %LINEPROTO-5-UPDOWN: Line protocol on Interface LIIN27/2, changed state to up
+*Jul 11 19:56:11.829: %LINEPROTO-5-UPDOWN: Line protocol on Interface , changed state to up
+*Jul 11 19:56:28.487: %LINK-5-CHANGED: Interface Vlan1, changed state to administratively down
+*Jul 11 19:56:28.499: %IOSXE_OIR-6-REMSPA: SPA removed from subslot 1/0, interfaces disabled
+*Jul 11 19:56:28.561: %SPA_OIR-6-OFFLINECARD: SPA (C9500X-28C8D) offline in subslot 1/0
+*Jul 11 19:56:28.561: %CRYPTO-5-SELF_TEST_START: Crypto algorithms release (Rel5a), Entropy release (3.4.1)
+       begin self-test
+*Jul 11 19:56:28.596: %IOSXE_OIR-6-INSCARD: Card (fp) inserted in slot F0
+*Jul 11 19:56:28.596: %IOSXE_OIR-6-ONLINECARD: Card (fp) online in slot F0
+*Jul 11 19:56:28.596: %IOSXE_OIR-6-INSCARD: Card (cc) inserted in slot 1
+*Jul 11 19:56:28.596: %IOSXE_OIR-6-ONLINECARD: Card (cc) online in slot 1
+*Jul 11 19:56:28.652: %IOSXE_OIR-6-INSSPA: SPA inserted in subslot 1/0
+*Jul 11 19:56:28.655: %SYS-5-CONFIG_P: Configured programmatically by process IOSXE CEOBC config from console as vty2
+*Jul 11 19:56:28.754: %SYS-5-RESTART: System restarted --
+Cisco IOS Software [Dublin], Catalyst L3 Switch Software (CAT9K_IOSXE), Version 17.12.6prd2, RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2025 by Cisco Systems, Inc.
+Compiled Wed 09-Jul-25 14:28 by mcpre
+*Jul 11 19:56:28.968: %CLNS-6-DFT_OPT: Protocol timers for fast convergence are Enabled.
+*Jul 11 19:56:29.106: %CRYPTO-5-SELF_TEST_END: Crypto algorithms self-test completed successfully
+       All tests passed.
+*Jul 11 19:56:30.499: %LINK-5-CHANGED: Interface HundredGigE0/1, changed state to administratively down
+*Jul 11 19:56:30.499: %LINK-5-CHANGED: Interface HundredGigE0/2, changed state to administratively down
+*Jul 11 19:56:30.500: %LINK-5-CHANGED: Interface HundredGigE0/3, changed state to administratively down
+*Jul 11 19:56:30.500: %LINK-5-CHANGED: Interface HundredGigE0/4, changed state to administratively down
+*Jul 11 19:56:30.500: %LINK-5-CHANGED: Interface HundredGigE0/5, changed state to administratively down
+*Jul 11 19:56:30.501: %LINK-5-CHANGED: Interface HundredGigE0/6, changed state to administratively down
+*Jul 11 19:56:30.501: %LINK-5-CHANGED: Interface HundredGigE0/7, changed state to administratively down
+*Jul 11 19:56:30.501: %LINK-5-CHANGED: Interface HundredGigE0/8, changed state to administratively down
+*Jul 11 19:56:30.501: %LINK-5-CHANGED: Interface HundredGigE0/9, changed state to administratively down
+*Jul 11 19:56:30.502: %LINK-5-CHANGED: Interface HundredGigE0/10, changed state to administratively down
+*Jul 11 19:56:30.502: %LINK-5-CHANGED: Interface HundredGigE0/11, changed state to administratively down
+*Jul 11 19:56:30.502: %LINK-5-CHANGED: Interface HundredGigE0/12, changed state to administratively down
+*Jul 11 19:56:30.504: %LINK-5-CHANGED: Interface HundredGigE0/13, changed state to administratively down
+*Jul 11 19:56:30.504: %LINK-5-CHANGED: Interface HundredGigE0/14, changed state to administratively down
+*Jul 11 19:56:30.504: %LINK-5-CHANGED: Interface FourHundredGigE0/15, changed state to administratively down
+*Jul 11 19:56:30.504: %LINK-5-CHANGED: Interface FourHundredGigE0/16, changed state to administratively down
+*Jul 11 19:56:30.504: %LINK-5-CHANGED: Interface FourHundredGigE0/17, changed state to administratively down
+*Jul 11 19:56:30.504: %LINK-5-CHANGED: Interface FourHundredGigE0/18, changed state to administratively down
+*Jul 11 19:56:30.504: %LINK-5-CHANGED: Interface FourHundredGigE0/19, changed state to administratively down
+*Jul 11 19:56:30.505: %LINK-5-CHANGED: Interface FourHundredGigE0/20, changed state to admate to administratively down
+*Jul 11 19:56:30.505: %LINK-5-CHANGED: Interface FourHundredGigE0/22, changed state to administratively down
+*Jul 11 19:56:30.506: %LINK-5-CHANGED: Interface HundredGigE0/23, changed state to administratively down
+*Jul 11 19:56:30.506: %LINK-5-CHANGED: Interface HundredGigE0/24, changed state to administratively down
+*Jul 11 19:56:30.506: %LINK-5-CHANGED: Interface HundredGigE0/25, changed state to administratively down
+*Jul 11 19:56:30.508: %LINK-5-CHANGED: Interface HundredGigE0/26, changed state to administratively down
+*Jul 11 19:56:30.508: %LINK-5-CHANGED: Interface HundredGigE0/27, changed state to administratively down
+*Jul 11 19:56:30.508: %LINK-5-CHANGED: Interface HundredGigE0/28, changed state to administratively down
+*Jul 11 19:56:30.508: %LINK-5-CHANGED: Interface HundredGigE0/29, changed state to administratively down
+*Jul 11 19:56:30.508: %LINK-5-CHANGED: Interface HundredGigE0/30, changed state to administratively down
+*Jul 11 19:56:30.508: %LINK-5-CHANGED: Interface HundredGigE0/31, changed state to administratively down
+*Jul 11 19:56:30.508: %LINK-5-CHANGED: Interface HundredGigE0/32, changed state to administratively down
+*Jul 11 19:56:30.509: %LINK-5-CHANGED: Interface HundredGigE0/33, changed state to administratively down
+*Jul 11 19:56:30.509: %LINK-5-CHANGED: Interface HundredGigE0/34, changed state to administratively down
+*Jul 11 19:56:30.509: %LINK-5-CHANGED: Interface AppGigabitEthernet0/1, changed state to administratively down
+*Jul 11 19:56:30.510: %LINK-5-CHANGED: Interface AppGigabitEthernet0/2, changed state to administratively down
+*Jul 11 19:56:30.510: %LINK-5-CHANGED: Interface HundredGigE0/1/1, changed state to administratively down
+*Jul 11 19:56:30.510: %LINK-5-CHANGED: Interface HundredGigE0/1/2, changed state to administratively down
+*Jul 11 19:56:30.512: %LINK-5-CHANGED: Interface HundredGigE0/1/3, changed state to administratively down
+*Jul 11 19:56:30.512: %LINK-5-CHANGED: Interface HundredGigE0/1/4, changed state to administratively down
+*Jul 11 19:56:38.608: %LINK-3-UPDOWN: Interface CEOBC, changed state to up
+*Jul 11 19:56:39.608: %LINEPROTO-5-UPDOWN: Line protocol on Interface CEOBC, changed state to up
+*Jul 11 19:56:48.942: %PKI-6-SUDI_INFO: PKI: platform doesn't support sudi certificate
+*Jul 11 19:56:48.942: %PKI-6-SUDI_INFO: PKI: no sudi certificate is installed
+*Jul 11 19:56:48.942: %PKI-2-NON_AUTHORITATIVE_CLOCK: PKI functions can not be initialized until an authoritative time source, like NTP, can be obtained.
+*Jul 11 19:56:55.339: %SPA_OIR-6-ONLINECARD: SPA (C9500X-28C8D) online in subslot 1/0
+*Jul 11 19:57:10.423: %LINK-3-UPDOWN: Interface HundredGigE0/35, changed state to up
+*Jul 11 19:57:11.647: %LINK-3-UPDOWN: Interface HundredGigE0/36, changed state to up
+*Jul 11 19:57:12.300: %LINK-3-UPDOWN: Interface Port-channel241, changed state to up
+*Jul 11 19:57:13.299: %LINEPROTO-5-UPDOWN: Line protocol on Interface HundredGigE0/35, changed state to up
+*Jul 11 19:57:13.300: %LINEPROTO-5-UPDOWN: Line protocol on Interface Port-channel241, changed state to up
+*Jul 11 19:57:14.286: %CLNS-5-ADJCHANGE: ISIS: Adjacency to 1430.3602.8000 (Port-channel241) topology changed, TID (0) added, locally configured
+*Jul 11 19:57:14.286: %CLNS-5-ADJCHANGE: ISIS: Adjacency to 1430.3602.8000 (Port-channel241)  , adjacency type changed
+*Jul 11 19:57:14.644: %LINEPROTO-5-UPDOWN: Line protocol on Interface HundredGigE0/36, changed state to up
+*Jul 11 19:57:15.286: %CLNS-5-ADJCHANGE: ISIS: Adjacency to 1430.3602.8000 (Port-channel241) Up, new adjacency
+*Jul 11 19:57:16.286: %CLNS-5-ADJCHANGE: ISIS: Adjacency to sw.80248F241C00 (Port-channel241) Up, new adjacency
+*Jul 11 19:57:25.234: %SYS-5-CONFIG_P: Configured programmatically by process IOSD ipc task from console as vty2
+              Restricted Rights Legend
+
+Use, duplication, or disclosure by the Government is
+subject to restrictions as set forth in subparagraph
+(c) of the Commercial Computer Software - Restricted
+Rights clause at FAR sec. 52.227-19 and subparagraph
+(c) (1) (ii) of the Rights in Technical Data and Computer
+Software clause at DFARS sec. 252.227-7013.
+
+           Cisco Systems, Inc.
+           170 West Tasman Drive
+           San Jose, California 95134-1706
+
+
+
+Cisco IOS Software [Dublin], Catalyst L3 Switch Software (CAT9K_IOSXE), Version 17.12.6prd2, RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2025 by Cisco Systems, Inc.
+Compiled Wed 09-Jul-25 14:28 by mcpre
+
+
+This software version supports only Smart Licensing as the software licensing mechanism.
+
+
+PLEASE READ THE FOLLOWING TERMS CAREFULLY. INSTALLING THE LICENSE OR
+LICENSE KEY PROVIDED FOR ANY CISCO SOFTWARE PRODUCT, PRODUCT FEATURE,
+AND/OR SUBSEQUENTLY PROVIDED SOFTWARE FEATURES (COLLECTIVELY, THE
+"SOFTWARE"), AND/OR USING SUCH SOFTWARE CONSTITUTES YOUR FULL
+ACCEPTANCE OF THE FOLLOWING TERMS. YOU MUST NOT PROCEED FURTHER IF YOU
+ARE NOT WILLING TO BE BOUND BY ALL THE TERMS SET FORTH HEREIN.
+
+Your use of the Software is subject to Cisco's General Terms and any
+relevant supplemental terms found at
+https://www.cisco.com/site/us/en/about/legal/contract-experience/index.html.
+
+You hereby acknowledge and agree that certain Software and/or features are
+licensed for a particular term, that the license to such Software and/or
+features is valid only for the applicable term and that such Software and/or
+features may be shut down or otherwise terminated by Cisco after expiration
+of the applicable license term (e.g., 90-day trial period). Cisco reserves
+the right to terminate any such Software feature electronically or by any
+other means available. While Cisco may provide alerts, it is your sole
+responsibility to monitor your usage of any such term Software feature to
+ensure that your systems and networks are prepared for a shutdown of the
+Software feature.
+
+
+
+FIPS key on Standby is not configured.
+If Active is  FIPS configured, please make sure to configure FIPS on Standby also.
+Else switch is in non-standard operating mode.
+cisco C9500X-28C8D (X86) processor (revision V00) with 6020467K/6147K bytes of memory.
+Processor board ID FDO25401712
+0 Virtual Ethernet interface
+32768K bytes of non-volatile configuration memory.
+33554432K bytes of physical memory.
+11161600K bytes of Bootflash at bootflash:.
+11161600K bytes of Bootflash at bootflash-1-0:.
+1638400K bytes of Crash Files at crashinfo:.
+1638400K bytes of Crash Files at crashinfo-1-0:.
+234430023K bytes of SATA hard disk at disk0:.
+234430023K bytes of SATA hard disk at disk0-1-0:.
+
+Base Ethernet MAC Address          : 80:24:8f:24:1c:00
+Motherboard Assembly Number        :
+Motherboard Serial Number          : FDO25390VQH
+Model Revision Number              : V02
+Motherboard Revision Number        :
+Model Number                       : C9500X-28C8D
+System Serial Number               : FDO25401715
+
+Switch 02
+---------
+Base Ethernet MAC Address          : 80:24:8f:24:24:00
+Motherboard Assembly Number        : 4DBE
+Motherboard Serial Number          : FDO25390VQT
+Model Revision Number              : V02
+Motherboard Revision Number        : 3
+Model Number                       : C9500X-28C8D
+System Serial Number               : FDO25401712
+
+
+
+Press RETURN to get started!

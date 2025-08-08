@@ -45,6 +45,17 @@ class Execute(svc.Execute):
         # Connection object will have all the received details
         super().__init__(connection, context, **kwargs)
         self.dialog += Dialog(execution_statement_list)
+        self.UNSUPPORTED_START_STATES = ['monitor']
+
+    def pre_service(self, *args, **kwargs):
+        # If the connection is in a unsupported state, go to enable mode
+        if self.connection.state_machine.current_state in \
+                self.UNSUPPORTED_START_STATES:
+            sm = self.get_sm()
+            sm.go_to('enable',
+                     self.connection.spawn,
+                     timeout=self.connection.spawn.settings.EXEC_TIMEOUT)
+        super().pre_service(*args, **kwargs)
 
 
 class Configure(svc.Configure):
@@ -194,7 +205,7 @@ class Switchover(BaseService):
         con.active.spawn.sendline(command)
         try:
             self.result = dialog.process(con.active.spawn,
-                           timeout=self.timeout,
+                           timeout=timeout,
                            prompt_recovery=self.prompt_recovery,
                            context=con.active.context)
         except SubCommandFailure as err:
@@ -571,7 +582,10 @@ class Monitor(BaseService):
             conn.log.info('Monitor not running')
             return
 
-        conn.state_machine.go_to('enable', conn.spawn)
+        conn.state_machine.go_to(
+            'enable',
+            conn.spawn,
+            timeout=conn.spawn.settings.EXEC_TIMEOUT)
 
         # Grab output after stopping monitor
         output = self.get_buffer(truncate=True)

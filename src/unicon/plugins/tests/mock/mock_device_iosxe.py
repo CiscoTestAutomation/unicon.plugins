@@ -206,6 +206,9 @@ class MockDeviceTcpWrapperIOSXE(MockDeviceTcpWrapper):
         if 'stack' in kwargs and kwargs['stack']:
             kwargs.pop('stack')
             self.mockdevice = MockDeviceStackIOSXE(*args, **kwargs)
+        elif 'stackwise_virtual' in kwargs and kwargs['stackwise_virtual']:
+            kwargs.pop('stackwise_virtual')
+            self.mockdevice = MockDeviceSVLStackIOSXE(*args, **kwargs)
         elif 'quad' in kwargs and kwargs['quad']:
             kwargs.pop('quad')
             self.mockdevice = MockDeviceQuadIOSXE(*args, **kwargs)
@@ -237,6 +240,45 @@ class MockDeviceStackIOSXE(MockDevice):
                 for other in self.transport_handles:
                     prompt = self.get_prompt(other)
                     self._write('\n{}'.format(prompt), other)
+
+    def update_show_switch(self, transport):
+        port = self.transport_handles[transport]
+        switch_no = self.transport_ports[port]['switch_no']
+        data  = 'Switch/Stack Mac Address : 5897.bd36.b380 - Local Mac Address\n'\
+                'Mac persistency wait time: Indefinite\n'\
+                '                                             H/W   Current\n'\
+                'Switch#   Role    Mac Address     Priority Version  State\n'\
+                '-------------------------------------------------------------------\n'
+
+        for i in self.transport_ports.values():
+            switch_line = '{star}{num}       {role}   5897.bd36.b380     3      V01     {state}  \n'
+            if i['switch_no'] == switch_no:
+                star = '*'
+            else:
+                star = ' '
+            switch_line = switch_line.format(star=star, num=i['switch_no'], role=i['role'], state=i['switch_state'])
+            data += switch_line
+        self.mock_data['stack_enable']['commands']['show switch'] = data
+
+
+class MockDeviceSVLStackIOSXE(MockDevice):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, device_os="iosxe", **kwargs)
+
+    def svl_stack_enable(self, transport, cmd):
+        port = self.transport_handles[transport]
+        ports = [p for p in self.transport_ports.keys() if p != port]
+
+        if cmd == 'show switch':
+            self.update_show_switch(transport)
+        if cmd == "redundancy force-switchover":
+            for idx, port in enumerate(ports):
+                if idx == 0:
+                    # standby -> active
+                    self.set_state(port, 'svl_stack_enable')
+                elif idx == 1:
+                    # active -> standby
+                    self.set_state(port, 'svl_standby_switchover')
 
     def update_show_switch(self, transport):
         port = self.transport_handles[transport]
@@ -297,6 +339,7 @@ def main(args=None):
         parser.add_argument('--ha', action='store_true', help='HA mode')
         parser.add_argument('--hostname', help='Device hostname (default: Switch')
         parser.add_argument('--stack', action='store_true', help='Stack mode')
+        parser.add_argument('--stackwise_virtual', action='store_true', help='SVL Stack mode')
         parser.add_argument('-d', action='store_true', help='Debug')
         args = parser.parse_args()
 
@@ -315,8 +358,12 @@ def main(args=None):
         hostname = 'Switch'
 
     if args.ha:
-        md = MockDeviceTcpWrapperIOSXE(hostname=hostname, state=state, stack=args.stack)
-        md.run()
+        if args.stack:
+            md = MockDeviceTcpWrapperIOSXE(hostname=hostname, state=state, stack=args.stack)
+            md.run()
+        elif args.stackwise_virtual:
+            md = MockDeviceTcpWrapperIOSXE(hostname=hostname, state=state, stackwise_virtual=args.stackwise_virtual)
+            md.run()
     else:
         md = MockDeviceIOSXE(hostname=hostname, state=state)
         md.run()

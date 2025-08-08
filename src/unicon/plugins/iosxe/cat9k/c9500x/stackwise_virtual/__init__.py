@@ -13,6 +13,7 @@ class IosXEC9500xStackwiseVirtualServiceList(StackIosXEServiceList):
     def __init__(self):
         super().__init__()
         self.reload = svc.SVLStackReload
+        self.switchover = svc.SVLStackSwitchover
 
 
 class IosXEC9500xStackwiseVirtualRPConnection(IosXEStackRPConnection):

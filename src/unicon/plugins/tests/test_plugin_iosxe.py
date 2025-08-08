@@ -874,6 +874,19 @@ class TestIosXEDiol(unittest.TestCase):
 
 class TestIosXEConfigure(unittest.TestCase):
 
+    def test_configure_cert_trustpool(self):
+        c = Connection(hostname='RouterRP',
+                       start=['mock_device_cli --os iosxe --state general_config --hostname RouterRP'],
+                       os='iosxe',
+                       mit=True,
+                       init_exec_commands=[],
+                       init_config_commands=[],
+                       log_buffer=True
+                       )
+        c.connect()
+        c.configure(['crypto pki certificate pool', 'cabundle nvram:ios_core.p7b'])
+        c.disconnect()
+
     def test_configure_are_you_sure_ywtdt(self):
         c = Connection(hostname='RouterRP',
                        start=['mock_device_cli --os iosxe --state general_enable --hostname RouterRP'],

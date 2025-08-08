@@ -11,7 +11,8 @@ from unicon.bases.routers.services import BaseService
 from unicon.plugins.iosxe.stack.utils import StackUtils
 from unicon.plugins.generic.statements import custom_auth_statements
 from unicon.plugins.iosxe.stack.service_statements import (switch_prompt,
-                                                           stack_reload_stmt_list)
+                                                           stack_reload_stmt_list,
+                                                           stack_switchover_stmt_list)
 
 utils = StackUtils()
 
@@ -247,3 +248,110 @@ class SVLStackReload(BaseService):
         if return_output:
             Result = namedtuple('Result', ['result', 'output'])
             self.result = Result(self.result, reload_cmd_output.match_output.replace(reload_cmd, '', 1))
+
+
+class SVLStackSwitchover(BaseService):
+    """ Get Rp state
+
+    Service to get the redundancy state of the device rp.
+
+    Arguments:
+        target: Service target, by default active
+
+    Returns:
+        Expected return values are ACTIVE, STANDBY, MEMBER
+        raise SubCommandFailure on failure.
+
+    Example:
+        .. code-block:: python
+
+            rtr.get_rp_state()
+            rtr.get_rp_state(target='standby')
+    """
+
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.start_state = 'enable'
+        self.end_state = 'enable'
+        self.timeout = connection.settings.STACK_SWITCHOVER_TIMEOUT
+        self.command = "redundancy force-switchover"
+        self.dialog = Dialog(stack_switchover_stmt_list)
+        self.__dict__.update(kwargs)
+
+    def call_service(self, command=None,
+                     reply=Dialog([]),
+                     timeout=None,
+                     *args, **kwargs):
+
+        switchover_cmd = command or self.command
+        timeout = timeout or self.timeout
+        conn = self.connection.active
+
+        expected_active_sw = self.connection.standby.member_id
+        dialog = self.dialog
+
+        if reply:
+            dialog = reply + self.dialog
+
+        # added connection dialog in case switchover ask for username/password
+        connect_dialog = self.connection.connection_provider.get_connection_dialog()
+        dialog += connect_dialog
+
+        conn.log.info('Processing on active rp %s-%s' % (conn.hostname, conn.alias))
+        conn.sendline(switchover_cmd)
+        try:
+            # A loop has been implemented to handle the
+            # "Press RETURN to get started" prompt twice. Based on extensive
+            # testing during SVL reloads on 9500x devices, it was observed
+            # that the device is not fully ready after the first prompt.
+            # As a result, the logic accounts for this behavior by waiting for
+            # the second occurrence of the message, which is assumed to be the
+            # default behavior for these devices.
+            for _ in range(2):
+                match_object = dialog.process(conn.spawn, timeout=timeout,
+                                            prompt_recovery=self.prompt_recovery,
+                                            context=conn.context)
+        except Exception as e:
+            raise SubCommandFailure('Error during switchover ', e) from e
+
+        # try boot up original active rp with current active system
+        # image, if it moved to rommon state.
+        if 'state' in conn.context and conn.context.state == 'rommon':
+            try:
+                conn.state_machine.detect_state(conn.spawn, context=conn.context)
+                conn.state_machine.go_to('enable', conn.spawn, timeout=timeout,
+                                         prompt_recovery=self.prompt_recovery,
+                                         context=conn.context, dialog=Dialog([switch_prompt]))
+            except Exception as e:
+                self.connection.log.warning('Fail to bring up original active rp from rommon state.', e)
+            finally:
+                conn.context.pop('state')
+
+        # To ensure the stack is ready to accept the login
+        self.connection.log.info('Sleeping for %s secs.' % \
+                                 self.connection.settings.POST_SWITCHOVER_SLEEP)
+        sleep(self.connection.settings.POST_SWITCHOVER_SLEEP)
+
+        # check all members are ready
+        conn.state_machine.detect_state(conn.spawn, context=conn.context)
+
+        interval = self.connection.settings.SWITCHOVER_POSTCHECK_INTERVAL
+        if utils.is_all_member_ready(conn, timeout=timeout, interval=interval):
+            self.connection.log.info('All members are ready.')
+        else:
+            self.connection.log.info('Timeout in %s secs. '
+                'Not all members are in Ready state.' % timeout)
+            self.result = False
+            return
+
+        self.connection.log.info('Disconnecting and reconnecting')
+        self.connection.disconnect()
+        self.connection.connect()
+
+        self.connection.log.info('Verifying active and standby switch State.')
+        if self.connection.active.member_id == expected_active_sw:
+            self.connection.log.info('Switchover successful')
+            self.result = True
+        else:
+            self.connection.log.info('Switchover failed')
+            self.result = False

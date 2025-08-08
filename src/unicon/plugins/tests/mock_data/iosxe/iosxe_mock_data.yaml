@@ -452,6 +452,8 @@ general_config:
       new_state: general_config_ca_profile
     "crypto pki trustpoint test":
       new_state: general_config_crypto_trustpoint
+    "crypto pki certificate pool":
+      new_state: cert_trustpool
     "no logging console": ""
     "line vty 0 4":
       new_state: general_config_line
@@ -617,6 +619,12 @@ general_config_certificate_map:
   commands:
     "end":
       new_state: general_enable
+
+cert_trustpool:
+  prompt: "%N(cert-trustpool)#"
+  commands:
+    "cabundle nvram:ios_core.p7b":
+      new_state: general_config
 
 ip_ddns_update_method:
   prompt: "%N(DDNS-update-method)#"
