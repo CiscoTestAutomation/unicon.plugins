@@ -1530,6 +1530,23 @@ monitor_interface_iface:
       new_state: enable
 
 
+monitor_interface_slow_stop:
+  preface: |
+    R1                   Monitor Time: 00:00:02          SysUptime: 22:48:09
+
+    Quit='q',     Clear='c',    Freeze='f', Thaw='t',
+    Next set='n', Prev set='p', Bytes='y',  Packets='k'
+  prompt: "(General='g', IPv4 Uni='4u', IPv4 Multi='4m', IPv6 Uni='6u', IPv6 Multi='6m')"
+  keys:
+    "q":
+      new_state: enable
+      response: ""
+      # wait 15 seconds before transitioning
+      timing:
+      - 0:,15
+
+
+
 enable7:
   prompt: "RP/0/RP0/CPU0:%N#"
   commands:

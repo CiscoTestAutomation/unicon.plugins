@@ -56,4 +56,4 @@ class IOSXRPatterns(GenericPatterns):
         # r1          Monitor Time: 00:00:06          SysUptime: 15:48:49
         self.monitor_time_regex = r'(?P<hostname>\S+).*?Monitor Time: (?P<time>\d+:\d+:\d+).*?SysUptime: (?P<uptime>\S+)'
         # Quit='q', Freeze='f', Thaw='t', Clear='c', Interface='i',
-        self.monitor_command_pattern = r"\s*(?P<command>[\w\s]+)='(?P<key>\w+)'"
+        self.monitor_command_pattern = r"\s*(?P<command>[\w ]+)='(?P<key>\w+)'"

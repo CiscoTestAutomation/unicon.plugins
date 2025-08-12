@@ -5,7 +5,7 @@ from unicon.plugins.iosxe.stack import StackIosXEServiceList
 from unicon.plugins.iosxe.stack import IosXEStackRPConnection
 from .connection_provider import StackwiseVirtualConnectionProvider
 
-from unicon.plugins.iosxe.stack.service_implementation import StackReload
+from unicon.plugins.iosxe.stack.service_implementation import StackReload, StackSwitchover
 
 
 class IosXECat9kStackwiseVirtualServiceList(StackIosXEServiceList):
@@ -13,6 +13,7 @@ class IosXECat9kStackwiseVirtualServiceList(StackIosXEServiceList):
     def __init__(self):
         super().__init__()
         self.reload = StackReload
+        self.switchover = StackSwitchover
 
 
 class IosXECat9kStackwiseVirtualRPConnection(IosXEStackRPConnection):

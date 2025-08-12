@@ -1,16 +1,16 @@
-stack_login:
+svl_stack_login:
     prompt: "Username: "
     commands:
       "cisco":
-        new_state: stack_password
+        new_state: svl_stack_password
 
-stack_password:
+svl_stack_password:
   prompt: "Password: "
   commands:
     "cisco":
-      new_state: stack_exec
+      new_state: svl_stack_exec
 
-stack_exec:
+svl_stack_exec:
   prompt: "%N>"
   commands:
     "term length 0": ""
@@ -22,12 +22,8 @@ stack_exec:
                                                   H/W   Current
       Switch#   Role    Mac Address     Priority Version  State
       -------------------------------------------------------------------------------------
-       1       Member   bcc4.9346.7880     1      V01     Ready
+       1       Standby   bcc4.9346.7880     1      V01     Ready
       *2       Active   bcc4.9346.9180     3      V04     Ready
-       3       Member   bcc4.9346.7a00     1      V04     Ready
-       4       Standby  bcc4.9346.6780     1      V04     Ready
-       5       Member   bcc4.9346.7280     1      V04     Ready
-       10      Standby  e069.ba68.5900     13     PP      Ready
 
     "show version": &SV |2
       Cisco IOS XE Software, Version BLD_V1612_THROTTLE_LATEST_20200403_053502_V16_12_3_6
@@ -118,9 +114,6 @@ stack_exec:
       ------ ----- -----              ----------        ----------            ----
           1 32    WS-C3850-24P       16.12.4           CAT3K_CAA-UNIVERSALK9 BUNDLE
       *   2 32    WS-C3850-24P       16.12.4           CAT3K_CAA-UNIVERSALK9 BUNDLE
-          3 32    WS-C3850-24P       16.12.4           CAT3K_CAA-UNIVERSALK9 BUNDLE
-          4 32    WS-C3850-24P       16.12.4           CAT3K_CAA-UNIVERSALK9 BUNDLE
-          5 32    WS-C3850-24P       16.12.4           CAT3K_CAA-UNIVERSALK9 BUNDLE
 
 
       Switch 01
@@ -136,7 +129,7 @@ stack_exec:
       System Serial Number               : FOC1914U0LK
       Last reload reason                 : Admin reload CLI
 
-      Switch 03
+      Switch 02
       ---------
       Switch uptime                      : 1 day, 12 hours, 0 minutes
 
@@ -147,32 +140,6 @@ stack_exec:
       Motherboard Revision Number        : A0
       Model Number                       : WS-C3850-24P
       System Serial Number               : FOC1914X0MX
-      Last reload reason                 : Admin reload CLI
-
-      Switch 04
-      ---------
-      Switch uptime                      : 1 day, 12 hours, 0 minutes
-
-      Base Ethernet MAC Address          : bc:c4:93:46:67:80
-      Motherboard Assembly Number        : 73-14441-10
-      Motherboard Serial Number          : FOC191448JX
-      Model Revision Number              : T0
-      Motherboard Revision Number        : A0
-      Model Number                       : WS-C3850-24P
-      System Serial Number               : FCW1914C0FX
-      Last reload reason                 : Admin reload CLI
-
-      Switch 05
-      ---------
-      Switch uptime                      : 1 day, 12 hours, 0 minutes
-
-      Base Ethernet MAC Address          : bc:c4:93:46:72:80
-      Motherboard Assembly Number        : 73-14441-10
-      Motherboard Serial Number          : FOC191448ZH
-      Model Revision Number              : T0
-      Motherboard Revision Number        : A0
-      Model Number                       : WS-C3850-24P
-      System Serial Number               : FOC1914X0KJ
       Last reload reason                 : Admin reload CLI
 
       Configuration register is 0x102
@@ -196,15 +163,15 @@ stack_exec:
                   RF debug mask = 0x0
 
     "enable":
-      new_state: enable_pwd
+      new_state: svl_enable_pwd
 
-enable_pwd:
+svl_enable_pwd:
   prompt: "Password: "
   commands:
     "cisco":
-      new_state: stack_enable
+      new_state: svl_stack_enable
 
-stack_enable:
+svl_stack_enable:
   prompt: "%N#"
   commands:
     "term length 0": ""
@@ -214,211 +181,147 @@ stack_enable:
     "show switch": *SS
     "sh redundancy state": *SRS
     "disable":
-      new_state: stack_exec
+      new_state: svl_stack_exec
     "enable": ""
 
     "config term":
-      new_state: stack_config
+      new_state: svl_stack_config
 
     "redundancy force-switchover":
-      new_state: switchover_prompt
+      new_state: svl_switchover_prompt
 
-    "redundancy reload shelf":
-      new_state: reload_prompt
-
-    "request platform software system shell":
-      new_state: stack_shell_confirm
-
-    "reload slot 1":
-      new_state: reload_prompt_1
-
-    "active_install_add":
-       new_state: install_add_commit
-
-    "exit":
-      new_state: press_return
-
-stack_shell_confirm:
-  prompt: "Are you sure you want to continue? [y/n] "
-  commands:
-    "y":
-      new_state: stack_bash
-
-stack_bash:
-  prompt: "[%N_RP_0:/]$"
-  commands:
-    "df /bootflash/": |
-      Filesystem     1K-blocks    Used Available Use% Mounted on
-      /dev/sda1        5974888 3569476   2101900  63% /bootflash
-    "stty cols 200": ""
-    "stty rows 200": ""
-    "exit":
-      new_state: stack_enable
-
-stack_config:
+svl_stack_config:
   prompt: "%N(config)#"
   commands:
     "no logging console": ""
     "line console 0":
-      new_state: stack_config_line
+      new_state: svl_stack_config_line
     "line vty 0 4":
-      new_state: stack_config_line
+      new_state: svl_stack_config_line
     "end":
-      new_state: stack_enable
+      new_state: svl_stack_enable
     "redundancy":
-      new_state: config_stack_redundancy
+      new_state: svl_config_stack_redundancy
 
-config_stack_redundancy:
+svl_config_stack_redundancy:
     prompt: "%N(config-red)#"
     commands:
       "main-cpu":
-        new_state: config_stack_redundancy_main_cpu
+        new_state: svl_config_stack_redundancy_main_cpu
       "end":
-        new_state: stack_enable
+        new_state: svl_stack_enable
 
-config_stack_redundancy_main_cpu:
+svl_config_stack_redundancy_main_cpu:
     prompt: "%N(config-r-mc)#"
     commands:
       "standby console enable": ""
       "end":
-        new_state: stack_enable
+        new_state: svl_stack_enable
 
-stack_config_line:
+svl_stack_config_line:
   prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
     "line vty 0 4": ""
     "end":
-      new_state: stack_enable
+      new_state: svl_stack_enable
 
-switchover_prompt:
+svl_switchover_prompt:
   prompt: "System configuration has been modified. Save? [yes/no]:"
   commands:
     "yes":
       response: |
         Building configuration...
         [OK]
-      new_state: switchover_prompt2
+      new_state: svl_switchover_prompt2
 
-switchover_prompt2:
+svl_switchover_prompt2:
   prompt: "Proceed with switchover to standby RP? [confirm]"
   commands:
     "":
-      response: file|mock_data/iosxe/iosxe_stack_switchover.txt
+      response: file|mock_data/iosxe/iosxe_stack_svl_9500x_switchover.txt
       timing:
         - 0:6,0,0.02
         - 6:,1,0.005
-      new_state: stack_login
+      new_state: svl_stby_login
 
+#  -----------standby--------------------
 
-reload_prompt:
-  prompt: "System configuration has been modified. Save? [yes/no]:"
+svl_stby_login:
+  prompt: "Username: "
   commands:
-    "n":
-      new_state: reload_prompt2
-
-reload_prompt2:
-  prompt: "Reload the entire shelf [confirm]"
+    "cisco":
+      new_state: svl_stby_password
+  
+svl_stby_password:
+  prompt: "Password: "
   commands:
-    "":
-      response: |
-        reparing to reload this shelf
-        reload fp action requested
-        process exit with reload stack code
+    "cisco":
+      new_state: svl_stby_exec
 
-
-        watchdog: watchdog0: watchdog did not stop!
-        reboot: Restarting system
-
-
-
-        Booting...(use SKIP_POST)Up 1000 Mbps Full duplex (port  0) (SGMII)
-
-        The system is not configured to boot automatically.  The
-        following command will finish loading the operating system
-        software:
-
-            boot
-
-      new_state: stack_rommon_1
-
-stack_rommon:
-  prompt: "switch: "
+svl_stby_exec:
+  prompt: "%N-stby>"
   commands:
-    "boot":
-      response: file|mock_data/iosxe/iosxe_stack_reload.txt
-      timing:
-        - 0:,0,0.005
-      new_state: stack_exec
+    "term length 0": ""
+    "term width 0": ""
+    "show switch": &SSS |2
+      Switch/Stack Mac Address : 00be.7574.6b0c - Local Mac Address
+      Mac persistency wait time: Indefinite
+                                                  H/W   Current
+      Switch#   Role    Mac Address     Priority Version  State
+      -------------------------------------------------------------------------------------
+       1       Active   00be.7574.6b0c     0      V02     Ready
+      *2       Standby  2cf8.9bb9.5648     0      V02     Ready
+    "show version": *SV
+    "show version | include operating mode" : ""
+    "sh redundancy state": *SRS
+    "enable":
+      new_state: svl_stby_enable_pwd
 
-reload_prompt_1:
-  prompt: "Proceed with reload?[confirm]:"
+svl_stby_enable_pwd:
+  prompt: "Password: "
   commands:
-    "":
-      new_state: stack_exec
+    "cisco":
+      new_state: svl_stby_enable
 
-install_add_commit:
-  preface: |2
-      Copying image file: bootflash:asr1000rpx86-universalk9.BLD_V166_THROTTLE_LATEST_20171101_090919_2.SSA.bin to standby
-      rsync: write failed on "asr1000rpx86-universalk9.BLD_V166_THROTTLE_LATEST_20171101_090919_2.SSA.bin" (in bootflash): No space left on device (28)
-      rsync error: error in file IO (code 11) at ../rsync-3.1.2/receiver.c(393) [receiver=3.1.2]
-      rsync error: error in file IO (code 11) at ../rsync-3.1.2/io.c(1633) [generator=3.1.2]
-      rsync: read error: Connection reset by peer (104)
-      FAILED: install_add_activate_commit : Copy bootflash:asr1000rpx86-universalk9.BLD_V16
-
-  new_state: stack_enable
-stack_rommon_1:
-  prompt: "switch: "
+svl_stby_enable:
+  prompt: "%N-stby#"
   commands:
-    "boot":
-      response: |
-        Booting...(use SKIP_POST)Up 1000 Mbps Full duplex (port  0) (SGMII)
+    "term length 0": ""
+    "term width 0": ""
+    "show version | include operating mode" : ""
+    "show version": *SV
+    "show switch": *SSS
+    "sh redundancy state": *SRS
+    "disable":
+      new_state: svl_stby_exec
+    "config term":
+      new_state: svl_stby_stack_config
+    "enable": ""
 
-        The system is not configured to boot automatically.  The
-        following command will finish loading the operating system
-        software:
+svl_standby_switchover:
+  prompt: "%N-stby>"
+  commands:
+    "enable":
+      new_state: svl_stby_enable
 
-            boot
+svl_stby_stack_config:
+  prompt: "%N-stby(config)#"
+  commands:
+    "no logging console": ""
+    "line console 0":
+      new_state: svl_stack_config_line
+    "line vty 0 4":
+      new_state: svl_stack_config_line
+    "end":
+      new_state: svl_stack_enable
+    "redundancy":
+      new_state: svl_stby_config_stack_redundancy
 
-
-        switch: boot
-        Reading full image into memory.............................................................................................................................................................................................................................................................................................................................................................................................................................................................................done
-        Bundle Image
-        --------------------------------------
-        Kernel Address    : 0x53778818
-        Kernel Size       : 0x438410/4424720
-        Initramfs Address : 0x53bb0c28
-        Initramfs Size    : 0x1abc00f/28033039
-        Compression Format: mzip
-        
-        Bootable image at @ ram:0x53778818
-        Bootable image segment 0 address range [0x81100000, 0x81da5280] is in range [0x80180000, 0x90000000].
-        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-        File "tftp://10.1.7.250/auto/nostgAuto/USERS/ranautiy/nirmagup/IOSXE/cat3k_caa-universalk9.BLD_V1612_THROTTLE_LATEST_20200403_053502_V16_12_3_6.SSA.bin" uncompressed and installed, entry point: 0x81895bf0
-        Loading Linux kernel with entry point 0x81895bf0 ...
-        Bootloader: Done loading app on core_mask: 0xf
-        
-        ### Launching Linux Kernel (flags = 0x5)
-        
-        Linux version 4.9.187 (xelinux@sjc-xelinux2) (gcc version 5.3.0 (GCC) ) #1 SMP Wed Dec 11 09:25:00 PST 2019
-        CVMSEG size: 2 cache lines (256 bytes)
-        Cavium Inc. SDK-5.1.0
-        bootconsole [early0] enabled
-        CPU0 revision is: 000d900a (Cavium Octeon II)
-        Checking for the multiply/shift bug... no.
-        Checking for the daddiu bug... no.
-        %IOSXEBOOT-c34ad91569d0f862504bc287a15afe2e-new_cksum: (rp/0): 4
-        %IOSXEBOOT-c34ad91569d0f862504bc287a15afe2e-saved_cksum: (rp/0): 4
-        
-        Final tar file: mcu_ucode_bundle_6_2_0.tar
-        
-        Waiting for 120 seconds for other switches to boot
-        #####
-        Switch number is 2
-        All switches in the stack have been discovered. Accelerating discovery
-        This software version supports only Smart Licensing as the software licensing mechanism.
-
-        Press RETURN to get started!
-      timing:
-        - 0:,0,0.005
-      new_state: stack_exec
+svl_stby_config_stack_redundancy:
+    prompt: "%N(config-red)#"
+    commands:
+      "main-cpu":
+        new_state: svl_config_stack_redundancy_main_cpu
+      "end":
+        new_state: svl_stby_enable

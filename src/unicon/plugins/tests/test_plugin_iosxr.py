@@ -8,6 +8,7 @@ Uses the mock_device.py script to test IOSXR plugin.
 __author__ = "Dave Wapstra <dwapstra@cisco.com>"
 
 import os
+import re
 import unittest
 from textwrap import dedent
 from unittest.mock import patch
@@ -15,10 +16,11 @@ from unittest.mock import patch
 import unicon
 from unicon import Connection
 from unicon.core.errors import SubCommandFailure
-from unicon.plugins.tests.mock.mock_device_iosxr import MockDeviceTcpWrapperIOSXR
+from unicon.plugins.tests.mock.mock_device_iosxr import MockDeviceTcpWrapperIOSXR, MockDeviceIOSXR
 from unicon.eal.dialogs import Dialog
 from unicon.mock.mock_device import mockdata_path
 
+from unicon.plugins.iosxr.patterns import IOSXRPatterns
 
 unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
 unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC = 0.2
@@ -858,6 +860,49 @@ class TestXRMonitorCommand(unittest.TestCase):
         expected_output = "4u\r\n(General='g', IPv4 Uni='4u', IPv4 Multi='4m', IPv6 Uni='6u', IPv6 Multi='6m')"
         self.assertEqual(output, expected_output)
 
+    def test_monitor_start_state(self):
+        conn = Connection(hostname='Router',
+                          start=['mock_device_cli --os iosxr --state monitor_interface'],
+                          os='iosxr',
+                          mit=True)
+
+        try:
+            conn.connect()
+            conn.execute('show platform')
+        finally:
+            self.assertEqual(conn.state_machine.current_state, 'enable')
+            conn.disconnect()
+
+    def test_monitor_stop_timeout(self):
+        conn = Connection(hostname='Router',
+                          start=['mock_device_cli --os iosxr --state monitor_interface_slow_stop'],
+                          os='iosxr',
+                          mit=True)
+
+        try:
+            conn.connect()
+            conn.monitor.stop()
+        finally:
+            self.assertEqual(conn.state_machine.current_state, 'enable')
+            conn.disconnect()
+
+    def test_monitor_prompt_regex(self):
+        p = IOSXRPatterns().monitor_command_pattern
+        output = MockDeviceIOSXR(state="enable").mock_data["monitor_interface"]["preface"]
+        matches = re.findall(p, output)
+        self.assertEqual(
+            matches,
+            [
+                ("Quit", "q"),
+                ("Clear", "c"),
+                ("Freeze", "f"),
+                ("Thaw", "t"),
+                ("Next set", "n"),
+                ("Prev set", "p"),
+                ("Bytes", "y"),
+                ("Packets", "k"),
+            ],
+        )
 
 
 if __name__ == "__main__":
