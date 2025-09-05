@@ -366,7 +366,7 @@ def ssh_tacacs_handler(spawn, context):
 def password_handler(spawn, context, session):
     """ handles password prompt
     """
-    if 'enable' in spawn.last_sent:
+    if spawn.last_sent.startswith('enable'):
         return enable_password_handler(spawn, context, session)
 
     credential = get_current_credential(context=context, session=session)
@@ -780,6 +780,13 @@ class GenericStatements():
                                                    loop_continue=True,
                                                    continue_timer=True)
 
+        self.tclsh_continue_stmt = Statement(pattern=pat.tclsh_continue,
+                                             action="sendline(})",
+                                             args=None,
+                                             loop_continue=True,
+                                             continue_timer=False)
+
+
 #############################################################
 #  Statement lists
 #############################################################
@@ -827,7 +834,8 @@ authentication_statement_list = [generic_statements.bad_password_stmt,
 initial_statement_list = [generic_statements.init_conf_stmt,
                           generic_statements.mgmt_setup_stmt,
                           generic_statements.enter_your_selection_stmt,
-                          generic_statements.enter_your_encryption_selection_stmt
+                          generic_statements.enter_your_encryption_selection_stmt,
+                          generic_statements.tclsh_continue_stmt
                           ]
 
 
@@ -842,4 +850,3 @@ connection_statement_list = \
     authentication_statement_list + \
     initial_statement_list + \
     pre_connection_statement_list
-

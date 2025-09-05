@@ -131,6 +131,24 @@ enable_asr:
     "reload":
       new_state: ha_reload_proceed
 
+    "dir bootflash:/core/": |
+        dir bootflash:/core/
+        Directory of flash-1:/core/
+
+        360468  -rw-                1  Jun 27 2022 19:49:31 +00:00  .callhome
+        360539  -rw-        609625345  May 19 2022 20:52:07 +00:00  UNIVERSALK9_20150104-042336-UTC.core.gz
+        360538  -rw-            90855  May 19 2022 20:50:59 +00:00  kernel.NA_CAT9K_NA_20220519205207.txt
+        524407  drwx             4096  Nov 10 2021 18:22:12 +00:00  modules
+
+    "dir stby-bootflash:/core/": |
+        dir stby-bootflash:/core/
+        Directory of stby-bootflash:/core/
+
+        360468  -rw-                1  Jun 27 2022 19:49:31 +00:00  .callhome
+        360539  -rw-        609625345  May 19 2022 20:52:07 +00:00  UNIVERSALK9_20150105-042336-UTC.core.gz
+        360538  -rw-            90855  May 19 2022 20:50:59 +00:00  kernel.NA_CAT9K_NA_20220519205207.txt
+        524407  drwx             4096  Nov 10 2021 18:22:12 +00:00  modules
+
 
 config_asr:
   prompt: "%N(conf)#"

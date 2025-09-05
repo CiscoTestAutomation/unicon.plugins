@@ -23,11 +23,11 @@ class IosXEPatterns(GenericPatterns):
         self.want_continue_confirm = r'.*Do you want to continue\?\s*\[confirm]\s*$'
         self.want_continue_yes = r'.*Do you want to continue\?\s*\[y/n]\?\s*\[yes]:\s*$'
         self.disable_prompt = \
-            r'^(.*?)(\(unlicensed\))?(WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(recovery-mode\))?(\(rp-rec-mode\))?(\(standby\))?(-stby)?(-standby)?(\(boot\))?>\s?$'
+            r'^(.*?)(\(unlicensed\))?(wlc|WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(recovery-mode\))?(\(rp-rec-mode\))?(\(standby\))?(-stby)?(-standby)?(\(boot\))?>\s?$'
         self.enable_prompt = \
-            r'^(.*?)(\(unlicensed\))?(WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(recovery-mode\))?(\(rp-rec-mode\))?(\(standby\))?(-stby)?(-standby)?(\(boot\))?#[\s\x07]*$'
+            r'^(.*?)(\(unlicensed\))?(wlc|WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(recovery-mode\))?(\(rp-rec-mode\))?(\(standby\))?(-stby)?(-standby)?(\(boot\))?#[\s\x07]*$'
         self.maintenance_mode_prompt = \
-            r'^(.*?)(\(unlicensed\))?(WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(-standby)?(\(boot\))?\(maint-mode\)#[\s\x07]*$'
+            r'^(.*?)(\(unlicensed\))?(wlc|WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(-standby)?(\(boot\))?\(maint-mode\)#[\s\x07]*$'
         self.press_enter = ReloadPatterns().press_enter
         self.config_prompt = r'^(.*)\((?!.*pki-hexmode).*(con|cfg|ipsec-profile|ca-trustpoint|ca-certificate-map|cs-server|ca-profile|gkm-local-server|cloud|host-list|config-gkm-group|gkm-sa-ipsec|gdoi-coop-ks-config|wsma|enforce-rule|DDNS|ca-trustpool|cert-trustpool)\S*\)#\s?$'
 
@@ -56,7 +56,7 @@ class IosXEReloadPatterns(ReloadPatterns):
         self.useracess = r'^.*User Access Verification'
         self.setup_dialog = r'^.*(initial|basic) configuration dialog.*\s?'
         self.autoinstall_dialog = r'^(.*)Would you like to terminate autoinstall\? ?\[yes\]: $'
-        self.default_prompts = r'^(.*?)(WLC|Router|RouterRP|Switch|ios|switch|.*)([0-9])?(\(standby\))?(\(boot\))?(>|#)'
+        self.default_prompts = r'^(.*?)(wlc|WLC|Router|RouterRP|Switch|ios|switch|.*)([0-9])?(\(standby\))?(\(boot\))?(>|#)'
         self.telnet_prompt = r'^.*telnet>\s?'
         self.please_reset = r'^(.*)Please reset'
         self.grub_prompt = r'.*The highlighted entry will be (booted|executed) automatically in .*?(\x1b\S+)?\s+'

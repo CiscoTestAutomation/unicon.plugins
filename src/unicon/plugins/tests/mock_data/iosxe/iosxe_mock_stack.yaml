@@ -238,6 +238,30 @@ stack_enable:
     "exit":
       new_state: press_return
 
+    "dir flash-1:/core/": |
+        dir flash-1:/core/
+        Directory of flash-1:/core/
+
+        360468  -rw-                1  Jun 27 2022 19:49:31 +00:00  .callhome
+        360539  -rw-        609625345  May 19 2022 20:52:07 +00:00  CAT3K_CAA-1-UNIVERSALK9_20150104-042336-UTC.core.gz
+        360538  -rw-            90855  May 19 2022 20:50:59 +00:00  kernel.NA_CAT9K_NA_20220519205207.txt
+        524407  drwx             4096  Nov 10 2021 18:22:12 +00:00  modules
+
+    "dir flash-2:/core/": |
+        dir flash-2:/core/
+        Directory of flash:-2/core/
+        170354  -rwx        216438863  Feb 27 2024 17:28:58 +00:00  lux-bootstrap-system-report_20240227-172836.tgz
+        170355  drwx             4096   May 3 2015 15:15:37 +00:00  modules
+        170357  -rw-         23128995   Jan 4 2015 04:23:42 +00:00  CAT3K_CAA-2-UNIVERSALK9_20150104-042336-UTC.core.gz
+        170356  -rw-           183910   Jan 4 2015 04:23:42 +00:00  CAT3K_CAA-UNIVERSALK9-042336-UTC.core.gz.coregen.dbg
+
+    "dir flash-3:/core/": |
+        dir flash-3:/core/
+        Directory of flash-3:/core/
+        170354  -rwx        216438863  Feb 27 2024 17:28:58 +00:00  lux-bootstrap-system-report_20240227-172836.tgz
+        170355  drwx             4096   May 3 2015 15:15:37 +00:00  modules
+        170357  -rw-         23128995   Jan 4 2015 04:23:42 +00:00  CAT3K_CAA-3-UNIVERSALK9_20150104-042336-UTC.core.gz
+        170356  -rw-           183910   Jan 4 2015 04:23:42 +00:00  CAT3K_CAA-UNIVERSALK9-042336-UTC.core.gz.coregen.dbg
 stack_shell_confirm:
   prompt: "Are you sure you want to continue? [y/n] "
   commands:

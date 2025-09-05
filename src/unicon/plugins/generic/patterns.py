@@ -71,12 +71,16 @@ class GenericPatterns(UniconCorePatterns):
         # RP/0/0/CPU0:Oct  9 01:44:47.875
         # *May 28 09:01:05.136: yang-infra: Default hostkey created (NETCONF_SSH_RSA_KEY.server)
         # *May 28 09:01:11.975: PKI_SSL_IPC: SUDI certificate chain and key pair are invalid
+        # SECURITY WARNING - Module: SSH, Command: crypto key generate rsa ..., Reason: SSH RSA host key uses insufficient key length, Remediation: Configure SSH RSA host key with minimum key length of 3072 bits
+        # Switch#[OK]
         self.syslog_message_pattern = (
             r"^.*?(%\w+(-\S+)?-\d+-\w+|"
             r"yang-infra:|PKI_SSL_IPC:|Guestshell destroyed successfully|"
             r"%Error opening tftp:\/\/255\.255\.255\.255|Autoinstall trying|"
-            r"audit: kauditd hold queue overflow|"
-            r"(LC|RP)/\d+/\d+/CPU\d+:\w+\s+\d+\s+\d{2}:\d{2}:\d{2}).*\s*$"
+            r"audit: kauditd hold queue overflow|SECURITY WARNING|"
+            r"(LC|RP)/\d+/\d+/CPU\d+:\w+\s+\d+\s+\d{2}:\d{2}:\d{2}|"
+            r"\[OK\]"
+            r").*\s*$"
         )
         self.config_locked = r'Configuration (mode )?(is )?locked|Config mode cannot be entered'
 
@@ -99,3 +103,5 @@ class GenericPatterns(UniconCorePatterns):
         self.enter_your_encryption_selection_2 = r'^.*?Enter your encryption selection( \[2])?:\s*$'
 
         self.no_password_set = r'^.*% (No password set|Error in authentication.).*'
+
+        self.tclsh_continue = r'^\+\>\s?$'

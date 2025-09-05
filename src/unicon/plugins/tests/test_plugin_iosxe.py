@@ -411,6 +411,47 @@ class TestIosXEPluginDisableEnable(unittest.TestCase):
             c.connect()
         c.disconnect()
 
+    def test_enable_password_handler(self):
+        c = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe --state general_exec1 --hostname Router'],
+                       os='iosxe',
+                       credentials=dict(default=dict(username='cisco', password='cisco'),
+                                        enable=dict(password='cisco123')),
+                       log_buffer=True
+                       )
+        try:
+            c.connect()
+        finally:
+            c.disconnect()
+
+    def test_enable_password_handler2(self):
+        c = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe --state general_login1 --hostname Router'],
+                       os='iosxe',
+                       credentials=dict(default=dict(username='notenable', password='cisco'),
+                                        enable=dict(password='cisco123')),
+                       log_buffer=True
+                       )
+        try:
+            c.connect()
+        finally:
+            c.disconnect()
+
+    def test_enable_password_handler3(self):
+        c = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe --state general_exec2 --hostname Router'],
+                       os='iosxe',
+                       credentials=dict(default=dict(username='notenable', password='cisco'),
+                                        enable=dict(password='cisco2')),
+                       log_buffer=True,
+                       mit=True
+                       )
+        try:
+            c.connect()
+            c.enable(command='enable 2')
+        finally:
+            c.disconnect()
+
 
 class TestIosXEPluginPing(unittest.TestCase):
 
@@ -1370,7 +1411,7 @@ class TestSyslogHandler(unittest.TestCase):
             raise
         finally:
             c.disconnect()
-    
+
     def test_handler_ddns_pattern(self):
         d = Connection(
             hostname='Router',
@@ -1380,8 +1421,25 @@ class TestSyslogHandler(unittest.TestCase):
             log_buffer=True
         )
 
-        d.connect()
-        d.disconnect()
+        try:
+            d.connect()
+        finally:
+            d.disconnect()
+
+    def test_reload_security_log_message(self):
+        d = Connection(
+            hostname='Router',
+            start=['mock_device_cli --os iosxe --state enable_reload_security_log1 --hostname Router'],
+            os='iosxe',
+            credentials=dict(default=dict(username='cisco', password='cisco')),
+            log_buffer=True,
+            mit=True,
+        )
+        try:
+            d.connect()
+            d.reload(post_reload_wait_time=3)
+        finally:
+            d.disconnect()
 
 
 class TestIosxeAsr1k(unittest.TestCase):
@@ -1491,6 +1549,19 @@ class TestIosxeTclsh(unittest.TestCase):
         c.tclsh()
         c.enable()
         c.disconnect()
+
+    def test_tclsh_continue(self):
+        c = Connection(
+            hostname='R1',
+            start=['mock_device_cli --os iosxe --state tclsh_continue --hostname R1'],
+            os='iosxe',
+            mit=True
+        )
+        try:
+            c.connect()
+        finally:
+            c.disconnect()
+
 
 class TestIosxeAcmConfigure(unittest.TestCase):
 

@@ -39,6 +39,36 @@ c9k_enable:
         new_state: c9k_enable_quick_reload
       "reload":
         new_state: c9k_reload_proceed
+      "show startup-config":
+        response: |
+          Building configuration...
+
+          Current configuration : 5073 bytes
+
+          !
+
+          ! Last configuration change at 14:22:51 UTC Mon Jul 14 2025
+
+          !
+
+          version 17.18
+
+          service timestamps debug datetime msec
+
+          service timestamps log datetime msec
+
+          service internal
+
+          !
+
+          hostname Switch
+
+          !
+
+          !
+          end
+        new_state:
+          log_message_2
       "show version | include operating mode" : ""
       "show version" :
         response: |
@@ -179,6 +209,13 @@ c9k_config_line:
 log_message:
   preface: |
     *Feb 22 01:31:30.836: %SEC_LOGIN-5-LOGIN_SUCCESS: Login Success [user: admin] [Source: UNKNOWN] [localport: 0] at 01:31:30 UTC Fri Feb 22 2019
+  prompt: ""
+  commands:
+    "":
+      new_state: c9k_enable
+
+log_message_2:
+  preface: "Switch#[OK]"
   prompt: ""
   commands:
     "":
