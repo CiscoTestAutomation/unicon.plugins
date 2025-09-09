@@ -1,7 +1,7 @@
 August 2025
 ==========
 
-September 30 - Unicon v25.8 
+August 23 - Unicon v25.8 
 ------------------------
 
 
