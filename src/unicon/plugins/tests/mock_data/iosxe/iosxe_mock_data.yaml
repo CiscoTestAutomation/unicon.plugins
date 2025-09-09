@@ -1765,3 +1765,70 @@ unlicensed_prompt:
     "show version | include operating mode": ""
     "end":
       new_state: general_enable
+
+
+
+security_log_message:
+  prompt: " SECURITY WARNING - Module: SSH, Command: crypto key generate rsa ..., Reason: SSH RSA host key uses insufficient key length, Remediation: Configure SSH RSA host key with minimum key length of 3072 bits"
+  commands:
+    "":
+      new_state: general_exec
+
+enable_reload_security_log1:
+  prompt: "%N#"
+  commands:
+    <<: *gen_enable_cmds
+    "reload":
+      new_state: enable_reload_security_log2
+
+enable_reload_security_log2:
+  preface: "Press RETURN to get started!"
+  prompt: "%N>"
+  commands:
+    "":
+      new_state: security_log_message
+
+general_login1:
+  prompt: "Username: "
+  commands:
+    "notenable":
+      new_state: general_password1
+
+general_password1:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: general_exec1
+
+general_exec1:
+  prompt: "%N>"
+  commands:
+    <<: *gen_exec_cmds
+    "enable":
+      new_state: enable_password1
+
+enable_password1:
+  prompt: "Password: "
+  commands:
+    "cisco123":
+      new_state: general_enable
+
+general_exec2:
+  prompt: "%N>"
+  commands:
+    <<: *gen_exec_cmds
+    "enable 2":
+      new_state: enable_password2
+
+enable_password2:
+  prompt: "Password: "
+  commands:
+    "cisco2":
+      new_state: general_enable
+
+
+tclsh_continue:
+  prompt: "+>"
+  commands:
+    "}":
+      new_state: tclsh

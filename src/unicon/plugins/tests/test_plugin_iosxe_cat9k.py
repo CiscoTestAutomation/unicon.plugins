@@ -892,5 +892,22 @@ class TestIosXECat9kGrubConnect(unittest.TestCase):
     def test_connect_grub(self):
         self.device.connect()
 
+class TestIosXeCat9kPluginSyslog(unittest.TestCase):
+
+    def test_syslog_messages(self):
+        d = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe --state c9k_enable'],
+                       os='iosxe',
+                       platform='cat9k',
+                       credentials=dict(default=dict(username='admin', password='cisco')),
+                       settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+                       log_buffer=True
+                       )
+        try:
+            d.connect()
+            d.execute('show startup-config', error_pattern=[])
+        finally:
+            d.disconnect()
+
 if __name__ == '__main__':
     unittest.main()

@@ -21,7 +21,6 @@ class IosxeSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
         """
         super().__init__(*args, **kwargs)
 
-
     def learn_tokens(self):
         con = self.connection
         if (not con.learn_tokens or not con.settings.LEARN_DEVICE_TOKENS)\
@@ -32,7 +31,8 @@ class IosxeSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
                                     con.spawn,
                                     context=con.context,
                                     prompt_recovery=con.prompt_recovery)
-            if con.state_machine.current_state in ['acm', 'config','rules']:
+
+            if con.state_machine.current_state in ['acm', 'config', 'rules', 'tclsh']:
                 con.state_machine.go_to('enable',
                                         con.spawn,
                                         context=con.context,
