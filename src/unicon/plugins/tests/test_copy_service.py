@@ -227,7 +227,7 @@ class TestIosXeCopyService(unittest.TestCase):
         output = '\n'.join(output.splitlines())
         expected_output = \
             self.md.mock_data['copy_to_tftp_dest_filename_overwrite']\
-            ['commands']['y']['response']
+            ['keys']['y']['response']
         expected_output = '\n'.join(expected_output.splitlines())
         self.assertIn(expected_output, output)
 
@@ -276,9 +276,10 @@ class TestIosXeCopyService(unittest.TestCase):
         output = '\n'.join(output.splitlines())
         expected_output = \
             self.md.mock_data['copy_to_tftp_dest_filename_overwrite']\
-            ['commands']['n']['response']
+            ['keys']['n']['response']
         expected_output = '\n'.join(expected_output.splitlines())
         self.assertIn(expected_output, output) 
+
 
 class TestMaxAttempts(unittest.TestCase):
     def setUp(self):

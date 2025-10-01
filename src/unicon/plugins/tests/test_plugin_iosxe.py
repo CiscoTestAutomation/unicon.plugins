@@ -14,6 +14,7 @@ import unittest
 from unittest.mock import patch
 
 from pyats.topology import loader
+from unittest.mock import Mock
 
 import unicon
 from unicon import Connection
@@ -452,6 +453,17 @@ class TestIosXEPluginDisableEnable(unittest.TestCase):
         finally:
             c.disconnect()
 
+    def test_disable_pattern(self):
+        from unicon.plugins.iosxe.statemachine import IosXESingleRpStateMachine
+        from unicon.plugins.iosxe.settings import IosXESettings
+        settings = IosXESettings()
+        sm = IosXESingleRpStateMachine(learn_hostname=True)
+        sm.learn_pattern = settings.DEFAULT_LEARNED_HOSTNAME
+        state = sm.get_state('disable')
+        match = re.match(state.pattern, 'route(s)  : 0.0.0.0 ->')
+        self.assertIsNone(match)
+        match = re.match(state.pattern, 'rtr->')
+        self.assertIsNotNone(match)
 
 class TestIosXEPluginPing(unittest.TestCase):
 
@@ -1625,6 +1637,22 @@ class TestIosxeAcmRulesConfigure(unittest.TestCase):
         c.configure(config_txt, rules=True)
         c.disconnect()
 
+class TestIosxeSyntaxConfigure(unittest.TestCase):
+
+    def test_syntax_configure(self):
+        c = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state general_enable --hostname PE1'],
+            os='iosxe',
+            mit=True
+        )
+        c.connect()
+        config_txt = [
+            'interface loopback 1',
+            'description test'
+        ]
+        c.configure(config_txt, config_syntax_check='my_config')
+        c.disconnect()
 
 class TestConfigTransition(unittest.TestCase):
 
@@ -1750,8 +1778,6 @@ class TestMaintenanceMode(unittest.TestCase):
         c.switchto('maintenance')
         c.switchto('enable')
         c.disconnect()
-
-
 
 if __name__ == "__main__":
     unittest.main()

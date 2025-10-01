@@ -232,6 +232,11 @@ general_enable:
     "write memory": ""
     "tclsh":
       new_state: tclsh
+    "config check syntax":
+      response:
+        - |
+          Enter configuration commands, one per line.  End with CNTL/Z.
+      new_state: syntax_check
     "acm configlet create my_config":
       response:
         - |
@@ -1565,6 +1570,19 @@ acm_configlet:
 
 acm_if:
   prompt: "%N(acm-if)#"
+  commands:
+    "description test": ""
+    "end":
+      new_state: general_enable
+
+syntax_check:
+  prompt: "%N(syntax)#"
+  commands:
+    "interface loopback 1":
+      new_state: syntax_if
+
+syntax_if:
+  prompt: "%N(syntax-if)#"
   commands:
     "description test": ""
     "end":

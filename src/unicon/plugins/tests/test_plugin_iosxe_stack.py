@@ -317,6 +317,34 @@ class TestIosXEStackReload(unittest.TestCase):
         d.disconnect()
         md.stop()
 
+    
+    def test_reload_log_buffer(self):
+        md = MockDeviceTcpWrapperIOSXE(hostname='Router', port=0, state='stack_enable' + ',stack_enable'*4, stack=True)
+        md.start()
+        d = Connection(hostname='Router',
+                       start = ['telnet 127.0.0.1 ' + str(i) for i in md.ports[:]],
+                       os='iosxe',
+                       chassis_type='stack',
+                       username='cisco',
+                       tacacs_password='cisco',
+                       enable_password='cisco')
+        d.settings.STACK_POST_RELOAD_SLEEP = 0
+        d.settings.STACK_ROMMON_SLEEP = 1
+        d.settings.POST_RELOAD_WAIT = 1
+        d.connect()
+        self.assertTrue(d.active.alias == 'peer_1')
+
+        res, output = d.reload(timeout=10, return_output=True)
+        expected_output = ["System configuration has been modified. Save? [yes/no]:", 
+                           "Press RETURN to get started!", 
+                           "All switches in the stack have been discovered. Accelerating discovery",
+                           "The system is not configured to boot automatically",
+                           "Reload result: None"]
+                
+        for expected in expected_output:
+            self.assertIn(expected, output)
+        d.disconnect()
+        md.stop()
 
 class TestIosXEluginBashService(unittest.TestCase):
 

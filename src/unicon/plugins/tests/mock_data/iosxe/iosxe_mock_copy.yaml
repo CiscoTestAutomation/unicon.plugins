@@ -17,8 +17,8 @@ copy_to_tftp_dest_filename:
             new_state: copy_to_tftp_dest_filename_overwrite
 
 copy_to_tftp_dest_filename_overwrite:
-    prompt: "%Warning:There is a file already existing with this name \r\nDo you want to over write? [confirm]'"
-    commands:
+    prompt: "%Warning:There is a file already existing with this name \r\nDo you want to over write? [confirm]"
+    keys:
         "y":
             response: |4
                 Accessing tftp://10.1.6.243/test...
@@ -29,7 +29,7 @@ copy_to_tftp_dest_filename_overwrite:
             new_state: enable_isr
         "n":
             response: ""
-            new_state: enable_isr 
+            new_state: enable_isr
 
 copy_from_tftp:
     prompt: "Source filename [test]? "

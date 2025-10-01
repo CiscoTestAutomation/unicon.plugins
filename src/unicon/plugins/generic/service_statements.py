@@ -170,9 +170,9 @@ def copy_handler_1(spawn, context, send_key):
 
 def copy_overwrite_handler(spawn, context):
     if context['overwrite'] == 'False':
-        spawn.sendline('n')
+        spawn.send('n')
     else:
-        spawn.sendline('y')
+        spawn.send('y')
 
 def copy_error_handler(context, retry=False):
     if retry:

@@ -149,7 +149,8 @@ class GenericSettings(Settings):
                                         r'subinterface is already configured as part of an IEEE 802.10, IEEE 802.1Q, '
                                         r'or ISL vLAN.',
                                         r'% OSPF: Please enable segment-routing globally',
-                                        r"% Invalid input detected at '^' marker"
+                                        r"% Invalid input detected at '^' marker",
+                                        r"%ERROR:"
                                         ]
 
         # Number of times to retry for config mode by configure service.

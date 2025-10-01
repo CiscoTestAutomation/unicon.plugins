@@ -1,4 +1,6 @@
 """ Stack based IOS-XE/cat9k/c9500X service implementations. """
+import io
+import logging
 from time import sleep
 from collections import namedtuple
 from datetime import timedelta
@@ -7,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor, wait as wait_futures, ALL_COM
 from unicon.eal.dialogs import Dialog
 from unicon.core.errors import SubCommandFailure
 from unicon.bases.routers.services import BaseService
+from unicon.logs import UniconStreamHandler, UNICON_LOG_FORMAT
 
 from unicon.plugins.iosxe.stack.utils import StackUtils
 from unicon.plugins.generic.statements import custom_auth_statements
@@ -44,6 +47,7 @@ class SVLStackReload(BaseService):
         self.end_state = 'enable'
         self.timeout = connection.settings.STACK_RELOAD_TIMEOUT
         self.reload_command = "redundancy reload shelf"
+        self.log_buffer = io.StringIO()
         self.dialog = Dialog(stack_reload_stmt_list)
 
     def call_service(self,
@@ -82,6 +86,20 @@ class SVLStackReload(BaseService):
             if not isinstance(append_error_pattern, list):
                 raise ValueError('append_error_pattern should be a list')
             self.error_pattern += append_error_pattern
+
+        # Connecting to the log handler to capture the buffer output
+        lb = UniconStreamHandler(self.log_buffer)
+        lb.setFormatter(logging.Formatter(fmt=UNICON_LOG_FORMAT))
+        self.connection.log.addHandler(lb)
+
+        # logging the output to subconnections
+        for subcon in self.connection.subconnections:
+            subcon.log.addHandler(lb)
+
+        # Clear log buffer
+        self.log_buffer.seek(0)
+        self.log_buffer.truncate()
+
         # update all subconnection context with image_to_boot
         if image_to_boot:
             for subconn in self.connection.subconnections:
@@ -243,12 +261,23 @@ class SVLStackReload(BaseService):
         self.connection.connection_provider.init_connection()
 
         self.connection.log.info("+++ Reload Completed Successfully +++")
+
+        # Read the log buffer 
+        self.log_buffer.seek(0)
+        reload_output = self.log_buffer.read()
+        # clear buffer
+        self.log_buffer.truncate()
+
+        # Remove the handler
+        self.connection.log.removeHandler(lb)
+        for subcon in self.connection.subconnections:
+            subcon.log.removeHandler(lb)
+
         self.result = True
 
         if return_output:
             Result = namedtuple('Result', ['result', 'output'])
-            self.result = Result(self.result, reload_cmd_output.match_output.replace(reload_cmd, '', 1))
-
+            self.result = Result(self.result, reload_output.replace(reload_cmd, '', 1))
 
 class SVLStackSwitchover(BaseService):
     """ Get Rp state
@@ -355,3 +384,4 @@ class SVLStackSwitchover(BaseService):
         else:
             self.connection.log.info('Switchover failed')
             self.result = False
+
