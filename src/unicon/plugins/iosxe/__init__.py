@@ -30,6 +30,7 @@ class IosXEServiceList(ServiceList):
         self.rommon = svc.Rommon
         self.tclsh = svc.Tclsh
         self.maintenance_mode = svc.MaintenanceMode
+        self.config_syntax = svc.ConfigSyntax
 
 
 class HAIosXEServiceList(HAServiceList):
@@ -48,6 +49,7 @@ class HAIosXEServiceList(HAServiceList):
         self.reset_standby_rp = svc.ResetStandbyRP
         self.rommon = svc.HARommon
         self.tclsh = svc.Tclsh
+        self.config_syntax = svc.ConfigSyntax
 
 
 class IosXESingleRpConnection(BaseSingleRpConnection):

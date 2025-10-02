@@ -5,6 +5,8 @@ __author__ = "Myles Dear"
 import re
 from unicon.eal.dialogs import Dialog
 from unicon.core.errors import SubCommandFailure
+from unicon.bases.routers.services import BaseService
+
 
 from unicon.plugins.generic.service_implementation import (
     Configure as GenericConfigure,
@@ -58,6 +60,8 @@ class Configure(GenericConfigure):
     def pre_service(self, *args, **kwargs):
 
         self.acm_configlet = kwargs.pop('acm_configlet', None)
+        self.syntax_configlet = kwargs.pop('syntax_configlet', None)
+        self.config_syntax_check = kwargs.pop('config_syntax_check', False)
         self.rules = kwargs.pop('rules', False)
         self.prompt_recovery = kwargs.get('prompt_recovery', True)
 
@@ -71,6 +75,13 @@ class Configure(GenericConfigure):
                 self.connection.state_machine.go_to('rules', self.connection.spawn)
                 self.start_state = 'rules'
                 self.end_state = 'rules'
+
+        elif self.syntax_configlet or self.config_syntax_check:
+            configlet_name = self.syntax_configlet if self.syntax_configlet else ''
+            self.connection.state_machine.go_to('syntax', self.connection.spawn,
+                                                context={'syntax_configlet': configlet_name})
+            self.start_state = 'syntax'
+            self.end_state = 'syntax'
 
         else:
             super().pre_service(*args, **kwargs)
@@ -86,6 +97,14 @@ class Configure(GenericConfigure):
 
 class Config(Configure):
     pass
+
+
+class ConfigSyntax(Configure):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.start_state = 'syntax'
+        self.end_state = 'enable'
 
 
 class Execute(GenericExecute):
@@ -126,6 +145,7 @@ class HAConfigure(GenericHAConfigure):
 
     def pre_service(self, *args, **kwargs):
         self.acm_configlet = kwargs.pop('acm_configlet', None)
+        self.syntax_configlet = kwargs.pop('syntax_configlet', None)
         self.rules = kwargs.pop('rules', False)
         self.prompt_recovery = kwargs.get('prompt_recovery', True)
 
@@ -133,6 +153,11 @@ class HAConfigure(GenericHAConfigure):
             self.connection.state_machine.go_to('acm', self.connection.spawn,context={'acm_configlet': self.acm_configlet})
             self.start_state = 'acm'
             self.end_state = 'acm'
+
+        if self.syntax_configlet:
+            self.connection.state_machine.go_to('syntax', self.connection.spawn,context={'syntax_configlet': self.syntax_configlet})
+            self.start_state = 'syntax'
+            self.end_state = 'syntax'
         elif self.rules:
             if self.connection.connected:
                 self.connection.state_machine.go_to('rules', self.connection.spawn)
@@ -450,6 +475,18 @@ class Tclsh(Execute):
         self.service_name = 'tclsh'
         self.__dict__.update(kwargs)
 
+class Syntaxsh(BaseService):
+
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.start_state = 'enable'
+        self.end_state = 'syntax_check'
+        self.service_name = 'syntax_check'
+
+    def call_service(self, syntax_file=None, **kwargs):
+        cmd = f"syntax configlet check {syntax_file}" if syntax_file else "syntax configlet check"
+        self.connection.spawn.sendline(cmd)
+        self.connection.state_machine.go_to('syntax_check', self.connection.spawn, **kwargs)
 
 class MaintenanceMode(ContextMgrBaseService):
 

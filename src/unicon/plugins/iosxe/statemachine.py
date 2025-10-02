@@ -67,6 +67,9 @@ def enable_to_acm_transition(state_machine, spawn, context):
     configlet_name = context.get('acm_configlet', '')
     spawn.sendline(f'acm configlet create {configlet_name}')
 
+def enable_to_syntax_transition(state_machine, spawn, context):
+    configlet_name = context.get('syntax_configlet', '')
+    spawn.sendline(f'syntax configlet create {configlet_name}')
 
 def maintenance_to_enable_transition(statemachine, spawn, context):
 
@@ -126,6 +129,7 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         rommon = State('rommon', patterns.rommon_prompt)
         tclsh = State('tclsh', patterns.tclsh_prompt)
         acm = State('acm', patterns.acm_prompt)
+        syntax = State('syntax', patterns.syntax_prompt)
         rules = State('rules', patterns.rules_prompt)
         macro = State('macro', patterns.macro_prompt)
         maintenance = State('maintenance', patterns.maintenance_mode_prompt)
@@ -152,6 +156,8 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         enable_to_acm = Path(enable, acm, enable_to_acm_transition, None)
         acm_to_enable = Path(acm, enable, 'end', None)
 
+        enable_to_syntax = Path(enable, syntax, 'config check syntax', None)
+        syntax_to_enable = Path(syntax, enable, 'end', None)
         enable_to_rules = Path(enable, rules, 'acm rules', None)
         rules_to_enable = Path(rules, enable, 'end', None)
 
@@ -168,6 +174,7 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         self.add_state(guestshell)
         self.add_state(tclsh)
         self.add_state(acm)
+        self.add_state(syntax)
         self.add_state(rules)
         self.add_state(macro)
         self.add_state(maintenance)
@@ -183,6 +190,8 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         self.add_path(tclsh_to_enable)
         self.add_path(enable_to_acm)
         self.add_path(acm_to_enable)
+        self.add_path(enable_to_syntax)
+        self.add_path(syntax_to_enable)
         self.add_path(enable_to_rules)
         self.add_path(rules_to_enable)
         self.add_path(macro_to_config)
@@ -225,6 +234,7 @@ class IosXEDualRpStateMachine(StateMachine):
         shell = State('shell', patterns.shell_prompt)
         tclsh = State('tclsh', patterns.tclsh_prompt)
         acm = State('acm', patterns.acm_prompt)
+        syntax = State('syntax', patterns.syntax_prompt)
         rules = State('rules', patterns.rules_prompt)
         macro = State('macro', patterns.macro_prompt)
 
@@ -265,6 +275,8 @@ class IosXEDualRpStateMachine(StateMachine):
         enable_to_acm = Path(enable, acm, enable_to_acm_transition, None)
         acm_to_enable = Path(acm, enable, 'end', None)
 
+        enable_to_syntax = Path(enable, syntax, enable_to_syntax_transition, None)
+        syntax_to_enable = Path(syntax, enable, 'end', None)
         enable_to_rules = Path(enable, rules, 'acm rules', None)
         rules_to_enable = Path(rules, enable, 'end', None)
 
@@ -276,6 +288,7 @@ class IosXEDualRpStateMachine(StateMachine):
         self.add_state(rommon)
         self.add_state(tclsh)
         self.add_state(acm)
+        self.add_state(syntax)
         self.add_state(rules)
         self.add_state(macro)
 
@@ -294,6 +307,8 @@ class IosXEDualRpStateMachine(StateMachine):
         self.add_path(tclsh_to_enable)
         self.add_path(enable_to_acm)
         self.add_path(acm_to_enable)
+        self.add_path(enable_to_syntax)
+        self.add_path(syntax_to_enable)
         self.add_path(enable_to_rules)
         self.add_path(rules_to_enable)
         self.add_path(macro_to_config)

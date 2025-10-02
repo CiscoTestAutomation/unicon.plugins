@@ -41,6 +41,8 @@ class Reload(XEReload):
         # assume the device is in rommon if image_to_boot is passed
         # update reload command to use rommon boot syntax
         if "image_to_boot" in kwargs:
+            if 'rommon_vars' in kwargs and self.connection.state_machine.current_state == 'rommon':
+                self.connection.execute([f'set {k}={v}' for k, v in kwargs['rommon_vars'].items()])
             self.context["image_to_boot"] = kwargs["image_to_boot"]
             reload_command = "boot {}".format(
                 self.context['image_to_boot']).strip()
@@ -63,6 +65,9 @@ class HAReloadService(GenericHAReloadService):
 
     def pre_service(self, *args, **kwargs):
         if "image_to_boot" in kwargs:
+            if 'rommon_vars' in kwargs and all(con.state_machine.current_state == 'rommon' for con in self.connection._subconnections):
+                for con in self.connection._subconnections:
+                    con.execute([f'set {k}={v}' for k, v in kwargs['rommon_vars'].items()])
             self.start_state = 'rommon'
             if 'image_to_boot' in self.context:
                 self.context['orig_image_to_boot'] = self.context['image_to_boot']

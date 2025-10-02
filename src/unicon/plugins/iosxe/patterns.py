@@ -23,7 +23,7 @@ class IosXEPatterns(GenericPatterns):
         self.want_continue_confirm = r'.*Do you want to continue\?\s*\[confirm]\s*$'
         self.want_continue_yes = r'.*Do you want to continue\?\s*\[y/n]\?\s*\[yes]:\s*$'
         self.disable_prompt = \
-            r'^(.*?)(\(unlicensed\))?(wlc|WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(recovery-mode\))?(\(rp-rec-mode\))?(\(standby\))?(-stby)?(-standby)?(\(boot\))?>\s?$'
+            r'^(.*?)(\(unlicensed\))?(wlc|WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(recovery-mode\))?(\(rp-rec-mode\))?(\(standby\))?(-stby)?(-standby)?(\(boot\))?(?<! -)>\s?$'
         self.enable_prompt = \
             r'^(.*?)(\(unlicensed\))?(wlc|WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(recovery-mode\))?(\(rp-rec-mode\))?(\(standby\))?(-stby)?(-standby)?(\(boot\))?#[\s\x07]*$'
         self.maintenance_mode_prompt = \
@@ -42,6 +42,7 @@ class IosXEPatterns(GenericPatterns):
         self.macro_prompt = r'^(.*?)(\{\.\.\}|then.else.fi)\s*>\s*$'
         self.unable_to_create = r'^(.*?)Unable to create.*$'
         self.acm_prompt = r'^(.*?)\(acm.*?\)#[\s\x07]*$'
+        self.syntax_prompt = r'^(.*?)\(syntax.*?\)#[\s\x07]*$'
         self.rules_prompt = r'^(.*?)\(rules.*?\)#[\s\x07]*$'
 
 
