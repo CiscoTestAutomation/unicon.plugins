@@ -155,27 +155,6 @@ class TestIosXEPluginSwitchoverWithStandbyCredentials(unittest.TestCase):
         self.c.execute('redundancy force-switchover')
 
 
-class TestIosXEPluginSwitchoverWithStandbyCredentials(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        cls.c = Connection(
-            hostname='Router',
-            start=['mock_device_cli --os iosxe --state c9k_login3'],
-            os='iosxe',
-            credentials=dict(
-                default=dict(
-                    username='admin', password='cisco'),
-                enable=dict(
-                    username='admin', password='cisco'),
-                disable=dict(
-                    username='admin', password='cisco')))
-        cls.c.connect()
-
-    def test_switchover(self):
-        self.c.execute('redundancy force-switchover')
-
-
 class TestIosXEEnableSecret(unittest.TestCase):
 
     @classmethod

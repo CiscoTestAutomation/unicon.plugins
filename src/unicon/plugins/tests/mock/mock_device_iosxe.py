@@ -275,10 +275,10 @@ class MockDeviceSVLStackIOSXE(MockDevice):
             for idx, port in enumerate(ports):
                 if idx == 0:
                     # standby -> active
-                    self.set_state(port, 'svl_stack_enable')
+                    self.set_state(port, 'svl_post_switchover_active_enable')
                 elif idx == 1:
                     # active -> standby
-                    self.set_state(port, 'svl_standby_switchover')
+                    self.set_state(port, 'svl_post_switchover_standby_enable')
 
     def update_show_switch(self, transport):
         port = self.transport_handles[transport]

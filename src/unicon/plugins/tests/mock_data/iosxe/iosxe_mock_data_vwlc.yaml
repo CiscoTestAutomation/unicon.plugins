@@ -14,8 +14,16 @@ c9k_vwlc_enable:
   prompt: "%N#"
   commands:
     "show version | include operating mode": ""
+    "config term":
+      new_state: c9k_vwlc_configure
     "reload":
       new_state: c9k_vwlc_system_config_change
+
+c9k_vwlc_configure:
+  prompt: "%N(config)#"
+  commands:
+    "end":
+      new_state: c9k_vwlc_enable
 
 c9k_vwlc_system_config_change:
   prompt: "\nSystem configuration has been modified. Save? [yes/no]:"

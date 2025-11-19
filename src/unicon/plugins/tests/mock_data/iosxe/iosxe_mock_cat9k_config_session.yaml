@@ -127,6 +127,8 @@ c9k_config4:
       "no boot system":
         response: "Config session is locked by process '566', user will be pushed back to exec mode. Command execution is locked, Please try later."
         new_state: c9k_enable4a
+      "end":
+        new_state: c9k_enable4a
 
 c9k_config4a:
     prompt: "%N(config)#"

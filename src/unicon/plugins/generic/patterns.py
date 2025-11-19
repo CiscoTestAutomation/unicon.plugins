@@ -77,7 +77,7 @@ class GenericPatterns(UniconCorePatterns):
             r"^.*?(%\w+(-\S+)?-\d+-\w+|"
             r"yang-infra:|PKI_SSL_IPC:|Guestshell destroyed successfully|"
             r"%Error opening tftp:\/\/255\.255\.255\.255|Autoinstall trying|"
-            r"audit: kauditd hold queue overflow|SECURITY WARNING|"
+            r"audit: kauditd hold queue overflow|SECURITY WARNING|%RSA key|"
             r"(LC|RP)/\d+/\d+/CPU\d+:\w+\s+\d+\s+\d{2}:\d{2}:\d{2}|"
             r"\[OK\]"
             r").*\s*$"

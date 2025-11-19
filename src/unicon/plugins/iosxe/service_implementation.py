@@ -68,7 +68,7 @@ class Configure(GenericConfigure):
         if self.acm_configlet:
             self.connection.state_machine.go_to('acm', self.connection.spawn,context={'acm_configlet': self.acm_configlet})
             self.start_state = 'acm'
-            self.end_state = 'acm'
+            self.end_state = 'enable'
 
         elif self.rules:
             if self.connection.connected:

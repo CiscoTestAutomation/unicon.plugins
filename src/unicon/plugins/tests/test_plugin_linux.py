@@ -757,6 +757,8 @@ class TestLinuxPromptOverride(unittest.TestCase):
         settings = LinuxSettings()
         prompt = 'shell_prompt'
         settings.SHELL_PROMPT = prompt
+        # set it to empty so that the default prompt does not interfere
+        settings.LINUX_INIT_EXEC_COMMANDS = []
         c = Connection(hostname='linux',
                        start=['mock_device_cli --os linux --state exec'],
                        os='linux',

@@ -613,6 +613,8 @@ config_c9k2:
       new_state: config_line_c9k2
     "redundancy":
       new_state: config_c9k_redundancy2
+    "end":
+      new_state: enable_c9k2
 
 config_line_c9k2:
   prompt: "%N(config-line)#"
@@ -922,6 +924,8 @@ config_c9k:
       new_state: config_line_c9k
     "line console 0":
       new_state: config_line_c9k
+    "end":
+      new_state: enable_c9k
 
 config_line_c9k:
   prompt: "%N(config-line)#"

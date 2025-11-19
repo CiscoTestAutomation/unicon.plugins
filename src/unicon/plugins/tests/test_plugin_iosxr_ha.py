@@ -69,6 +69,46 @@ class TestIOSXRPluginHAConnect(unittest.TestCase):
         self.assertIn('exit', ret)
         self.assertIn('Router#', ret)
 
+
+class TestIOSXRPluginHAConnectLearnTokens(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.md = MockDeviceTcpWrapperIOSXR(port=0, state='login,console_standby')
+        cls.md.start()
+
+        cls.testbed = """
+        devices:
+          Router:
+            os: iosxr
+            type: router
+            tacacs:
+                username: admin
+            passwords:
+                tacacs: admin
+            connections:
+              defaults:
+                class: unicon.Unicon
+              a:
+                protocol: telnet
+                ip: 127.0.0.1
+                port: {}
+              b:
+                protocol: telnet
+                ip: 127.0.0.1
+                port: {}
+        """.format(cls.md.ports[0], cls.md.ports[1])
+        tb = loader.load(cls.testbed)
+        cls.r = tb.devices.Router
+
+    @classmethod
+    def tearDownClass(self):
+        self.md.stop()
+
+    def test_learn_tokens_ha(self):
+        self.r.connect(learn_tokens=True)
+
+
 class TestIOSXRPluginHAConnectAdmin(unittest.TestCase):
 
     @classmethod
