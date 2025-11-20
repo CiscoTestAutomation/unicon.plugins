@@ -302,7 +302,10 @@ exec:
         response: "ls -ltr\r\n\x1b[?2004l\rtotal 35828\r\ndrwxr-xr-x 11 root     root         4096 Feb 22 14:21 \x1b[01;34mdata\x1b[0m\r\n\x1b[?2004hndfc-web:~ # "
         timing:
         - 0:,0,0.1,0.01
-
+    "uptime":
+        response: "20:17:07 up 1 min,  1 user,  load average: 0.13, 0.05, 0.02"
+        timing:
+        - 0:,0,0.1,0.01
 
 trex_console:
   prompt: "trex> "
@@ -633,9 +636,30 @@ ios_sw4_enable:
     "term length 0": ""
     "term width 0": ""
     "show version": ""
+    "show install summary": ""
+    "config term":
+      new_state: ios_sw4_config
 
+ios_sw4_config:
+  prompt: "Sw04(config)#"
+  commands:
+    "no logging console": ""
+    "line console 0":
+      new_state: ios_sw4_config_line
+    "line vty 0 4":
+      new_state: ios_sw4_config_line
+    "exit":
+      new_state: ios_sw4_enable
+    "end":
+      new_state: ios_sw4_enable
 
-
+ios_sw4_config_line:
+  prompt: "Sw04(config-line)#"
+  commands:
+    "exec-timeout 0": ""
+    "line vty 0 4": ""
+    "end":
+      new_state: ios_sw4_enable
 
 exec_ps1:
   prompt: "Linux$ "

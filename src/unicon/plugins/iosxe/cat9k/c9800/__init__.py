@@ -8,13 +8,13 @@ from .. import IosXEServiceList
 from .statemachine import IosXEc9800SingleRpStateMachine
 from .settings import IosXEc9800Settings
 from .. import service_implementation as svc
-
+from .service_implementation import Rommon   
 
 class IosXEc9800ServiceList(IosXEServiceList):
     def __init__(self):
         super().__init__()
         self.reload = svc.Reload
-        self.rommon = svc.Rommon
+        self.rommon = Rommon
 
 
 class IosXEc9800SingleRpConnection(IosXESingleRpConnection):

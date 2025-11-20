@@ -2,12 +2,11 @@
 Authors:
     pyATS TEAM (pyats-support@cisco.com, pyats-support-ext@cisco.com)
 """
-
+import re
 from unicon.eal.dialogs import Dialog
 from unicon.bases.routers.connection_provider import BaseStackRpConnectionProvider
 
 from unicon.plugins.generic.statements import connection_statement_list, custom_auth_statements
-
 
 class StackwiseVirtualConnectionProvider(BaseStackRpConnectionProvider):
     """ Implements Stack Connection Provider,
@@ -49,9 +48,11 @@ class StackwiseVirtualConnectionProvider(BaseStackRpConnectionProvider):
             con.log.debug('{} in state: {}'.format(subcon.alias, subcon.state_machine.current_state))
 
         if subcon1.state_machine.current_state == 'enable':
+            target_con = subcon1
             target_alias = subcon1_alias
             other_alias = subcon2_alias
         elif subcon2.state_machine.current_state == 'enable':
+            target_con = subcon2
             target_alias = subcon2_alias
             other_alias = subcon1_alias
 
@@ -60,7 +61,6 @@ class StackwiseVirtualConnectionProvider(BaseStackRpConnectionProvider):
         con._handles_designated = True
 
         device = con.device
-
         try:
             # To check if the device is in SVL state
             output = device.parse("show switch")
@@ -72,7 +72,23 @@ class StackwiseVirtualConnectionProvider(BaseStackRpConnectionProvider):
                 # There are case when in non-SVL the device connection
                 # becomes active for both connection and there isn't a standby state
                 # it would have either active and member state or just active state
-                super().designate_handles()
+                
+                # Verify the active and standby
+                target_con.spawn.sendline(target_con.spawn.settings.SHOW_REDUNDANCY_CMD)
+                output = target_con.spawn.expect(
+                    target_con.state_machine.get_state('enable').pattern,
+                    timeout=con.settings.EXEC_TIMEOUT).match_output
+
+                state = re.findall(target_con.spawn.settings.REDUNDANCY_STATE_PATTERN, output, flags=re.M)
+                target_con.log.debug(f'{target_con.spawn} state: {state}')
+                if any('active' in s.lower() for s in state):
+                    con._set_active_alias(target_alias)
+                    con._set_standby_alias(other_alias)
+                elif any('standby' in s.lower() for s in state):
+                    con._set_standby_alias(target_alias)
+                    con._set_active_alias(other_alias)
+                else:
+                    raise ConnectionError('unable to designate handles')
 
         except Exception:
             con.log.exception("Failed to designate handle for SVL stack")

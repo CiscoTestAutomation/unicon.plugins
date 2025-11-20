@@ -176,3 +176,34 @@ cat9k_rommon_boot:
   commands:
     "":
       new_state: c9k_disable
+
+c9800_rommon_boot:
+  prompt: "WLC#"
+  commands:
+    "show version | include operating mode":
+      response: "Router operating mode: Autonomous"
+    "config term":
+      new_state: config_mode 
+    "reload":
+      response: |
+        System configuration has been modified. Save? [yes/no]: n
+        Reload command is being issued on Active unit, this will reload the whole stack
+        Proceed with reload? [confirm]
+        Chassis 1 reloading, reason - Reload command
+        Oct  6 17:33:34.243: %PMAN-5-EXITACTION: F0/0: pvp: Process manager is exiting:
+        Oct  6 17:33:35.179: %PMAN-5-EXITACTION: R0/0: pvp: Process manager is exiting: process exit with reload chassis code
+      new_state: rommon_prompt
+
+config_mode:
+  prompt: "WLC(config)#"
+  commands:
+    "config-register 0x0":
+      response: ""
+    "end":
+      new_state: c9800_rommon_boot
+
+rommon_prompt:
+  prompt: "grub>"
+  commands:
+    "":
+      response: ""

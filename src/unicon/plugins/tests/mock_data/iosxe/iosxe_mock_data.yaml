@@ -68,8 +68,8 @@ general_exec:
       78085207K bytes of SATA hard disk at harddisk:.
 
       Configuration register is 0x1
-
-
+    "config term":
+      new_state: general_config
     "enable":
       new_state: enable_password
 
@@ -658,6 +658,14 @@ standby_exec:
   commands:
     "show version | include operating mode": ""
     "cisco": ""
+    "config term":
+      new_state: configure_standby
+
+configure_standby:
+  prompt: "%N-standby(conf)#"
+  commands:
+    "end":
+      new_state: standby_exec
 
 iosxe_config_1:
   prompt: "%N(conf)#"
@@ -1572,9 +1580,14 @@ acm_if:
   prompt: "%N(acm-if)#"
   commands:
     "description test": ""
+    "invalid command example":
+      response: |
+        invalid command example
+        ^
+        % Invalid input detected at '^' marker.
+    "description test1": ""
     "end":
       new_state: general_enable
-
 syntax_check:
   prompt: "%N(syntax)#"
   commands:
@@ -1791,6 +1804,26 @@ security_log_message:
   commands:
     "":
       new_state: general_exec
+
+RSA_key_message:
+  prompt: " %RSA key size needs to be atleast 3072 bitsfor SSH server functionality to be enabled"
+  commands:
+    "":
+      new_state: general_exec
+
+enable_reload_RSA_log1:
+  prompt: "%N#"
+  commands:
+    <<: *gen_enable_cmds
+    "reload":
+      new_state: enable_reload_RSA_log2
+
+enable_reload_RSA_log2:
+  preface: "Press RETURN to get started!"
+  prompt: "%N>"
+  commands:
+    "":
+      new_state: RSA_key_message
 
 enable_reload_security_log1:
   prompt: "%N#"

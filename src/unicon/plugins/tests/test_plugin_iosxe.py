@@ -1453,6 +1453,21 @@ class TestSyslogHandler(unittest.TestCase):
         finally:
             d.disconnect()
 
+    def test_reload_RSA_key_log_message(self):
+        d = Connection(
+            hostname='Router',
+            start=['mock_device_cli --os iosxe --state enable_reload_RSA_log1 --hostname Router'],
+            os='iosxe',
+            credentials=dict(default=dict(username='cisco', password='cisco')),
+            log_buffer=True,
+            mit=True,
+        )
+        try:
+            d.connect()
+            d.reload(post_reload_wait_time=3)
+        finally:
+            d.disconnect()
+
 
 class TestIosxeAsr1k(unittest.TestCase):
     def test_connect_asr1k_ha(self):
@@ -1636,6 +1651,33 @@ class TestIosxeAcmRulesConfigure(unittest.TestCase):
         ]
         c.configure(config_txt, rules=True)
         c.disconnect()
+
+
+class TestIosxeAcmConfigureInvalidInput(unittest.TestCase):
+
+    def test_acm_configure_invalid_input(self):
+        c = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state general_enable --hostname PE1'],
+            os='iosxe',
+            mit=True
+        )
+        c.connect()
+        config_txt = [
+            'interface loopback 1',
+            'description test',
+            'invalid command example',  # this should trigger % Invalid input
+            'description test1'
+        ]
+        with self.assertRaises(SubCommandFailure):
+            c.configure(config_txt, acm_configlet='my_config')
+        self.assertEqual(
+            c.state_machine.current_state,
+            'enable',
+            f"Device not recovered to exec mode after invalid input, current: {c.state_machine.current_state}"
+        )
+        c.disconnect()
+
 
 class TestIosxeSyntaxConfigure(unittest.TestCase):
 

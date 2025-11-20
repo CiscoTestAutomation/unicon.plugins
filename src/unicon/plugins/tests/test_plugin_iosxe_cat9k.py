@@ -909,5 +909,26 @@ class TestIosXeCat9kPluginSyslog(unittest.TestCase):
         finally:
             d.disconnect()
 
+class RommonwithConfigRegister(unittest.TestCase):
+
+    def test_rommon_service_transitions_to_rommon(self):
+        c = Connection(
+            hostname='switch',
+            start=['mock_device_cli --os iosxe --state c9800_rommon_boot'],
+            os='iosxe',
+            platform='cat9k',
+            model='c9800',
+            mit=True,
+            credentials=dict(default=dict(username='cisco', password='cisco')),
+            settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+            log_buffer=True
+        )
+        try:
+            c.connect()
+            c.rommon() 
+            self.assertEqual(c.state_machine.current_state, 'rommon')
+        finally:
+            c.disconnect()
+
 if __name__ == '__main__':
     unittest.main()

@@ -15,7 +15,7 @@ class IosXESettings(GenericSettings):
         self.PROMPT_RECOVERY_COMMANDS = ['\r', '\x1e', '\x03']
 
         self.ERROR_PATTERN = [
-            r'^%\s*[Ii]nvalid (command|input)',
+            r'^\s*%\s*[Ii]nvalid (command|input)',
             r'^%\s*[Ii]ncomplete (command|input)',
             r'^%\s*[Aa]mbiguous (command|input)',
             r'% Bad IP address or host name',

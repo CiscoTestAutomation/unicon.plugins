@@ -22,9 +22,8 @@ svl_stack_exec:
                                                   H/W   Current
       Switch#   Role    Mac Address     Priority Version  State
       -------------------------------------------------------------------------------------
-       1       Standby   bcc4.9346.7880     1      V01     Ready
-      *2       Active   bcc4.9346.9180     3      V04     Ready
-
+      *1       Active   bcc4.9346.7880     1      V01     Ready
+      2       Standby   bcc4.9346.9180     3      V04     Ready
     "show version": &SV |2
       Cisco IOS XE Software, Version BLD_V1612_THROTTLE_LATEST_20200403_053502_V16_12_3_6
       Cisco IOS Software [Gibraltar], Catalyst L3 Switch Software (CAT3K_CAA-UNIVERSALK9-M), Experimental Version 16.12.20200403:060733 [S2C-build-v1612_throttle-BLD_V1612_THROTTLE_S2C_20200403_035148-/nobackup/mcpre/BLD-BLD_V1612_THROTTLE_LATEST_20200403_053502 132]
@@ -112,8 +111,8 @@ svl_stack_exec:
 
       Switch Ports Model              SW Version        SW Image              Mode
       ------ ----- -----              ----------        ----------            ----
-          1 32    WS-C3850-24P       16.12.4           CAT3K_CAA-UNIVERSALK9 BUNDLE
-      *   2 32    WS-C3850-24P       16.12.4           CAT3K_CAA-UNIVERSALK9 BUNDLE
+      *   1 32    WS-C3850-24P       16.12.4           CAT3K_CAA-UNIVERSALK9 BUNDLE
+          2 32    WS-C3850-24P       16.12.4           CAT3K_CAA-UNIVERSALK9 BUNDLE
 
 
       Switch 01
@@ -143,13 +142,12 @@ svl_stack_exec:
       Last reload reason                 : Admin reload CLI
 
       Configuration register is 0x102
-
-    "sh redundancy state": &SRS |2
-            my state = 13 -ACTIVE
-            peer state = 8  -STANDBY HOT
-                  Mode = Duplex
-                  Unit = Primary
-              Unit ID = 4
+    "sh redundancy state": &ASRS |2
+        my state = 13 -ACTIVE
+        peer state = 8  -STANDBY HOT
+              Mode = Duplex
+              Unit = Primary
+          Unit ID = 4
 
       Redundancy Mode (Operational) = sso
       Redundancy Mode (Configured)  = sso
@@ -161,6 +159,17 @@ svl_stack_exec:
           client count = 113
         client_notification_TMR = 30000 milliseconds
                   RF debug mask = 0x0
+    "show install summary": &SIS |2
+      [ Chassis 1/R0 2/R0 ] Installed Package(s) Information:
+      State (St): I - Inactive, U - Activated & Uncommitted,
+                  C - Activated & Committed, D - Deactivated & Uncommitted
+      --------------------------------------------------------------------------------
+      Type  St   Filename/Version
+      --------------------------------------------------------------------------------
+      IMG   C    26.01.01.0.227079
+      --------------------------------------------------------------------------------
+      Auto abort timer: inactive
+      --------------------------------------------------------------------------------
 
     "enable":
       new_state: svl_enable_pwd
@@ -179,11 +188,14 @@ svl_stack_enable:
     "show version": *SV
     "show version | include operating mode" : ""
     "show switch": *SS
-    "sh redundancy state": *SRS
+    "sh redundancy state": *ASRS
+    "sh redundancy stat | inc my state": |
+            my state = 13 -ACTIVE
+    "show install summary": *SIS
+    
     "disable":
       new_state: svl_stack_exec
     "enable": ""
-
     "config term":
       new_state: svl_stack_config
 
@@ -243,69 +255,76 @@ svl_switchover_prompt2:
       timing:
         - 0:6,0,0.02
         - 6:,1,0.005
-      new_state: svl_stby_login
+      new_state: svl_post_switchover_standby_login
 
-#  -----------standby--------------------
+#  -----------standby before switchover-------------------- 
 
-svl_stby_login:
+svl_initial_standby_login:
   prompt: "Username: "
   commands:
     "cisco":
-      new_state: svl_stby_password
-  
-svl_stby_password:
+      new_state: svl_initial_standby_password
+
+svl_initial_standby_password: # Initial password for p2
   prompt: "Password: "
   commands:
     "cisco":
-      new_state: svl_stby_exec
+      new_state: svl_initial_standby_exec
 
-svl_stby_exec:
+svl_initial_standby_exec:
   prompt: "%N-stby>"
   commands:
     "term length 0": ""
     "term width 0": ""
-    "show switch": &SSS |2
-      Switch/Stack Mac Address : 00be.7574.6b0c - Local Mac Address
-      Mac persistency wait time: Indefinite
-                                                  H/W   Current
-      Switch#   Role    Mac Address     Priority Version  State
-      -------------------------------------------------------------------------------------
-       1       Active   00be.7574.6b0c     0      V02     Ready
-      *2       Standby  2cf8.9bb9.5648     0      V02     Ready
-    "show version": *SV
     "show version | include operating mode" : ""
-    "sh redundancy state": *SRS
-    "enable":
-      new_state: svl_stby_enable_pwd
+    "show switch": *SS
+    "show version": *SV
+    "sh redundancy state":  &SRS |2
+            my state = 8  -STANDBY HOT
+            peer state = 13 -ACTIVE
+                  Mode = Duplex
+                  Unit = Secondary
+              Unit ID = 4
 
-svl_stby_enable_pwd:
+      Redundancy Mode (Operational) = sso
+      Redundancy Mode (Configured)  = sso
+      Redundancy State              = sso
+            Maintenance Mode = Disabled
+          Manual Swact = enabled
+        Communications = Up
+
+          client count = 113
+        client_notification_TMR = 30000 milliseconds
+                  RF debug mask = 0x0
+
+    "sh redundancy stat | inc my state": |
+      my state = 8 -STANDBY HOT
+    "enable":
+      new_state: svl_initial_standby_enable_pwd
+
+svl_initial_standby_enable_pwd:
   prompt: "Password: "
   commands:
     "cisco":
-      new_state: svl_stby_enable
+      new_state: svl_initial_standby_enable
 
-svl_stby_enable:
+svl_initial_standby_enable:
   prompt: "%N-stby#"
   commands:
     "term length 0": ""
     "term width 0": ""
     "show version | include operating mode" : ""
     "show version": *SV
-    "show switch": *SSS
+    "show switch": *SS
     "sh redundancy state": *SRS
+    "sh redundancy stat | inc my state": |
+      my state = 8 -STANDBY HOT
     "disable":
-      new_state: svl_stby_exec
+      new_state: svl_initial_standby_exec
     "config term":
-      new_state: svl_stby_stack_config
-    "enable": ""
+      new_state: svl_initial_standby_config
 
-svl_standby_switchover:
-  prompt: "%N-stby>"
-  commands:
-    "enable":
-      new_state: svl_stby_enable
-
-svl_stby_stack_config:
+svl_initial_standby_config:
   prompt: "%N-stby(config)#"
   commands:
     "no logging console": ""
@@ -314,14 +333,158 @@ svl_stby_stack_config:
     "line vty 0 4":
       new_state: svl_stack_config_line
     "end":
-      new_state: svl_stack_enable
+      new_state: svl_initial_standby_enable
     "redundancy":
-      new_state: svl_stby_config_stack_redundancy
+      new_state: svl_initial_standby_config_redundancy
 
-svl_stby_config_stack_redundancy:
+svl_initial_standby_config_redundancy:
     prompt: "%N(config-red)#"
     commands:
       "main-cpu":
         new_state: svl_config_stack_redundancy_main_cpu
       "end":
-        new_state: svl_stby_enable
+        new_state: svl_initial_standby_enable
+  
+#  -----------standby post switchover-------------------- 
+
+svl_post_switchover_standby_login:
+  prompt: "Username: "
+  commands:
+    "cisco":
+      new_state: svl_post_switchover_standby_password
+
+svl_post_switchover_standby_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: svl_post_switchover_standby_exec
+
+svl_post_switchover_standby_exec:
+  prompt: "%N-stby>"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show switch": &PSS |2
+      Switch/Stack Mac Address : 00be.7574.6b0c - Local Mac Address
+      Mac persistency wait time: Indefinite
+                                                  H/W   Current
+      Switch#   Role    Mac Address     Priority Version  State
+      -------------------------------------------------------------------------------------
+      1       Standby   00be.7574.6b0c     0      V02     Ready
+      *2       Active    2cf8.9bb9.5648     0      V02     Ready
+
+    "show version": *SV
+    "show version | include operating mode" : ""
+    "sh redundancy state": *SRS
+    "sh redundancy stat | inc my state": |
+      my state = 8 -STANDBY HOT
+    "enable":
+      new_state: svl_post_switchover_standby_enable_pwd
+
+svl_post_switchover_standby_enable_pwd:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: svl_post_switchover_standby_enable
+
+svl_post_switchover_standby_enable:
+  prompt: "%N-stby#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version | include operating mode" : ""
+    "show version": *SV
+    "show switch": *PSS
+    "sh redundancy state": *SRS
+    "sh redundancy stat | inc my state": |
+      my state = 8 -STANDBY HOT
+    "disable":
+      new_state: svl_post_switchover_standby_exec
+    "config term":
+      new_state: svl_post_switchover_standby_config
+
+svl_post_switchover_standby_config:
+  prompt: "%N-stby(config)#"
+  commands:
+    "no logging console": ""
+    "line console 0":
+      new_state: svl_stack_config_line
+    "line vty 0 4":
+      new_state: svl_stack_config_line
+    "end":
+      new_state: svl_post_switchover_standby_enable
+    "redundancy":
+      new_state: svl_post_switchover_standby_config_redundancy
+
+svl_post_switchover_standby_config_redundancy:
+    prompt: "%N(config-red)#"
+    commands:
+      "main-cpu":
+        new_state: svl_config_stack_redundancy_main_cpu
+      "end":
+        new_state: svl_post_switchover_standby_enable
+
+#  -----------Active post switchover-------------------- 
+
+svl_post_switchover_active_login:
+    prompt: "Username: "
+    commands:
+      "cisco":
+        new_state: svl_post_switchover_active_password
+
+svl_post_switchover_active_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: svl_post_switchover_active_exec
+
+svl_post_switchover_active_exec:
+  prompt: "%N>"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version | include operating mode" : ""
+    "show switch": *PSS
+    "show version": *SV
+    "sh redundancy state": *ASRS
+    "sh redundancy stat | inc my state": |
+        my state = 13 -ACTIVE
+    "show install summary": *SIS
+    "enable":
+      new_state: svl_post_switchover_active_enable_pwd
+
+svl_post_switchover_active_enable_pwd:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: svl_post_switchover_active_enable
+
+svl_post_switchover_active_enable:
+  prompt: "%N#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": *SV
+    "show version | include operating mode" : ""
+    "show switch": *PSS 
+    "sh redundancy state": *ASRS 
+    "sh redundancy stat | inc my state": |
+            my state = 13 -ACTIVE
+    "show install summary": *SIS
+    "disable":
+      new_state: svl_post_switchover_active_exec
+    "config term":
+      new_state: svl_post_switchover_active_config
+
+svl_post_switchover_active_config:
+  prompt: "%N(config)#"
+  commands:
+    "no logging console": ""
+    "line console 0":
+      new_state: svl_stack_config_line
+    "line vty 0 4":
+      new_state: svl_stack_config_line
+    "end":
+      new_state: svl_post_switchover_active_enable
+    "redundancy":
+      new_state: svl_config_stack_redundancy 

@@ -19,7 +19,7 @@ class LinuxSettings(GenericSettings):
         """ initialize
         """
         super().__init__()
-        self.LINUX_INIT_EXEC_COMMANDS = []
+        self.LINUX_INIT_EXEC_COMMANDS = ['uptime']
 
         ## Prompt recovery commands for Linux
         # Default commands: Enter key , Ctrl-C, Enter Key
