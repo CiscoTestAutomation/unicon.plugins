@@ -60,7 +60,7 @@ class GenericSettings(Settings):
         # Temporary enable secret used during setup
         # this is used if no password is available
         # and would not be saved by default
-        self.TEMP_ENABLE_SECRET = 'Secret12345'
+        self.TEMP_ENABLE_SECRET = 'Secret12345!'
         # Minimum length for enable secret password:
         # if the password specified is shorter,
         # use the TEMP_ENABLE_SECRET instead.

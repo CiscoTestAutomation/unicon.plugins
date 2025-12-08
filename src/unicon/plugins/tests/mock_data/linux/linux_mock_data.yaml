@@ -716,6 +716,11 @@ ansi_prompt:
   commands: *cmds
 
 
+ansi_prompt2:
+  prompt: "\x1b[0;32m[user@host:~] >\x1b[m \x1b[m\x0f"
+  commands: *cmds
+
+
 slow_connection_exec:
   preface:
     response: ""

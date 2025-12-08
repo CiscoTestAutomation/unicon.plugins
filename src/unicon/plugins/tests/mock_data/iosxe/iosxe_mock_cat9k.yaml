@@ -695,6 +695,7 @@ c9k_exec:
     "term length 0": ""
     "term width 0": ""
     "show version | include operating mode" : ""
+    "show install summary": ""
     "show version": |2
           Cisco IOS XE Software, Version 16.09.02
           Cisco IOS Software [Fuji], Catalyst L3 Switch Software (c9k_IOSXE), Version 16.9.2, RELEASE SOFTWARE (fc4)
@@ -805,6 +806,7 @@ enable_c9k:
     "term length 0": ""
     "term width 0": ""
     "show version | include operating mode" : ""
+    "show install summary": ""
     "show version": |2
       Cisco IOS XE Software, Version 16.09.02
       Cisco IOS Software [Fuji], Catalyst L3 Switch Software (c9k_IOSXE), Version 16.9.2, RELEASE SOFTWARE (fc4)
@@ -1113,3 +1115,93 @@ grub_execute:
       MANUAL_BOOT=yes
     "boot":
       new_state: cat9k_rommon_boot
+
+
+# ================================
+# Login sequence for login_creds
+
+c9k_login7:
+  prompt: "Username: "
+  commands:
+    "ts_user":  # First credential from login_creds: [ts, default] - terminal server auth
+      new_state: c9k_password7_ts
+
+c9k_password7_ts:
+  prompt: "Password: "
+  commands:
+    "ts_pass":
+      response: |
+
+        Password OK
+
+      new_state: c9k_password7_ok  # Intermediate state after Password OK
+
+c9k_password7_ok:
+  prompt: ""  # Empty prompt - requires 'enter' to proceed
+  commands:
+    "":
+      new_state: c9k_login7_device  # Now go to device login
+
+c9k_login7_device:
+  prompt: "Username: "
+  commands:
+    "admin":  # Second credential from login_creds: [ts, default] - device credential
+      new_state: c9k_password7_device
+
+c9k_password7_device:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: c9k_exec
+
+# ================================
+# Login sequence for login_creds with fallback testing
+c9k_login8:
+  prompt: "Username: "
+  commands:
+    "ts_user":  # First credential from login_creds: [ts, default] - terminal server auth
+      new_state: c9k_password8_ts
+
+c9k_password8_ts:
+  prompt: "Password: "
+  commands:
+    "ts_pass":
+      response: |
+
+        Password OK
+
+      new_state: c9k_password8_ok  # Intermediate state after Password OK
+
+c9k_password8_ok:
+  prompt: ""  # Empty prompt - requires 'enter' to proceed
+  commands:
+    "":
+      new_state: c9k_login8_device  # Now go to device login
+
+c9k_login8_device:
+  prompt: "Username: "
+  commands:
+    "admin":  # Second credential from login_creds: [ts, default] - device credential (will fail)
+      new_state: c9k_password8_device_fail
+
+c9k_password8_device_fail:
+  prompt: "Password: "
+  commands:
+    "wrong_password":
+      response: |
+        % Login invalid
+
+      new_state: c9k_login8_fallback  # Default fails, go to fallback
+
+c9k_login8_fallback:
+  prompt: "Username: "
+  commands:
+    "fallback_user":  # Fallback credential - this will succeed
+      new_state: c9k_password8_fallback
+
+c9k_password8_fallback:
+  prompt: "Password: "
+  commands:
+    "fallback_pass":
+      new_state: c9k_exec
+

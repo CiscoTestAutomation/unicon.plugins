@@ -21,7 +21,7 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
                        platform='cat9k',
                        type='vWLC',
                        credentials=dict(default=dict(username='admin', password='cisco'),
-                                        enable=dict(password='Secret12345')),
+                                        enable=dict(password='Secret12345!')),
                        learn_hostname=True,
                        log_buffer=True,
                        init_exec_commands=[],

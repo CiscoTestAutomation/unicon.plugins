@@ -87,6 +87,16 @@ class TestIosXeCat9kPlugin(unittest.TestCase):
             md.stop()
 
     def test_connect_fallback(self):
+        """
+        Test the fallback credentials functionality for IOSXE Cat9k devices.
+
+        This test verifies that when the default credentials fail to authenticate,
+        the connection process falls back to the configured fallback credentials
+        (set1) and successfully establishes a connection to the device.
+
+        Expected behavior: Connection should succeed using fallback credentials
+        when default credentials are not accepted by the device.
+        """
         md = MockDeviceTcpWrapperIOSXE(port=0, state='c9k_login5', hostname='switch')
         md.start()
 
@@ -118,6 +128,10 @@ class TestIosXeCat9kPlugin(unittest.TestCase):
         try:
             device.connect()
             self.assertEqual(device.state_machine.current_state, 'enable')
+            self.assertIn('current_credentials', device.credentials)
+            self.assertEqual(device.credentials['current_credentials']['username'], 'cisco')
+            # Should match the fallback credential, not default
+            self.assertEqual(device.credentials['current_credentials'], device.credentials['set1'])
         finally:
             device.disconnect()
             md.stop()
@@ -154,6 +168,120 @@ class TestIosXeCat9kPlugin(unittest.TestCase):
         try:
             device.connect()
             self.assertEqual(device.state_machine.current_state, 'enable')
+        finally:
+            device.disconnect()
+            md.stop()
+
+    def test_connect_login_creds(self):
+        """
+        Test that login_creds stores the last credential as current_credentials.
+
+        This test verifies that when multiple credentials are specified in login_creds,
+        the connection process correctly stores the last successfully used credential
+        as the current_credentials in the device's credentials dictionary.
+
+        Expected behavior:
+        - TS credentials pass initially but are not stored as current_credentials
+        - Default credentials are used for enable mode and stored as current_credentials
+        - Device successfully connects and reaches enable state
+        - current_credentials should reflect the 'default' credential set
+
+        This ensures proper credential tracking for subsequent operations.
+        """
+        md = MockDeviceTcpWrapperIOSXE(port=0, state='c9k_login7', hostname='switch')
+        md.start()
+
+        testbed = """
+        devices:
+            R1:
+                os: iosxe
+                type: cat9k
+                credentials:
+                    default:
+                        username: admin
+                        password: cisco
+                    ts:
+                        username: ts_user
+                        password: ts_pass
+                connections:
+                    defaults:
+                        class: unicon.Unicon
+                    a:
+                        protocol: telnet
+                        ip: 127.0.0.1
+                        port: {}
+                        login_creds: [ts, default]
+        """.format(md.ports[0])
+
+        tb = loader.load(testbed)
+        device = tb.devices.R1
+        try:
+            device.connect()
+            self.assertEqual(device.state_machine.current_state, 'enable')
+            self.assertIn('current_credentials', device.credentials)
+            self.assertEqual(device.credentials['current_credentials']['username'], 'admin')
+            # Should match the 'default' credential, not 'ts'
+            self.assertEqual(device.credentials['current_credentials'], device.credentials['default'])
+        finally:
+            device.disconnect()
+            md.stop()
+
+    def test_connect_login_creds_with_fallback(self):
+        """
+        Test login credentials with fallback mechanism for IOSXE Cat9k device connection.
+
+        This test verifies the credential fallback behavior when multiple credential sets
+        are configured and some fail during authentication:
+
+        Expected behavior:
+        - TS credentials pass initially
+        - Default credentials fail (wrong password)
+        - Fallback credentials are attempted and succeed
+        - Fallback credentials are stored as current_credentials
+        - Device successfully connects and reaches enable state
+        """
+        md = MockDeviceTcpWrapperIOSXE(port=0, state='c9k_login8', hostname='switch')
+        md.start()
+
+        testbed = """
+        devices:
+            R1:
+                os: iosxe
+                type: cat9k
+                credentials:
+                    default:
+                        username: admin
+                        password: wrong_password  # This will fail
+                    ts:
+                        username: ts_user
+                        password: ts_pass
+                    fallback_set:
+                        username: fallback_user
+                        password: fallback_pass
+                connections:
+                    defaults:
+                        class: unicon.Unicon
+                        fallback_credentials:
+                            - fallback_set
+                    a:
+                        protocol: telnet
+                        ip: 127.0.0.1
+                        port: {}
+                        login_creds: [ts, default]
+        """.format(md.ports[0])
+
+        tb = loader.load(testbed)
+        device = tb.devices.R1
+        try:
+            device.connect()
+            self.assertEqual(device.state_machine.current_state, 'enable')
+            # Verify that fallback credential is stored as current_credentials
+            # Since default failed and fallback succeeded, fallback_set should be stored
+            self.assertIn('current_credentials', device.credentials)
+            self.assertEqual(device.credentials['current_credentials']['username'], 'fallback_user')
+            # Should match the fallback credential, not default or ts
+            self.assertEqual(device.credentials['current_credentials'], device.credentials['fallback_set'])
+
         finally:
             device.disconnect()
             md.stop()

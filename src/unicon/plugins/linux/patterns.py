@@ -12,17 +12,17 @@ class LinuxPatterns(GenericPatterns):
         # The reason for using the learn_hostname pattern instead of the shell_prompt pattern
         # to learn the hostname, is that the regex in the router implementation matches \S
         # which is not exact enough for the known linux prompts.
-        self.learn_hostname = r'^.*?({a})?(?P<hostname>[-\w]+)\s?([-\w\]/~:\.\d ]+)?([>\$~%#\]])\s*(\x1b\S+)?$'.format(a=ANSI_REGEX)
+        self.learn_hostname = r'^.*?({a})?(?P<hostname>[-\w]+)\s?([-\w\]/~:\.\d ]+)?([>\$~%#\]])\s*(\x1b\S+\s?)*$'.format(a=ANSI_REGEX)
 
         # shell_prompt pattern will be used by the 'shell' state after lean_hostname matches
         # a known hostname pattern this pattern is set for the shell state at transition
         # from learn_hostname to shell, see statemachine for more details.
-        self.shell_prompt = r'^(.*?(?P<prompt>((\([-\w]+\) |\x1b(?!\[\?2004).*?)?\S+)?%N\s?([-\w\]/~\s:\.\d]+)?[>\$~%#\]]\s?(\x1b\S+)?))$'
+        self.shell_prompt = r'^(.*?(?P<prompt>((\([-\w]+\) |\x1b(?!\[\?2004).*?)?\S+)?%N\s?([-\w\]/~\s:\.\d]+)?[>\$~%#\]]\s?(\x1b\S+\s?)*))$'
 
         # default linux prompt with loose matching of the prompt
         # this can result in false prompt matching when output has
         # one of the prompt characters at the end of the line,
         # e.g. XML output or a banner
-        self.prompt = r'^(.*?([>\$~%\]]|\] # |[^#\s]#|~ #|~/|^admin:|^#|~\s?#\s?)\s?(\x1b\S+)?)$'
+        self.prompt = r'^(.*?([>\$~%\]]|\] # |[^#\s]#|~ #|~/|^admin:|^#|~\s?#\s?)\s?(\x1b\S+\s?)*)$'
 
         self.trex_console = r'^(.*?)(?P<prompt>trex>\s*)$'
