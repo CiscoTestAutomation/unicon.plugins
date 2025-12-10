@@ -172,7 +172,7 @@ class TestIosXEEnableSecret(unittest.TestCase):
                     username: cisco
                     password: cisco
                 enable:
-                    password: Secret12345
+                    password: Secret12345!
             connections:
               defaults:
                 class: unicon.Unicon

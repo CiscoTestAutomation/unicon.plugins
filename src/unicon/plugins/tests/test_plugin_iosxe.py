@@ -816,7 +816,7 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
             os='iosxe',
             platform='cat9k',
             credentials=dict(default=dict(
-                username='cisco', password='cisco', enable_password='Secret12345')),
+                username='cisco', password='cisco', enable_password='Secret12345!')),
             log_buffer=True,
             mit=True
             )
@@ -1212,7 +1212,7 @@ class TestIosXEEnableSecret(unittest.TestCase):
                        os='iosxe',
                        init_exec_commands=[],
                        init_config_commands=[],
-                       credentials=dict(default=dict(password='Secret12345')),
+                       credentials=dict(default=dict(password='Secret12345!')),
                        log_buffer=True
                        )
         c.connect()
@@ -1238,7 +1238,7 @@ class TestIosXEEnableSecret(unittest.TestCase):
           R1:
             os: iosxe
             passwords:
-                enable: Secret12345
+                enable: Secret12345!
             connections:
               cli:
                 command: mock_device_cli --os iosxe --state initial_config_dialog --hostname R1
@@ -1258,7 +1258,7 @@ class TestIosXEEnableSecret(unittest.TestCase):
             os: iosxe
             credentials:
               default:
-                password: Secret12345
+                password: Secret12345!
             connections:
               cli:
                 command: mock_device_cli --os iosxe --state initial_config_dialog --hostname R1
@@ -1437,6 +1437,7 @@ class TestSyslogHandler(unittest.TestCase):
             d.connect()
         finally:
             d.disconnect()
+    
 
     def test_reload_security_log_message(self):
         d = Connection(
@@ -1457,6 +1458,21 @@ class TestSyslogHandler(unittest.TestCase):
         d = Connection(
             hostname='Router',
             start=['mock_device_cli --os iosxe --state enable_reload_RSA_log1 --hostname Router'],
+            os='iosxe',
+            credentials=dict(default=dict(username='cisco', password='cisco')),
+            log_buffer=True,
+            mit=True,
+        )
+        try:
+            d.connect()
+            d.reload(post_reload_wait_time=3)
+        finally:
+            d.disconnect()
+
+    def test_reload_Insecure_log_message(self):
+        d = Connection(
+            hostname='Router',
+            start=['mock_device_cli --os iosxe --state enable_reload_insecure_log1 --hostname Router'],
             os='iosxe',
             credentials=dict(default=dict(username='cisco', password='cisco')),
             log_buffer=True,

@@ -297,7 +297,7 @@ class TestLinuxPluginPrompts(unittest.TestCase):
 class TestLearnHostname(unittest.TestCase):
 
     def test_learn_hostname(self):
-        states = {
+        states_to_host = {
           'exec': 'Linux',
           'exec2': 'Linux',
           'exec3': 'Linux',
@@ -318,10 +318,11 @@ class TestLearnHostname(unittest.TestCase):
           'exec18': LinuxSettings().DEFAULT_LEARNED_HOSTNAME,
           'exec20': 'Linux',
           'exec21': 'mock-server',
-          'ansi_prompt': 'apc'
+          'ansi_prompt': 'apc',
+          'ansi_prompt2': 'host',
         }
 
-        for state in states:
+        for state in states_to_host:
             print('\n\n## Testing state %s ##' % state)
             testbed = """
             devices:
@@ -341,10 +342,10 @@ class TestLearnHostname(unittest.TestCase):
             tb = loader.load(testbed)
             c = tb.devices.lnx
             c.connect(learn_hostname=True)
-            self.assertEqual(c.learned_hostname, states[state])
+            self.assertEqual(c.learned_hostname, states_to_host[state])
 
             # only check for supported prompts
-            if states[state] != LinuxSettings().DEFAULT_LEARNED_HOSTNAME:
+            if states_to_host[state] != LinuxSettings().DEFAULT_LEARNED_HOSTNAME:
                 x = c.execute('xml')
                 self.assertEqual(x.replace('\r', ''), mock_data['exec']['commands']['xml']['response'].strip())
                 x = c.execute('banner1')

@@ -656,10 +656,11 @@ class GenericStatements():
                                             loop_continue=True,
                                             continue_timer=False)
         self.password_ok_stmt = Statement(pattern=pat.password_ok,
-                                          action=sendline,
+                                          action=escape_char_callback,
                                           args=None,
                                           loop_continue=True,
-                                          continue_timer=False)
+                                          continue_timer=True,
+                                          trim_buffer=False)
         self.more_prompt_stmt = Statement(pattern=pat.more_prompt,
                                           action=more_prompt_handler,
                                           args=None,

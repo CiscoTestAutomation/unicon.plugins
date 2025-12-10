@@ -26,7 +26,7 @@ from unicon.plugins.generic.service_implementation import (
 
 from .service_statements import execute_statement_list, configure_statement_list, confirm
 
-from .statements import grub_prompt_stmt, boot_from_rommon_stmt
+from .statements import grub_prompt_stmt, boot_from_rommon_stmt, terminal_position_stmt
 
 from unicon.plugins.generic.utils import GenericUtils
 from unicon.plugins.generic.service_implementation import BashService as GenericBashService
@@ -258,6 +258,7 @@ class BashService(GenericBashService):
                              timeout=timeout,
                              **kwargs)
 
+            self.terminal_position_dialog = Dialog([terminal_position_stmt])
         def __enter__(self):
 
             if self.conn.context.get('_disable_selinux'):
@@ -272,7 +273,8 @@ class BashService(GenericBashService):
                 'shell',
                 self.conn.spawn,
                 timeout=self.timeout,
-                context=self.conn.context)
+                context=self.conn.context,
+                dialog=self.terminal_position_dialog,)
 
             for cmd in self.conn.settings.BASH_INIT_COMMANDS:
                 self.conn.execute(

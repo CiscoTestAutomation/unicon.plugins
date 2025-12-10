@@ -941,14 +941,14 @@ enter_enable_secret:
     "": "Please enter a secret"
     "veryverybadpw":
       response: "%Password validation failed"
-    "Secret12345":
+    "Secret12345!":
       new_state: confirm_enable_secret
 
 confirm_enable_secret:
   prompt: "  Confirm enable secret: "
   commands:
     "": "Please enter a secret"
-    "Secret12345":
+    "Secret12345!":
       response: |2
 
         The following configuration command script was created:
@@ -1002,7 +1002,7 @@ enable_secret_exec:
 enable_secret_password:
   prompt: "Password: "
   commands:
-    "Secret12345":
+    "Secret12345!":
       new_state: general_enable
 
 guestshell:
@@ -1083,13 +1083,13 @@ management_setup_hostname:
 management_setup_enable_secret:
   prompt: "Enter enable secret: "
   commands:
-    "Secret12345":
+    "Secret12345!":
       new_state: management_setup_enable_secret2
 
 management_setup_enable_secret2:
   prompt: "Confirm enable secret: "
   commands:
-    "Secret12345":
+    "Secret12345!":
       new_state: management_setup_enable_password
 
 management_setup_enable_password:
@@ -1287,13 +1287,13 @@ management_setup_enable_secret1:
     -------------------------------------------------
   prompt: "Enter enable secret: "
   commands:
-    "Secret12345":
+    "Secret12345!":
       new_state: management_setup_enable_secret_confirm1
 
 management_setup_enable_secret_confirm1:
   prompt: "Confirm enable secret: "
   commands:
-    "Secret12345":
+    "Secret12345!":
       new_state: management_setup_confirm_selection
 
 
@@ -1810,6 +1810,26 @@ RSA_key_message:
   commands:
     "":
       new_state: general_exec
+
+insecure_log_message:
+  prompt: " INSECURE DYNAMIC WARNING - Module: SSH, Command: crypto key generate rsa modulus <modulus-size> label <label-name>, Reason: An SSH hostkey has been provisioned on the device with insufficient key length, Remediation: Please provision an SSH RSA hostkey with minimum modulus size of 3072 bits for enhanced security, Submode: exec, Parent CLI: Not Applicable"
+  commands:
+    "":
+      new_state: general_exec
+enable_reload_insecure_log1:
+  prompt: "%N#"
+  commands:
+    <<: *gen_enable_cmds
+    "reload":
+      new_state: enable_reload_insecure_log2
+
+enable_reload_insecure_log2:
+  preface: "Press RETURN to get started!"
+  prompt: "%N>"
+  commands:
+    "":
+      new_state: insecure_log_message
+
 
 enable_reload_RSA_log1:
   prompt: "%N#"

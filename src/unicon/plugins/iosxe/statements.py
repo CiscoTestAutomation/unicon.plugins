@@ -8,7 +8,10 @@ from unicon.eal.dialogs import Statement
 from unicon.plugins.generic.service_statements import\
     admin_password as admin_password_stmt
 from unicon.plugins.generic.statements import (
-    connection_statement_list, boot_timeout_stmt)
+    connection_statement_list,
+    boot_timeout_stmt,
+    terminal_position_handler,
+)
 
 from .patterns import IosXEReloadPatterns, IosXEPatterns
 
@@ -183,6 +186,13 @@ boot_from_rommon_stmt = Statement(
     loop_continue=True,
     continue_timer=False)
 
+terminal_position_stmt = Statement(
+    pattern=patterns.get_cursor_position,
+    action=terminal_position_handler,
+    args=None,
+    loop_continue=True,
+    continue_timer=False,
+)
 
 # Statement covering when a device asks us to reset it.
 please_reset_stmt = \
