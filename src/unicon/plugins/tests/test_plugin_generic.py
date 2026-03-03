@@ -1020,7 +1020,7 @@ class TestEscapeHandler(unittest.TestCase):
 
     def setUp(self):
         self.old_term_setting = os.environ.get('TERM')
-        os.environ['TERM'] = 'VT100'
+        os.environ['TERM'] = 'xterm'
 
     def test_escape_handler_uav(self):
         c = Connection(hostname='Router',

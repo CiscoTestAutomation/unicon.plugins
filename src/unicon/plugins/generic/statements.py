@@ -40,7 +40,7 @@ utils = Utils()
 
 def terminal_position_handler(spawn, session, context):
     """ send terminal position (VT100) """
-    spawn.send('\x1b[0;200R')
+    spawn.send('\x1b[0;0R')
 
 
 def connection_refused_handler(spawn, context):

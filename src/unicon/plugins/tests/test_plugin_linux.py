@@ -54,7 +54,7 @@ class TestLinuxPluginConnect(unittest.TestCase):
                        os='linux',
                        username='admin',
                        password='cisco')
-        c1 = Connection(hostname='pod-esa01',
+        c1 = Connection(hostname='pod-esa01.cisco.com',
                        start=['mock_device_cli --os linux --state connect_sma'],
                        os='linux',
                        username='admin',
@@ -269,7 +269,9 @@ class TestLinuxPluginPrompts(unittest.TestCase):
       'prompt17',
       'prompt18',
       'prompt19',
-      'prompt20'
+      'prompt20',
+      'prompt21',
+      'prompt22'
     ]
 
     @classmethod
@@ -314,10 +316,11 @@ class TestLearnHostname(unittest.TestCase):
           'exec14': 'rally',
           'exec15': LinuxSettings().DEFAULT_LEARNED_HOSTNAME,
           'sma_prompt' : 'sma03',
-          'sma_prompt_1' : 'pod-esa01',
+          'sma_prompt_1' : 'pod-esa01.cisco.com',
           'exec18': LinuxSettings().DEFAULT_LEARNED_HOSTNAME,
           'exec20': 'Linux',
           'exec21': 'mock-server',
+          'exec22': 'server.cisco.com',
           'ansi_prompt': 'apc',
           'ansi_prompt2': 'host',
         }

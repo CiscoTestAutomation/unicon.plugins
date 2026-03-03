@@ -29,7 +29,7 @@ prompt_switchover = Statement(pattern=pat.prompt_switchover,
                               continue_timer=True)
 
 switchover_complete = Statement(pattern=pat.switchover_complete,
-                                action='sendline()',
+                                action=None,
                                 loop_continue=False,
                                 continue_timer=False)
 

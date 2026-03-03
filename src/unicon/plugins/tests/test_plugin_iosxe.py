@@ -11,11 +11,11 @@ import re
 import os 
 import time
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, Mock, MagicMock
 from pyats.topology import loader
-from unittest.mock import Mock
 
 import unicon
+from unicon.plugins.generic.statements import terminal_position_handler
 from unicon import Connection
 from unicon.eal.dialogs import Dialog, Statement
 from unicon.eal.utils import ExpectMatch, MatchMode
@@ -592,6 +592,18 @@ splitlines()))
 
 
 class TestIosXEluginBashService(unittest.TestCase):
+
+    def test_terminal_position_handler(self):
+        """Test that terminal_position_handler sends correct VT100 cursor
+        position response ESC[0;0R without any additional cleanup."""
+        mock_spawn = MagicMock()
+        mock_session = {}
+        mock_context = {}
+
+        terminal_position_handler(mock_spawn, mock_session, mock_context)
+
+        # Verify the handler sent only the cursor position response
+        mock_spawn.send.assert_called_once_with('\x1b[0;0R')
 
     def test_bash(self):
         c = Connection(hostname='Router',

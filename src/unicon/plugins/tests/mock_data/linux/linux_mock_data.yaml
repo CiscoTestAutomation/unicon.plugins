@@ -166,6 +166,8 @@ exec:
         new_state: exec20
     "prompt21":
         new_state: exec21
+    "prompt22":
+        new_state: exec22
     "ls": |
       /tmp
       /var
@@ -399,6 +401,10 @@ exec20:
 
 exec21:
   prompt: "cxta@mock-server:~$ "
+  commands: *cmds
+
+exec22:
+  prompt: "(server.cisco.com)~ : "
   commands: *cmds
 
 

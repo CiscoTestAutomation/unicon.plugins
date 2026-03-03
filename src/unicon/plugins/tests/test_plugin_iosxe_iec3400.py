@@ -21,7 +21,8 @@ class TestIec3400Plugin(unittest.TestCase):
         )
         c.connect()
         c.execute('get terminal position')
-        self.assertEqual(c.spawn.match.match_output, '^[[0;200RPE1#')
+        self.assertIn('^[[0;0R', c.spawn.match.match_output)
+        self.assertTrue(c.spawn.match.match_output.endswith('PE1#'))
         c.disconnect()
 
     def test_reload_with_error_pattern(self):
