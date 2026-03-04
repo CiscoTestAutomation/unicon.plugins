@@ -166,6 +166,38 @@ class TestIosXECat8kPluginSwitchover(unittest.TestCase):
             c.disconnect()
             md.stop()
 
+    def test_switchover_verify_reconnect(self):
+        """Test that switchover properly reconnects after standby becomes active."""
+        md = MockDeviceTcpWrapperIOSXECat8k(port=0, state='c8k_login')
+        md.start()
+
+        c = Connection(
+            hostname='Switch',
+            start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
+            os='iosxe',
+            platform='cat8k',
+            settings=dict(
+                POST_DISCONNECT_WAIT_SEC=0,
+                GRACEFUL_DISCONNECT_WAIT_SEC=0.2,
+                POST_HA_RELOAD_CONFIG_SYNC_WAIT=1,
+                POST_SWITCHOVER_WAIT=1,
+            ),
+            credentials=dict(default=dict(username='admin', password='cisco')),
+            mit=True,
+        )
+        try:
+            c.connect()
+            initial_state = c.state_machine.current_state
+            c.switchover()
+            # After switchover, should be back in enable state
+            self.assertEqual(c.state_machine.current_state, 'enable')
+            # Should be able to execute commands
+            output = c.execute('show version')
+            self.assertIn('Cisco IOS', output)
+        finally:
+            c.disconnect()
+            md.stop()
+
 @unittest.skip("Skipping until test is fixed")
 class TestIosXECat8kPluginReload(unittest.TestCase):
 

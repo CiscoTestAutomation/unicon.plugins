@@ -304,7 +304,7 @@ class TestLearnHostname(unittest.TestCase):
           'exec14': 'rally',
           'exec15': LinuxSettings().DEFAULT_LEARNED_HOSTNAME,
           'sma_prompt' : 'sma03',
-          'sma_prompt_1' : 'pod-esa01',
+          'sma_prompt_1' : 'pod-esa01.cisco.com',
           'exec18': LinuxSettings().DEFAULT_LEARNED_HOSTNAME,
         }
 

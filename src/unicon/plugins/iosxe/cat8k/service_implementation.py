@@ -108,24 +108,8 @@ class SwitchoverService(BaseService):
         sleep(con.settings.POST_SWITCHOVER_WAIT)
 
         con.spawn.sendline()
-        con.state_machine.go_to(
-            'any',
-            con.spawn,
-            prompt_recovery=self.prompt_recovery,
-            timeout=con.connection_timeout,
-            context=self.context
-        )
 
-        con.log.info(f'Waiting {con.settings.POST_SWITCHOVER_WAIT} seconds before going to enable mode')
-        sleep(con.settings.POST_SWITCHOVER_WAIT)
-        
-        con.spawn.sendline()
-        con.state_machine.go_to(
-            'enable',
-            con.spawn,
-            prompt_recovery=self.prompt_recovery,
-            context=self.context
-        )
+        con.connection_provider.connect()
         self.result = True
 
         if not sync_standby:

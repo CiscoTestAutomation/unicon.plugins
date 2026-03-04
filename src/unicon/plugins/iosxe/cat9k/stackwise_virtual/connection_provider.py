@@ -3,10 +3,14 @@ Authors:
     pyATS TEAM (pyats-support@cisco.com, pyats-support-ext@cisco.com)
 """
 import re
-from unicon.eal.dialogs import Dialog
+
+from unicon.eal.dialogs import Dialog, Statement
 from unicon.bases.routers.connection_provider import BaseStackRpConnectionProvider
 
+from genie.metaparser.util.exceptions import SchemaEmptyParserError
+
 from unicon.plugins.generic.statements import connection_statement_list, custom_auth_statements
+
 
 class StackwiseVirtualConnectionProvider(BaseStackRpConnectionProvider):
     """ Implements Stack Connection Provider,
@@ -36,12 +40,23 @@ class StackwiseVirtualConnectionProvider(BaseStackRpConnectionProvider):
         other_alias = None
 
         # Try to go to enable mode on both connections
+        standby_locked_dialog = Dialog([
+            Statement(
+                pattern=r'.*Standby console disabled.*',
+                action=None,
+                loop_continue=False,
+                continue_timer=False,
+            )
+        ])
+
         for subcon in [subcon1, subcon2]:
             try:
                 subcon.state_machine.go_to(
                     'enable',
                     subcon.spawn,
                     context=subcon.context,
+                    timeout=con.settings.BOOT_TIMEOUT,
+                    dialog=standby_locked_dialog,
                 )
             except Exception:
                 pass
@@ -63,7 +78,11 @@ class StackwiseVirtualConnectionProvider(BaseStackRpConnectionProvider):
         device = con.device
         try:
             # To check if the device is in SVL state
-            output = device.parse("show switch")
+            try:
+                output = device.parse("show switch")
+            except SchemaEmptyParserError:
+                con.log.debug("show switch returned empty output")
+                output = {}
             stack_info = output.get("switch", {}).get("stack", {})
             roles = [switch_info.get("role") for switch_info in stack_info.values()]
 

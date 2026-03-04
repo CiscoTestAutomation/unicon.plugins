@@ -64,7 +64,7 @@ class PingPatterns():
         self.tunnel = r'^.*Tunnel interface number \[.+\]\s?: $'
         self.repeat = r'^.*Repeat count \[.+\]\s?: $'
         self.size = r'^.*Datagram size \[.+\]\s?: $'
-        self.verbose = r'^.*Verbose \[.+\]\s?: $'
+        self.verbose = r'^.*Verbose(\?)? \[.+\]\s?: $'
         self.interval = r'^.*Interval in milliseconds \[.+\]: $'
         self.packet_timeout = r'^.*Timeout in seconds \[.+\]\s?: $'
         self.sending_interval = r'^.*Sending interval in seconds \[.+\]\s?: $'
