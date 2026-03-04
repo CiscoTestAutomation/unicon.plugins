@@ -36,9 +36,6 @@ Changelogs
 * stackwisevirtualconnectionprovider
     * Avoid traceback on empty 'show switch' output
 
-* unicon.plugin/c8kv
-    * imported connection provider from internal plugin to fix system mode insecure command issue.
-
 * unicon.plugin/cat8k
     * Modified the Switchover implementaion of cat8k to connect post switchover
     * This is to avoid any prompt mismatch issues post switchover
