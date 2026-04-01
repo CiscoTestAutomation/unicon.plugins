@@ -67,7 +67,7 @@ class C9350StackReload(BaseService):
         if member:
             reload_command = f'reload slot {member}'
 
-        reload_cmd = reload_command or self.reload_command
+        reload_cmd = reload_command if reload_command is not None else self.reload_command
         timeout = timeout or self.timeout
         conn = self.connection.active
 
@@ -122,7 +122,8 @@ class C9350StackReload(BaseService):
         conn.context['post_reload_wait_time'] = timedelta(seconds= self.post_reload_wait_time)
 
         conn.log.info('Processing on active rp %s-%s with timeout %s' % (conn.hostname, conn.alias, timeout))
-        conn.sendline(reload_cmd)
+        if reload_cmd:
+            conn.sendline(reload_cmd)
 
         conn_list = self.connection.subconnections
         reload_cmd_output = None

@@ -7,7 +7,6 @@ from unicon.eal.dialogs import Dialog
 from unicon.core.errors import SubCommandFailure
 from unicon.bases.routers.services import BaseService
 
-
 from unicon.plugins.generic.service_implementation import (
     Configure as GenericConfigure,
     Execute as GenericExecute,
@@ -64,6 +63,10 @@ class Configure(GenericConfigure):
         self.config_syntax_check = kwargs.pop('config_syntax_check', False)
         self.rules = kwargs.pop('rules', False)
         self.prompt_recovery = kwargs.get('prompt_recovery', True)
+
+        self.connection.context.pop('acm_configlet', None)
+        self.start_state = 'config'
+        self.end_state = 'enable'
 
         if self.acm_configlet:
             self.connection.state_machine.go_to('acm', self.connection.spawn,context={'acm_configlet': self.acm_configlet})
@@ -222,7 +225,7 @@ class HAReload(GenericHAReload):
 
 
 class HASwitchover(GenericHASwitchover):
-    def call_service(self, command=[], reply=Dialog([]), timeout=None, *args,
+    def call_service(self, command=None, reply=Dialog([]), timeout=None, *args,
                      **kwargs):
         super().call_service(command, reply=reply + Dialog([confirm]), timeout=timeout, *args, **kwargs)
 

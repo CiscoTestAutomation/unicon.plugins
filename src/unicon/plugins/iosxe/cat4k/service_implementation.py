@@ -105,7 +105,7 @@ class Reload(BaseService):
 
         timeout = timeout or self.timeout
 
-        command = reload_command or self.command
+        command = reload_command if reload_command is not None else self.command
 
         fmt_str = "+++ reloading  %s  with reload_command %s and timeout is %s +++"
         con.log.info(fmt_str % (con.hostname, command, timeout))
@@ -125,7 +125,8 @@ class Reload(BaseService):
             dialog += Dialog(custom_auth_stmt)
 
         # Issue reload command
-        con.active.spawn.sendline(command)
+        if command:
+            con.active.spawn.sendline(command)
         try:
             dialog.process(con.active.spawn,
                            context=context,

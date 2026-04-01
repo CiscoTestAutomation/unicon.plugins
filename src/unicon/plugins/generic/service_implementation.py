@@ -934,9 +934,11 @@ class Configure(BaseService):
             else:
                 sm.update_cur_state(from_state)
 
+        # Flatten multi-line input into one-command-per-line list.
+        flat_cmd_list = list(self.utils.flatten_splitlines_command(command) if command else [])
+
         self.result = ''
-        if command:
-            flat_cmd = self.utils.flatten_splitlines_command(command)
+        if flat_cmd_list:
             dialog = self.dialog + self.service_dialog(handle=handle, service_dialog=reply)
             # Add all known states to detect state changes.
             for state in sm.states:
@@ -957,11 +959,17 @@ class Configure(BaseService):
                                 matched_retry_sleep=self.state_change_matched_retry_sleep
                             ))
 
-            banner_lines, command_lines, banner_delim = self.get_banner_lines(flat_cmd)
+            # Use flattened command list
+            pre_lines, banner_lines, post_lines, banner_delim = self.get_banner_lines(flat_cmd_list)
 
             # Populate context for banner_text_handler only if banner was detected
             if banner_lines:
                 self.connection.log.info('Banner detected, configuring banners without state detection')
+
+                for cmd in pre_lines:
+                    handle.spawn.sendline(cmd)
+                    self.update_hostname_if_needed([cmd])
+                    self.process_dialog_on_handle(handle, dialog, timeout)
 
                 # Send banner lines
                 for line in banner_lines:
@@ -969,10 +977,17 @@ class Configure(BaseService):
                     time.sleep(0.1)
                     handle.spawn.read_update_buffer()
 
+                self.process_dialog_on_handle(handle, dialog, timeout)
 
-            if bulk:
+                post_cmds = chain(post_lines, [self.commit_cmd]) if self.commit_cmd else post_lines
+                for cmd in post_cmds:
+                    handle.spawn.sendline(cmd)
+                    self.update_hostname_if_needed([cmd])
+                    self.process_dialog_on_handle(handle, dialog, timeout)
+
+            elif bulk:
                 indicator = handle.settings.BULK_CONFIG_END_INDICATOR
-                cmd_lst = list(chain(command_lines, [indicator]))
+                cmd_lst = list(chain(flat_cmd_list, [indicator]))
                 if bulk_chunk_lines == 0:
                     chunks = [cmd_lst]
                 else:
@@ -998,8 +1013,8 @@ class Configure(BaseService):
                     handle.spawn.sendline(self.commit_cmd)
                     self.process_dialog_on_handle(handle, dialog, timeout)
             else:
-                cmds = chain(command_lines, [self.commit_cmd]) \
-                    if self.commit_cmd else command_lines
+                cmds = chain(flat_cmd_list, [self.commit_cmd]) \
+                    if self.commit_cmd else flat_cmd_list
                 for cmd in cmds:
                     handle.spawn.sendline(cmd)
                     self.update_hostname_if_needed([cmd])
@@ -1032,34 +1047,49 @@ class Configure(BaseService):
 
 
     def get_banner_lines(self, config_lines):
-        """ Process lines related to the banner command
+        """ Process lines related to the banner command.
+        Handles detection and separation of banner configuration blocks from
+        regular configuration commands. Supports the first banner block only;
+        subsequent banners (if any) will be processed sequentially.
         Args:
-            config_lines (list): list of config lines
+            config_lines (list): Configuration command lines
         Returns:
-            tuple: (banner_lines, command_lines, banner_delim)
+            tuple: (pre_lines, banner_lines, post_lines, banner_delim)
+                - pre_lines: Commands before the banner block
+                - banner_lines: The banner initiation line and content
+                - post_lines: Commands after the banner block
+                - banner_delim: The delimiter character used for the banner
         """
-        banner_lines = []
-        command_lines = []
+        pre_lines, banner_lines, post_lines = [], [], []
         banner_delim = None
+        in_banner = False
+        banner_seen = False
 
         for line in config_lines:
 
-            match = re.match(r'^\s*banner\s+(login|motd|exec|incoming)\s+(\S)', line)
-            if match:
-                banner_lines.append(line)
-                banner_delim = match.group(2)
+            if not in_banner and not banner_seen:
+                match = re.match(r'^\s*banner\s+(login|motd|exec|incoming)\s+(\S+)', line)
+                if match:
+                    banner_lines.append(line)
+                    raw_delim = match.group(2)
+                    # Use '^C' token when present, else first character (e.g. '%')
+                    banner_delim = '^C' if raw_delim.startswith('^C') else raw_delim[0]
+                    in_banner = True
+                    banner_seen = True
+                    continue
+                pre_lines.append(line)
                 continue
 
-            if banner_delim:
+            if in_banner:
                 banner_lines.append(line)
                 # End of banner when delimiter repeats as a full line
                 if line.strip() == banner_delim:
-                    banner_delim = None
+                    in_banner = False
                 continue
 
-            command_lines.append(line)
+            post_lines.append(line)
 
-        return banner_lines, command_lines, banner_delim
+        return pre_lines, banner_lines, post_lines, banner_delim
 
     def process_dialog_on_handle(self, handle, dialog, timeout):
         try:
@@ -2175,7 +2205,7 @@ class HAReloadService(BaseService):
         if command and reload_command:
             raise SubCommandFailure(
                 "Please use either 'command' or 'reload_command' parameter")
-        command = command or reload_command or self.command
+        command = command if command is not None else (reload_command if reload_command is not None else self.command)
 
         # TODO counter value must be moved to settings
         counter = 0
@@ -2197,7 +2227,8 @@ class HAReloadService(BaseService):
             dialog += Dialog(custom_auth_stmt)
 
         # Issue reload command
-        con.active.spawn.sendline(command)
+        if command:
+            con.active.spawn.sendline(command)
         try:
             reload_output = dialog.process(con.active.spawn,
                                            context=context,
@@ -2373,7 +2404,7 @@ class SwitchoverService(BaseService):
                           category=DeprecationWarning)
 
         timeout = timeout or self.timeout
-        command = command or self.command
+        command = command if command is not None else self.command
         switchover_counter = con.settings.SWITCHOVER_COUNTER
         con.log.debug("+++ Issuing switchover on  %s  with "
                       "switchover_command %s and timeout is %s +++"
@@ -2403,7 +2434,8 @@ class SwitchoverService(BaseService):
             context = con.standby.context
 
         # Issue switchover command
-        con.active.spawn.sendline(command)
+        if command:
+            con.active.spawn.sendline(command)
         try:
             dialog.process(con.active.spawn,
                            timeout=timeout,

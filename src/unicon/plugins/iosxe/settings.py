@@ -51,7 +51,7 @@ class IosXESettings(GenericSettings):
         self.CONFIG_LOCK_RETRY_SLEEP = 30
         self.CONFIG_LOCK_RETRIES = 10
 
-        self.POST_BOOT_TIMEOUT = 300
+        self.POST_BOOT_TIMEOUT = 900
         self.BOOT_POSTCHECK_INTERVAL = 30
 
         self.SERVICE_PROMPT_CONFIG_CMD = 'service prompt config'

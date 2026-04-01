@@ -339,11 +339,22 @@ def enable_secret_handler(spawn, context, session):
         spawn.log.warning('Using enable secret from TEMP_ENABLE_SECRET setting')
         enable_secret = spawn.settings.TEMP_ENABLE_SECRET
         context['setup_selection'] = 0
+        context['encryption_selection'] = 2
         spawn.sendline(enable_secret)
 
 
 def setup_enter_selection(spawn, context):
     selection = context.get('setup_selection')
+    if selection is not None:
+        if str(selection) == '0':
+            spawn.log.warning('Not saving setup configuration')
+        spawn.sendline(f'{selection}')
+    else:
+        spawn.sendline('2')
+
+
+def setup_enter_encryption_selection(spawn, context):
+    selection = context.get('encryption_selection', context.get('setup_selection'))
     if selection is not None:
         if str(selection) == '0':
             spawn.log.warning('Not saving setup configuration')
@@ -781,7 +792,7 @@ class GenericStatements():
                                                 continue_timer=False)
 
         self.enter_your_encryption_selection_stmt = Statement(pattern=pat.enter_your_encryption_selection_2,
-                                                   action=setup_enter_selection,
+                                                   action=setup_enter_encryption_selection,
                                                    args=None,
                                                    loop_continue=True,
                                                    continue_timer=True)

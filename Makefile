@@ -9,7 +9,7 @@ BUILD_CMD     = $(PYTHON) setup.py bdist_wheel --dist-dir=$(DIST_DIR)
 PYPIREPO      = pypitest
 
 
-DEPENDENCIES = robotframework pyyaml dill coverage Sphinx \
+DEPENDENCIES = robotframework pyyaml dill coverage Sphinx==7.4.7 \
 			   sphinxcontrib-napoleon sphinxcontrib-mockautodoc \
 			   sphinx-rtd-theme asyncssh PrettyTable "cryptography>=43.0"
 

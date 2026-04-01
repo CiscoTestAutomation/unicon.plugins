@@ -121,7 +121,7 @@ class QuadSwitchover(BaseService):
                      *args, **kwargs):
 
         self.result = False
-        switchover_cmd = command or self.command
+        switchover_cmd = command if command is not None else self.command
         timeout = timeout or self.timeout
         conn = self.connection.active
 
@@ -137,7 +137,8 @@ class QuadSwitchover(BaseService):
 
         self.connection.log.info('Processing on original Global Active rp '
                                  '%s-%s' % (conn.hostname, conn.alias))
-        conn.sendline(switchover_cmd)
+        if switchover_cmd:
+            conn.sendline(switchover_cmd)
         try:
             active_output = dialog.process(conn.spawn, timeout=timeout,
                                     prompt_recovery=self.prompt_recovery,
@@ -262,7 +263,7 @@ class QuadReload(BaseService):
                      **kwargs):
 
         self.result = False
-        reload_cmd = reload_command or self.reload_command
+        reload_cmd = reload_command if reload_command is not None else self.reload_command
         timeout = timeout or self.timeout
         conn = self.connection.active
 
@@ -289,7 +290,8 @@ class QuadReload(BaseService):
 
         self.connection.log.info('Processing on rp %s-%s' %
                                 (conn.hostname, conn.alias))
-        conn.sendline(reload_cmd)
+        if reload_cmd:
+            conn.sendline(reload_cmd)
         try:
             reload_output = reload_dialog.process(conn.spawn, timeout=timeout,
                                                   prompt_recovery=self.prompt_recovery,

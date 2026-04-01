@@ -51,15 +51,19 @@ class StackwiseVirtualConnectionProvider(BaseStackRpConnectionProvider):
 
         for subcon in [subcon1, subcon2]:
             try:
-                subcon.state_machine.go_to(
-                    'enable',
-                    subcon.spawn,
-                    context=subcon.context,
-                    timeout=con.settings.BOOT_TIMEOUT,
-                    dialog=standby_locked_dialog,
-                )
-            except Exception:
-                pass
+                # Attempt to detect the current state of the subcon and go to enable if not already there
+                subcon.state_machine.detect_state(subcon.spawn, subcon.context)
+                if subcon.state_machine.current_state != 'enable':
+                    subcon.sendline()
+                    subcon.state_machine.go_to(
+                        'enable',
+                        subcon.spawn,
+                        context=subcon.context,
+                        timeout=con.settings.BOOT_TIMEOUT,
+                        dialog=standby_locked_dialog,
+                    )
+            except Exception as e:
+                con.log.exception('Failed to go to enable on %s: %s', subcon.alias, e)
             con.log.debug('{} in state: {}'.format(subcon.alias, subcon.state_machine.current_state))
 
         if subcon1.state_machine.current_state == 'enable':
@@ -85,13 +89,14 @@ class StackwiseVirtualConnectionProvider(BaseStackRpConnectionProvider):
                 output = {}
             stack_info = output.get("switch", {}).get("stack", {})
             roles = [switch_info.get("role") for switch_info in stack_info.values()]
+            roles_lower = [str(role).lower() for role in roles if role is not None]
 
-            if "active" in roles and "standby" in roles:
+            if "active" in roles_lower and "standby" in roles_lower:
                 # Only designate handle when in SVL state
                 # There are case when in non-SVL the device connection
                 # becomes active for both connection and there isn't a standby state
                 # it would have either active and member state or just active state
-                
+
                 # Verify the active and standby
                 target_con.spawn.sendline(target_con.spawn.settings.SHOW_REDUNDANCY_CMD)
                 output = target_con.spawn.expect(
