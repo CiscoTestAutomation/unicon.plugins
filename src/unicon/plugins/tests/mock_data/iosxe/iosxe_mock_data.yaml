@@ -494,6 +494,18 @@ general_config:
       new_state: wsma_agent
     "banner login *":
       new_state: banner_config_state
+    "vrf definition Mgmt": ""
+    "interface loopback 2": ""
+    "description test": ""
+    "description plain test": ""
+    " ": " "
+    "  interface loopback 1  ": ""
+    "description test device": ""
+    " no shutdown  ": ""
+    "banner login *":
+      new_state: banner_config_state
+    "end":
+      new_state: general_enable
 
 wsma_agent:
   prompt: "%N(wsma-exec-agent)#"
@@ -1583,6 +1595,7 @@ tclsh:
 banner_config_state: 
   prompt: ""
   commands:
+    "": ""
     "Updated - Unauthorized access to this device is strictly prohibited.": ""
     "Please contact corpnet@fb.com with any access requests.": ""
     "Done": ""
@@ -1606,6 +1619,10 @@ acm_configlet:
     "banner login %":
       response: "Enter TEXT message. End with the character '%'."
       new_state: acm_configlet_banner_input_percent
+    "interface loopback 2":
+      new_state: acm_if
+    "invalid command example":
+      response: "% Invalid input detected at '^' marker."
     "end":
       new_state: general_enable
 

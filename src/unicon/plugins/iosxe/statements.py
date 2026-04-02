@@ -158,19 +158,37 @@ def boot_image(spawn, context, session):
         elif context.get('image_to_boot', '').strip():
             cmd = "boot {}".format(context['image_to_boot']).strip()
         elif spawn.settings.FIND_BOOT_IMAGE:
-            filesystem = spawn.settings.BOOT_FILESYSTEM if \
-                hasattr(spawn.settings, 'BOOT_FILESYSTEM') else 'flash:'
-            spawn.buffer = ''
-            spawn.sendline('dir {}'.format(filesystem))
-            dir_listing = spawn.expect(patterns.rommon_prompt).match_output
-            boot_file_regex = spawn.settings.BOOT_FILE_REGEX if \
-                hasattr(spawn.settings, 'BOOT_FILE_REGEX') else r'(\S+\.bin)'
-            m = re.search(boot_file_regex, dir_listing)
-            if m:
-                boot_image = m.group(1)
-                cmd = "boot {}{}".format(filesystem, boot_image)
+            if context.get('filesystem_images'):
+                # Attempt to boot the next image from the list of images
+                # collected from the possible boot filesystems.
+                cmd = "boot {}".format(context['filesystem_images'].pop(0))
             else:
-                cmd = "boot"
+                if hasattr(spawn.settings, 'BOOT_FILESYSTEM'):
+                    if isinstance(spawn.settings.BOOT_FILESYSTEM, list):
+                        filesystems = spawn.settings.BOOT_FILESYSTEM
+                    else:
+                        filesystems = [spawn.settings.BOOT_FILESYSTEM]
+                else:
+                    filesystems = ["flash:"]
+                # Collect all possible boot images from the filesystems and
+                # attempt to boot each one until successful / max attempts reached.
+                context['filesystem_images'] = []
+                for fs in filesystems:
+                    spawn.buffer = ''
+                    spawn.sendline('dir {}'.format(fs))
+                    dir_listing = spawn.expect(patterns.rommon_prompt).match_output
+                    boot_file_regex = spawn.settings.BOOT_FILE_REGEX if \
+                        hasattr(spawn.settings, 'BOOT_FILE_REGEX') else r'(\S+\.bin)'
+                    matches = re.findall(boot_file_regex, dir_listing)
+                    if matches:
+                        context['filesystem_images'].extend(
+                            [fs + image_name for image_name in matches]
+                        )
+                # Attempt to boot the first image from the list.
+                if context['filesystem_images']:
+                    cmd = "boot {}".format(context['filesystem_images'].pop(0))
+                else:
+                    cmd = "boot"
         else:
             cmd = "boot"
         spawn.sendline(cmd)

@@ -66,7 +66,7 @@ class SVLStackReload(BaseService):
         self.result = False
         if member:
             reload_command = f'reload slot {member}'
-        reload_cmd = reload_command or self.reload_command
+        reload_cmd = reload_command if reload_command is not None else self.reload_command
         timeout = timeout or self.timeout
         conn = self.connection.active
 
@@ -118,7 +118,8 @@ class SVLStackReload(BaseService):
         conn.context['post_reload_wait_time'] = timedelta(seconds= self.post_reload_wait_time)
 
         conn.log.info('Processing on active rp %s-%s with timeout %s' % (conn.hostname, conn.alias, timeout))
-        conn.sendline(reload_cmd)
+        if reload_cmd:
+            conn.sendline(reload_cmd)
 
         conn_list = self.connection.subconnections
         reload_cmd_output = None
@@ -223,13 +224,13 @@ class SVLStackReload(BaseService):
                     raise SubCommandFailure('Error during reload', e) from e
         else:
             try:
-                # bring device to enable mode
-                conn.sendline()
-                conn.log.info("Bringing device to any state")
+                conn.log.info("Bring device to any state")
                 conn.state_machine.go_to('any', conn.spawn, timeout=timeout,
                                         prompt_recovery=self.prompt_recovery,
                                         context=conn.context)
-
+                conn.state_machine.go_to('enable', conn.spawn, timeout=timeout,
+                                        prompt_recovery=self.prompt_recovery,
+                                        context=conn.context)
             except Exception as e:
                 raise SubCommandFailure('Failed to bring device to disable mode.', e) from e
 
@@ -257,8 +258,9 @@ class SVLStackReload(BaseService):
                 self.connection.settings.STACK_POST_RELOAD_SLEEP)
         sleep(self.connection.settings.STACK_POST_RELOAD_SLEEP)
 
-        self.connection.log.info('Initialize the connection after reload')
-        self.connection.connection_provider.init_connection()
+        self.connection.log.info('Disconnecting and reconnecting')
+        self.connection.disconnect()
+        self.connection.connect()
 
         self.connection.log.info("+++ Reload Completed Successfully +++")
 
@@ -312,7 +314,7 @@ class SVLStackSwitchover(BaseService):
                      timeout=None,
                      *args, **kwargs):
 
-        switchover_cmd = command or self.command
+        switchover_cmd = command if command is not None else self.command
         timeout = timeout or self.timeout
         conn = self.connection.active
 
@@ -327,7 +329,8 @@ class SVLStackSwitchover(BaseService):
         dialog += connect_dialog
 
         conn.log.info('Processing on active rp %s-%s' % (conn.hostname, conn.alias))
-        conn.sendline(switchover_cmd)
+        if switchover_cmd:
+            conn.sendline(switchover_cmd)
         try:
             # A loop has been implemented to handle the
             # "Press RETURN to get started" prompt twice. Based on extensive

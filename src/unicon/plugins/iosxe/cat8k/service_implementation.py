@@ -66,7 +66,7 @@ class SwitchoverService(BaseService):
         # create an alias for connection.
         con = self.connection
         timeout = timeout or self.timeout
-        command = command or self.command
+        command = command if command is not None else self.command
 
         if (reply is None) or (reply == []):
             reply = Dialog([])
@@ -93,7 +93,8 @@ class SwitchoverService(BaseService):
 
 
         # Issue switchover command
-        con.spawn.sendline(command)
+        if command:
+            con.spawn.sendline(command)
         try:
             reply.process(con.spawn,
                            timeout=timeout,

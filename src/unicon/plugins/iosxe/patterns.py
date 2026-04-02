@@ -19,7 +19,7 @@ class IosXEPatterns(GenericPatterns):
             r'^.*Are you sure you want to continue\? \(y\/n\)\[y\]:?\s?$'
         self.delete_filename = r'^.*Delete filename \[.*\]\?\s*$'
         self.wish_continue = r'^.*Do you wish to continue\? \[yes\]:\s*$'
-        self.want_continue = r'^.*Do you want to continue\? \[no\]:\s*$'
+        self.want_continue = r'^.*(Do you want to )?[Cc]ontinue\? \[no\]:\s*$'
         self.want_continue_confirm = r'.*Do you want to continue\?\s*\[confirm]\s*$'
         self.want_continue_yes = r'.*Do you want to continue\?\s*\[y/n]\?\s*\[yes]:\s*$'
         self.disable_prompt = \

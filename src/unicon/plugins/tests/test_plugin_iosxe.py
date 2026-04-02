@@ -11,6 +11,7 @@ import re
 import os 
 import time
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch, Mock, MagicMock
 from pyats.topology import loader
 
@@ -20,10 +21,76 @@ from unicon import Connection
 from unicon.eal.dialogs import Dialog, Statement
 from unicon.eal.utils import ExpectMatch, MatchMode
 from unicon.core.errors import SubCommandFailure, StateMachineError, UniconAuthenticationError, ConnectionError as UniconConnectionError
+from unicon.plugins.iosxe.statements import boot_image
 from unicon.plugins.tests.mock.mock_device_iosxe import MockDeviceTcpWrapperIOSXE
 
 unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
 unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC = 0.2
+
+
+class TestIosXEStatements(unittest.TestCase):
+
+    def test_boot_image_finds_images_from_multiple_filesystems(self):
+        spawn = Mock()
+        spawn.settings = SimpleNamespace(
+            MAX_BOOT_ATTEMPTS=5,
+            FIND_BOOT_IMAGE=True,
+            BOOT_FILESYSTEM=['bootflash:', 'flash:'],
+            BOOT_FILE_REGEX=r'(\S+\.bin)'
+        )
+        spawn.expect.side_effect = [
+            Mock(match_output='bootflash: cat9k_gold.bin cat9k_prod.bin'),
+            Mock(match_output='flash: emergency.bin')
+        ]
+
+        context = {}
+        session = {}
+
+        boot_image(spawn, context, session)
+
+        self.assertEqual(
+            spawn.sendline.call_args_list,
+            [
+                unittest.mock.call('dir bootflash:'),
+                unittest.mock.call('dir flash:'),
+                unittest.mock.call('boot bootflash:cat9k_gold.bin')
+            ]
+        )
+        self.assertEqual(
+            context['filesystem_images'],
+            ['bootflash:cat9k_prod.bin', 'flash:emergency.bin']
+        )
+        self.assertEqual(context['boot_prompt_count'], 2)
+
+    def test_boot_image_uses_cached_filesystem_images_fifo_order(self):
+        spawn = Mock()
+        spawn.settings = SimpleNamespace(
+            MAX_BOOT_ATTEMPTS=5,
+            FIND_BOOT_IMAGE=True,
+            BOOT_FILESYSTEM=['bootflash:', 'flash:'],
+            BOOT_FILE_REGEX=r'(\S+\.bin)'
+        )
+        spawn.expect.side_effect = [
+            Mock(match_output='bootflash: cat9k_gold.bin cat9k_prod.bin'),
+            Mock(match_output='flash: emergency.bin')
+        ]
+
+        context = {}
+        session = {}
+
+        # First call builds the filesystem image list and boots first image.
+        boot_image(spawn, context, session)
+
+        spawn.sendline.reset_mock()
+        spawn.expect.reset_mock()
+
+        # Second call should use cached images in FIFO order without re-running dir.
+        boot_image(spawn, context, session)
+
+        spawn.expect.assert_not_called()
+        spawn.sendline.assert_called_once_with('boot bootflash:cat9k_prod.bin')
+        self.assertEqual(context['filesystem_images'], ['flash:emergency.bin'])
+        self.assertEqual(context['boot_prompt_count'], 3)
 
 
 class TestIosXEPluginConnect(unittest.TestCase):
@@ -1709,6 +1776,111 @@ class TestIosxeAcmConfigureInvalidInput(unittest.TestCase):
         )
         c.disconnect()
 
+
+class TestIosxeAcmInvalidCommand(unittest.TestCase):
+
+    def test_invalid_command_configure(self):
+        """Test plain configure after failed ACM - should not enter ACM mode"""
+        c = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state general_enable --hostname PE1'],
+            os='iosxe',
+            mit=True
+        )
+        c.connect()
+
+        config_txt_fail = [
+            'interface loopback 1',
+            'invalid command example', #invalid commad
+        ]
+        with patch.object(c.spawn, 'sendline', wraps=c.spawn.sendline) as mock_sendline_fail:
+            with self.assertRaises(SubCommandFailure):
+                c.configure(config_txt_fail, acm_configlet='my_config')
+
+        sent_fail = [call.args[0] for call in mock_sendline_fail.call_args_list if call.args]
+        expected_fail = ['acm configlet create my_config', 'interface loopback 1', 'invalid command example', 'end']
+        self.assertEqual(sent_fail, expected_fail, f"Expected commands {expected_fail}, but got {sent_fail}")
+
+        config_txt_plain = ['interface loopback 2', 'description test']
+        with patch.object(c.spawn, 'sendline', wraps=c.spawn.sendline) as mock_sendline_plain:
+            c.configure(config_txt_plain)
+
+        sent_plain = [call.args[0] for call in mock_sendline_plain.call_args_list if call.args]
+        expected_plain = ['config term', 'interface loopback 2', 'description test', 'end']
+        self.assertEqual(sent_plain, expected_plain, f"Expected commands {expected_plain}, but got {sent_plain}")
+        self.assertNotIn('acm configlet create my_config', sent_plain)
+
+        c.disconnect()
+
+
+class TestConfigureEmptySpacesHandling(unittest.TestCase):
+
+    def test_configure_with_leading_trailing_spaces(self):
+        """Test configure commands with leading and trailing spaces"""
+        c = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state general_enable --hostname PE1'],
+            os='iosxe',
+            mit=True
+        )
+        c.connect()
+
+        config_txt = [
+            " ",
+            "  interface loopback 1  ",
+            "description test device",
+            " no shutdown  "  # Leading space
+        ]
+
+        with patch.object(c.spawn, 'sendline', wraps=c.spawn.sendline) as mock_sendline:
+            c.configure(config_txt)
+
+        sent_commands = [call.args[0] for call in mock_sendline.call_args_list if call.args]
+        # Validate exact expected commands with preserved leading/trailing spaces
+        expected_config = ['config term', ' ', '  interface loopback 1  ', 'description test device', ' no shutdown  ', 'end']
+        self.assertEqual(sent_commands, expected_config, f"Expected {expected_config}, but got {sent_commands}")
+        self.assertEqual(
+            c.state_machine.current_state,
+            'enable',
+            f"Device should be in enable state, but is in {c.state_machine.current_state}"
+        )
+
+        c.disconnect()
+
+class TestBannerWithPreCommands(unittest.TestCase):
+
+    def test_banner_login_with_pre_commands(self):
+        """Test banner login configuration with pre-commands before banner content"""
+        c = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state general_enable --hostname PE1'],
+            os='iosxe',
+            mit=True
+        )
+        c.connect()
+
+        config_txt = (
+            "vrf definition Mgmt\n"
+            "banner login *\n"
+            "\n"
+            "Updated - Unauthorized access to this device is strictly prohibited.\n"
+            "\n"
+            "Please contact corpnet@fb.com with any access requests.\n"
+            "Done\n"
+            "\n"
+            "*"
+        )
+        with patch.object(c.spawn, 'sendline', wraps=c.spawn.sendline) as mock_sendline:
+            c.configure(config_txt)
+
+        sent_commands = [call.args[0] for call in mock_sendline.call_args_list if call.args]
+        # Check complete list of expected commands including empty lines
+        expected_commands = ['config term', 'vrf definition Mgmt', 'banner login *', '', 
+                           'Updated - Unauthorized access to this device is strictly prohibited.', '',
+                           'Please contact corpnet@fb.com with any access requests.', 'Done', '', '*', 'end']
+        self.assertEqual(sent_commands, expected_commands, f"Expected exact command sequence {expected_commands}, but got {sent_commands}")
+
+        c.disconnect()
 
 class TestIosxeSyntaxConfigure(unittest.TestCase):
 
