@@ -11,7 +11,7 @@ PYPIREPO      = pypitest
 
 DEPENDENCIES = robotframework pyyaml dill coverage Sphinx==7.4.7 \
 			   sphinxcontrib-napoleon sphinxcontrib-mockautodoc \
-			   sphinx-rtd-theme asyncssh PrettyTable "cryptography>=43.0"
+			   sphinx-rtd-theme==3.1.0 asyncssh PrettyTable "cryptography>=43.0"
 
 
 .PHONY: clean package distribute develop undevelop help devnet\
