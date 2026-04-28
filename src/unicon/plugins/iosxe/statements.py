@@ -172,18 +172,48 @@ def boot_image(spawn, context, session):
                     filesystems = ["flash:"]
                 # Collect all possible boot images from the filesystems and
                 # attempt to boot each one until successful / max attempts reached.
-                context['filesystem_images'] = []
-                for fs in filesystems:
-                    spawn.buffer = ''
-                    spawn.sendline('dir {}'.format(fs))
-                    dir_listing = spawn.expect(patterns.rommon_prompt).match_output
-                    boot_file_regex = spawn.settings.BOOT_FILE_REGEX if \
-                        hasattr(spawn.settings, 'BOOT_FILE_REGEX') else r'(\S+\.bin)'
-                    matches = re.findall(boot_file_regex, dir_listing)
-                    if matches:
-                        context['filesystem_images'].extend(
-                            [fs + image_name for image_name in matches]
-                        )
+                boot_file_regex = spawn.settings.BOOT_FILE_REGEX if \
+                    hasattr(spawn.settings, 'BOOT_FILE_REGEX') else r'(\S+\.bin)'
+                if isinstance(boot_file_regex, list):
+                    # Group matches into one bucket per BOOT_FILE_REGEX entry.
+                    # Example:
+                    # BOOT_FILE_REGEX = [r'(\S+\.SSA\.bin)', r'(\S+\.SPA\.bin)', r'(\S+\.bin)']
+                    # ranked_matches[0] collects all .SSA.bin images,
+                    # ranked_matches[1] collects all .SPA.bin images,
+                    # ranked_matches[2] collects the remaining .bin images.
+                    #
+                    # Flattening these buckets later makes the final boot queue
+                    # prefer earlier BOOT_FILE_REGEX entries across all
+                    # filesystems instead of only within each filesystem.
+                    ranked_matches = [[] for _ in boot_file_regex]
+                    for fs in filesystems:
+                        spawn.buffer = ''
+                        spawn.sendline('dir {}'.format(fs))
+                        dir_listing = spawn.expect(patterns.rommon_prompt).match_output
+                        seen = set()
+                        for rank, pattern in enumerate(boot_file_regex):
+                            image_names = re.findall(pattern, dir_listing)
+                            for image_name in image_names:
+                                full_image_name = fs + image_name
+                                if full_image_name not in seen:
+                                    ranked_matches[rank].append(full_image_name)
+                                    seen.add(full_image_name)
+                    context['filesystem_images'] = [
+                        image_name
+                        for rank_bucket in ranked_matches
+                        for image_name in rank_bucket
+                    ]
+                else:
+                    context['filesystem_images'] = []
+                    for fs in filesystems:
+                        spawn.buffer = ''
+                        spawn.sendline('dir {}'.format(fs))
+                        dir_listing = spawn.expect(patterns.rommon_prompt).match_output
+                        matches = re.findall(boot_file_regex, dir_listing)
+                        if matches:
+                            context['filesystem_images'].extend(
+                                [fs + image_name for image_name in matches]
+                            )
                 # Attempt to boot the first image from the list.
                 if context['filesystem_images']:
                     cmd = "boot {}".format(context['filesystem_images'].pop(0))

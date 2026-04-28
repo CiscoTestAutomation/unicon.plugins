@@ -258,7 +258,7 @@ The following testbed YAML shows these three kinds of override:
 
 .. note ::
 
-   Details specified under the ``arguments``, ``settings`` or
+   Details specified under the ``arguments``,``settings`` or
    ``service_attributes`` connection block keys take
    precedence over any identically-named details passed to the
    ``device.connect()`` call.
@@ -277,7 +277,7 @@ The following testbed YAML shows these three kinds of override:
 
 
 If you want to change to default timeout value for execute and configure service,
-you can set the ``EXEC_TIMEOUT`` and ``CONFIG_TIMEOUT`` in the testbed file:
+you can set the ``EXEC_TIMEOUT``and``CONFIG_TIMEOUT`` in the testbed file:
 
 .. code-block:: yaml
 
@@ -352,7 +352,7 @@ For more info on testbed refer to :ref:`topology<schema>` package.
 .. note::
 
   unicon Connection arguments may be passed in the pyATS
-  ``device.connect()``.  For example: ``device.connect(learn_hostname=True)``.
+  ``device.connect()``.  For example:``device.connect(learn_hostname=True)``.
 
 
 
@@ -1045,7 +1045,7 @@ Extend Settings Attributes
 """"""""""""""""""""""""""
 
 It is possible to extend list settings attributes of the connection like ``ERROR_PATTERN``
-and ``CONFIGURE_ERROR_PATTERN`` by using ``overwrite_settings=False`` argument.
+and ``CONFIGURE_ERROR_PATTERN``by using``overwrite_settings=False`` argument.
 
 .. code-block:: python
 

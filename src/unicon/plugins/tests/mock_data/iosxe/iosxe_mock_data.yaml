@@ -1023,6 +1023,8 @@ enable_secret_exec:
 enable_secret_password:
   prompt: "Password: "
   commands:
+    "Secret12345":
+      new_state: general_enable
     "Secret12345!":
       new_state: general_enable
 
@@ -1557,7 +1559,9 @@ meraki_container_shell:
   commands:
     "show version | include operating mode": ""
     "exit":
-      BusyBox v1.32.0 (2021-10-12 10:15:40 UTC) built-in shell (ash)
+      response: |
+        BusyBox v1.32.0 (2021-10-12 10:15:40 UTC) built-in shell (ash)
+      new_state: enable_container
   keys:
     ctrl-c:
       new_state: meraki_ctrl_c

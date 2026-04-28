@@ -1,5 +1,5 @@
 August 2022
-==========
+===========
 
 August 30 - Unicon v22.8
 ------------------------
@@ -32,10 +32,10 @@ Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 --------------------------------------------------------------------------------
-                                      Fix
+Fix
 --------------------------------------------------------------------------------
 
 * connection parse_spawn_command
-    * Fixed Although `login_creds='local'` is specified, `default` is selected
+    * Fixed Although ``login_creds='local'``is specified,``default`` is selected
 
 

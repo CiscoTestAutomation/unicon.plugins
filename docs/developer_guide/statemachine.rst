@@ -19,8 +19,8 @@ platform implementation is over.
 In this chapter we will go through the important APIs and using an example
 device we will try to implement a working statemachine.
 
-Before you go further, please make sure you have gone through
-:doc:`Expect Abstraction Library <../user_guide/eal>`
+Before you go further, please make sure you have gone through the Expect
+Abstraction Library material.
 
 .. note::
 
@@ -92,7 +92,7 @@ Continuing from the previous example, lets add a few ``Path``.
    config_to_enable = Path(config, enable, "end", None)
 
 Please note that ``Dialog`` in above example will be different in all the lines,
-based on the nature of interaction caused by the ``command``, a blank ``Dialog``
+based on the nature of interaction caused by the ``command``, a blank``Dialog``
 has been used just for example.
 
 The ``command`` option can also be a callable function. This can be used in case
@@ -121,7 +121,7 @@ required for creating shortest paths between any two given states. It uses all
 the ``Path`` instances to make way from any given state to any state. It
 provides APIs required for state migration, which we shall see shortly.
 
-Let's create a sample *statemachine* class. All the ``State`` and the ``Path``
+Let's create a sample *statemachine* class. All the ``State``and the``Path``
 instances, which we created above are eventually fed into the custom
 statemachine class.
 
@@ -160,7 +160,7 @@ statemachine class.
 
 .. note::
 
-    Please note that we don't want same ``State`` and ``Path`` instances to be
+    Please note that we don't want same ``State``and``Path`` instances to be
     reused by different *statemachine* classes. Hence we create ``State`` and
     ``Path`` instances inside the scope of *statemachine* class.
 

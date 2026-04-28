@@ -193,6 +193,15 @@ class MockDeviceIOSXE(MockDevice):
                 self._write('\n'.format(prompt), other_transport)
             return True
 
+    def ha_asrk_active_reload_proceed(self, transport, cmd):
+        if 'prompt' in self.transport_ports[self.transport_handles[transport]]:
+            prompt = self.transport_ports[self.transport_handles[transport]]['prompt']
+            if cmd == "" and prompt == 'Proceed with reload? [confirm]':
+                if len(self.transport_ports) > 1:
+                    self.state_change_switchover(
+                        transport, 'ha_asrk_active_reload_boot',
+                        'ha_asrk_standby_boot')
+                return True
 
 
 class MockDeviceTcpWrapperIOSXE(MockDeviceTcpWrapper):

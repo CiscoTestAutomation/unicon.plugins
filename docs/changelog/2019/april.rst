@@ -22,7 +22,7 @@ Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 - learn_hostname feature updated to allow common plugin-specific default device
-  names such as `Router` to be learned if no hostname has been set on the
+  names such as ``Router`` to be learned if no hostname has been set on the
   device.
 
 - The iosxr plugin enable pattern is now more strict.

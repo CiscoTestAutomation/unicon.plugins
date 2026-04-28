@@ -6,4 +6,4 @@ class IosXEIe9kSettings(IosXESettings):
     def __init__(self):
         super().__init__()
 
-        self.BOOT_FILESYSTEM = ["sdflash:", "flash:"]
+        self.BOOT_FILESYSTEM = ["flash:", "sdflash:"]

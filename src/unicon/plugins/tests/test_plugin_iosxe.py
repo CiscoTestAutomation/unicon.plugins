@@ -92,6 +92,146 @@ class TestIosXEStatements(unittest.TestCase):
         self.assertEqual(context['filesystem_images'], ['flash:emergency.bin'])
         self.assertEqual(context['boot_prompt_count'], 3)
 
+    def test_boot_image_orders_images_with_boot_file_regex_list(self):
+        spawn = Mock()
+        spawn.settings = SimpleNamespace(
+            MAX_BOOT_ATTEMPTS=5,
+            FIND_BOOT_IMAGE=True,
+            BOOT_FILESYSTEM=['flash:'],
+            BOOT_FILE_REGEX=[
+                r'(\S+\.SSA\.bin)',
+                r'(\S+\.SPA\.bin)',
+                r'(\S+\.bin)',
+            ],
+        )
+        spawn.expect.return_value = Mock(
+            match_output='flash: ie35xx.BLD_x.SPA.bin ie35xx.BLD_y.SSA.bin ie35xx.BLD_z.bin'
+        )
+
+        context = {}
+        session = {}
+
+        boot_image(spawn, context, session)
+
+        self.assertEqual(
+            spawn.sendline.call_args_list,
+            [
+                unittest.mock.call('dir flash:'),
+                unittest.mock.call('boot flash:ie35xx.BLD_y.SSA.bin'),
+            ],
+        )
+        self.assertEqual(
+            context['filesystem_images'],
+            ['flash:ie35xx.BLD_x.SPA.bin', 'flash:ie35xx.BLD_z.bin'],
+        )
+
+    def test_boot_image_deduplicates_images_from_boot_file_regex_list(self):
+        spawn = Mock()
+        spawn.settings = SimpleNamespace(
+            MAX_BOOT_ATTEMPTS=5,
+            FIND_BOOT_IMAGE=True,
+            BOOT_FILESYSTEM=['flash:'],
+            BOOT_FILE_REGEX=[
+                r'(\S+\.SSA\.bin)',
+                r'(\S+\.bin)',
+            ],
+        )
+        spawn.expect.return_value = Mock(
+            match_output='flash: image1.SSA.bin image2.bin'
+        )
+
+        context = {}
+        session = {}
+
+        boot_image(spawn, context, session)
+
+        self.assertEqual(
+            spawn.sendline.call_args_list,
+            [
+                unittest.mock.call('dir flash:'),
+                unittest.mock.call('boot flash:image1.SSA.bin'),
+            ],
+        )
+        self.assertEqual(context['filesystem_images'], ['flash:image2.bin'])
+
+    def test_boot_image_orders_filesystem_images_by_boot_file_regex_priority(self):
+        spawn = Mock()
+        spawn.settings = SimpleNamespace(
+            MAX_BOOT_ATTEMPTS=5,
+            FIND_BOOT_IMAGE=True,
+            BOOT_FILESYSTEM=['bootflash:', 'flash:'],
+            BOOT_FILE_REGEX=[
+                r'(\S+\.SSA\.bin)',
+                r'(\S+\.SPA\.bin)',
+                r'(\S+\.bin)',
+            ],
+        )
+        spawn.expect.side_effect = [
+            Mock(match_output='bootflash: bootflash_spa.SPA.bin bootflash_other.bin'),
+            Mock(match_output='flash: flash_ssa.SSA.bin flash_other.bin'),
+        ]
+
+        context = {}
+        session = {}
+
+        boot_image(spawn, context, session)
+
+        self.assertEqual(
+            spawn.sendline.call_args_list,
+            [
+                unittest.mock.call('dir bootflash:'),
+                unittest.mock.call('dir flash:'),
+                unittest.mock.call('boot flash:flash_ssa.SSA.bin'),
+            ],
+        )
+        self.assertEqual(
+            context['filesystem_images'],
+            [
+                'bootflash:bootflash_spa.SPA.bin',
+                'bootflash:bootflash_other.bin',
+                'flash:flash_other.bin',
+            ],
+        )
+
+    def test_boot_image_orders_filesystem_images_by_boot_file_regex_priority(self):
+        spawn = Mock()
+        spawn.settings = SimpleNamespace(
+            MAX_BOOT_ATTEMPTS=5,
+            FIND_BOOT_IMAGE=True,
+            BOOT_FILESYSTEM=['bootflash:', 'flash:'],
+            BOOT_FILE_REGEX=[
+                r'(\S+\.SSA\.bin)',
+                r'(\S+\.SPA\.bin)',
+                r'(\S+\.bin)',
+            ],
+        )
+        spawn.expect.side_effect = [
+            Mock(match_output='bootflash: bootflash_spa.SPA.bin bootflash_other.bin'),
+            Mock(match_output='flash: flash_ssa.SSA.bin flash_other.bin'),
+        ]
+
+        context = {}
+        session = {}
+
+        boot_image(spawn, context, session)
+
+        self.assertEqual(
+            spawn.sendline.call_args_list,
+            [
+                unittest.mock.call('dir bootflash:'),
+                unittest.mock.call('dir flash:'),
+                unittest.mock.call('boot flash:flash_ssa.SSA.bin'),
+            ],
+        )
+        self.assertEqual(
+            context['filesystem_images'],
+            [
+                'bootflash:bootflash_spa.SPA.bin',
+                'bootflash:bootflash_other.bin',
+                'flash:flash_other.bin',
+            ],
+        )
+
 
 class TestIosXEPluginConnect(unittest.TestCase):
 

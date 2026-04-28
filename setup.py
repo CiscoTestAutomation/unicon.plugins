@@ -133,7 +133,7 @@ setup(
                 'wheel',
                 'coverage',
                 'restview',
-                'Sphinx',
+                'Sphinx==7.4.7',
                 'sphinxcontrib-napoleon',
                 'sphinxcontrib-mockautodoc',
                 'sphinx-rtd-theme'],

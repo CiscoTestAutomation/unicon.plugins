@@ -262,6 +262,21 @@ stack_enable:
         170355  drwx             4096   May 3 2015 15:15:37 +00:00  modules
         170357  -rw-         23128995   Jan 4 2015 04:23:42 +00:00  CAT3K_CAA-3-UNIVERSALK9_20150104-042336-UTC.core.gz
         170356  -rw-           183910   Jan 4 2015 04:23:42 +00:00  CAT3K_CAA-UNIVERSALK9-042336-UTC.core.gz.coregen.dbg
+
+
+    "show boot": |
+      ---------------------------
+      Switch 1
+      ---------------------------
+      Current Boot Variables:
+      BOOT variable does not exist
+      Boot Variables on next reload:
+      BOOT variable = flash:packages.conf;
+      Manual Boot = yes
+      Enable Break = yes
+      Boot Mode = DEVICE
+      iPXE Timeout = 0
+    
 stack_shell_confirm:
   prompt: "Are you sure you want to continue? [y/n] "
   commands:
@@ -291,6 +306,18 @@ stack_config:
       new_state: stack_enable
     "redundancy":
       new_state: config_stack_redundancy
+    "show boot": |
+      ---------------------------
+      Switch 1
+      ---------------------------
+      Current Boot Variables:
+      BOOT variable does not exist
+      Boot Variables on next reload:
+      BOOT variable = flash:packages.conf;
+      Manual Boot = yes
+      Enable Break = yes
+      Boot Mode = DEVICE
+      iPXE Timeout = 0
 
 config_stack_redundancy:
     prompt: "%N(config-red)#"

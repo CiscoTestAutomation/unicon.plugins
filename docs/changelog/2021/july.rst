@@ -1,8 +1,8 @@
 July 2021
-========
+=========
 
 July 27
-------
+-------
 
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
@@ -30,7 +30,7 @@ Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 --------------------------------------------------------------------------------
-                                      Fix
+Fix
 --------------------------------------------------------------------------------
 
 * connection provider
@@ -41,7 +41,7 @@ Features and Bug Fixes:
     * changed basicConfig from stderr to stdout from mock device to prevent stderr output
 
 * statemachine
-    * Log warning when `add_state_pattern` is used
+    * Log warning when ``add_state_pattern`` is used
 
 * prompt recovery
     * Use warning on hostname mismatch instead of raising exception

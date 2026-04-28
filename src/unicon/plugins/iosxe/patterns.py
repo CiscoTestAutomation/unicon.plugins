@@ -23,7 +23,7 @@ class IosXEPatterns(GenericPatterns):
         self.want_continue_confirm = r'.*Do you want to continue\?\s*\[confirm]\s*$'
         self.want_continue_yes = r'.*Do you want to continue\?\s*\[y/n]\?\s*\[yes]:\s*$'
         self.disable_prompt = \
-            r'^(?!.*?grub)(.*?)(\(unlicensed\))?(wlc|WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(recovery-mode\))?(\(rp-rec-mode\))?(\(standby\))?(-stby)?(-standby)?(\(boot\))?(?<! -)>\s?$'
+            r'^(?!.*?grub)(?!.*<\S+>\s*$)(.*?)(\(unlicensed\))?(wlc|WLC|Router|RouterRP|Switch|ios|switch|(?!["\'<])%N)([0-9])?(\(recovery-mode\))?(\(rp-rec-mode\))?(\(standby\))?(-stby)?(-standby)?(\(boot\))?(?<! -)>\s?$'
         self.enable_prompt = \
             r'^(.*?)(\(unlicensed\))?(wlc|WLC|eWLC|Router|RouterRP|Switch|ios|switch|%N)([a-zA-Z0-9-]*)(\(recovery-mode\))?(\(rp-rec-mode\))?(\(standby\))?(-stby)?(-standby)?(\(boot\))?#[\s\x07]*$'
         self.maintenance_mode_prompt = \

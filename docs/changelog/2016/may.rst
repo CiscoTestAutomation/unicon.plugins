@@ -18,5 +18,5 @@ Features:
  - Support for linux platform
  - Support for NXOS vdc  - Unicon Device logging enhancements
  - Shorthand notations for Dialog callbacks
- - Renamed `config` service to `Configure`
+ - Renamed ``config``service to``Configure``
  - Bug fixes

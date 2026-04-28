@@ -30,48 +30,48 @@ Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 --------------------------------------------------------------------------------
-                                      New
+New
 --------------------------------------------------------------------------------
 
 * AIREOS PLUGIN
-    * Add error_pattern for `^[Rr]Equest [Ff]Ailed And R'^(.*?) Already In Use`
-    * Add error_pattern For `Wlan Identifier Is Invalid` and `^Request Failed`
+    * Add error_pattern for ``^[Rr]Equest [Ff]Ailed And R'^(.*?) Already In Use``
+    * Add error_pattern For ``Wlan Identifier Is Invalid``and``^Request Failed ``
 
 * NXOS/ACI
     * Inherit services from nxos plugin
 
 * GENERIC PLUGIN
-    * Add syslog message handler to `connect`, `execute` and `configure` services
+    * Add syslog message handler to ``connect``,``execute``and``configure`` services
 
 * IOSXE/CAT9K
-    * Support `rommon()` and `reload()` services
+    * Support ``rommon()``and``reload()`` services
 
 * IOSXE
     * New exec error_pattern to match '% Bad IP address or host name% Unknown command or computer name, or unable to find computer address'
     * New configure error_pattern to match '% IP  routing table <name> does not exist'
 
 * GENERIC EXECUTE AND CONFIGURE SERVICES
-    * Added `append_error_pattern` argument
+    * Added ``append_error_pattern`` argument
 
 * NXOS
-    * Added `skip_poap` statement for reload service
-    * Add execute statement list for `execute` service
+    * Added ``skip_poap`` statement for reload service
+    * Add execute statement list for ``execute`` service
     * Add add error_pattern for "command failed...aborting"
 
 * NXOS PLUGIN
     * Add dialog to handle commit confirm message
-    * Use 'commit' as default commit command for `configure_dual` service
+    * Use 'commit' as default commit command for ``configure_dual`` service
 
 
 --------------------------------------------------------------------------------
-                                      Fix
+Fix
 --------------------------------------------------------------------------------
 
 * NXOS/ACI
     * attach_console service for NXOS/ACI plugin
 
 * IOSXR
-    * Updated `run_prompt` pattern to accept more variety
+    * Updated ``run_prompt`` pattern to accept more variety
 
 * IOSXR/SPITFIRE
     * Fixed failed config handling when transitioning from config to enable state
@@ -80,11 +80,11 @@ Features and Bug Fixes:
     * Updated shell prompt pattern
 
 * AIREOS PLUGIN
-    * Changed error_pattern `^(%\S*)?Error` To `^(%\S*)?(Error|error)` so it's case insensitive
+    * Changed error_pattern ``^(%\S*)?Error``To``^(%\S*)?(Error|error)`` so it's case insensitive
 
 
 * JUNOS PLUGIN
-    * Update `configure` service to allow `commit_cmd` override
+    * Update ``configure``service to allow``commit_cmd`` override
 
 * IOSXE
     * Updated config prompt pattern to include "cloud"

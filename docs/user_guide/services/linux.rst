@@ -59,7 +59,7 @@ or it raises an exception. You can expect a TimeoutError or SubCommandFailure
 error in case anything goes wrong.
 
 This list of valid return codes can be specified via ``valid_retcodes``. If the setting
-`CHECK_RETURN_CODE` is set to ``True`` or the ``check_retcode`` option is True,
+`CHECK_RETURN_CODE` is set to ``True``or the``check_retcode`` option is True,
 the command `echo $?` is used to check the return value of the (last) executed command.
 If the value is not in the list, a SubCommandFailure is raised.
 

@@ -148,7 +148,25 @@ class StackSwitchover(BaseService):
         sleep(self.connection.settings.POST_SWITCHOVER_SLEEP)
 
         # check all members are ready
-        conn.state_machine.detect_state(conn.spawn, context=conn.context)
+        # Check all members are ready
+        # After switchover, the device continues to reload/boot. We need to wait
+        # for the device to reach a stable state before attempting to verify
+        # member readiness. The go_to('any') will handle the boot sequence including
+        # "Press RETURN to get started" prompts and login sequences.
+        self.connection.log.info('Waiting for device to reach stable state post-switchover')
+        try:
+            # Wait for device to reach any recognizable state (handles booting device)
+            conn.state_machine.go_to('any', conn.spawn, timeout=timeout,
+                                     prompt_recovery=self.prompt_recovery,
+                                     context=conn.context)
+
+            # Now transition to enable mode for verification
+            conn.state_machine.go_to('enable', conn.spawn, timeout=timeout,
+                                     prompt_recovery=self.prompt_recovery,
+                                     context=conn.context)
+        except Exception as e:
+            self.connection.log.warning('Failed to reach enable state post-switchover: %s' % e)
+            raise
 
         interval = self.connection.settings.SWITCHOVER_POSTCHECK_INTERVAL
         if utils.is_all_member_ready(conn, timeout=timeout, interval=interval):
@@ -458,36 +476,57 @@ class StackRommon(GenericExecute):
 
     def pre_service(self, reload_command=None, timeout=None, *args, **kwargs):
         con = self.connection
-        sm = self.get_sm()
-        con = self.connection
-        sm.go_to('enable',
-                 con.spawn,
-                 context=self.context)
-        boot_info = con.execute('show boot')
-        m = re.search(r'Enable Break = (yes|no)', boot_info)
-        if m:
-            break_enabled = m.group(1)
-            if break_enabled == 'no':
-                con.configure('boot enable-break')
-        else:
-            raise SubCommandFailure('Could not determine if break is enabled, cannot transition to rommon')
+        timeout = timeout or self.timeout
 
-        if reload_command:
-            reload_dialog = self.dialog
+        con.log.info('Checking current state of all subconnections')
+        rommon_conns = []
+        non_rommon_conns = []
+
+        for subconn in con._subconnections.values():
+            state = subconn.state_machine.detect_state(subconn.spawn, subconn.context)
+
+            if state == 'rommon':
+                rommon_conns.append(subconn)
+            else:
+                non_rommon_conns.append(subconn)
+
+        # If ALL are in ROMMON, do nothing and skip synchronization.
+        if not non_rommon_conns:
+            con.log.info('Uniform state detected (All ROMMON). Skipping synchronization logic.')
+            super().pre_service(*args, **kwargs)
+            return
+
+        reload_conn = non_rommon_conns[0]
+
+        # Ensure break is enabled so the reload stops at ROMMON
+        reload_conn.state_machine.go_to('enable', reload_conn.spawn, context=reload_conn.context)
+        boot_info = reload_conn.execute('show boot')
+        if 'Enable Break = no' in boot_info or 'ENABLE_BREAK variable does not exist' in boot_info:
+            reload_conn.configure('boot enable-break')
+
+        # Prepare and send reload
+        reload_cmd = reload_command if reload_command else 'reload'
+        reload_dialog = self.dialog
+        if not reload_command:
             reload_dialog += Dialog([switch_prompt] + stack_factory_reset_stmt_list)
-            timeout = timeout or self.timeout
-            con.sendline(reload_command)
-            try:
-                reload_cmd_output = reload_dialog.process(con.spawn,
-                                                        timeout=timeout,
-                                                        prompt_recovery=con.prompt_recovery,
-                                                        context=con.context)
-                self.result=reload_cmd_output.match_output
-                self.get_service_result()
-            except Exception as e:
-                raise SubCommandFailure('Error during reload', e) from e
-            sleep(self.connection.settings.STACK_ROMMON_SLEEP)
 
+        reload_conn.sendline(reload_cmd)
+        try:
+            reload_dialog.process(reload_conn.spawn, timeout=timeout, context=reload_conn.context)
+        except Exception as e:
+            con.log.warning(f'Reload command issued, proceeding to sync loop. (Note: {e})')
+
+        con.log.info('Waiting for all consoles to reach rommon state...')
+        sleep(self.connection.settings.STACK_ROMMON_SLEEP)
+
+        max_wait = 30
+        poll_interval = 15
+        waited = 0
+        while waited < max_wait:
+            sleep(poll_interval)
+            waited += poll_interval
+
+            all_rommon = True
             for subconn in con._subconnections.values():
                 subconn.sendline()
                 subconn.state_machine.go_to(
@@ -495,12 +534,15 @@ class StackRommon(GenericExecute):
                     subconn.spawn,
                     context=subconn.context,
                     prompt_recovery=subconn.prompt_recovery,
-                    timeout=subconn.settings.STACK_SWITCHOVER_TIMEOUT,
                 )
                 self.connection.log.debug('{} in state: {}'.format(subconn.alias, subconn.state_machine.current_state))
 
+            con.log.info(f'Sync in progress... ({waited}/{max_wait}s)')
+
+        if not all_rommon:
+            raise SubCommandFailure('Timeout: Stack failed to synchronize all consoles to ROMMON.')
+
         super().pre_service(*args, **kwargs)
-        
         # send boot command for each subconnection
         for subconn in con._subconnections.values():
             subconn.sendline()

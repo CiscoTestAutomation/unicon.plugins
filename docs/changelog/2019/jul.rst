@@ -85,9 +85,9 @@ Features and Bug Fixes:
 
   - If one or more credentials are supplied:
 
-    - The ``tacacs`` and ``passwords`` pyATS testbed keys are ignored.
+    - The ``tacacs``and``passwords`` pyATS testbed keys are ignored.
 
-    - Use of any of the following `unicon.Unicon.Connection` arguments cause a
+    - Use of any of the following ``unicon.Unicon.Connection`` arguments cause a
       deprecation warning to be raised :
 
       - ``username``
@@ -109,13 +109,13 @@ Features and Bug Fixes:
         that server block.
 
     - The ``login_creds`` argument (specified either in pyATS connection
-      block or as a `unicon.Unicon.Connection` parameter), now controls
+      block or as a ``unicon.Unicon.Connection`` parameter), now controls
       the order credentials are applied when username/password prompts are
       received while connecting to the device.
 
-    - The ``prompts/login`` and ``prompts/password`` parameters are now
+    - The ``prompts/login``and``prompts/password`` parameters are now
       expected to be explicitly set in the pyATS connection block or
-      as `unicon.Unicon.Connection` parameters.
+      as ``unicon.Unicon.Connection`` parameters.
 
     - The switchover service now accepts a ``switchover_creds`` parameter that
       allows users to define what credentials to use should a username or

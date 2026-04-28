@@ -91,7 +91,7 @@ Here a few examples on how to use it.
     easypy jobfile.py -testbed_file mytestbed.yaml --replay recording1 --speed .25
 
 In case the dash argument cannot be used, environment variable
-``UNICON_REPLAY`` and ``UNICON_REPLAY_SPEED`` can be used instead.
+``UNICON_REPLAY``and``UNICON_REPLAY_SPEED`` can be used instead.
 
 .. code-block:: bash
 

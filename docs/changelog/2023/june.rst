@@ -37,12 +37,12 @@ Features and Bug Fixes:
 Changelogs
 ^^^^^^^^^^
 --------------------------------------------------------------------------------
-                                      Fix                                       
+Fix
 --------------------------------------------------------------------------------
 
 * unicon.eal.backend
-    * Refactored backend to use telnetlib by default. All telnet connections will now use `telnetlib` implementation instead of system telnet.
-    * Set `<connection_object>.settings.BACKEND = "unicon.eal.backend.pty_backend"` to revert to the system telnet client.
+    * Refactored backend to use telnetlib by default. All telnet connections will now use ``telnetlib`` implementation instead of system telnet.
+    * Set ``<connection_object>.settings.BACKEND = "unicon.eal.backend.pty_backend"`` to revert to the system telnet client.
 
 * unicon.mock
     * Update mock_device_cli to work with telnetlib backend

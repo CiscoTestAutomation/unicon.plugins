@@ -51,7 +51,7 @@ Features and Bug Fixes:
   - Fix reload service that was hanging when mgmt connection was attempted.
 
   - Updated execute() service to allow override of default service dialogs by
-    passing `service_dialog`
+    passing ``service_dialog``
 
   - improve ping extd_ping judgement and fix endless ping dialog on erroneous
     value
@@ -68,8 +68,8 @@ Features and Bug Fixes:
 
 - core
 
-  - modifed ``unicon_record``, ``unicon_replay``, ``unicon_speed`` environment
-     variables to ``UNICON_RECORD``, ``UNICON_REPLAY``, and ``UNICON_REPLAY_SPEED``.
+  - modifed ``unicon_record``,``unicon_replay``,``unicon_speed`` environment
+     variables to ``UNICON_RECORD``,``UNICON_REPLAY``, and``UNICON_REPLAY_SPEED``.
 
   - Disconnect timers may now be updated via Settings object
 

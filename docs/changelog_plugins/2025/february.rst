@@ -1,8 +1,8 @@
 February 2025
-==========
+=============
 
 February 25 - Unicon.Plugins v25.2 
-------------------------
+----------------------------------
 
 
 
@@ -18,7 +18,7 @@ February 25 - Unicon.Plugins v25.2
 Changelogs
 ^^^^^^^^^^
 --------------------------------------------------------------------------------
-                                      Fix                                       
+Fix
 --------------------------------------------------------------------------------
 
 * generic
@@ -31,6 +31,6 @@ Changelogs
     * Update prompt pattern
 
 * iosxe
-    * Updated the enable, disable and maintenance states to support `(unlicensed)` prompt
+    * Updated the enable, disable and maintenance states to support ``(unlicensed)`` prompt
 
 

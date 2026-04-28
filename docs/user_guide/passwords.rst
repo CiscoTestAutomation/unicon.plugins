@@ -13,7 +13,7 @@ Credentials
 
 The ``credentials`` connection parameter defines a dictionary of named
 credentials.  A credential is a dictionary typically containing both
-``username`` and ``password`` keys.
+``username``and``password`` keys.
 
 The ``login_creds`` connection parameter defines an optional sequence of
 credential names to try.  Each time the device prompts for a username or
@@ -141,7 +141,7 @@ Settings can also be specified for the connection in the topology file as shown 
           SENDLINE_AFTER_CRED: terminal_server
 
 
-The post credential action supports ``send`` and ``sendline``, you can specify a string to be sent,
+The post credential action supports ``send``and``sendline``, you can specify a string to be sent,
 e.g. `send( )` to send a space or `send(\\x03)` to send Ctrl-C. Quotes should not be specified.
 
 .. code-block:: yaml
@@ -296,16 +296,16 @@ When a router asks for an enable password, the password sent is determined
 by the following checks.  If all checks are done and still no enable password
 is found then an exception is raised.
 
-#. The ``enable_password`` field of the credential specified by the ``login_creds`` in the connect call.
-#. The ``default`` credential ``enable_password``
-#. The ``enable`` credential ``password`` (legacy)
-#. The ``default`` credential ``password`` (legacy)
+#. The ``enable_password``field of the credential specified by the``login_creds`` in the connect call.
+#. The ``default``credential``enable_password``
+#. The ``enable``credential``password`` (legacy)
+#. The ``default``credential``password`` (legacy)
 
 
 Password sequences in service calls
 -----------------------------------
 
-Several services, including ``reload`` and ``switchover``, accept a
+Several services, including ``reload``and``switchover``, accept a
 credential list that is used to authenticate against a sequence of
 username/password prompts encountered while the service is running.
 
@@ -474,7 +474,7 @@ If connecting via ssh, the username of the currently logged in user is used
 by default if not otherwise specified via credentials or via ``command``
 or ``ssh_options`` keys in one of the following forms:
 
-``ssh -l username <address>`` or ``ssh username@<address>``.
+``ssh -l username <address>``or``ssh username@<address>``.
 
 In order to execute a command that leads to a username/password prompt,
 you must explicitly add the password statement to the reply Dialog.
@@ -527,7 +527,7 @@ Otherwise, the password from the ``default`` credential is sent.  Otherwise, a
 nxos password logic
 -------------------
 
-The ``switchto`` service accepts a ``vdc_cred`` argument that identifies a
+The ``switchto``service accepts a``vdc_cred`` argument that identifies a
 named credential to use to authenticate against the VDC.
 
 SSH passphrase

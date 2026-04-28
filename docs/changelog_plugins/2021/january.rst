@@ -30,7 +30,7 @@ Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 --------------------------------------------------------------------------------
-                                      Fix                                       
+Fix
 --------------------------------------------------------------------------------
 
 * GENERIC PLUGIN
@@ -76,7 +76,7 @@ Features and Bug Fixes:
 * REMOVED NXOS/ACI/N9K PLUGIN (USE OS NXOS, PLATFORM=ACI INSTEAD)
 
 * ALL PLUGINS
-    * `Series` Has Been Renamed To `Platform`
+    * ``Series``Has Been Renamed To``Platform``
 
 * ADDED NEW HP COMWARE PLUGINS
 

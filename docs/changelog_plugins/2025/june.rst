@@ -2,7 +2,7 @@ June 2025
 ==========
 
 June 29 - Unicon.Plugins v25.6 
-------------------------
+------------------------------
 
 
 
@@ -18,7 +18,7 @@ June 29 - Unicon.Plugins v25.6
 Changelogs
 ^^^^^^^^^^
 --------------------------------------------------------------------------------
-                                      Fix                                       
+Fix
 --------------------------------------------------------------------------------
 
 * iosxr/spitfire
@@ -27,14 +27,14 @@ Changelogs
 * unicon.plugins
     * IOSXE
         * Stack
-            * Fixed `image_to_boot` parameter in reload service so that it is actually used in the reload process.
+            * Fixed ``image_to_boot`` parameter in reload service so that it is actually used in the reload process.
 
 * generic
     * Update syslog pattern
 
 
 --------------------------------------------------------------------------------
-                                      New                                       
+New
 --------------------------------------------------------------------------------
 
 * iosxe
