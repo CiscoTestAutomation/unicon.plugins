@@ -36,7 +36,7 @@ specified in the topology YAML file.
 CLI proxy with pyATS topology integration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Example topology file with a ``proxy`` configuration for the ``cli`` connection.
+Example topology file with a ``proxy``configuration for the``cli`` connection.
 Please note that credentials have been left out of this example.
 
 .. code:: yaml
@@ -607,7 +607,7 @@ The SSH tunnel host can be a testbed server or can be another device from the te
 SSH tunnel with pyATS topology integration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Example topology file with a ``sshtunnel`` configuration for the ``a`` connection of device R2.
+Example topology file with a ``sshtunnel``configuration for the``a`` connection of device R2.
 
 .. code:: yaml
 

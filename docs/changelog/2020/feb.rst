@@ -29,9 +29,9 @@ Upgrade Instructions
 Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-* Added `debug_statement` boolean argument to `Statement class` to print the statement matched pattern.
+* Added ``debug_statement``boolean argument to``Statement class`` to print the statement matched pattern.
 
-* Added `STATEMENT_LOG_DEBUG` boolean argument to `Settings class` to print all the matched patterns.
+* Added ``STATEMENT_LOG_DEBUG``boolean argument to``Settings class`` to print all the matched patterns.
 
 * Add python3.8 support.
 

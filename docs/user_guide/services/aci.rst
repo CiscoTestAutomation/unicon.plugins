@@ -8,7 +8,7 @@ This section lists the services which are supported for Application Centric Infr
   * `reload <#reload>`__
 
 The ACI plugin supports only APIC and N9K (in ACI mode). Specify ``os=apic`` for APIC, specify
-``os=nxos`` and ``platform=aci`` for N9K.
+``os=nxos``and``platform=aci`` for N9K.
 
 .. note::
 

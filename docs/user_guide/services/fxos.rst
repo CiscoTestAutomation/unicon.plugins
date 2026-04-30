@@ -28,7 +28,7 @@ The following generic services are also available:
 execute
 -------
 
-The services ``ftd``, ``fxos``, ``fxos_mgmt``, ``expert``, ``sudo``, ``disable``, ``enable``,
+The services ``ftd``,``fxos``,``fxos_mgmt``,``expert``,``sudo``,``disable``,``enable``,
 ``rommon`` are aliases to the execute service and are based on the generic execute implementation.
 You can use these methods to switch between states and/or execute commands in that state.
 

@@ -1,8 +1,8 @@
 February 2021
-============
+=============
 
 February 23rd
-------------
+-------------
 
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
@@ -31,24 +31,24 @@ Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 --------------------------------------------------------------------------------
-                                New
+New
 --------------------------------------------------------------------------------
 
 * Generic plugin
     * Add syslog message handler to connect, execute and configure services
 
 * IOSXE/CAT9K
-    * Support `rommon()` and `reload()` services
+    * Support ``rommon()``and``reload()`` services
 
 * Generic execute and configure services
-    * Added `append_error_pattern` argument
+    * Added ``append_error_pattern`` argument
 
 * Aireos plugin
     * Add ERROR_PATTERN for ^[Rr]equest [Ff]ailed and r'^(.*?) already in use'
     * Add ERROR_PATTERN for r'WLAN Identifier is invalid' and r'^Request failed'
 	
 --------------------------------------------------------------------------------
-                                      Fix                                       
+Fix
 --------------------------------------------------------------------------------
 
 * setup.py

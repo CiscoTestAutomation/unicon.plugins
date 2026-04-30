@@ -37,10 +37,10 @@ Features and Bug Fixes:
 Changelogs
 ^^^^^^^^^^
 --------------------------------------------------------------------------------
-                                      Fix                                       
+Fix
 --------------------------------------------------------------------------------
 
 * generic
-    * Updated with `sleep_time` to handle the copy command
+    * Updated with ``sleep_time`` to handle the copy command
 
 

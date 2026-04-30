@@ -143,7 +143,7 @@ Users implementing a new platform have to define a ``Connection class``, with th
 parameters which are listed below in this section. The new ``Connection`` class
 should satisfy the following conditions
 
-    * It should be subclass (direct or indirect) of ``Connection``, ``BaseSingleRpConnection`` or ``BaseDualRpConnection``
+    * It should be subclass (direct or indirect) of ``Connection``,``BaseSingleRpConnection``or``BaseDualRpConnection``
 
     * ``Connection`` follows class hierarchy which is aligned/derived according to the os, platform and model
 
@@ -164,7 +164,7 @@ subcommand_list           List of subcommand supported
 settings                  Settings to be used for this connection
 ========================= ========================================
 
-``os`` and ``chassis_type`` of the implementation has to be mentioned in the connection.
+``os``and``chassis_type`` of the implementation has to be mentioned in the connection.
 
 .. code-block:: python
 
@@ -202,7 +202,7 @@ The connection class for any platform depends on the connection provider for ini
 connection. As the name suggests, their role is to provide a method to let the
 application connect and disconnect to the device.
 
-This class provides two essential methods, namely ``connect`` and ``disconnect``.
+This class provides two essential methods, namely ``connect``and``disconnect``.
 The ``connect`` method defines all the steps involved in the connection process, which are
 defined as separate methods. These steps vary
 depending on the chassis type and the device, changing the behaviour of these

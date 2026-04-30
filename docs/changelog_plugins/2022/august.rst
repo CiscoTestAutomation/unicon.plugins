@@ -1,8 +1,8 @@
 August 2022
-==========
+===========
 
 August 30 - Unicon.Plugins v22.8
-------------------------
+--------------------------------
 
 
 
@@ -32,7 +32,7 @@ Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 --------------------------------------------------------------------------------
-                                      Fix
+Fix
 --------------------------------------------------------------------------------
 
 * generic
@@ -46,8 +46,8 @@ Features and Bug Fixes:
     * Refactor iosxe reload service, rename context variable boot_image to grub_boot_image
     * Update press_any_key regex pattern
     * Update grub_prompt regex pattern
-    * Add escape char regex setting `ESCAPE_CHAR_PROMPT_PATTERN`
-    * Add grub regex pattern setting `GRUB_REGEX_PATTERN` to match menu entries
+    * Add escape char regex setting ``ESCAPE_CHAR_PROMPT_PATTERN``
+    * Add grub regex pattern setting ``GRUB_REGEX_PATTERN`` to match menu entries
 
 * linux
     * Updated linux prompt pattern

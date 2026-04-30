@@ -1,8 +1,8 @@
 September 2021
-========
+==============
 
 September 28th
-------
+--------------
 
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
@@ -30,7 +30,7 @@ Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 --------------------------------------------------------------------------------
-                                      Fix
+Fix
 --------------------------------------------------------------------------------
 
 * iosxr
@@ -47,4 +47,4 @@ Features and Bug Fixes:
     * Use generic pre-connection statement list to handle syslog messages on connect
 
 * linux
-    * Add `sudo` service
+    * Add ``sudo`` service

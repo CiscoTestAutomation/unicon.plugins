@@ -43,7 +43,7 @@ Features and Bug Fixes:
     * Removed deprecation message from nxos->aci->n9k
     * Fixed a bug where the buffer might not be empty after connecting to the device
 * ASA Plugin
-    - Add error_pattern to capture `*** WARNING ***`
+    - Add error_pattern to capture ``*** WARNING ***``
 * FXOS/FTD Plugin
     - Added support for "* " in chassis prompt, e.g. "FirePower* #"
 * Linux

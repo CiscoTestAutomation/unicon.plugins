@@ -8,9 +8,9 @@ model (specific model support).
 These values help Unicon load the most accurate connection plugin for the given
 network device, and corresponds to ther pyATS testbed YAML counterparts.
 
-For example, if ``os=iosxe`` and ``platform=abc``, since ``abc`` is not found in
+For example, if ``os=iosxe``and``platform=abc``, since``abc`` is not found in
 the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
-``os=iosxe`` and ``platform=cat3k``, it will use the specific plugin ``iosxe/cat3k``.
+``os=iosxe``and``platform=cat3k``, it will use the specific plugin``iosxe/cat3k``.
 
 .. tip::
 
@@ -36,59 +36,59 @@ the iosxe table, it will fallback to use the generic ``iosxe`` plugin. If
     ``apic``
     ``aireos``
     ``asa``
-    ``asa``, ``asav``
-    ``asa``, ``fp2k``
-    ``cheetah``, ``ap``
+    ``asa``,``asav``
+    ``asa``,``fp2k``
+    ``cheetah``,``ap``
     ``cimc``
     ``comware``
     ``confd``
-    ``confd``, ``esc``
-    ``confd``, ``nfvis``
+    ``confd``,``esc``
+    ``confd``,``nfvis``
     ``dnos6``
     ``dnos10``
     ``fxos``,,,,"Tested with FP2K."
-    ``fxos``, ``fp4k``
-    ``fxos``, ``fp9k``
-    ``fxos``, ``ftd``,,,"Deprecated, please use one of the other fxos plugins."
+    ``fxos``,``fp4k``
+    ``fxos``,``fp9k``
+    ``fxos``,``ftd``,,,"Deprecated, please use one of the other fxos plugins."
     ``gaia``, , , , "Check Point Gaia OS"
     ``hvrp``
-    ``ios``, ``ap``
-    ``ios``, ``iol``
-    ``ios``, ``iosv``
-    ``ios``, ``pagent``,,,"See example below."
+    ``ios``,``ap``
+    ``ios``,``iol``
+    ``ios``,``iosv``
+    ``ios``,``pagent``,,,"See example below."
     ``iosxe``
-    ``iosxe``, ``cat3k``
-    ``iosxe``, ``cat3k``, ``ewlc``
-    ``iosxe``, ``cat8k``
-    ``iosxe``, ``cat9k``,
-    ``iosxe``, ``cat9k``, ``c9500``, ``c9500x``, "See example below."
-    ``iosxe``, ``c9800``
-    ``iosxe``, ``c9800``, ``ewc_ap``
-    ``iosxe``, ``csr1000v``
-    ``iosxe``, ``csr1000v``, ``vewlc``
-    ``iosxe``, ``iec3400``
-    ``iosxe``, ``sdwan``
+    ``iosxe``,``cat3k``
+    ``iosxe``,``cat3k``,``ewlc``
+    ``iosxe``,``cat8k``
+    ``iosxe``,``cat9k``,
+    ``iosxe``,``cat9k``,``c9500``,``c9500x``, "See example below."
+    ``iosxe``,``c9800``
+    ``iosxe``,``c9800``,``ewc_ap``
+    ``iosxe``,``csr1000v``
+    ``iosxe``,``csr1000v``,``vewlc``
+    ``iosxe``,``iec3400``
+    ``iosxe``,``sdwan``
     ``iosxr``
-    ``iosxr``, ``asr9k``
-    ``iosxr``, ``iosxrv``
-    ``iosxr``, ``iosxrv9k``
-    ``iosxr``, ``moonshine``
-    ``iosxr``, ``ncs5k``
-    ``iosxr``, ``spitfire``
+    ``iosxr``,``asr9k``
+    ``iosxr``,``iosxrv``
+    ``iosxr``,``iosxrv9k``
+    ``iosxr``,``moonshine``
+    ``iosxr``,``ncs5k``
+    ``iosxr``,``spitfire``
     ``ironware``
     ``ise``
     ``linux``, , , , "Generic Linux server with bash prompts"
     ``nd``, , , , "Nexus Dashboard (ND) Linux server. identical to os: linux"
     ``nxos``
-    ``nxos``, ``mds``
-    ``nxos``, ``n5k``
-    ``nxos``, ``n7k``
-    ``nxos``, ``n9k``
-    ``nxos``, ``nxosv``
-    ``nxos``, ``aci``
+    ``nxos``,``mds``
+    ``nxos``,``n5k``
+    ``nxos``,``n7k``
+    ``nxos``,``n9k``
+    ``nxos``,``nxosv``
+    ``nxos``,``aci``
     ``nso``,,,, "Network Service Orchestrator"
     ``ons``,,,, "Optical Networking System"
-    ``sdwan``, ``viptela``,,,"Identical to os=viptela."
+    ``sdwan``,``viptela``,,,"Identical to os=viptela."
     ``sros``
     ``staros``
     ``vos``
@@ -119,7 +119,7 @@ your pyATS testbed YAML with it:
 
 .. tip::
 
-  in the above example, ``platform`` and ``model`` is not provided, hence Unicon
+  in the above example, ``platform``and``model`` is not provided, hence Unicon
   will use the most generic ``os=iosxe`` connection implementation for my
   device.
 

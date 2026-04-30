@@ -133,10 +133,10 @@ setup(
                 'wheel',
                 'coverage',
                 'restview',
-                'Sphinx',
+                'Sphinx==7.4.7',
                 'sphinxcontrib-napoleon',
                 'sphinxcontrib-mockautodoc',
-                'sphinx-rtd-theme'],
+                'sphinx-rtd-theme==3.1.0'],
     },
 
     # any data files placed outside this package.

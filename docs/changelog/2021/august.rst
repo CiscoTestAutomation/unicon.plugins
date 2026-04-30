@@ -1,8 +1,8 @@
 August 2021
-========
+===========
 
 August 31st
-------
+-----------
 
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"

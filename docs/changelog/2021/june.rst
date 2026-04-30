@@ -1,8 +1,8 @@
 June 2021
-========
+=========
 
 June 29
-------
+-------
 
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
@@ -30,7 +30,7 @@ Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 --------------------------------------------------------------------------------
-                                      Fix
+Fix
 --------------------------------------------------------------------------------
 
 * iosxe/sdwan
@@ -44,7 +44,7 @@ Features and Bug Fixes:
     * Added warning log message if reconnect occurs
 
 * unicon.eal.dialogs
-    * Fixed `sendline_cred_user` and `sendline_cred_pass` implementation
+    * Fixed ``sendline_cred_user``and``sendline_cred_pass`` implementation
 
 * generic
     * Do not insert username for device SSH command

@@ -114,7 +114,7 @@ Spawn
 -----
 
 You can ``Spawn`` any command to interact with it. Once the command is spawned
-you can interact with it using APIs like ``send`` and ``expect``.
+you can interact with it using APIs like ``send``and``expect``.
 
 This is how, in a nutshell, it works
 
@@ -241,7 +241,7 @@ the **username** prompt.
 
 Let us generalise the above program a bit. We may come across some routers
 where username prompt doesn't look like ``username:``, it may also show up like
-``login::``. The good news is, ``expect`` method can take a list of patterns.
+``login::``. The good news is,``expect`` method can take a list of patterns.
 
 .. code-block:: python
 
@@ -413,14 +413,14 @@ in the next section.
 
 .. note::
 
-    Mention ``args``, ``loop_continue``, ``continue_timer`` only if you want to
+    Mention ``args``,``loop_continue``,``continue_timer`` only if you want to
     change the the default values. This will help reducting the clutter.
 
 **Timeout Statement**:
 By default, if none of Statement patterns get match within timeout period
 ``TimeoutError`` execption gets raised. If we want to add some custom action when
 timeout occurs before ``TimeoutError`` execption, this can be done by adding a
-``Statement`` with pattern set as ``__timeout__``. Action set for this Statement
+``Statement``with pattern set as``__timeout__``. Action set for this Statement
 will get invoke if timeout occurs.
 
 .. code-block:: python
@@ -435,8 +435,8 @@ will get invoke if timeout occurs.
 
 .. note::
 
-    Make sure to set ``continue_timer`` as ``False`` for timeout statement, else it may
-    will end up in infinite loop. If ``continue_timer`` set as ``True``, then ``Dialog`` will
+    Make sure to set ``continue_timer``as``False`` for timeout statement, else it may
+    will end up in infinite loop. If ``continue_timer``set as``True``, then``Dialog`` will
     start trying to match all patterns again and timeout period will be reset to
     original one.
 

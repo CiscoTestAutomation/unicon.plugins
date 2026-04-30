@@ -83,7 +83,7 @@ Before start coding pre_service, let us go through __init__ of BaseService Class
 .. note::
 
     Any input object sent by the user calling your service, if not passed
-    directly to the ``send`` or ``sendline`` spawn method, must be properly
+    directly to the ``send``or``sendline`` spawn method, must be properly
     converted to a string form.  Users are allowed to specify non-string
     objects as input.
 

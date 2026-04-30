@@ -198,11 +198,11 @@ class TestIosXeCat9kPlugin(unittest.TestCase):
                 type: cat9k
                 credentials:
                     default:
-                        username: admin
-                        password: cisco
+                        username: device_user_7
+                        password: device_pass_7
                     ts:
-                        username: ts_user
-                        password: ts_pass
+                        username: ts_line_user_7
+                        password: ts_line_pass_7
                 connections:
                     defaults:
                         class: unicon.Unicon
@@ -211,6 +211,9 @@ class TestIosXeCat9kPlugin(unittest.TestCase):
                         ip: 127.0.0.1
                         port: {}
                         login_creds: [ts, default]
+                        arguments:
+                            settings:
+                                SENDLINE_AFTER_CRED: ts
         """.format(md.ports[0])
 
         tb = loader.load(testbed)
@@ -219,8 +222,55 @@ class TestIosXeCat9kPlugin(unittest.TestCase):
             device.connect()
             self.assertEqual(device.state_machine.current_state, 'enable')
             self.assertIn('current_credentials', device.credentials)
-            self.assertEqual(device.credentials['current_credentials']['username'], 'admin')
+            self.assertEqual(device.credentials['current_credentials']['username'], 'device_user_7')
             # Should match the 'default' credential, not 'ts'
+            self.assertEqual(device.credentials['current_credentials'], device.credentials['default'])
+        finally:
+            device.disconnect()
+            md.stop()
+
+    def test_logout_relogin_uses_device_credential(self):
+        """
+        Test that relogin after logout reuses the device credential, not the
+        terminal server credential, for console login_creds flows.
+        """
+        md = MockDeviceTcpWrapperIOSXE(port=0, state='c9k_login7', hostname='switch')
+        md.start()
+
+        testbed = """
+        devices:
+            R1:
+                os: iosxe
+                type: cat9k
+                credentials:
+                    default:
+                        username: device_user_7
+                        password: device_pass_7
+                    ts:
+                        username: ts_line_user_7
+                        password: ts_line_pass_7
+                connections:
+                    defaults:
+                        class: unicon.Unicon
+                    a:
+                        protocol: telnet
+                        ip: 127.0.0.1
+                        port: {}
+                        login_creds: [ts, default]
+                        arguments:
+                            settings:
+                                SENDLINE_AFTER_CRED: ts
+        """.format(md.ports[0])
+
+        tb = loader.load(testbed)
+        device = tb.devices.R1
+        try:
+            device.connect()
+            device.logout()
+
+            device.connection_provider.connect()
+
+            self.assertEqual(device.state_machine.current_state, 'enable')
             self.assertEqual(device.credentials['current_credentials'], device.credentials['default'])
         finally:
             device.disconnect()

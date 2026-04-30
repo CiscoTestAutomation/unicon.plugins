@@ -73,11 +73,14 @@ class GenericPatterns(UniconCorePatterns):
         # *May 28 09:01:11.975: PKI_SSL_IPC: SUDI certificate chain and key pair are invalid
         # SECURITY WARNING - Module: SSH, Command: crypto key generate rsa ..., Reason: SSH RSA host key uses insufficient key length, Remediation: Configure SSH RSA host key with minimum key length of 3072 bits
         # Switch#[OK]
+        # % WARNING: The master key is not configured, so passwords/secrets might not be encrypted.
+        # Configure the master key by using the following command: "key config-key password-encrypt <encryption-key>
         self.syslog_message_pattern = (
             r"^.*?(%\w+(-\S+)?-\d+-\w+|"
             r"yang-infra:|PKI_SSL_IPC:|Guestshell destroyed successfully|"
             r"%Error opening tftp:\/\/255\.255\.255\.255|Autoinstall trying|"
             r"audit: kauditd hold queue overflow|SECURITY WARNING|%RSA key|INSECURE DYNAMIC WARNING|"
+            r"key config-key password-encrypt|"
             r"(LC|RP)/\d+/\d+/CPU\d+:\w+\s+\d+\s+\d{2}:\d{2}:\d{2}|"
             r"\[OK\]"
             r").*\s*$"

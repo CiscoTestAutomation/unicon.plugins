@@ -30,14 +30,14 @@ Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 --------------------------------------------------------------------------------
-                                      Fix                                       
+Fix
 --------------------------------------------------------------------------------
 
 * IOSXE/pattern
     * Allow 'WLC' to default prompt patterns
 
 * Comware
-    * Changed from `hp_comware` to `comware`
+    * Changed from ``hp_comware``to``comware``
 
 * IOSXE/CAT9K
     * image_to_boot argument support for reload service
@@ -67,13 +67,13 @@ Features and Bug Fixes:
 
 
 --------------------------------------------------------------------------------
-                                      New                                       
+New
 --------------------------------------------------------------------------------
 
 * NXOS
     * Add 'mode' to configure() service as argument.
     * configure_dual service is now deprecated.
-    * Fixed `switchto` and `switchback` service and added UTs
+    * Fixed ``switchto``and``switchback`` service and added UTs
 
 * FXOS/FP4K
     * New plugin for Firepower 4000 series

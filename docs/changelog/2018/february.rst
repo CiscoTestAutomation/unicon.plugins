@@ -27,12 +27,12 @@ Features and Bug Fixes:
 
     - Added learn hostname feature
 
-      Linux connections now support the `learn_hostname` connect option to
+      Linux connections now support the ``learn_hostname`` connect option to
       automatically learn the hostname.
 
       This improves reliable prompt matching as the default prompt matching may
       result in false positives when the command output contains one of the
-      prompt pattern characters `> # % ~ $` at the end of a line.
+      prompt pattern characters ``> # % ~ $`` at the end of a line.
 
     - Prompt stripping update
 
@@ -69,8 +69,8 @@ Features and Bug Fixes:
   - Removed OS static checking list, and made a warning instead.
 
   - New feature that allows user to specify initial exec and config command
-    when connecting to a device.  Users can now specify `init_exec_commands`
-    and `init_config_commands` options when connecting to a device.
+    when connecting to a device.  Users can now specify ``init_exec_commands``
+    and ``init_config_commands`` options when connecting to a device.
 
   - The terminal variable is now set to VT100 before launching the telnet or
     ssh connection to a device. This is to tell devices not to use fancy ANSI

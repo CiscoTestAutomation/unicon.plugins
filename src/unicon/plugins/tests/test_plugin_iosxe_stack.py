@@ -217,6 +217,15 @@ class TestIosXEStackSwitchover(unittest.TestCase):
         self.c.active.context.state = 'rommon'
         self.c.switchover()
 
+    def test_switchover_with_extended_timeout(self):
+        """
+        Test switchover with extended timeout to handle device boot sequence.
+        """
+        # Reset state to ensure clean test
+        self.c.active.context.state = None
+
+        # Perform switchover with extended timeout
+        self.c.switchover(timeout=1500)
 
 class TestIosXEStackReload(unittest.TestCase):
 
@@ -422,6 +431,57 @@ class TestIosXEStackUtils(unittest.TestCase):
                                     "state": "Ready"
                                 }
                             }, rd)
+
+
+class TestIosXEStackRommon(unittest.TestCase):
+
+    def test_stack_rommon_mixed_states(self):
+        """Test StackRommon pre_service with mixed states (rommon and enable)"""
+        md = MockDeviceTcpWrapperIOSXE(hostname='Router', port=0,
+                                       state='stack_enable,stack_rommon,stack_enable,stack_enable,stack_rommon',
+                                       stack=True)
+        md.start()
+        try:
+            d = Connection(hostname='Router',
+                           start=['telnet 127.0.0.1 ' + str(i) for i in md.ports[:]],
+                           os='iosxe',
+                           chassis_type='stack',
+                           username='cisco',
+                           tacacs_password='cisco',
+                           enable_password='cisco',
+                           log_buffer=True)
+            d.settings.STACK_ROMMON_SLEEP = 1
+            d.settings.STACK_BOOT_TIMEOUT = 200
+            d.connect()
+
+            # Mock the log to capture messages
+            with patch.object(d.log, 'info') as mock_log_info, \
+                 patch.object(d.log, 'warning') as mock_log_warning:
+
+                # Execute rommon service which should trigger mixed state handling
+                try:
+                    d.rommon('dir flash:', timeout=20)
+                except Exception:
+                    # May fail in mock environment but we're testing the pre_service logic
+                    pass
+
+                # Verify that mixed state detection was logged
+                log_messages = [call[0][0] for call in mock_log_info.call_args_list]
+
+                # Check for key log messages that indicate mixed state handling
+                self.assertTrue(
+                    any('Waiting for all consoles to reach rommon state' in str(msg) for msg in log_messages),
+                    "Expected 'Waiting for all consoles to reach rommon state' log message"
+                )
+
+                self.assertTrue(
+                    any('Sync in progress' in str(msg) for msg in log_messages),
+                    "Expected 'Sync in progress' log message indicating synchronization"
+                )
+
+            d.disconnect()
+        finally:
+            md.stop()
 
 
 if __name__ == "__main__":

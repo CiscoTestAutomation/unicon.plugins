@@ -1,8 +1,8 @@
 August 2021
-========
+===========
 
 August 31st
-------
+-----------
 
 .. csv-table:: Module Versions
     :header: "Modules", "Versions"
@@ -30,7 +30,7 @@ Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 --------------------------------------------------------------------------------
-                                      Fix                                       
+Fix
 --------------------------------------------------------------------------------
 
 * generic
@@ -38,7 +38,7 @@ Features and Bug Fixes:
         * Automatically set extd_ping to 'y' if extended option is specified
         * Handle invalid input errors
         * Add address to ping command if no other options are given
-        * Deprecated arguments `int` and `src_addr` for ``interface`` and ``source``
-    * Modified reload service, added `raise_on_error` option
+        * Deprecated arguments ``int``and``src_addr``for``interface``and``source``
+    * Modified reload service, added ``raise_on_error`` option
 
 

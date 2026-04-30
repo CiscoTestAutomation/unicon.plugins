@@ -30,7 +30,7 @@ Features and Bug Fixes:
 ^^^^^^^^^^^^^^^^^^^^^^^
 * Fixed unittests failures seen with multiprocessing on Mac-py38 environment
 
-* Added `goto_enable` and `standby_goto_enable` key to generic connect service to
+* Added ``goto_enable``and``standby_goto_enable`` key to generic connect service to
   allow user to disable device behavior of going to enable state in every device
   connect call, Default is True not to interrupt intuitive device behavior
 

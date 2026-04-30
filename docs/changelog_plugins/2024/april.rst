@@ -1,7 +1,7 @@
 April 2024
 ==========
 
- - Unicon.Plugins v24.4 
+- Unicon.Plugins v24.4
 ------------------------
 
 
@@ -37,7 +37,7 @@ Features and Bug Fixes:
 Changelogs
 ^^^^^^^^^^
 --------------------------------------------------------------------------------
-                                      Fix                                       
+Fix
 --------------------------------------------------------------------------------
 
 * generic
@@ -48,7 +48,7 @@ Changelogs
     * Update escape character handler timing settings
     * Revert adding connection closed statement to execute service
     * Update config transition logic
-    * Add `result_check_per_command` option to disable/enable error checking per configuration command
+    * Add ``result_check_per_command`` option to disable/enable error checking per configuration command
 
 * iosxe
     * Fix operating mode logic
@@ -58,8 +58,8 @@ Changelogs
 * iosxr
     * Add standby locked state to single RP statemachine
     * Change default behavior of ``configure()`` service, error check after all commands by default
-    * Add handler for `show configuration failed` errors to ``configure()`` service.
-    * Add `SHOW_CONFIG_FAILED_CMD` setting for command to use, default `show configuration failed`
+    * Add handler for ``show configuration failed``errors to`` configure()`` service.
+    * Add ``SHOW_CONFIG_FAILED_CMD``setting for command to use, default``show configuration failed``
 
 * other
     * update pid token list

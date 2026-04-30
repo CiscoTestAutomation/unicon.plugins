@@ -35,9 +35,9 @@ Features and Bug Fixes:
 
 * Enhance IOSXR enable pattern to accomodate different preceding card/slot.
 
-* Adding `copy` service to the HA IOSXE plugin implementation.
+* Adding ``copy`` service to the HA IOSXE plugin implementation.
 
-* Supporting `reset_standby_rp` on IOSXE.
+* Supporting ``reset_standby_rp`` on IOSXE.
 
 * Updating XR spitfire plugin run prompts pattern.
 

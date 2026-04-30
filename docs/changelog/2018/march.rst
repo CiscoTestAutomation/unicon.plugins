@@ -69,7 +69,7 @@ Features and Bug Fixes:
   - new NXOS subcommand for attaching to bash shell using context managers
 
 - CIMC plugin update
-    Add response for `Enter 'yes' or 'no' to confirm` pattern
+    Add response for ``Enter 'yes' or 'no' to confirm`` pattern
 
 - New feature: CLI proxy
     This feature allows users to connect to devices via another device.

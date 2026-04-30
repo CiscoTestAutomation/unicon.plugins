@@ -191,6 +191,17 @@ cat9k_ha_active_enable_reload:
       new_state: cat9k_ha_standby_disable_locked
 
 
+cat9k_ha_standby_boot_to_rommon:
+  preface:
+    response: file|mock_data/iosxe/c9k_boot_rommon.txt
+    timing:
+    - 0:,0,0.02
+  prompt: ""
+  keys:
+    ctrl-c:
+      new_state: cat9k_ha_standby_rommon
+
+
 cat9k_ha_active_enable_wrerase_confirm:
     prompt: "Erasing the nvram filesystem will remove all configuration files! Continue? [confirm]"
     commands:
@@ -204,6 +215,7 @@ cat9k_ha_active_enable_wrerase_confirm:
 cat9k_ha_active_config:
   prompt: "%N(config)#"
   commands:
+    "config-register 0x0": ""
     "no logging console": ""
     "line console 0": ""
     "line vty 0 4": ""
@@ -412,4 +424,3 @@ cat9k_ha_active_install_add_1:
     FAILED: install_add_activate_commit : Copy bootflash:asr1000rpx86-universalk9.BLD_V16
 
   new_state: cat9k_ha_active_enable
-

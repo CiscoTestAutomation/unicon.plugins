@@ -25,7 +25,10 @@ class MockDeviceIOSXECat9k(MockDevice):
                 prompt = self.transport_ports[self.transport_handles[transport]]['prompt']
                 if len(self.transport_ports) > 1 :
                     self.state_change_switchover(
-                        transport, 'cat9k_ha_active_enable_reload', 'cat9k_ha_active_enable')
+                        transport,
+                        'cat9k_ha_active_enable_reload',
+                        'cat9k_ha_standby_boot_to_rommon',
+                    )
                 return True
 
     def cat9k_ha_active_config_redundancy_mc(self, transport, cmd):

@@ -1,8 +1,8 @@
 January 2022
-==========
+============
 
 January 25 - Unicon.Plugins v22.1 
-------------------------
+---------------------------------
 
 
 
@@ -37,11 +37,11 @@ Features and Bug Fixes:
 Changelogs
 ^^^^^^^^^^
 --------------------------------------------------------------------------------
-                                      Fix                                       
+Fix
 --------------------------------------------------------------------------------
 
 * generic
-    * Added `CONFIG_TRANSITION_WAIT` setting to allow changes the config transition wait time
+    * Added ``CONFIG_TRANSITION_WAIT`` setting to allow changes the config transition wait time
 
 * iosxe/iec3400
     * New plugin for IEC3400 device
@@ -56,7 +56,7 @@ Changelogs
     * Added support for ROMMON init commands
 
 --------------------------------------------------------------------------------
-                                      New                                       
+New
 --------------------------------------------------------------------------------
 
 * iosxe
@@ -75,4 +75,4 @@ Changelogs
 
 * nxos
     * Added l2rib client support to statemachine
-    * New `l2rib_dt` service
+    * New ``l2rib_dt`` service

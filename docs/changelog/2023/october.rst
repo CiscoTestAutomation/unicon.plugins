@@ -37,12 +37,12 @@ Features and Bug Fixes:
 Changelogs
 ^^^^^^^^^^
 --------------------------------------------------------------------------------
-                                      Fix                                       
+Fix
 --------------------------------------------------------------------------------
 
 * unicon.eal.backend
     * Added telnetlib backend.
-    * Set `<connection_object>.settings.BACKEND = "auto"` to use the new telnetlib backend.
+    * Set ``<connection_object>.settings.BACKEND = "auto"`` to use the new telnetlib backend.
 
 * unicon.mock
     * Update mock_device_cli to work with telnetlib backend
@@ -57,7 +57,7 @@ Changelogs
 
 
 --------------------------------------------------------------------------------
-                                      New                                       
+New
 --------------------------------------------------------------------------------
 
 * unicon.adapters
@@ -67,7 +67,7 @@ Changelogs
 
 
 --------------------------------------------------------------------------------
-                                      Fix                                       
+Fix
 --------------------------------------------------------------------------------
 
 * cheetah
