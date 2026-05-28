@@ -442,44 +442,23 @@ class TestIosXEStackRommon(unittest.TestCase):
                                        stack=True)
         md.start()
         try:
-            d = Connection(hostname='Router',
+            con = Connection(hostname='Router',
                            start=['telnet 127.0.0.1 ' + str(i) for i in md.ports[:]],
                            os='iosxe',
                            chassis_type='stack',
                            username='cisco',
                            tacacs_password='cisco',
                            enable_password='cisco',
-                           log_buffer=True)
-            d.settings.STACK_ROMMON_SLEEP = 1
-            d.settings.STACK_BOOT_TIMEOUT = 200
-            d.connect()
+                           log_buffer=True,
+                           debug=True)
+            con.settings.STACK_ROMMON_SLEEP = 1
+            con.settings.STACK_BOOT_TIMEOUT = 200
+            con.connect()
+            con.rommon(timeout=20)
+            for subcon in con.subconnections:
+                self.assertEqual(subcon.state_machine.current_state, 'rommon')
 
-            # Mock the log to capture messages
-            with patch.object(d.log, 'info') as mock_log_info, \
-                 patch.object(d.log, 'warning') as mock_log_warning:
-
-                # Execute rommon service which should trigger mixed state handling
-                try:
-                    d.rommon('dir flash:', timeout=20)
-                except Exception:
-                    # May fail in mock environment but we're testing the pre_service logic
-                    pass
-
-                # Verify that mixed state detection was logged
-                log_messages = [call[0][0] for call in mock_log_info.call_args_list]
-
-                # Check for key log messages that indicate mixed state handling
-                self.assertTrue(
-                    any('Waiting for all consoles to reach rommon state' in str(msg) for msg in log_messages),
-                    "Expected 'Waiting for all consoles to reach rommon state' log message"
-                )
-
-                self.assertTrue(
-                    any('Sync in progress' in str(msg) for msg in log_messages),
-                    "Expected 'Sync in progress' log message indicating synchronization"
-                )
-
-            d.disconnect()
+            con.disconnect()
         finally:
             md.stop()
 

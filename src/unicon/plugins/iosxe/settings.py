@@ -67,6 +67,10 @@ class IosXESettings(GenericSettings):
         # Regex to match the entries on the grub boot screen
         self.GRUB_REGEX_PATTERN = r'(?:\x1b\[7m)?\x1b\[\d;3H.*?   '
 
+        # Max retries waiting for all GRUB boot entries to arrive in the buffer
+        # before selecting a boot image. Each retry sleeps 0.1 s.
+        self.GRUB_MENU_WAIT_RETRIES = 10
+
         self.MAINTENANCE_MODE_WAIT_TIME = 30   # 30 seconds
         self.MAINTENANCE_MODE_TIMEOUT = 60*40  # 40 minutes
         self.MAINTENANCE_START_COMMAND = 'start maintenance'

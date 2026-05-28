@@ -513,7 +513,8 @@ class Enable(BaseService):
             sm.go_to(self.start_state,
                      spawn,
                      context=handle.context,
-                     timeout=timeout)
+                     timeout=timeout,
+                     prompt_recovery=self.prompt_recovery)
         except (UniconAuthenticationError, CredentialsExhaustedError):
             # Don't wrap auth errors - re-raise them directly
             raise
@@ -611,7 +612,6 @@ class Execute(BaseService):
         self.matched_retry_sleep = connection.settings.EXECUTE_MATCHED_RETRY_SLEEP
         self.state_change_matched_retries = connection.settings.EXECUTE_STATE_CHANGE_MATCH_RETRIES
         self.state_change_matched_retry_sleep = connection.settings.EXECUTE_STATE_CHANGE_MATCH_RETRY_SLEEP
-        self.detect_state = True
 
     def log_service_call(self):
         pass
@@ -635,7 +635,7 @@ class Execute(BaseService):
         if allow_state_change is None:
             allow_state_change = con.settings.EXEC_ALLOW_STATE_CHANGE
 
-        self.detect_state = detect_state if detect_state is not None else self.detect_state
+        detect_state = True if detect_state is None else detect_state
 
         timeout = timeout or self.timeout
 
@@ -693,7 +693,7 @@ class Execute(BaseService):
             if custom_auth_stmt:
                 dialog += Dialog(custom_auth_stmt)
 
-        if self.detect_state:
+        if detect_state:
             # Add all known states to detect state changes.
             for state in sm.states:
                 # The current state is already added by the service_dialog method
@@ -3130,4 +3130,3 @@ class ContextMgrBaseService(BaseService):
             else:
                 raise AttributeError('Device %s and/or connection %s has no attribute %s'
                                     % (self.conn.device, self.conn, attr))
-

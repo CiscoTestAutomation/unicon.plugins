@@ -207,6 +207,26 @@ class TestIosXRPluginExecute(unittest.TestCase):
         finally:
             md.stop()
 
+    def test_execute_avoid_state_detection_does_not_persist(self):
+        md = MockDeviceTcpWrapperIOSXR(port=0, state='enable')
+        md.start()
+        conn = Connection(hostname='Router',
+                          start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
+                          os='iosxr',
+                          username='admin',
+                          tacacs_password='admin')
+
+        try:
+            conn.connect()
+            conn.execute('show context')
+            conn.execute('run', allow_state_change=True, timeout=5)
+            self.assertEqual(conn.state_machine.current_state, 'run')
+            conn.execute('exit', allow_state_change=True, timeout=5)
+            self.assertEqual(conn.state_machine.current_state, 'enable')
+        finally:
+            conn.disconnect()
+            md.stop()
+
 
 class TestIosXrPluginPrompts(unittest.TestCase):
     """Tests for prompt handling."""

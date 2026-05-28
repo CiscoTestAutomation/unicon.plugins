@@ -91,18 +91,32 @@ def grub_prompt_handler(spawn, session, context):
         context['boot_start_time'] = datetime.now()
         context['boot_prompt_count'] = 1
 
-    grub_boot_image = context.get('grub_boot_image')
-    # if no grub_boot_image, do nothing
-    if not grub_boot_image:
-        return
-
-    spawn.log.info("Finding an entry that includes the string '{}'".
-             format(grub_boot_image))
+    # If no grub_boot_image is specified, default to '*' which will
+    # match the currently highlighted entry (marked with '*' prefix
+    # or \x1b[7m reverse video) and boot it without moving the cursor.
+    grub_boot_image = context.get('grub_boot_image') or '*'
 
     # Regex to match grub screen boot entries on cat9kv
     lines = re.findall(spawn.settings.GRUB_REGEX_PATTERN, spawn.buffer)
 
-    spawn.log.debug(f'Grub lines: {lines}')
+    # The grub pattern may fire before all menu entries have been buffered,
+    # e.g. when the PTY delivers data in multiple chunks (slow connections)
+    # Retry until the desired entry is visible so that
+    # the correct line index can be calculated.
+    grub_menu_wait_retries = spawn.settings.GRUB_MENU_WAIT_RETRIES
+    for attempt in range(grub_menu_wait_retries):
+        if any(grub_boot_image in line for line in lines):
+            break
+        spawn.log.debug(
+            'Entry "{}" not yet in buffer, retrying ({}/{})...'.format(
+                grub_boot_image, attempt + 1, grub_menu_wait_retries))
+        time.sleep(0.1)
+        spawn.read_update_buffer()
+        lines = re.findall(spawn.settings.GRUB_REGEX_PATTERN, spawn.buffer)
+        spawn.log.debug(f'Grub lines: {lines}')
+
+    spawn.log.info("Finding an entry that includes the string '{}'".
+             format(grub_boot_image))
 
     selected_line = None
     desired_line = None
@@ -116,16 +130,17 @@ def grub_prompt_handler(spawn, session, context):
             desired_line = index
 
     if selected_line is None or desired_line is None:
-        raise Exception("Cannot figure out which image to select! "
-                        "Debug info:\n"
-                        "selected_line: {}\n"
-                        "desired_line: {}\n"
-                        "lines: {}"
-                        .format(selected_line, desired_line, lines))
-
-    spawn.log.info("Selecting the entry '{}' now.".format(lines[desired_line]))
-
-    num_lines_to_move = desired_line - selected_line
+        if grub_boot_image != '*':
+            raise Exception("Cannot figure out which image to select! "
+                            "Debug info:\n"
+                            "selected_line: {}\n"
+                            "desired_line: {}\n"
+                            "lines: {}"
+                            .format(selected_line, desired_line, lines))
+        num_lines_to_move = 0
+    else:
+        spawn.log.info("Selecting the entry '{}' now.".format(lines[desired_line]))
+        num_lines_to_move = desired_line - selected_line
 
     spawn.log.debug(f'Lines to move: {num_lines_to_move}')
 
@@ -133,9 +148,10 @@ def grub_prompt_handler(spawn, session, context):
         'down': '\x1B[B',
         'up': '\x1B[A'
     }
+
     # If positive we want to move down the list.
     # If negative we want to move up the list.
-    if num_lines_to_move >= 0:
+    if num_lines_to_move > 0:
         key = 'down'
     else:
         key = 'up'
@@ -143,9 +159,15 @@ def grub_prompt_handler(spawn, session, context):
     for _ in range(abs(num_lines_to_move)):
         spawn.send(keys.get(key))
         time.sleep(0.5)
+        spawn.read_update_buffer()
 
-    spawn.sendline()
+    # Wait for the PTY to finish delivering any remaining GRUB menu
+    # output before sending Enter. Depending on PTY buffer sizes, data
+    # may arrive in multiple chunks; without this drain the sendline
+    # may be lost or interleaved with pending output.
     time.sleep(0.5)
+    spawn.read_update_buffer()
+    spawn.sendline()
 
 
 def boot_image(spawn, context, session):
@@ -267,6 +289,13 @@ setup_dialog_stmt = \
 auto_install_stmt = \
     Statement(pattern=reload_patterns.autoinstall_dialog,
               action='sendline(yes)',
+              args=None,
+              loop_continue=True,
+              continue_timer=False)
+
+fast_reload_confirm_stmt = \
+    Statement(pattern=reload_patterns.fast_reload_confirm,
+              action='sendline()',
               args=None,
               loop_continue=True,
               continue_timer=False)

@@ -20,6 +20,7 @@ from .service_statements import (switch_prompt,
                                  stack_reload_stmt_list_1,
                                  stack_switchover_stmt_list, stack_factory_reset_stmt_list)
 from unicon.plugins.generic.service_implementation import Enable as GenericEnable, Execute as GenericExecute
+from unicon.plugins.iosxe.cat9k.service_implementation import HARommon as HACat9kRommon
 
 utils = StackUtils()
 
@@ -461,99 +462,11 @@ class StackReload(BaseService):
             Result = namedtuple('Result', ['result', 'output'])
             self.result = Result(self.result, reload_output.replace(reload_cmd, '', 1))
 
-class StackRommon(GenericExecute):
+class StackRommon(HACat9kRommon):
     """ Brings device to the Rommon prompt and executes commands specified
     """
-    def __init__(self, connection, context, **kwargs):
-        # Connection object will have all the received details
-        super().__init__(connection, context, **kwargs)
-        self.start_state = 'rommon'
-        self.end_state = 'rommon'
-        self.service_name = 'rommon'
-        self.dialog = Dialog(stack_reload_stmt_list)
-        self.timeout = 200
-        self.__dict__.update(kwargs)
+    pass
 
-    def pre_service(self, reload_command=None, timeout=None, *args, **kwargs):
-        con = self.connection
-        timeout = timeout or self.timeout
-
-        con.log.info('Checking current state of all subconnections')
-        rommon_conns = []
-        non_rommon_conns = []
-
-        for subconn in con._subconnections.values():
-            state = subconn.state_machine.detect_state(subconn.spawn, subconn.context)
-
-            if state == 'rommon':
-                rommon_conns.append(subconn)
-            else:
-                non_rommon_conns.append(subconn)
-
-        # If ALL are in ROMMON, do nothing and skip synchronization.
-        if not non_rommon_conns:
-            con.log.info('Uniform state detected (All ROMMON). Skipping synchronization logic.')
-            super().pre_service(*args, **kwargs)
-            return
-
-        reload_conn = non_rommon_conns[0]
-
-        # Ensure break is enabled so the reload stops at ROMMON
-        reload_conn.state_machine.go_to('enable', reload_conn.spawn, context=reload_conn.context)
-        boot_info = reload_conn.execute('show boot')
-        if 'Enable Break = no' in boot_info or 'ENABLE_BREAK variable does not exist' in boot_info:
-            reload_conn.configure('boot enable-break')
-
-        # Prepare and send reload
-        reload_cmd = reload_command if reload_command else 'reload'
-        reload_dialog = self.dialog
-        if not reload_command:
-            reload_dialog += Dialog([switch_prompt] + stack_factory_reset_stmt_list)
-
-        reload_conn.sendline(reload_cmd)
-        try:
-            reload_dialog.process(reload_conn.spawn, timeout=timeout, context=reload_conn.context)
-        except Exception as e:
-            con.log.warning(f'Reload command issued, proceeding to sync loop. (Note: {e})')
-
-        con.log.info('Waiting for all consoles to reach rommon state...')
-        sleep(self.connection.settings.STACK_ROMMON_SLEEP)
-
-        max_wait = 30
-        poll_interval = 15
-        waited = 0
-        while waited < max_wait:
-            sleep(poll_interval)
-            waited += poll_interval
-
-            all_rommon = True
-            for subconn in con._subconnections.values():
-                subconn.sendline()
-                subconn.state_machine.go_to(
-                    'any',
-                    subconn.spawn,
-                    context=subconn.context,
-                    prompt_recovery=subconn.prompt_recovery,
-                )
-                self.connection.log.debug('{} in state: {}'.format(subconn.alias, subconn.state_machine.current_state))
-
-            con.log.info(f'Sync in progress... ({waited}/{max_wait}s)')
-
-        if not all_rommon:
-            raise SubCommandFailure('Timeout: Stack failed to synchronize all consoles to ROMMON.')
-
-        super().pre_service(*args, **kwargs)
-        # send boot command for each subconnection
-        for subconn in con._subconnections.values():
-            subconn.sendline()
-            subconn.state_machine.go_to(
-                'any',
-                subconn.spawn,
-                context=subconn.context,
-                prompt_recovery=subconn.prompt_recovery,
-                timeout=subconn.connection_timeout,
-            )
-            self.connection.log.debug('{} in state: {}'.format(subconn.alias, subconn.state_machine.current_state))
 
 
 class StackEnable(GenericEnable):

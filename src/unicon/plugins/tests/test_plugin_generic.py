@@ -23,6 +23,7 @@ from unicon.eal.dialogs import Dialog, Statement
 from unicon.plugins.utils import sanitize
 from unicon.plugins.tests.mock.mock_device_ios import MockDeviceTcpWrapperIOS
 from unicon.mock.mock_device import MockDevice, MockDeviceTcpWrapper
+from unicon.plugins.generic.service_implementation import Enable as GenericEnable
 from unicon.plugins.generic.statements import login_handler, password_handler, passphrase_handler
 from unicon.plugins.generic.statemachine import config_transition
 from pyats.topology import loader
@@ -36,6 +37,29 @@ from unicon.core.errors import (SubCommandFailure, StateMachineError,
 
 unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC=0
 unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC=0.2
+
+
+class TestGenericEnable(unittest.TestCase):
+
+    def test_enable_passes_prompt_recovery_to_state_machine(self):
+        d = Connection(hostname='Router',
+                       start=['mock_device_cli --os ios'],
+                       os='ios',
+                       prompt_recovery=True)
+        d.spawn = Mock()
+        d.state_machine = Mock()
+        d.state_machine.go_to = Mock()
+
+        enable = GenericEnable(d, d.context)
+        enable.pre_service()
+        enable.call_service()
+
+        d.state_machine.go_to.assert_called_once_with(
+            'enable',
+            d.spawn,
+            context=d.context,
+            timeout=d.settings.ENABLE_TIMEOUT,
+            prompt_recovery=True)
 
 
 class TestPasswordHandler(unittest.TestCase):

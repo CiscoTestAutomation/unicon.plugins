@@ -31,7 +31,7 @@ class ReloadPatterns(UniconCorePatterns):
         self.connection_closed = r'^(.*?)Connection.*? closed|disconnect: Broken pipe'
         self.press_return = r'Press RETURN to get started.*'
         self.config_session_locked = r'^.*Config session is locked.*user will be pushed back to exec mode'
-
+        self.fast_reload_confirm = r'^.*Proceed( with( (quick|fast))? reload)?\?\s*\[confirm\]'
 
 # Traceroute patterns
 class TraceroutePatterns(object):

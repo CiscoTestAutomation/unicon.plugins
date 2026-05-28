@@ -129,7 +129,7 @@ class HANxos9kReloadService(HANxosReloadService):
 class AttachModuleConsoleN9k(AttachModuleConsole):
     """ Service to attach to N9K module console (linecard) via rlogin.
     This service provides a context manager to connect to a linecard console
-    on Nexus 9000 devices using the 'run bash rlogin lc<N>' command.
+    on Nexus 9000 devices using the 'run bash sudo rlogin lc<N>' command.
 
     The service returns a context manager that:
     - Attaches to the specified module console on entry
@@ -194,7 +194,7 @@ class AttachModuleConsoleN9k(AttachModuleConsole):
 
         def __enter__(self):
             """Enter the module console context.
-            Executes 'run bash rlogin lc<N>' to attach to the module console
+            Executes 'run bash sudo rlogin lc<N>' to attach to the module console
             and waits for the module prompt to appear.
             Returns:
                 self: Context manager instance for command execution
@@ -205,14 +205,14 @@ class AttachModuleConsoleN9k(AttachModuleConsole):
             self.conn.log.debug('+++ attaching console +++')
             try:
                 # Execute the rlogin command to attach to module console
-                self.conn.log.debug('Sending: run bash rlogin lc%s' % (self.module_num))
-                self.conn.sendline('run bash rlogin lc%s' % self.module_num)
+                self.conn.log.debug('Sending: run bash sudo rlogin lc%s' % (self.module_num))
+                self.conn.sendline('run bash sudo rlogin lc%s' % self.module_num)
 
-                # Wait for module console prompt (supports both user and privileged modes)
+                # Wait for bash prompt (e.g., root@lc1:~#)
                 patterns = [
-                            r'module-\d+[#>]',        # Standard prompt: module-1#
-                            r'module-\d+\(.*\)[#>]',  # Config mode: module-1(config)#
-                        ]
+                    r'root@lc\d+:~#',           # Bash prompt for root user on linecard
+                    r'root@lc\d+:\S+#',         # Bash prompt with different working directory
+                ]
                 match_output = self.conn.expect(patterns, timeout=self.timeout)
 
                 # Get the matched output - use match object instead of buffer
@@ -292,10 +292,10 @@ class AttachModuleConsoleN9k(AttachModuleConsole):
             # Send the command to the module console
             self.conn.sendline(command)
             
-            # Wait for the module prompt to return
+            # Wait for the bash prompt to return (since we use sudo rlogin)
             patterns = [
-                r'module-\d+[#>]',        # Standard prompt
-                r'module-\d+\(.*\)[#>]',  # Config mode prompt
+                r'root@lc\d+:~#',           # Bash prompt for root user on linecard
+                r'root@lc\d+:\S+#',         # Bash prompt with different working directory
             ]
 
             try:

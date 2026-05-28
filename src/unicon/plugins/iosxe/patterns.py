@@ -16,7 +16,7 @@ class IosXEPatterns(GenericPatterns):
         self.overwrite_previous = \
             r'^.*Overwrite the previous NVRAM configuration\?\[confirm\].*$'
         self.are_you_sure = \
-            r'^.*Are you sure you want to continue\? \(y\/n\)\[y\]:?\s?$'
+            r'^.*Are you sure you want to continue\? \(y\/n\)(\[y\])?:?\s?$'
         self.delete_filename = r'^.*Delete filename \[.*\]\?\s*$'
         self.wish_continue = r'^.*Do you wish to continue\? \[yes\]:\s*$'
         self.want_continue = r'^.*(Do you want to )?[Cc]ontinue\? \[no\]:\s*$'
@@ -60,7 +60,7 @@ class IosXEReloadPatterns(ReloadPatterns):
         self.default_prompts = r'^(.*?)(wlc|WLC|Router|RouterRP|Switch|ios|switch|.*)([0-9])?(\(standby\))?(\(boot\))?(>|#)'
         self.telnet_prompt = r'^.*telnet>\s?'
         self.please_reset = r'^(.*)Please reset'
-        self.grub_prompt = r'.*The highlighted entry will be (booted|executed) automatically in .*?(\x1b\S+)?\s+'
+        self.grub_prompt = r'.*(The highlighted entry will be (booted|executed) automatically in .*|Press <Enter> to boot the selected OS or .c. for a command-line.)(\x1b\S+)?\s+'
 
         # The uniclean package expects these patterns to be here.
         self.enable_prompt = IosXEPatterns().enable_prompt

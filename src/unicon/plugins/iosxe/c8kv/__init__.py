@@ -2,9 +2,13 @@
 from unicon.plugins.iosxe import IosXEServiceList, IosXESingleRpConnection
 from unicon.plugins.iosxe.c8kv.statemachine import IosXEC8kvSingleRpStateMachine
 
+from . import service_implementation as svc
+
 class IosXEC8kvServiceList(IosXEServiceList):
     def __init__(self):
         super().__init__()
+        self.reload = svc.Reload
+
 
 class IosXEC8kvSingleRpConnection(IosXESingleRpConnection):
     platform = 'c8kv'

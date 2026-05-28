@@ -1526,6 +1526,11 @@ class AttachModuleConsole(BaseService):
                 # save the new escape chars
                 self.escape_chars = match.last_match.groupdict()['escape_chars']
 
+            try:
+                self.conn.expect([r'press ~, to exit'], timeout=self.timeout)
+            except (SubCommandFailure, TimeoutError):
+                self.conn.log.warning('Did not see "press ~, to exit" message')
+
             # slow console
             for _ in range(3):
                 try:
