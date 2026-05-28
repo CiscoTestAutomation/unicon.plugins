@@ -91,6 +91,8 @@ c8kv_config_term:
       new_state: 'c8kv_enable'
     'config-register 0x40':
       new_state: 'c8kv_config_term_autoboot_disabled'
+    'config-register 0x2102': ""
+
 
 c8kv_config_term_autoboot_disabled:
   prompt: "%N(config)#"
@@ -113,6 +115,9 @@ c8kv_reload_proceed:
 c8kv_grub_menu:
   preface: file|mock_data/iosxe/cat8kv_grub_menu.txt
   prompt: ""
+  keys:
+    ctrl-\\[:
+      new_state: 'c8kv_grub_menu'
   commands:
     '':
       new_state: 'c8kv_grub_boot_image'
@@ -245,6 +250,10 @@ c8kv_exec:
 
 c8kv_rommon:
   prompt: "grub>"
+  keys:
+    'ctrl-\[':  # 'escape' character
+      new_state: 'c8kv_grub_menu'
   commands:
+    '': 'blah'
     'boot':
       new_state: 'c8kv_enable'

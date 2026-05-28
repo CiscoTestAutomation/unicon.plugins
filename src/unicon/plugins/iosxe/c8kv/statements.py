@@ -1,58 +1,47 @@
-import re
-import time
+import datetime
 import logging
 
 from unicon.eal.dialogs import Statement
-from unicon.plugins.generic.statements import (
-    boot_timeout_stmt,
-)
+from ..patterns import IosXEPatterns
+from ..settings import IosXESettings
 
-from unicon.plugins.iosxe.patterns import IosXEReloadPatterns, IosXEPatterns
-
-log = logging.getLogger(__name__)
-reload_patterns = IosXEReloadPatterns()
+logger = logging.getLogger(__name__)
 patterns = IosXEPatterns()
+settings = IosXESettings()
 
-def boot_image(spawn, context, session):
-    if not context.get('boot_prompt_count'):
-        context['boot_prompt_count'] = 1
-    if context.get('boot_prompt_count') < \
-            spawn.settings.MAX_BOOT_ATTEMPTS:
-        if "boot_cmd" in context:
-            cmd = context.get('boot_cmd')
-        elif "image_to_boot" in context:
-            cmd = "boot {}".format(context['image_to_boot']).strip()
-        elif spawn.settings.FIND_BOOT_IMAGE:
-            filesystem = spawn.settings.BOOT_FILESYSTEM if \
-                hasattr(spawn.settings, 'BOOT_FILESYSTEM') else 'flash:'
-            spawn.buffer = ''
-            spawn.sendline('dir {}'.format(filesystem))
-            dir_listing = spawn.expect(patterns.rommon_prompt).match_output
-            boot_file_regex = spawn.settings.BOOT_FILE_REGEX if \
-                hasattr(spawn.settings, 'BOOT_FILE_REGEX') else r'(\S+\.bin)'
-            m = re.search(boot_file_regex, dir_listing)
-            if m:
-                boot_image = m.group(1)
-                cmd = "boot {}{}".format(filesystem, boot_image)
-            else:
-                cmd = "boot"
-        else:
-            cmd = "boot"
-        spawn.sendline(cmd)
-        context['boot_prompt_count'] += 1
+
+def boot_from_rommon(statemachine, spawn, context):
+    context['boot_start_time'] = datetime.datetime.now()
+    context['boot_prompt_count'] = 1
+    if context.get('grub_boot_image') is None:
+        logger.info('No grub_boot_image specified, will use default')
     else:
-        raise Exception("Too many failed boot attempts have been detected.")
+        logger.info(f"Using grub_boot_image: {context['grub_boot_image']}")
+    logger.info('Sending escape to trigger boot menu in GRUB')
+    # C8KV uses GRUB as its bootloader rather than traditional ROMMON.
+    # Sending ESC interrupts the GRUB autoboot countdown and presents
+    # the boot menu, allowing selection of a specific boot image.
+    spawn.send('\x1b')
 
 
+def send_escape(spawn, session):
+    session.setdefault('boot_attempt_count', 0)
+    if session.get('boot_attempt_count') < settings.MAX_BOOT_ATTEMPTS:
+        spawn.send('\x1b')  # send escape character to trigger boot menu in GRUB
+        session['boot_attempt_count'] += 1
+    else:
+        err_info = 'Too many failed boot attempts have been detected.'
+        raise Exception(err_info)
+
+
+# Create c8kv specific boot from rommon statement
+# C8KV is a virtual platform that exclusively uses
+# GRUB bootloader - the ROMMON prompt is always grub>,
+# never the classic rommon> or switch: prompts.
 boot_from_rommon_stmt = Statement(
     pattern=patterns.rommon_prompt,
-    action=boot_image,
+    action=send_escape,
     args=None,
     loop_continue=True,
-    continue_timer=False)
-
-# This list is extended later, see below
-boot_from_rommon_statement_list = [
-    boot_timeout_stmt,
-    boot_from_rommon_stmt
-]
+    continue_timer=False
+)

@@ -613,6 +613,50 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
             c.disconnect()
             md.stop()
 
+    def test_reload_fast_reload_confirm(self):
+        md = MockDeviceTcpWrapperIOSXE(port=0, state='c9k_enable')
+        md.start()
+
+        c = Connection(
+            hostname='switch',
+            start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
+            os='iosxe',
+            platform='cat9k',
+            settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+            credentials=dict(default=dict(username='cisco', password='cisco'),
+                             alt=dict(username='admin', password='lab')),
+            mit=True
+        )
+        try:
+            c.connect()
+            c.settings.POST_RELOAD_WAIT = 1
+            c.execute('fast reload')
+            c.reload(timeout=10)
+            self.assertEqual(c.state_machine.current_state, 'enable')
+        finally:
+            c.disconnect()
+            md.stop()
+
+    def test_reload_with_self_signed_certificate_warning(self):
+        c = Connection(
+            hostname='switch',
+            start=['mock_device_cli --os iosxe --state c9k_login4 --hostname switch'],
+            os='iosxe',
+            platform='cat9k',
+            settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+            credentials=dict(default=dict(username='cisco', password='cisco'),
+                             alt=dict(username='admin', password='lab')),
+            mit=True
+        )
+        try:
+            c.connect()
+            c.settings.POST_RELOAD_WAIT = 1
+            c.reload(reload_command='reload self-signed-certificate')
+            self.assertEqual(c.state_machine.current_state, 'enable')
+        finally:
+            if c.connected:
+                c.disconnect()
+
     def test_reload_with_error_pattern(self):
         md = MockDeviceTcpWrapperIOSXE(port=0, state='c9k_login4')
         md.start()

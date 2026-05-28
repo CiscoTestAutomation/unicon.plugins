@@ -38,7 +38,7 @@ class IosxeSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
             except StateMachineError:
                 pass
             else:
-                con.enable()
+                con.enable(prompt_recovery=con.prompt_recovery)
                 
             # If the learn token is not enabled we need to see if the device is in Controller-Managed mode
             # or it's in autonomous mode. If the device is in Controller-Managed mode, enable token discovery.
@@ -80,4 +80,3 @@ class IosxeSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
                                         context=con.context,
                                         prompt_recovery=con.prompt_recovery)
         super().learn_tokens()
-

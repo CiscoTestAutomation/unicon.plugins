@@ -68,6 +68,29 @@ class TestIosXECat3kEwlcConfigure(unittest.TestCase):
         self.d.configure("wlan shutdown")
 
 
+class TestIosXECat3kEwlcApLscProvision(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.d = Connection(hostname='Router',
+                           start=['mock_device_cli --os iosxe --state ewlc_enable'],
+                           os='iosxe',
+                           platform='cat3k',
+                           model='ewlc',
+                           username='cisco',
+                           tacacs_password='cisco')
+        cls.d.connect()
+
+    @classmethod
+    @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+    @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
+    def tearDownClass(cls):
+        cls.d.disconnect()
+
+    def test_config_ap_lsc_provision_no_default_yn(self):
+        self.d.configure("ap lsc-provision")
+
+
 class TestIosXECat3kEwlcStandbyReload(unittest.TestCase):
 
     @classmethod

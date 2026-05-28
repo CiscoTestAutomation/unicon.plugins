@@ -12,8 +12,7 @@ n9k_exec2:
     "term length 0": ""
     "term width 511": ""
     "terminal session-timeout 0": ""
-    "run bash rlogin lc1":
-      prompt: "module-1#"
+    "run bash sudo rlogin lc1":
       new_state: n9k_module_console
     "config term":
       new_state: n9k_config2
@@ -497,7 +496,7 @@ n9k_boot_shell:
       new_state: n9k_boot
 
 n9k_module_console:
-  prompt: "module-1#"
+  prompt: "root@lc1:~#"
   commands:
     "show version": 
       response: |

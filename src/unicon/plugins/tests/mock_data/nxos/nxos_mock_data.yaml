@@ -618,7 +618,9 @@ nxos_l2rib_pycl_prompt_delay_custom:
       new_state: bash
 
 console_escape:
-  preface: "Escape character is ~,'"
+  preface: |
+    Escape character is '~,'
+    press ~, to exit
   prompt: ""
   commands:
     "":

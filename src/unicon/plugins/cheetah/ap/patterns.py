@@ -9,4 +9,4 @@ class CheetahAPPatterns(GenericPatterns):
 
     def __init__(self):
         super().__init__()
-        self.ap_shell_prompt = r'^(.*?)\w+:\/(.*?)#\s?$'
+        self.ap_shell_prompt = r'^(.*?)\w+:(~|\/)(.*?)#\s?$'

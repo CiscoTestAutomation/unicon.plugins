@@ -81,6 +81,8 @@ class GenericPatterns(UniconCorePatterns):
             r"%Error opening tftp:\/\/255\.255\.255\.255|Autoinstall trying|"
             r"audit: kauditd hold queue overflow|SECURITY WARNING|%RSA key|INSECURE DYNAMIC WARNING|"
             r"key config-key password-encrypt|"
+            r"Failed to generate persistent self-signed certificate\.|"
+            r"Secure server will use temporary self-signed certificate\.|"
             r"(LC|RP)/\d+/\d+/CPU\d+:\w+\s+\d+\s+\d{2}:\d{2}:\d{2}|"
             r"\[OK\]"
             r").*\s*$"

@@ -14,7 +14,7 @@ from unicon.plugins.generic.service_implementation import (
 )
 
 from ..service_implementation import Reload as XEReload
-from ..statements import boot_from_rommon_stmt
+from ..statements import boot_from_rommon_stmt, fast_reload_confirm_stmt
 from .statements import boot_interrupt_stmt
 
 
@@ -23,7 +23,7 @@ class Reload(XEReload):
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
         # Override the service dialog
-        self.dialog = Dialog(reload_statement_list + [boot_from_rommon_stmt])
+        self.dialog = Dialog(reload_statement_list + [boot_from_rommon_stmt, fast_reload_confirm_stmt])
 
     def pre_service(self, *args, **kwargs):
         if "image_to_boot" in kwargs:

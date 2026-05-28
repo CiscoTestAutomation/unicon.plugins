@@ -37,6 +37,8 @@ c9k_enable:
       "term width 0": ""
       "quick reload":
         new_state: c9k_enable_quick_reload
+      "fast reload":
+        new_state: c9k_enable_fast_reload
       "reload":
         new_state: c9k_reload_proceed
       "show startup-config":
@@ -914,6 +916,8 @@ enable_c9k:
       new_state: c9k_exec
     "reload":
       new_state: c9k_system_config_change
+    "reload self-signed-certificate":
+      new_state: c9k_system_config_change_self_signed
 
     "active_install_add":
       new_state: cat9k_install_add_commit
@@ -951,6 +955,46 @@ c9k_reload_proceed:
       timing:
         - 0:,0,0.005
       new_state: c9k_login4
+
+c9k_system_config_change_self_signed:
+  prompt: "System configuration has been modified. Save? [yes/no]:"
+  commands:
+    "n":
+      new_state: c9k_reload_proceed_self_signed
+
+c9k_reload_proceed_self_signed:
+  prompt: "Proceed with reload? [confirm]"
+  commands:
+    "":
+      response: file|mock_data/iosxe/cat9k_reload_logs.txt
+      timing:
+        - 0:,0,0.005
+      new_state: c9k_login_self_signed
+
+c9k_login_self_signed:
+  prompt: "Username: "
+  commands:
+    "cisco":
+      new_state: c9k_password_self_signed
+
+c9k_password_self_signed:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: c9k_exec_self_signed
+
+c9k_exec_self_signed:
+  preface: |
+    switch>Failed to generate persistent self-signed certificate.
+        Secure server will use temporary self-signed certificate.
+  prompt: "%N>"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version | include operating mode" : ""
+    "show install summary": ""
+    "enable":
+      new_state: enable_c9k
 
 c9k_quick_reload_proceed:
   prompt: "Proceed with quick reload? [confirm]"
@@ -1115,7 +1159,8 @@ grub_execute:
       MANUAL_BOOT=yes
     "boot":
       new_state: cat9k_rommon_boot
-
+    "":
+      new_state: c9k_login4
 
 # ================================
 # Login sequence for login_creds
@@ -1275,3 +1320,18 @@ c9k_password8_fallback:
   commands:
     "fallback_pass":
       new_state: c9k_exec
+
+c9k_enable_fast_reload:
+  commands:
+    <<: *c9k_enable_cmds
+    "reload":
+      new_state: c9k_fast_reload_proceed
+
+c9k_fast_reload_proceed:
+  prompt: "Proceed with fast reload? [confirm]"
+  commands:
+    "":
+      response: file|mock_data/iosxe/cat9k_reload_logs.txt
+      timing:
+        - 0:,0,0.005
+      new_state: c9k_login4

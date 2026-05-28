@@ -5,20 +5,17 @@ This module provides the custom state machine for C8KV devices, handling
 GRUB boot mode and golden image recovery.
 """
 
-from unicon.statemachine import State, Path
-from unicon.eal.dialogs import Dialog, Statement
-from unicon.plugins.iosxe.statemachine import (
-    IosXESingleRpStateMachine,
-    IosXEDualRpStateMachine,
-    boot_from_rommon
-    )
-from unicon.plugins.iosxe.statements import boot_from_rommon_statement_list
-from unicon.plugins.generic.service_patterns import ReloadPatterns
+from unicon.statemachine import  Path
+from unicon.eal.dialogs import Dialog
+from unicon.plugins.iosxe.statemachine import IosXESingleRpStateMachine
 from unicon.plugins.generic.patterns import GenericPatterns
-from unicon.plugins.iosxe.cat8k.service_statements import (
-    reload_to_rommon_statement_list)
+from unicon.plugins.iosxe.statements import boot_from_rommon_statement_list
+
+from .statements import boot_from_rommon
+
 
 generic_patterns = GenericPatterns()  # Uses generic patterns to support GRUB prompt
+
 
 class IosXEC8kvSingleRpStateMachine(IosXESingleRpStateMachine):
     """State machine for single RP Cisco Catalyst 8000V devices.
@@ -53,7 +50,6 @@ class IosXEC8kvSingleRpStateMachine(IosXESingleRpStateMachine):
         # Get state objects
         rommon = self.get_state('rommon')
         disable = self.get_state('disable')
-        enable = self.get_state('enable')
 
         # Update rommon pattern to include GRUB prompt (grub>)
         # GenericPatterns.rommon_prompt matches: rommon>, switch:, and grub>
@@ -61,17 +57,11 @@ class IosXEC8kvSingleRpStateMachine(IosXESingleRpStateMachine):
 
         # Remove default paths that don't handle GRUB properly
         self.remove_path('rommon', 'disable')
-        self.remove_path('enable', 'rommon')
 
         # Add C8KV-specific rommon-to-disable path
         # Uses custom boot_from_rommon_statement_list that handles GRUB
         rommon_to_disable = Path(rommon, disable, boot_from_rommon, Dialog(
             boot_from_rommon_statement_list))
-        
-        # Add C8KV-specific enable-to-rommon path for reload operations
-        enable_to_rommon = Path(enable, rommon, 'reload', Dialog(
-            reload_to_rommon_statement_list))
 
         # Register the custom paths
         self.add_path(rommon_to_disable)
-        self.add_path(enable_to_rommon)

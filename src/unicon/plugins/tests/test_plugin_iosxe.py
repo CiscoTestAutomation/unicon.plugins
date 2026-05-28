@@ -987,47 +987,6 @@ class TestIosXESDWANConfigure(unittest.TestCase):
         d.configure('no logging console')
         d.disconnect()
 
-class TestIosXEC8KVPlugin(unittest.TestCase):
-    def test_connect(self):
-        d = Connection(hostname="switch",
-                       start=["mock_device_cli --os iosxe --state c8kv_rommon --hostname switch"],
-                       os="iosxe",
-                       platform="cat8k",
-                       log_buffer=True)
-        d.connect()
-        d.disconnect()
-
-class TestIosXEC8KvPluginReload(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.c = Connection(
-            hostname='switch',
-            start=['mock_device_cli --os iosxe --state c8kv_exec --hostname switch'],
-            os='iosxe',
-            platform='c8kv',
-            credentials=dict(default=dict(
-                username='cisco', password='cisco'),
-                alt=dict(
-                username='admin', password='lab')),
-            log_buffer=True
-            )
-        cls.c.connect()
-
-    @classmethod
-    def tearDownClass(cls):
-         cls.c.disconnect()
-
-    def test_reload(self):
-        self.c.settings.POST_RELOAD_WAIT = 1
-        self.c.reload(grub_boot_image='GOLDEN')
-
-    def test_golden_image(self):
-        self.c.settings.POST_RELOAD_WAIT = 1
-        self.c.reload(grub_boot_image='GOLDEN IMAGE')
-
-    def test_rommon(self):
-        self.c.rommon(config_register="0x40")
-
 class TestIosXECat9kPluginReload(unittest.TestCase):
 
     @classmethod

@@ -26,6 +26,7 @@ class IosxeCat9kHAServiceList(HAIosXEServiceList):
     def __init__(self):
         super().__init__()
         self.reload = svc.HAReloadService
+        self.rommon = svc.HARommon
 
 
 class IosXECat9kSingleRpConnection(IosXESingleRpConnection):

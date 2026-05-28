@@ -2,6 +2,7 @@ import unittest
 
 import unicon
 from unicon import Connection
+from unicon.plugins.cheetah.ap.patterns import CheetahAPPatterns
 
 unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
 unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC = 0.2
@@ -38,6 +39,12 @@ class TestCheetahAp(unittest.TestCase):
         output = self.c.execute('show command with more')
         self.assertEqual(output, 'first\r\n\r\nsecond\r\n\r\nthird')
         self.assertEqual(repr(output), repr('first\r\n\r\nsecond\r\n\r\nthird'))
+
+    def test_ap_shell_prompt_matches_home_directory(self):
+        patterns = CheetahAPPatterns()
+
+        self.assertRegex('AP2C57:~#', patterns.ap_shell_prompt)
+        self.assertRegex('AP2C57:/logs#', patterns.ap_shell_prompt)
 
 
 # class TestCheetanApReloadService(unittest.TestCase):

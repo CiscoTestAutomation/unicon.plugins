@@ -130,11 +130,21 @@ ewlc_config:
       new_state: ewlc_wlan_shutdown_confirm
       response: |2
         Warning! All WLANs will be disabled.
+    "ap lsc-provision":
+      new_state: ewlc_lsc_provision_confirm
+      response: |2
+        In Non-WLANCC mode APs will be provisioning with RSA certificates with specified key-size configuration. In WLANCC mode APs will be provisioning with EC certificates with a 384 bit key.
     "end":
       new_state: ewlc_enable
 
 ewlc_wlan_shutdown_confirm:
     prompt: "Are you sure you want to continue? (y/n)[y]"
+    commands:
+        "y":
+          new_state: ewlc_config
+
+ewlc_lsc_provision_confirm:
+    prompt: "Are you sure you want to continue? (y/n):"
     commands:
         "y":
           new_state: ewlc_config
