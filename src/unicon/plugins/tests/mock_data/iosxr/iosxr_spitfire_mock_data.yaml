@@ -45,7 +45,7 @@ spitfire_enable:
           For now putting some random data and will update once we capture the right cli output.
         - |2
           Thu Sep 19 14:50:51.247 UTC
-    "show ztp log | i 'SUCCESSFULLY'":
+    'show ztp log | i "SUCCESSFULLY"':
       response:
         - |2
           Thu Sep 19 14:50:51.247 UTC
@@ -164,7 +164,7 @@ spitfire_enable2:
           For now putting some random data and will update once we capture the right cli output.
         - |2
           Thu Sep 19 14:50:51.247 UTC
-    "show ztp log | i 'SUCCESSFULLY'":
+    'show ztp log | i "SUCCESSFULLY"':
       response:
         - ""
         - |2
@@ -572,7 +572,7 @@ spitfire_enable_ztp_lock:
           For now putting some random data and will update once we capture the right cli output.
         - |2
           Thu Sep 19 14:50:51.247 UTC
-    "show ztp log | i 'SUCCESSFULLY'":
+    'show ztp log | i "SUCCESSFULLY"':
       response:
         - |2
           Thu Sep 19 14:50:51.247 UTC

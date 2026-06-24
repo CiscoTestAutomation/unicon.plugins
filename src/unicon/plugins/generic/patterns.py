@@ -75,12 +75,14 @@ class GenericPatterns(UniconCorePatterns):
         # Switch#[OK]
         # % WARNING: The master key is not configured, so passwords/secrets might not be encrypted.
         # Configure the master key by using the following command: "key config-key password-encrypt <encryption-key>
+        # Applying config on Switch 3...[DONE]
         self.syslog_message_pattern = (
             r"^.*?(%\w+(-\S+)?-\d+-\w+|"
             r"yang-infra:|PKI_SSL_IPC:|Guestshell destroyed successfully|"
             r"%Error opening tftp:\/\/255\.255\.255\.255|Autoinstall trying|"
             r"audit: kauditd hold queue overflow|SECURITY WARNING|%RSA key|INSECURE DYNAMIC WARNING|"
             r"key config-key password-encrypt|"
+            r"Applying config on Switch\s+\d+|"
             r"Failed to generate persistent self-signed certificate\.|"
             r"Secure server will use temporary self-signed certificate\.|"
             r"(LC|RP)/\d+/\d+/CPU\d+:\w+\s+\d+\s+\d{2}:\d{2}:\d{2}|"

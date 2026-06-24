@@ -10,7 +10,7 @@ class ApicPatterns(GenericPatterns):
         self.learn_hostname = r'^.*?({a})?(?P<hostname>[-\w]+)\s?([-\w\]/~:\.\d ]+)?([>\$~%#\]])\s*(\x1b\S+)?$'.format(a=ANSI_REGEX)
         self.enable_prompt = r'^(.*?)((\x1b\S+)?\x00)*(%N)#\s*(\x1b\S+)?$'
         self.config_prompt = r'^(.*?)((\x1b\S+)?\x00)*(%N)\(config.*\)#\s*(\x1b\S+)?$'
-        self.shell_prompt = r'^(.*?)((\x1b\S+)?\x00)*\[[-\.\w]+@((%N)\s+.*?\]#)\s*(\x1b\S+)?$'
+        self.shell_prompt = r'^(.*?)((\x1b\S+)?\x00)*(\[[-\.\w]+@(%N)\s+.*?\]#|[-\.\w]+@(%N):[^\s]*#)\s*(\x1b\S+)?$'
 
 
 class ApicSetupPatterns(object):

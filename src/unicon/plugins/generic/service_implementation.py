@@ -979,10 +979,26 @@ class Configure(BaseService):
 
                 self.process_dialog_on_handle(handle, dialog, timeout)
 
-                post_cmds = chain(post_lines, [self.commit_cmd]) if self.commit_cmd else post_lines
-                for cmd in post_cmds:
-                    handle.spawn.sendline(cmd)
-                    self.update_hostname_if_needed([cmd])
+                # Recursively handle any additional banner blocks in post_lines
+                remaining = post_lines
+                while remaining:
+                    sub_pre, sub_banner, sub_post, sub_delim = self.get_banner_lines(remaining)
+                    for cmd in sub_pre:
+                        handle.spawn.sendline(cmd)
+                        self.update_hostname_if_needed([cmd])
+                        self.process_dialog_on_handle(handle, dialog, timeout)
+                    if sub_banner:
+                        for line in sub_banner:
+                            handle.spawn.sendline(line)
+                            time.sleep(0.1)
+                            handle.spawn.read_update_buffer()
+                        self.process_dialog_on_handle(handle, dialog, timeout)
+                        remaining = sub_post
+                    else:
+                        remaining = None
+
+                if self.commit_cmd:
+                    handle.spawn.sendline(self.commit_cmd)
                     self.process_dialog_on_handle(handle, dialog, timeout)
 
             elif bulk:

@@ -494,6 +494,10 @@ general_config:
       new_state: wsma_agent
     "banner login *":
       new_state: banner_config_state
+    "banner login %":
+      new_state: banner_config_state
+    "hostname PE1": ""
+    "interface loopback 0": ""
     "vrf definition Mgmt": ""
     "interface loopback 2": ""
     "description test": ""
@@ -504,8 +508,18 @@ general_config:
     " no shutdown  ": ""
     "banner login *":
       new_state: banner_config_state
+    "nat scale":
+      new_state: general_config_nat_scale_confirm
+      response: |
+        Enable AOT and clear NAT Flow entries before enabling scale
     "end":
       new_state: general_enable
+
+general_config_nat_scale_confirm:
+  prompt: "% Are you sure you want to continue? [yes]: "
+  commands:
+    "yes":
+      new_state: general_config
 
 wsma_agent:
   prompt: "%N(wsma-exec-agent)#"
@@ -1603,7 +1617,11 @@ banner_config_state:
     "Updated - Unauthorized access to this device is strictly prohibited.": ""
     "Please contact corpnet@fb.com with any access requests.": ""
     "Done": ""
+    "ENG Systems and Solutions Team Administered device.": ""
+    "Only Admins have PRIV-15 Login.": ""
     "*":
+      new_state: general_config
+    "%":
       new_state: general_config
 
 acm_configlet_banner_input_percent:

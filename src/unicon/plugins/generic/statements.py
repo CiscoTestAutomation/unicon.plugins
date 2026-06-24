@@ -53,6 +53,10 @@ def connection_refused_handler(spawn, context):
             spawn.device.api.execute_clear_line()
             spawn.device.connect()
             return
+    spawn.log.error(
+        'Too many connection refused events: {}, update setting '
+        'CONNECTION_REFUSED_MAX_COUNT as needed.'.format(
+            context['connection_refused_count']))
     raise Exception('Connection refused to device %s' % (str(spawn)))
 
 

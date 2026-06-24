@@ -424,6 +424,19 @@ class TestIosXEPluginConnect(unittest.TestCase):
         finally:
             c.disconnect()
 
+    def test_configure_nat_scale_are_you_sure_yes(self):
+        """Test that 'Are you sure you want to continue? [yes]:' prompt is handled."""
+        c = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe --state general_login --hostname Router'],
+                       os='iosxe',
+                       credentials=dict(default=dict(username='cisco', password='cisco')))
+        try:
+            c.connect()
+            c.configure('nat scale', timeout=60)
+            self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
+        finally:
+            c.disconnect()
+
     def test_login_console_server_sendline_after(self):
         md = MockDeviceTcpWrapperIOSXE(port=0, state='ts_login')
         md.start()
@@ -2049,6 +2062,56 @@ Done
 '''
 
         c.configure(bnr, acm_configlet='my_config')
+        c.disconnect()
+
+
+class TestIosxeMultipleBannersInSingleConfigure(unittest.TestCase):
+    """Test that multiple banner blocks in a single configure call are all
+    handled correctly without deadlock/timeout."""
+
+    def test_two_banners_exec_and_login(self):
+        """Two banners (exec + login) with pre/post commands in one configure call."""
+        c = Connection(
+            hostname='PE1',
+            start=['mock_device_cli --os iosxe --state general_enable --hostname PE1'],
+            os='iosxe',
+            mit=True
+        )
+        c.connect()
+
+        config_txt = (
+            "banner login *\n"
+            "\n"
+            "Updated - Unauthorized access to this device is strictly prohibited.\n"
+            "\n"
+            "Please contact corpnet@fb.com with any access requests.\n"
+            "Done\n"
+            "\n"
+            "*"
+            "\n"
+            "banner login %\n"
+            "\n"
+            "ENG Systems and Solutions Team Administered device.\n"
+            "\n"
+            "Only Admins have PRIV-15 Login.\n"
+            "Done\n"
+            "%\n"
+        )
+
+        with patch.object(c.spawn, 'sendline', wraps=c.spawn.sendline) as mock_sendline:
+            c.configure(config_txt)
+
+        sent = [call.args[0] for call in mock_sendline.call_args_list if call.args]
+        # Check complete list of expected commands including empty lines for BOTH banners
+        expected_commands = ['config term', 'banner login *', '',
+                           'Updated - Unauthorized access to this device is strictly prohibited.', '',
+                           'Please contact corpnet@fb.com with any access requests.', 'Done', '', '*',
+                           'banner login %', '',
+                           'ENG Systems and Solutions Team Administered device.', '',
+                           'Only Admins have PRIV-15 Login.', 'Done', '%',
+                           'end']
+        self.assertEqual(sent, expected_commands, f"Expected exact command sequence {expected_commands}, but got {sent}")
+
         c.disconnect()
 
 class TestConfigTransition(unittest.TestCase):
