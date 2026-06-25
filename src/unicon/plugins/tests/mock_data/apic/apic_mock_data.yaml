@@ -116,3 +116,17 @@ apic_shell:
   commands:
     "pwd": |
       /root
+
+apic_shell_ubuntu_connect:
+  preface: |
+    Application Policy Infrastructure Controller
+  prompt: "root@10.197.154.122's password: "
+  commands:
+    "cisco":
+      new_state: apic_shell_ubuntu
+
+apic_shell_ubuntu:
+  prompt: "root@APC:~# "
+  commands:
+    "pwd": |
+      /root

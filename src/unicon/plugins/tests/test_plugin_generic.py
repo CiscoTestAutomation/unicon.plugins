@@ -24,7 +24,8 @@ from unicon.plugins.utils import sanitize
 from unicon.plugins.tests.mock.mock_device_ios import MockDeviceTcpWrapperIOS
 from unicon.mock.mock_device import MockDevice, MockDeviceTcpWrapper
 from unicon.plugins.generic.service_implementation import Enable as GenericEnable
-from unicon.plugins.generic.statements import login_handler, password_handler, passphrase_handler
+from unicon.plugins.generic.statements import (login_handler, password_handler,
+    passphrase_handler, connection_refused_handler)
 from unicon.plugins.generic.statemachine import config_transition
 from pyats.topology import loader
 from pyats.topology.credentials import Credentials
@@ -1475,6 +1476,18 @@ class TestGenericReload(unittest.TestCase):
 
 
 class TestGenericConnectionRefused(unittest.TestCase):
+
+    def test_connection_refused_handler_logs_max_count(self):
+        spawn = Mock()
+        spawn.settings.CONNECTION_REFUSED_MAX_COUNT = 3
+        context = {'connection_refused_count': 2}
+
+        with self.assertRaisesRegex(Exception, 'Connection refused to device'):
+            connection_refused_handler(spawn, context)
+
+        spawn.log.error.assert_called_once_with(
+            'Too many connection refused events: 3, update setting '
+            'CONNECTION_REFUSED_MAX_COUNT as needed.')
 
     def test_connection_refused_handler_with_peripheral(self):
         md = MockDeviceTcpWrapper(device_os='iosxe', hostname='R1',

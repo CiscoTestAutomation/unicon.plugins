@@ -67,8 +67,8 @@ class HAReloadService(GenericHAReloadService):
 
     def pre_service(self, *args, **kwargs):
         if "image_to_boot" in kwargs:
-            if 'rommon_vars' in kwargs and all(con.state_machine.current_state == 'rommon' for con in self.connection._subconnections):
-                for con in self.connection._subconnections:
+            if 'rommon_vars' in kwargs and all(con.state_machine.current_state == 'rommon' for con in self.connection._subconnections.values()):
+                for con in self.connection._subconnections.values():
                     con.execute([f'set {k}={v}' for k, v in kwargs['rommon_vars'].items()])
             self.start_state = 'rommon'
             if 'image_to_boot' in self.context:

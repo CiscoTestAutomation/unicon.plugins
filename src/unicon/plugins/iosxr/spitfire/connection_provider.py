@@ -86,7 +86,7 @@ class SpitfireSingleRpConnectionProvider(IOSXRSingleRpConnectionProvider):
         # Wait upto 10 mins for ztp configuration lock to be done
         t_end = time.time() + t_out
         while time.time() < t_end:
-            output = con.execute("show ztp log | i 'SUCCESSFULLY'", prompt_recovery = self.prompt_recovery)
+            output = con.execute('show ztp log | i "SUCCESSFULLY"', prompt_recovery = self.prompt_recovery)
             if ('Exiting SUCCESSFULLY' in output) or ('Binary file (standard input) matches' in output):
                 break
             time.sleep(10)

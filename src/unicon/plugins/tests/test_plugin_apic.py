@@ -127,6 +127,17 @@ class TestAciApicPlugin(unittest.TestCase):
         self.assertEqual(out, '/root')
         c.disconnect()
 
+    def test_connect_shell_ubuntu(self):
+        c = Connection(hostname='APC',
+                       start=['mock_device_cli --os apic --state apic_shell_ubuntu_connect'],
+                       os='apic',
+                       credentials=dict(default=dict(username='cisco', password='cisco')))
+        c.connect()
+        self.assertEqual(c.state_machine.current_state, 'shell')
+        out = c.execute('pwd')
+        self.assertEqual(out, '/root')
+        c.disconnect()
+
     def test_execute_output(self):
         c = Connection(hostname='APC',
                        start=[APIC_MOCK_DEVICE_CLI],

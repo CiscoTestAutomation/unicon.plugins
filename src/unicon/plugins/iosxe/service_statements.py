@@ -49,6 +49,11 @@ wish_continue = Statement(pattern=patterns.wish_continue,
                           loop_continue=True,
                           continue_timer=False)
 
+are_you_sure_yes = Statement(pattern=patterns.are_you_sure_yes,
+                             action='sendline(yes)',
+                             loop_continue=True,
+                             continue_timer=False)
+
 want_continue = Statement(pattern=patterns.want_continue,
                           action='sendline(yes)',
                           loop_continue=True,
@@ -76,6 +81,7 @@ macro_prompt = Statement(pattern=patterns.macro_prompt,
 configure_statement_list = [
     are_you_sure,
     wish_continue,
+    are_you_sure_yes,
     confirm,
     want_continue,
     are_you_sure_ywtdt,
