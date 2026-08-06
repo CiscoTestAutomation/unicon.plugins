@@ -312,6 +312,8 @@ class StackReload(BaseService):
             # prompt or "All switches in the stack have been discovered.
             # Accelerating discovery" message indicating readiness. At this
             # point, the dialog exits to proceed with subsequent operations.
+            # Clear state left by an earlier transition before this dialog.
+            con.context.pop('state', None)
             reload_cmd_output = reload_dialog2.process(con.spawn,
                                                        timeout=timeout,
                                                        prompt_recovery=self.prompt_recovery,
@@ -320,8 +322,10 @@ class StackReload(BaseService):
             # A sendline command is necessary when the device is configured
             # for manual boot or when device is in enable/disable state
             # during the member reload to ensure the subsequent dialog can
-            # proceed seamlessly.
-            con.sendline()
+            # proceed seamlessly. Discovery leaves state unset, so skip the
+            # extra return and let the next dialog handle Press RETURN.
+            if con.context.get('state') in ('rommon', 'enable', 'disable'):
+                con.sendline()
 
             # The dialog process outlined below manages the
             # "Press RETURN to get started" prompt for each subconnection.

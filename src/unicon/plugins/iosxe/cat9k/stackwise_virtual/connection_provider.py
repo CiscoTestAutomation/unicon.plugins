@@ -12,6 +12,10 @@ from genie.metaparser.util.exceptions import SchemaEmptyParserError
 from unicon.plugins.generic.statements import connection_statement_list, custom_auth_statements
 
 
+SHOW_SWITCH_MATCHED_RETRIES = 3
+SHOW_SWITCH_MATCHED_RETRY_SLEEP = 1
+
+
 class StackwiseVirtualConnectionProvider(BaseStackRpConnectionProvider):
     """ Implements Stack Connection Provider,
         This class overrides the base class with the
@@ -83,7 +87,12 @@ class StackwiseVirtualConnectionProvider(BaseStackRpConnectionProvider):
         try:
             # To check if the device is in SVL state
             try:
-                output = device.parse("show switch")
+                show_switch_output = device.execute(
+                    "show switch",
+                    matched_retries=SHOW_SWITCH_MATCHED_RETRIES,
+                    matched_retry_sleep=SHOW_SWITCH_MATCHED_RETRY_SLEEP,
+                )
+                output = device.parse("show switch", output=show_switch_output)
             except SchemaEmptyParserError:
                 con.log.debug("show switch returned empty output")
                 output = {}

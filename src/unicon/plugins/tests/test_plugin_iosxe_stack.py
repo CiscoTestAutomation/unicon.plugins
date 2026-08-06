@@ -5,16 +5,20 @@ Unittests for IOSXE/Stack plugin
 
 import re
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, Mock, call, patch
 
 from pyats.topology import loader
 
 import unicon
 from unicon import Connection
 from unicon.eal.dialogs import Statement, Dialog
+from unicon.eal.utils import ExpectMatch
 from unicon.core.errors import SubCommandFailure
+from unicon.plugins.iosxe.stack.service_implementation import StackReload
 from unicon.plugins.tests.mock.mock_device_iosxe import MockDeviceTcpWrapperIOSXE
 from unicon.plugins.iosxe.stack.utils import StackUtils
+from unicon.plugins.generic.service_patterns import reload_patterns
+from unicon.plugins.generic.service_statements import reload_statement_list
 
 
 unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
@@ -228,6 +232,104 @@ class TestIosXEStackSwitchover(unittest.TestCase):
         self.c.switchover(timeout=1500)
 
 class TestIosXEStackReload(unittest.TestCase):
+
+    class StackReloadPromptSpawn(object):
+
+        def __init__(self, match_index):
+            self.timeout = 1
+            self.hostname = None
+            self.match_index = match_index
+            self.match = ExpectMatch()
+            self.log = Mock()
+            self.sendline = Mock()
+            self.match_buffer = Mock(side_effect=self._match_buffer)
+
+        def read_update_buffer(self, size=None):
+            return 'Press RETURN to get started!\nUsername:'
+
+        def _match_buffer(self, pat_list):
+            self.match.match_output = 'Press RETURN to get started!'
+            return self.match_index
+
+        def trim_buffer(self):
+            pass
+
+    def test_reload_dialog_matched_retries_reset_for_stack_subconnections(self):
+        dialog = Dialog(reload_statement_list)
+        press_return_idx, press_return_stmt = next(
+            (idx, stmt) for idx, stmt in enumerate(dialog.statements)
+            if stmt.pattern == reload_patterns.press_return)
+        press_return_stmt.matched_retries = 1
+        press_return_stmt.matched_retry_sleep = 0
+        press_return_stmt.args = {'wait': 0}
+
+        for _ in range(2):
+            spawn = self.StackReloadPromptSpawn(press_return_idx)
+            dialog.process(spawn, timeout=1)
+            self.assertEqual(spawn.match_buffer.call_count, 2)
+            self.assertEqual(spawn.sendline.call_count, 1)
+
+        self.assertEqual(press_return_stmt.matched_retries, 1)
+
+    @patch('unicon.plugins.iosxe.stack.service_implementation.sleep')
+    @patch('unicon.plugins.iosxe.stack.service_implementation.utils')
+    @patch('unicon.plugins.iosxe.stack.service_implementation.custom_auth_statements',
+           return_value=[])
+    @patch('unicon.eal.dialogs.Dialog.process')
+    def test_stack_reload_post_discovery_return(
+            self, mock_process, mock_auth, mock_utils, mock_sleep):
+        class Context(dict):
+            __getattr__ = dict.__getitem__
+
+        settings = MagicMock(
+            STACK_RELOAD_TIMEOUT=10,
+            ERROR_PATTERN=[],
+            POST_RELOAD_WAIT=0,
+            RELOAD_POSTCHECK_INTERVAL=0,
+            STACK_POST_RELOAD_SLEEP=0,
+            STACK_ROMMON_SLEEP=0,
+        )
+        connection = MagicMock(settings=settings)
+        active = MagicMock(
+            alias='peer_1',
+            hostname='Router',
+            settings=settings,
+            context=Context(state='enable'),
+        )
+        active.spawn = MagicMock()
+        connection.active = active
+        connection.subconnections = [active]
+        mock_utils.is_active_standby_ready.return_value = True
+
+        def run_reload(detected_state=None):
+            def dialog_process(*args, **kwargs):
+                if mock_process.call_count == 1:
+                    if detected_state:
+                        kwargs['context']['state'] = detected_state
+                    return MagicMock(match_output='discovery')
+                return MagicMock(match_output='reload')
+
+            active.context = Context(state='enable')  # stale state
+            active.sendline.reset_mock()
+            mock_process.reset_mock()
+            mock_process.side_effect = dialog_process
+            service = StackReload(connection, active.context)
+            service.prompt_recovery = False
+            service.get_service_result = Mock()
+            service.call_service(reload_command='reload')
+
+        # Discovery does not set state, so no post-discovery blank return is
+        # sent.
+        run_reload()
+        active.sendline.assert_called_once_with('reload')
+        self.assertNotIn(call(), active.sendline.call_args_list)
+
+        # A state detected by the first dialog still requires the return.
+        for state in ('rommon', 'enable', 'disable'):
+            with self.subTest(state=state):
+                run_reload(state)
+                self.assertEqual(active.sendline.call_args_list,
+                                 [call('reload'), call()])
 
     def test_reload(self):
         md = MockDeviceTcpWrapperIOSXE(hostname='Router', port=0, state='stack_enable' + ',stack_enable'*4, stack=True)

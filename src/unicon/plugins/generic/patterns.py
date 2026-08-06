@@ -24,7 +24,7 @@ class GenericPatterns(UniconCorePatterns):
         """
         super().__init__()
         # self.enable_prompt = r'.*%N#\s?$'
-        self.default_hostname_pattern = r'WLC|RouterRP|Router|[Ss]witch|Controller|ios'
+        self.default_hostname_pattern = r'(?:WLC|RouterRP|[Rr]outer|[Ss]witch|Controller|ios)[\w-]*'
 
         self.enable_prompt = r'^(.*?)(Router|Router-stby|Router-sdby|RouterRP|RouterRP-standby|%N-standby|%N\(standby\)|%N-sdby|%N-stby|(S|s)witch|(S|s)witch\(standby\)|Controller|ios|-Slot[0-9]+|%N)(\(boot\))*#\s?$'
 
@@ -96,7 +96,11 @@ class GenericPatterns(UniconCorePatterns):
         self.enable_secret = r'^.*?(Enter|Confirm) enable secret( \[<Use current secret>\])?:\s*$'
         self.enable_password = r'^.*?enable[\r\n]*.*?[Pp]assword( for )?(\S+)?: ?$'
 
-        self.enter_your_selection_2 = r'^.*?Enter your selection( \[2])?:\s*$'
+        # The optional ``\r?\n[\s\S]*`` tail forces whole-buffer (multi-line) match
+        # mode so the selection prompt is still matched when any log message
+        # (autoinstall, syslog, etc.) is printed on the line right after the
+        # prompt. Kept generic to tolerate future/unknown trailing output.
+        self.enter_your_selection_2 = r'^.*?Enter your selection( \[2])?:[ \t]*(\r?\n[\s\S]*)?$'
 
         self.guestshell_prompt = r'^(.*)\[\S+@guestshell\s+.*\][#\$]\s?$'
 

@@ -6,8 +6,7 @@ from unicon.plugins.generic.service_statements import (reload_statement_list,
                                                        reload_confirm_ios,
                                                        reload_confirm_iosxe,
                                                        reload_entire_shelf,
-                                                       reload_this_shelf,
-                                                       send_response)
+                                                       reload_this_shelf)
 
 from unicon.plugins.iosxe.service_statements import (factory_reset_confirm,
                                                      are_you_sure_confirm)
@@ -135,7 +134,7 @@ reload_fast = Statement(pattern=reload_pat.reload_fast,
                         continue_timer=False)
 
 accelarating_discovery = Statement(pattern=reload_pat.accelarating_discovery,
-                                   action=send_response,
+                                   action=None,
                                    args=None,
                                    loop_continue=False,
                                    continue_timer=False)

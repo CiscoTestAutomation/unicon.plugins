@@ -6,6 +6,8 @@ import unittest
 from unittest.mock import MagicMock
 
 from unicon.plugins.iosxe.cat9k.stackwise_virtual.connection_provider import (
+    SHOW_SWITCH_MATCHED_RETRIES,
+    SHOW_SWITCH_MATCHED_RETRY_SLEEP,
     StackwiseVirtualConnectionProvider,
 )
 
@@ -17,6 +19,8 @@ class TestIosxeSVLDesignateHandles(unittest.TestCase):
         con.settings.BOOT_TIMEOUT = 1
         con.settings.EXEC_TIMEOUT = 1
         con.device = MagicMock()
+        show_switch_output = "show switch output"
+        con.device.execute.return_value = show_switch_output
         con.device.parse.return_value = {
             'switch': {
                 'stack': {
@@ -52,7 +56,15 @@ class TestIosxeSVLDesignateHandles(unittest.TestCase):
         provider = StackwiseVirtualConnectionProvider(con)
         provider.designate_handles()
 
-        con.device.parse.assert_called_with("show switch")
+        con.device.execute.assert_called_once_with(
+            "show switch",
+            matched_retries=SHOW_SWITCH_MATCHED_RETRIES,
+            matched_retry_sleep=SHOW_SWITCH_MATCHED_RETRY_SLEEP,
+        )
+        con.device.parse.assert_called_once_with(
+            "show switch",
+            output=show_switch_output,
+        )
         subcon_a.spawn.sendline.assert_called_with(show_redundancy_cmd)
         self.assertEqual(con._set_active_alias.call_args_list[-1].args[0], 'b')
         self.assertEqual(con._set_standby_alias.call_args_list[-1].args[0], 'a')

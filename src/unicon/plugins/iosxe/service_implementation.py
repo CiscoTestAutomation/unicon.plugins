@@ -23,7 +23,12 @@ from unicon.plugins.generic.service_implementation import (
     ContextMgrBaseService)
 
 
-from .service_statements import execute_statement_list, configure_statement_list, confirm
+from .service_statements import (
+    execute_statement_list,
+    configure_statement_list,
+    confirm,
+    want_continue,
+)
 
 from .statements import grub_prompt_stmt, boot_from_rommon_stmt, terminal_position_stmt
 
@@ -132,6 +137,10 @@ class Ping(GenericPing):
 
 
 class Copy(GenericCopy):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.dialog += Dialog([want_continue])
+
     def call_service(self, reply=Dialog([]), vrf=None, *args, **kwargs):
         if vrf is not None:
             kwargs['extra_options'] = kwargs.setdefault('extra_options', '') + ' vrf {}'.format(vrf)

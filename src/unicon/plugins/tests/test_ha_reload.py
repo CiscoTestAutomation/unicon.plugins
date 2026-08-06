@@ -438,5 +438,41 @@ class TestIosXECat3kReloadOutput(unittest.TestCase):
                       '\n'.join(output.splitlines()))
 
 
+class TestHAReloadServiceSettleWait(unittest.TestCase):
+    """Verify HAReloadService waits for buffer to settle before go_to('any')."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.ha = MockDeviceTcpWrapperIOS(port=0, state='login,exec_standby')
+        cls.ha.start()
+        cls.ha_device = Connection(
+            hostname='Router',
+            start=['telnet 127.0.0.1 ' + str(cls.ha.ports[0]),
+                   'telnet 127.0.0.1 ' + str(cls.ha.ports[1])],
+            os='ios', username='cisco', tacacs_password='cisco',
+            enable_password='cisco'
+        )
+        cls.ha_device.connect()
+
+    @classmethod
+    @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+    @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
+    def tearDownClass(cls):
+        cls.ha_device.disconnect()
+        cls.ha.stop()
+
+    def test_ha_reload_settles_before_login(self):
+        self.ha_device.settings.POST_HA_RELOAD_CONFIG_SYNC_WAIT = 0
+        self.ha_device.settings.POST_RELOAD_WAIT = 1
+        with patch('unicon.plugins.generic.service_implementation.buffer_settled',
+                   return_value=True) as mock_settled:
+            res, output = self.ha_device.reload(return_output=True,
+                                                reload_command='reload',
+                                                prompt_recovery=True,
+                                                timeout=5)
+            self.assertTrue(res)
+            mock_settled.assert_called()
+
+
 if __name__ == "__main__":
     unittest.main()

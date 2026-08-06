@@ -37,7 +37,8 @@ class IosXESettings(GenericSettings):
             r'Invalid policy name, \S+ does not exist',
             r'% Deletion of RD in progress; wait for it to complete',
             r'% VLAN \[\d+\] already in use',
-            r'% VNI \d+ is either already in use or exceeds the maximum allowable VNIs.'
+            r'% VNI \d+ is either already in use or exceeds the maximum allowable VNIs.',
+            r'% Error: Password/key validation failed against .* policy'
         ]
 
         self.EXECUTE_MATCHED_RETRIES = 1
@@ -53,6 +54,12 @@ class IosXESettings(GenericSettings):
 
         self.POST_BOOT_TIMEOUT = 900
         self.BOOT_POSTCHECK_INTERVAL = 30
+
+        # Timeout (seconds) for the rommon 'dir <fs>' listing used to discover
+        # boot images. A cluttered bootflash (e.g. many show-tech/trace files)
+        # can take longer than the default expect timeout to fully render the
+        # rommon prompt, so allow a generous, configurable value.
+        self.ROMMON_DIR_TIMEOUT = 120
 
         self.SERVICE_PROMPT_CONFIG_CMD = 'service prompt config'
         self.CONFIG_PROMPT_WAIT = 2
