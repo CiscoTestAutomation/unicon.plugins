@@ -232,6 +232,25 @@ class TestIosXEStatements(unittest.TestCase):
             ],
         )
 
+    def test_boot_image_passes_rommon_dir_timeout_to_expect(self):
+        spawn = Mock()
+        spawn.settings = SimpleNamespace(
+            MAX_BOOT_ATTEMPTS=5,
+            FIND_BOOT_IMAGE=True,
+            BOOT_FILESYSTEM=['bootflash:'],
+            BOOT_FILE_REGEX=r'(\S+\.bin)',
+            ROMMON_DIR_TIMEOUT=120,
+        )
+        spawn.expect.return_value = Mock(
+            match_output='bootflash: cat9k_gold.bin'
+        )
+
+        boot_image(spawn, {}, {})
+
+        spawn.expect.assert_called_once_with(
+            unittest.mock.ANY, timeout=120
+        )
+
 
 class TestIosXEPluginConnect(unittest.TestCase):
 
@@ -683,6 +702,88 @@ class TestIosXEPluginDisableEnable(unittest.TestCase):
         self.assertIsNone(match)
         match = re.match(state.pattern, 'rtr->')
         self.assertIsNotNone(match)
+
+    def test_controller_mode_disable_lowercase_router_prompts(self):
+        """Match router> and router# while %N is still the old hostname."""
+        c = Connection(
+            hostname='C8000V',
+            start=[
+                'mock_device_cli --os iosxe '
+                '--state c8kv_controller_mode_enable --hostname C8000V'
+            ],
+            os='iosxe',
+            operating_mode='Controller-Managed',
+            mit=True,
+            log_buffer=True,
+            connection_timeout=5,
+        )
+        controller_mode_dialog = Dialog([
+            Statement(
+                pattern=r'Continue\? \[confirm\]',
+                action='sendline()',
+                loop_continue=True,
+                continue_timer=False,
+            ),
+            Statement(
+                pattern=r'Do you want to abort\? \(yes/\[no\]\):',
+                action='sendline(no)',
+                loop_continue=True,
+                continue_timer=False,
+            ),
+            Statement(
+                pattern=(
+                    r'.*Would you like to enter the initial configuration '
+                    r'dialog\? \[yes/no\]:\s*'
+                ),
+                action='sendline(no)',
+                loop_continue=True,
+                continue_timer=False,
+            ),
+        ])
+
+        try:
+            c.connect()
+            c.execute(
+                'controller-mode disable',
+                service_dialog=controller_mode_dialog,
+                allow_state_change=True,
+                timeout=5,
+            )
+            self.assertEqual(c.state_machine.current_state, 'disable')
+            self.assertIn('router>', c.spawn.match.match_output)
+
+            # Execute state detection does not relearn %N. The first enable
+            # transition therefore must match the explicit default hostname.
+            self.assertEqual(c.hostname, 'C8000V')
+            c.enable()
+            self.assertEqual(c.state_machine.current_state, 'enable')
+            self.assertIn('router#', c.spawn.match.match_output)
+        finally:
+            c.disconnect()
+
+    def test_learn_lowercase_default_router_hostname(self):
+        """Learn router when the explicit default-hostname branch matches."""
+        c = Connection(
+            hostname='C8000V',
+            start=[
+                'mock_device_cli --os iosxe '
+                '--state c8kv_controller_mode_disable'
+            ],
+            os='iosxe',
+            operating_mode='Autonomous',
+            learn_hostname=True,
+            mit=True,
+            log_buffer=True,
+            connection_timeout=5,
+        )
+
+        try:
+            c.connect()
+            self.assertEqual(c.hostname, 'router')
+            self.assertEqual(c.previous_hostname, 'C8000V')
+            self.assertEqual(c.state_machine.current_state, 'disable')
+        finally:
+            c.disconnect()
 
 class TestIosXEPluginPing(unittest.TestCase):
 
@@ -1158,6 +1259,18 @@ class TestIosXEConfigure(unittest.TestCase):
         for cmd in ['ntp server vrf foo 1.2.3.4']:
           with self.assertRaises(SubCommandFailure) as err:
               r = c.configure(cmd)
+        c.disconnect()
+
+    def test_password_validation_error_pattern(self):
+        c = Connection(hostname='RouterRP',
+                       start=['mock_device_cli --os iosxe --state general_enable --hostname RouterRP'],
+                       os='iosxe',
+                       init_exec_commands=[],
+                       log_buffer=True
+                       )
+        c.connect()
+        with self.assertRaises(SubCommandFailure):
+            c.configure('username admin privilege 15 password Secret12345')
         c.disconnect()
 
     def test_configure_with_msgs(self):

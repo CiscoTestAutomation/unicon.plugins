@@ -5,11 +5,13 @@ Unittest for copy() service
 import re
 import unittest
 import unicon
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from unicon import Connection, eal
 from unicon.mock import mock_device
 from unicon.core.errors import SubCommandFailure, TimeoutError
+from unicon.plugins.iosxe.service_implementation import Copy as IosXECopy
+from unicon.plugins.iosxe.service_statements import want_continue
 from unicon.plugins.tests.mock.mock_device_ios import MockDeviceIOS, MockDeviceTcpWrapperIOS
 from unicon.utils import to_plaintext, SecretString
 
@@ -305,6 +307,17 @@ class TestMaxAttempts(unittest.TestCase):
     def test_max_attempt(self):
         self.dev.copy(source='tftp:', source_file='/tftpboot/mdear/n7k.gbin',
             dest='bootflash:', vrf='management', server='10.1.0.207', max_attempts=3)
+
+
+class TestIosXeSaveConfigDialog(unittest.TestCase):
+
+    def test_copy_dialog_answers_continue(self):
+        device = Mock()
+        service = IosXECopy(device, {})
+
+        self.assertIn(want_continue, service.dialog)
+        self.assertEqual(want_continue.args, {'key': 'yes'})
+
 
 if __name__ == '__main__':
     unittest.main()

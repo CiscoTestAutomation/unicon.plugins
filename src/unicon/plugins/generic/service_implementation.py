@@ -2254,6 +2254,21 @@ class HAReloadService(BaseService):
 
             self.get_service_result()
 
+            con.log.info('Waiting for boot messages to settle for {} seconds'.format(
+                con.settings.POST_RELOAD_WAIT
+            ))
+            wait_time = timedelta(seconds=con.settings.POST_RELOAD_WAIT)
+            settle_time = current_time = datetime.now()
+            timeout_time = timedelta(seconds=timeout)
+            while (current_time - settle_time) < wait_time:
+                if buffer_settled(con.active.spawn, con.settings.POST_RELOAD_WAIT):
+                    con.log.info('Buffer settled, accessing device..')
+                    break
+                current_time = datetime.now()
+                if (current_time - settle_time) > timeout_time:
+                    con.log.info('Time out, trying to acces device..')
+                    break
+
             con.active.state_machine.go_to('any',
                                            con.active.spawn,
                                            prompt_recovery=self.prompt_recovery,

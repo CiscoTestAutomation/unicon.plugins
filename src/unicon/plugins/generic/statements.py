@@ -272,14 +272,29 @@ def get_enable_credential_password(context):
     # credential even if the device does not ask for a password on login
     # and the given credential is not consumed.
     final_credential = login_creds[-1] if login_creds else ""
+
+    # Terminal-server post action can reach the device prompt before the last
+    # login credential is used, so previous_credential differs from it.
+    previous_credential = context.get('previous_credential', "")
+    fallback_creds = context.get('fallback_creds') or []
+    direct_post_to_device_prompt = (
+        len(login_creds) > 1
+        and previous_credential
+        and previous_credential != final_credential
+    )
+
     if credentials:
         enable_pw_checks = [
-            (context.get('previous_credential', ""), 'enable_password'),
+            (previous_credential, 'enable_password'),
             (final_credential, 'enable_password'),
             (fallback_cred, 'enable_password'),
-            (ENABLE_CRED_NAME, 'password'),
-            (context.get('default_cred_name', ""), 'password'),
         ]
+        if direct_post_to_device_prompt:
+            # Try the login credentials' passwords before the generic enable lookup.
+            enable_pw_checks.extend(
+                (credential, 'password') for credential in fallback_creds)
+        enable_pw_checks.append((ENABLE_CRED_NAME, 'password'))
+        enable_pw_checks.append((context.get('default_cred_name', ""), 'password'))
         for cred_name, key in enable_pw_checks:
             if cred_name:
                 candidate_enable_pw = credentials.get(cred_name, {}).get(key)

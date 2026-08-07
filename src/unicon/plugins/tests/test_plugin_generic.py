@@ -25,7 +25,7 @@ from unicon.plugins.tests.mock.mock_device_ios import MockDeviceTcpWrapperIOS
 from unicon.mock.mock_device import MockDevice, MockDeviceTcpWrapper
 from unicon.plugins.generic.service_implementation import Enable as GenericEnable
 from unicon.plugins.generic.statements import (login_handler, password_handler,
-    passphrase_handler, connection_refused_handler)
+    passphrase_handler, connection_refused_handler, get_enable_credential_password)
 from unicon.plugins.generic.statemachine import config_transition
 from pyats.topology import loader
 from pyats.topology.credentials import Credentials
@@ -456,6 +456,34 @@ class TestCredentialLoginPasswordHandlers(unittest.TestCase):
 
         with self.assertRaises(UniconAuthenticationError):
             d.connect()
+
+
+class TestEnableCredentialSelection(unittest.TestCase):
+    """Unit tests for get_enable_credential_password() credential ordering."""
+
+    def _context(self, previous_credential):
+        return AttrDict({
+            'hostname': 'Router',
+            'login_creds': ['terminal_server', 'default'],
+            'fallback_creds': ['default'],
+            'default_cred_name': 'default',
+            'previous_credential': previous_credential,
+            'credentials': Credentials({
+                # terminal server cred has no enable_password
+                'terminal_server': {'username': 'ts', 'password': 'tspw'},
+                # device login cred; its password doubles as the enable secret
+                'default': {'username': 'admin', 'password': 'devpw'},
+                # a generic enable cred with a DIFFERENT password
+                'enable': {'password': 'wrongenpw'},
+            }),
+        })
+
+    def test_terminal_server_direct_post_prefers_login_credential(self):
+        # TS post reached device prompt: use the login credential's password
+        # instead of the wrong generic 'enable' credential.
+        context = self._context(previous_credential='terminal_server')
+        enable_pw = get_enable_credential_password(context)
+        self.assertEqual(enable_pw, 'devpw')
 
 
 class TestGenericServices(unittest.TestCase):

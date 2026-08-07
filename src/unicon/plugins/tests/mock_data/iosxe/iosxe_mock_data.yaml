@@ -481,6 +481,7 @@ general_config:
     "crypto pki certificate chain SLA-TrustPoint":
       new_state: config-cert-chain
     "ntp server vrf foo 1.2.3.4": "% IP  routing table foo does not exist"
+    "username admin privilege 15 password Secret12345": "% Error: Password/key validation failed against default policy"
     "iox": ""
     "app-hosting appid guestshell": ""
     "app-vnic management guest-interface 0": ""
@@ -1982,3 +1983,40 @@ tclsh_continue:
   commands:
     "}":
       new_state: tclsh
+
+c8kv_controller_mode_enable:
+  prompt: "%N#"
+  commands:
+    "enable": ""
+    "controller-mode disable":
+      new_state: c8kv_controller_mode_confirm
+
+c8kv_controller_mode_confirm:
+  prompt: "Continue? [confirm]"
+  commands:
+    "":
+      new_state: c8kv_controller_mode_abort
+
+c8kv_controller_mode_abort:
+  prompt: "Do you want to abort? (yes/[no]):"
+  commands:
+    "no":
+      new_state: c8kv_controller_mode_initial_config
+
+c8kv_controller_mode_initial_config:
+  prompt: "Would you like to enter the initial configuration dialog? [yes/no]: "
+  commands:
+    "no":
+      new_state: c8kv_controller_mode_disable
+
+c8kv_controller_mode_disable:
+  prompt: "router>"
+  commands:
+    "enable":
+      new_state: c8kv_controller_mode_autonomous_enable
+
+c8kv_controller_mode_autonomous_enable:
+  prompt: "router#"
+  commands:
+    "disable":
+      new_state: c8kv_controller_mode_disable

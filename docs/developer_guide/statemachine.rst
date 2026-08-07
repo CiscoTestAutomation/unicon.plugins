@@ -258,7 +258,7 @@ for driving this feature.
 If for some reason, ``learn_hostname`` is unable to detect hostname then unicon
 compares unicon buffer with default hostname pattern set to ``Settings``
 Attribute ``DEFAULT_HOSTNAME_PATTERN``. Default value is
-``r'RouterRP|Router|[Ss]witch|Controller|ios'``
+``r'(?:WLC|RouterRP|Router|[Ss]witch|Controller|ios)[\w-]*'``
 
 API Guide For StateMachine
 --------------------------

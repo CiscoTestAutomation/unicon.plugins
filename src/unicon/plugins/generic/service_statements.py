@@ -344,6 +344,14 @@ config_session_locked_stmt = Statement(pattern=reload_patterns.config_session_lo
                                        loop_continue=False,
                                        continue_timer=False)
 
+# Handles [yes/no]: prompts (slash variant only) during configure.
+# Sends 'yes' to avoid issues with devices that reject the short form 'y'.
+# Note: [yes,no] comma-variant prompts are intentionally not handled here.
+configure_yes_no_stmt = Statement(pattern=reload_patterns.configure_yes_no,
+                                  action=send_response, args={'response': 'yes'},
+                                  loop_continue=True,
+                                  continue_timer=False)
+
 eof_statement = Statement(pattern='__eof__',
                           action=connection_closed_handler,
                           args=None,
@@ -1239,4 +1247,5 @@ execution_statement_list = [generic_statements.confirm_prompt_y_n_stmt,
                             generic_statements.syslog_msg_stmt]
 
 configure_statement_list = [generic_statements.syslog_msg_stmt,
+                            configure_yes_no_stmt,
                             config_session_locked_stmt]

@@ -208,10 +208,14 @@ def boot_image(spawn, context, session):
                     # prefer earlier BOOT_FILE_REGEX entries across all
                     # filesystems instead of only within each filesystem.
                     ranked_matches = [[] for _ in boot_file_regex]
+                    rommon_dir_timeout = getattr(
+                        spawn.settings, 'ROMMON_DIR_TIMEOUT', None)
                     for fs in filesystems:
                         spawn.buffer = ''
                         spawn.sendline('dir {}'.format(fs))
-                        dir_listing = spawn.expect(patterns.rommon_prompt).match_output
+                        dir_listing = spawn.expect(
+                            patterns.rommon_prompt,
+                            timeout=rommon_dir_timeout).match_output
                         seen = set()
                         for rank, pattern in enumerate(boot_file_regex):
                             image_names = re.findall(pattern, dir_listing)
@@ -227,10 +231,14 @@ def boot_image(spawn, context, session):
                     ]
                 else:
                     context['filesystem_images'] = []
+                    rommon_dir_timeout = getattr(
+                        spawn.settings, 'ROMMON_DIR_TIMEOUT', None)
                     for fs in filesystems:
                         spawn.buffer = ''
                         spawn.sendline('dir {}'.format(fs))
-                        dir_listing = spawn.expect(patterns.rommon_prompt).match_output
+                        dir_listing = spawn.expect(
+                            patterns.rommon_prompt,
+                            timeout=rommon_dir_timeout).match_output
                         matches = re.findall(boot_file_regex, dir_listing)
                         if matches:
                             context['filesystem_images'].extend(

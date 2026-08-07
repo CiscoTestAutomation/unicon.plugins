@@ -10,7 +10,7 @@ import re
 from unicon.plugins.generic.settings import GenericSettings
 from unicon.plugins.iosxe.patterns import IosXEPatterns
 from unicon.eal.backend.spawn import RawSpawn
-
+from unicon.plugins.generic.patterns import GenericPatterns
 
 class DummySpawn(RawSpawn):
     """Minimal spawn implementation for exercising backend match logic."""
@@ -54,6 +54,7 @@ class TestIosXEDisablePrompt(unittest.TestCase):
         """Test that disable_prompt matches valid disable mode prompts."""
         valid_prompts = [
             'Router>',
+            'router>',
             'Switch>',
             'ios>',
             'wlc>',
@@ -62,11 +63,17 @@ class TestIosXEDisablePrompt(unittest.TestCase):
             'Router1>',
             'Switch2>',
             'Router(boot)>',
+            'router(boot)>',
             'Router(standby)>',
+            'router(standby)>',
             'Router-stby>',
+            'router-stby>',
             'Router-standby>',
+            'router-standby>',
             'Router(recovery-mode)>',
-            'Router(rp-rec-mode)>'
+            'router(recovery-mode)>',
+            'Router(rp-rec-mode)>',
+            'router(rp-rec-mode)>'
         ]
         
         for prompt in valid_prompts:
@@ -74,6 +81,27 @@ class TestIosXEDisablePrompt(unittest.TestCase):
                 match = re.search(self.disable_pattern, prompt)
                 self.assertIsNotNone(match, 
                     f"Pattern should match valid disable prompt: {prompt}")
+
+    def test_enable_prompt_matches_lowercase_router(self):
+        """Test that enable_prompt recognizes lowercase default hostnames."""
+        valid_prompts = [
+            'Router#',
+            'router#',
+            'router(boot)#',
+            'router(standby)#',
+            'router-stby#',
+            'router-standby#',
+            'router(recovery-mode)#',
+            'router(rp-rec-mode)#',
+        ]
+
+        for prompt in valid_prompts:
+            with self.subTest(prompt=prompt):
+                match = re.search(self.patterns.enable_prompt, prompt)
+                self.assertIsNotNone(
+                    match,
+                    f"Pattern should match valid enable prompt: {prompt}"
+                )
 
     def test_disable_prompt_does_not_match_rommon_prompts(self):
         """Test that disable_prompt does NOT match rommon prompts."""
@@ -114,6 +142,24 @@ class TestIosXEDisablePrompt(unittest.TestCase):
             "is replaced with DEFAULT_LEARNED_HOSTNAME"
         )
 
+    def test_default_hostname_pattern_learns_full_keyword_hostname(self):
+        """default_hostname_pattern must capture the full hostname token
+        when it starts with a keyword like Switch/Router.
+        """
+        pat = GenericPatterns().default_hostname_pattern
+        for prompt, expected in [
+            ('Switch-C9200L-24T-4X-JAE2248059H#',
+             'Switch-C9200L-24T-4X-JAE2248059H'),
+            ('Switch-FVH2940L4UY>', 'Switch-FVH2940L4UY'),
+            ('Router-abc-123#', 'Router-abc-123'),
+            ('Switch#', 'Switch'),
+            ('Router>', 'Router'),
+            ('router>', 'router'),
+        ]:
+            with self.subTest(prompt=prompt):
+                m = re.search(pat, prompt)
+                self.assertIsNotNone(m)
+                self.assertEqual(m.group(), expected)
 
 if __name__ == '__main__':
     unittest.main()

@@ -54,6 +54,11 @@ are_you_sure_yes = Statement(pattern=patterns.are_you_sure_yes,
                              loop_continue=True,
                              continue_timer=False)
 
+continue_yes = Statement(pattern=patterns.continue_yes,
+                         action='sendline(yes)',
+                         loop_continue=True,
+                         continue_timer=False)
+
 want_continue = Statement(pattern=patterns.want_continue,
                           action='sendline(yes)',
                           loop_continue=True,
@@ -82,6 +87,7 @@ configure_statement_list = [
     are_you_sure,
     wish_continue,
     are_you_sure_yes,
+    continue_yes,
     confirm,
     want_continue,
     are_you_sure_ywtdt,
