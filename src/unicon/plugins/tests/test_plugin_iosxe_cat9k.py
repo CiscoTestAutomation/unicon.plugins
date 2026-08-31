@@ -11,12 +11,44 @@ from unicon import Connection
 from unicon.eal.dialogs import Statement, Dialog
 from unicon.plugins.tests.mock.mock_device_iosxe import MockDeviceTcpWrapperIOSXE
 from unicon.plugins.tests.mock.mock_device_iosxe_cat9k import MockDeviceTcpWrapperIOSXECat9k
+from unicon.plugins.iosxe.cat9k.statemachine import IosXECat9kDualRpStateMachine
 from unicon.core.errors import SubCommandFailure
 
 from pyats.topology import loader
 
 unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
 unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC = 0.2
+
+
+class TestIosXeCat9kStateMachine(unittest.TestCase):
+
+    def test_dual_rp_syntax_transition(self):
+        md = MockDeviceTcpWrapperIOSXECat9k(
+            port=0,
+            state='cat9k_ha_active_enable,cat9k_ha_standby_enable')
+        md.start()
+
+        c = Connection(
+            hostname='switch',
+            start=[
+                'telnet 127.0.0.1 {}'.format(md.ports[0]),
+                'telnet 127.0.0.1 {}'.format(md.ports[1]),
+            ],
+            os='iosxe',
+            platform='cat9k',
+            credentials=dict(
+                default=dict(username='cisco', password='cisco'),
+                alt=dict(username='admin', password='lab')),
+        )
+        try:
+            c.connect()
+            sm = IosXECat9kDualRpStateMachine()
+            sm.update_cur_state('enable')
+            sm.go_to('syntax', c.spawn)
+            self.assertEqual(sm.current_state, 'syntax')
+        finally:
+            c.disconnect()
+            md.stop()
 
 
 class TestIosXeCat9kPlugin(unittest.TestCase):

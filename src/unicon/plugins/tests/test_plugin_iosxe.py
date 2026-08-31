@@ -16,19 +16,162 @@ from unittest.mock import patch, Mock, MagicMock
 from pyats.topology import loader
 
 import unicon
-from unicon.plugins.generic.statements import terminal_position_handler
+from unicon.plugins.generic.statements import (
+    connection_statement_list,
+    generic_statements,
+    terminal_position_handler,
+)
 from unicon import Connection
 from unicon.eal.dialogs import Dialog, Statement
 from unicon.eal.utils import ExpectMatch, MatchMode
-from unicon.core.errors import SubCommandFailure, StateMachineError, UniconAuthenticationError, ConnectionError as UniconConnectionError
-from unicon.plugins.iosxe.statements import boot_image
-from unicon.plugins.tests.mock.mock_device_iosxe import MockDeviceTcpWrapperIOSXE
+from unicon.core.errors import (
+    ConnectionError as UniconConnectionError,
+    StateMachineError,
+    SubCommandFailure,
+    UniconAuthenticationError,
+)
+from unicon.plugins.iosxe.patterns import IosXEPatterns
+from unicon.plugins.iosxe.sdwan.statemachine import (
+    SDWANDualRpStateMachine,
+    SDWANSingleRpStateMachine,
+)
+from unicon.plugins.iosxe.statemachine import (
+    IosXEDualRpStateMachine,
+    IosXESingleRpStateMachine,
+)
+from unicon.plugins.iosxe.statements import (
+    boot_finished_deco,
+    boot_from_rommon_statement_list,
+    boot_image,
+)
+from unicon.plugins.tests.mock.mock_device_iosxe import (
+    MockDeviceTcpWrapperIOSXE,
+)
 
 unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
 unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC = 0.2
 
 
 class TestIosXEStatements(unittest.TestCase):
+
+    class RommonDialogSpawn:
+
+        def __init__(self):
+            self.timeout = 1
+            self.hostname = None
+            self.match = ExpectMatch()
+            self.log = Mock()
+
+        def read_update_buffer(self, size=None):
+            return 'Connection closed by foreign host'
+
+        def match_buffer(self, patterns):
+            self.match.match_output = 'Connection closed by foreign host'
+            return 0
+
+        def trim_buffer(self):
+            pass
+
+        def __str__(self):
+            return 'Router'
+
+    def test_boot_finished_decorator_maps_arguments_by_name(self):
+        spawn = Mock()
+        session = {'booting': True}
+        context = {'boot_start_time': object()}
+        received = {}
+
+        def callback(spawn, /, context, *, wait=None):
+            received.update(spawn=spawn, context=context, wait=wait)
+
+        decorated_callback = boot_finished_deco(callback)
+        decorated_callback(
+            spawn, session, context, wait=5, unused_argument=True
+        )
+
+        self.assertEqual(
+            received,
+            {'spawn': spawn, 'context': context, 'wait': 5},
+        )
+        self.assertNotIn('boot_start_time', context)
+
+    def test_boot_finished_decorator_forwards_statement_arguments(self):
+        spawn = Mock()
+        received = {}
+
+        def callback(spawn, **kwargs):
+            received.update(spawn=spawn, kwargs=kwargs)
+
+        boot_finished_deco(callback)(
+            spawn, {'booting': True}, {}, wait=5
+        )
+
+        self.assertEqual(received, {'spawn': spawn, 'kwargs': {'wait': 5}})
+
+    def test_boot_finished_decorator_propagates_callback_type_error_once(self):
+        spawn = Mock()
+        callback_calls = []
+
+        def callback(spawn):
+            callback_calls.append(spawn)
+            raise TypeError('callback failure')
+
+        with self.assertRaisesRegex(TypeError, 'callback failure'):
+            boot_finished_deco(callback)(
+                spawn, {}, {'boot_start_time': object()}
+            )
+
+        self.assertEqual(callback_calls, [spawn])
+
+    def test_boot_from_rommon_dialog_supports_spawn_only_callback(self):
+        disconnect_statement = next(
+            statement for statement in boot_from_rommon_statement_list
+            if statement.pattern ==
+            generic_statements.disconnect_error_stmt.pattern
+        )
+        context = {'boot_start_time': object()}
+
+        with self.assertRaisesRegex(
+                Exception, 'received disconnect from router Router'):
+            Dialog([disconnect_statement]).process(
+                self.RommonDialogSpawn(), timeout=1, context=context
+            )
+
+        self.assertNotIn('boot_start_time', context)
+
+    def test_boot_from_rommon_dialog_supports_spawn_context_callback(self):
+        connection_refused_statement = next(
+            statement for statement in boot_from_rommon_statement_list
+            if statement.pattern ==
+            generic_statements.connection_refused_stmt.pattern
+        )
+        spawn = self.RommonDialogSpawn()
+        spawn.device = None
+        context = {'boot_start_time': object()}
+
+        with self.assertRaisesRegex(
+                ConnectionRefusedError,
+                'Connection refused to device Router') as cm:
+            Dialog([connection_refused_statement]).process(
+                spawn, timeout=1, context=context
+            )
+
+        self.assertEqual(context, {})
+        self.assertIs(cm.exception.spawn, spawn)
+        self.assertIs(cm.exception.context, context)
+
+    def test_boot_from_rommon_owns_generic_connection_statements(self):
+        iosxe_connection_statements = boot_from_rommon_statement_list[
+            -len(connection_statement_list):
+        ]
+
+        self.assertEqual(
+            len(iosxe_connection_statements),
+            len(connection_statement_list),
+        )
+        for iosxe_statement, generic_statement in zip(
+                iosxe_connection_statements, connection_statement_list):
+            self.assertIsNot(iosxe_statement, generic_statement)
 
     def test_boot_image_finds_images_from_multiple_filesystems(self):
         spawn = Mock()
@@ -252,6 +395,37 @@ class TestIosXEStatements(unittest.TestCase):
         )
 
 
+class TestIosXEStateMachine(unittest.TestCase):
+
+    def assert_config_to_enable_prompt_handler(self, state_machine_class):
+        state_machine = state_machine_class()
+        dialog = state_machine.get_path('config', 'enable').dialog
+        prompt_statements = [
+            statement for statement in dialog.statements
+            if statement.pattern == IosXEPatterns().confirm_uncommited_changes
+        ]
+
+        self.assertEqual(len(prompt_statements), 1)
+        statement = prompt_statements[0]
+        self.assertEqual(statement.action.__name__, 'sendline')
+        self.assertEqual(statement.args, {'key': 'no'})
+        self.assertTrue(statement.loop_continue)
+
+    def test_generic_config_to_enable_prompt_handler(self):
+        for state_machine_class in (
+                IosXESingleRpStateMachine, IosXEDualRpStateMachine):
+            with self.subTest(state_machine=state_machine_class.__name__):
+                self.assert_config_to_enable_prompt_handler(
+                    state_machine_class)
+
+    def test_sdwan_config_to_enable_prompt_handler_is_not_duplicated(self):
+        for state_machine_class in (
+                SDWANSingleRpStateMachine, SDWANDualRpStateMachine):
+            with self.subTest(state_machine=state_machine_class.__name__):
+                self.assert_config_to_enable_prompt_handler(
+                    state_machine_class)
+
+
 class TestIosXEPluginConnect(unittest.TestCase):
 
     def test_asr_login_connect(self):
@@ -398,6 +572,47 @@ class TestIosXEPluginConnect(unittest.TestCase):
                'lifetime certificate 3650', 'database archive pkcs12 password 0 cisco123', 'no shutdown']
         c.configure(cmd, timeout=60, error_pattern=[], service_dialogue=None)
         self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
+
+    def test_configure_rsa_key_modulus_prompt_auto_answered(self):
+        # The default applies when the caller does not provide a reply.
+        c = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe '
+                              '--state general_login --hostname Router'],
+                       os='iosxe',
+                       credentials=dict(
+                           default=dict(username='cisco', password='cisco')))
+        try:
+            c.connect()
+            c.configure(
+                'crypto key generate rsa general-keys '
+                'label 9800-keys exportable', timeout=60)
+            self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
+        finally:
+            c.disconnect()
+
+    def test_configure_rsa_key_modulus_prompt_caller_override(self):
+        c = Connection(hostname='Router',
+                       start=['mock_device_cli --os iosxe '
+                              '--state general_login --hostname Router'],
+                       os='iosxe',
+                       credentials=dict(
+                           default=dict(username='cisco', password='cisco')))
+        reply = Dialog([
+            Statement(pattern=r'^.*How many bits in the modulus.*:\s*$',
+                      action='sendline(3072)',
+                      loop_continue=True,
+                      continue_timer=False)
+        ])
+        try:
+            c.connect()
+            output = c.configure(
+                'crypto key generate rsa general-keys '
+                'label 9800-keys exportable', reply=reply, timeout=60)
+            self.assertIn(
+                'How many bits in the modulus [1024]: 3072', output)
+            self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
+        finally:
+            c.disconnect()
 
     def test_general_config_ca_profile(self):
         c = Connection(hostname='Router',
@@ -1100,6 +1315,32 @@ class TestIosXESDWANConfigure(unittest.TestCase):
         d.connect()
         d.configure('no logging console')
         d.disconnect()
+
+
+class TestIosXEControllerTransactionConfigure(unittest.TestCase):
+
+    def test_config_to_enable_discards_uncommitted_changes(self):
+        connection = Connection(
+            hostname='Router',
+            start=[
+                'mock_device_cli --os iosxe '
+                '--state controller_transaction_enable --hostname Router'
+            ],
+            os='iosxe',
+            credentials=dict(
+                default=dict(username='cisco', password='cisco')),
+            log_buffer=True,
+            mit=True,
+        )
+
+        try:
+            connection.connect()
+            connection.configure('no logging console')
+            self.assertEqual(
+                connection.state_machine.current_state, 'enable')
+        finally:
+            connection.disconnect()
+
 
 class TestIosXECat9kPluginReload(unittest.TestCase):
 
@@ -2121,7 +2362,16 @@ class TestIosxeSyntaxConfigure(unittest.TestCase):
             'interface loopback 1',
             'description test'
         ]
-        c.configure(config_txt, config_syntax_check='my_config')
+        with patch.object(
+                c.spawn, 'sendline', wraps=c.spawn.sendline) as sendline:
+            c.configure(config_txt, config_syntax_check=True)
+        self.assertEqual(c.state_machine.current_state, 'enable')
+        self.assertEqual(sendline.call_args_list, [
+            unittest.mock.call('config check syntax'),
+            unittest.mock.call('interface loopback 1'),
+            unittest.mock.call('description test'),
+            unittest.mock.call('end'),
+        ])
         c.disconnect()
 
 
@@ -2150,6 +2400,130 @@ Done
 
         c.configure(banner_config)
         c.disconnect()
+
+
+class TestIosxeConfigSyntaxService(unittest.TestCase):
+
+    def test_single_rp_config_syntax_service(self):
+        c = Connection(
+            hostname='PE1',
+            start=[
+                'mock_device_cli --os iosxe --state general_enable '
+                '--hostname PE1'
+            ],
+            os='iosxe',
+            mit=True
+        )
+        c.connect()
+        try:
+            with patch.object(
+                    c.spawn, 'sendline', wraps=c.spawn.sendline) as sendline:
+                c.config_syntax([
+                    'interface loopback 1',
+                    'description test',
+                ])
+            self.assertEqual(c.state_machine.current_state, 'enable')
+            self.assertEqual(sendline.call_args_list, [
+                unittest.mock.call('config check syntax'),
+                unittest.mock.call('interface loopback 1'),
+                unittest.mock.call('description test'),
+                unittest.mock.call('end'),
+            ])
+        finally:
+            c.disconnect()
+
+    def test_dual_rp_config_syntax_service(self):
+        md = MockDeviceTcpWrapperIOSXE(
+            port=0,
+            state='ha_asr1k_exec,ha_asr1k_stby_exec',
+            hostname='R1')
+        md.start()
+        c = Connection(
+            hostname='R1',
+            start=[
+                'telnet 127.0.0.1 {}'.format(md.ports[0]),
+                'telnet 127.0.0.1 {}'.format(md.ports[1]),
+            ],
+            os='iosxe',
+            connection_timeout=10,
+            credentials=dict(default=dict(password='lab')),
+        )
+        try:
+            c.connect()
+            with patch.object(
+                    c.active.spawn,
+                    'sendline',
+                    wraps=c.active.spawn.sendline) as sendline:
+                c.config_syntax([
+                    'interface loopback 1',
+                    'description syntax test',
+                ])
+            self.assertEqual(c.active.state_machine.current_state, 'enable')
+            self.assertEqual(sendline.call_args_list, [
+                unittest.mock.call('config check syntax'),
+                unittest.mock.call('interface loopback 1'),
+                unittest.mock.call('description syntax test'),
+                unittest.mock.call('end'),
+            ])
+        finally:
+            c.disconnect()
+            md.stop()
+
+    def test_syntax_configlet_rejected_single_rp(self):
+        c = Connection(
+            hostname='PE1',
+            start=[
+                'mock_device_cli --os iosxe --state general_enable '
+                '--hostname PE1'
+            ],
+            os='iosxe',
+            mit=True
+        )
+        c.connect()
+        try:
+            with patch.object(
+                    c.spawn, 'sendline', wraps=c.spawn.sendline) as sendline:
+                with self.assertRaises(SubCommandFailure):
+                    c.configure('interface loopback 1',
+                                syntax_configlet='my_config')
+            sent = [call.args[0] for call in sendline.call_args_list
+                    if call.args]
+            self.assertNotIn('config term', sent)
+        finally:
+            c.disconnect()
+
+    def test_syntax_configlet_rejected_dual_rp(self):
+        md = MockDeviceTcpWrapperIOSXE(
+            port=0,
+            state='ha_asr1k_exec,ha_asr1k_stby_exec',
+            hostname='R1')
+        md.start()
+        c = Connection(
+            hostname='R1',
+            start=[
+                'telnet 127.0.0.1 {}'.format(md.ports[0]),
+                'telnet 127.0.0.1 {}'.format(md.ports[1]),
+            ],
+            os='iosxe',
+            connection_timeout=10,
+            credentials=dict(default=dict(password='lab')),
+        )
+        try:
+            c.connect()
+            with patch.object(
+                    c.active.spawn,
+                    'sendline',
+                    wraps=c.active.spawn.sendline) as sendline:
+                with self.assertRaises(SubCommandFailure):
+                    c.configure('interface loopback 1',
+                                syntax_configlet='my_config')
+            sent = [call.args[0] for call in sendline.call_args_list
+                    if call.args]
+            self.assertNotIn('config term', sent)
+        finally:
+            c.disconnect()
+            md.stop()
+
 
 class TestIosxeBannerACM(unittest.TestCase):
     '''

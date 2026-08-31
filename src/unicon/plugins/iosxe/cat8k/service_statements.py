@@ -2,8 +2,9 @@ __author__ = "Lukas McClelland <lumcclel@cisco.com>"
 
 from unicon.eal.dialogs import Statement
 from unicon.plugins.iosxe.cat8k.service_patterns import SwitchoverPatterns, ReloadPatterns
+from unicon.plugins.generic.service_patterns import reload_patterns
 from unicon.plugins.generic.service_statements import (
-    save_env, confirm_reset, reload_confirm, reload_confirm_ios)
+    confirm_reset, reload_confirm, reload_confirm_ios)
 
 
 
@@ -42,6 +43,13 @@ switchover_statement_list = [save_config,
 #############################################################################
 patterns = ReloadPatterns()
 
+save_env_to_rommon = Statement(
+    pattern=reload_patterns.savenv,
+    action='sendline(yes)',
+    args=None,
+    loop_continue=True,
+    continue_timer=False)
+
 boot_interrupt_stmt = Statement(
     pattern=patterns.boot_interrupt_prompt,
     action='send(\x03)',
@@ -50,7 +58,7 @@ boot_interrupt_stmt = Statement(
     continue_timer=False)
 
 
-reload_to_rommon_statement_list = [save_env,
+reload_to_rommon_statement_list = [save_env_to_rommon,
                                    confirm_reset,
                                    reload_confirm,
                                    reload_confirm_ios,

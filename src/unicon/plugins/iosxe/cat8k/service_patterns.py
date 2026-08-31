@@ -5,7 +5,10 @@ class ReloadPatterns(IosXEPatterns):
 
     def __init__(self):
         super().__init__()
-        self.boot_interrupt_prompt = r'Preparing to autoboot. \[Press Ctrl-C to interrupt\]'
+        self.boot_interrupt_prompt = (
+            r'(?:Preparing to autoboot\. \[Press Ctrl-C to interrupt\]|'
+            r'System Bootstrap, Version .*)'
+        )
 class SwitchoverPatterns:
     def __init__(self):
         self.save_config = r'.*System configuration has been modified\.\s*Save\?\s*\[yes\/no\]:\s*$'

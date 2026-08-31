@@ -46,6 +46,7 @@ class IosXEPatterns(GenericPatterns):
         self.acm_prompt = r'^(.*?)\(acm.*?\)#[\s\x07]*$'
         self.syntax_prompt = r'^(.*?)\(syntax.*?\)#[\s\x07]*$'
         self.rules_prompt = r'^(.*?)\(rules.*?\)#[\s\x07]*$'
+        self.rsa_modulus_prompt = r'^.*How many bits in the modulus \[\d+\]:\s*$'
 
 
 class IosXEReloadPatterns(ReloadPatterns):

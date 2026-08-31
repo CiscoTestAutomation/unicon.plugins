@@ -146,6 +146,9 @@ cat9k_ha_active_enable:
     "config term":
         new_state: cat9k_ha_active_config
 
+    "config check syntax":
+        new_state: cat9k_ha_active_syntax
+
     "show boot": |
       ---------------------------
       Switch 1
@@ -159,6 +162,10 @@ cat9k_ha_active_enable:
       Enable Break = yes
       Boot Mode = DEVICE
       iPXE Timeout = 0
+
+
+cat9k_ha_active_syntax:
+    prompt: "%N(syntax)#"
 
 
 cat9k_ha_active_enable_reload_confirm:

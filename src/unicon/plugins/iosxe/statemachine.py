@@ -20,6 +20,18 @@ from .statements import (
 patterns = IosXEPatterns()
 statements = GenericStatements()
 
+
+def _config_to_enable_dialog(config_command):
+    statement_list = [statements.syslog_msg_stmt]
+    if config_command == 'config term':
+        statement_list.append(Statement(
+            pattern=patterns.confirm_uncommited_changes,
+            action='sendline(no)',
+            loop_continue=True,
+        ))
+    return Dialog(statement_list)
+
+
 def enable_bash_console_transition(statemachine, spawn, context):
     ''' Transition from enable mode to bash_console
 
@@ -68,8 +80,7 @@ def enable_to_acm_transition(state_machine, spawn, context):
     spawn.sendline(f'acm configlet create {configlet_name}')
 
 def enable_to_syntax_transition(state_machine, spawn, context):
-    configlet_name = context.get('syntax_configlet', '')
-    spawn.sendline(f'syntax configlet create {configlet_name}')
+    spawn.sendline('config check syntax')
 
 def maintenance_to_enable_transition(statemachine, spawn, context):
 
@@ -145,7 +156,9 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         enable_to_disable = Path(enable, disable, 'disable', None)
 
         enable_to_config = Path(enable, config, config_transition, Dialog([statements.syslog_msg_stmt]))
-        config_to_enable = Path(config, enable, 'end', Dialog([statements.syslog_msg_stmt]))
+        config_to_enable = Path(
+            config, enable, 'end',
+            _config_to_enable_dialog(self.config_command))
 
         enable_to_guestshell = Path(enable, guestshell, 'guestshell run bash', None)
         guestshell_to_enable = Path(guestshell, enable, 'exit', None)
@@ -156,7 +169,7 @@ class IosXESingleRpStateMachine(GenericSingleRpStateMachine):
         enable_to_acm = Path(enable, acm, enable_to_acm_transition, None)
         acm_to_enable = Path(acm, enable, 'end', None)
 
-        enable_to_syntax = Path(enable, syntax, 'config check syntax', None)
+        enable_to_syntax = Path(enable, syntax, enable_to_syntax_transition, None)
         syntax_to_enable = Path(syntax, enable, 'end', None)
         enable_to_rules = Path(enable, rules, 'acm rules', None)
         rules_to_enable = Path(rules, enable, 'end', None)
@@ -260,7 +273,9 @@ class IosXEDualRpStateMachine(StateMachine):
 
         enable_to_config = Path(enable, config, config_transition, Dialog([statements.syslog_msg_stmt]))
 
-        config_to_enable = Path(config, enable, 'end', Dialog([statements.syslog_msg_stmt]))
+        config_to_enable = Path(
+            config, enable, 'end',
+            _config_to_enable_dialog(self.config_command))
 
         enable_to_rommon = Path(enable, rommon, 'reload', Dialog(
             connection_statement_list + reload_statement_list))
