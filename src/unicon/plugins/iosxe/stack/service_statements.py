@@ -1,4 +1,7 @@
 """ Generic IOS-XE Stack Service Statements """
+import re
+from datetime import datetime, timedelta
+
 from unicon.eal.dialogs import Statement
 
 from unicon.plugins.generic.service_statements import (reload_statement_list,
@@ -6,7 +9,9 @@ from unicon.plugins.generic.service_statements import (reload_statement_list,
                                                        reload_confirm_ios,
                                                        reload_confirm_iosxe,
                                                        reload_entire_shelf,
-                                                       reload_this_shelf)
+                                                       reload_this_shelf,
+                                                       press_enter,
+                                                       press_return)
 
 from unicon.plugins.iosxe.service_statements import (factory_reset_confirm,
                                                      are_you_sure_confirm)
@@ -123,6 +128,42 @@ stack_switchover_stmt_list = [save_config, proceed_sw, commit_changes,
 # reload service statements
 reload_pat = StackIosXEReloadPatterns()
 
+
+def stack_wait_and_enter(spawn, wait=0.5):
+    """Handle the stack reload ``Press RETURN``/authentication prompt race."""
+    last_match = getattr(getattr(spawn, 'match', None), 'last_match', None)
+    match_start = last_match.start() if last_match is not None else 0
+
+    wait_time = timedelta(seconds=wait)
+    settle_time = current_time = datetime.now()
+    while (current_time - settle_time) < wait_time:
+        spawn.read_update_buffer()
+        current_time = datetime.now()
+
+    settings = getattr(spawn, 'settings', None)
+    auth_patterns = (
+        reload_pat.username,
+        reload_pat.password,
+        getattr(settings, 'LOGIN_PROMPT', None),
+        getattr(settings, 'PASSWORD_PROMPT', None),
+    )
+    pending_output = (spawn.buffer or '')[match_start:]
+    if any(pattern and re.search(pattern, pending_output, re.DOTALL)
+           for pattern in auth_patterns):
+        spawn.log.debug(
+            'Authentication prompt appeared while waiting; skipping RETURN')
+        return
+
+    spawn.sendline()
+
+
+stack_press_return = Statement(
+    pattern=reload_pat.press_return,
+    action=stack_wait_and_enter,
+    loop_continue=True,
+    continue_timer=False,
+)
+
 reload_shelf = Statement(pattern=reload_pat.reload_entire_shelf,
                          action='sendline()',
                          loop_continue=True,
@@ -156,12 +197,21 @@ stack_reload_stmt_list_1 = [save_env, reload_confirm_ios, reload_confirm_iosxe,
                             accelarating_discovery, fastreload_iosxeswitch,
                             proceed_prompt_stmt]
 
+# Some stack variants process each "Press RETURN" in separate dialog calls.
 stack_reload_stmt_list = list(reload_statement_list)
 
 # The enable and disable states are needed when using `reload slot N`
 stack_reload_stmt_list.extend([en_state, dis_state])
 stack_reload_stmt_list.insert(0, reload_shelf)
 stack_reload_stmt_list.insert(0, reload_fast)
+
+# Both generic statements match "Press RETURN". Keep one stack handler active
+# so authentication prompts that arrive while settling stay in this dialog.
+stack_reload_auth_stmt_list = [
+    stack_press_return if statement is press_enter else statement
+    for statement in stack_reload_stmt_list
+    if statement is not press_return
+]
 
 
 stack_factory_reset_stmt_list = [factory_reset_confirm, are_you_sure_confirm]

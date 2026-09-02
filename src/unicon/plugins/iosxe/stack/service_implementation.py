@@ -16,7 +16,7 @@ from .utils import StackUtils
 from unicon.plugins.generic.statements import custom_auth_statements, buffer_settled
 from unicon.plugins.generic.service_statements import standby_reset_rp_statement_list
 from .service_statements import (switch_prompt,
-                                 stack_reload_stmt_list,
+                                 stack_reload_auth_stmt_list,
                                  stack_reload_stmt_list_1,
                                  stack_switchover_stmt_list, stack_factory_reset_stmt_list)
 from unicon.plugins.generic.service_implementation import Enable as GenericEnable, Execute as GenericExecute
@@ -219,7 +219,7 @@ class StackReload(BaseService):
         self.timeout = connection.settings.STACK_RELOAD_TIMEOUT
         self.reload_command = "redundancy reload shelf"
         self.log_buffer = io.StringIO()
-        self.dialog = Dialog(stack_reload_stmt_list)
+        self.dialog = Dialog(stack_reload_auth_stmt_list)
 
     def call_service(self,
                      reload_command=None,

@@ -1505,17 +1505,20 @@ class TestGenericReload(unittest.TestCase):
 
 class TestGenericConnectionRefused(unittest.TestCase):
 
-    def test_connection_refused_handler_logs_max_count(self):
+    def test_connection_refused_handler_raises_typed_error(self):
         spawn = Mock()
-        spawn.settings.CONNECTION_REFUSED_MAX_COUNT = 3
-        context = {'connection_refused_count': 2}
+        context = {}
 
-        with self.assertRaisesRegex(Exception, 'Connection refused to device'):
+        with self.assertRaisesRegex(
+                ConnectionRefusedError, 'Connection refused to device') as cm:
             connection_refused_handler(spawn, context)
 
-        spawn.log.error.assert_called_once_with(
-            'Too many connection refused events: 3, update setting '
-            'CONNECTION_REFUSED_MAX_COUNT as needed.')
+        self.assertIs(cm.exception.spawn, spawn)
+        self.assertIs(cm.exception.context, context)
+        self.assertIs(cm.exception.device, spawn.device)
+        self.assertNotIn('connection_refused_count', context)
+        spawn.device.api.execute_clear_line.assert_not_called()
+        spawn.device.connect.assert_not_called()
 
     def test_connection_refused_handler_with_peripheral(self):
         md = MockDeviceTcpWrapper(device_os='iosxe', hostname='R1',

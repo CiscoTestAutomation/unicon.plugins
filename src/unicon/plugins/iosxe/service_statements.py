@@ -82,6 +82,11 @@ proceed_confirm_stmt = Statement(pattern=patterns.proceed_confirm,
 macro_prompt = Statement(pattern=patterns.macro_prompt,
                          loop_continue=False)
 
+rsa_modulus = Statement(pattern=patterns.rsa_modulus_prompt,
+                        action='sendline(2048)',
+                        loop_continue=True,
+                        continue_timer=False)
+
 
 configure_statement_list = [
     are_you_sure,

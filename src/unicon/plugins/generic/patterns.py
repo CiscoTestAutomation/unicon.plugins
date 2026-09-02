@@ -76,6 +76,7 @@ class GenericPatterns(UniconCorePatterns):
         # % WARNING: The master key is not configured, so passwords/secrets might not be encrypted.
         # Configure the master key by using the following command: "key config-key password-encrypt <encryption-key>
         # Applying config on Switch 3...[DONE]
+        # UNIX ERR:tcgetattr:Inappropriate ioctl for device
         self.syslog_message_pattern = (
             r"^.*?(%\w+(-\S+)?-\d+-\w+|"
             r"yang-infra:|PKI_SSL_IPC:|Guestshell destroyed successfully|"
@@ -86,7 +87,8 @@ class GenericPatterns(UniconCorePatterns):
             r"Failed to generate persistent self-signed certificate\.|"
             r"Secure server will use temporary self-signed certificate\.|"
             r"(LC|RP)/\d+/\d+/CPU\d+:\w+\s+\d+\s+\d{2}:\d{2}:\d{2}|"
-            r"\[OK\]"
+            r"\[OK\]|"
+            r"UNIX ERR:tcgetattr:Inappropriate ioctl for device"
             r").*\s*$"
         )
         self.config_locked = r'Configuration (mode )?(is )?locked|Config mode cannot be entered'

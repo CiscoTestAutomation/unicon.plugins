@@ -2,16 +2,39 @@
 Unittests for iosxe/cat8k plugin
 """
 
+import re
 import unittest
 
 import unicon
 from unicon import Connection
 from unicon.plugins.tests.mock.mock_device_iosxe_cat8k import MockDeviceTcpWrapperIOSXECat8k
 from unicon.core.errors import SubCommandFailure
+from unicon.plugins.iosxe.cat8k.service_statements import (
+    boot_interrupt_stmt,
+    reload_to_rommon_statement_list,
+    save_env_to_rommon,
+)
 
 
 unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
 unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC = 0.2
+
+
+class TestIosXeCat8kRommonStatements(unittest.TestCase):
+
+    def test_system_bootstrap_interrupts_boot(self):
+        output = 'System Bootstrap, Version 17.11(1r), RELEASE SOFTWARE'
+
+        self.assertIsNotNone(re.search(boot_interrupt_stmt.pattern, output))
+
+    def test_existing_autoboot_prompt_still_interrupts_boot(self):
+        output = 'Preparing to autoboot. [Press Ctrl-C to interrupt]'
+
+        self.assertIsNotNone(re.search(boot_interrupt_stmt.pattern, output))
+
+    def test_rommon_transition_saves_config_register_change(self):
+        self.assertIs(reload_to_rommon_statement_list[0], save_env_to_rommon)
+        self.assertEqual(save_env_to_rommon.args, {'key': 'yes'})
 
 
 class TestIosXeCat8kPlugin(unittest.TestCase):

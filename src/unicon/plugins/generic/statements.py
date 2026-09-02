@@ -46,18 +46,12 @@ def terminal_position_handler(spawn, session, context):
 def connection_refused_handler(spawn, context):
     """ handles connection refused scenarios
     """
-    context.setdefault('connection_refused_count', 0)
-    context['connection_refused_count'] += 1
-    if context.get('connection_refused_count') < spawn.settings.CONNECTION_REFUSED_MAX_COUNT:
-        if spawn.device:
-            spawn.device.api.execute_clear_line()
-            spawn.device.connect()
-            return
-    spawn.log.error(
-        'Too many connection refused events: {}, update setting '
-        'CONNECTION_REFUSED_MAX_COUNT as needed.'.format(
-            context['connection_refused_count']))
-    raise Exception('Connection refused to device %s' % (str(spawn)))
+    error = ConnectionRefusedError(
+        'Connection refused to device %s' % str(spawn))
+    error.spawn = spawn
+    error.context = context
+    error.device = getattr(spawn, 'device', None)
+    raise error
 
 
 def connection_failure_handler(spawn):

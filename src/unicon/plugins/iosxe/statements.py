@@ -1,7 +1,9 @@
 import re
 import time
 import logging
+from copy import copy
 from functools import wraps
+from inspect import Parameter, signature
 from datetime import datetime, timedelta
 
 from unicon.eal.dialogs import Statement
@@ -324,12 +326,48 @@ def boot_finished_deco(func):
     Used with boot_from_rommon_statement_list (see below)
     '''
 
+    parameters = signature(func).parameters
+    accepts_extra_keywords = any(
+        parameter.kind is Parameter.VAR_KEYWORD
+        for parameter in parameters.values()
+    )
+
     @wraps(func)
     def wrapper(spawn, session, context, **kwargs):
-        args = [a for a in [spawn, session, context] if a]
-        if context:
+        if context is not None:
             context.pop('boot_start_time', None)
-        return func(*args, **kwargs)
+
+        available_arguments = {
+            'spawn': spawn,
+            'session': session,
+            'context': context,
+        }
+        positional_arguments = []
+        keyword_arguments = {}
+        for name, parameter in parameters.items():
+            if name not in available_arguments:
+                continue
+            if parameter.kind is Parameter.POSITIONAL_ONLY:
+                positional_arguments.append(available_arguments[name])
+            elif parameter.kind in (
+                Parameter.POSITIONAL_OR_KEYWORD,
+                Parameter.KEYWORD_ONLY,
+            ):
+                keyword_arguments[name] = available_arguments[name]
+
+        if accepts_extra_keywords:
+            keyword_arguments.update(kwargs)
+        else:
+            keyword_arguments.update(
+                (name, value) for name, value in kwargs.items()
+                if name in parameters
+                and parameters[name].kind in (
+                    Parameter.POSITIONAL_OR_KEYWORD,
+                    Parameter.KEYWORD_ONLY,
+                )
+            )
+
+        return func(*positional_arguments, **keyword_arguments)
     return wrapper
 
 
@@ -337,7 +375,10 @@ def boot_finished_deco(func):
 # If the boot is completed because we hit a statement with
 # loop_continue = False, use the wrapper to pop the start time
 # from the context dict.
-boot_from_rommon_statement_list += connection_statement_list.copy()
+boot_from_rommon_statement_list += [
+    copy(statement) for statement in connection_statement_list
+]
 for stmt in boot_from_rommon_statement_list:
-    if stmt.pattern in [reload_patterns.press_return] or stmt.loop_continue is False:
+    if (stmt.pattern in [reload_patterns.press_return] or
+            stmt.loop_continue is False):
         stmt.action = boot_finished_deco(stmt.action)

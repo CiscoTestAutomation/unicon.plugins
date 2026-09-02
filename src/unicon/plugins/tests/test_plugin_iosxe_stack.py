@@ -3,7 +3,6 @@ Unittests for IOSXE/Stack plugin
 
 """
 
-import re
 import unittest
 from unittest.mock import MagicMock, Mock, call, patch
 
@@ -15,10 +14,20 @@ from unicon.eal.dialogs import Statement, Dialog
 from unicon.eal.utils import ExpectMatch
 from unicon.core.errors import SubCommandFailure
 from unicon.plugins.iosxe.stack.service_implementation import StackReload
+from unicon.plugins.iosxe.stack.service_statements import (
+    stack_press_return,
+    stack_reload_auth_stmt_list,
+    stack_wait_and_enter,
+)
+from unicon.plugins.generic.statements import wait_and_enter as generic_wait_and_enter
 from unicon.plugins.tests.mock.mock_device_iosxe import MockDeviceTcpWrapperIOSXE
 from unicon.plugins.iosxe.stack.utils import StackUtils
 from unicon.plugins.generic.service_patterns import reload_patterns
-from unicon.plugins.generic.service_statements import reload_statement_list
+from unicon.plugins.generic.service_statements import (
+    press_enter,
+    press_return,
+    reload_statement_list,
+)
 
 
 unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
@@ -239,16 +248,23 @@ class TestIosXEStackReload(unittest.TestCase):
             self.timeout = 1
             self.hostname = None
             self.match_index = match_index
+            self.buffer = 'Press RETURN to get started!'
             self.match = ExpectMatch()
             self.log = Mock()
             self.sendline = Mock()
+            self.settings = MagicMock(
+                LOGIN_PROMPT=None,
+                PASSWORD_PROMPT=None,
+            )
             self.match_buffer = Mock(side_effect=self._match_buffer)
 
         def read_update_buffer(self, size=None):
-            return 'Press RETURN to get started!\nUsername:'
+            return self.buffer
 
         def _match_buffer(self, pat_list):
-            self.match.match_output = 'Press RETURN to get started!'
+            pattern = pat_list[self.match_index]
+            self.match.last_match = pattern.search(self.buffer)
+            self.match.match_output = self.match.last_match.group()
             return self.match_index
 
         def trim_buffer(self):
@@ -270,6 +286,84 @@ class TestIosXEStackReload(unittest.TestCase):
             self.assertEqual(spawn.sendline.call_count, 1)
 
         self.assertEqual(press_return_stmt.matched_retries, 1)
+
+    def test_stack_reload_dialog_uses_stack_press_return(self):
+        connection = MagicMock(
+            settings=MagicMock(STACK_RELOAD_TIMEOUT=10))
+        service = StackReload(connection, {})
+        statements = service.dialog.statements
+
+        self.assertEqual(
+            sum(statement.action is stack_wait_and_enter
+                for statement in statements), 1)
+        self.assertFalse(any(
+            statement.action is generic_wait_and_enter and
+            statement.pattern in (press_enter.pattern, press_return.pattern)
+            for statement in statements))
+
+    def test_stack_press_return_sends_return_when_prompt_is_unchanged(self):
+        spawn = self.StackReloadPromptSpawn(match_index=0)
+
+        stack_wait_and_enter(spawn, wait=0.01)
+
+        spawn.sendline.assert_called_once_with()
+
+    def test_stack_reload_authenticates_after_press_return(self):
+        class StackReloadAuthSpawn:
+            def __init__(self):
+                self.timeout = 1
+                self.hostname = 'Router'
+                self.buffer = 'Press RETURN to get started!'
+                self.match = ExpectMatch()
+                self.log = Mock()
+                self.settings = MagicMock(
+                    LOGIN_PROMPT=None,
+                    PASSWORD_PROMPT=None,
+                    PASSWORD_ATTEMPTS=3,
+                )
+                self.sent_lines = []
+                self.last_sent = ''
+                self.read_count = 0
+
+            def read_update_buffer(self, size=None):
+                self.read_count += 1
+                if self.read_count == 2:
+                    self.buffer += '\nUsername:'
+                return self.buffer
+
+            def match_buffer(self, patterns):
+                for index, pattern in enumerate(patterns):
+                    match = pattern.search(self.buffer)
+                    if match:
+                        self.match.last_match = match
+                        self.match.match_output = match.group()
+                        return index
+                raise AssertionError(
+                    'No reload dialog pattern matched {!r}'.format(
+                        self.buffer))
+
+            def trim_buffer(self):
+                self.buffer = self.buffer[self.match.last_match.end():]
+
+            def sendline(self, value=''):
+                self.sent_lines.append(value)
+                self.last_sent = value
+                if value == 'admin':
+                    self.buffer += '\nPassword:'
+                elif value == 'lab':
+                    self.buffer += '\nRouter#'
+
+        spawn = StackReloadAuthSpawn()
+        Dialog(stack_reload_auth_stmt_list).process(
+            spawn,
+            timeout=1,
+            context={'username': 'admin', 'tacacs_password': 'lab'})
+
+        self.assertTrue(stack_press_return.loop_continue)
+        self.assertEqual(spawn.sent_lines, ['admin', 'lab'])
+        self.assertEqual(spawn.buffer, '\nRouter#')
+        spawn.log.debug.assert_any_call(
+            'Authentication prompt appeared while waiting; skipping RETURN')
 
     @patch('unicon.plugins.iosxe.stack.service_implementation.sleep')
     @patch('unicon.plugins.iosxe.stack.service_implementation.utils')

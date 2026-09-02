@@ -474,6 +474,8 @@ general_config:
         % The key modulus size is 2048 bits
         % Generating 2048 bit RSA keys, keys will be non-exportable...
         [OK] (elapsed time was 2 seconds)
+    "crypto key generate rsa general-keys label 9800-keys exportable":
+      new_state: general_config_rsa_modulus_prompt
     "crypto pki server ca":
       new_state: config_general_server
     "crypto gkm group g1":
@@ -515,6 +517,26 @@ general_config:
         Enable AOT and clear NAT Flow entries before enabling scale
     "end":
       new_state: general_enable
+
+controller_transaction_enable:
+  prompt: "%N#"
+  commands:
+    <<: *gen_enable_cmds
+    "config term":
+      new_state: controller_transaction_config
+
+controller_transaction_config:
+  prompt: "%N(config)#"
+  commands:
+    "no logging console": ""
+    "end":
+      new_state: controller_transaction_confirm
+
+controller_transaction_confirm:
+  prompt: "Uncommitted changes found, commit them? [yes/no/CANCEL] "
+  commands:
+    "no":
+      new_state: controller_transaction_enable
 
 general_config_nat_scale_confirm:
   prompt: "% Are you sure you want to continue? [yes]: "
@@ -602,6 +624,30 @@ config_general_redundancy_main_cpu:
       "standby console enable": ""
       "end":
         new_state: general_enable
+
+general_config_rsa_modulus_prompt:
+  prompt: "How many bits in the modulus [1024]: "
+  commands:
+    "2048":
+      new_state: general_config_rsa_keygen_done
+    "3072":
+      new_state: general_config_rsa_keygen_custom_done
+
+general_config_rsa_keygen_done:
+  prompt: "%N(conf)#"
+  result: |
+    % Generating 2048 bit RSA keys, keys will be exportable...
+    [OK] (elapsed time was 1 seconds)
+  commands:
+    <<: *general_config_cmds
+
+general_config_rsa_keygen_custom_done:
+  prompt: "%N(conf)#"
+  result: |
+    % Generating 3072 bit RSA keys, keys will be exportable...
+    [OK] (elapsed time was 1 seconds)
+  commands:
+    <<: *general_config_cmds
 
 general_config_ca_profile:
   prompt: "%N(ca-profile-enroll)#"

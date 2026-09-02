@@ -27,6 +27,7 @@ from .service_statements import (
     execute_statement_list,
     configure_statement_list,
     confirm,
+    rsa_modulus,
     want_continue,
 )
 
@@ -34,6 +35,13 @@ from .statements import grub_prompt_stmt, boot_from_rommon_stmt, terminal_positi
 
 from unicon.plugins.generic.utils import GenericUtils
 from unicon.plugins.generic.service_implementation import BashService as GenericBashService
+
+
+def _with_rsa_modulus_fallback(reply):
+    """Append the default RSA response after any caller-provided statements."""
+    if isinstance(reply, Dialog):
+        return reply + Dialog([rsa_modulus])
+    return reply
 
 
 # Simplex Services
@@ -61,10 +69,19 @@ class Configure(GenericConfigure):
 
         self.utils = ConfigUtils()
 
+    def call_service(self, command=[], reply=Dialog([]), *args, **kwargs):
+        reply = _with_rsa_modulus_fallback(reply)
+        return super().call_service(command, reply, *args, **kwargs)
+
     def pre_service(self, *args, **kwargs):
 
         self.acm_configlet = kwargs.pop('acm_configlet', None)
-        self.syntax_configlet = kwargs.pop('syntax_configlet', None)
+        syntax_configlet = kwargs.pop('syntax_configlet', None)
+        if syntax_configlet:
+            raise SubCommandFailure(
+                "'syntax_configlet' is no longer supported. "
+                "Use configure(..., config_syntax_check=True) "
+                "or config_syntax() instead.")
         self.config_syntax_check = kwargs.pop('config_syntax_check', False)
         self.rules = kwargs.pop('rules', False)
         self.prompt_recovery = kwargs.get('prompt_recovery', True)
@@ -84,12 +101,13 @@ class Configure(GenericConfigure):
                 self.start_state = 'rules'
                 self.end_state = 'rules'
 
-        elif self.syntax_configlet or self.config_syntax_check:
-            configlet_name = self.syntax_configlet if self.syntax_configlet else ''
-            self.connection.state_machine.go_to('syntax', self.connection.spawn,
-                                                context={'syntax_configlet': configlet_name})
+        elif self.config_syntax_check:
+            target = kwargs.get('target') if self.connection.is_ha else None
+            handle = self.get_handle(target)
+            handle.state_machine.go_to(
+                'syntax', handle.spawn, context=handle.context)
             self.start_state = 'syntax'
-            self.end_state = 'syntax'
+            self.end_state = 'enable'
 
         else:
             super().pre_service(*args, **kwargs)
@@ -109,10 +127,9 @@ class Config(Configure):
 
 class ConfigSyntax(Configure):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.start_state = 'syntax'
-        self.end_state = 'enable'
+    def pre_service(self, *args, **kwargs):
+        kwargs['config_syntax_check'] = True
+        super().pre_service(*args, **kwargs)
 
 
 class Execute(GenericExecute):
@@ -155,9 +172,19 @@ class HAConfigure(GenericHAConfigure):
         super().__init__(connection, context, **kwargs)
         self.dialog += Dialog(configure_statement_list)
 
+    def call_service(self, command=[], reply=Dialog([]), *args, **kwargs):
+        reply = _with_rsa_modulus_fallback(reply)
+        return super().call_service(command, reply, *args, **kwargs)
+
     def pre_service(self, *args, **kwargs):
         self.acm_configlet = kwargs.pop('acm_configlet', None)
-        self.syntax_configlet = kwargs.pop('syntax_configlet', None)
+        syntax_configlet = kwargs.pop('syntax_configlet', None)
+        if syntax_configlet:
+            raise SubCommandFailure(
+                "'syntax_configlet' is no longer supported. "
+                "Use configure(..., config_syntax_check=True) "
+                "or config_syntax() instead.")
+        self.config_syntax_check = kwargs.pop('config_syntax_check', False)
         self.rules = kwargs.pop('rules', False)
         self.prompt_recovery = kwargs.get('prompt_recovery', True)
 
@@ -166,10 +193,12 @@ class HAConfigure(GenericHAConfigure):
             self.start_state = 'acm'
             self.end_state = 'acm'
 
-        if self.syntax_configlet:
-            self.connection.state_machine.go_to('syntax', self.connection.spawn,context={'syntax_configlet': self.syntax_configlet})
+        if self.config_syntax_check:
+            handle = self.get_handle(kwargs.get('target'))
+            handle.state_machine.go_to(
+                'syntax', handle.spawn, context=handle.context)
             self.start_state = 'syntax'
-            self.end_state = 'syntax'
+            self.end_state = 'enable'
         elif self.rules:
             if self.connection.connected:
                 self.connection.state_machine.go_to('rules', self.connection.spawn)
@@ -488,19 +517,6 @@ class Tclsh(Execute):
         self.end_state = 'tclsh'
         self.service_name = 'tclsh'
         self.__dict__.update(kwargs)
-
-class Syntaxsh(BaseService):
-
-    def __init__(self, connection, context, **kwargs):
-        super().__init__(connection, context, **kwargs)
-        self.start_state = 'enable'
-        self.end_state = 'syntax_check'
-        self.service_name = 'syntax_check'
-
-    def call_service(self, syntax_file=None, **kwargs):
-        cmd = f"syntax configlet check {syntax_file}" if syntax_file else "syntax configlet check"
-        self.connection.spawn.sendline(cmd)
-        self.connection.state_machine.go_to('syntax_check', self.connection.spawn, **kwargs)
 
 class MaintenanceMode(ContextMgrBaseService):
 
