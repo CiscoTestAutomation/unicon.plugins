@@ -16,7 +16,7 @@ class CspServiceList(ConfdServiceList):
 
 class CspSingleRPConnection(ConfdConnection):
     os = 'confd'
-    series = 'csp'
+    platform = 'csp'
     chassis_type = 'single_rp'
     state_machine_class = CspStateMachine
     connection_provider_class = ConfdConnectionProvider

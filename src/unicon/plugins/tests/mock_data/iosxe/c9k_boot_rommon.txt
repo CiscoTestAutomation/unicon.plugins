@@ -1,0 +1,12 @@
+
+
+Initializing Hardware......
+
+System Bootstrap, Version 17.3.6r, RELEASE SOFTWARE (P)
+Compiled Tue 09/15/2020 14:10:33.03 by rel
+
+Current ROMMON image : Primary
+Last reset cause     : SoftwareReload
+
+
+Preparing to autoboot. [Press Ctrl-C to interrupt]  0     

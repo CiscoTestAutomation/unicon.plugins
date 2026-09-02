@@ -1,0 +1,82 @@
+
+Try autoboot...
+
+find the string ! boot bootflash:/installables/switch/fxos-k9-kickstart.5.0.3.N2.4.71.72.SPA bootflash:/installables/switch/fxos-k9-system.5.0.3.N2.4.71.72.SPA 
+
+  !!   Kickstart Image verified successfully   !!
+
+
+Linux version: 3.14.39ltsi (security@cisco.com) #1 SMP Thu Jun 27 11:22:06 PDT 2019
+
+linuxrc.ext Fri Jan 29 06:48:01 UTC 2021
+1+0 records in
+1+0 records out
+64 bytes (64 B)POST INIT Starts at Fri Jan 29 06:48:08 UTC 2021
+S10mount-ramfs.supnuovaca Mounting /isan 2500m
+Mounted /isan
+Creating /callhome..
+Mounting /callhome..
+Creating /callhome done.
+Callhome spool file system init done.
+FPGA Version 0x00010500 FPGA Min Version 0x00000600
+Checking all filesystems..r... done.
+Checking NVRAM block device ... done
+. 
+FIPS power-on self-test passed
+Unpack CMC Application software
+1
+Loading system software
+Uncompressing system image: bootflash:/installables/switch/fxos-k9-system.5.0.3.N2.4.71.72.SPA
+
+
+Manager image digital signature verification successful
+C
+11+1 records in
+11+1 records out
+9594 bytes (9.6 kB) copied, 0.000119768 s, 80.1 MB/s
+snm mode on SUP
+
+INIT: Entering runlevel: 3
+
+cmcmon: 160:cmclog_setlevel_modu
+
+
+---------------------
+enabled fc feature
+---------------------
+2021 Jan 29 06:51:06  %$ VDC-1 %$ %USER-2-SYSTEM_MSG: CLIS: loading cmd files begin  - clis
+
+2021 Jan 29 06:51:15  %$ VDC-1 %$ %USER-2-SYSTEM_MSG: CLIS: loading cmd files end  - clis
+
+2021 Jan 29 06:51:15  %$ VDC-1 %$ %USER-2-SYSTEM_MSG: CLIS: init begin  - clis
+
+2021 Jan 29 06:51:15  %$ VDC-1 %$ %USER-2-SYSTEM_MSG: %SMART_LIC-2-PLATFORM_ERROR:Smart Licensing has encountered an internal software error. Contact TAC: The platform provided UDI list has invalid values: ; udi_pid is emp  - SMART_AGENT[4941]
+
+System is coming up ... Please wait ...
+System is coming up ... Please wait ...
+System is coming up ... Please wait ...
+System is coming up ... Please wait ...
+System is coming up ... Please wait ...
+System is coming up ... Please wait ...
+2021 Jan 29 06:52:03  %$ VDC-1 %$ %USER-0-SYSTEM_MSG: Starting bcm_attach, unit 0 - bcm_usd
+
+System is coming up ... Please wait ...
+2021 Jan 29 06:52:09  %$ VDC-1 %$ %USER-0-SYSTEM_MSG: Finished bcm_attach..., unit 0 - bcm_usd
+
+System is coming up ... Please wait ...
+2021 Jan 29 06:52:10  %$ VDC-1 %$ %USER-0-SYSTEM_MSG: Enabling Filter on CPU port  - bcm_usd
+
+2021 Jan 29 06:52:14  %$ VDC-1 %$ %VDC_MGR-2-VDC_ONLINE: vdc 1 has come online 
+
+System is coming up ... Please wait ...
+
+
+
+
+DP-QP login: 2021 Jan 29 06:53:21 DP-QP %$ VDC-1 %$ %ETHPC-2-PORTS_UP: 
+
+2021 Jan 29 06:54:17 DP-QP %$ VDC-1 %$ %CALLHOME-2-EVENT: SAM_SLA_NORMAL
+
+2021 Jan 29 06:54:17 DP-QP %$ VDC-1 %$ %FPRM-2-LINK_DOWN: [F0209][critical][link-down][sys/chassis-1/blade-1/adaptor-1/ext-eth-1] Adapter uplink interface 1/1/1/1 on security module 1 link state: down. Please check switch blade-facing port status. Resetting security module might be required.
+
+

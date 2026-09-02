@@ -25,7 +25,6 @@ class Switchto(BaseService):
     def __init__(self, connection, context, **kwargs):
         # Connection object will have all the received details
         super().__init__(connection, context, **kwargs)
-        self.service_name = 'switchto'
         self.timeout = connection.settings.EXEC_TIMEOUT
         self.context = context
 
@@ -62,9 +61,9 @@ class Switchto(BaseService):
             raise Exception('Invalid switchto target type: %s' % repr(target))
 
         for target_state in target_list:
-            m1 = re.match('module\s+(\d+)\s+console', target_state)
-            m2 = re.match('cimc\s+(\S+)', target_state)
-            m3 = re.match('chassis scope (.*)', target_state)
+            m1 = re.match(r'module\s+(\d+)\s+console', target_state)
+            m2 = re.match(r'cimc\s+(\S+)', target_state)
+            m3 = re.match(r'chassis scope (.*)', target_state)
             if m1:
                 mod = m1.group(1)
                 self.context._module = mod

@@ -2,6 +2,7 @@ cat9k_ha_reload_proceed:
   prompt: "Proceed with reload? [confirm]"
   commands:
     "":
+      new_state: cat9k_ha_active_console
 
 cat9k_ha_active_console: &BL
   preface: file|mock_data/iosxe/cat9k_reload_logs.txt
@@ -17,3 +18,192 @@ cat9k_ha_standby_console:
       new_state: asr_exec
 
 
+# Rommon boot
+
+cat9k_enable_reload_to_rommon:
+  prompt: "switch1#"
+  commands:
+    "show version | include operating mode": ""
+    "show boot": |
+      ---------------------------
+      Switch 1
+      ---------------------------
+      Current Boot Variables:
+      BOOT variable = flash:cat9k_iosxe.2019-06-21_17.21_sdcunha.SSA.bin;
+
+      Boot Variables on next reload:
+      BOOT variable = flash:cat9k_iosxe.2019-06-21_17.21_sdcunha.SSA.bin;
+      Manual Boot = no
+      Enable Break = yes
+      Boot Mode = DEVICE
+      iPXE Timeout = 0
+    "reload":
+      new_state: cat9k_boot_to_rommon
+
+
+
+cat9k_enable_reload_to_rommon_break:
+  prompt: "switch1#"
+  commands:
+    "show version | include operating mode": ""
+    "show boot": |
+      ---------------------------
+      Switch 1
+      ---------------------------
+      Current Boot Variables:
+      BOOT variable = flash:cat9k_iosxe.2019-06-21_17.21_sdcunha.SSA.bin;
+
+      Boot Variables on next reload:
+      BOOT variable = flash:cat9k_iosxe.2019-06-21_17.21_sdcunha.SSA.bin;
+      Manual Boot = no
+      Enable Break = no
+      Boot Mode = DEVICE
+      iPXE Timeout = 0
+    "config term":
+      new_state: cat9k_enable_reload_to_rommon_break_config
+    "reload":
+      new_state: cat9k_boot_to_rommon
+
+
+cat9k_enable_reload_to_rommon_break2:
+  prompt: "switch1#"
+  commands:
+    "show version | include operating mode": ""
+    "show boot": |
+      ---------------------------
+      Switch 1
+      ---------------------------
+      Current Boot Variables:
+      BOOT variable = flash:cat9k_iosxe.2019-06-21_17.21_sdcunha.SSA.bin;
+
+      Boot Variables on next reload:
+      BOOT variable = flash:cat9k_iosxe.2019-06-21_17.21_sdcunha.SSA.bin;
+      Manual Boot = no
+      ENABLE_BREAK variable does not exist
+      Boot Mode = DEVICE
+      iPXE Timeout = 0
+    "config term":
+      new_state: cat9k_enable_reload_to_rommon_break_config
+    "reload":
+      new_state: cat9k_boot_to_rommon
+
+
+cat9k_enable_reload_to_rommon_break3:
+  prompt: "switch1#"
+  commands:
+    "show version | include operating mode": ""
+    "show boot": |
+      ---------------------------
+      Switch 1
+      ---------------------------
+      Current Boot Variables:
+      BOOT variable does not exist
+
+      Boot Variables on next reload:
+      BOOT variable does not exist
+      Manual Boot = yes
+      Enable Break = 1
+      Boot Mode = DEVICE
+      iPXE Timeout = 0
+    "config term":
+      new_state: cat9k_enable_reload_to_rommon_break_config
+    "reload":
+      new_state: cat9k_boot_to_rommon
+
+
+cat9k_enable_reload_to_rommon_break4:
+  prompt: "switch1#"
+  commands:
+    "show version | include operating mode": ""
+    "show boot": |
+      ---------------------------
+      Switch 1
+      ---------------------------
+      Current Boot Variables:
+      BOOT variable does not exist
+
+      Boot Variables on next reload:
+      BOOT variable does not exist
+      Manual Boot = yes
+      Enable Break = 0
+      Boot Mode = DEVICE
+      iPXE Timeout = 0
+    "config term":
+      new_state: cat9k_enable_reload_to_rommon_break_config
+    "reload":
+      new_state: cat9k_boot_to_rommon
+
+cat9k_enable_reload_to_rommon_break_config:
+  prompt: "%N(config)#"
+  commands:
+    "boot enable-break": ""
+    "end":
+      new_state: cat9k_enable_reload_to_rommon_break
+
+cat9k_boot_to_rommon:
+  prompt: ""
+  preface: file|mock_data/iosxe/c9k_boot_rommon.txt
+  keys:
+    ctrl-c:
+      new_state: cat9k_rommon
+
+cat9k_rommon:
+    prompt: "switch:"
+    commands:
+      "set": |
+        BOOT=bootflash:/cat9k_iosxe.17.06.01.SPA.bin;
+        BOOT_LOADER_UPGRADE_DISABLE=1
+        MANUAL_BOOT=yes
+      "MANUAL_BOOT=yes": ""
+      "unset TFTP_FILE": ""
+      "unset BOOT": ""
+      "TFTP_BLKSIZE=8192": ""
+      "unset BOOT_DEVICE_MODE": ""
+      "unlock flash:": ""
+      "ping 1.1.1.1": |
+        16 bytes from 1.1.1.1: ICMPv4 seq#0 RTT=656 ms
+      "boot":
+        new_state: cat9k_rommon_boot
+      "boot tftp://1.1.1.1/latest.bin":
+        new_state: cat9k_rommon_boot
+
+cat9k_rommon_boot:
+  preface:
+    response: file|mock_data/iosxe/cat9k_reload_logs.txt
+    timing:
+      - 0:,0,0.005
+  prompt: ""
+  commands:
+    "":
+      new_state: c9k_disable
+
+c9800_rommon_boot:
+  prompt: "WLC#"
+  commands:
+    "show version | include operating mode":
+      response: "Router operating mode: Autonomous"
+    "config term":
+      new_state: config_mode 
+    "reload":
+      response: |
+        System configuration has been modified. Save? [yes/no]: n
+        Reload command is being issued on Active unit, this will reload the whole stack
+        Proceed with reload? [confirm]
+        Chassis 1 reloading, reason - Reload command
+        Oct  6 17:33:34.243: %PMAN-5-EXITACTION: F0/0: pvp: Process manager is exiting:
+        Oct  6 17:33:35.179: %PMAN-5-EXITACTION: R0/0: pvp: Process manager is exiting: process exit with reload chassis code
+      new_state: rommon_prompt
+
+config_mode:
+  prompt: "WLC(config)#"
+  commands:
+    "config-register 0x0":
+      response: ""
+    "end":
+      new_state: c9800_rommon_boot
+
+rommon_prompt:
+  prompt: "grub>"
+  commands:
+    "":
+      response: ""

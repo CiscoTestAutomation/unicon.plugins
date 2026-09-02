@@ -1,0 +1,92 @@
+
+# ---    moonshine  -----
+
+moonshine_enable:
+  prompt: "RP/0/0/CPU0:%N#"
+  commands: &enable_cmds
+    "end":
+      new_state: enable
+    "exit":
+      new_state: enable
+    "show version": file|mock_data/iosxr/show_version.txt
+    "configure terminal":
+      new_state: moonshine_config
+    "configure exclusive":
+      new_state: config_exclusive
+    "redundancy switchover":
+      new_state: confirm_switchover
+    "run":
+      new_state: bash_console
+
+    "term len 0": ""
+    "term length 0": ""
+    "term width 0": ""
+    "terminal length 0": ""
+    "terminal width 0": ""
+    "show redundancy | inc ^Node": |
+      Node 0/0/CPU0 is in ACTIVE role
+
+
+moonshine_enable_standby:
+  prompt: "RP/0/0/CPU0:%N#"
+  commands:
+    <<: *enable_cmds
+    "show redundancy | inc ^Node": |
+      Node 0/1/CPU0 is in STANDBY role
+
+
+moonshine_config:
+  prompt: "RP/0/0/CPU0:%N(config)#"
+  commands:
+    "hostname R1": ""
+    "logging console disable": ""
+    "line con 0":
+      new_state:
+        config_line
+    "line default":
+      new_state: config_line
+    "hostname Router": ""
+    "no logging console": ""
+    "line console":
+      new_state:
+        line_console
+    "end":
+      new_state: moonshine_enable
+    "test failed":
+      new_state:
+        moonshine_failed_config
+    "commit": ""
+
+moonshine_failed_config:
+  prompt: "RP/0/0/CPU0:%N(config)#"
+  commands:
+    "end":
+      new_state: moonshine_failed_config_uncommitted
+
+moonshine_failed_config_uncommitted:
+  prompt: "Uncommitted changes found, commit them before exiting(yes/no/cancel)? [cancel]:"
+  commands:
+    "yes":
+      response: "% Failed to commit one or more configuration items during a pseudo-atomic operation. All changes made have been reverted. Please issue 'show configuration failed [inheritance]' from this session to view the errors"
+      new_state: moonshine_failed_config_show
+
+moonshine_failed_config_show:
+  prompt: "RP/0/0/CPU0:%N(config)#"
+  commands:
+    "show configuration failed": |2
+      Fri Aug  3 15:34:40.336 UTC
+      !! SEMANTIC ERRORS: This configuration was rejected by
+      !! the system due to semantic errors. The individual
+      !! errors with each failed configuration command can be
+      !! found below.
+
+
+      test failed
+      !!% Invalid config
+       !
+      !
+      end
+
+    "abort":
+      new_state: moonshine_enable
+

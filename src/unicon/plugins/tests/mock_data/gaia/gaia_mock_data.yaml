@@ -1,0 +1,57 @@
+# Gaia device that is configured to login to clish mode
+
+login:
+  prompt: "login: "
+  commands: 
+    "gaia-user":
+      new_state: password
+
+password:
+  prompt: "Password: "
+  commands:
+    "gaia-password":
+      new_state: clish
+
+clish:
+  prompt: "gaia-gw> "
+  commands: 
+      "set clienv rows 0": ""
+      "show version all" : 
+        response: |
+          Product version Check Point Gaia R80.40
+          OS build 294
+          OS kernel version 3.10.0-957.21.3cpx86_64
+          OS edition 64-bit
+      "ping -A -c5 192.168.1.1" :
+        response: |
+          ping -A -c5 192.168.1.1
+          PING 192.168.1.1 (192.168.1.1) 56(84) bytes of data.
+          64 bytes from 192.168.1.1: icmp_seq=1 ttl=63 time=16.0 ms
+          64 bytes from 192.168.1.1: icmp_seq=2 ttl=63 time=9.93 ms
+          64 bytes from 192.168.1.1: icmp_seq=3 ttl=63 time=7.57 ms
+          64 bytes from 192.168.1.1: icmp_seq=4 ttl=63 time=13.2 ms
+          64 bytes from 192.168.1.1: icmp_seq=5 ttl=63 time=13.3 ms
+
+          --- 192.168.1.1 ping statistics ---
+          5 packets transmitted, 5 received, 0% packet loss, time 76ms
+          rtt min/avg/max/mdev = 7.576/12.017/16.022/2.944 ms, ipg/ewma 19.241/14.061 ms
+      "traceroute 192.168.1.1":
+        response: |
+          traceroute 192.168.1.1
+          traceroute to 192.168.1.1 (192.168.1.1), 30 hops max, 40 byte packets
+          1  10.1.1.1 (10.1.1.1)  13.508 ms  21.951 ms  130.937 ms
+          2  192.168.1.1 (192.168.1.1)  58.791 ms  57.351 ms  64.980 ms
+      "expert":
+        new_state: expert_password
+
+expert_password:
+  prompt: "Enter expert password:"
+  commands: 
+    "gaia-expert-pass":
+      new_state: expert
+
+expert:
+  prompt: "[Expert@%N:0]# "
+  commands:
+    "exit":
+      new_state: clish

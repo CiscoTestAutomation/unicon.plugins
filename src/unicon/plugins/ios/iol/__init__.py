@@ -13,5 +13,5 @@ class IosIolHAServiceList(HAServiceList):
 
 class IosIolDualRPConnection(GenericDualRPConnection):
     os = 'ios'
-    series = 'iol'
+    platform = 'iol'
     subcommand_list = IosIolHAServiceList

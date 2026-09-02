@@ -1,0 +1,12 @@
+Dec 22 15:14:08.814: %PMAN-5-EXITACTION: R0/0: pvp: Process manager is exiting: process exit with reload chassis code
+
+
+*Dec 22 15:14:11.655: %IOSXEBOOT-4-FACTORY_RESET: (rp/0): This was not selected via cli. Rebooting like normal
+[H[J[1;1H[?25l[m[H[J[1;1H[2;30HGNU GRUB  version 2.02
+
+
+[m[4;2H+----------------------------------------------------------------------------+[5;2H|[5;79H|[6;2H|[6;79H|[7;2H|[7;79H|[8;2H|[8;79H|[9;2H|[9;79H|[10;2H|[10;79H|[11;2H|[11;79H|[12;2H|[12;79H|[13;2H|[13;79H|[14;2H|[14;79H|[15;2H|[15;79H|[16;2H|[16;79H|[17;2H+----------------------------------------------------------------------------+[m[18;2H[19;2H[m     Use the UP and DOWN arrow keys to select which entry is
+
+        highlighted.
+
+        Press <Enter> to boot the selected OS or `c' for a command-line.    [5;80H [7m[5;3H*C8000V - /vmlinux_0                                                        [m[5;78H[m[m[6;3H C8000V - packages.conf                                                     [m[6;78H[m[m[7;3H C8000V - GOLDEN IMAGE                                                      [m[7;78H[m[m[8;3H                                                                            [m[8;78H[m[m[9;3H                                                                            [m[9;78H[m[m[10;3H                                                                            [m[10;78H[m[m[11;3H                                                                            [m[11;78H[m[m[12;3H                                                                            [m[12;78H[m[m[13;3H                                                                            [m[13;78H[m[m[14;3H                                                                            [m[14;78H[m[m[15;3H                                                                            [m[15;78H[m[m[16;3H                                                                            [m[16;78H[m[16;80H [5;78H[22;1H   The highlighted entry will be executed automatically in 5s.

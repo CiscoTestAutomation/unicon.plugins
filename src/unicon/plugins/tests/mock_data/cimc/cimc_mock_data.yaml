@@ -14,6 +14,8 @@ cimc_exec:
       new_state: scope_chassis
     "scope vmedia":
       new_state: scope_vmedia
+    "show foo":
+      response: This is some output
 
 scope_chassis:
   prompt: "Compute-Node-1 /chassis # "

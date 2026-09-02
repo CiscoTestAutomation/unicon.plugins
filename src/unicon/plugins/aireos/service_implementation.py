@@ -5,7 +5,9 @@ from unicon.bases.routers.services import BaseService
 from unicon.core.errors import SubCommandFailure
 from unicon.eal.dialogs import Dialog
 
-from unicon.plugins.generic.service_implementation import Execute as GenericExecute, Configure as GenericConfigure
+from unicon.plugins.generic.service_implementation import Execute as GenericExecute, \
+    Configure as GenericConfigure, \
+    HaExecService as GenericHaExecute
 from unicon.plugins.generic.utils import GenericUtils
 
 from .patterns import (AireosPatterns, AireosReloadPatterns, AireosPingPatterns, AireosCopyPatterns)
@@ -25,6 +27,13 @@ class AireosExecute(GenericExecute):
         self.dialog += Dialog(execute_statements)
 
 
+class AireosHaExecute(GenericHaExecute):
+
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.dialog += Dialog(execute_statements)
+
+
 class AireosConfigure(GenericConfigure):
 
     def __init__(self, connection, context, **kwargs):
@@ -38,11 +47,9 @@ class AireosReload(BaseService):
         self.connection = connection
         self.context = context
         self.timeout_pattern = ['Timeout occurred', ]
-        self.error_pattern = [r'Invalid', r'Incorrect', r'HELP']
         self.start_state = 'enable'
         self.end_state = 'enable'
         self.result = None
-        self.service_name = 'reload'
         self.timeout = self.connection.settings.RELOAD_TIMEOUT
         self.dialog_reload = Dialog(reload_statements)
         # add the keyword arguments to the object
@@ -52,11 +59,18 @@ class AireosReload(BaseService):
                      reload_command='reset system forced',
                      dialog=Dialog([]),
                      timeout=None,
+                     error_pattern=None,
                      **kwargs):
         con = self.connection
         timeout = timeout or self.timeout
         con.log.debug('+++ reloading  %s  with reload_command %s and timeout is %s +++'
                       % (self.connection.hostname, reload_command, timeout))
+
+        if error_pattern is None:
+            self.error_pattern = con.settings.ERROR_PATTERN
+        else:
+            self.error_pattern = error_pattern
+
 
         dialog += self.dialog_reload
         try:
@@ -64,6 +78,10 @@ class AireosReload(BaseService):
             self.result = dialog.process(con.spawn,
                                          timeout=timeout,
                                          prompt_recovery=self.prompt_recovery)
+            if self.result:
+                self.result = self.result.match_output
+                self.result = self.get_service_result()
+
             con.state_machine.go_to('any',
                                     con.spawn,
                                     context=self.context,
@@ -85,7 +103,6 @@ class AireosPing(BaseService):
         self.start_state = 'enable'
         self.end_state = 'enable'
         self.result = None
-        self.service_name = 'ping'
         self.timeout = 60
 
         # add the keyword arguments to the object
@@ -132,8 +149,8 @@ class AireosCopy(BaseService):
         self.error_pattern = []
         self.start_state = 'enable'
         self.end_state = 'enable'
+        self.timeout = 300
         self.result = None
-        self.service_name = 'copy'
         self.dialog = Dialog([
             [pr.are_you_sure,
                 lambda spawn: spawn.sendline('y'),
@@ -190,9 +207,9 @@ class AireosCopy(BaseService):
         param['source_file'] = os.path.basename(param['source_file'])
 
         # Sets the time it takes to download and trigger reboot
-        if param['mode'] is 'code':
+        if param['mode'] == 'code':
             timeout = 200
-        elif param['mode'] is 'simconfig':
+        elif param['mode'] == 'simconfig':
             timeout = 50
         else:
             raise SubCommandFailure('Copy mode must be \'code\' or \'simconfig\'')

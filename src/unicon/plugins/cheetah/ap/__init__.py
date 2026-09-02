@@ -1,27 +1,27 @@
 __author__ = "Giacomo Trifilo <gtrifilo@cisco.com>"
 
-
 from unicon.bases.routers.connection import BaseSingleRpConnection
-from unicon.plugins.generic.statemachine import GenericSingleRpStateMachine
 from unicon.plugins.generic import ServiceList
 from unicon.plugins.generic import GenericSingleRpConnectionProvider
 from unicon.plugins.cheetah.ap.settings import ApSettings
 from unicon.plugins.cheetah.ap import service_implementation as svc
 from unicon.plugins.generic import service_implementation as gsvc
+from unicon.plugins.iosxe import service_implementation as iosxe_svc
 
+from .statemachine import ApSingleRpStateMachine
 
 class ApServiceList(ServiceList):
     def __init__(self):
+        super().__init__()
         self.execute = svc.Execute
         self.send = gsvc.Send
         self.sendline = gsvc.Sendline
         self.expect = gsvc.Expect
         self.enable = gsvc.Enable
         self.disable = gsvc.Disable
-        self.reload = gsvc.Reload
-        self.expect_log = gsvc.ExpectLogging
+        self.reload = svc.Reload
         self.log_user = gsvc.LogUser
-
+        self.bash_console = iosxe_svc.BashService
 
 class ApSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
 
@@ -40,7 +40,6 @@ class ApSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
 
     def init_handle(self):
         con = self.connection
-        con._is_connected = True
         con.state_machine.go_to('enable',
                                 self.connection.spawn,
                                 context=self.connection.context,
@@ -50,9 +49,9 @@ class ApSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
 
 class ApSingleRpConnection(BaseSingleRpConnection):
     os = 'cheetah'
-    series = 'ap'
+    platform = 'ap'
     chassis_type = 'single_rp'
-    state_machine_class = GenericSingleRpStateMachine
+    state_machine_class = ApSingleRpStateMachine
     connection_provider_class = ApSingleRpConnectionProvider
     subcommand_list = ApServiceList
     settings = ApSettings()

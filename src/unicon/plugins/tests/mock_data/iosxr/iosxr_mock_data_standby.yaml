@@ -23,4 +23,249 @@ enable_standby:
     "":
       new_state: login
 
+login_switchover:
+  preface: file|mock_data/iosxr/login_banner.txt
+  prompt: "Username: "
+  commands:
+    "admin":
+      new_state: password_switchover
 
+password_switchover:
+  prompt: "Password: "
+  commands:
+    "admin":
+      response: "\n"
+      new_state: enable_switchover
+
+enable_switchover:
+  prompt: "RP/0/RP0/CPU0:%N#"
+  commands:
+    "term len 0": ""
+    "term length 0": ""
+    "term width 0": ""
+    "terminal length 0": ""
+    "terminal width 0": ""
+    "configure terminal":
+      new_state: config_switchover
+    "show redundancy":
+      response:
+        - |2
+          Thu Aug  2 01:40:01.802 PST
+          Redundancy information for node 0/RSP1/CPU0:
+          ==========================================
+          Node 0/RSP1/CPU0 is in ACTIVE role
+          Node 0/RSP1/CPU0 has no valid partner
+          Group            Primary         Backup          Status
+          ---------        ---------       ---------       ---------
+          v6-routing       0/RSP1/CPU0     N/A             Not Ready
+          mcast-routing    0/RSP1/CPU0     N/A             Not Ready
+          netmgmt          0/RSP1/CPU0     N/A             Not Ready
+          v4-routing       0/RSP1/CPU0     N/A             Not Ready
+          v4-routing       0/RSP1/CPU0     N/A             NSR-not-configured
+          central-services 0/RSP1/CPU0     N/A             Not Ready
+          central-services 0/RSP1/CPU0     N/A             NSR-not-configured
+          dsc              0/RSP1/CPU0     N/A             Not Ready
+          dlrsc            0/RSP1/CPU0     N/A             Not Ready
+          Process Group Details
+          ---------------------
+          Current primary rmf state:
+              NSR is not configured
+          Reload and boot info
+          ----------------------
+          A9K-RSP440-TR reloaded Fri Jul 27 08:02:55 2018: 5 days, 17 hours, 37 minutes ago
+          Active node booted Thu Aug  2 01:32:17 2018: 7 minutes ago
+          Last switch-over Thu Aug  2 01:39:48 2018:  13 seconds ago
+          Active node reload  Cause: Initiating switch-over.
+        - |2
+          Thu Aug  2 01:42:29.248 PST
+          Redundancy information for node 0/RSP1/CPU0:
+          ==========================================
+          Node 0/RSP1/CPU0 is in ACTIVE role
+          Node Redundancy Partner (0/RSP0/CPU0) is in STANDBY role
+          Standby node in 0/RSP0/CPU0 is ready
+          Standby node in 0/RSP0/CPU0 is NSR-not-configured
+          Node 0/RSP1/CPU0 is in process group PRIMARY role
+          Process Redundancy Partner (0/RSP0/CPU0) is in BACKUP role
+          Backup node in 0/RSP0/CPU0 is not ready
+          Backup node in 0/RSP0/CPU0 is not NSR-ready
+          Group            Primary         Backup          Status
+          ---------        ---------       ---------       ---------
+          v6-routing       0/RSP1/CPU0     0/RSP0/CPU0     Not Ready
+          mcast-routing    0/RSP1/CPU0     0/RSP0/CPU0     Not Ready
+          netmgmt          0/RSP1/CPU0     0/RSP0/CPU0     Not Ready
+          v4-routing       0/RSP1/CPU0     0/RSP0/CPU0     Not Ready
+          v4-routing       0/RSP1/CPU0     0/RSP0/CPU0     Not NSR-Ready
+          central-services 0/RSP1/CPU0     0/RSP0/CPU0     Not Ready
+          dsc              0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          dlrsc            0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          Process Group Details
+          ---------------------
+          Current primary rmf state: Not Ready
+            <jid>       <node>       <name>      <group> Reason for backup not ready
+              397  0/RSP1/CPU0      rmf_svr   v6-routing Waiting for Initial Data Transfer timer
+                  Not ready set Thu Aug  2 01:41:47 2018:  42 seconds ago
+              397  0/RSP1/CPU0      rmf_svr mcast-routing Waiting for Initial Data Transfer timer
+                  Not ready set Thu Aug  2 01:41:47 2018:  42 seconds ago
+              397  0/RSP1/CPU0      rmf_svr      netmgmt Waiting for Initial Data Transfer timer
+                  Not ready set Thu Aug  2 01:41:47 2018:  42 seconds ago
+              397  0/RSP1/CPU0      rmf_svr   v4-routing Waiting for Initial Data Transfer timer
+                  Not ready set Thu Aug  2 01:41:47 2018:  42 seconds ago
+              397  0/RSP1/CPU0      rmf_svr central-services Waiting for Initial Data Transfer timer
+                  Not ready set Thu Aug  2 01:41:47 2018:  42 seconds ago
+          Current primary rmf state for NSR: Not Ready
+            <jid>       <node>       <name>      <group> Reason for backup not NSR-ready
+             1063  0/RSP1/CPU0          bgp   v4-routing BGP NSR sessions not synchronized : inst_name=default, inst_id=0
+                  Not ready set Thu Aug  2 01:39:58 2018: 2 minutes ago
+          Reload and boot info
+          ----------------------
+          A9K-RSP440-TR reloaded Fri Jul 27 08:02:55 2018: 5 days, 17 hours, 39 minutes ago
+          Active node booted Thu Aug  2 01:32:17 2018: 10 minutes ago
+          Last switch-over Thu Aug  2 01:39:48 2018: 2 minutes ago
+          Standby node boot Thu Aug  2 01:40:26 2018: 2 minutes ago
+          Standby node last went not ready Thu Aug  2 01:41:12 2018: 1 minute ago
+          Standby node last went ready Thu Aug  2 01:42:12 2018:  17 seconds ago
+          There have been 21 switch-overs since reload
+          Active node reload  Cause: Initiating switch-over.
+          Standby node reload "Cause: Initiating switch-over."
+        - |2
+          Thu Aug  2 01:43:02.679 PST
+          Redundancy information for node 0/RSP1/CPU0:
+          ==========================================
+          Node 0/RSP1/CPU0 is in ACTIVE role
+          Node Redundancy Partner (0/RSP0/CPU0) is in STANDBY role
+          Standby node in 0/RSP0/CPU0 is ready
+          Standby node in 0/RSP0/CPU0 is NSR-not-configured
+          Node 0/RSP1/CPU0 is in process group PRIMARY role
+          Process Redundancy Partner (0/RSP0/CPU0) is in BACKUP role
+          Backup node in 0/RSP0/CPU0 is ready
+          Backup node in 0/RSP0/CPU0 is not NSR-ready
+          Group            Primary         Backup          Status
+          ---------        ---------       ---------       ---------
+          v6-routing       0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          mcast-routing    0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          netmgmt          0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          v4-routing       0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          v4-routing       0/RSP1/CPU0     0/RSP0/CPU0     Not NSR-Ready
+          central-services 0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          dsc              0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          dlrsc            0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          Process Group Details
+          ---------------------
+          Current primary rmf state: Ready
+          All backup not-ready bits clear - backup should be ready
+          Current primary rmf state for NSR: Not Ready
+            <jid>       <node>       <name>      <group> Reason for backup not NSR-ready
+             1063  0/RSP1/CPU0          bgp   v4-routing BGP NSR sessions not synchronized : inst_name=default, inst_id=0
+                  Not ready set Thu Aug  2 01:39:58 2018: 3 minutes ago
+          Reload and boot info
+          ----------------------
+          A9K-RSP440-TR reloaded Fri Jul 27 08:02:55 2018: 5 days, 17 hours, 40 minutes ago
+          Active node booted Thu Aug  2 01:32:17 2018: 10 minutes ago
+          Last switch-over Thu Aug  2 01:39:48 2018: 3 minutes ago
+          Standby node boot Thu Aug  2 01:40:26 2018: 2 minutes ago
+          Standby node last went not ready Thu Aug  2 01:41:12 2018: 1 minute ago
+          Standby node last went ready Thu Aug  2 01:42:12 2018:  50 seconds ago
+          There have been 21 switch-overs since reload
+          Active node reload  Cause: Initiating switch-over.
+          Standby node reload "Cause: Initiating switch-over."
+        - |2
+          Thu Aug  2 01:44:19.763 PST
+          Redundancy information for node 0/RSP1/CPU0:
+          ==========================================
+          Node 0/RSP1/CPU0 is in ACTIVE role
+          Node Redundancy Partner (0/RSP0/CPU0) is in STANDBY role
+          Standby node in 0/RSP0/CPU0 is ready
+          Standby node in 0/RSP0/CPU0 is NSR-not-configured
+          Node 0/RSP1/CPU0 is in process group PRIMARY role
+          Process Redundancy Partner (0/RSP0/CPU0) is in BACKUP role
+          Backup node in 0/RSP0/CPU0 is ready
+          Backup node in 0/RSP0/CPU0 is NSR-ready
+          Group            Primary         Backup          Status
+          ---------        ---------       ---------       ---------
+          v6-routing       0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          mcast-routing    0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          netmgmt          0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          v4-routing       0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          central-services 0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          dsc              0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          dlrsc            0/RSP1/CPU0     0/RSP0/CPU0     Ready
+          Reload and boot info
+          ----------------------
+          A9K-RSP440-TR reloaded Fri Jul 27 08:02:55 2018: 5 days, 17 hours, 41 minutes ago
+          Active node booted Thu Aug  2 01:32:17 2018: 12 minutes ago
+          Last switch-over Thu Aug  2 01:39:48 2018: 4 minutes ago
+          Standby node boot Thu Aug  2 01:40:26 2018: 3 minutes ago
+          Standby node last went not ready Thu Aug  2 01:41:12 2018: 3 minutes ago
+          Standby node last went ready Thu Aug  2 01:42:12 2018: 2 minutes ago
+          There have been 21 switch-overs since reload
+          Active node reload  Cause: Initiating switch-over.
+          Standby node reload "Cause: Initiating switch-over."
+    "redundancy switchover": |
+
+      Fri Oct 25 03:38:11.163 UTC
+      Switchover disallowed: Standby node is not NSR ready.
+
+config_switchover:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "hostname R2":
+      new_state: config_r2
+    "end":
+      new_state: enable_switchover
+    "exit":
+      new_state: enable_switchover
+    "no logging console": ""
+    "logging console disable": ""
+    "!end indicator for bulk configure": ""
+    "line con 0":
+      new_state:
+        config_line
+    "line default":
+      new_state: config_line
+    "hostname Router": ""
+    "large config":
+      new_state: large_config
+    "line console":
+      new_state:
+        line_console_switchover
+    "line console 0":
+      new_state:
+        line_console_switchover
+    "line vty 0 4":
+      new_state:
+        line_console_switchover
+    "commit":
+      new_state: commit_prompt
+    "commit force": ""
+    "commit replace":
+      new_state: commit_replace
+    "commit best-effort":
+      new_state: commit_best_effort
+    "test failed":
+      new_state:
+        failed_config
+    "test failed2":
+      new_state:
+        failed_config2
+    "redundancy":
+      new_state: config_redundancy
+
+line_console_switchover:
+  prompt: "RP/0/RP0/CPU0:%N(config-line)#"
+  commands:
+    "exec-timeout 0": ""
+    "line vty 0 4": ""
+    "exec-timeout 0 0": ""
+    "absolute-timeout 0": ""
+    "session-timeout 0": ""
+    "line default": ""
+    "commit":
+      new_state: commit_prompt_switchover
+    "end":
+      new_state: enable_switchover
+
+commit_prompt_switchover:
+  prompt: "Uncommitted changes found, commit them before exiting(yes/no/cancel)? [cancel]:"
+  commands:
+    "yes":
+      new_state: config_switchover

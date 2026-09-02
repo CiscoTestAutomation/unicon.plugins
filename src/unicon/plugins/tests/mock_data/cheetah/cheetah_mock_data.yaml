@@ -1,0 +1,81 @@
+
+ap_enable:
+  prompt: "%N#"
+  commands:
+    "exec-timeout 0": ""
+    "terminal length 0": ""
+    "terminal width 0": ""
+    "logging console disable": ""
+    "show version": |
+      cisco C9130AXE-B ARMv8 Processor rev 4 (v8l) with 1819328/990204K bytes of memory.
+      Processor board ID FJC2428144F
+      AP Running Image     : 17.13.0.44
+      Primary Boot Image   : 17.13.0.44
+      Backup Boot Image    : 17.13.0.44
+      Primary Boot Image Hash: 4c6c4f0e2ea7ae9a409cf8e2d9da35c2db44aba81b25925edc4bdbc94cc450147f8277d9c32433b006303bdf79b0aba74deb98a513f978ed49d55ccea6ad3789
+      Backup  Boot Image Hash: 7034edbb7ffd3a497c5430563a6f34750b3d61ce1be88293fb83c9b4b35acf0cb2f033a176c11c7fbe24783e1920e6d0c727348adf43aecbbaab2baa4dd60550
+      1 Multigigabit Ethernet interfaces
+      3 802.11 Radios
+      Radio FW version : QC_IMAGE_VERSION_STRING=WLAN.HK.2.7-04674-QCAHKSWPL_SILICONZ-1
+      NSS FW version : NSS.FW.12.0-custom-HK.E_custC
+
+      Base ethernet MAC Address            : 2C:57:41:52:37:6C
+      Part Number                          : 0-0000-00
+      PCA Assembly Number                  : 800-106171-01
+      PCA Revision Number                  : A0
+      PCB Serial Number                    : KWC24190FTE
+      Top Assembly Part Number             : 800-106171-01
+      Top Assembly Serial Number           : FJC2428144F
+      Top Revision Number                  : A0
+      Product/Model Number                 : C9130AXE-B
+
+    "devshell":
+      new_state: ap_devshell
+
+    "reload":
+      new_state: ap_reload
+
+    "show command with more":
+      new_state: show_command_with_more_first
+
+
+show_command_with_more_first:
+  preface: "first"
+  prompt: " --More-- "
+  commands:
+    "":
+      new_state: show_command_with_more_second
+
+
+show_command_with_more_second:
+  preface: "second"
+  prompt: " -- More -- "
+  commands:
+    "":
+      response: "third"
+      new_state: ap_enable
+
+
+ap_devshell:
+  prompt: "AP2C57:/#"
+  commands:
+    "stty cols 200": ""
+    "stty rows 200": ""
+    "pwd": "/tmp"
+    "exit":
+      new_state: ap_enable
+
+ap_reload:
+  prompt: "Proceed with reload command (cold)? [confirm]"
+  commands:
+    "":
+      response: file|mock_data/cheetah/cheetah_reload.txt
+      timing:
+        - 0:,5,0.005
+      new_state: ap_reload_console_password
+
+ap_reload_console_password:
+  prompt: "Password:"
+  commands:
+    "lab":
+      new_state: ap_enable

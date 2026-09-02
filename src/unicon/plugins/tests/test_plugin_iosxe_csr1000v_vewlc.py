@@ -18,7 +18,7 @@ class IosXECsr1000vVewlcCopy(unittest.TestCase):
         cls.d = Connection(hostname='Router',
                            start=['mock_device_cli --os iosxe --state ewlc_enable'],
                            os='iosxe',
-                           series='csr1000v',
+                           platform='csr1000v',
                            model='vewlc',
                            username='cisco',
                            tacacs_password='cisco')

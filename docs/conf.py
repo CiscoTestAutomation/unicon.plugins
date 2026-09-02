@@ -36,18 +36,21 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
-    'sphinxcontrib.mockautodoc',
+    # 'sphinxcontrib.mockautodoc',
 ]
 
 if os.environ.get('DEVNET', None) == 'true':
     intersphinx_mapping = {
         'python': ('http://docs.python.org/3.6', None ),
         'pyats':  ('https://pubhub.devnetcloud.com/media/pyats/docs', None ),
+        'unicon':  ('https://pubhub.devnetcloud.com/media/unicon/docs', None ),
     }
 else:
     intersphinx_mapping = {
         'python': ('http://docs.python.org/3.6', None ),
         'pyats':  ('http://wwwin-pyats.cisco.com/documentation/latest', None ),
+        'unicon':  ('http://wwwin-pyats.cisco.com/cisco-shared/unicon/latest',
+             None ),
     }
 
 
@@ -66,7 +69,7 @@ master_doc = 'index'
 # General information about the project.
 project = 'Unicon Plugins'
 
-copyright = '2014-2019, Cisco Systems Inc.'
+copyright = '2014-2020, Cisco Systems Inc.'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -91,7 +94,13 @@ release = ''
 # directories to ignore when looking for source files.
 # README.rst and DESCRIPTION.rst are placed in some packages, but are not
 # built into the cisco-shared Sphinx documentation.
-exclude_patterns = ['_build', 'tests']
+exclude_patterns = [
+    '_build', 'tests',
+    'changelog/undistributed.rst', 'changelog/undistributed/*',
+    'changelog_plugins/undistributed.rst', 'changelog_plugins/undistributed/*',
+    'changelog_plugins/changelog_*.rst',
+]
+suppress_warnings = ['docutils', 'ref.ref', 'toc.not_included', 'misc.highlighting_failure']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -148,7 +157,7 @@ html_short_title = 'Unicon Docs'
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-html_favicon = 'favicon.ico'
+html_favicon = 'favicon.ico' if os.path.exists('favicon.ico') else None
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

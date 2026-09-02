@@ -1,0 +1,816 @@
+Located '.boot_string' @ cluster 235321.
+
+
+Located 'installables/switch/fxos-k8-fp2k-lfbff.82.10.1.347i.SSB' @ cluster 5200.
+
+####################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################
+
+    !!! WARNING:  The image is signed with a development key which is currently allowed !!!
+LFBFF signature verified.
++-------------------------------------------------------------------+
++------------------------- SUCCESS ---------------------------------+
++-------------------------------------------------------------------+
+|                                                                   |
+|              LFBFF controller type check passed !!!               |
+|                                                                   |
++-------------------------------------------------------------------+
+
+Linux version: 4.18.45-yocto-standard (oe-user@oe-host) #1 SMP Mon Oct 12 05:13:19 UTC 2020
+kernel_image = 0x8db02db8, kernel_size=0x63a2a0
+Image validated
+INIT: version 2.88 booting
+Starting udev
+Hardware tweak APPLIED: Disable SATA Throttle.1
+Hardware tweak APPLIED: Disable SATA Throttle.2
+Configuring network interfaces... done.
+Starting random number generator daemonUnable to open file: /dev/tpm0
+.
+Starting Power Off Shutdown Handler (poshd)
+poshd: using FPGA version  and PSEQ version 
+Device configuration status = TAM_SUCCESS
+TAm Services started successfully
+Primary SSD discovered
+fsck from util-linux 2.32.1
+[/sbin/fsck.ext3 (1) -- /dev/sda1] fsck.ext3 -a /dev/sda1 
+/dev/sda1: clean, 120/61056 files, 15260/244224 blocks
+fsck(/dev/sda1) returned 0
+fsck from util-linux 2.32.1
+[/sbin/fsck.ext3 (1) -- /dev/sda2] fsck.ext3 -a /dev/sda2 
+/dev/sda2: clean, 128/61056 files, 14005/243968 blocks
+fsck(/dev/sda2) returned 0
+fsck from util-linux 2.32.1
+[/sbin/fsck.ext3 (1) -- /dev/sda3] fsck.ext3 -a /dev/sda3 
+/dev/sda3: clean, 50/732960 files, 152289/2929664 blocks
+fsck(/dev/sda3) returned 0
+fsck from util-linux 2.32.1
+[/sbin/fsck.vfat (1) -- /dev/sdb1] fsck.vfat -a /dev/sdb1 
+fsck.fat 4.1 (2017-01-24)
+/dev/sdb1: 32 files, 235324/1798467 clusters
+fsck(/dev/sdb1) returned 0
+
+
+======================================
+Press ESC to enter backup and restore.
+Press SPACE to continue boot.
+Boot in 0 seconds ...  
+useradd: warning: the home directory already exists.
+Not copying any file from skel directory into it.
+useradd: warning: the home directory already exists.
+Not copying any file from skel directory into it.
+useradd: warning: the home directory already exists.
+Not copying any file from skel directory into it.
+useradd: warning: the home directory already exists.
+Not copying any file from skel directory into it.
+useradd: warning: the home directory already exists.
+Not copying any file from skel directory into it.
+useradd: warning: the home directory already exists.
+Not copying any file from skel directory into it.
+FIPS POST Test Script
+NOTICE: The FIPS POST is not run because the FIPS feature is not enabled
+INIT: Entering runlevel: 3rst bo
+Starting system message bus: dbus.
+Starting OpenBSD Secure Shell server: sshd
+done.
+Starting rpcbind daemon...done.
+starting statd: done
+Starting Advanced Configuration and Power Interface daemon: acpid.
+acpid: starting up with netlink and the input layer
+acpid: 1 rule loaded
+acpid: waiting for events: event logging is off
+Starting DHCP server: .
+starting 8 nfsd kernel threads: done
+starting mountd: done
+Starting ntpd: done
+Starting internet superserver: xinetd.
+Starting Octeon NPU ... 
+Starting Octeon NPU ... success
+Starting fan control daemon: fancontrol... done.
+INFO: in validating image ...
+INFO: manager_validate_image: fxmgr_absfilename /mnt/boot/installables/switch/fxos-k9-fp2k-manager.82.10.1.347i.SSB
+INFO: Validating image /mnt/boot/installables/switch/fxos-k9-fp2k-manager.82.10.1.347i.SSB signature ...
+: File /mnt/boot/installables/switch/fxos-k9-fp2k-manager.82.10.1.347i.SSB size 1296
+Done!
+Computed Hash   SHA2: 64bd44ca9b5465307bade56ee146611b
+                      fc2a9d730f2e148bc2f1a7449d8b3bdc
+                      28496f111f350f8a8bb02e88f9cda08a
+                      01c4682174ccee60cf04dacbac285214
+                      
+Embedded Hash   SHA2: 64bd44ca9b5465307bade56ee146611b
+                      fc2a9d730f2e148bc2f1a7449d8b3bdc
+                      28496f111f350f8a8bb02e88f9cda08a
+                      01c4682174ccee60cf04dacbac285214
+                      
+The digital signature of the file: fxos-k9-fp2k-manager.82.10.1.347i.SSB verified successfully
+INFO: beginning of manager_install
+INFO: manager_install: fxmgr=/mnt/boot/installables/switch/fxos-k9-fp2k-manager.82.10.1.347i.SSB chmgr= update=false
+INFO: manager_install: fxmgr is dummy, skip_fxmgr_install=true
+error: destination /var/log/btmp-20210109 already exists, skipping rotation
+error: destination /var/log/wtmp-20210109 already exists, skipping rotation
+INFO: manager_install: skip_fxmgr_install=true - delete unnecessary files and skip
+INFO: deleting unnecessary xml file..!!
+INFO: deleted unnecessary xml file..!!
+INFO: manager_post_install ...
+INFO: manager_post_install: fxmgr=/mnt/boot/installables/switch/fxos-k9-fp2k-manager.82.10.1.347i.SSB chmgr= update=false
+INFO: manager_post_install: fxmgr is dummy
+INFO: manager_post_install: Linking libraries ...
+INFO: manager_post_install: Linking binaries ...
+INFO: Trying to add iptables and ip6tables rules ...
+INFO: Set up Application Diagnostic Interface ...
+INFO: Configure management0 interface ...
+INFO: Configure system files ...
+INFO: System Name is: KP-DE-A
+Starting sensors logging daemon: sensord... done.
+INFO: /mnt/boot/installables/switch/fxos-k8-fp2k-npu.82.10.1.347i.SSB
+INFO: Need to validate the image
+: File /mnt/boot/installables/switch/fxos-k8-fp2k-npu.82.10.1.347i.SSB size 72264656
+Done!
+Computed Hash   SHA2: 980b395119fac34e61953abce47ce137
+                      c50a3a8efea498038bc30678cdc4faff
+                      b92f9293f9967263d3af0ac7034ff546
+                      ff95c61c4d0e77e3913f6d4febcdab7a
+                      
+Embedded Hash   SHA2: 980b395119fac34e61953abce47ce137
+                      c50a3a8efea498038bc30678cdc4faff
+                      b92f9293f9967263d3af0ac7034ff546
+                      ff95c61c4d0e77e3913f6d4febcdab7a
+                      
+The digital signature of the file: fxos-k8-fp2k-npu.82.10.1.347i.SSB verified successfully
+INFO: Creating directory /tmp/npu
+INFO: all files are there ...
+INFO: console : ttyS0, speed : 9600
+INFO: manager_startup: setting up fxmgr apache ...
+INFO: manager_startup: Start manager httpd setup...
+INFO: manager_startup: using HTTPD_INFO persistent cache
+/bin/rm: cannot remove '/tmp/openssl.conf': No such file or directory
+ httpdRegister INFO: [httpd.2234 -s -4 192.168.0.161 -n localhost]
+ httpdRegister INFO: SKIP httpd syntax check
+ httpdRegister INFO: Starting httpd setup/registration...
+ httpdRegister INFO: Completed httpd setup/registration!
+ INFO: httpdRegister [httpd.2234 script exit]
+INFO: manager_startup: Completed manager httpd setup!
+Starting crond: OK
+FTD
+1:/opt/cisco/csp/cores
+/opt/cisco/csp/cores 31457280
+
+Threat Defense System: CMD=-bootup, CSP-ID=cisco-ftd.6.8.0.1751__ftd_001_JMX2209Y05Y6LOUKI1, FLAG=''
+System is booting up ...
+Cisco FTD booted up successfully.
+INFO:-MspCheck: Configuration Xml found is /opt/cisco/csp/applications/configs/cspCfg_cisco-ftd.6.8.0.1751__ftd_SCP Server[3232]: Waiting for a connection 
+
+INFO: System Disks /dev/sda is present. Status: Operable. /dev/sdb is present. Status: Inoperable.
+
+
+KP-DE-A login: 
+Waiting for Application infrastructure to be ready...
+Verifying the signature of the Application image...
+admin
+Password: Cisco FTD initializing ...
+Verify FSIC, File System Integrity Check
+Obtained uid 501 and gid 501 for external user
+verify_fsic(start)
+Do not run FSIC twice for SSP systems...
+Initializing Threat Defense ...
+
+51tCsco1.23                                                           [  OK  ]
+Starting system log daemon...                                         [  OK  ]
+Adding swapfile /ngfw/Volume/.swaptwo
+Flushing all current IPv4 rules and user defined chains: ...success
+Clearing all current IPv4 rules and user defined chains: ...success
+Applying iptables firewall rules: 
+Flushing chain `PREROUTING'
+Flushing chain `INPUT'
+Flushing chain `OUTPUT'
+Flushing chain `POSTROUTING'
+Flushing chain `PREROUTING'
+Flushing chain `OUTPUT'
+Flushing chain `PREROUTING'
+Flushing chain `INPUT'
+Flushing chain `FORWARD'
+Flushing chain `OUTPUT'
+Flushing chain `POSTROUTING'
+Flushing chain `INPUT'
+Flushing chain `FORWARD'
+Flushing chain `OUTPUT'
+Applying rules successed
+Flushing all current IPv6 rules and user defined chains: ...success
+Clearing all current IPv6 rules and user defined chains: ...success
+Applying ip6tables firewall rules: 
+Flushing chain `PREROUTING'
+Flushing chain `INPUT'
+Flushing chain `OUTPUT'
+Flushing chain `POSTROUTING'
+Flushing chain `PREROUTING'
+Flushing chain `OUTPUT'
+Flushing chain `PREROUTING'
+Flushing chain `INPUT'
+Flushing chain `FORWARD'
+Flushing chain `OUTPUT'
+Flushing chain `POSTROUTING'
+Flushing chain `INPUT'
+Flushing chain `FORWARD'
+Flushing chain `OUTPUT'
+Applying rules successed
+Starting nscd...                                                      [  OK  ]
+Starting , please wait......complete.
+cleaning up *.TMM and *.TMD files
+Sucessfully updated threat.conf
+cleanup /var/sf/mabain/metadatastore
+Configuring NTP...                                                    [  OK  ]
+Not reconfigurating
+Sat Jan 9 01:30:07 UTC 2021
+Starting MySQL...
+Pinging mysql
+Pinging mysql, try 1
+Found mysql is running
+Detecting expanded storage...
+Running initializeObjects...
+
+Login incorrect
+KP-DE-A login: admin
+Password: Stopping MySQL...
+Killing mysqld with pid 5325
+
+Last login: Sat Jan  9 01:22:43 UTC 2021 on ttyS0
+Successful login attempts for user 'admin' : 4
+Last failed login: Sat Jan  9 01:30:09 UTC 2021 on ttyS0
+There was 1 failed login attempt since the last successful login.
+System is coming up... Please wait...
+Sat Jan 9 01:30:14 UTC 2021
+Starting sfifd...                                                     [  OK  ]
+Removing Compiled Python Files on Sensor......done
+Checking status...
+Starting Cisco Firepower 2110 Threat Defense, please wait...No PM running!
+...started.
+Cisco FTD initialization finished successfully.
+System is coming up... Please wait...
+
+System is coming up... Please wait...
+System is coming up... Please wait...
+System is coming up... Please wait...
+Cisco Firepower Extensible Operating System (FX-OS) Software
+TAC support: http://www.cisco.com/tac
+Copyright (c) 2009-2019, Cisco Systems, Inc. All rights reserved.
+
+The copyrights to certain works contained in this software are
+owned by other third parties and used and distributed under
+license.
+
+Certain components of this software are licensed under the "GNU General Public
+License, version 3" provided with ABSOLUTELY NO WARRANTY under the terms of
+"GNU General Public License, Version 3", available here:
+http://www.gnu.org/licenses/gpl.html. See User Manual (''Licensing'') for
+details.
+
+Certain components of this software are licensed under the "GNU General Public
+License, version 2" provided with ABSOLUTELY NO WARRANTY under the terms of
+"GNU General Public License, version 2", available here:
+http://www.gnu.org/licenses/old-licenses/gpl-2.0.html. See User Manual
+(''Licensing'') for details.
+
+Certain components of this software are licensed under the "GNU LESSER GENERAL
+PUBLIC LICENSE, version 3" provided with ABSOLUTELY NO WARRANTY under the terms
+of "GNU LESSER GENERAL PUBLIC LICENSE" Version 3", available here:
+http://www.gnu.org/licenses/lgpl.html. See User Manual (''Licensing'') for
+details.
+
+Certain components of this software are licensed under the "GNU Lesser General
+Public License, version 2.1" provided with ABSOLUTELY NO WARRANTY under the
+terms of "GNU Lesser General Public License, version 2", available here:
+http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html. See User Manual
+(''Licensing'') for details.
+
+Certain components of this software are licensed under the "GNU Library General
+Public License, version 2" provided with ABSOLUTELY NO WARRANTY under the terms
+of "GNU Library General Public License, version 2", available here:
+http://www.gnu.org/licenses/old-licenses/lgpl-2.0.html. See User Manual
+(''Licensing'') for details.
+
+KP-DE-A# 
+KP-DE-A# connect ftd
+> reboot
+This command will reboot the system.  Continue?
+Please enter 'YES' or 'NO': yes
+
+INIT: Sending pSignal 15 (TERM) caught by ps (3.3.15).
+/bin/ps:../procps-ng-3.3.15/ps/display.c:66: please report this bug
+2021 Jan 09 01:30:55 PMLOG: PM IPC UTILITY: Shutting down all ports
+
+Threat Defense System: CMD=-stop, CSP-ID=cisco-ftd.6.8.0.1751__ftd_001_JMX2209Y05Y6LOUKI1, FLAG=''
+Cisco FTD stopping ...
+
+Stopping Cisco Firepower 2110 Threat Defense......ok
+Shutting down sfifd...                                                [  OK  ]
+Clearing static routes
+Unconfiguring default route                                           [  OK  ]
+Unconfiguring address on management0                                  [FAILED]
+Unconfiguring IPv6                                                    [  OK  ]
+Downing interface                                                     [  OK  ]
+Stopping nscd...                                                      [  OK  ]
+Turning off swapfile /ngfw/Volume/.swaptwo
+Stopping system log daemon...                                         [  OK  ]
+Stopping Threat Defense ...                                           [  OK  ]
+Cisco FTD stopped successfully.
+Stopping OpenBSD Secure Shell server: sshd
+stopped /usr/sbin/sshd (pid 1166)
+done.
+Stopping Octeon NPU ... 
+Stopping Octeon NPU ... unreachable
+Stopping Advanced Configuration and Power Interface daemon: stopped /usr/sbin/acpid (pid 1178)
+acpid.
+Stopping web server: apache2failed
+Stopping system message bus: dbus.
+Stopping DHCP server: dhcpd3no /usr/sbin/dhcpd found; none killed
+.
+stopping DNS forwarder and DHCP server: dnsmasq... no /usr/bin/dnsmasq found; none killed
+stopping mountd: done
+stopping nfsd: .acpid: exiting
+done
+Stopping ntpd: stopped process in pidfile '/var/run/ntp.pid' (pid 1215)
+done
+Stopping internet superserver: xinetd.
+stopping statd: done
+Stopping random number generator daemon.
+Stopping domain name service: named.
+Stopping rpcbind daemon...
+done.
+Stopping fan control daemon: fancontrol... no process in pidfile '/var/run/fancontrol.pid' found; none killed
+done.
+Stopping sensors logging daemon: sensord... stopped /usr/sbin/sensord (pid 2164)
+done.
+ * Stopping virtualization library daemon: libvirtd                      [fail]
+Deconfiguring network interfaces... done.
+Stopping FreeRADIUS daemon radiusd Failed
+Sat Jan  9 01:31:09 UTC 2021
+SSP-Security-Module is shutting down ...
+Sat Jan  9 01:31:09 UTC 2021 SHUTDOWN WARNING: Beginning System Shutdown request for CSP Apps
+Sat Jan  9 01:31:09 UTC 2021 SHUTDOWN WARNING: Continue System Shutdown request for CSP Apps
+Sat Jan  9 01:31:10 UTC 2021
+Sending ALL processes the TERM signal ...
+Note: SIGKILL_ALL will be triggered after after 1 + 2 secs ...
+Jan  9 01:31:09 KP-DE-A KP-NVRAM: Confreg value: confreg = 0x1
+Sat Jan  9 01:31:12 UTC 2021
+Sending ALL processes the KILL signal ...
+Sat Jan  9 01:31:13 UTC 2021
+Deactivating swap...
+Unmounting local filesystems...
+Rebooting... [  196.440620] reboot: Restarting system
+
+
+
+*******************************************************************************
+Cisco System ROMMON, Version 1.0.12, RELEASE SOFTWARE
+Copyright (c) 1994-2019  by Cisco Systems, Inc.
+Compiled Mon 06/17/2019 16:23:23.36 by builder
+*******************************************************************************
+
+Current image running: Boot ROM1
+Last reset cause: ResetRequest (0x00001000)
+DIMM_1/1 : Present
+DIMM_2/1 : Absent
+
+Platform FPR-2110 with 16384 MBytes of main memory
+BIOS has been successfully locked !!
+MAC Address: 00:fc:ba:7a:01:00
+
+Use BREAK or ESC to interrupt boot.
+Use SPACE to begin boot immediately.
+Boot interrupted.  
+
+
+rommon 1 > boot
+Located '.boot_string' @ cluster 235321.
+
+
+Located 'installables/switch/fxos-k8-fp2k-lfbff.82.10.1.347i.SSB' @ cluster 5200.
+
+####################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################
+
+    !!! WARNING:  The image is signed with a development key which is currently allowed !!!
+LFBFF signature verified.
++-------------------------------------------------------------------+
++------------------------- SUCCESS ---------------------------------+
++-------------------------------------------------------------------+
+|                                                                   |
+|              LFBFF controller type check passed !!!               |
+|                                                                   |
++-------------------------------------------------------------------+
+
+Linux version: 4.18.45-yocto-standard (oe-user@oe-host) #1 SMP Mon Oct 12 05:13:19 UTC 2020
+kernel_image = 0x8db02db8, kernel_size=0x63a2a0
+Image validated
+INIT: version 2.88 booting
+Starting udev
+Hardware tweak APPLIED: Disable SATA Throttle.1
+Hardware tweak APPLIED: Disable SATA Throttle.2
+Configuring network interfaces... done.
+Starting random number generator daemonUnable to open file: /dev/tpm0
+.
+Starting Power Off Shutdown Handler (poshd)
+poshd: using FPGA version  and PSEQ version 
+Device configuration status = TAM_SUCCESS
+TAm Services started successfully
+Primary SSD discovered
+fsck from util-linux 2.32.1
+[/sbin/fsck.ext3 (1) -- /dev/sda1] fsck.ext3 -a /dev/sda1 
+/dev/sda1: clean, 120/61056 files, 15357/244224 blocks
+fsck(/dev/sda1) returned 0
+fsck from util-linux 2.32.1
+[/sbin/fsck.ext3 (1) -- /dev/sda2] fsck.ext3 -a /dev/sda2 
+/dev/sda2: clean, 129/61056 files, 14055/243968 blocks
+fsck(/dev/sda2) returned 0
+fsck from util-linux 2.32.1
+[/sbin/fsck.ext3 (1) -- /dev/sda3] fsck.ext3 -a /dev/sda3 
+/dev/sda3: clean, 50/732960 files, 152289/2929664 blocks
+fsck(/dev/sda3) returned 0
+fsck from util-linux 2.32.1
+[/sbin/fsck.vfat (1) -- /dev/sdb1] fsck.vfat -a /dev/sdb1 
+fsck.fat 4.1 (2017-01-24)
+/dev/sdb1: 32 files, 235324/1798467 clusters
+fsck(/dev/sdb1) returned 0
+
+
+======================================
+Press ESC to enter backup and restore.
+Press SPACE to continue boot.
+Boot in 0 seconds ...  
+useradd: warning: the home directory already exists.
+Not copying any file from skel directory into it.
+useradd: warning: the home directory already exists.
+Not copying any file from skel directory into it.
+useradd: warning: the home directory already exists.
+Not copying any file from skel directory into it.
+useradd: warning: the home directory already exists.
+Not copying any file from skel directory into it.
+useradd: warning: the home directory already exists.
+Not copying any file from skel directory into it.
+useradd: warning: the home directory already exists.
+Not copying any file from skel directory into it.
+FIPS POST Test Script
+NOTICE: The FIPS POST is not run because the FIPS feature is not enabled
+INIT: Entering runlevel: 3rst bo
+Starting system message bus: dbus.
+Starting OpenBSD Secure Shell server: sshd
+done.
+Starting rpcbind daemon...done.
+starting statd: done
+Starting Advanced Configuration and Power Interface daemon: acpid.
+acpid: starting up with netlink and the input layer
+acpid: 1 rule loaded
+acpid: waiting for events: event logging is off
+Starting DHCP server: .
+starting 8 nfsd kernel threads: done
+starting mountd: done
+Starting ntpd: done
+Starting internet superserver: xinetd.
+Starting Octeon NPU ... 
+Starting Octeon NPU ... success
+Starting fan control daemon: fancontrol... done.
+INFO: in validating image ...
+INFO: manager_validate_image: fxmgr_absfilename /mnt/boot/installables/switch/fxos-k9-fp2k-manager.82.10.1.347i.SSB
+INFO: Validating image /mnt/boot/installables/switch/fxos-k9-fp2k-manager.82.10.1.347i.SSB signature ...
+: File /mnt/boot/installables/switch/fxos-k9-fp2k-manager.82.10.1.347i.SSB size 1296
+Done!
+Computed Hash   SHA2: 64bd44ca9b5465307bade56ee146611b
+                      fc2a9d730f2e148bc2f1a7449d8b3bdc
+                      28496f111f350f8a8bb02e88f9cda08a
+                      01c4682174ccee60cf04dacbac285214
+                      
+Embedded Hash   SHA2: 64bd44ca9b5465307bade56ee146611b
+                      fc2a9d730f2e148bc2f1a7449d8b3bdc
+                      28496f111f350f8a8bb02e88f9cda08a
+                      01c4682174ccee60cf04dacbac285214
+                      
+The digital signature of the file: fxos-k9-fp2k-manager.82.10.1.347i.SSB verified successfully
+INFO: beginning of manager_install
+INFO: manager_install: fxmgr=/mnt/boot/installables/switch/fxos-k9-fp2k-manager.82.10.1.347i.SSB chmgr= update=false
+INFO: manager_install: fxmgr is dummy, skip_fxmgr_install=true
+error: destination /var/log/btmp-20210109 already exists, skipping rotation
+error: destination /var/log/wtmp-20210109 already exists, skipping rotation
+INFO: manager_install: skip_fxmgr_install=true - delete unnecessary files and skip
+INFO: deleting unnecessary xml file..!!
+INFO: deleted unnecessary xml file..!!
+INFO: manager_post_install ...
+INFO: manager_post_install: fxmgr=/mnt/boot/installables/switch/fxos-k9-fp2k-manager.82.10.1.347i.SSB chmgr= update=false
+INFO: manager_post_install: fxmgr is dummy
+INFO: manager_post_install: Linking libraries ...
+INFO: manager_post_install: Linking binaries ...
+INFO: Trying to add iptables and ip6tables rules ...
+INFO: Set up Application Diagnostic Interface ...
+INFO: Configure management0 interface ...
+INFO: Configure system files ...
+INFO: System Name is: KP-DE-A
+Starting sensors logging daemon: sensord... done.
+INFO: /mnt/boot/installables/switch/fxos-k8-fp2k-npu.82.10.1.347i.SSB
+INFO: Need to validate the image
+: File /mnt/boot/installables/switch/fxos-k8-fp2k-npu.82.10.1.347i.SSB size 72264656
+Done!
+Computed Hash   SHA2: 980b395119fac34e61953abce47ce137
+                      c50a3a8efea498038bc30678cdc4faff
+                      b92f9293f9967263d3af0ac7034ff546
+                      ff95c61c4d0e77e3913f6d4febcdab7a
+                      
+Embedded Hash   SHA2: 980b395119fac34e61953abce47ce137
+                      c50a3a8efea498038bc30678cdc4faff
+                      b92f9293f9967263d3af0ac7034ff546
+                      ff95c61c4d0e77e3913f6d4febcdab7a
+                      
+The digital signature of the file: fxos-k8-fp2k-npu.82.10.1.347i.SSB verified successfully
+INFO: Creating directory /tmp/npu
+INFO: all files are there ...
+INFO: cur reboot count is 0
+INFO: max reboot count is 7
+INFO: console : ttyS0, speed : 9600
+INFO: manager_startup: setting up fxmgr apache ...
+INFO: manager_startup: Start manager httpd setup...
+INFO: manager_startup: using HTTPD_INFO persistent cache
+/bin/rm: cannot remove '/tmp/openssl.conf': No such file or directory
+ httpdRegister INFO: [httpd.2240 -s -4 192.168.0.161 -n localhost]
+ httpdRegister INFO: SKIP httpd syntax check
+ httpdRegister INFO: Starting httpd setup/registration...
+ httpdRegister INFO: Completed httpd setup/registration!
+ INFO: httpdRegister [httpd.2240 script exit]
+INFO: manager_startup: Completed manager httpd setup!
+Starting crond: OK
+FTD
+1:/opt/cisco/csp/cores
+/opt/cisco/csp/cores 31457280
+
+Threat Defense System: CMD=-bootup, CSP-ID=cisco-ftd.6.8.0.1751__ftd_001_JMX2209Y05Y6LOUKI1, FLAG=''
+System is booting up ...
+Cisco FTD booted up successfully.
+INFO:-MspCheck: Configuration Xml found is /opt/cisco/csp/applications/configs/cspCfg_cisco-ftd.6.8.0.1751__ftd_SCP Server[3239]: Waiting for a connection 
+
+INFO: System Disks /dev/sda is present. Status: Operable. /dev/sdb is present. Status: Inoperable.
+
+
+KP-DE-A login: 
+Waiting for Application infrastructure to be ready...
+Verifying the signature of the Application image...
+Cisco FTD initializing ...
+Verify FSIC, File System Integrity Check
+Obtained uid 501 and gid 501 for external user
+verify_fsic(start)
+Do not run FSIC twice for SSP systems...
+Initializing Threat Defense ...
+Terminal size: 151x43                                                 [  OK  ]
+Starting system log daemon...                                                                                                                [  OK  ]
+Adding swapfile /ngfw/Volume/.swaptwo
+Flushing all current IPv4 rules and user defined chains: ...success
+Clearing all current IPv4 rules and user defined chains: ...success
+Applying iptables firewall rules: 
+Flushing chain `PREROUTING'
+Flushing chain `INPUT'
+Flushing chain `OUTPUT'
+Flushing chain `POSTROUTING'
+Flushing chain `PREROUTING'
+Flushing chain `OUTPUT'
+Flushing chain `PREROUTING'
+Flushing chain `INPUT'
+Flushing chain `FORWARD'
+Flushing chain `OUTPUT'
+Flushing chain `POSTROUTING'
+Flushing chain `INPUT'
+Flushing chain `FORWARD'
+Flushing chain `OUTPUT'
+Applying rules successed
+Flushing all current IPv6 rules and user defined chains: ...success
+Clearing all current IPv6 rules and user defined chains: ...success
+Applying ip6tables firewall rules: 
+Flushing chain `PREROUTING'
+Flushing chain `INPUT'
+Flushing chain `OUTPUT'
+Flushing chain `POSTROUTING'
+Flushing chain `PREROUTING'
+Flushing chain `OUTPUT'
+Flushing chain `PREROUTING'
+Flushing chain `INPUT'
+Flushing chain `FORWARD'
+Flushing chain `OUTPUT'
+Flushing chain `POSTROUTING'
+Flushing chain `INPUT'
+Flushing chain `FORWARD'
+Flushing chain `OUTPUT'
+Applying rules successed
+Starting nscd...                                                                                                                             [  OK  ]
+Starting , please wait......complete.
+cleaning up *.TMM and *.TMD files
+Sucessfully updated threat.conf
+cleanup /var/sf/mabain/metadatastore
+Configuring NTP...                                                                                                                           [  OK  ]
+Not reconfigurating
+Sat Jan 9 01:34:26 UTC 2021
+Starting MySQL...
+Pinging mysql
+Pinging mysql, try 1
+Found mysql is running
+Detecting expanded storage...
+Running initializeObjects...
+Stopping MySQL...
+Killing mysqld with pid 5346
+Sat Jan 9 01:34:33 UTC 2021
+Starting sfifd...                                                                                                                            [  OK  ]
+Removing Compiled Python Files on Sensor......done
+Checking status...
+Starting Cisco Firepower 2110 Threat Defense, please wait......started.
+Cisco FTD initialization finished successfully.
+
+
+KP-DE-A login: Number of Cores 6
+
+total_reserved_mem = 1073741824 
+
+total_heapcache_mem = 0 
+total mem 7160060847 system 7221538816 kernel 61477969 image 0
+new 7160060847 old 1073741824 reserve 1073741824 priv new 6147796992 priv old 0
+Processor memory:   6906966016
+POST started...
+POST finished, result is 0 (hint: 1 means it failed)
+
+Compiled on Wed 14-Oct-20 05:05 GMT by builders
+SSL Hardware Offload is Enabled 
+Using configured value (300000) from /mnt/disk0/.private/ctm_scb_handles.conf
+Snort trust pinhole is enabled 
+Platform is FPR-2110
+Adding Cavium NIC interface 1 port 0
+
+Total NICs found: 6
+
+NIC pci:id 00, slot 0, port 1, bus -1, dev -1 func 0, irq 00, internal, ten_gb-ethernet, ind 1
+NIC pci:id 01, slot 0, port -1, bus 0, dev 0 func 0, irq 00, internal, , ind 0
+NIC pci:id 02, slot 1, port 1, bus -1, dev -1 func -1, irq 00, external, gb-ethernet, ind 1
+NIC pci:id 03, slot 1, port 1, bus -1, dev -1 func -1, irq 00, internal, gb-ethernet, ind 1
+NIC pci:id 04, slot 1, port 2, bus -1, dev -1 func -1, irq 00, internal, gb-ethernet, ind 2
+NIC pci:id 05, slot 1, port 1, bus -1, dev -1 func -1, irq 00, internal, gb-ethernet, ind 1
+Jan  9 01:38:09 KP-DE-A port-manager: Alert: Internal1/3 link changed to UP
+en_vtun rev00 Backplane Ext-Mgmt Interface     @ index 02 MAC: 00fc.ba7a.0101
+en_vtun rev00 Backplane Tap Interface     @ index 03 MAC: 0000.0100.0001
+en_vtun rev00 Backplane Control Interface  @ index 05 MAC: 0000.0300.0101
+Initialized 500000 elements for 3 consumers 
+WARNING: Attribute already exists in the dictionary.
+Use sofeware crypto.
+
+  ****************************** Warning *******************************
+  This product contains cryptographic features and is
+  subject to United States and local country laws
+  governing, import, export, transfer, and use.
+  Delivery of Cisco cryptographic products does not
+  imply third-party authority to import, export,
+  distribute, or use encryption. Importers, exporters,
+  distributors and users are responsible for compliance
+  with U.S. and local country laws. By using this
+  product you agree to comply with applicable laws and
+  regulations. If you are unable to comply with U.S.
+  and local laws, return the enclosed items immediately.
+
+  A summary of U.S. laws governing Cisco cryptographic
+  products may be found at:
+  http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+  If you require further assistance please contact us by
+  sending email to export@cisco.com.
+  ******************************* Warning *******************************
+
+Copyright (c) 1996-2020 by Cisco Systems, Inc.
+
+                Restricted Rights Legend
+Use, duplication, or disclosure by the Government is
+subject to restrictions as set forth in subparagraph
+(c) of the Commercial Computer Software - Restricted
+Rights clause at FAR sec. 52.227-19 and subparagraph
+(c) (1) (ii) of the Rights in Technical Data and Computer
+Software clause at DFARS sec. 252.227-7013.
+
+                Cisco Systems, Inc.
+                170 West Tasman Drive
+                San Jose, California 95134-1706
+
+Reading from flash...
+!!!nic_get_channel: INVALID_NICNUM (17) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (17) from 0x000000aaad0996f0
+nic_get_channel: INVALID_NICNUM (18) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (18) from 0x000000aaad0996f0
+nic_get_channel: INVALID_NICNUM (19) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (19) from 0x000000aaad0996f0
+nic_get_channel: INVALID_NICNUM (20) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (20) from 0x000000aaad0996f0
+nic_get_channel: INVALID_NICNUM (21) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (21) from 0x000000aaad0996f0
+nic_get_channel: INVALID_NICNUM (22) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (22) from 0x000000aaad0996f0
+nic_get_channel: INVALID_NICNUM (23) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (23) from 0x000000aaad0996f0
+nic_get_channel: INVALID_NICNUM (24) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (24) from 0x000000aaad0996f0
+nic_get_channel: INVALID_NICNUM (25) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (25) from 0x000000aaad0996f0
+nic_get_channel: INVALID_NICNUM (26) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (26) from 0x000000aaad0996f0
+.nic_get_channel: INVALID_NICNUM (27) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (27) from 0x000000aaad0996f0
+nic_get_channel: INVALID_NICNUM (28) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (28) from 0x000000aaad0996f0
+nic_get_channel: INVALID_NICNUM (29) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (30) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (31) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (32) from 0x000000aaad0a46cc
+....WARNING: This command will not take effect until interface 'outside3' has been initialized with at least one global IPv6 address
+*** Output from config line 402, "ip-client outside3 ipv6"
+WARNING: This command will not take effect until interface 'outside4' has been initialized with at least one global IPv6 address
+*** Output from config line 404, "ip-client outside4 ipv6"
+WARNING: This command will not take effect until interface 'inside5' has been initialized with at least one global IPv6 address
+*** Output from config line 406, "ip-client inside5 ipv6"
+WARNING: This command will not take effect until interface 'inside6' has been initialized with at least one global IPv6 address
+*** Output from config line 408, "ip-client inside6 ipv6"
+WARNING: This command will not take effect until interface 'inside4' has been initialized with at least one global IPv6 address
+*** Output from config line 410, "ip-client inside4 ipv6"
+WARNING: This command will not take effect until interface 'inside2' has been initialized with at least one global IPv6 address
+*** Output from config line 412, "ip-client inside2 ipv6"
+WARNING: This command will not take effect until interface 'inside3' has been initialized with at least one global IPv6 address
+*** Output from config line 414, "ip-client inside3 ipv6"
+WARNING: This command will not take effect until interface 'inside1' has been initialized with at least one global IPv6 address
+*** Output from config line 416, "ip-client inside1 ipv6"
+WARNING: This command will not take effect until interface 'outside6' has been initialized with at least one global IPv6 address
+*** Output from config line 418, "ip-client outside6 ipv6"
+WARNING: This command will not take effect until interface 'outside2' has been initialized with at least one global IPv6 address
+*** Output from config line 420, "ip-client outside2 ipv6"
+WARNING: This command will not take effect until interface 'outside5' has been initialized with at least one global IPv6 address
+*** Output from config line 422, "ip-client outside5 ipv6"
+WARNING: This command will not take effect until interface 'outside1' has been initialized with at least one global IPv6 address
+*** Output from config line 424, "ip-client outside1 ipv6"
+WARNING: This command will not take effect until interface 'management' has been initialized with at least one global IPv6 address
+*** Output from config line 426, "ip-client management ipv..."
+.
+Cryptochecksum (unchanged): c57989f6 b521cee4 e7fb2b5c a0c624af 
+M_MMAP_THRESHOLD 65536, M_MMAP_MAX 105391
+Using Hardware Random Number Generator 
+Error opening /dev/mem
+platcap_error: 56, Attribute not valid for platform
+Interface 3 has 128 ports (NPI)
+
+********************************************************************************
+   FPA3 on node 0: intr=0
+********************************************************************************
+  POOL  Size           Free                            Name Intr
+     0  9472          20480                          (null)    0
+
+  AURA  POOL      Allocated      Remaining             Name Intr
+     2     2          40600            360           (null)    0
+   511    31          40208            752           (null)    0
+
+User enable_1 logged in to KP-DE-A
+Logins over the last 1 days: 1.  
+Failed logins since the last login: 0.  
+Type help or '?' for a list of available commands.
+KP-DE-A> nic_get_channel: INVALID_NICNUM (30) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (31) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (32) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (26) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (26) from 0x000000aaad08f08c
+nic_get_channel: INVALID_NICNUM (27) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (27) from 0x000000aaad08f08c
+nic_get_channel: INVALID_NICNUM (28) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (28) from 0x000000aaad08f08c
+nic_get_channel: INVALID_NICNUM (29) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (21) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (21) from 0x000000aaad08f08c
+nic_get_channel: INVALID_NICNUM (20) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (20) from 0x000000aaad08f08c
+nic_get_channel: INVALID_NICNUM (23) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (23) from 0x000000aaad08f08c
+nic_get_channel: INVALID_NICNUM (22) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (22) from 0x000000aaad08f08c
+nic_get_channel: INVALID_NICNUM (17) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (17) from 0x000000aaad08f08c
+nic_get_channel: INVALID_NICNUM (19) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (19) from 0x000000aaad08f08c
+nic_get_channel: INVALID_NICNUM (18) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (18) from 0x000000aaad08f08c
+nic_get_channel: INVALID_NICNUM (25) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (25) from 0x000000aaad08f08c
+nic_get_channel: INVALID_NICNUM (24) from 0x000000aaad0a46cc
+nic_get_channel: INVALID_NICNUM (24) from 0x000000aaad08f08c
+nic_get_channel: INVALID_NICNUM (18) from 0x000000aaad08f08c
+nic_get_channel: INVALID_NICNUM (17) from 0x000000aaad08f08c
+nic_get_channel: INVALID_NICNUM (28) from 0x000000aaad08f08c
+nic_get_channel: INVALID_NICNUM (27) from 0x000000aaad08f08c
+nic_get_channel: INVALID_NICNUM (26) from 0x000000aaad08f08c
+nic_get_channel: INVALID_NICNUM (25) from 0x000000aaad08f08c
+nic_get_channel: INVALID_NICNUM (24) from 0x000000aaad08f08c
+nic_get_channel: INVALID_NICNUM (23) from 0x000000aaad08f08c
+nic_get_channel: INVALID_NICNUM (22) from 0x000000aaad08f08c
+nic_get_channel: INVALID_NICNUM (21) from 0x000000aaad08f08c
+nic_get_channel: INVALID_NICNUM (20) from 0x000000aaad08f08c
+nic_get_channel: INVALID_NICNUM (19) from 0x000000aaad08f08c
+Jan  9 01:38:33 KP-DE-A port-manager: Alert: Ethernet1/2 link changed to UP
+Jan  9 01:38:33 KP-DE-A port-manager: Alert: Ethernet1/1 link changed to UP
+Jan  9 01:38:33 KP-DE-A port-manager: Alert: Ethernet1/12 link changed to UP
+Jan  9 01:38:33 KP-DE-A port-manager: Alert: Ethernet1/11 link changed to UP
+Jan  9 01:38:33 KP-DE-A port-manager: Alert: Ethernet1/10 link changed to UP
+Jan  9 01:38:33 KP-DE-A port-manager: Alert: Ethernet1/9 link changed to UP
+Jan  9 01:38:33 KP-DE-A port-manager: Alert: Ethernet1/8 link changed to UP
+Jan  9 01:38:33 KP-DE-A port-manager: Alert: Ethernet1/7 link changed to UP
+Jan  9 01:38:33 KP-DE-A port-manager: Alert: Ethernet1/6 link changed to UP
+Jan  9 01:38:33 KP-DE-A port-manager: Alert: Ethernet1/5 link changed to UP
+Jan  9 01:38:33 KP-DE-A port-manager: Alert: Ethernet1/4 link changed to UP
+Jan  9 01:38:33 KP-DE-A port-manager: Alert: Ethernet1/3 link changed to UP

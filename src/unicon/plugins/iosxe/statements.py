@@ -1,12 +1,26 @@
+import re
+import time
+import logging
+from copy import copy
+from functools import wraps
+from inspect import Parameter, signature
+from datetime import datetime, timedelta
 
 from unicon.eal.dialogs import Statement
-
 from unicon.plugins.generic.service_statements import\
     admin_password as admin_password_stmt
+from unicon.plugins.generic.statements import (
+    connection_statement_list,
+    boot_timeout_stmt,
+    terminal_position_handler,
+)
 
-from .patterns import IosXEReloadPatterns
+from .patterns import IosXEReloadPatterns, IosXEPatterns
 
-p = IosXEReloadPatterns()
+log = logging.getLogger(__name__)
+reload_patterns = IosXEReloadPatterns()
+patterns = IosXEPatterns()
+
 
 def please_reset_handler(spawn, session):
     """ Handles the router asking to be reset before booting. """
@@ -60,40 +74,311 @@ def rommon_prompt_handler(spawn, session, context):
             # "Please reset" message was detected.
             # Set the configuration register to 0x0 (boot to rommon) and reset.
             # This is recommended in the platform documentation:
-            # http://www.cisco.com/c/en/us/support/docs/routers/4000-series-integrated-services-routers/200678-Troubleshoot-Cisco-4000-Series-ISR-Stuck.pdf
+            # http://www.cisco.com/c/en/us/support/docs/routers/4000-platform-integrated-services-routers/200678-Troubleshoot-Cisco-4000-platform-ISR-Stuck.pdf
             spawn.send("confreg 0x0\r")
             session['rommon_count'] = 1
 
+
+def grub_prompt_handler(spawn, session, context):
+    """ handles the grub menu during boot process
+    """
+
+    # if grub prompt already handled, return
+    if session.get('grub_handler'):
+        return
+    else:
+        session['grub_handler'] = True
+        # Below is used by the boot_timeout statement
+        # with the `BOOT_TIMEOUT` setting.
+        context['boot_start_time'] = datetime.now()
+        context['boot_prompt_count'] = 1
+
+    # If no grub_boot_image is specified, default to '*' which will
+    # match the currently highlighted entry (marked with '*' prefix
+    # or \x1b[7m reverse video) and boot it without moving the cursor.
+    grub_boot_image = context.get('grub_boot_image') or '*'
+
+    # Regex to match grub screen boot entries on cat9kv
+    lines = re.findall(spawn.settings.GRUB_REGEX_PATTERN, spawn.buffer)
+
+    # The grub pattern may fire before all menu entries have been buffered,
+    # e.g. when the PTY delivers data in multiple chunks (slow connections)
+    # Retry until the desired entry is visible so that
+    # the correct line index can be calculated.
+    grub_menu_wait_retries = spawn.settings.GRUB_MENU_WAIT_RETRIES
+    for attempt in range(grub_menu_wait_retries):
+        if any(grub_boot_image in line for line in lines):
+            break
+        spawn.log.debug(
+            'Entry "{}" not yet in buffer, retrying ({}/{})...'.format(
+                grub_boot_image, attempt + 1, grub_menu_wait_retries))
+        time.sleep(0.1)
+        spawn.read_update_buffer()
+        lines = re.findall(spawn.settings.GRUB_REGEX_PATTERN, spawn.buffer)
+        spawn.log.debug(f'Grub lines: {lines}')
+
+    spawn.log.info("Finding an entry that includes the string '{}'".
+             format(grub_boot_image))
+
+    selected_line = None
+    desired_line = None
+
+    # Get index for selected_line and desired_line
+    for index, line in enumerate(lines):
+        # \x1b[7m is reverse video (inverted colors)
+        if '*' in line or '\x1b[7m' in line:
+            selected_line = index
+        if grub_boot_image in line:
+            desired_line = index
+
+    if selected_line is None or desired_line is None:
+        if grub_boot_image != '*':
+            raise Exception("Cannot figure out which image to select! "
+                            "Debug info:\n"
+                            "selected_line: {}\n"
+                            "desired_line: {}\n"
+                            "lines: {}"
+                            .format(selected_line, desired_line, lines))
+        num_lines_to_move = 0
+    else:
+        spawn.log.info("Selecting the entry '{}' now.".format(lines[desired_line]))
+        num_lines_to_move = desired_line - selected_line
+
+    spawn.log.debug(f'Lines to move: {num_lines_to_move}')
+
+    keys = {
+        'down': '\x1B[B',
+        'up': '\x1B[A'
+    }
+
+    # If positive we want to move down the list.
+    # If negative we want to move up the list.
+    if num_lines_to_move > 0:
+        key = 'down'
+    else:
+        key = 'up'
+
+    for _ in range(abs(num_lines_to_move)):
+        spawn.send(keys.get(key))
+        time.sleep(0.5)
+        spawn.read_update_buffer()
+
+    # Wait for the PTY to finish delivering any remaining GRUB menu
+    # output before sending Enter. Depending on PTY buffer sizes, data
+    # may arrive in multiple chunks; without this drain the sendline
+    # may be lost or interleaved with pending output.
+    time.sleep(0.5)
+    spawn.read_update_buffer()
+    spawn.sendline()
+
+
+def boot_image(spawn, context, session):
+    if not context.get('boot_prompt_count'):
+        context['boot_prompt_count'] = 1
+    if context.get('boot_prompt_count') < \
+            spawn.settings.MAX_BOOT_ATTEMPTS:
+        if "boot_cmd" in context:
+            cmd = context.get('boot_cmd')
+        elif context.get('image_to_boot', '').strip():
+            cmd = "boot {}".format(context['image_to_boot']).strip()
+        elif spawn.settings.FIND_BOOT_IMAGE:
+            if context.get('filesystem_images'):
+                # Attempt to boot the next image from the list of images
+                # collected from the possible boot filesystems.
+                cmd = "boot {}".format(context['filesystem_images'].pop(0))
+            else:
+                if hasattr(spawn.settings, 'BOOT_FILESYSTEM'):
+                    if isinstance(spawn.settings.BOOT_FILESYSTEM, list):
+                        filesystems = spawn.settings.BOOT_FILESYSTEM
+                    else:
+                        filesystems = [spawn.settings.BOOT_FILESYSTEM]
+                else:
+                    filesystems = ["flash:"]
+                # Collect all possible boot images from the filesystems and
+                # attempt to boot each one until successful / max attempts reached.
+                boot_file_regex = spawn.settings.BOOT_FILE_REGEX if \
+                    hasattr(spawn.settings, 'BOOT_FILE_REGEX') else r'(\S+\.bin)'
+                if isinstance(boot_file_regex, list):
+                    # Group matches into one bucket per BOOT_FILE_REGEX entry.
+                    # Example:
+                    # BOOT_FILE_REGEX = [r'(\S+\.SSA\.bin)', r'(\S+\.SPA\.bin)', r'(\S+\.bin)']
+                    # ranked_matches[0] collects all .SSA.bin images,
+                    # ranked_matches[1] collects all .SPA.bin images,
+                    # ranked_matches[2] collects the remaining .bin images.
+                    #
+                    # Flattening these buckets later makes the final boot queue
+                    # prefer earlier BOOT_FILE_REGEX entries across all
+                    # filesystems instead of only within each filesystem.
+                    ranked_matches = [[] for _ in boot_file_regex]
+                    rommon_dir_timeout = getattr(
+                        spawn.settings, 'ROMMON_DIR_TIMEOUT', None)
+                    for fs in filesystems:
+                        spawn.buffer = ''
+                        spawn.sendline('dir {}'.format(fs))
+                        dir_listing = spawn.expect(
+                            patterns.rommon_prompt,
+                            timeout=rommon_dir_timeout).match_output
+                        seen = set()
+                        for rank, pattern in enumerate(boot_file_regex):
+                            image_names = re.findall(pattern, dir_listing)
+                            for image_name in image_names:
+                                full_image_name = fs + image_name
+                                if full_image_name not in seen:
+                                    ranked_matches[rank].append(full_image_name)
+                                    seen.add(full_image_name)
+                    context['filesystem_images'] = [
+                        image_name
+                        for rank_bucket in ranked_matches
+                        for image_name in rank_bucket
+                    ]
+                else:
+                    context['filesystem_images'] = []
+                    rommon_dir_timeout = getattr(
+                        spawn.settings, 'ROMMON_DIR_TIMEOUT', None)
+                    for fs in filesystems:
+                        spawn.buffer = ''
+                        spawn.sendline('dir {}'.format(fs))
+                        dir_listing = spawn.expect(
+                            patterns.rommon_prompt,
+                            timeout=rommon_dir_timeout).match_output
+                        matches = re.findall(boot_file_regex, dir_listing)
+                        if matches:
+                            context['filesystem_images'].extend(
+                                [fs + image_name for image_name in matches]
+                            )
+                # Attempt to boot the first image from the list.
+                if context['filesystem_images']:
+                    cmd = "boot {}".format(context['filesystem_images'].pop(0))
+                else:
+                    cmd = "boot"
+        else:
+            cmd = "boot"
+        spawn.sendline(cmd)
+        context['boot_prompt_count'] += 1
+    else:
+        raise Exception("Too many failed boot attempts have been detected.")
+
+
+boot_from_rommon_stmt = Statement(
+    pattern=patterns.rommon_prompt,
+    action=boot_image,
+    args=None,
+    loop_continue=True,
+    continue_timer=False)
+
+terminal_position_stmt = Statement(
+    pattern=patterns.get_cursor_position,
+    action=terminal_position_handler,
+    args=None,
+    loop_continue=True,
+    continue_timer=False,
+)
+
 # Statement covering when a device asks us to reset it.
 please_reset_stmt = \
-    Statement(pattern=p.please_reset,
+    Statement(pattern=reload_patterns.please_reset,
               action=please_reset_handler,
               args=None,
               loop_continue=True,
               continue_timer=False)
 
-rommon_boot_stmt = \
-    Statement(pattern=p.rommon_prompt,
-              action=rommon_prompt_handler,
+grub_prompt_stmt = \
+    Statement(pattern=reload_patterns.grub_prompt,
+              action=grub_prompt_handler,
               args=None,
               loop_continue=True,
               continue_timer=False)
 
 setup_dialog_stmt = \
-    Statement(pattern=p.setup_dialog,
+    Statement(pattern=reload_patterns.setup_dialog,
               action='sendline(no)',
               args=None,
               loop_continue=True,
               continue_timer=False)
 
 auto_install_stmt = \
-    Statement(pattern=p.autoinstall_dialog,
+    Statement(pattern=reload_patterns.autoinstall_dialog,
               action='sendline(yes)',
               args=None,
               loop_continue=True,
               continue_timer=False)
 
+fast_reload_confirm_stmt = \
+    Statement(pattern=reload_patterns.fast_reload_confirm,
+              action='sendline()',
+              args=None,
+              loop_continue=True,
+              continue_timer=False)
+
+# This list is extended later, see below
 boot_from_rommon_statement_list = [
-    please_reset_stmt, rommon_boot_stmt, admin_password_stmt,
+    please_reset_stmt, admin_password_stmt,
     setup_dialog_stmt, auto_install_stmt,
+    boot_timeout_stmt, grub_prompt_stmt
 ]
+
+
+def boot_finished_deco(func):
+    '''Decorator function that wraps dialog statements
+    for rommon to disable state transition to pop the
+    boot_start_time  after boot is (supposedly) finished.
+
+    Used with boot_from_rommon_statement_list (see below)
+    '''
+
+    parameters = signature(func).parameters
+    accepts_extra_keywords = any(
+        parameter.kind is Parameter.VAR_KEYWORD
+        for parameter in parameters.values()
+    )
+
+    @wraps(func)
+    def wrapper(spawn, session, context, **kwargs):
+        if context is not None:
+            context.pop('boot_start_time', None)
+
+        available_arguments = {
+            'spawn': spawn,
+            'session': session,
+            'context': context,
+        }
+        positional_arguments = []
+        keyword_arguments = {}
+        for name, parameter in parameters.items():
+            if name not in available_arguments:
+                continue
+            if parameter.kind is Parameter.POSITIONAL_ONLY:
+                positional_arguments.append(available_arguments[name])
+            elif parameter.kind in (
+                Parameter.POSITIONAL_OR_KEYWORD,
+                Parameter.KEYWORD_ONLY,
+            ):
+                keyword_arguments[name] = available_arguments[name]
+
+        if accepts_extra_keywords:
+            keyword_arguments.update(kwargs)
+        else:
+            keyword_arguments.update(
+                (name, value) for name, value in kwargs.items()
+                if name in parameters
+                and parameters[name].kind in (
+                    Parameter.POSITIONAL_OR_KEYWORD,
+                    Parameter.KEYWORD_ONLY,
+                )
+            )
+
+        return func(*positional_arguments, **keyword_arguments)
+    return wrapper
+
+
+# Create list of statements for rommon to disable, i.e. device boot
+# If the boot is completed because we hit a statement with
+# loop_continue = False, use the wrapper to pop the start time
+# from the context dict.
+boot_from_rommon_statement_list += [
+    copy(statement) for statement in connection_statement_list
+]
+for stmt in boot_from_rommon_statement_list:
+    if (stmt.pattern in [reload_patterns.press_return] or
+            stmt.loop_continue is False):
+        stmt.action = boot_finished_deco(stmt.action)

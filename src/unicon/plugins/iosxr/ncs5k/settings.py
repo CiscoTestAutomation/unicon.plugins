@@ -11,3 +11,8 @@ class NCS5KSettings(IOSXRSettings):
 
         # prompt wait retries
         self.ESCAPE_CHAR_PROMPT_WAIT_RETRIES = 3
+
+        # number of retries to reconnect after reloading
+        self.RELOAD_RECONNECT_ATTEMPTS = 3
+        
+        self.STANDBY_STATE_REGEX = r'Standby node .* is (.*)'

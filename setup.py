@@ -28,9 +28,14 @@ def build_version_range(version):
     for any given version, return the major.minor version requirement range
     eg: for version '3.4.7', return '>=3.4.0, <3.5.0'
     '''
-    req_ver = version.split('.')
-    version_range = '>= %s.%s.0, < %s.%s.0' % \
-        (req_ver[0], req_ver[1], req_ver[0], int(req_ver[1])+1)
+    non_local_version = version.split('+')[0]
+    req_ver = non_local_version.split('.')
+    if 'rc' in version:
+        version_range = '>= %s.%s.0rc0, < %s.%s.0' % \
+            (req_ver[0], req_ver[1], req_ver[0], int(req_ver[1])+1)
+    else:
+        version_range = '>= %s.%s.0, < %s.%s.0' % \
+            (req_ver[0], req_ver[1], req_ver[0], int(req_ver[1])+1)
 
     return version_range
 
@@ -43,8 +48,10 @@ def version_info(*paths):
 # compute version range
 version, version_range = version_info('src', 'unicon', 'plugins', '__init__.py')
 
-install_requires = ['pyyaml',
-                    'unicon {range}'.format(range = version_range)],
+install_requires = ['unicon {range}'.format(range = version_range),
+                    'pyyaml',
+                    'PrettyTable',
+                    'cryptography>=43.0']
 
 # launch setup
 setup(
@@ -105,6 +112,7 @@ setup(
                          'tests/mock_data/*/*.txt',
                          'tests/mock_data/*/*/*.txt',
                          'tests/unittest/ssh_host_key',
+                         'pid_tokens.csv'
                          ]},
 
     # Standalone scripts
@@ -125,10 +133,10 @@ setup(
                 'wheel',
                 'coverage',
                 'restview',
-                'Sphinx',
+                'Sphinx==7.4.7',
                 'sphinxcontrib-napoleon',
                 'sphinxcontrib-mockautodoc',
-                'sphinx-rtd-theme'],
+                'sphinx-rtd-theme==3.1.0'],
     },
 
     # any data files placed outside this package.

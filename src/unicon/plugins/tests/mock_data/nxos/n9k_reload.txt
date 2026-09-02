@@ -1,0 +1,206 @@
+CISCO MODULE
+BIOS Ver: 5.47
+Switch G5
+RC Revision:  02.03.00
+
+Memory Information:
+ MRC Revision:00.50.00
+ Total  DRAM: 32768 MB
+ Memory TOLM: 80000000
+ PCIE   BASE: 80000000     	Size : 10000000
+ PCI32  BASE: 90000000     	Limit: FBFFFFFF
+ PCI64  BASE: 80000000000     	Limit: 83FFFFFFFFF
+ UC    START: 80000000000     	End  : 84000000000
+ME Operational Firmware Version: 06:3.0.3.214
+
+DIMM Information:
+ Clock Speed: 1067MHz
+ Socket: 0x0 Channel: 0x0 Number: 0x0 Presence: Yes Size: 32GB
+ Socket: 0x0 Channel: 0x0 Number: 0x1 Presence: No
+ Socket: 0x0 Channel: 0x1 Number: 0x0 Presence: No
+ Socket: 0x0 Channel: 0x1 Number: 0x1 Presence: No
+
+Detected CISCO IOFPGA
+Booting from Primary BIOS
+ Code Signing Results: 0x0
+ Booting from Upgrade FPGA
+IOFPGA Subsystem Vendor ID 0x1172
+ FPGA Revision         : 0x1000022
+ FPGA ID               : 0x1564687
+ FPGA Date             : 0x20200410
+ Power Debug Register1  : 0x0
+ Power Debug Register2  : 0x9002f
+ Reset Cause Register  : 0x1
+ Boot Ctrl Register    : 0xe0ff
+ FPGA Update Status    : 0x20
+
+Detected CISCO MIFPGA
+MIFPGA Subsystem Vendor ID 0x1172
+ MIFPGA Version        : 0x10
+ MIFPGA Date           : 0x20170515
+ MIFPGA Update Status  : 0x20
+ MIFPGA ID             : 0x1555231
+
+Board Type: SUMPIN
+
+Bootable Disk is detected. Device Name: Micron_5300_MTFDDAV240TDS
+Version 2.18.1260. Copyright (C) 2022 American Megatrends, Inc.
+FPGA SPI Flash Winbond W25Q128BV
+Board type  4
+IOFPGA @ 0xd8000000
+SLOT_ID @ 0xf
+Set fan speed to 60%
+Initializing fan controller...
+Standalone chassis
+check_bootmode: grub: Continue grub
+Trying to read config file /boot/grub/menu.lst.local from (hd0,4)
+ Filesystem type is ext2fs, partition type 0x83
+
+
+Security Lock
+Booting bootflash:/nxos64-cs.10.3.1.5.F.bin.upg
+Trying diskboot
+ Filesystem type is ext2fs, partition type 0x83
+Image valid
+OS Image Key Type: Development KEY
+
+
+Image Signature verification was Successful.
+
+Boot Time: 1/5/2023  23:3:45
+
+Security Lock
+mount: overlay mounted on /newroot/usr.
+Installing klm_card_index
+done
+Setting nativeboot
+Linking n9k flash devices
+creating flash devices BOOT_DEV= sda
+
+INIT: version 2.88 booting
+Installing ata_piix module ... Installing kheaders module ... done.
+Executing /etc/rc.d/rcS.d//S06exablaze start
+Executing /etc/rc.d/rcS.d//S06exablaze start
+Unsquashing rootfs ...
+Total size needed in bootflash is 153688
+check bootflash : OK
+Total size needed in bootflash is 54456
+check bootflash : OK
+done.
+Enabling 8250 serial driver spurious INTs workaround
+Installing isan procfs ... done.
+Installing SSE module with card index 21135 ... done.
+Creating SSE device node 243 ... done.
+Inserting kernel_services module ... done.
+Making kernel_services character devices
+is_lxc: is_titan_eor: is_stby: suffix: klm_ftrace: /isanboot/lib/modules/klm_ftrace.o
+Installing ftrace in non-lxc mode done
+cgroups initialized
+Not Micron SSD...
+Loading I2C driver ... done.
+Installing CCTRL driver for card_type 54 without NEED_GEM ... done.
+Loading IGB driver ...
+Checking all filesystems.done.
+
+Installing SPROM driver ... 21135 Extracting rpms from image...
+IS_N9K done.
+Installing pfmsvcs module ...done.
+Installing nvram module ... done.
+Installing if_index module with port mode 6 ... done.
+Installing fcfwd
+Installing RNI lcnd ... done
+Running mode is N9K-ToR ...done
+Installing LC netdev ... done
+Installing psdev module ... done.
+Installing veobc module ... done.
+Clean up previous pcap files present in tmp directory
+Checking SR card
+Card Index is 21135
+Inserting eMMC module ...
+Inserting OBFL module ... 13.49: eMMC Device found.
+13.49: card has mmc
+done.
+13.50: Making OBFL character devices for mmc
+mounting plog for N9k!
+13.54: mounting plog for N9k!
+13.55: Done..mounting plog for N9k!
+Mounting OBFL for eMMC
+Attach blkoops
+15.01: Before mounting blkoops
+15.02: After mounting blkoops
+15.02: recreate_mmcftrace_rr_device
+/
+Calling install_tor for TOR
+copying common rpm to ftp
+tune2fs 1.45.6 (20-Mar-2020)
+Setting reserved blocks percentage to 0% (0 blocks)
+update-alternatives: Linking /usr/bin/unshare to /usr/bin/unshare.util-linux
+ Removing any system startup links for cgroups-init ...
+ Adding system startup for /etc/init.d/cgroups-init.
+Loading system software
+Running groupadd commands...
+NOTE: docker-ce: Performing groupadd with [ -r docker]
+update-alternatives: Linking /bin/vi to /usr/bin/vim.tiny
+update-alternatives: Linking /usr/bin/vim to /usr/bin/vim.tiny
+/mnt/pstore/stats_ssd/.ssd_overall_data file exist !!
+moving /mnt/pstore/stats_ssd/.ssd_overall_data to /mnt/pstore/stats_ssd/.ssd_lastboot_data
+Starting crond: OK
+Starting rpcbind daemon...done.
+creating NFS state directory: done
+starting 8 nfsd kernel threads: done
+starting mountd: done
+starting statd: done
+exit code: 1
+Saving image for img-sync ...
+Installing local RPMS
+Not Micron SSD...
+Not Micron SSD...
+Stopping crond: OK
+Starting crond: OK
+Patch Repository Setup completed successfully
+Creating /dev/mcelog
+Starting mcelog daemon
+N9K CPA setup done
+N9K TOR LC CPA s
+INIT: Entering runlevel: 3
+rm: cannot remove '/isan/etc/sysmgr.d/s1hal.conf': No such file or directory
+rm: cannot remove '/isan/etc/cli/mvdxn.cli__': No such file or directory
+Running S93thirdparty-script...
+vlc_card_index 0
+S26: sw_id 21135 vp 0
+S26 B: sw_id 21135, Moving libcrdcfgdata_tah_tor.so to libcrdcfgdata.so
+S26 5: Before Move : TOR HW  :
+S26 6: After Move : Populating conf files for hybrid sysmgr ...
+Starting hybrid sysmgr ...
+Starting lem_drv driver
+done
+Netbroker support IS present in the kernel.
+done
+Skipping EMON in TOR ...
+Executing Prune clis.
+Removing exusd cli files if it is not exbl_card in prune_clis
+ethernet switching mode Thu Jan  5 23:04:31 UTC 2023
+prepare span CLI
+Jan  5 23:04:39 %PLATFORM-5-PS_STATUS PowerSupply 1 current-status is PS_SHUT
+Jan  5 23:04:39 %PLATFORM-2-PS_FAIL Power supply 1 failed or shut down (Serial number LIT2540CHN9)
+Jan  5 23:04:39 %PLATFORM-5-PS_FOUND Power supply 2 found (Serial number LIT2540CGJ6)
+Jan  5 23:04:39 %PLATFORM-2-PS_OK Power supply 2 ok (Serial number LIT2540CGJ6)
+Jan  5 23:04:39 %PLATFORM-5-PS_STATUS PowerSupply 2 current-status is PS_OK
+Jan  5 23:04:39 %PLATFORM-2-PS_FANOK Fan in Power supply 2 ok
+Jan  5 23:04:39 %PLATFORM-4-PFM_PS_RED_MODE_CHG Power redundancy configured mode changed to ps-redundant
+Jan  5 23:04:39 %PLATFORM-2-PS_ABSENT Power supply 1 is absent/shutdown, ps-redundancy might be affected
+Jan  5 23:04:39 %PLATFORM-2-PS_RED_MODE_CHG Power supply operational redundancy mode changed to non-redundant
+Jan  5 23:04:39 %PLATFORM-5-FAN_DETECT Fan module 1 (Serial number ) Fan1(sys_fan1) detected
+Jan  5 23:04:39 %PLATFORM-5-FAN_STATUS Fan module 1 (Serial number ) Fan1(sys_fan1) current-status is FAN_OK
+Jan  5 23:04:39 %PLATFORM-2-FANMOD_FAN_OK Fan module 1 (Fan1(sys_fan1) fan) ok
+Jan  5 23:04:39 %PLATFORM-5-FAN_DETECT Fan module 2 (Serial number ) Fan2(sys_fan2) detected
+Jan  5 23:04:39 %PLATFORM-5-FAN_STATUS Fan module 2 (Serial number ) Fan2(sys_fan2) current-status is FAN_OK
+Jan  5 23:04:39 %PLATFORM-2-FANMOD_FAN_OK Fan module 2 (Fan2(sys_fan2) fan) ok
+Jan  5 23:04:39 %PLATFORM-5-FAN_DETECT Fan module 3 (Serial number ) Fan3(sys_fan3) detected
+Jan  5 23:04:39 %PLATFORM-5-FAN_STATUS Fan module 3 (Serial number ) Fan3(sys_fan3) current-status is FAN_OK
+Jan  5 23:04:39 %PLATFORM-2-FANMOD_FAN_OK Fan module 3 (Fan3(sys_fan3) fan) ok
+Jan  5 23:04:39 %PLATFORM-5-FAN_DETECT Fan module 4 (Serial number ) Fan4(sys_fan4) detected
+Jan  5 23:04:39 %PLATFORM-5-FAN_STATUS Fan module 4 (Serial number ) Fan4(sys_fan4) current-status is FAN_OK
+Jan  5 23:04:39 %PLATFORM-2-FANMOD_FAN_OK Fan module 4 (Fan4(sys_fan4) fan) ok
+
+User Access Verification

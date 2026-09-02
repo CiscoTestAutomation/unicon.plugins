@@ -18,7 +18,7 @@ class TestIosXECat3kEwlcCopy(unittest.TestCase):
         cls.d = Connection(hostname='Router',
                            start=['mock_device_cli --os iosxe --state ewlc_enable'],
                            os='iosxe',
-                           series='cat3k',
+                           platform='cat3k',
                            model='ewlc',
                            username='cisco',
                            tacacs_password='cisco')
@@ -44,6 +44,103 @@ class TestIosXECat3kEwlcCopy(unittest.TestCase):
                     server='172.18.200.210',
                     source_file='/boot/vrf_rp_super_universalk9.edison.bin',
                     dest_file='vrf_rp_super_universalk9.edison.bin')
+
+class TestIosXECat3kEwlcConfigure(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.d = Connection(hostname='Router',
+                           start=['mock_device_cli --os iosxe --state ewlc_enable'],
+                           os='iosxe',
+                           platform='cat3k',
+                           model='ewlc',
+                           username='cisco',
+                           tacacs_password='cisco')
+        cls.d.connect()
+
+    @classmethod
+    @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+    @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
+    def tearDownClass(cls):
+        cls.d.disconnect()
+
+    def test_config_with_prompt(self):
+        self.d.configure("wlan shutdown")
+
+
+class TestIosXECat3kEwlcApLscProvision(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.d = Connection(hostname='Router',
+                           start=['mock_device_cli --os iosxe --state ewlc_enable'],
+                           os='iosxe',
+                           platform='cat3k',
+                           model='ewlc',
+                           username='cisco',
+                           tacacs_password='cisco')
+        cls.d.connect()
+
+    @classmethod
+    @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+    @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
+    def tearDownClass(cls):
+        cls.d.disconnect()
+
+    def test_config_ap_lsc_provision_no_default_yn(self):
+        self.d.configure("ap lsc-provision")
+
+
+class TestIosXECat3kEwlcStandbyReload(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.d = Connection(hostname='Router',
+                           start=['mock_device_cli --os iosxe --state ewlc_enable'],
+                           os='iosxe',
+                           platform='cat3k',
+                           model='ewlc',
+                           username='cisco',
+                           tacacs_password='cisco')
+        cls.d.connect()
+
+    def test_reset_standby(self):
+        r = self.d.execute('redundancy reload peer')
+
+
+class TestIosXeCat3kEwlcPluginRecoveryMode(unittest.TestCase):
+
+    def test_boot_from_rommon_with_image(self):
+        d = Connection(hostname='Router',
+                        start=['mock_device_cli --os iosxe --state ewlc_exec_recovery_mode'],
+                        os='iosxe',
+                        platform='cat3k',
+                        init_config_commands=[])
+        d.connect()
+
+
+class TestIosXECat3kEwlcBash(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.d = Connection(hostname='Router',
+                           start=['mock_device_cli --os iosxe --state ewlc_enable'],
+                           os='iosxe',
+                           platform='cat3k',
+                           model='ewlc',
+                           username='cisco',
+                           tacacs_password='cisco')
+        cls.d.connect()
+
+    def test_bash_console(self):
+        with self.d.bash_console() as bash:
+            bash.execute('ls')
+
+    @classmethod
+    @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+    @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
+    def tearDownClass(cls):
+        cls.d.disconnect()
 
 
 if __name__ == '__main__':

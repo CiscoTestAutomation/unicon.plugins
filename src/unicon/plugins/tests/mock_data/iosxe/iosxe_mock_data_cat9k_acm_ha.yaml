@@ -1,0 +1,169 @@
+ha_cat9k_exec:
+  prompt: "%N>"
+  commands:
+    "show version | include operating mode": ""
+    "enable":
+      new_state: ha_cat9k_enable_password
+
+ha_cat9k_enable_password:
+  prompt: "Password:"
+  commands:
+    "lab":
+      new_state: ha_cat9k_enable
+
+ha_cat9k_enable:
+  prompt: "%N#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version | include operating mode" : ""
+    "show version": |
+      Cisco IOS XE Software, Version BLD_POLARIS_DEV_LATEST_20250520_001713
+      Cisco IOS Software [IOSXE], C9800 Software (C9800_IOSXE-K9), Experimental Version 17.19.20250520:011900 [BLD_POLARIS_DEV_LATEST_20250519_135055:/nobackup/mcpre/s2c-build-ws 101]
+      Copyright (c) 1986-2025 by Cisco Systems, Inc.
+      Compiled Mon 19-May-25 18:19 by mcpre
+
+
+      Cisco IOS-XE software, Copyright (c) 2005-2025 by cisco Systems, Inc.
+      All rights reserved.  Certain components of Cisco IOS-XE software are
+      licensed under the GNU General Public License ("GPL") Version 2.0.  The
+      software code licensed under GPL Version 2.0 is free software that comes
+      with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+      GPL code under the terms of GPL Version 2.0.  For more details, see the
+      documentation or "License Notice" file accompanying the IOS-XE software,
+      or the applicable URL provided on the flyer accompanying the IOS-XE
+      software.
+
+
+      ROM: 16.12(3r)
+
+      Y8-9800-2042-2043 uptime is 19 hours, 43 minutes
+      Uptime for this control processor is 19 hours, 45 minutes
+      System returned to ROM by Image Install 
+      System image file is "bootflash:packages.conf"
+      Last reload reason: Image Install 
+
+
+
+      This product contains cryptographic features and is subject to United
+      States and local country laws governing import, export, transfer and
+      use. Delivery of Cisco cryptographic products does not imply
+      third-party authority to import, export, distribute or use encryption.
+      Importers, exporters, distributors and users are responsible for
+      compliance with U.S. and local country laws. By using this product you
+      agree to comply with applicable laws and regulations. If you are unable
+      to comply with U.S. and local laws, return this product immediately.
+
+      A summary of U.S. laws governing Cisco cryptographic products may be found at:
+      http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+      If you require further assistance please contact us by sending email to
+      export@cisco.com.
+
+      License Type: Smart License is permanent
+      License Level: adventerprise
+      Next reload license Level: adventerprise
+      AIR License Level: AIR Network Advantage addon AIR DNA Advantage
+      Next reload AIR License Level: AIR Network Advantage addon AIR DNA Advantage
+      Cisco Wireless License Level: Cisco Wireless Advantage
+      Next reload Cisco Wireless License Level: Cisco Wireless Advantage
+      Cisco Wireless License enforcement: DISABLE
+
+      The current crypto throughput level is 0 kbps 
+
+
+      Smart Licensing Status: Smart Licensing Using Policy
+
+      cisco C9800-L-C-K9 (KATAR) processor (revision KATAR) with 1609943K/6147K bytes of memory.
+      Processor board ID FCL24180011
+      Router operating mode: Autonomous
+      2 Virtual Ethernet interfaces
+      4 2.5 Gigabit Ethernet interfaces
+      2 Ten Gigabit Ethernet interfaces
+      32768K bytes of non-volatile configuration memory.
+      16777216K bytes of physical memory.
+      26251263K bytes of eUSB flash at bootflash:.
+      26251263K bytes of eUSB flash at bootflash-2:.
+      0K bytes of Cloud S3 Storage at cloudfs:.
+
+      Base Ethernet MAC Address          : F4:BD:9E:58:48:80
+
+      Installation mode is INSTALL
+
+      Configuration register is 0x2102
+    "sh redundancy stat | inc my state": |2
+             my state = 13 -ACTIVE 
+    "config term":
+      new_state: ha_cat9k_config
+    "sh redundancy state": |2
+             my state = 13 -ACTIVE 
+           peer state = 8  -STANDBY HOT 
+                 Mode = Duplex
+                 Unit = Primary
+              Unit ID = 48
+
+      Redundancy Mode (Operational) = sso
+      Redundancy Mode (Configured)  = sso
+      Redundancy State              = sso
+           Maintenance Mode = Disabled
+          Manual Swact = enabled
+       Communications = Up
+
+         client count = 84
+       client_notification_TMR = 30000 milliseconds
+                 RF debug mask = 0x0
+    "acm configlet create my_config":
+      response:
+        - |
+          advanced configuration mode started.
+          enter configuration commands, one per line.  end with cntl/z.
+      new_state: acm_configlet1
+
+ha_cat9k_config:
+  prompt: "%N(conf)#"
+  commands: &config_cmds
+    "no logging console": ""
+    "line vty 0 4": ""
+    "line console 0": ""
+    "exec-timeout 0": ""
+    "redundancy": ""
+    "main-cpu": ""
+    "standby console enable": ""
+    "config-register 0x0": ""
+    "end":
+      new_state: ha_cat9k_enable
+
+ha_cat9k_stby_exec:
+  prompt: "%N-stby>"
+  commands:
+    "show version | include operating mode": ""
+    "enable":
+      new_state: "ha_cat9k_stby_enable_password"
+
+ha_cat9k_stby_enable_password:
+  prompt: "Password: "
+  commands:
+    "lab":
+      new_state: ha_cat9k_stby_enable
+
+ha_cat9k_stby_enable:
+  prompt: "%N-stby#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": |
+      Cisco IOS XE Software, Version BLD_V177_THROTTLE_LATEST_20210903_031009_V17_7_0_94
+    "show version | include operating mode" : ""
+
+acm_configlet1:
+  prompt: "%N(acm)#"
+  commands:
+    "interface loopback 1":
+      new_state: acm_if1
+
+acm_if1:
+  prompt: "%N(acm-if)#"
+  commands:
+    "description test": ""
+    "end":
+      new_state: general_enable

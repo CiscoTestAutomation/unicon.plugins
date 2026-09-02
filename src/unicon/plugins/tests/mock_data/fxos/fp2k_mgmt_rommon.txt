@@ -1,0 +1,141 @@
+KP-DE-A(local-mgmt)# reboot
+Before rebooting, please take a configuration backup.
+Do you still want to reboot? (yes/no):yes
+
+Broadcast message from admin@KP-DE-A (Sat Jan  9 01:22:53 2021):
+
+All shells being terminated due to system /sbin/reboot
+
+Broadcast message from admin@KP-DE-A (Sat Jan  9 01:22:54 2021):
+
+ Reboot requested by the user.
+
+Broadcast message from root@2021 Jan 09 01:22:56 PMLOG: PM IPC UTILITY: Shutting down all ports
+
+Threat Defense System: CMD=-stop, CSP-ID=cisco-ftd.6.8.0.1751__ftd_001_JMX2209Y05Y6LOUKI1, FLAG=''
+Cisco FTD stopping ...
+Jan  9 01:22:56 KP-DE-A port-manager: Alert: Ethernet1/12 link changed to DOWN
+nic_get_channel: INVALID_NICNUM (28) from 0x000000aaacf7008c
+Jan  9 01:22:56 KP-DE-A port-manager: Alert: Ethernet1/11 link changed to DOWN
+nic_get_channel: INVALID_NICNUM (27) from 0x000000aaacf7008c
+Jan  9 01:22:56 KP-DE-A port-manager: Alert: Ethernet1/10 link changed to DOWN
+Jan  9 01:22:56 KP-DE-A port-manager: Alert: Ethernet1/9 link changed to DOWN
+nic_get_channel: INVALID_NICNUM (26) from 0x000000aaacf7008c
+nic_get_channel: INVALID_NICNUM (25) from 0x000000aaacf7008c
+nic_get_channel: INVALID_NICNUM (24) from 0x000000aaacf7008c
+nic_get_channel: INVALID_NICNUM (23) from 0x000000aaacf7008c
+nic_get_channel: INVALID_NICNUM (22) from 0x000000aaacf7008c
+nic_get_channel: INVALID_NICNUM (21) from 0x000000aaacf7008c
+nic_get_channel: INVALID_NICNUM (20) from 0x000000aaacf7008c
+nic_get_channel: INVALID_NICNUM (19) from 0x000000aaacf7008c
+nic_get_channel: INVALID_NICNUM (18) from 0x000000aaacf7008c
+nic_get_channel: INVALID_NICNUM (17) from 0x000000aaacf7008c
+Jan  9 01:22:56 KP-DE-A port-manager: Alert: Ethernet1/8 link changed to DOWN
+Jan  9 01:22:56 KP-DE-A port-manager: Alert: Ethernet1/7 link changed to DOWN
+Jan  9 01:22:56 KP-DE-A port-manager: Alert: Ethernet1/6 link changed to DOWN
+Jan  9 01:22:56 KP-DE-A port-manager: Alert: Ethernet1/5 link changed to DOWN
+Jan  9 01:22:56 KP-DE-A port-manager: Alert: Ethernet1/4 link changed to DOWN
+Jan  9 01:22:56 KP-DE-A port-manager: Alert: Ethernet1/3 link changed to DOWN
+Jan  9 01:22:56 KP-DE-A port-manager: Alert: Ethernet1/2 link changed to DOWN
+Jan  9 01:22:56 KP-DE-A port-manager: Alert: Ethernet1/1 link changed to DOWN
+Jan  9 01:23:07 KP-DE-A port-manager: Alert: Ethernet1/2 link changed to UP
+nic_get_channel: INVALID_NICNUM (18) from 0x000000aaacf7008c
+Jan  9 01:23:07 KP-DE-A port-manager: Alert: Ethernet1/1 link changed to UP
+nic_get_channel: INVALID_NICNUM (17) from 0x000000aaacf7008c
+Jan  9 01:23:08 KP-DE-A port-manager: Alert: Ethernet1/12 link changed to UP
+nic_get_channel: INVALID_NICNUM (28) from 0x000000aaacf7008c
+Jan  9 01:23:08 KP-DE-A port-manager: Alert: Ethernet1/11 link changed to UP
+nic_get_channel: INVALID_NICNUM (27) from 0x000000aaacf7008c
+Jan  9 01:23:08 KP-DE-A port-manager: Alert: Ethernet1/10 link changed to UP
+nic_get_channel: INVALID_NICNUM (26) from 0x000000aaacf7008c
+Jan  9 01:23:08 KP-DE-A port-manager: Alert: Ethernet1/9 link changed to UP
+nic_get_channel: INVALID_NICNUM (25) from 0x000000aaacf7008c
+nic_get_channel: INVALID_NICNUM (24) from 0x000000aaacf7008c
+nic_get_channel: INVALID_NICNUM (23) from 0x000000aaacf7008c
+nic_get_channel: INVALID_NICNUM (22) from 0x000000aaacf7008c
+nic_get_channel: INVALID_NICNUM (21) from 0x000000aaacf7008c
+nic_get_channel: INVALID_NICNUM (20) from 0x000000aaacf7008c
+nic_get_channel: INVALID_NICNUM (19) from 0x000000aaacf7008c
+Jan  9 01:23:08 KP-DE-A port-manager: Alert: Ethernet1/8 link changed to UP
+Jan  9 01:23:08 KP-DE-A port-manager: Alert: Ethernet1/7 link changed to UP
+Jan  9 01:23:08 KP-DE-A port-manager: Alert: Ethernet1/6 link changed to UP
+Jan  9 01:23:08 KP-DE-A port-manager: Alert: Ethernet1/5 link changed to UP
+Jan  9 01:23:08 KP-DE-A port-manager: Alert: Ethernet1/4 link changed to UP
+Jan  9 01:23:08 KP-DE-A port-manager: Alert: Ethernet1/3 link changed to UP
+
+Stopping Cisco Firepower 2110 Threat Defense......ok
+Shutting down sfifd...                                                                                                                       [  OK  ]
+Clearing static routes
+Unconfiguring default route                                                                                                                  [  OK  ]
+Unconfiguring address on management0                                                                                                         [FAILED]
+Unconfiguring IPv6                                                                                                                           [  OK  ]
+Downing interface                                                                                                                            [  OK  ]
+Stopping nscd...                                                                                                                             [  OK  ]
+Turning off swapfile /ngfw/Volume/.swaptwo
+Stopping system log daemon...                                                                                                                [  OK  ]
+Stopping Threat Defense ...                                                                                                                  [  OK  ]
+Cisco FTD stopped successfully.
+Stopping OpenBSD Secure Shell server: sshd
+stopped /usr/sbin/sshd (pid 12769)
+done.
+Stopping Octeon NPU ... 
+Stopping Octeon NPU ... unreachable
+Stopping Advanced Configuration and Power Interface daemon: stopped /usr/sbin/acpid (pid 1177)
+acpid.
+Stopping web server: apache2failed
+Stopping system message bus: dbus.
+Stopping DHCP server: dhcpd3no /usr/sbin/dhcpd found; none killed
+.
+stopping DNS forwarder and DHCP server: dnsmasq... no /usr/bin/dnsmasq found; none killed
+stopping mountd: done
+stopping nfsd: .acpid: exiting
+done
+Stopping ntpd: stopped process in pidfile '/var/run/ntp.pid' (pid 13022)
+done
+Stopping internet superserver: xinetd.
+stopping statd: done
+Stopping random number generator daemon.
+Stopping domain name service: named.
+Stopping rpcbind daemon...
+done.
+Stopping fan control daemon: fancontrol... no process in pidfile '/var/run/fancontrol.pid' found; none killed
+done.
+Stopping sensors logging daemon: sensord... stopped /usr/sbin/sensord (pid 2164)
+done.
+ * Stopping virtualization library daemon: libvirtd                                                                                             [fail]
+Deconfiguring network interfaces... done.
+Stopping FreeRADIUS daemon radiusd Failed
+Sat Jan  9 01:23:24 UTC 2021
+SSP-Security-Module is shutting down ...
+Sat Jan  9 01:23:24 UTC 2021 SHUTDOWN WARNING: Beginning System Shutdown request for CSP Apps
+Sat Jan  9 01:23:24 UTC 2021 SHUTDOWN WARNING: Continue System Shutdown request for CSP Apps
+Sat Jan  9 01:23:24 UTC 2021
+Sending ALL processes the TERM signal ...
+Note: SIGKILL_ALL will be triggered after after 1 + 2 secs ...
+Jan  9 01:23:24 KP-DE-A KP-NVRAM: Confreg value: confreg = 0x1
+Sat Jan  9 01:23:26 UTC 2021
+Sending ALL processes the KILL signal ...
+Sat Jan  9 01:23:27 UTC 2021
+Deactivating swap...
+Unmounting local filesystems...
+Rebooting... [ 2560.600421] reboot: Restarting system
+
+
+
+*******************************************************************************
+Cisco System ROMMON, Version 1.0.12, RELEASE SOFTWARE
+Copyright (c) 1994-2019  by Cisco Systems, Inc.
+Compiled Mon 06/17/2019 16:23:23.36 by builder
+*******************************************************************************
+
+Current image running: Boot ROM1
+Last reset cause: ResetRequest (0x00001000)
+DIMM_1/1 : Present
+DIMM_2/1 : Absent
+
+Platform FPR-2110 with 16384 MBytes of main memory
+BIOS has been successfully locked !!
+MAC Address: 00:fc:ba:7a:01:00
+
+Use BREAK or ESC to interrupt boot.
+Use SPACE to begin boot immediately.

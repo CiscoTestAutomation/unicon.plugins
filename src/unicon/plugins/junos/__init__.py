@@ -8,16 +8,18 @@ Authors:
 Description:
     This subpackage implements Junos devices
 """
+from unicon.plugins.generic import ServiceList
 from unicon.bases.routers.connection import BaseSingleRpConnection
 from unicon.plugins.junos.connection_provider import JunosSingleRpConnectionProvider
 from .statemachine import JunosSingleRpStateMachine
 from .setting import JunosSettings
-from unicon.plugins.generic import ServiceList
+from unicon.plugins.generic import ServiceList, service_implementation as gsvc
 from unicon.plugins.junos import service_implementation as svc
 
 
-class JunosServiceList(object):
+class JunosServiceList(ServiceList):
     def __init__(self):
+        super().__init__()
         self.send = svc.Send
         self.sendline = svc.Sendline
         self.expect = svc.Expect
@@ -25,14 +27,14 @@ class JunosServiceList(object):
         self.configure = svc.Configure
         self.enable = svc.Enable
         self.disable = svc.Disable
-        self.expect_log = svc.ExpectLogging
         self.log_user = svc.LogUser
         self.bash_console = svc.BashService
+        self.expect_log = gsvc.ExpectLogging
 
 
 class JunosSingleRpConnection(BaseSingleRpConnection):
     os = 'junos'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     state_machine_class = JunosSingleRpStateMachine
     connection_provider_class = JunosSingleRpConnectionProvider

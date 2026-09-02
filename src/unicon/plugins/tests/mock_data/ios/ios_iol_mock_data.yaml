@@ -44,7 +44,7 @@ press_return2:
       new_state: exec_standby2
 
 exec_standby2:
-    prompt: Router-standby>
+    prompt: "%N-standby>"
     commands:
       "":
         new_state: exec_standby2

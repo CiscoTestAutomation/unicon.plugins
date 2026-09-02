@@ -110,4 +110,6 @@ basic_config_prompt:
   prompt: "Would you like to enter the basic configuration dialog (yes/no):"
   commands:
     "n":
-      new_state: user_access_veri 
+      new_state: user_access_veri
+    "no":
+      new_state: user_access_veri

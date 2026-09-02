@@ -1,0 +1,14 @@
+windows_connect:
+  prompt: "administrator@10.22.175.104's password: "
+  commands:
+    "cisco":
+      response: |
+        Microsoft Windows [Version 6.1.7601]                                            
+        Copyright (c) 2009 Microsoft Corporation.  All rights reserved.                 
+
+      new_state: windows_exec
+
+windows_exec:
+  prompt: "administrator@WIN7 C:\\Users\\Administrator>"
+  commands:
+    "dir": file|mock_data/windows/dir.txt

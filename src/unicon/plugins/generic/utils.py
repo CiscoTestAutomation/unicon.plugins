@@ -32,58 +32,76 @@ class GenericUtils(Utils):
             redundancy_details['role'] = "standby"
             redundancy_details['state'] =\
                 show_red_out[show_red_out.find('-') + 1:].strip()
+        elif re.search("DISABLED|disabled", show_red_out):
+            redundancy_details['role'] = "disabled"
+            redundancy_details['state'] =\
+                show_red_out[show_red_out.find('-') + 1:].strip()
         show_red_out = connection.execute(
             "show redundancy sta | inc Redundancy State")
         redundancy_details['mode'] =\
             show_red_out[show_red_out.find("=") + 1:].strip()
         return redundancy_details
 
-    def retry_state_machine_go_to(self,
-                                  state_machine,
-                                  to_state,
-                                  spawn,
-                                  retries,
-                                  retry_sleep,
-                                  context=AttributeDict(),
-                                  dialog=None,
-                                  timeout=None,
-                                  hop_wise=False,
-                                  prompt_recovery=False):
-        for index in range(retries + 1):
-            try:
-                state_machine.go_to(to_state,
-                                    spawn,
-                                    context=context,
-                                    dialog=dialog,
-                                    timeout=timeout,
-                                    hop_wise=hop_wise,
-                                    prompt_recovery=prompt_recovery)
-                break
-            except Exception as err:
-                if index == retries:
-                    raise SubCommandFailure(err, spawn.buffer)
-                time.sleep(retry_sleep)
+    def is_active_standby_ready(self, connection, timeout=120, interval=30):
+        """Check whether active and standby RP are ready using show redundancy.
 
-    def retry_handle_state_machine_go_to(self,
-                                         handle,
-                                         to_state,
-                                         retries,
-                                         retry_sleep,
-                                         context=AttributeDict(),
-                                         dialog=None,
-                                         timeout=None,
-                                         hop_wise=False,
-                                         prompt_recovery=False):
-        self.retry_state_machine_go_to(handle.state_machine,
-                                       to_state,
-                                       handle.spawn,
-                                       retries,
-                                       retry_sleep,
-                                       context=context,
-                                       dialog=dialog,
-                                       timeout=timeout,
-                                       hop_wise=hop_wise,
-                                       prompt_recovery=prompt_recovery)
+        Parses 'show redundancy' output to verify:
+        - Active RP is in ACTIVE state
+        - Standby RP is in STANDBY HOT state
+
+        Args:
+            connection: connection object to execute on
+            timeout: maximum time to wait in seconds
+            interval: polling interval in seconds
+        Returns:
+            True if both RPs are ready, False on timeout
+        """
+        start_time = time.time()
+
+          # Current Processor Information :
+          # -----------------------
+          #   Active Location = slot 6
+          #   Current Software state = ACTIVE
+
+        p_active = re.compile(
+            r'Current Processor Information[\s\S]*?'
+            r'Current Software state\s*=\s*(?P<state>\S+)')
+        
+        # Peer Processor Information :
+        # ----------------------------
+        #    Standby Location = slot 7
+        #    Current Software state = STANDBY HOT
+
+        p_standby = re.compile(
+            r'Peer Processor Information[\s\S]*?'
+            r'Current Software state\s*=\s*(?P<state>[\S ]+)')
+
+        while (time.time() - start_time) < timeout:
+            try:
+                output = connection.execute('show redundancy', timeout=60)
+            except Exception as err:
+                connection.log.error(
+                    'Failed to execute show redundancy: {}'.format(err))
+                time.sleep(interval)
+                continue
+
+            active_match = p_active.search(output)
+            standby_match = p_standby.search(output)
+
+            active_state = active_match.group('state').strip() if active_match else 'Unknown'
+            standby_state = standby_match.group('state').strip() if standby_match else 'Unknown'
+
+            connection.log.info(
+                'Active RP state: {}, Standby RP state: {}'.format(
+                    active_state, standby_state))
+
+            if active_state == 'ACTIVE' and standby_state == 'STANDBY HOT':
+                return True
+
+            connection.log.info('Sleeping for {} secs.'.format(interval))
+            time.sleep(interval)
+
+        return False
 
     def flatten_splitlines_command(self, command):
         if isinstance(command, str):
