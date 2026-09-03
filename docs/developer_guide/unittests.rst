@@ -99,7 +99,7 @@ Running the mock device:
 **High Availability (HA) mock device**
 
 To create a High Availability (HA) mock device that simulates multiple RPs
-or a stack of devices, you need to specifiy the '--ha' option with multiple 
+or a stack of devices, you need to specify the '--ha' option with multiple 
 states specified using the '--state' option, separated by a comma, for 
 example:
 
@@ -235,6 +235,24 @@ of a line. The line and char interval timings are optional and can be omitted.
            - "<line range>,<start delay>,<line interval>,<char interval>"
            - "<line range>,<start delay>,<line interval>,<char interval>"
 
+     keys:
+       # same kind of response structure as commands
+       "<key>": ""
+       "<key>": |2
+          <response data>
+
+       # response with additional options
+       "<cmd>":
+
+         # (optional) state transition
+         new_state: <state>
+
+       # ... etc, see above
+
+       # special keys: Control-X where X is one of 0ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_
+       # example: ctrl-y
+       "ctrl-y": "Control Y pressed"
+
 
 Example data:
 
@@ -275,7 +293,8 @@ Create YAML data with the state, prompt and command(s) that you want to match.
 
 
 Note: the above example data is incomplete, see 
-:download:`ios_mock_data.yaml <ios_mock_data.yaml>` for all the data.
+:download:`ios_mock_data.yaml <ios_mock_data.yaml>` 
+for a more complete example.
 
 
 Create a unittest that executes the mock device with the state that you created. 

@@ -13,7 +13,7 @@ class EscServiceList(ConfdServiceList):
 
 class EscSingleRPConnection(ConfdConnection):
     os = 'confd'
-    series = 'esc'
+    platform = 'esc'
     chassis_type = 'single_rp'
     state_machine_class = ConfdStateMachine
     connection_provider_class = ConfdConnectionProvider

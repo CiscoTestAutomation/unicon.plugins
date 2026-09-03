@@ -1,0 +1,147 @@
+c9k_vwlc_login:
+  prompt: "Username: "
+  commands:
+    "admin":
+      new_state: c9k_vwlc_password
+
+c9k_vwlc_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: c9k_vwlc_enable
+
+c9k_vwlc_enable:
+  prompt: "%N#"
+  commands:
+    "show version | include operating mode": ""
+    "config term":
+      new_state: c9k_vwlc_configure
+    "reload":
+      new_state: c9k_vwlc_system_config_change
+
+c9k_vwlc_configure:
+  prompt: "%N(config)#"
+  commands:
+    "end":
+      new_state: c9k_vwlc_enable
+
+c9k_vwlc_system_config_change:
+  prompt: "\nSystem configuration has been modified. Save? [yes/no]:"
+  commands:
+    "n":
+      new_state: c9k_vwlc_reload_proceed
+    "no":
+      new_state: c9k_vwlc_reload_proceed
+
+c9k_vwlc_reload_proceed:
+  prompt: "\nProceed with reload? [confirm]"
+  commands:
+    "":
+      response: file|mock_data/iosxe/cat9k_vwlc_reload_logs.txt
+      timing:
+        - 0:,0,0.005
+      new_state: c9k_vwlc_config_dialog
+
+c9k_vwlc_config_dialog:
+  preface:
+    timing:
+      - 0:,0,0.01
+    response: |2
+             --- System Configuration Dialog ---
+  prompt: "\nWould you like to enter the initial configuration dialog? [yes/no]: "
+  commands:
+    "no":
+      new_state: c9k_vwlc_enter_enable_config_secret
+      response: |2
+
+          The enable secret is a password used to protect
+          access to privileged EXEC and configuration modes.
+          This password, after entered, becomes encrypted in
+          the configuration.
+          -------------------------------------------------
+          secret should be of minimum 10 characters with
+          at least 1 upper case, 1 lower case, 1 digit and
+          should not contain [cisco]
+          -------------------------------------------------
+
+
+c9k_vwlc_enter_enable_config_secret:
+  prompt: "\n  Enter enable secret: "
+  commands:
+    "Secret12345!":
+      new_state: c9k_vwlc_confirm_enable_config_secret
+
+c9k_vwlc_confirm_enable_config_secret:
+  prompt: "  Confirm enable secret: "
+  commands:
+    "Secret12345!":
+      new_state: c9k_vwlc_enter_enable_secret_selection
+      response: |2
+
+        The following configuration command script was created:
+        enable secret 9 $9$gCGcm2IWBJOT5U$p6jqb1plxOJpr3yYwa/3fUSfpQjM.RgfcunyUXhqfRA
+        !
+        end
+
+        [0] Go to the IOS command prompt without saving this config.
+        [1] Return back to the setup without saving this config.
+        [2] Save this configuration to nvram and exit.
+
+c9k_vwlc_enter_enable_secret_selection:
+  prompt: "\nEnter your selection: "
+  commands:
+    "2":
+      new_state: c9k_vwlc_enter_encryption_config_selection
+      response: |
+
+        Building configuration...
+        [OK]
+        Use the enabled mode 'configure' command to modify this configuration.
+
+                     -----System Security Configuration Dialog-----        
+
+c9k_vwlc_enter_encryption_config_selection:
+  prompt: "\nWould you like to enter the initial configuration dialog? [yes/no]: "
+  commands:
+    "no":
+      new_state: c9k_vwlc_enter_enable_config_current_secret
+      response: |2
+
+        The enable secret is a password used to protect
+        access to privileged EXEC and configuration modes.
+        This password, after entered, becomes encrypted in
+        the configuration.
+        -------------------------------------------------
+        secret should be of minimum 10 characters with
+        at least 1 upper case, 1 lower case, 1 digit and
+        should not contain [cisco]
+        -------------------------------------------------
+
+c9k_vwlc_enter_enable_config_current_secret:
+  prompt: "\nEnter enable secret [<Use current secret>]: "
+  commands:
+    "Secret12345!":
+      new_state: c9k_vwlc_enter_enable_config_current_secret_again
+
+c9k_vwlc_enter_enable_config_current_secret_again:
+  prompt: "\nConfirm enable secret [<Use current secret>]: "
+  commands:
+    "Secret12345!":
+      new_state: c9k_vwlc_enter_current_secret_selection
+      response: |2
+
+          The following configuration command script was created:
+
+          enable secret 9 $9$gCGcm2IWBJOT5U$p6jqb1plxOJpr3yYwa/3fUSfpQjM.RgfcunyUXhqfRA
+          !
+          end
+
+          [0] Go to the IOS command prompt without saving this config.
+          [1] Return back to the setup without saving this config.
+          [2] Save this configuration to nvram and exit.
+
+c9k_vwlc_enter_current_secret_selection:
+  prompt: "\nEnter your selection: "
+  commands:
+    "2":
+      new_state: press_return

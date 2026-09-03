@@ -14,7 +14,7 @@ class NfvisServiceList(ConfdServiceList):
 
 class NfvisSingleRPConnection(ConfdConnection):
     os = 'confd'
-    series = 'nfvis'
+    platform = 'nfvis'
     chassis_type = 'single_rp'
     state_machine_class = NfvisStateMachine
     connection_provider_class = ConfdConnectionProvider

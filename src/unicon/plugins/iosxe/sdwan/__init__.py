@@ -1,6 +1,6 @@
 
-from unicon.plugins.iosxe import IosXESingleRpConnection, IosXEServiceList
-from unicon.plugins.iosxe.sdwan.statemachine import SDWANSingleRpStateMachine 
+from unicon.plugins.iosxe import IosXESingleRpConnection, IosXEServiceList, IosXEDualRPConnection
+from unicon.plugins.iosxe.sdwan.statemachine import SDWANSingleRpStateMachine, SDWANDualRpStateMachine
 from unicon.plugins.iosxe.sdwan import service_implementation as svc
 from unicon.plugins.iosxe.sdwan.settings import SDWANSettings
 
@@ -11,7 +11,14 @@ class SDWANServiceList(IosXEServiceList):
 
 class SDWANSingleRpConnection(IosXESingleRpConnection):
     os = 'iosxe'
-    series = 'sdwan'
+    platform = 'sdwan'
     state_machine_class = SDWANSingleRpStateMachine
+    subcommand_list = SDWANServiceList
+    settings = SDWANSettings()
+
+class SDWANDualRpConnection(IosXEDualRPConnection):
+    os = 'iosxe'
+    platform = 'sdwan'
+    state_machine_class = SDWANDualRpStateMachine
     subcommand_list = SDWANServiceList
     settings = SDWANSettings()

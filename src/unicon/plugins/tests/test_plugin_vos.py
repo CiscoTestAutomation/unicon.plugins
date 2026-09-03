@@ -34,21 +34,23 @@ class TestVosPlugin(unittest.TestCase):
         cls.c.connect()
 
     def test_execute_with_paging(self):
-        r = self.c.execute('show tech dbstateinfo')
-        self.assertEqual(r.strip().splitlines(), dedent("""\
-            ------------------------ Show tech dbstateinfo -------------------
+        self.maxDiff = None
+        output = self.c.execute('show tech dbstateinfo')
+        self.assertEqual(output.splitlines(), """\
+------------------------ Show tech dbstateinfo -------------------
 
 
-            Database State Info
+Database State Info
 
-            Output is in /cm/trace/dbl/showtechdbstateinfo211506.txt
-             Please use "file view activelog /cm/trace/dbl/showtechdbstateinfo211506.txt" to see the 
-                contents of File
-             Error Output is in /cm/trace/dbl/showtechdbstateinfo_cdr_err211506.out
+Output is in /cm/trace/dbl/showtechdbstateinfo211506.txt
+ 
+ Please use "file view activelog /cm/trace/dbl/showtechdbstateinfo211506.txt" to see the 
+    contents of File
+ 
+ Error Output is in /cm/trace/dbl/showtechdbstateinfo_cdr_err211506.out
 
-            Please use "file view activelog /cm/trace/dbl/showtechdbstateinfo_cdr_err211506.out" command to see the contents of File
-
-            """).strip().splitlines())
+Please use "file view activelog /cm/trace/dbl/showtechdbstateinfo_cdr_err211506.out" command to see the contents of File
+""".splitlines())
 
     def test_execute_with_continue(self):
         r = self.c.execute('utils core active analyze')

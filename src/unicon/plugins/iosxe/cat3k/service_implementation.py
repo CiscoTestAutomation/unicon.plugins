@@ -9,9 +9,10 @@ from unicon.plugins.generic.service_statements import reload_statement_list
 from unicon.plugins.generic.service_implementation import ReloadResult
 from unicon.eal.dialogs import Dialog
 from unicon.core.errors import SubCommandFailure
-from .service_statements import boot_reached, tcpdump_continue
 from unicon.utils import AttributeDict
 
+from ..statements import boot_from_rommon_stmt
+from .service_statements import tcpdump_continue
 
 class Reload(BaseService):
     """Service to reload the device.
@@ -42,19 +43,33 @@ class Reload(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'enable'
         self.end_state = 'enable'
-        self.service_name = 'reload'
         self.timeout = connection.settings.RELOAD_TIMEOUT
-        self.dialog = Dialog(reload_statement_list)
-        self.dialog.append(boot_reached)
+        self.dialog = Dialog(reload_statement_list + [boot_from_rommon_stmt])
 
     def call_service(self,
                      reload_command='reload',
                      dialog=Dialog([]),
                      timeout=None,
                      return_output=False,
-                     *args, **kwargs):
+                     error_pattern=None,
+                     append_error_pattern=None,
+                     *args,
+                     **kwargs):
         con = self.connection
         timeout = timeout or self.timeout
+
+        if error_pattern is None:
+            self.error_pattern = con.settings.ERROR_PATTERN
+        else:
+            self.error_pattern = error_pattern
+
+        if not isinstance(self.error_pattern, list):
+            raise ValueError('error_pattern should be a list')
+        if append_error_pattern:
+            if not isinstance(append_error_pattern, list):
+                raise ValueError('append_error_pattern should be a list')
+            self.error_pattern += append_error_pattern
+
         assert isinstance(dialog,
                           Dialog), "dialog passed must be an instance of Dialog"
         dialog += self.dialog
@@ -70,10 +85,17 @@ class Reload(BaseService):
         dialog = self.service_dialog(service_dialog=dialog)
         con.spawn.sendline(reload_command)
         try:
-            reload_op=dialog.process(con.spawn, context=context, timeout=timeout,
-                prompt_recovery=self.prompt_recovery)
-            con.state_machine.go_to(['disable', 'enable'], con.spawn,
+            reload_op=dialog.process(con.spawn,
+                                     context=context,
+                                     timeout=timeout,
+                                     prompt_recovery=self.prompt_recovery)
+
+            self.result = reload_op.match_output
+            self.get_service_result()
+
+            con.state_machine.go_to('enable', con.spawn,
                                     context=context,
+                                    timeout=con.connection_timeout,
                                     prompt_recovery=self.prompt_recovery)
         except Exception as err:
             raise SubCommandFailure("Reload failed : {}".format(err))
@@ -135,7 +157,6 @@ class Shell(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'shell'
         self.end_state = 'enable'
-        self.service_name = 'shellexec'
         self.timeout = connection.settings.EXEC_TIMEOUT
         self.transition_timeout = connection.settings.STATE_TRANSITION_TIMEOUT
         self.shell_enable = False
@@ -205,7 +226,6 @@ class Rommon(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'rommon'
         self.end_state = 'rommon'
-        self.service_name = 'rommon'
         self.local_end_state = None
         self.timeout = connection.settings.EXEC_TIMEOUT
 

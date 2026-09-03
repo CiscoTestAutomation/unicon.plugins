@@ -1,0 +1,85 @@
+
+
+***
+*** --- START GRACEFUL SHUTDOWN ---
+Shutting down Application Agent
+Shutting down isakmp
+Shutting down webvpn
+Shutting down sw-module
+Shutting down License Controller
+Shutting down File system
+
+
+
+***
+*** --- SHUTDOWN NOW ---
+Process shutdown finished
+Rebooting... (status 0x9)
+..
+lina_monitor pro2021 Jan 12 17:15:17 PMLOG: PM IPC UTILITY: Shutting down all ports
+
+Cisco ASA: CMD=-stop, CSP-ID=cisco-asa.99.16.1.222__asa_001_JMX2209Y019IKMF061, FLAG=''
+Cisco ASA stopping ...
+Cisco ASA stopped successfully.
+Stopping OpenBSD Secure Shell server: sshd
+stopped /usr/sbin/sshd (pid 10297)
+done.
+Stopping Octeon NPU ... 
+Stopping Octeon NPU ... success
+Stopping Advanced Configuration and Power Interface daemon: stopped /usr/sbin/acpid (pid 1398)
+acpid.
+Stopping web server: apache2failed
+Stopping system message bus: dbus.
+Stopping DHCP server: dhcpd3no /usr/sbin/dhcpd found; none killed
+.
+stopping DNS forwarder and DHCP server: dnsmasq... no /usr/bin/dnsmasq found; none killed
+stopping mountd: done
+stopping nfsd: .acpid: exiting
+done
+Stopping ntpd: stopped process in pidfile '/var/run/ntp.pid' (pid 4262)
+done
+Stopping internet superserver: xinetd.
+stopping statd: done
+Stopping random number generator daemon.
+Stopping domain name service: named.
+Stopping crond: OK
+Stopping rpcbind daemon...
+done.
+Stopping fan control daemon: fancontrol... no process in pidfile '/var/run/fancontrol.pid' found; none killed
+done.
+Stopping sensors logging daemon: sensord... stopped /usr/sbin/sensord (pid 2483)
+done.
+ * Stopping virtualization library daemon: libvirtd                      [fail]
+Deconfiguring network interfaces... done.
+Stopping FreeRADIUS daemon radiusd Failed
+Tue Jan 12 17:15:28 UTC 2021
+SSP-Security-Module is shutting down ...
+Tue Jan 12 17:15:28 UTC 2021 SHUTDOWN WARNING: Beginning System Shutdown request for CSP Apps
+Tue Jan 12 17:15:28 UTC 2021 SHUTDOWN WARNING: Continue System Shutdown request for CSP Apps
+Tue Jan 12 17:15:28 UTC 2021
+Sending ALL processes the TERM signal ...
+Note: SIGKILL_ALL will be triggered after after 1 + 2 secs ...
+Tue Jan 12 17:15:30 UTC 2021
+Sending ALL processes the KILL signal ...
+Tue Jan 12 17:15:31 UTC 2021
+Deactivating swap...
+Unmounting local filesystems...
+Rebooting... [  439.640414] reboot: Restarting system
+
+
+
+*******************************************************************************
+Cisco System ROMMON, Version 1.0.12, RELEASE SOFTWARE
+Copyright (c) 1994-2019  by Cisco Systems, Inc.
+Compiled Mon 06/17/2019 16:23:23.36 by builder
+*******************************************************************************
+
+Current image running: Boot ROM0
+Last reset cause: ResetRequest (0x00001000)
+DIMM_1/1 : Present
+DIMM_2/1 : Absent
+
+Platform FPR-2120 with 16384 MBytes of main memory
+BIOS has been successfully locked !!
+MAC Address: 00:fc:ba:04:62:00
+

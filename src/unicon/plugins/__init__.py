@@ -1,30 +1,46 @@
-
-__version__ = '19.12'
+__version__ = "26.8"
 
 supported_chassis = [
     'single_rp',
     'dual_rp',
     'stack',
+    'quad',
+    'stackwise_virtual'
 ]
 
 supported_os = [
+    'aci',
+    'aireos',
+    'apic',
+    'asa',
+    'cheetah',
+    'cimc',
+    'comware',
+    'confd',
+    'dnos6',
+    'dnos10',
+    'eos',
+    'fxos',
+    'gaia',
     'generic',
+    'hvrp',
     'ios',
-    'nxos',
     'iosxe',
     'iosxr',
-    'aireos',
-    'linux',
-    'cheetah',
+    'ironware',
     'ise',
-    'asa',
-    'nso',
-    'confd',
-    'vos',
-    'cimc',
-    'fxos',
     'junos',
-    'staros',
-    'aci',
+    'linux',
+    'nd',
+    'nso',
+    'nxos',
+    'ons',
     'sdwan',
+    'slxos',
+    'sonic',
+    'sros',
+    'staros',
+    'viptela',
+    'vos',
+    'windows'
 ]

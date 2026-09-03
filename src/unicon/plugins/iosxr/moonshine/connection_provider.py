@@ -10,6 +10,7 @@ from unicon.plugins.iosxr.moonshine.statements import MoonshineStatements
 from unicon.plugins.iosxr.moonshine.patterns import MoonshinePatterns
 from unicon.plugins.iosxr.errors import RpNotRunningError
 from unicon.eal.dialogs import Dialog
+from unicon.plugins.generic.connection_provider import GenericDualRpConnectionProvider
 
 
 patterns = MoonshinePatterns()
@@ -37,7 +38,6 @@ class MoonshineSingleRpConnectionProvider(IOSXRSingleRpConnectionProvider):
         """ Executes the init commands on the device after bringing
             it to enable state """
         con = self.connection
-        con._is_connected = True
         con.state_machine.go_to('enable',
                                 self.connection.spawn,
                                 context=self.connection.context,
@@ -45,7 +45,11 @@ class MoonshineSingleRpConnectionProvider(IOSXRSingleRpConnectionProvider):
         self.execute_init_commands()
 
 
-class MoonshineDualRpConnectionProvider(IOSXRDualRpConnectionProvider):
+class MoonshineDualRpConnectionProvider(GenericDualRpConnectionProvider):
+    # This class inherits from GenericDualRpConnectionProvider instead
+    # of IOSXRDualRpConnectionProvider because we want to use the
+    # generic `designate_handles` method.
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -65,3 +69,8 @@ class MoonshineDualRpConnectionProvider(IOSXRDualRpConnectionProvider):
                 hostname_command = ['hostname ' + con.hostname]
             self.init_config_commands = hostname_command + con.settings.MOONSHINE_INIT_CONFIG_COMMANDS
 
+    def unlock_standby(self):
+        pass
+
+    def assign_ha_mode(self):
+        pass

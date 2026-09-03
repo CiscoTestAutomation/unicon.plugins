@@ -24,5 +24,7 @@ class ASASettings(GenericSettings):
         self.MAX_COPY_ATTEMPTS = 2
         self.ERROR_PATTERN = [
             r'^ERROR:',
-            r'^WARNING:'
+            r'^WARNING:',
+            r'\*{1,} WARNING \*{1,}',
+            r'^Removing.*?failed.*?$'
         ]

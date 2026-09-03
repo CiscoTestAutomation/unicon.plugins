@@ -16,7 +16,7 @@ class IosXECat3kServiceList(IosXEServiceList):
 
 
 class IosXECat3kSingleRpConnection(IosXESingleRpConnection):
-    series = 'cat3k'
+    platform = 'cat3k'
     os = 'iosxe'
     chassis_type = 'single_rp'
     state_machine_class = IosXECat3kSingleRpStateMachine

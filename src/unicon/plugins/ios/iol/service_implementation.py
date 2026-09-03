@@ -11,6 +11,5 @@ class IosIolSwitchoverService(HAReloadService):
 
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
-        self.service_name = 'switchover'
         self.command = 'redundancy switch-activity force'
         self.dialog = Dialog(ios_iol_ha_reload_statement_list)

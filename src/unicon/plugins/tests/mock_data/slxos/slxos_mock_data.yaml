@@ -1,0 +1,124 @@
+connect_ssh:
+  preface: |
+    The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
+    RSA key fingerprint is a1:07:ac:9b:8c:c2:db:c5:4c:dc:70:b5:09:2a:a5:b1.
+  prompt: "Are you sure you want to continue connecting (yes/no)? "
+  commands:
+    "yes":
+      new_state: user_access_veri
+
+exec:
+  prompt: "SLX#"
+  commands:
+    "show version": |
+      
+      SLX-OS Operating System Version: 20.2.2
+      Copyright (c) 1995-2021 Extreme Networks, Inc.
+      Firmware name:      20.2.2a
+      Build Time:         10:29:46 Nov 11, 2020
+      Install Time:       05:00:38 Nov 28, 2020
+      Kernel:             4.14.67
+      Control Processor:  Intel(R) Xeon(R) CPU D-1527 @ 2.20GHz,  4 cores
+      Microcode Version:  0x7000017
+      Memory Size:        System Total: 31644 MB
+      System Uptime:      2days 21hrs 27mins 54secs
+
+      Name     Primary/Secondary Versions
+      ------------------------------------------
+      SLX-OS   20.2.2a
+              20.2.2a
+      
+    "show ip interface brief" : |
+      Flags:  I - Insight Enabled     U - Unnumbered interface    M - Redundant Management
+      Interface              IP-Address          Vrf                     Status                    Protocol
+      ==================     ==========          ==================      ====================      ========
+      Port-channel 1         unassigned           default-vrf             up                        up
+      Port-channel 63        unassigned           default-vrf             up                        down
+      Port-channel 64        unassigned           default-vrf             up                        down
+      Loopback 1             172.20.0.5           default-vrf             up                        up
+      Ethernet 0/1           unassigned           default-vrf             up                        up
+      Ethernet 0/2           unassigned           default-vrf             up                        up
+      Ethernet 0/3           unassigned           default-vrf             administratively down     down
+      Ethernet 0/4           unassigned           default-vrf             administratively down     down
+      Ethernet 0/5           unassigned           default-vrf             administratively down     down
+      Ethernet 0/6           unassigned           default-vrf             administratively down     down
+      Ethernet 0/7           unassigned           default-vrf             administratively down     down
+      Ethernet 0/8           unassigned           default-vrf             administratively down     down
+      Ethernet 0/9           unassigned           default-vrf             administratively down     down
+      Ethernet 0/10          unassigned           default-vrf             administratively down     down
+      Ethernet 0/11          unassigned           default-vrf             administratively down     down
+      Ethernet 0/12          unassigned           default-vrf             administratively down     down
+      Ethernet 0/13          unassigned           default-vrf             administratively down     down
+      Ethernet 0/14          unassigned           default-vrf             administratively down     down
+      Ethernet 0/15          unassigned           default-vrf             administratively down     down
+      Ethernet 0/16          unassigned           default-vrf             administratively down     down
+      Ethernet 0/17          unassigned           default-vrf             administratively down     down
+      Ethernet 0/18          unassigned           default-vrf             administratively down     down
+      Ethernet 0/19          unassigned           default-vrf             administratively down     down
+      Ethernet 0/20          unassigned           default-vrf             administratively down     down
+      Ethernet 0/21          unassigned           default-vrf             administratively down     down
+      Ethernet 0/22          unassigned           default-vrf             administratively down     down
+      Ethernet 0/23          unassigned           default-vrf             administratively down     down
+      Ethernet 0/24          unassigned           default-vrf             administratively down     down
+      Ethernet 0/25          unassigned           default-vrf             administratively down     down
+      Ethernet 0/26          unassigned           default-vrf             administratively down     down
+      Ethernet 0/27          unassigned           default-vrf             administratively down     down
+      Ethernet 0/28          unassigned           default-vrf             administratively down     down
+      Ethernet 0/29          unassigned           default-vrf             administratively down     down
+      Ethernet 0/30          unassigned           default-vrf             administratively down     down
+      Ethernet 0/31          unassigned           default-vrf             administratively down     down
+      Ethernet 0/32          unassigned           default-vrf             administratively down     down
+      Ethernet 0/33          unassigned           default-vrf             administratively down     down
+      Ethernet 0/34          unassigned           default-vrf             administratively down     down
+      Ethernet 0/35          unassigned           default-vrf             administratively down     down
+      Ethernet 0/36          unassigned           default-vrf             administratively down     down
+      Ethernet 0/37          unassigned           default-vrf             administratively down     down
+      Ethernet 0/38          unassigned           default-vrf             administratively down     down
+      Ethernet 0/39          unassigned           default-vrf             administratively down     down
+      Ethernet 0/40          unassigned           mgmt-vrf                administratively down     down
+      Ethernet 0/41          unassigned           default-vrf             administratively down     down
+      Ethernet 0/42          unassigned           default-vrf             administratively down     down
+      Ethernet 0/43          unassigned           default-vrf             administratively down     down
+      Ethernet 0/44          unassigned           default-vrf             administratively down     down
+      Ethernet 0/45          unassigned           default-vrf             administratively down     down
+      Ethernet 0/46          unassigned           default-vrf             administratively down     down
+      Ethernet 0/47          unassigned           default-vrf             administratively down     down
+      Ethernet 0/49          unassigned           default-vrf             up                        down
+      Ethernet 0/50          unassigned           default-vrf             up                        down
+      Ethernet 0/51          unassigned           default-vrf             up                        down
+      Ethernet 0/52          unassigned           default-vrf             up                        down
+      Ethernet 0/53          unassigned           default-vrf             up                        down
+      Ethernet 0/54          unassigned           default-vrf             up                        down
+      Ethernet 0/125(I)      unassigned           default-vrf             administratively down     down
+      Ve 151                 10.254.0.9           default-vrf             up                        down (No active member ports)
+      Ve 152                 10.254.0.11          default-vrf             up                        down
+    "configure":
+      new_state: config
+    "configure terminal":
+      new_state: config
+    "terminal timeout 0": |
+      Successfully set This Session Idle Timeout to 0 seconds.
+    "terminal length 0": |
+      Successfully set This Session Terminal Length to  0.
+    "no terminal monitor": |
+      Terminal monitoring is disabled.
+
+config:
+  prompt: "%N(config)#"
+  commands:
+    "end":
+      new_state: exec
+    "exit":
+      new_state: exec
+
+user_access_veri:
+  prompt: "%N login: "
+  commands:
+    "admin":
+      new_state: user_password
+
+user_password:
+  prompt: "Password: "
+  commands:
+    "password":
+      new_state: exec

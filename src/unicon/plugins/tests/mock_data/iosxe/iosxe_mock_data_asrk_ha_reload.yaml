@@ -1,0 +1,230 @@
+
+ha_asrk_active_disable:
+  prompt: "%N>"
+  commands:
+    "show version | include operating mode": ""
+    "enable":
+      new_state: ha_asrk_active_enable
+
+ha_asrk_active_enable:
+  prompt: "%N#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version | include operating mode": ""
+    "show version": |
+      Cisco IOS XE Software, Version 17.07.01
+      Cisco IOS Software [Bengaluru], ASR1000 Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 17.7.1
+      Copyright (c) 1986-2021 by Cisco Systems, Inc.
+
+      ROM: 17.7(2r)
+
+      Router uptime is 3 days, 4 hours, 15 minutes
+      Uptime for this control processor is 3 days, 4 hours, 17 minutes
+      System returned to ROM by LocalSoft
+      System image file is "bootflash:/asr1k.bin"
+      Last reload reason: LocalSoft
+
+      cisco ASR1009-X (RP3) processor (revision RP3) with 4125167K/24590K bytes of memory.
+      Processor board ID FXS2230Q31P
+      Router operating mode: Autonomous
+      32768K bytes of non-volatile configuration memory.
+      8388608K bytes of physical memory.
+      7116799K bytes of eUSB flash at bootflash:.
+
+      Configuration register is 0x2102
+    "sh redundancy stat | inc my state": |2
+             my state = 13 -ACTIVE 
+    "show redundancy sta |  in my": |2
+             my state = 13 -ACTIVE 
+    "show redundancy sta |  in peer": |2
+           peer state = 8  -STANDBY HOT 
+    "show redundancy sta | inc Redundancy State": |2
+      Redundancy State              = sso
+    "sh redundancy state": &show_redundancy_state |2
+             my state = 13 -ACTIVE 
+           peer state = 8  -STANDBY HOT 
+                 Mode = Duplex
+                 Unit = Primary
+              Unit ID = 48
+
+      Redundancy Mode (Operational) = sso
+      Redundancy Mode (Configured)  = sso
+      Redundancy State              = sso
+           Maintenance Mode = Disabled
+          Manual Swact = enabled
+       Communications = Up
+
+         client count = 84
+       client_notification_TMR = 30000 milliseconds
+                 RF debug mask = 0x0   
+    "show redundancy": |2
+      Redundancy Mode (Operational) = sso
+      Redundancy Mode (Configured)  = sso
+      Redundancy State              = sso
+           Maintenance Mode = Disabled
+          Manual Swact = enabled
+       Communications = Up
+
+      Current Processor Information :
+      -------------------------------
+        Active Location = slot 6
+        Current Software state = ACTIVE
+        Uptime in current state = 3 days, 4 hours
+        Image Version = Cisco IOS Software [Bengaluru], Version 17.7.1
+        BOOT = bootflash:/asr1k.bin,1;
+        CONFIG_FILE =
+        Configuration register = 0x2102
+
+      Peer Processor Information :
+      ----------------------------
+        Standby Location = slot 7
+        Current Software state = STANDBY HOT
+        Uptime in current state = 3 days, 3 hours
+        Image Version = Cisco IOS Software [Bengaluru], Version 17.7.1
+        BOOT = bootflash:/asr1k.bin,1;
+        CONFIG_FILE =
+        Configuration register = 0x2102
+    "reload":
+      new_state: ha_asrk_active_reload_confirm
+    "config term":
+      new_state: ha_asrk_active_config
+
+ha_asrk_active_reload_confirm:
+  prompt: "System configuration has been modified. Save? [yes/no]: "
+  commands:
+    "n":
+      new_state: ha_asrk_active_reload_proceed
+    "y":
+      new_state: ha_asrk_active_reload_proceed
+
+ha_asrk_active_reload_proceed:
+  prompt: "Proceed with reload? [confirm]"
+  commands:
+    "":
+      new_state: ha_asrk_active_reload_boot
+
+ha_asrk_active_reload_boot:
+  preface: |2
+
+    Sep 20 19:20:19.451: %PMAN-5-EXITACTION: R1/0: pvp: Process manager is exiting: process exit with reload chassis code
+
+    Initializing Hardware ...
+
+    System Bootstrap, Version 17.7(2r), RELEASE SOFTWARE
+    Copyright (c) 1994-2021  by cisco Systems, Inc.
+
+    Current image running: Boot ROM1
+    Last reset cause: LocalSoft
+
+    ASR1000-RP3 platform with 8388608 Kbytes of main memory
+
+    Cisco IOS Software [Bengaluru], ASR1000 Software, Version 17.7.1
+    Copyright (c) 1986-2021 by Cisco Systems, Inc.
+
+    cisco ASR1009-X (RP3) processor with 4125167K/24590K bytes of memory.
+    Processor board ID FXS2230Q31P
+
+    Press RETURN to get started!
+  prompt: ""
+  commands:
+    "":
+      new_state: ha_asrk_active_disable
+
+ha_asrk_active_config:
+  prompt: "%N(config)#"
+  commands:
+    "no logging console": ""
+    "line console 0": ""
+    "line vty 0 4": ""
+    "exec-timeout 0": ""
+    "redundancy":
+      new_state: ha_asrk_active_config_redundancy
+    "end":
+      new_state: ha_asrk_active_enable
+
+ha_asrk_active_config_redundancy:
+  prompt: "%N(config-red)#"
+  commands:
+    "main-cpu":
+      new_state: ha_asrk_active_config_redundancy_mc
+
+ha_asrk_active_config_redundancy_mc:
+  prompt: "%N(config-red-mc)#"
+  commands:
+    "standby console enable": ""
+    "end":
+      new_state: ha_asrk_active_enable
+
+ha_asrk_standby_disable:
+  prompt: "%N-stby>"
+  commands:
+    "show version | include operating mode": ""
+    "enable":
+      new_state: ha_asrk_standby_enable
+
+ha_asrk_standby_disable_locked:
+  prompt: "%N-stby>"
+  commands:
+    "enable": "Standby console disabled"
+
+ha_asrk_standby_boot:
+  preface: |2
+
+    Sep 20 19:20:19.891: %PMAN-5-EXITACTION: R0/0: pvp: Process manager is exiting: process exit with reload fru code
+    Initializing Hardware ...
+
+    System Bootstrap, Version 17.7(2r), RELEASE SOFTWARE
+    Copyright (c) 1994-2021  by cisco Systems, Inc.
+
+    Current image running: Boot ROM0
+    Last reset cause: LocalSoft
+
+    ASR1000-RP3 platform with 67108864 Kbytes of main memory
+
+    Cisco IOS Software [Bengaluru], ASR1000 Software, Version 17.7.1
+    Copyright (c) 1986-2021 by Cisco Systems, Inc.
+
+    cisco ASR1009-X (RP3) processor with 4125167K/24590K bytes of memory.
+
+    Press RETURN to get started!
+  prompt: ""
+  commands:
+    "":
+      new_state: ha_asrk_standby_disable
+
+ha_asrk_standby_enable:
+  prompt: "%N-stby#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version | include operating mode": ""
+    "show version": |
+      Cisco IOS XE Software, Version 17.07.01
+      Cisco IOS Software [Bengaluru], ASR1000 Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 17.7.1
+      Copyright (c) 1986-2021 by Cisco Systems, Inc.
+    "sh redundancy stat | inc my state": |2
+             my state = 8  -STANDBY HOT
+    "show redundancy sta |  in my": |2
+             my state = 8  -STANDBY HOT
+    "show redundancy sta |  in peer": |2
+           peer state = 13 -ACTIVE
+    "show redundancy sta | inc Redundancy State": |2
+      Redundancy State              = sso
+    "sh redundancy state": |2
+             my state = 8  -STANDBY HOT 
+           peer state = 13 -ACTIVE 
+                 Mode = Duplex
+                 Unit = Secondary
+              Unit ID = 49
+
+      Redundancy Mode (Operational) = sso
+      Redundancy Mode (Configured)  = sso
+      Redundancy State              = sso
+           Maintenance Mode = Disabled
+          Manual Swact = enabled
+       Communications = Up
+
+         client count = 84
+       client_notification_TMR = 30000 milliseconds
+                 RF debug mask = 0x0   

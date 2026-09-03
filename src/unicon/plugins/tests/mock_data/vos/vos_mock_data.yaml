@@ -20,15 +20,14 @@ vos_exec:
     "set cli pagination off": ""
     "some command": "some output"
     "some other command": "some other output"
-    "show tech dbstateinfo": 
-      response: |
+    "show tech dbstateinfo":
+      response: |2
         ------------------------ Show tech dbstateinfo -------------------
 
 
         Database State Info
 
         Output is in /cm/trace/dbl/showtechdbstateinfo211506.txt
-
       new_state: press_enter
     "utils core active analyze":
       response: |
@@ -48,28 +47,32 @@ continue_prompt:
 
 
 press_enter:
-  prompt: ESC[1mPress <enter> for 1 line, <space> for one page, or <q> to quitESC[0mESC[K
-  commands:
-    "":
+  prompt: "%1B[1mPress <enter> for 1 line, <space> for one page, or <q> to quit%1B[0m%1B[K"
+  keys:
+    " ":
       new_state: press_enter2
-
-press_enter2:
-  preface: |
-    Please use "file view activelog /cm/trace/dbl/showtechdbstateinfo211506.txt" to see the 
-        contents of File
-  prompt: ESC[1mPress <enter> for 1 line, <space> for one page, or <q> to quitESC[0mESC[K
-  commands:
-    "":
-      new_stae: press_enter3
-
-press_enter3:
-  preface: |
-    Error Output is in /cm/trace/dbl/showtechdbstateinfo_cdr_err211506.out
-
-    Please use "file view activelog /cm/trace/dbl/showtechdbstateinfo_cdr_err211506.out" command to see the contents of File
-  prompt: ESC[1mPress <enter> for 1 line, <space> for one page, or <q> to quitESC[0mESC[K
-  commands:
-    "":
+    "q":
       new_state: vos_exec
 
+press_enter2:
+  preface: |2
+     Please use "file view activelog /cm/trace/dbl/showtechdbstateinfo211506.txt" to see the 
+        contents of File
+  prompt: "%1B[1mPress <enter> for 1 line, <space> for one page, or <q> to quit%1B[0m%1B[K"
+  keys:
+    " ":
+      new_state: press_enter3
+    "q":
+      new_state: vos_exec
 
+press_enter3:
+  preface: |2
+     Error Output is in /cm/trace/dbl/showtechdbstateinfo_cdr_err211506.out
+
+    Please use "file view activelog /cm/trace/dbl/showtechdbstateinfo_cdr_err211506.out" command to see the contents of File
+  prompt: "%1B[1mPress <enter> for 1 line, <space> for one page, or <q> to quit%1B[0m%1B[K"
+  keys:
+    " ":
+      new_state: vos_exec
+    "q":
+      new_state: vos_exec

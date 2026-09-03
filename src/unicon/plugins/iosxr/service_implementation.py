@@ -1,18 +1,31 @@
 __author__ = "Syed Raza <syedraza@cisco.com>"
 
+import io
 import re
+import logging
 from time import sleep
 from datetime import datetime, timedelta
 
 from unicon.plugins.generic import service_implementation as svc
 from unicon.bases.routers.services import BaseService
-from unicon.core.errors import SubCommandFailure
-from unicon.eal.dialogs import Dialog
-from unicon.plugins.generic.service_implementation import BashService
+from unicon.core.errors import SubCommandFailure, StateMachineError, SwitchoverDisallowedError
+from unicon.eal.dialogs import Dialog, Statement
+from unicon.logs import UniconStreamHandler
+from unicon.plugins.utils import slugify
+from unicon.plugins.generic.service_implementation import BashService as GenericBashService
+from unicon.plugins.generic.service_implementation import GetRPState as GenericGetRPState
 
 from .service_statements import (switchover_statement_list,
                                  config_commit_stmt_list,
-                                 execution_statement_list)
+                                 execution_statement_list,
+                                 configure_statement_list,
+                                 reload_statement_list)
+
+from .utils import IosxrUtils
+from .patterns import IOSXRPatterns
+
+utils = IosxrUtils()
+patterns = IOSXRPatterns()
 
 
 def get_commit_cmd(**kwargs):
@@ -20,6 +33,8 @@ def get_commit_cmd(**kwargs):
         commit_cmd = 'commit force'
     elif 'replace' in kwargs and kwargs['replace'] is True:
         commit_cmd = 'commit replace'
+    elif 'best_effort' in kwargs and kwargs['best_effort'] is True:
+        commit_cmd = 'commit best-effort'
     else:
         commit_cmd = 'commit'
     return commit_cmd
@@ -30,6 +45,24 @@ class Execute(svc.Execute):
         # Connection object will have all the received details
         super().__init__(connection, context, **kwargs)
         self.dialog += Dialog(execution_statement_list)
+        self.UNSUPPORTED_START_STATES = ['monitor']
+
+    def pre_service(self, *args, **kwargs):
+        # If the connection is in a unsupported state, go to enable mode
+        if self.connection.state_machine.current_state in \
+                self.UNSUPPORTED_START_STATES:
+            sm = self.get_sm()
+            sm.go_to('enable',
+                     self.connection.spawn,
+                     timeout=self.connection.spawn.settings.EXEC_TIMEOUT)
+
+        super().pre_service(*args, **kwargs)
+
+    def call_service(self, command=[], *args, **kwargs):
+        if command and command in self.connection.settings.AVOID_STATE_DETECTION_COMMANDS \
+                and kwargs.get('detect_state') is None:
+            kwargs['detect_state'] = False
+        super().call_service(command, *args, **kwargs)
 
 
 class Configure(svc.Configure):
@@ -37,29 +70,61 @@ class Configure(svc.Configure):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'config'
         self.end_state = 'enable'
-        self.service_name = 'config'
+        self.dialog += Dialog(configure_statement_list)
 
     def call_service(self, command=[], reply=Dialog([]),
-                      timeout=None, *args, **kwargs):
+                     timeout=None, *args, **kwargs):
         self.commit_cmd = get_commit_cmd(**kwargs)
         super().call_service(command,
                              reply=reply + Dialog(config_commit_stmt_list),
-                             timeout=timeout, *args, **kwargs)
+                             timeout=timeout,
+                             result_check_per_command=False,
+                             *args, **kwargs)
+
+
+class ConfigureExclusive(Configure):
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.start_state = 'exclusive'
+        self.end_state = 'enable'
+        self.service_name = 'exclusive'
+
 
 class HaConfigureService(svc.HaConfigureService):
     def call_service(self, command=[], reply=Dialog([]), target='active',
-                      timeout=None, *args, **kwargs):
+                     timeout=None, *args, **kwargs):
         self.commit_cmd = get_commit_cmd(**kwargs)
         super().call_service(command,
                              reply=reply + Dialog(config_commit_stmt_list),
                              target=target, timeout=timeout, *args, **kwargs)
+
+
+class Reload(svc.Reload):
+
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.dialog += Dialog(reload_statement_list)
+
+    def call_service(self, reload_command='reload', *args, **kwargs):
+        super().call_service(reload_command, *args, **kwargs)
+
+
+class HaReload(svc.HAReloadService):
+    def call_service(self, command=[], reload_command=[], reply=Dialog([]), timeout=None, *args,
+                     **kwargs):
+        if command:
+            super().call_service(command,
+                                 timeout=timeout, *args, **kwargs)
+        else:
+            super().call_service(reload_command=reload_command or "reload",
+                                 timeout=timeout, *args, **kwargs)
+
 
 class AdminExecute(Execute):
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'admin'
         self.end_state = 'enable'
-        self.service_name = 'admin_execute'
 
 
 class AdminConfigure(Configure):
@@ -67,7 +132,6 @@ class AdminConfigure(Configure):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'admin_conf'
         self.end_state = 'enable'
-        self.service_name = 'admin_configure'
 
 
 class HAExecute(svc.HaExecService):
@@ -76,12 +140,11 @@ class HAExecute(svc.HaExecService):
         self.dialog += Dialog(execution_statement_list)
 
 
-class HaAdminExecute(HAExecute):
+class HaAdminExecute(AdminExecute):
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'admin'
         self.end_state = 'enable'
-        self.service_name = 'admin_execute'
 
 
 class HaAdminConfigure(HaConfigureService):
@@ -89,7 +152,6 @@ class HaAdminConfigure(HaConfigureService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'admin_conf'
         self.end_state = 'enable'
-        self.service_name = 'admin_configure'
 
 
 class Switchover(BaseService):
@@ -119,7 +181,6 @@ class Switchover(BaseService):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'enable'
         self.end_state = 'enable'
-        self.service_name = 'switchover'
         self.timeout = connection.settings.SWITCHOVER_TIMEOUT
         self.dialog = Dialog(switchover_statement_list)
 
@@ -151,11 +212,13 @@ class Switchover(BaseService):
         con.active.spawn.sendline(command)
         try:
             self.result = dialog.process(con.active.spawn,
-                           timeout=self.timeout,
+                           timeout=timeout,
                            prompt_recovery=self.prompt_recovery,
-                           context=con.context)
+                           context=con.active.context)
         except SubCommandFailure as err:
             raise SubCommandFailure("Switchover Failed %s" % str(err))
+        except SwitchoverDisallowedError as err:
+            raise SwitchoverDisallowedError("Switchover Failed with error: %s" % str(err))
 
         output = ""
         if self.result:
@@ -202,7 +265,6 @@ class AttachModuleConsole(BaseService):
 
         self.start_state = "enable"
         self.end_state = "enable"
-        self.service_name = "attach_console_module"
 
     def call_service(self, module_num, **kwargs):
         self.result = self.__class__.ContextMgr(connection = self.connection,
@@ -242,8 +304,7 @@ class AttachModuleConsole(BaseService):
 
             # expect output until prompt again
             # wait for timeout provided by user
-            out = self.conn.expect([r'(.+)[\r\n]*%s' % self.change_prompt],
-                                   timeout = timeout)
+            out = self.conn.expect([r'(.+)[\r\n]*%s$' % self.change_prompt], timeout=timeout)
             raw = out.last_match.groups()[0].strip()
 
             # remove the echo back - best effort
@@ -285,14 +346,13 @@ class AdminAttachModuleConsole(AttachModuleConsole):
 
         self.start_state = "admin"
         self.end_state = "enable"
-        self.service_name = "admin_attach_console_module"
 
     class ContextMgr(AttachModuleConsole.ContextMgr):
 
         def __init__(self, connection,
                            module_num,
                            login_name = 'root',
-                           change_prompt = '\~(.+)?\]\$',
+                           change_prompt = r'\~(.+)?\]\$',
                            timeout = None):
             self.conn = connection
             self.module_num = module_num
@@ -302,13 +362,9 @@ class AdminAttachModuleConsole(AttachModuleConsole):
 
         def __enter__(self):
             self.conn.log.debug('+++ attaching console +++')
-            if self.conn.is_ha:
-                conn = self.conn.active
-            else:
-                conn = self.conn
 
-            sm = conn.state_machine
-            sm.go_to('admin', conn.spawn)
+            sm = self.conn.state_machine
+            sm.go_to('admin', self.conn.spawn)
 
             # attach to console
             self.conn.sendline('attach location %s' % self.module_num)
@@ -323,87 +379,233 @@ class AdminAttachModuleConsole(AttachModuleConsole):
         def __exit__(self, exc_type, exc_val, exc_tb):
             if exc_type is not SubCommandFailure:
                 # exit from attached location
-                conn = self.conn.active if self.conn.is_ha else self.conn
-                admin = conn.state_machine.get_state('admin')
+                admin = self.conn.state_machine.get_state('admin')
                 self.conn.sendline('exit')
                 self.conn.expect(admin.pattern, timeout = self.timeout)
             return super().__exit__(exc_type, exc_val, exc_tb)
 
 
-class AdminService(BashService):
+class AdminService(GenericBashService):
 
-    class ContextMgr(BashService.ContextMgr):
-        def __init__(self, connection,
-                           enable_bash = False,
-                           timeout = None):
-            # overwrite the prompt
-            super().__init__(connection=connection,
-                             enable_bash=enable_bash,
-                             timeout=timeout)
+    class ContextMgr(GenericBashService.ContextMgr):
 
         def __enter__(self):
             self.conn.log.debug('+++ attaching admin shell +++')
-
-            if self.conn.is_ha:
-                conn = self.conn.active
-            else:
-                conn = self.conn
-
-            sm = conn.state_machine
-            sm.go_to('admin', conn.spawn)
-
+            sm = self.conn.state_machine
+            sm.go_to('admin', self.conn.spawn)
             return self
 
 
-class BashService(BashService):
+class BashService(GenericBashService):
 
-    class ContextMgr(BashService.ContextMgr):
-        def __init__(self, connection,
-                           enable_bash = False,
-                           target = 'active',
-                           timeout = None):
-            # overwrite the prompt
-            super().__init__(connection=connection,
-                             enable_bash=enable_bash,
-                             target=target,
-                             timeout=timeout)
+    class ContextMgr(GenericBashService.ContextMgr):
 
         def __enter__(self):
             self.conn.log.debug('+++ attaching bash shell +++')
-
-            if self.conn.is_ha:
-                if self.target == 'standby':
-                    conn = self.conn.standby
-                if self.target == 'active':
-                    conn = self.conn.active
-            else:
-                conn = self.conn
-
-            sm = conn.state_machine
-            sm.go_to('run', conn.spawn)
-
+            sm = self.conn.state_machine
+            sm.go_to('run', self.conn.spawn)
             return self
 
-class AdminBashService(BashService):
+class AdminBashService(GenericBashService):
 
-    class ContextMgr(BashService.ContextMgr):
-        def __init__(self, connection,
-                           enable_bash = False,
-                           timeout = None):
-            # overwrite the prompt
-            super().__init__(connection=connection,
-                             enable_bash=enable_bash,
-                             timeout=timeout)
+    class ContextMgr(GenericBashService.ContextMgr):
 
         def __enter__(self):
             self.conn.log.debug('+++ attaching bash shell +++')
-
-            if self.conn.is_ha:
-                conn = self.conn.active
-            else:
-                conn = self.conn
-
-            sm = conn.state_machine
-            sm.go_to('admin_run', conn.spawn)
-
+            sm = self.conn.state_machine
+            sm.go_to('admin_run', self.conn.spawn)
             return self
+
+
+class GetRPState(GenericGetRPState):
+    """ Get Rp state
+
+    Service to get the redundancy state of the device rp.
+    Returns standby rp state if standby is passed as input.
+
+    Arguments:
+        target: Service target, by default active
+
+    Returns:
+        Expected return values are ACTIVE, STANDBY COLD, STANDBY HOT
+        raise SubCommandFailure on failure.
+
+    Example:
+        .. code-block:: python
+
+            rtr.get_rp_state()
+            rtr.get_rp_state(target='standby')
+    """
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.start_state = 'any'
+        self.end_state = 'any'
+
+    def call_service(self,
+                     target='active',
+                     timeout=None,
+                     utils=utils,
+                     *args,
+                     **kwargs):
+
+        """send the command on the right rp and return the output"""
+        return super().call_service(target=target, timeout=timeout, utils=utils, *args, **kwargs)
+
+
+class Monitor(BaseService):
+
+    def __init__(self, connection, context, **kwargs):
+        super().__init__(connection, context, **kwargs)
+        self.service_name = 'monitor'
+        self.start_state = 'any'
+        self.end_state = 'any'
+        self.monitor_state = {}
+        self.timeout = connection.settings.EXEC_TIMEOUT
+        self.dialog = Dialog()
+        self.log_buffer = io.StringIO()
+        lb = UniconStreamHandler(self.log_buffer)
+        lb.setFormatter(logging.Formatter(fmt='[%(asctime)s] %(message)s'))
+        self.connection.log.addHandler(lb)
+
+    @property
+    def running(self):
+        return self.connection.state_machine.current_state == 'monitor'
+
+    def call_service(self, command, reply=Dialog(), timeout=None, **kwargs):
+        conn = self.connection
+        if not isinstance(command, str):
+            raise ValueError('command must be a string')
+        command = command.strip()
+        timeout = timeout or self.timeout
+
+        monitor_action = re.search(r'(?:mon\S* )?(?P<command>(?P<action>\S+).*)', command)
+        if monitor_action:
+            action = monitor_action.groupdict().get('action')
+            action_command = monitor_action.groupdict().get('command')
+            if monitor_action in ['stop', 'quit']:
+                return self.stop()
+
+            if action != 'interface':
+                # command could be "IPv4 Uni", action would be "IPv4", using
+                # action command match to grab full command.
+                action = slugify(action_command.replace(' ', ''))
+                # grab last 250 bytes
+                monitor_output = self.get_buffer()[-250:]
+                m = re.finditer(patterns.monitor_command_pattern, monitor_output)
+                # try to find the command in the output
+                for item in m:
+                    group = item.groupdict()
+                    monitor_command = slugify(group.get('command').replace(' ', ''))
+                    command_key = group.get('key')
+                    if action == monitor_command:
+                        conn.send(command_key)
+                        return self._process_dialog(reply=reply, timeout=timeout)
+                else:
+                    raise SubCommandFailure(f'Monitor command {command} is not supported')
+
+        if command:
+            conn.state_machine.go_to('enable', conn.spawn)
+            if not re.match('^mon', command):
+                command = 'monitor ' + command
+
+            # Clear log buffer
+            self.log_buffer.seek(0)
+            self.log_buffer.truncate()
+
+            conn.sendline(command)
+            return self._process_dialog(reply=reply, timeout=timeout)
+
+    def _process_dialog(self, reply=None, timeout=None):
+        conn = self.connection
+        sm = conn.state_machine
+        dialog = self.dialog + self.service_dialog()
+        for state in sm.states:
+            if state.name != sm.current_state:
+                dialog.append(Statement(pattern=state.pattern))
+
+        try:
+            dialog_match = dialog.process(
+                conn.spawn,
+                timeout=timeout,
+                prompt_recovery=self.prompt_recovery,
+                context=conn.context
+            )
+            if dialog_match:
+                self.result = utils.remove_ansi_escape_codes(dialog_match.match_output)
+                self.result = self.get_service_result()
+            sm.detect_state(conn.spawn, conn.context)
+        except StateMachineError:
+            raise
+        except Exception as err:
+            raise SubCommandFailure("Command execution failed", err) from err
+
+        m = re.search(patterns.monitor_time_regex, self.result)
+        if m:
+            for k, v in m.groupdict().items():
+                self.monitor_state[k] = v
+
+        return self.result
+
+    def get_buffer(self, truncate=False):
+        """
+        Return log buffer contents and clear log buffer if truncate is true
+        """
+        self.log_buffer.seek(0)
+        output = self.log_buffer.read()
+        if truncate:
+            self.log_buffer.seek(0)
+            self.log_buffer.truncate()
+        return output
+
+    def tail(self, timeout=30, reply=None):
+        """
+        Monitor the 'monitor' output up to 'timeout' seconds or if a reply statement matches.
+
+        :Parameters:
+            :param timeout: (int) Timeout in seconds. Default: 30
+            :param reply: (Dialog) reply dialog (optional)
+
+        :Returns:
+            Returns the current buffer contents.
+        """
+        conn = self.connection
+
+        dialog = Dialog()
+        if reply:
+            dialog += reply
+        try:
+            dialog.process(conn.spawn, timeout=timeout, context=self.context)
+        except TimeoutError:
+            pass
+
+        return self.get_buffer()
+
+    def stop(self):
+        """ Stop the monitor session and return to enable mode.
+        """
+        conn = self.connection
+
+        if not self.running:
+            conn.log.info('Monitor not running')
+            return
+
+        conn.state_machine.go_to(
+            'enable',
+            conn.spawn,
+            timeout=conn.spawn.settings.EXEC_TIMEOUT)
+
+        # Grab output after stopping monitor
+        output = self.get_buffer(truncate=True)
+        output = utils.remove_ansi_escape_codes(output)
+        output = utils.truncate_trailing_prompt(
+            conn.state_machine.get_state(conn.state_machine.current_state),
+            output)
+        conn.log.info('Stopped monitor...')
+
+        return output
+
+    def log_service_call(self):
+        pass
+
+    def post_service(self, *args, **kwargs):
+        pass

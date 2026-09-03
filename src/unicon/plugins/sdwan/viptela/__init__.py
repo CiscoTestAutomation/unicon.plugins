@@ -37,7 +37,7 @@ class ViptelaServiceList(ConfdServiceList):
 
 class ViptelaSingleRPConnection(ConfdConnection):
     os = 'sdwan'
-    series = 'viptela'
+    platform = 'viptela'
     chassis_type = 'single_rp'
     state_machine_class = ViptelaStateMachine
     connection_provider_class = ViptelaConnectionProvider

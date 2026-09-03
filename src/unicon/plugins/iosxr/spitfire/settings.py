@@ -8,8 +8,8 @@ class SpitfireSettings(IOSXRSettings):
     def __init__(self):
         super().__init__()
         self.SPITFIRE_INIT_EXEC_COMMANDS = [
-            'term length 0',
-            'term width 0',
+            'terminal length 0',
+            'terminal width 0',
             'show version',
             'bash cat /etc/bake-info.txt',
             'bash cat /etc/build-info.txt'
@@ -27,4 +27,8 @@ class SpitfireSettings(IOSXRSettings):
             'session-timeout 0'
         ]
         self.CONFIG_TIMEOUT = 600
+        self.UNICON_BACKEND_DECODE_ERROR_LIMIT = 10
         self.STANDBY_STATE_REGEX = r'Standby node .* is (.*)'
+
+        # Default commands: Enter key , Ctrl-C, Enter Key
+        self.PROMPT_RECOVERY_COMMANDS = ['\r', '\x03', '\r']

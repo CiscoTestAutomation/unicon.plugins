@@ -1,0 +1,75 @@
+login:
+  prompt: "login as: "
+  commands:
+    "admin":
+      new_state: password
+
+password:
+  prompt: "Password: "
+  commands:
+    "admin":
+      new_state: exec
+
+exec:
+  prompt: "%N>"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": &SV |2
+       vEOS
+       Hardware version:
+       Serial number:
+       System MAC address:  0ca4.ed02.1311
+       
+       Software image version: 4.23.0F
+       Architecture:           i686
+       Internal build version: 4.23.0F-13614065.4230F
+       Internal build ID:      bf140e5e-dc9b-4586-9c8e-9615c43ed837
+       
+       Uptime:                 0 weeks, 0 days, 0 hours and 14 minutes
+       Total memory:           2014520 kB
+       Free memory:            1333512 kB
+
+    "enable":
+      new_state: enable
+
+
+enable:
+  prompt: "%N#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version": *SV
+
+    "disable":
+      new_state: exec
+    "enable": ""
+
+    "dir": |2
+      Directory of flash:/
+
+       -rw-        3003           Apr 26 13:02  AsuFastPktTransmit.log
+       drwx        4096            Oct 6  2020  Fossil
+       -rw-        1846           Apr 26 13:02  SsuRestore.log
+       -rw-        1846           Apr 26 13:02  SsuRestoreLegacy.log
+       -rw-          24           Sep 26  2019  boot-config
+       drwx        4096            Oct 6  2020  debug
+       drwx        4096            Oct 6  2020  fastpkttx.backup
+       drwx       16384           Sep 26  2019  lost+found
+       drwx        4096           Apr 26 13:18  persist
+       drwx        4096            Oct 6  2020  schedule
+       -rw-         952           Apr 16 15:14  startup-config
+       -rw-   430740806           Sep 26  2019  vEOS-lab.swi
+       -rw-           0            Oct 6  2020  zerotouch-config
+
+      4093313024 bytes total (3192283136 bytes free)
+
+    "config term":
+      new_state: config
+
+config:
+  prompt: "%N(config)#"
+  commands:
+    "end":
+      new_state: enable
+    "no logging console": ""

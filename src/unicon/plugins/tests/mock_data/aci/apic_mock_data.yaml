@@ -7,7 +7,7 @@ apic_connect:
 
 
 apic_exec:
-  prompt: APC#
+  prompt: "APC#"
   commands: &exec_commands
     "terminal length 0": ""
     "terminal width 0": ""
@@ -23,10 +23,12 @@ apic_exec:
        leaf        1           3108        LEA-3108-1671             n9000-13.2(2l)       
     "acidiag reboot":
       new_state: apic_restart_confirm
+    "configure":
+      new_state: apic_config
 
 
 apic_hostname_with_escape_codes:
-  prompt: "ESC[0mESC[27mESC[24mESC[JAPC-0001-2001# "
+  prompt: "%1B[0m%1B[27m%1B[24m%1B[JAPC# "
   commands: *exec_commands
 
 
@@ -58,3 +60,18 @@ apic_ssh_password:
   commands:
     "cisco123":
       new_state: apic_exec
+
+apic_config:
+  prompt: "APC(config)#"
+  commands:
+    "tenant test":
+      new_state: apic_config_tenant
+    "end":
+      new_state: apic_exec
+
+apic_config_tenant:
+  prompt: "APC(config-tenant)#"
+  commands:
+    "end":
+      new_state: apic_exec
+

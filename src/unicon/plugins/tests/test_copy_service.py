@@ -5,11 +5,13 @@ Unittest for copy() service
 import re
 import unittest
 import unicon
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from unicon import Connection, eal
 from unicon.mock import mock_device
 from unicon.core.errors import SubCommandFailure, TimeoutError
+from unicon.plugins.iosxe.service_implementation import Copy as IosXECopy
+from unicon.plugins.iosxe.service_statements import want_continue
 from unicon.plugins.tests.mock.mock_device_ios import MockDeviceIOS, MockDeviceTcpWrapperIOS
 from unicon.utils import to_plaintext, SecretString
 
@@ -117,6 +119,17 @@ class TestCopyService(unittest.TestCase):
                         timeout=9)
         self.assertEqual(err.exception.args[0], 'Copy failed')
 
+    def test_copy_to_usb(self):
+        test_output = self.d.copy(source = 'bootflash:', dest = 'usb:',
+                          source_file = '/c8000aep-universalk9.17.12.04.0.4708.SSA.bin',
+                          dest_file = 'test/c8000aep-universalk9.17.12.04.0.4708.SSA.bin',
+                          sleep_time = 10)
+        expected_output = self.md.mock_data['dest_file_name']['commands']\
+                              ['test/c8000aep-universalk9.17.12.04.0.4708.SSA.bin']['response']
+        test_output = '\n'.join(test_output.splitlines())
+        expected_output = '\n'.join(expected_output.splitlines())
+        self.assertIn(expected_output, test_output)
+
 
 @patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
 @patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
@@ -188,6 +201,88 @@ class TestNxosCopyService(unittest.TestCase):
                         vrf='dnsvrf', user='dnsuser', password='dnspwd')
 
 
+@patch.object(unicon.settings.Settings, 'POST_DISCONNECT_WAIT_SEC', 0)
+@patch.object(unicon.settings.Settings, 'GRACEFUL_DISCONNECT_WAIT_SEC', 0.2)
+class TestIosXeCopyService(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.d = Connection(hostname='Router',
+                           start=['mock_device_cli --os iosxe --state enable_isr'],
+                           os='iosxe')
+        cls.d.connect()
+        cls.md = mock_device.MockDevice(device_os='iosxe', state='enable_isr')
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.d.disconnect()
+
+    def test_to_tftp(self):
+        output = self.d.copy(
+            source='tftp:',
+            dest='bootflash:',
+            source_file='test',
+            dest_file='test2',
+            server='10.1.6.243',
+            vrf='Mgmt-intf',
+        )
+        output = '\n'.join(output.splitlines())
+        expected_output = \
+            self.md.mock_data['copy_to_tftp_dest_filename_overwrite']\
+            ['keys']['y']['response']
+        expected_output = '\n'.join(expected_output.splitlines())
+        self.assertIn(expected_output, output)
+
+    def test_from_tftp(self):
+        output = self.d.copy(
+            source='bootflash:',
+            dest='tftp:',
+            source_file='test2',
+            dest_file='test',
+            server='10.1.6.243',
+            vrf='Mgmt-intf',
+        )
+        output = '\n'.join(output.splitlines())
+        expected_output = \
+            self.md.mock_data['copy_from_tftp_dest_filename']\
+            ['commands']['test']['response']
+        expected_output = '\n'.join(expected_output.splitlines())
+        self.assertIn(expected_output, output)
+
+    def test_from_tftp_testcase_name_pattern_issue(self):
+            output = self.d.copy(
+                source='bootflash:',
+                dest='tftp:',
+                source_file='test2',
+                dest_file='test',
+                server='10.1.6.243',
+                vrf='Mgmt-intf',
+            )
+            output = '\n'.join(output.splitlines())
+            expected_output = \
+                self.md.mock_data['copy_from_tftp_dest_filename_with_failure']\
+                ['commands']['test']['response']
+            expected_output = '\n'.join(expected_output.splitlines())
+            self.assertIn(expected_output, output)
+
+    def test_to_tftp_overwrite_False(self):
+        output = self.d.copy(
+            source='tftp:',
+            dest='bootflash:',
+            source_file='test',
+            dest_file='test2',
+            server='10.1.6.243',
+            vrf='Mgmt-intf',
+            overwrite=False,
+        )
+        output = '\n'.join(output.splitlines())
+        expected_output = \
+            self.md.mock_data['copy_to_tftp_dest_filename_overwrite']\
+            ['keys']['n']['response']
+        expected_output = '\n'.join(expected_output.splitlines())
+        self.assertIn(expected_output, output) 
+
+
 class TestMaxAttempts(unittest.TestCase):
     def setUp(self):
         self.md = MockDeviceTcpWrapperIOS(port=0, state='enable')
@@ -212,6 +307,17 @@ class TestMaxAttempts(unittest.TestCase):
     def test_max_attempt(self):
         self.dev.copy(source='tftp:', source_file='/tftpboot/mdear/n7k.gbin',
             dest='bootflash:', vrf='management', server='10.1.0.207', max_attempts=3)
+
+
+class TestIosXeSaveConfigDialog(unittest.TestCase):
+
+    def test_copy_dialog_answers_continue(self):
+        device = Mock()
+        service = IosXECopy(device, {})
+
+        self.assertIn(want_continue, service.dialog)
+        self.assertEqual(want_continue.args, {'key': 'yes'})
+
 
 if __name__ == '__main__':
     unittest.main()

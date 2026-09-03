@@ -10,9 +10,16 @@ isr_password:
     "cisco":
       new_state: isr_exec
 
+isr_enable_password:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: enable_isr
+
 isr_exec:
-  prompt: "Router>"
+  prompt: "%N>"
   commands: 
+    "show version | include operating mode" : ""
     "show version": &SV |2
       Cisco IOS Software, IOS-XE Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 15.3(2)S1, RELEASE SOFTWARE (fc1)
       Technical Support: http://www.cisco.com/techsupport
@@ -80,11 +87,17 @@ isr_exec:
 
 
     "enable":
-      new_state: enable_isr
+      new_state: isr_enable_password
+
+    "enable 7":
+      new_state: isr_enable_password
+
+    "disable":
+      new_state: disable_isr
 
 
 isr_bash:
-  prompt: "[Router:/]$"
+  prompt: "[%N:/]$"
   commands:
     "ls": |
         3pa    dev     init   mount_packages.sh  sys
@@ -110,11 +123,12 @@ act_reply:
       
 
 enable_isr:
-  prompt: "Router#"
+  prompt: "%N#"
   commands:
     "term length 0": ""
     "term width 0": ""
     "show version": *SV
+    "show version | include operating mode" : ""
 
     # The following commands are for uniclean testing.
     # NOTE: Some ISR software versions do not have the leading slash after the
@@ -138,7 +152,10 @@ enable_isr:
 
     "disable":
       new_state: isr_exec
-
+    "enable":
+      new_state: enable_isr
+    "enable 7":
+      new_state: enable_isr
     "ping":
       new_state: ping_proto_isr
 
@@ -154,6 +171,18 @@ enable_isr:
     "traceroute vrf MG501":
       new_state: traceroute_proto_isr
       
+    "set platform software selinux permissive":
+      response:
+      - |2
+                                ^
+        % Invalid input detected at '^' marker."
+
+    "set platform software selinux default":
+      response:
+      - |2
+                                ^
+        % Invalid input detected at '^' marker."
+
     "not a real command":
       response:
       - |2
@@ -166,20 +195,40 @@ enable_isr:
                                 ^
         % Invalid i"
 
+    "copy  tftp: bootflash:  vrf Mgmt-intf":
+      new_state: copy_to_tftp
+
+    "copy  bootflash: tftp:  vrf Mgmt-intf":
+      new_state: copy_from_tftp
+    "install remove inactive":
+      new_state: do_you_want_to_remove
+
+disable_isr:
+  prompt: "%N>"
+  commands:
+    "enable":
+      new_state: isr_enable_password
+    "enable 7":
+      new_state: isr_enable_password
+
 config_isr:
-  prompt: "Router(config)#"
+  prompt: "%N(config)#"
   commands:
     "no logging console": ""
     "line console 0":
       new_state: config_line_isr
-
-config_line_isr:
-  prompt: "Router(config-line)#"
-  commands:
-    "exec-timeout 0": ""
+    "line vty 0 4":
+      new_state: config_line_isr
     "end":
       new_state: enable_isr
 
+config_line_isr:
+  prompt: "%N(config-line)#"
+  commands:
+    "exec-timeout 0": ""
+    "line vty 0 4": ""
+    "end":
+      new_state: enable_isr
 
 traceroute_proto_isr:
   prompt: "Protocol [ip]: "
@@ -226,7 +275,7 @@ traceroute_timeout_isr:
 traceroute_probe_isr:
   prompt: "Probe count [3]: "
   commands:
-    "":
+    "30":
       new_state: traceroute_mittl_isr
 
 traceroute_mittl_isr:
@@ -257,9 +306,6 @@ traceroute_loose_isr:
         Tracing the route to 192.0.0.5
         VRF info: (vrf in name/id, vrf out name/id)
           1 192.0.0.5 msec *  1 msec
-
-
-
 
 ping_proto_isr:
   prompt: "Protocol [ip]: "
@@ -355,28 +401,146 @@ ping1_sweep_isr_vrf:
         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         Success rate is 100 percent (30/30), round-trip min/avg/max = 1/1/3 ms
 
-sdwan_enable:
-  prompt: "Router#"
+do_you_want_to_remove:
+  preface: |
+    install_remove: START Mon Apr 26 13:25:18 Greenwi 2021
+    Cleaning up unnecessary package files
+    No path specified, will use booted path bootflash:packages.conf
+    Cleaning bootflash:
+      Scanning boot directory for packages ... done.
+      Preparing packages list to delete ...
+        C9800-L-mono-universalk9_wlc.17.03.03.SPA.pkg
+          File is in use, will not delete.
+        C9800-L-rpboot.17.03.03.SPA.pkg
+          File is in use, will not delete.
+        packages.conf
+          File is in use, will not delete.
+      done.
+
+    The following files will be deleted:
+    [chassis 1/R0]:
+    /bootflash/C9800-L-hw-programmables.16.12.04a.SPA.pkg
+    /bootflash/C9800-L-mono-universalk9_wlc.16.12.04a.SPA.pkg
+    /bootflash/C9800-L-rpboot.16.12.04a.SPA.pkg
+    /bootflash/C9800-L-universalk9_wlc.16.12.04a.SPA.bin
+    /bootflash/C9800-L-universalk9_wlc.17.03.03.SPA.conf
+  prompt: Do you want to remove the above files? [y/n]
   commands:
-    "term length 0": ""
-    "term width 0": ""
+    "y":
+      response: |
+        Deleting file bootflash:C9800-L-hw-programmables.16.12.04a.SPA.pkg ... done.
+        Deleting file bootflash:C9800-L-mono-universalk9_wlc.16.12.04a.SPA.pkg ... done.
+        Deleting file bootflash:C9800-L-rpboot.16.12.04a.SPA.pkg ... done.
+        Deleting file bootflash:C9800-L-universalk9_wlc.16.12.04a.SPA.bin ... done.
+        Deleting file bootflash:C9800-L-universalk9_wlc.17.03.03.SPA.conf ... done.
+        SUCCESS: Files deleted.
+        --- Starting Post_Remove_Cleanup ---
+        Performing Post_Remove_Cleanup on all members
+          [1] Post_Remove_Cleanup package(s) on chassis 1/R0
+          [1] Finished Post_Remove_Cleanup on chassis 1/R0
+        Checking status of Post_Remove_Cleanup on [1/R0]
+        Post_Remove_Cleanup: Passed on [1/R0]
+        Finished Post_Remove_Cleanup
+        SUCCESS: install_remove  Mon Apr 26 14:24:33 Greenwi 2021
+      new_state: enable_isr
+
+isr_exec_1:
+  prompt: "%N#"
+  commands: 
+    "show version | include operating mode" : "operating mode: Controller-Managed"
+    "uname -a": ""
+    "show inventory": ""
+    "pnpa service discovery stop":
+      new_state: isr_exec_1
+    "show version":
+      response: |
+        Cisco IOS XE Software, Version BLD_POLARIS_DEV_LATEST_20230924_003642
+        Cisco IOS Software [IOSXE], ISR Software (X86_64_LINUX_IOSD-UNIVERSALK9_IAS-M), Experimental Version 17.14.20230924:023456 [BLD_POLARIS_DEV_LATEST_20230924_003642:/nobackup/mcpre/s2c-build-ws 101]
+        Copyright (c) 1986-2023 by Cisco Systems, Inc.
+        Compiled Sat 23-Sep-23 19:35 by mcpre
+
+
+        Cisco IOS-XE software, Copyright (c) 2005-2023 by cisco Systems, Inc. 
+        All rights reserved.  Certain components of Cisco IOS-XE software are
+        licensed under the GNU General Public License ("GPL") Version 2.0.  The
+        software code licensed under GPL Version 2.0 is free software that comes
+        with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+        GPL code under the terms of GPL Version 2.0.  For more details, see the
+        documentation or "License Notice" file accompanying the IOS-XE software,
+        or the applicable URL provided on the flyer accompanying the IOS-XE
+        software.
+
+
+        ROM: 16.7(3r)
+
+        Router uptime is 5 days, 1 hour, 5 minutes
+        Uptime for this control processor is 5 days, 1 hour, 8 minutes
+        System returned to ROM by Enabling Install mode
+        System image file is "bootflash:packages.conf"
+        Last reload reason: Enabling Install mode
+
+
+
+        This product contains cryptographic features and is subject to United
+        States and local country laws governing import, export, transfer and
+        use. Delivery of Cisco cryptographic products does not imply
+        third-party authority to import, export, distribute or use encryption.
+        Importers, exporters, distributors and users are responsible for
+        compliance with U.S. and local country laws. By using this product you
+        agree to comply with applicable laws and regulations. If you are unable
+        to comply with U.S. and local laws, return this product immediately.
+
+        A summary of U.S. laws governing Cisco cryptographic products may be found at:
+        http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+        If you require further assistance please contact us by sending email to
+        export@cisco.com.
+
+
+
+        Suite License Information for Module:'esg'
+
+        --------------------------------------------------------------------------------
+        Suite                 Suite Current         Type           Suite Next reboot
+        --------------------------------------------------------------------------------
+        FoundationSuiteK9     None                  Smart License  None
+        securityk9
+        appxk9
+
+
+        Technology Package License Information:
+
+        -----------------------------------------------------------------
+        Technology    Technology-package           Technology-package
+                Current       Type           Next reboot
+        ------------------------------------------------------------------
+        appxk9           appxk9           Smart License    appxk9
+        securityk9       securityk9       Smart License    securityk9
+        ipbase           ipbasek9         Smart License    ipbasek9
+
+        The current throughput level is unthrottled
+
+
+        Smart Licensing Status: Smart Licensing Using Policy
+
+        cisco ISR4221/K9 (1RU) processor with 1639118K/3071K bytes of memory.
+        Processor board ID FGL224914YB
+        Router operating mode: Controller-Managed
+        4 Gigabit Ethernet interfaces
+        32768K bytes of non-volatile configuration memory.
+        4194304K bytes of physical memory.
+        7086079K bytes of flash memory at bootflash:.
+
+        Configuration register is 0x2102
+
     "show sdwan version": "16.12.1.0.533"
-    "show sdwan software": |2
-      VERSION        ACTIVE  DEFAULT  PREVIOUS  CONFIRMED  TIMESTAMP
-      --------------------------------------------------------------------------------
-      16.12.1.0.533  true    true     false     auto       2019-05-21T03:00:31-00:00
-    "show version": *SV
-    "config term": "This command is not supported"
     "config-transaction":
       new_state: sdwan_config
-
-sdwan_config:
-  preface: "admin connected from 127.0.0.1 using console on Router"
-  prompt: "Router(config)#"
-  commands:
-    "no logging console": ""
-    "line console 0": "syntax error: \"console\" is not a valid value."
-    "exec-timeout 0" : "syntax error: unknown command"
-    "commit": "% No modifications to commit."
-    "end":
-      new_state: sdwan_enable
+    "term length 0": ""
+    "term width 0": ""
+    "show sdwan software": |2
+          VERSION        ACTIVE  DEFAULT  PREVIOUS  CONFIRMED  TIMESTAMP
+          --------------------------------------------------------------------------------
+          16.12.1.0.533  true    true     false     auto       2019-05-21T03:00:31-00:00
+    "config-transaction":
+      new_state: sdwan_config

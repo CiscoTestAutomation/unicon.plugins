@@ -116,3 +116,237 @@ reload_confirm_prompt:
         SAM detects CA certificate(Code Signing Server Certificate Authority,O=Cisco,C=US) has expired. The validity period is Oct 17, 2000 01:46:24 UTC - Oct 17, 2015 01:51:47 UTC. Continue at risk? (Y/N) [Default: N w/in 10]:
 
         ios con0/RSP0/CPU0 is in standby
+
+reload_hardware_confirm_prompt:
+  preface: |
+    Thu Jul 30 14:05:01.006 UTC
+  prompt: "Reload hardware module ? [no,yes]"
+  commands:
+    "yes":
+      new_state: asr9k_ha_login
+      response: |
+        reload request on all acknowledged.
+        RP/0/RSP1/CPU0:ASR9k-880#
+        Preparing system for backup. This may take a few minutes especially for large configurations.
+        Status report: node0_RSP1_CPU0: BACKUP INPROGRESS 
+        Status report: node0_RSP1_CPU0: BACKUP HAS COMPLETED SUCCESSFULLY 
+        [Done]
+        Executing ifconfig eth-vf1.3074 down
+        [14:05:20.009] Sending KILL signal to ds..
+        [14:05:20.012] Sending KILL signal to processmgr..
+        PM disconnect successStopping OpenBSD Secure Shell server: sshdinitctl: Unknown instance: 
+        Stopping system message bus: dbus.
+        Stopping random number generator daemon.
+        Stopping system log daemon...0
+        Stopping kernel log daemon...0
+        Stopping internet superserver: xinetd.
+        Stopping crond: OK
+        Stopping rpcbind daemon...
+        done.
+        Stopping libvirtd daemon: [  OK  ]
+        Deconfiguring network interfaces... done.
+        Sending all processes the KILL signal...
+        Unmounting remote filesystems...
+        Deactivating swap...
+        Unmounting local filesystems...
+        mount: can't find /mnt/ram in /etc/fstab
+        mount: / is busy
+        [ 1703.737119] reboot: Power down
+        Stopping ts_agt
+        Stopping OpenBSD Secure Shell server: sshdinitctl: Unknown instance: 
+        Stopping system message bus: dbus.
+        Stopping random number generator daemon.
+        Stopping system log daemon...0
+        Stopping kernel log daemon...0
+        Stopping internet superserver: xinetd.
+        Stopping crond: OK
+        Stopping rpcbind daemon...
+        done.
+        Stopping S.M.A.R.T. daemon: smartd.
+        Stopping Lighttpd Web Server: stopped /usr/sbin/lighttpd (pid 4024)
+        lighttpd.
+        Stopping libvirtd daemon: [  OK  ]
+        Deconfiguring network interfaces... done.
+        Sending all processes the KILL signal...
+        umount: /dev/mq: mountpoint not found
+        Thu Jul 30 14:05:35 UTC 2020: halt -w 
+        Thu Jul 30 14:05:35 UTC 2020: original - op: Halt, hop: Halt OS
+        Thu Jul 30 14:05:35 UTC 2020: adjusted - op: Poweroff, hop: Halt OS
+        Thu Jul 30 14:05:35 UTC 2020: Reboot Mode: Poweroff, Hushd mode: Halt OS, IPU: 20
+        Unmounting remote filesystems...
+        Deactivating swap...
+        Unmounting local filesystems...
+        Thu Jul 30 14:05:35 UTC 2020: halt -d -f -h 
+        Thu Jul 30 14:05:35 UTC 2020: original - op: Halt, hop: Halt OS
+        Thu Jul 30 14:05:35 UTC 2020: adjusted - op: Poweroff, hop: Halt OS
+        Thu Jul 30 14:05:35 UTC 2020: Reboot Mode: Poweroff, Hushd mode: Halt OS, IPU: 20
+
+
+        Booting Main Processor
+        Transferring Console
+
+
+        CPU reset reason = 5 (CPU_RESET_POR) 
+
+        ##########################################################
+        System Bootstrap, Version 10.65 [ASR9K x86 ROMMON],
+        Copyright (c) 1994-2014 by Cisco Systems, Inc.
+        Compiled on Tue 01/22/2019  0:56:38.61 
+
+        BOARD_TYPE             : 0x100316 
+        Rommon                 : 10.65 (Primary) 
+        Board Revision         : 4
+        PCH EEPROM             : 3.4
+        IPU FPGA(PL)           : 0.69.0 (Primary)
+        IPU INIT(HW_FPD)       : 0.71.0
+        IPU FSBL(BOOT.BIN)     : 1.110.0
+        IPU LINUX(IMAGE.FPD)   : 1.110.0
+        OPTIMUS FPGA           : 0.12.0
+        OMEGA FPGA             : 0.16.0
+        ALPHA FPGA             : 0.16.0
+        CHA FPGA               : 0.8.1
+        CBC0                   : Part 1=34.39, Part 2=34.38, Act Part=1 
+        Product Number         : A9K-RSP880-TR
+        Chassis                : ASR-9006-AC-V2
+        Chassis Serial Number  : FOX1809GEAE
+        Slot Number            : 1
+        Pxe Mac Address LAN 0  : 70:e4:22:3c:f8:10
+        Pxe Mac Address LAN 1  : 70:e4:22:3c:f8:11
+        ==========================================================
+        Got EMT Mode as Disk Boot
+        Set OS type None, Received OS type=0
+        Got Boot Mode as Disk Boot
+
+        Booting IOS-XR 64 bit Boot previously installed image - Press Ctrl-c to stop
+
+        Checking peer OS type.
+        Set OS type None, Received OS type=0
+        Set OS type None, Received OS type=0
+        Set OS type None, Received OS type=0
+        Set OS type None, Received OS type=0
+        Set OS type None, Received OS type=0
+        Set OS type None, Received OS type=0
+        Set OS type None, Received OS type=0
+        CBC OS type detected emt_mode 2 CBC OS type as 3
+
+        Set CBCOS type IOS-XR 64 bit, emt Disk Boot to CBC
+
+
+
+        Serial ATA Port 4 : SMART iSATA SHSLM32GEBCITHD02           
+        Serial ATA Port 5 : SMART iSATA SHSLM32GEBCITHD02           ASR9K Host OS.......BIOS CODE SIGN ENTRY ...
+
+        Image ASR9K verified successfully
+        Image Verification Passed
+
+
+        GNU GRUB version 2.00
+        Press F2 to goto grub Menu..
+        Booting from Disk..
+        Loading Kernel..
+        Kernel Secure Boot Validation Result: PASSED
+        Loading initrd..
+        Initrd Secure Boot Validation Result: PASSED
+        [    0.919889] Created proc for bigphysarea
+
+
+        2020-07-30 10:08:08,376: %UNICON-INFO: non_utf-8_character b'\xff'
+        b'\xff'[    3.125472] i8042: No controller found
+        Enable selinux to relabel filesystem from initramfs
+        Load IMA appraise policy: OK
+        Switching to new root and running init.
+        Sourcing /etc/sysconfig/udev
+        Starting udev: [  OK  ]
+        eUSB found after 0 seconds
+        Creating Physical NICs
+        Renaming Physical NICs
+        Configuring Physical NICs
+        Reserving Virtual NICs
+        Creating Virtual NICs
+        Renaming Virtual NICs
+        Configuring Virtual NICs
+        Configuring network interfaces... done.
+        Starting system message bus: dbus.
+        Starting OpenBSD Secure Shell server: sshd
+        sshd start/running, process 3382
+        Starting rpcbind daemon...done.
+        cp: cannot stat '/lib/modules/3*/kernel/lib/asn1_decoder.ko': No such file or directory
+        kernel.softlockup_panic = 1
+        kernel.panic_on_oops = 1
+        kernel.panic_on_stackoverflow = 1
+        kernel.hung_task_panic = 1
+        Starting kdump:[  OK  ]
+        Starting random number generator daemonUnable to open file: /dev/tpm0
+        .
+        Starting system log daemon...0
+        Starting kernel log daemon...0
+        Starting HPA's tftpd: in.tftpd-hpa
+        Starting internet superserver: xinetd.
+        Starting S.M.A.R.T. daemon: smartd.
+        Starting Lighttpd Web Server: lighttpd.
+        Starting libvirtd daemon: [  OK  ]
+        Starting crond: OK
+        Starting uio_dma_proxy: mvdma0=1M,0 mvdma1=1M,1M mvdma2=1M,2M
+        Discovered ESD 11ab:8000 x4
+        Discovered IPU 10b5:87a0 x1
+        Discovered FAB 1137:00ca x2
+        Discovered FAB 1137:0082 x1
+        Discovered FAB 1137:00fb x1
+        Discovered DSK sda: 29.8GiB
+        Discovered DSK sdb: 29.8GiB
+        Discovered DSK sdc: 7.5GiB
+        Discovered NIC eth-mgmt1: 70:e4:22:3c:f8:10
+        Discovered NIC eth-mgmt2: 70:e4:22:3c:f8:11
+        Discovered NIC eth0: 70:e4:22:3c:f8:14
+        Discovered NIC eth1: 70:e4:22:3c:f8:15
+        Discovered NIC eth2: 70:e4:22:3c:f8:16
+        Discovered NIC eth3: 70:e4:22:3c:f8:17
+        Discovered NIC eth4: 70:e4:22:3c:f8:18
+        Discovered NIC eth5: 70:e4:22:3c:f8:19
+        Discovered MEM 16216784 kB
+        Discovered PID A9K-RSP880-TR
+        Discovered SNO FOC1946NGQ8
+        Discovered CPD ASR-9006-AC-V2
+        Discovered CSN FOX1809GEAE
+        Issuing OIR Reset
+        Starting interface for ts_agt
+        mcelog start/running, process 5038
+        diskmon start/running, process 5044
+        RTC Get: Sun Jul 30 14:09:36 2020
+        RTC Set: Thu Jul 30 14:09:37 2020
+        Stopping ts_agt
+
+        DBG_MSG: platform type is 0
+        RP/0/RSP1/CPU0:Jul 30 14:12:13.647 UTC: rmf_svr[418]: %PKT_INFRA-FM-2-FAULT_CRITICAL : ALARM_CRITICAL :RP-RED-LOST-PNP :DECLARE :0/        RSP1/CPU0:  
+        RP/0/RSP1/CPU0:Jul 30 14:12:13.648 UTC: rmf_svr[418]: %PKT_INFRA-FM-3-FAULT_MAJOR : ALARM_MAJOR :RP-RED-LOST-NNR :DECLARE :0/RSP1/        CPU0:  
+        RP/0/RSP1/CPU0:Jul 30 14:12:22.310 UTC: fpd-serv[182]: %PKT_INFRA-FM-3-FAULT_MAJOR : ALARM_MAJOR :FPD-NEED-UPGRADE :DECLARE :0/        RSP0:  
+        RP/0/RSP1/CPU0:Jul 30 14:12:22.310 UTC: fpd-serv[182]: %PKT_INFRA-FM-3-FAULT_MAJOR : ALARM_MAJOR :FPD-NEED-UPGRADE :DECLARE :0/        RSP1:  
+
+
+        RP/0/RSP1/CPU0:Jul 30 14:12:43.374 UTC: rmf_svr[418]: %PKT_INFRA-FM-2-FAULT_CRITICAL : ALARM_CRITICAL :RP-RED-LOST-PNP :CLEAR :0/        RSP1/CPU0:  
+
+
+
+
+        This product contains cryptographic features and is subject to United 
+        States and local country laws governing import, export, transfer and 
+        use. Delivery of Cisco cryptographic products does not imply third-party 
+        authority to import, export, distribute or use encryption. Importers, 
+        exporters, distributors and users are responsible for compliance with 
+        U.S. and local country laws. By using this product you agree to comply 
+        with applicable laws and regulations. If you are unable to comply with 
+        U.S. and local laws, return this product immediately. 
+
+        A summary of U.S. laws governing Cisco cryptographic products may be 
+        found at:
+        http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+        If you require further assistance please contact us by sending email to 
+        export@cisco.com.
+
+
+
+        RP/0/RSP1/CPU0:Jul 30 14:12:54.792 UTC: rmf_svr[418]: %PKT_INFRA-FM-3-FAULT_MAJOR : ALARM_MAJOR :RP-RED-LOST-NSRNR :DECLARE :0/RSP1/        CPU0:  
+
+
+        Router con0/RSP1/CPU0 is in standby

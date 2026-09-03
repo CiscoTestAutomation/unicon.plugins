@@ -24,9 +24,15 @@ class ReloadPatterns(UniconCorePatterns):
         self.secure_passwd_std = r'^.*Do you want to enforce secure password standard(\?)?\s*\(yes\/no\)(\s*\[[yn]\])?\:\s*'
         self.admin_password = r'^.*(Enter|Confirm) the password for .*admin'
         self.auto_provision = r'Abort( Power On)? Auto Provisioning .*:'
-        self.reload_confirm_ios = r'^.*Proceed( with reload)?\?\s*\[confirm\]'
+        self.reload_confirm_ios = r'^.*Proceed( with( quick)? reload)?\?\s*\[confirm\]'
+        self.reload_confirm_iosxe = r'^.*Do you wish to proceed with reload anyway\s*\[confirm\]\s*'
         self.reload_confirm = r'^.*Reload node\s*\?\s*\[no,yes\]\s?$'
         self.reload_confirm_nxos = r'^(.*)This command will reboot the system.\s*\(y\/n\)\?\s*\[n\]\s?$'
+        self.connection_closed = r'^(.*?)Connection.*? closed|disconnect: Broken pipe'
+        self.press_return = r'Press RETURN to get started.*'
+        self.config_session_locked = r'^.*Config session is locked.*user will be pushed back to exec mode'
+        self.configure_yes_no = r'^.*\[yes\/[Nn][Oo]\]\s*:\s*$'
+        self.fast_reload_confirm = r'^.*Proceed( with( (quick|fast))? reload)?\?\s*\[confirm\]'
 
 # Traceroute patterns
 class TraceroutePatterns(object):
@@ -59,7 +65,7 @@ class PingPatterns():
         self.tunnel = r'^.*Tunnel interface number \[.+\]\s?: $'
         self.repeat = r'^.*Repeat count \[.+\]\s?: $'
         self.size = r'^.*Datagram size \[.+\]\s?: $'
-        self.verbose = r'^.*Verbose \[.+\]\s?: $'
+        self.verbose = r'^.*Verbose(\?)? \[.+\]\s?: $'
         self.interval = r'^.*Interval in milliseconds \[.+\]: $'
         self.packet_timeout = r'^.*Timeout in seconds \[.+\]\s?: $'
         self.sending_interval = r'^.*Sending interval in seconds \[.+\]\s?: $'
@@ -76,7 +82,7 @@ class PingPatterns():
         self.ipv6_precedence = r'^.*Precedence \[.+\]\s?: $'
         self.ipv6_dscp = r'^.*DSCP \[.+\]\s?: $'
         self.ipv6_hop = r'^.*Include hop by hop option\? \[.+\]\s?: $'
-        self.pv6_dest = r'^.*Include destination option\? \[.+\]\s?: $'
+        self.ipv6_dest = r'^.*Include destination option\? \[.+\]\s?: $'
         self.ipv6_extn_header = r'^.*Include extension headers\? \[.+\]\s?: $'
         self.ext_cmds_timeout = r'ADD TIMEOUT PATTERNS'
         # For IPV4
@@ -94,11 +100,11 @@ class PingPatterns():
         self.verbomode = r'^.*Verbose mode\? \[.+\]\s?: $'
         self.ext_cmds_source = r'^.*Source .*address( or interface)?\s?: $'
         self.tos = r'^.*Type of service \[.+\]\s?: $'
-        self.validate = r'^.*Validate reply data\? \[.+\]\s?: $'
+        self.validate = r'^.*Validate reply data\?\s*\[.+\]:\s*$'
         self.data_pattern = r'^.*Data pattern \[.+\]\s?: $'
         self.dfbit_header = r'^.*Set DF bit in IP header(\?)? \[.+\]\s?: $'
         self.dscp = r'^.*DSCP .*\[.+\]\s?: $'
-        self.lsrtv = r'^.*Loose, Strict, Record, Timestamp, Verbose\s?\[.+\]\s?: $'
+        self.lsrtv = r'^.*Loose, Strict, Record, Timestamp, Verbose\s?\[(.+)\]\s?: $'
         self.qos = r'^.*Include global QOS option\? \[.+\]\s?: $'
         self.packet = r'^.*Pad packet\? \[.+\]\s?: $'
         # Range internal dialogs
@@ -111,10 +117,14 @@ class PingPatterns():
         self.others = r'^.*\[.+\]\s?: $'
         #  extd_LSRTV patterns
         self.lsrtv_source = r'^.*Source route: $'
-        self.lsrtv_hot_count = r'^.*Number of hops \[.*\]: $'
-        self.lsrtv_timestamp_count = r'^.*Number of timestamps \[.*\]: $}'
-        self.lsrtv_noroom = r'^.*No room for that option$'
-        self.lsrtv_invalid_hop = r'^.*Invalid number of hops$'
+        self.lsrtv_hop_count = r'^.*Number of hops \[.*\]: $'
+        self.lsrtv_timestamp_count = r'^.*Number of timestamps \[.*\]: $'
+        self.lsrtv_noroom = r'^.*No room for that option'
+        self.lsrtv_invalid_hop = r'^.*Invalid number of hops'
+        self.lsrtv_one_allowed = r'^.*% Only one source route option allowed'
+        # Invalid commands
+        self.invalid_command = r'^.*% *Invalid.*'
+
 
 class CopyPatterns():
     def __init__(self):
@@ -122,14 +132,14 @@ class CopyPatterns():
         self.copy_file = r'^.*(file to copy|Source file name|Source filename) *\[*.*\]*\?.*$'
         self.file_to_write = r'^file to write.*\[*.*\]*.*$'
         self.hostname = r'^.*((h|H)ost|(h|H)ostname)(.*?)\[.*\]\?( *)?$'
-        self.host = r'Address or name of remote host.*\?'
-        self.src_file = r'Name of file to copy\?'
+        self.host = r'Address or name of remote host.*\?\s*$'
+        self.src_file = r'Name of file to copy\?\s*$'
         self.dest_file = r'Destination filename.*$'
         self.dest_directory = r'Destination directory.*$'
         #Move this to NXOS group
         self.nx_hostname = r'^.*Enter hostname for the (tftp|ftp|scp) server:\s*$'
         self.partition = r'^.*Which partition\?.*$'
-        self.config = r'^.*Name of configuration file.*\[*.*\]*.*\?'
+        self.config = r'^.*Name of configuration file.*\[*.*\]*.*\?\s*$'
         self.writeto = r'^.*(name to write to|[Dd]estination file ?name).*\[.*\].*$'
         self.username = r'^.*username.*(\[.*\])?.*$'
         self.password = r'^.*[Pp]assword.*(\[.*\])?.*$'
@@ -145,24 +155,25 @@ class CopyPatterns():
         self.copy_overwrite = r'^.*Do you want to over\s?write\?? (\(y\/n\)\?)?\[.*\].*$'
         self.copy_nx_vrf = r'^.*Enter vrf \(If no input,.*default.*\):\s*$'
         self.copy_proceed = r'^.*bytes.*proceed\?.*$'
-        self.tftp_addr =r'^.*Address.*$'
+        self.tftp_addr =r'^.*Address or name of remote host \[\]\?\s*$'
         self.copy_complete = r'^.*bank [0-9]+'
-        self.copy_error_message = r'fail|timed out|Timed out|Error|Login incorrect|denied|Problem' \
-                                  r'|NOT|Invalid|No memory|Failed|mismatch|Bad|bogus|lose|abort' \
+        self.copy_error_message = r'\bfail\b|timed out|Timed out|Error|Login incorrect|denied|Problem' \
+                                  r'|NOT|Invalid|No memory|Failed(?! to generate persistent self-signed certificate)|mismatch|Bad|bogus|lose|abort' \
                                   r'|Not |too big|exceeds|detected|[Nn]o route to host' \
                                   r'|image is not allowed|Could not resolve|No such'
-        self.copy_retry_message = r'fail|[Tt]imed out|Error|Problem|NOT|Failed|Bad|bogus|lose|abort|Not |too big|exceeds|detected'
-        self.copy_continue = r'Are you sure you want to continue connecting (yes/no)?'
+        self.copy_retry_message = r'\bfail\b|[Tt]imed out|Error|Problem|NOT|Failed(?! to generate persistent self-signed certificate)|Bad|bogus|lose|abort|Not |too big|exceeds|detected'
+        self.copy_continue = r'Are you sure you want to continue connecting ((yes/no)|\((yes/no(/\[fingerprint\])?)?\))?'
         self.copy_other = r'^.*\[yes\/no\]\s*\?*\s*$'
         self.remote_param ='ftp:|tftp:|http:|rcp:|scp:'
         self.remote_in_dest = r'(ftp:|sftp:|tftp:|http:|rcp:|scp:)/*$'
         self.addr_in_remote = r'(ftp:|tftp:|http:|rcp:|scp:)\/*([\w\.\:]+)'
+        self.abort_copy = r'Abort Copy\? \[confirm\]\s*$'
 
 class HaReloadPatterns(UniconCorePatterns):
     def __init__(self):
         super().__init__()
         self.savenv = r'^.*System configuration has been modified\. Save.*$'
-        self.reload_proceed = r'^(.*)Proceed with reload\?\s*\[confirm\]$|^.*Escape character is.*\n'
+        self.reload_proceed = r'^(.*)Proceed with( quick)? reload\?\s*\[confirm\]\s*$'
         self.reload_entire_shelf = r'Reload the entire shelf\s*\[confirm\]'
         self.reload_this_shelf = r'Reload this shelf\s*\[confirm\]'
         self.default_prompts = r'(Router|Switch|ios|Switch-standby)(\\(boot\\))?(>|#)'
@@ -179,7 +190,7 @@ class HaReloadPatterns(UniconCorePatterns):
 class SwitchoverPatterns:
     def __init__(self):
         self.save_config = r'^.*System configuration has been modified\.\s*Save\s?\?.*$'
-        self.build_config= r'Building configuration'
+        self.build_config = r'Building configuration'
         self.prompt_switchover = r'This will reload the active unit and force switchover to standby\[confirm\]'
         self.switchover_init = r'Preparing for switchover|LOGGER_FLUSHING|RELOAD|Reload'
         self.switchover_reason = r'^(.*)Reset Reason'
@@ -188,6 +199,8 @@ class SwitchoverPatterns:
         self.switchover_fail3 = r'% There is no STANDBY present\.?'
         self.switchover_fail4 = r'Failed to switchover'
         self.switchover_cmd_issued = r'Resetting ...(.*)'
+        self.switchover_proceed = r'^.*Proceed with switchover to standby RP\? \[confirm\]'
+
 
 class ResetStandbyPatterns:
     def __init__(self):
@@ -196,3 +209,5 @@ class ResetStandbyPatterns:
         self.reset_abort = r'Peer reload not performed'
         self.reload_proceed1 = r'System is running in SIMPLEX mode, reload anyway\?\s*\[confirm\]'
 
+
+reload_patterns = ReloadPatterns()

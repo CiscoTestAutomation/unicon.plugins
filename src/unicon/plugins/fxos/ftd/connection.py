@@ -1,9 +1,9 @@
+import warnings
 from time import sleep
 from unicon.plugins.generic import GenericSingleRpConnection, ServiceList
-from unicon.plugins.generic import service_implementation as svc
-from unicon.eal.dialogs import Dialog, Statement
+from unicon.eal.dialogs import Dialog
 
-from ..connection import FxosConnectionProvider
+from .. import FxosConnectionProvider
 from . import service_implementation as ftd_svc
 from .statemachine import FtdStateMachine
 from .statements import FtdStatements
@@ -17,6 +17,17 @@ class FtdConnectionProvider(FxosConnectionProvider):
     """
         Connection provider class for fxos connections.
     """
+
+    def __init__(self, *args, **kwargs):
+        """ Initializes the connection provider
+        """
+        warnings.warn("This plugin fxos/ftd is deprecated, it has been"
+                      "replaced by fxos, fxos/fp4k and fxos/fp9k."
+                      "Please update your topology file.",
+                      DeprecationWarning)
+
+        super().__init__(*args, **kwargs)
+
     def get_connection_dialog(self):
         dialog = Dialog([ftd_statements.cssp_stmt,
                          ftd_statements.command_not_completed_stmt])
@@ -25,7 +36,6 @@ class FtdConnectionProvider(FxosConnectionProvider):
 
     def init_handle(self):
         con = self.connection
-        con._is_connected = True
         self.execute_init_commands()
 
     def disconnect(self):
@@ -45,7 +55,6 @@ class FtdConnectionProvider(FxosConnectionProvider):
             con.expect('.*')
             con.log.info('Closing connection...')
             con.spawn.close()
-            self.connection._is_connected = False
 
 
 class FtdServiceList(ServiceList):
@@ -61,7 +70,7 @@ class FtdConnection(GenericSingleRpConnection):
         Connection class for fxos connections.
     """
     os = 'fxos'
-    series = 'ftd'
+    platform = 'ftd'
     chassis_type = 'single_rp'
     state_machine_class = FtdStateMachine
     connection_provider_class = FtdConnectionProvider

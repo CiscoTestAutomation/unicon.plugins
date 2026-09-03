@@ -1,26 +1,45 @@
 __author__ = "Syed Raza <syedraza@cisco.com>"
 
-from unicon.plugins.generic.statements import GenericStatements
+from unicon.plugins.generic.statements import GenericStatements, more_prompt_handler
 from unicon.plugins.iosxr.patterns import IOSXRPatterns
 from unicon.eal.dialogs import Statement, Dialog
 from unicon.eal.helpers import sendline
+from unicon.core.errors import SubCommandFailure, SwitchoverDisallowedError
 
-from unicon.plugins.utils import (get_current_credential,
-    common_cred_username_handler, common_cred_password_handler, )
+from unicon.plugins.utils import (
+    get_current_credential,
+    common_cred_username_handler,
+    common_cred_password_handler,
+)
 
 patterns = IOSXRPatterns()
 
 
+def handle_failed_config(spawn, abort=True):
+    spawn.read_update_buffer()
+    spawn.sendline("show configuration failed")
+    if abort:
+        spawn.expect([patterns.config_prompt])
+        spawn.sendline("abort")
+
+
+def switchover_disallowed_handler(error):
+    raise SwitchoverDisallowedError(error)
+
+
 def password_handler(spawn, context, session):
-    """ handles password prompt
-    """
+    """handles password prompt"""
     credential = get_current_credential(context=context, session=session)
     if credential:
         common_cred_password_handler(
-            spawn=spawn, context=context, credential=credential,
-            session=session, reuse_current_credential=True)
+            spawn=spawn,
+            context=context,
+            credential=credential,
+            session=session,
+            reuse_current_credential=True,
+        )
     else:
-        spawn.sendline(context['tacacs_password'])
+        spawn.sendline(context["tacacs_password"])
 
 
 class IOSXRStatements(GenericStatements):
@@ -32,21 +51,29 @@ class IOSXRStatements(GenericStatements):
             action=password_handler,
             args=None,
             loop_continue=True,
-            continue_timer=False
+            continue_timer=False,
         )
         self.commit_replace_stmt = Statement(
             pattern=patterns.commit_replace_prompt,
             action=sendline,
-            args={'command': 'yes'},
+            args={"command": "yes"},
             loop_continue=True,
-            continue_timer=False
+            continue_timer=False,
         )
         self.confirm_y_prompt_stmt = Statement(
             pattern=patterns.confirm_y_prompt,
             action=sendline,
-            args={'command': 'y'},
+            args={"command": "y"},
             loop_continue=True,
-            continue_timer=False
+            continue_timer=False,
+        )
+        self.more_prompt_stmt = Statement(
+            pattern=patterns.more_prompt,
+            action=more_prompt_handler,
+            args=None,
+            loop_continue=True,
+            continue_timer=False,
+            trim_buffer=False,
         )
 
 

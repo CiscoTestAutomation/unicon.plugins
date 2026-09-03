@@ -11,5 +11,6 @@ class ApSettings(GenericSettings):
             'debug capwap console cli',
             'terminal length 0',
             'terminal width 0',
-            'show version'
+            'show version',
+            'logging console disable'
         ]

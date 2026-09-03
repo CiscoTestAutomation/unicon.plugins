@@ -1,0 +1,78 @@
+nohup: ignoring input and appending output to 'nohup.out'
+
+
+Broadcast message from root@DP-QP (Fri Jan 29 06:45:42 2021):
+
+
+
+All shells being terminated due to system /sbin/reboot
+
+[  497.115473]  writing reset reason 9, 
+
+
+DP-QP login: 
+INIT: /bin/cp: cannot stat '/tmp/sysmgr_dtrace.dbg.0': No such file or directory
+Sending all processes the TERM signal...
+Sending all processes the KILL signal...
+Copying /bootflash/logs/plog to /mnt/plog
+Unmounting filesystems...
+/bootflash/sysdebug/tftpd_logs: ignored
+/spare                   : successfully unmounted
+/cgroup                  : successfully unmounted
+/workspace               : successfully unmounted
+/opt/db/nvram            : successfully unmounted
+/opt                     : successfully unmounted
+/bootflash               : successfully unmounted
+/mnt/pss                 : successfully unmounted
+/dev/pts                 : ignored
+/var/sysmgr/startup-cfg  : ignored
+/mnt/cfg/1               : successfully unmounted
+/mnt/cfg/0               : successfully unmounted
+/mnt/plog                : successfully unmounted
+/debugfs                 : successfully unmounted
+/dev/mqueue              : successfully unmounted
+/debug                   : ignored
+/volatile                : ignored
+/dev/shm                 : ignored
+/callhome                : ignored
+/var/sysmgr/ftp          : ignored
+/var/sysmgr              : ignored
+/var/tmp                 : ignored
+/isan                    : ignored
+/sys                     : ignored
+/proc                    : ignored
+[  514.582128] Disconnected SATA Storage device(sda) from PCI bus
+[  590.720120] reboot: Restarting system
+
+
+!!  Rommon image verified successfully  !!
+
+
+
+
+Cisco System ROMMON, Version 1.0.11, RELEASE SOFTWARE
+Copyright (c) 1994-2016  by Cisco Systems, Inc.
+Compiled Wed 11/23/2016 11:23:23.47 by builder
+Current image running: Boot ROM1
+
+Last reset cause: ResetRequest
+
+DIMM Slot 0 : Present
+
+DIMM Slot 1 : Present
+
+No USB drive !! 
+
+BIOS has been locked !!
+
+
+Platform FPR-4110-SUP with 8192 Mbytes of main memory
+
+MAC Address: 28:6f:7f:02:cb:a4
+
+
+find the string ! boot bootflash:/installables/switch/fxos-k9-kickstart.5.0.3.N2.4.71.72.SPA bootflash:/installables/switch/fxos-k9-system.5.0.3.N2.4.71.72.SPA 
+
+
+Use BREAK, ESC or CTRL+L to interrupt boot.
+Use SPACE to begin boot immediately.

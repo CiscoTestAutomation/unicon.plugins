@@ -1,4 +1,4 @@
-  
+
 exec:
   prompt: "switch#"
   commands:
@@ -9,6 +9,8 @@ exec:
       new_state: config
     "bash":
       new_state: bash
+    "san-ext-tuner":
+      new_state: tie
 
 config:
   prompt: "switch(config)#"
@@ -25,4 +27,23 @@ bash:
   commands:
     "ls": ""
     "exit":
+      new_state: exec
+
+tie:
+  prompt: "%N(tie)#"
+  commands:
+    "cmd": ""
+    "nport target disk pWWN 41:00:00:00:00:00:00:14 vsan 20 interface gigabitethernet 1/2 out-interface fc1/14":
+      new_state: tie_nport
+    "exit":
+      new_state: exec
+    "end":
+      new_state: exec
+
+tie_nport:
+  prompt: "%N(tie-nport)#"
+  commands:
+    "exit":
+      new_state: tie
+    "end":
       new_state: exec

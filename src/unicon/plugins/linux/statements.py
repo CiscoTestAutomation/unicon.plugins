@@ -2,6 +2,8 @@ from unicon.core.errors import ConnectionError
 from unicon.eal.dialogs import Statement
 from unicon.plugins.generic.statements import (pre_connection_statement_list,
                                                generic_statements)
+from unicon.plugins.generic.service_statements import (
+    execution_statement_list as generic_execution_statements)
 from unicon.plugins.utils import (get_current_credential,
                                   common_cred_username_handler,
                                   common_cred_password_handler)
@@ -14,6 +16,8 @@ pat = LinuxPatterns()
 def username_handler(spawn, context, session):
     credential = get_current_credential(context=context, session=session)
     if credential:
+        if credential != 'default':
+            spawn.log.info(f'Using {credential} credential set for login into device')
         common_cred_username_handler(spawn=spawn, context=context,
                                      credential=credential)
     else:
@@ -27,13 +31,6 @@ def password_handler(spawn, context, session):
                                      credential=credential, session=session)
     else:
         spawn.sendline(context['password'])
-
-
-def permission_denied(spawn):
-    """
-    handles connection refused scenarios
-    """
-    raise ConnectionError('Permission denied for device "%s"' % (str(spawn)))
 
 
 def custom_auth_username_password_statements(login_pattern=None,
@@ -59,11 +56,6 @@ def custom_auth_username_password_statements(login_pattern=None,
 class LinuxStatements(object):
 
     def __init__(self):
-        self.permission_denied_stmt = Statement(pattern=pat.permission_denied,
-                                                action=permission_denied,
-                                                args=None,
-                                                loop_continue=False,
-                                                continue_timer=False)
         self.username_stmt = Statement(pattern=pat.username,
                                        action=username_handler,
                                        args=None,
@@ -74,11 +66,17 @@ class LinuxStatements(object):
                                        args=None,
                                        loop_continue=True,
                                        continue_timer=False)
+        self.passphrase_stmt = Statement(pattern=pat.passphrase_prompt,
+                                         action=password_handler,
+                                         args=None,
+                                         loop_continue=True,
+                                         continue_timer=False)
 
 
 linux_statements = LinuxStatements()
 linux_pre_connection_statement_list = pre_connection_statement_list
-linux_auth_other_statement_list = [generic_statements.login_incorrect,
-                                   linux_statements.permission_denied_stmt]
+linux_auth_other_statement_list = [generic_statements.login_incorrect]
 linux_auth_username_password_statement_list = [linux_statements.username_stmt,
-                                               linux_statements.password_stmt]
+                                               linux_statements.password_stmt,
+                                               linux_statements.passphrase_stmt]
+linux_execution_statements = generic_execution_statements + [generic_statements.sudo_stmt]

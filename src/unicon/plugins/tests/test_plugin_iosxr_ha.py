@@ -3,6 +3,7 @@ import unittest
 from time import sleep
 
 from unicon import Connection
+from unicon.core.errors import SwitchoverDisallowedError
 from pyats.topology import loader
 
 from unicon.plugins.tests.mock.mock_device_iosxr import MockDeviceTcpWrapperIOSXR
@@ -51,6 +52,7 @@ class TestIOSXRPluginHAConnect(unittest.TestCase):
         self.r.switchover(sync_standby=False)
 
     def test_switchover_with_standby_sync(self):
+        self.r.settings.STANDBY_STATE_INTERVAL = 1
         self.r.switchover(sync_standby=True)
 
     def test_bash_console(self):
@@ -66,6 +68,46 @@ class TestIOSXRPluginHAConnect(unittest.TestCase):
         ret = self.r.active.spawn.match.match_output
         self.assertIn('exit', ret)
         self.assertIn('Router#', ret)
+
+
+class TestIOSXRPluginHAConnectLearnTokens(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.md = MockDeviceTcpWrapperIOSXR(port=0, state='login,console_standby')
+        cls.md.start()
+
+        cls.testbed = """
+        devices:
+          Router:
+            os: iosxr
+            type: router
+            tacacs:
+                username: admin
+            passwords:
+                tacacs: admin
+            connections:
+              defaults:
+                class: unicon.Unicon
+              a:
+                protocol: telnet
+                ip: 127.0.0.1
+                port: {}
+              b:
+                protocol: telnet
+                ip: 127.0.0.1
+                port: {}
+        """.format(cls.md.ports[0], cls.md.ports[1])
+        tb = loader.load(cls.testbed)
+        cls.r = tb.devices.Router
+
+    @classmethod
+    def tearDownClass(self):
+        self.md.stop()
+
+    def test_learn_tokens_ha(self):
+        self.r.connect(learn_tokens=True)
+
 
 class TestIOSXRPluginHAConnectAdmin(unittest.TestCase):
 
@@ -111,6 +153,47 @@ class TestIOSXRPluginHAConnectAdmin(unittest.TestCase):
         ret = self.r.active.spawn.match.match_output
         self.assertIn('exit', ret)
         self.assertIn('Router#', ret)
+
+class TestIOSXRPluginHASwitchoverDisallowed(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.md = MockDeviceTcpWrapperIOSXR(port=0, state='login_switchover,enable_switchover')
+        cls.md.start()
+
+        cls.testbed = """
+        devices:
+          Router:
+            os: iosxr
+            type: router
+            tacacs:
+                username: admin
+            passwords:
+                tacacs: admin
+            connections:
+              defaults:
+                class: unicon.Unicon
+              a:
+                protocol: telnet
+                ip: 127.0.0.1
+                port: {}
+              b:
+                protocol: telnet
+                ip: 127.0.0.1
+                port: {}
+        """.format(cls.md.ports[0], cls.md.ports[1])
+        tb = loader.load(cls.testbed)
+        cls.r = tb.devices.Router
+        cls.r.connect()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.md.stop()
+
+    def test_switchover(self):
+        with self.assertRaises(SwitchoverDisallowedError) as context:
+            self.r.switchover()
+        self.assertTrue("Switchover disallowed" in str(context.exception))
 
 
 if __name__ == "__main__":

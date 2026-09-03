@@ -9,11 +9,10 @@ from unicon.eal.dialogs import Dialog
 class ASAStateMachine(StateMachine):
     def create(self):
         p = patterns.ASAPatterns()
-        
+
         enable = State('enable', p.enable_prompt)
         disable = State('disable', p.disable_prompt)
         config = State('config', p.config_prompt)
-
 
         enable_to_disable = Path(enable, disable, 'disable', None)
         enable_to_config = Path(enable, config, 'config term', None)

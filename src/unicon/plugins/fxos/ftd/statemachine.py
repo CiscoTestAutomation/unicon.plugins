@@ -7,6 +7,7 @@ import re
 from unicon.core.errors import SubCommandFailure, StateMachineError
 from unicon.statemachine import State, Path, StateMachine
 from unicon.eal.dialogs import Dialog, Statement
+from unicon.utils import to_plaintext
 
 from unicon.plugins.generic.statements import GenericStatements
 from unicon.plugins.generic.patterns import GenericPatterns
@@ -36,7 +37,7 @@ def connect_module_console(state_machine, spawn, context):
     dialog = Dialog([escape_char_stmt])
     dialog += Dialog([Statement(state.pattern, loop_continue=False) for state in sm.states])
     spawn.sendline('connect module %s console' % context.get('_module', 1))
-    sm.go_to('any', spawn, dialog=Dialog([escape_char_stmt]))
+    sm.go_to('any', spawn, timeout=spawn.timeout, dialog=Dialog([escape_char_stmt]))
 
     if sm.current_state != 'module_console':
         sm.go_to('module_console', spawn,
@@ -73,7 +74,8 @@ def sudo_password_handler(spawn, context):
     credentials = context.get('credentials')
     if credentials:
         try:
-            spawn.sendline(credentials[SUDO_CRED_NAME]['password'])
+            spawn.sendline(
+                to_plaintext(credentials[SUDO_CRED_NAME]['password']))
         except KeyError as exc:
             raise UniconAuthenticationError("No password has been defined "
                 "for credential '{}'.".format(SUDO_CRED_NAME))

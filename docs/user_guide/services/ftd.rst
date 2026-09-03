@@ -1,7 +1,7 @@
 FXOS/FTD
 ========
 
-This section lists the services which are supported with FXOS Firepower Threat Defence (FTD) Unicon plugin. This plugin is used when `os=fxos` and `series=ftd` are specified.
+This section lists the services which are supported with FXOS Firepower Threat Defence (FTD) Unicon plugin. This plugin is used when `os=fxos` and `platform=ftd` are specified.
 
   * `execute <#execute>`__
   * `switchto <#switchto>`__
@@ -11,7 +11,6 @@ The following generic services are also available:
   * send
   * sendline
   * expect
-  * expect_log
   * log_user
 
 

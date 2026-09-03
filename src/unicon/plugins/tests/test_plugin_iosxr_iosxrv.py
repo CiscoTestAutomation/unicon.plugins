@@ -26,7 +26,7 @@ class TestIosXrPlugin(unittest.TestCase):
         cls.c = Connection(hostname='iosxrv-1',
                             start=['mock_device_cli --os iosxr --state iosxrv_enable'],
                             os='iosxr',
-                            series='iosxrv',
+                            platform='iosxrv',
                             username='cisco',
                             enable_password='admin',
                             init_exec_commands=[],
@@ -46,7 +46,7 @@ class TestIosXrPlugin(unittest.TestCase):
         c = Connection(hostname='iosxrv-1',
                             start=['mock_device_cli --os iosxr --state iosxrv_enable'],
                             os='iosxr',
-                            series='iosxrv',
+                            platform='iosxrv',
                             username='cisco',
                             tacacs_password='admin',
                             )

@@ -1,0 +1,289 @@
+
+
+ewc_enable:
+  prompt: "WLC3C57.31C5.7BC8#"
+  commands:
+    "exec-timeout 0": ""
+    "terminal length 0": ""
+    "terminal width 0": ""
+    "logging console disable": ""
+    "term length 0": ""
+    "term width 0": ""
+    "show version | include operating mode" : ""
+    "show version | inc ^Cisco": |2
+      Cisco IOS XE Software, Version BLD_POLARIS_DEV_LATEST_20210112_042049
+    "show version": |2
+      Cisco IOS XE Software, Version BLD_POLARIS_DEV_LATEST_20210112_042049
+      Cisco IOS Software [Bengaluru], C9800-AP Software (C9800-AP-K9_IOSXE-UNIVERSALK9-M), Experimental Version 17.6.20210112:042415 [S2C-build-polaris_dev-129467-/nobackup/mcpre/BLD-BLD_POLARIS_DEV_LATEST_20210112_042049 125]
+      Copyright (c) 1986-2021 by Cisco Systems, Inc.
+      Compiled Tue 12-Jan-21 00:04 by mcpre
+
+
+      Cisco IOS-XE software, Copyright (c) 2005-2021 by cisco Systems, Inc.
+      All rights reserved.  Certain components of Cisco IOS-XE software are
+      licensed under the GNU General Public License ("GPL") Version 2.0.  The
+      software code licensed under GPL Version 2.0 is free software that comes
+      with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+      GPL code under the terms of GPL Version 2.0.  For more details, see the
+      documentation or "License Notice" file accompanying the IOS-XE software,
+      or the applicable URL provided on the flyer accompanying the IOS-XE
+      software.
+
+
+      ROM: IOS-XE ROMMON
+
+      WLC3C57.31C5.7BC8 uptime is 31 minutes
+      Uptime for this control processor is 34 minutes
+      System returned to ROM by reload at 04:23:22 UTC Mon May 3 2021
+      System image file is "/tmp/sw/rp/0/0/rp_wlc/mount/usr/binos/bin/linux_iosd-image"
+      Last reload reason: reload
+
+
+
+      This product contains cryptographic features and is subject to United
+      States and local country laws governing import, export, transfer and
+      use. Delivery of Cisco cryptographic products does not imply
+      third-party authority to import, export, distribute or use encryption.
+      Importers, exporters, distributors and users are responsible for
+      compliance with U.S. and local country laws. By using this product you
+      agree to comply with applicable laws and regulations. If you are unable
+      to comply with U.S. and local laws, return this product immediately.
+
+      A summary of U.S. laws governing Cisco cryptographic products may be found at:
+      http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+      If you require further assistance please contact us by sending email to
+      export@cisco.com.
+
+      AIR License Level: AIR Network Essentials
+      Next reload AIR license Level: AIR Network Essentials
+      cisco C9124AXE-B (VXE) processor (revision VXE) with 167216K bytes of memory.
+      Processor board ID FOC24384GTP
+      2048K bytes of non-volatile configuration memory.
+      1813640K bytes of physical memory.
+      100000K bytes of AP Images at ap_images:.
+      513300K bytes of Backup Controller Image at backup_image:.
+      7774207K bytes of virtual hard disk at bootflash:.
+      25000K bytes of Temp trace export at tmp_trace_export:.
+      Installation mode is BUNDLE
+
+
+      Configuration register is 0x2102
+
+    "config term":
+      new_state: ewc_config
+
+    "show install summary": |2
+      [ Chassis 1/R0 ] Installed Package(s) Information:
+      State (St): I - Inactive, U - Activated & Uncommitted,
+                  C - Activated & Committed, D - Deactivated & Uncommitted
+      --------------------------------------------------------------------------------
+      Type  St   Filename/Version
+      --------------------------------------------------------------------------------
+      IMG   C    17.06.01.0.129467
+
+      --------------------------------------------------------------------------------
+      Auto abort timer: inactive
+      --------------------------------------------------------------------------------
+
+    "show chassis": |2
+      Chassis/Stack Mac Address : 3c57.31c5.7b48 - Local Mac Address
+      Mac persistency wait time: Indefinite
+                                                  H/W   Current
+      Chassis#   Role    Mac Address     Priority Version  State                 IP
+      -------------------------------------------------------------------------------------
+      *1       Active   3c57.31c5.7b48     1      V01     Ready                10.10.10.1
+
+    "wireless ewc-ap ap shell username lab":
+      new_state: ewc_ap_password
+    "request platform software system shell chassis 1 R0":
+      new_state:
+        ewc_bash_console
+
+ewc_ap_password:
+  preface: |
+    The authenticity of host '192.168.129.1 (192.168.129.1)' can't be established.
+    ECDSA key fingerprint is SHA256:yQlO/R4iSBucMHkdgwK/QG9QC22WS2O7eIf1qEl5uEY.
+    Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+    Warning: Permanently added '192.168.129.1' (ECDSA) to the list of known hosts.
+  prompt: "lab@192.168.129.1's password:"
+  commands:
+    "lab":
+      new_state: ewc_ap_exec
+
+ewc_ap_exec:
+  preface:
+    timing:
+    - 0:,0,0.1,0.01
+    response: |
+      # https://www.cisco.com/c/en/us/td/docs/wireless/embedded_wireless_controller_configuration_guide.html #
+      #                                                                                                      #
+      ########################################################################################################
+  prompt: "AP3C57.31C5.7B48>"
+  commands:
+    "exit":
+      new_state: ewc_enable
+    "enable":
+      new_state: ewc_ap_enable_password
+
+ewc_ap_enable_password:
+  prompt: "Password:"
+  commands:
+    "lab":
+      new_state: ewc_ap_enable
+
+
+ewc_ap_enable:
+  prompt: "AP3C57.31C5.7B48#"
+  commands:
+    "exec-timeout 0": ""
+    "line vty 0 4": ""
+    "terminal length 0": ""
+    "terminal width 0": ""
+    "disable":
+      new_state: ewc_ap_exec
+    "exit":
+      new_state: ewc_enable
+    "show version | inc ^Cisco": |2
+      Cisco AP Software, (ap1g6a), [build-lnx-071:/san1/jenkins-ci/workspace/postcommit-master-cisco-platforms-4064/label/ap1g6a]
+    "show version | include operating mode" : ""
+    "show version": |2
+                  Restricted Rights Legend
+
+      Use, duplication, or disclosure by the Government is subject to
+      restrictions as set forth in subparagraph (c) of the Commercial
+      Computer Software - Restricted Rights clause at FAR sec. 52.227-19 and
+      subparagraph (c) (1) (ii) of the Rights in Technical Data and Computer
+      Software clause at DFARS sec. 252.227-7013.
+
+                  Cisco Systems, Inc.
+                  170 West Tasman Drive
+                  San Jose, California 95134-1706
+
+      This product contains cryptographic features and is subject to United
+      States and local country laws governing import, export, transfer and
+      use. Delivery of Cisco cryptographic products does not imply
+      third-party authority to import, export, distribute or use encryption.
+      Importers, exporters, distributors and users are responsible for
+      compliance with U.S. and local country laws. By using this product you
+      agree to comply with applicable laws and regulations. If you are unable
+      to comply with U.S. and local laws, return this product immediately.
+
+      A summary of U.S. laws governing Cisco cryptographic products may be found at:
+      http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+      If you require further assistance please contact us by sending email to
+      export@cisco.com.
+
+      This product contains some software licensed under the
+      "GNU General Public License, version 2" provided with
+      ABSOLUTELY NO WARRANTY under the terms of
+      "GNU General Public License, version 2", available here:
+      http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+
+      This product contains some software licensed under the
+      "GNU Library General Public License, version 2" provided
+      with ABSOLUTELY NO WARRANTY under the terms of "GNU Library
+      General Public License, version 2", available here:
+      http://www.gnu.org/licenses/old-licenses/lgpl-2.0.html
+
+      This product contains some software licensed under the
+      "GNU Lesser General Public License, version 2.1" provided
+      with ABSOLUTELY NO WARRANTY under the terms of "GNU Lesser
+      General Public License, version 2.1", available here:
+      http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
+
+      This product contains some software licensed under the
+      "GNU General Public License, version 3" provided with
+      ABSOLUTELY NO WARRANTY under the terms of
+      "GNU General Public License, Version 3", available here:
+      http://www.gnu.org/licenses/gpl.html.
+
+      This product contains some software licensed under the
+      "GNU Affero General Public License, version 3" provided
+      with ABSOLUTELY NO WARRANTY under the terms of
+      "GNU Affero General Public License, version 3", available here:
+      http://www.gnu.org/licenses/agpl-3.0.html.
+
+      Cisco AP Software, (ap1g6a), [build-lnx-071:/san1/jenkins-ci/workspace/postcommit-master-cisco-platforms-4064/label/ap1g6a]
+      Technical Support: http://www.cisco.com/techsupport
+      Copyright (c) 1986-2021 by Cisco Systems, Inc.
+      Compiled Fri Jan  8 22:59:35 GMT 2021
+
+      ROM: Bootstrap program is U-Boot boot loader
+      BOOTLDR: U-Boot boot loader Version 5
+
+      AP3C57.31C5.7B48 uptime is 0 days, 0 hours, 35 minutes
+      Last reload time   : Mon May 3 05:03:43 UTC 2021
+      Last reload reason : unknown
+
+      cisco C9124AXE-B ARMv8 Processor rev 4 (v8l) with 1813640/130272K bytes of memory.
+      Processor board ID FOC24384GTP
+      AP Running Image     : 17.6.0.14
+      Primary Boot Image   : 17.6.0.14
+      Backup Boot Image    : 17.7.0.9
+      Primary Boot Image Hash: bf1f90d4247d31fe75ee7e629f07133d8b9ebd6672b91ca8e5494f58efd27f302c7b05789ce2737dd52e2157f7739abcb8a49e3e88cb003328968c25d63be0aa
+      Backup  Boot Image Hash: 8f888b1b0016503433f62db63d567850a5a095d6942e3bbf2e90aaa4f623ebaca1fe439b84e59010a52041062390ea6e694daf1271fdc9ca381878c112aa356c
+      AP Image type    : EWC-AP IMAGE
+      AP Configuration : EWC-AP CAPABLE
+      3 Multigigabit Ethernet interfaces
+      2 802.11 Radios
+      Radio FW version : QC_IMAGE_VERSION_STRING=WLAN.HK.2.1-01577-QCAHKSWPL_SILICONZ-1.342931.1.351584.1
+      NSS FW version : NSS.HK.K.CS-18-sba5.1-max_seg_len_E_custC
+
+      Base ethernet MAC Address            : 3C:57:31:C5:7B:48
+      Part Number                          : 0-0000-00
+      PCA Assembly Number                  : 074-125084-01
+      PCA Revision Number                  : 01
+      PCB Serial Number                    : FOC24384GTP
+      Top Assembly Part Number             : 074-125084-01
+      Top Assembly Serial Number           : FOC24384GTP
+      Top Revision Number                  : 01
+      Product/Model Number                 : C9124AXE-B
+    "logging console disable": ""
+    "show interfaces wired 0": |
+      wired0    Link encap:Ethernet  HWaddr 3C:57:31:C5:7B:48
+          inet addr: 15.0.0.1  Bcast: 15.0.0.255  Mask: 255.255.255.0
+                UP BROADCAST RUNNING PROMISC MULTICAST  MTU:1500  Metric:1
+                collisions:0 txqueuelen:80
+                Base address:0x7000
+          full Duplex, 1000 Mb/s
+
+      Wired0 Port Statistics:
+      RX PKTS    :            1509/1           TX PKTS    :            1509/1
+      RX BYTES   :          431476/122         TX BYTES   :          431476/122
+      RX DROPS   :               0/0
+
+
+ewc_config:
+  preface: "Enter configuration commands, one per line.  End with CNTL/Z."
+  prompt: "WLC3C57.31C5.7BC8(config)#"
+  commands:
+    "no logging console": ""
+    "line console 0": ""
+    "line vty 0 4": ""
+    "exec-timeout 0": ""
+    "end":
+      new_state: ewc_enable
+
+    "ap profile default-ap-profile":
+      new_state: ewc_config_ap_profile
+
+
+ewc_config_ap_profile:
+  prompt: "WLC3C57.31C5.7BC8(config-ap-profile)#"
+  commands:
+    "mgmtuser username lab password 0 lab secret 0 lab": ""
+    "ssh": ""
+    "end":
+      new_state: ewc_enable
+
+
+ewc_bash_console:
+  prompt: "Coral-mewlc#"
+  commands:
+    "stty cols 200": ""
+    "stty rows 200": ""
+    "help": "help"
+    "exit":
+      new_state: ewc_enable

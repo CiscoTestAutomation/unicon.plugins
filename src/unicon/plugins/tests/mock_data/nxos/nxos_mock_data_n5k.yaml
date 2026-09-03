@@ -115,6 +115,8 @@ n5k_basic_config_prompt:
     to skip the remaining dialogs.
   prompt: "Would you like to enter the basic configuration dialog (yes/no): "
   commands:
+    "no":
+      new_state: n5k_user_access_veri
     "n":
       new_state: n5k_user_access_veri
 
@@ -129,6 +131,8 @@ n5k_user_password:
   prompt: "Password: "
   commands:
     "lab":
+      new_state: n5k_exec
+    "lab2":
       new_state: n5k_exec
 
 n5k_config:

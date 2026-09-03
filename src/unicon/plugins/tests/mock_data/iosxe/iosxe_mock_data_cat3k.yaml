@@ -43,12 +43,22 @@ cat3k_password:
   commands:
     "cisco":
       new_state: cat3k_exec
+    "cisco1":
+      response: Password OK
+      new_state: cat3k_password_ok_prompt
+
+cat3k_password_ok_prompt:
+  prompt: ""
+  commands:
+    "":
+      new_state: cat3k_exec
 
 cat3k_exec:
-  prompt: "Router>"
+  prompt: "%N>"
   commands:
     "term length 0": ""
     "term width 0": ""
+    "show version | include operating mode" : ""
     "show version": &SV |2
       Cisco IOS XE Software, Version BLD_POLARIS_DEV_LATEST_20170430_051046
       Cisco IOS Software [Everest], Catalyst L3 Switch Software (CAT3K_CAA-UNIVERSALK9-M), Experimental Version 16.7.20170430:042622 [polaris_dev-/scratch/mcpre/BLD-BLD_POLARIS_DEV_LATEST_20170430_051046 121]
@@ -164,11 +174,12 @@ cat3k_exec:
 
 
 enable_cat3k:
-  prompt: "Router#"
-  commands:
+  prompt: "%N#"
+  commands: &cat3k_enable_cmds
     "term length 0": ""
     "term width 0": ""
     "show version": *SV
+    "show version | include operating mode" : ""
 
     # The following commands are for uniclean testing.
     "show version | inc System image file is": |2
@@ -191,19 +202,34 @@ enable_cat3k:
       new_state: cat3k_exec
     "reload":
       new_state: system_config_change
+    "active_install_add":
+        new_state: cat3k_install_add_commit
+    "dir bootflash:/core/": |
+        dir bootflash:/core/
+        Directory of flash:/core/
+
+        360468  -rw-                1  Jun 27 2022 19:49:31 +00:00  .callhome
+        360539  -rw-        609625345  May 19 2022 20:52:07 +00:00  kernel.NA_CAT9K_NA_20220519205207.core.gz
+        360538  -rw-            90855  May 19 2022 20:50:59 +00:00  kernel.NA_CAT9K_NA_20220519205207.txt
+        524407  drwx             4096  Nov 10 2021 18:22:12 +00:00  modules
 
 
 config_cat3k:
-  prompt: "Router(config)#"
+  prompt: "%N(config)#"
   commands:
+    "end":
+      new_state: enable_cat3k
     "no logging console": ""
+    "line vty 0 4":
+      new_state: config_line_cat3k
     "line console 0":
       new_state: config_line_cat3k
 
 config_line_cat3k:
-  prompt: "Router(config-line)#"
+  prompt: "%N(config-line)#"
   commands:
     "exec-timeout 0": ""
+    "line vty 0 4": ""
     "end":
       new_state: enable_cat3k
 
@@ -352,3 +378,22 @@ reload_cat3k_logs:
   commands:
     "":
       new_state: cat3k_exec
+
+
+cat3k_enable_reload_to_rommon:
+  prompt: "%N#"
+  commands:
+    <<: *cat3k_enable_cmds
+    "reload":
+      new_state: cat3k_rommon
+
+cat3k_install_add_commit:
+   preface: |2
+      Copying image file: bootflash:asr1000rpx86-universalk9.BLD_V166_THROTTLE_LATEST_20171101_090919_2.SSA.bin to standby
+      rsync: write failed on "asr1000rpx86-universalk9.BLD_V166_THROTTLE_LATEST_20171101_090919_2.SSA.bin" (in bootflash): No space left on device (28)
+      rsync error: error in file IO (code 11) at ../rsync-3.1.2/receiver.c(393) [receiver=3.1.2]
+      rsync error: error in file IO (code 11) at ../rsync-3.1.2/io.c(1633) [generator=3.1.2]
+      rsync: read error: Connection reset by peer (104)
+      FAILED: install_add_activate_commit : Copy bootflash:asr1000rpx86-universalk9.BLD_V16
+
+   new_state: enable_cat3k

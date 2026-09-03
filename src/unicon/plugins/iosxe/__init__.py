@@ -9,11 +9,10 @@ from unicon.plugins.generic import ServiceList, HAServiceList
 from unicon.bases.routers.connection import BaseSingleRpConnection
 from unicon.plugins.iosxe.statemachine import IosXESingleRpStateMachine
 from unicon.plugins.iosxe.statemachine import IosXEDualRpStateMachine
-from unicon.plugins.generic import GenericSingleRpConnectionProvider,\
-    GenericDualRPConnection
+from unicon.plugins.iosxe.connection_provider import  IosxeSingleRpConnectionProvider
+from unicon.plugins.generic import GenericDualRPConnection
 from unicon.plugins.iosxe.settings import IosXESettings
 
-from unicon.plugins.generic.service_implementation import Reload
 from unicon.plugins.iosxe import service_implementation as svc
 
 
@@ -26,6 +25,13 @@ class IosXEServiceList(ServiceList):
         self.ping = svc.Ping
         self.traceroute = svc.Traceroute
         self.bash_console = svc.BashService
+        self.copy = svc.Copy
+        self.reload = svc.Reload
+        self.rommon = svc.Rommon
+        self.tclsh = svc.Tclsh
+        self.maintenance_mode = svc.MaintenanceMode
+        self.config_syntax = svc.ConfigSyntax
+        self.enable = svc.Enable
 
 
 class HAIosXEServiceList(HAServiceList):
@@ -39,21 +45,28 @@ class HAIosXEServiceList(HAServiceList):
         self.switchover = svc.HASwitchover
         self.ping = svc.Ping
         self.bash_console = svc.BashService
+        self.traceroute = svc.Traceroute
+        self.copy = svc.Copy
+        self.reset_standby_rp = svc.ResetStandbyRP
+        self.rommon = svc.HARommon
+        self.tclsh = svc.Tclsh
+        self.config_syntax = svc.ConfigSyntax
+        self.enable = svc.Enable
 
 
 class IosXESingleRpConnection(BaseSingleRpConnection):
     os = 'iosxe'
-    series = None
+    platform = None
     chassis_type = 'single_rp'
     state_machine_class = IosXESingleRpStateMachine
-    connection_provider_class = GenericSingleRpConnectionProvider
+    connection_provider_class = IosxeSingleRpConnectionProvider
     subcommand_list = IosXEServiceList
     settings = IosXESettings()
 
 
 class IosXEDualRPConnection(GenericDualRPConnection):
     os = 'iosxe'
-    series = None
+    platform = None
     chassis_type = 'dual_rp'
     subcommand_list = HAIosXEServiceList
     state_machine_class = IosXEDualRpStateMachine

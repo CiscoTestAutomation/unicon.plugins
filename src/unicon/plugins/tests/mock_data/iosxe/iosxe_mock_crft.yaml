@@ -1,0 +1,27 @@
+
+enable_crft:
+  prompt: "%N#"
+  commands:
+    "dir flash:/CRFT_*": |4
+
+        Directory of flash:/CRFT_*
+
+
+        Directory of flash:/
+
+
+        655502  -rw-      796729  Oct 22 2021 19:35:59 +00:00  CRFT__ott-c9300-22__000001__C930024T_2021-10-22_19-35-59.tar.gz
+
+        11353194496 bytes total (1054248960 bytes free)
+
+
+    "dir": |
+        Directory of flash:/
+
+        655385  -rw-          5242880  Oct 22 2021 18:39:51 +00:00  ssd
+
+        11353194496 bytes total (1055051776 bytes free)
+
+    "verify /md5 CRFT__ott-c9300-22__000001__C930024T_2021-10-22_19-35-59.tar.gz": ""
+    "delete /force flash:CRFT_*": ""
+    "dir flash:CRFT_*": ""

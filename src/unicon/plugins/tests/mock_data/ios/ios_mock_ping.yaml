@@ -251,3 +251,110 @@ ping_sweep_vrf:
       Sending 5, 100-byte ICMP Echos to 1.1.1.1, timeout is 2 seconds:
       !!!!!
       Success rate is 100 percent (5/5), round-trip min/avg/max = 1/1/3 ms
+
+
+ping_proto_ios_verbose:
+  prompt: "Protocol [ip]: "
+  commands:
+   "":
+    new_state: ping_target_ip_verbose
+
+ping_target_ip_verbose:
+  prompt: "Target IP address: "
+  commands:
+   "1.1.1.1":
+    new_state: ping_count_verbose
+
+ping_count_verbose:
+  prompt: "Repeat count [5]: "
+  commands:
+   "":
+    new_state: ping_size_verbose
+
+ping_size_verbose:
+  prompt: "Datagram size [100]: "
+  commands:
+   "":
+    new_state: ping_timeout_verbose
+
+ping_timeout_verbose:
+  prompt: "Timeout in seconds [2]: "
+  commands:
+   "":
+    new_state: ping_extend_verbose
+
+ping_extend_verbose:
+  prompt: "Extended commands? [no]: "
+  commands:
+   "y":
+    new_state: ping_ingress_ping_verbose
+
+ping_ingress_ping_verbose:
+  prompt: "Ingress ping [n]: "
+  commands:
+   "":
+    new_state: ping_source_add_or_int_verbose
+
+ping_source_add_or_int_verbose:
+  prompt: "Source address or interface: "
+  commands:
+   "":
+    new_state: ping_dscp_value_verbose
+
+ping_dscp_value_verbose:
+  prompt: "DSCP Value [0]: "
+  commands:
+    "":
+      new_state: ping_tos_verbose
+
+ping_tos_verbose:
+  prompt: "Type of service [0]: "
+  commands:
+    "":
+      new_state: ping_dfbit_verbose
+
+ping_dfbit_verbose:
+  prompt: "Set DF bit in IP header? [no]: "
+  commands:
+    "":
+      new_state: ping_validate_data_verbose
+
+ping_validate_data_verbose:
+  prompt: "Validate reply data? [no]: "
+  commands:
+    "":
+      new_state: ping_data_pattern_verbose
+
+ping_data_pattern_verbose:
+  prompt: "Data pattern [0x0000ABCD]: "
+  commands:
+    "":
+      new_state: ping_lsrtv_verbose
+
+ping_lsrtv_verbose:
+  prompt: "Loose, Strict, Record, Timestamp, Verbose[none]: "
+  commands:
+    "v":
+      new_state: ping_lsrtv_v_verbose
+
+ping_lsrtv_v_verbose:
+  prompt: "Loose, Strict, Record, Timestamp, Verbose[V]: "
+  commands:
+    "":
+      new_state: ping_sweep_verbose
+
+ping_sweep_verbose:
+  prompt: "Sweep range of sizes? [no]: "
+  commands:
+   "n":
+    new_state: enable
+    response: |
+      Type escape sequence to abort.
+      Sending 5, 100-byte ICMP Echos to 1.1.1.1, timeout is 2 seconds:
+      Reply to request 0 (5 ms)
+      Reply to request 1 (2 ms)
+      Reply to request 2 (2 ms)
+      Reply to request 3 (2 ms)
+      Reply to request 4 (8 ms)
+      Success rate is 100 percent (5/5), round-trip min/avg/max = 2/3/8 ms
+

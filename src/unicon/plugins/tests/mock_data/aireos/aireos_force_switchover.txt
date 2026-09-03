@@ -1,0 +1,223 @@
+
+
+
+System will now restart!
+Updating license storage ...  Done.
+
+ Exiting SL process !
+Collect the core using oct utility
+18_44_42_2020_06_07
+Collection Done @18_44_43_2020_06_07
+Core Creation Done @18_44_43_2020_06_07
+Terminated
+sh: can't kill pid 1893: No such process
+Shutting down NA Connector...
+Unloading host drivers...
+Shutting down DB Services...
+Stopping Hardware Acceleration...
+Shutting down Web Services...
+Unloading host NIC drivers...
+INIT: Sending processes the TERM signal
+Sending all processes the TERM signal...
+Sending all processes the KILL signal...
+Rebooting... [ 1022.646053] reboot: Restarting system
+
+ Cisco Systems, Inc.
+ Configuring and testing memory..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Cisco IMC IPv4 : 1.4.9.211
+MAC ADDR : C4:F7:D5:C7:8B:88
+Initializing Intel(R) Boot Agent GE v1.5.85                                                                                   PXE 2.1 Build 092 (WfM 2.0)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         Press <F2> Setup, <F6> Boot Menu, <F7> Diagnostics, <F8>Cisco IMC Configuration,                                              <F12> Network Boot                                                                                                                                                                                                                                          Bios Version : C220M4.4.0.1c.0.0711181559                                                                                     Platform ID  : C220M4                                                                                                                                                                                                                                       Cisco IMC IPv4 Address : 1.4.9.211                                                                                            Cisco IMC MAC Address : C4:F7:D5:C7:8B:88
+Processor(s) Intel(R) Xeon(R) CPU E5-2609 v3 @ 1.90GHz
+Total Memory  = 32 GB Effective Memory = 32 GB
+Memory Operating Speed 1600 Mhz                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               Press <F2> Setup, <F6> Boot Menu, <F7> Diagnostics, <F8>Cisco IMC Configuration,<F12> Network Boot                                                                                                                                              Bios Version : C220M4.4.0.1c.0.0711181559                                       Platform ID  : C220M4                                                                                                                                           Cisco IMC IPv4 Address : 1.4.9.211                                              Cisco IMC MAC Address : C4:F7:D5:C7:8B:88                                                                                                                       Processor(s) Intel(R) Xeon(R) CPU E5-2609 v3 @ 1.90GHz                          Total Memory  = 32 GB Effective Memory = 32 GB                                  Memory Operating Speed 1600 Mhz                                         Please wait, preparing to boot.. ................................................
+.......................................................
+Cisco Bootloade
+
+  Booting 'Primary image'
+
+Detecting hardware . . . . 3
+INIT: version 2.88 booting
+Starting udev
+Configuring network interfaces... done.
+
+Octeon NIC Check Iteration 0
+Setting up the kernel dump handler..
+INIT: Entering runlevel: 3
+Detecting Hardware ...
+
+
+
+Loading host drivers..
+Loading host NIC drivers..
+Starting Hardware Acceleration...
+Starting Ulogd...
+Starting DB Services...
+Starting NA Connector...
+
+Cryptographic library self-test....
+Testing SHA1 Short Message 1
+Testing SHA256 Short Message 1
+Testing SHA384 Short Message 1
+SHA1 POST PASSED
+Testing HMAC SHA1 Short Message 1
+Testing HMAC SHA2 Short Message 1
+Testing HMAC SHA384 Short Message 1
+passed!
+
+XML config selected
+LinkEncrypt config loaded
+
+XML config selected
+Validating XML configuration
+octeon_device_init: found 1 DPs
+Cisco is a trademark of Cisco Systems, Inc.
+Software Copyright Cisco Systems, Inc. All rights reserved.
+
+Cisco AireOS Version 8.10.112.0
+Initializing OS Services: ok
+Initializing Serial Services: ok
+Initializing Network Services: ok
+Initializing Licensing Services: ok
+Starting Statistics Service: ok
+Unable to open dx flag file
+Starting ARP Services: ok
+Starting Trap Manager: ok
+
+
+License daemon start initialization.....
+
+License daemon running.....
+Starting Data Externalization services: ok
+Starting Network Interface Management Services: ok
+Starting System Services: ok
+Starting FIPS Features: ok : Not enabled
+Starting SNMP services: ok
+Starting Fastpath Hardware Acceleration: ok
+Starting Fastpath DP Heartbeat : ok
+Fastpath CPU0.00(0): Starting Fastpath Application. SDK-Cavium Inc. OCTEON SDK version 3.1.0, build 549. Flags-[DUTY CYCLE] : ok
+Fastpath CPU0.00(0): Initializing last packet received queue. Num of cores(24)
+Fastpath CPU0.00(0): Initializing Global Packet Queue. Num of packets supported(1000)
+Fastpath CPU0.00(0): Init MBUF size: 1856, Subsequent MBUF size: 2040
+Fastpath CPU0.00(0): Core 0 Initialization and FIPS self-test: ok
+Fastpath CPU0.00(0): 24 Cores are being initialized
+Fastpath CPU0.00(0): Initializing Timer...
+Fastpath CPU0.00(0): Initializing Timer...done.
+Fastpath CPU0.00(0): Initializing Timer...
+Fastpath CPU0.00(0): Initializing NBAR AGING Timer...done.
+Fastpath CPU0.01(0): Core 1 Initialization and FIPS self-test: ok
+Fastpath CPU0.02(0): Core 2 Initialization and FIPS self-test: ok
+Fastpath CPU0.03(1): Core 3 Initialization and FIPS self-test: ok
+Fastpath CPU0.04(2): Core 4 Initialization and FIPS self-test: ok
+Fastpath CPU0.05(3): Core 5 Initialization and FIPS self-test: ok
+Fastpath CPU0.06(4): Core 6 Initialization and FIPS self-test: ok
+Fastpath CPU0.07(5): Core 7 Initialization and FIPS self-test: ok
+Fastpath CPU0.08(6): Core 8 Initialization and FIPS self-test: ok
+Fastpath CPU0.09(7): Core 9 Initialization and FIPS self-test: ok
+Fastpath CPU0.10(8): Core 10 Initialization and FIPS self-test: ok
+Fastpath CPU0.11(9): Core 11 Initialization and FIPS self-test: ok
+Fastpath CPU0.12(10): Core 12 Initialization and FIPS self-test: ok
+Fastpath CPU0.13(11): Core 13 Initialization and FIPS self-test: ok
+Fastpath CPU0.14(12): Core 14 Initialization and FIPS self-test: ok
+Fastpath CPU0.15(13): Core 15 Initialization and FIPS self-test: ok
+Fastpath CPU0.16(14): Core 16 Initialization and FIPS self-test: ok
+Fastpath CPU0.17(15): Core 17 Initialization and FIPS self-test: ok
+Fastpath CPU0.18(16): Core 18 Initialization and FIPS self-test: ok
+Fastpath CPU0.19(17): Core 19 Initialization and FIPS self-test: ok
+Fastpath CPU0.20(18): Core 20 Initialization and FIPS self-test: ok
+Fastpath CPU0.08(19): Pkt Ptr Unaligned, WQE-080000000037e6d80 PktPtr-0x84bdc880 Buffer-0
+Fastpath CPU0.21(19): Core 21 Initialization and FIPS self-test: ok
+Fastpath CPU0.22(20): Core 22 Initialization and FIPS self-test: ok
+Fastpath CPU0.23(21): Core 23 Initialization and FIPS self-test: ok
+Starting Switching Services: ok
+Starting QoS Services: ok
+Starting Policy Manager: ok
+Starting Data Transport Link Layer: ok
+Starting Access Control List Services: ok
+Starting System Interfaces: ok
+Starting Client Troubleshooting Service: ok
+Starting Certificate Database: Initializing Curl Globally..
+ok
+Starting VPN Services: ok
+Starting Management Frame Protection: ok
+Starting DNS Services: ok
+ok
+HBL initialization is successful
+Starting Licensing Services: ok
+Starting Redundancy: Starting Peer Search Timer of 120 seconds
+Initiate Role Negotiation Message to peer
+Found the Peer. Starting Role Determination...ok
+Start rmgrPingTask: ok
+Starting LWAPP: ok
+Starting CAPWAP: ok
+Starting LOCP: ok
+Starting Security Services: ok
+Starting OpenDNS Services: ok
+Starting Policy Manager: ok
+Starting TrustSec Services: ok
+Starting Authentication Engine: ok
+Starting Mobility Management: ok
+Starting Capwap Ping Component: ok
+Starting AVC Services: ok
+Starting AVC Flex Services: ok
+Starting Virtual AP Services: ok
+Starting AireWave Director: ok
+Starting Network Time Services: ok
+Starting Cisco Discovery Protocol: ok
+Starting Broadcast Services: ok
+Starting Logging Services: ok
+Starting DHCP Server: ok
+Starting IDS Signature Manager: ok
+Starting RFID Tag Tracking: ok
+Starting RF Profiles: ok
+Starting Environment Status Monitoring Service: ok
+Starting RAID Volume Status Monitoring Service: ok
+Starting Mesh Services:  ok
+Starting TSM: ok
+Starting CIDS Services: ok
+Starting Ethernet-over-IP: ok
+Starting DTLS server:  enabled in CAPWAP
+Starting CleanAir: ok
+Starting WIPS: ok
+Starting SSHPM LSC PROV LIST: ok
+Starting RRC Services: ok
+Starting SXP Services: ok
+Starting Alarm Services: ok
+Starting FMC HS: ok
+Starting IPv6 Services: ok
+Starting Config Sync Manager : ok
+Starting Hotspot Services: Fan Policy : Max power
+Fan Policy : Max power
+Setting Fan policy to Low Power Mode
+ok
+Starting Tunnel Services New: ok
+Starting PMIP Services: ok
+Starting Portal Server Services: ok
+Starting mDNS Services: ok
+Starting Management Services:
+   Web Server:    CLI:    Secure Web: ok
+   SSH: ok
+Starting IPSec Profiles component: ok
+Starting FEW Services: ok
+Starting MS Agent Services: ok
+Starting CPU ACL Logging services: ok
+
+(AIT-CT5520-Standby)
+
+Enter User Name (or 'Recover-Config' this one-time only to reset configuration to factory defaults)
+

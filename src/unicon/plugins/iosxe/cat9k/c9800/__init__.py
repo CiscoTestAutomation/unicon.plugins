@@ -1,0 +1,31 @@
+""" C9800 connection implementation.
+"""
+
+from unicon.plugins.iosxe import IosXESingleRpConnection, IosXEDualRPConnection
+
+from .. import IosXEServiceList
+
+from .statemachine import IosXEc9800SingleRpStateMachine
+from .settings import IosXEc9800Settings
+from .. import service_implementation as svc
+from .service_implementation import Rommon   
+
+class IosXEc9800ServiceList(IosXEServiceList):
+    def __init__(self):
+        super().__init__()
+        self.reload = svc.Reload
+        self.rommon = Rommon
+
+
+class IosXEc9800SingleRpConnection(IosXESingleRpConnection):
+    platform = 'cat9k'
+    model = 'c9800'
+    state_machine_class = IosXEc9800SingleRpStateMachine
+    subcommand_list = IosXEc9800ServiceList
+    settings = IosXEc9800Settings()
+
+
+class IosXEc9800DualRPConnection(IosXEDualRPConnection):
+    platform = 'cat9k'
+    model = 'c9800'
+    settings = IosXEc9800Settings()

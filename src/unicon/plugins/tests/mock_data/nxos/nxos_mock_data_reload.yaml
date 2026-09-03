@@ -78,6 +78,271 @@ confirm_reload:
     "y":
       new_state: login_after_reload
 
+confirm_reload3:
+  prompt: "This command will reboot the system. (y/n)?  [n]"
+  commands:
+    "y":
+      new_state: skip_poap
+
+
+confirm_reload4:
+  prompt: "This command will reboot the system. (y/n)?  [n]"
+  commands:
+    "y":
+      new_state: skip_poap2
+
+confirm_reload5:
+  prompt: "This command will reboot the system. (y/n)?  [n]"
+  commands:
+    "y":
+      new_state: login_after_buffer_settle_reload
+
+skip_poap2:
+  preface: |2
+      Waiting for system online status before starting POAP ...
+      Waiting for system online status before starting POAP ...
+      Waiting for system online status before starting POAP ...
+      2021 Mar 26 21:59:21 switch %$ VDC-1 %$ %DEVICE_TEST-2-ASICMEM_FAIL: Module 1 has failed test AsicMemoryTest 1 times on device ASIC Memory due to error General Failure
+      2021 Mar 26 21:59:21 switch %$ VDC-1 %$ %DEVICE_TEST-SLOT1-2-ASICMEM_FAIL: Module 1 has failed test AsicMemoryTest 1 times on device ASIC Memory due to error General Failure
+      2021 Mar 26 21:59:32 switch %$ VDC-1 %$ %ASCII-CFG-2-CONF_CONTROL: System ready
+      Starting Auto Provisioning ...
+      Done
+  prompt: "Abort Power On Auto Provisioning [yes - continue with normal setup, skip - bypass password and basic configuration, no - continue with Power On Auto Provisioning] (yes/skip/no)[no]:"
+  commands: 
+      "y": 
+          new_state: reconnect_login
+          response: Disabling POAP.......Disabling POAP 
+
+skip_poap:
+  preface: |2
+    CISCO MODULE
+    BIOS Ver: 5.34
+    RC Revision:  02.03.00
+
+    Memory Information:
+     MRC Revision:00.50.00
+     Total  DRAM: 16384 MB
+     Memory TOLM: 80000000
+     PCIE   BASE: 80000000     	Size : 10000000
+     PCI32  BASE: 90000000     	Limit: FBFFFFFF
+     PCI64  BASE: 80000000000     	Limit: 83FFFFFFFFF
+     UC    START: 80000000000     	End  : 84000000000
+    ME Operational Firmware Version: 06:3.0.3.27
+    
+    DIMM Information:
+     Clock Speed: 1067MHz
+     Socket: 0x0 Channel: 0x0 Number: 0x0 Presence: Yes Size: 8GB
+     Socket: 0x0 Channel: 0x1 Number: 0x0 Presence: Yes Size: 8GB
+    
+    Detected CISCO IOFPGA
+    Booting from Primary Bios
+     Code Signing Results: 0x0
+     Booting from Upgrade FPGA
+     FPGA Revision         : 0x10
+     FPGA ID               : 0x11514088
+     FPGA Date             : 0x20190123
+     Power Debug Register1  : 0xbaadbeef
+     Power Debug Register2  : 0xbaadbeef
+     Reset Cause Register  : 0x22
+     Boot Ctrl Register    : 0xe0ff
+     FPGA Update Status    : 0x0
+    EventLog  Register1 : 0xc2048000
+    EventLog  Register2 : 0xfffeffff
+    
+    Board Type: Sup-A+
+    
+    Bootable Disk is detected. Device Name: SHMST064G3FECTLP51
+    Version 2.18.1260. Copyright (C) 2018 American Megatrends, Inc.
+    Board type  1
+    CISCO SUP-A+
+    IOFPGA @ 0xe8000000
+    SLOT_ID @ 0x1b
+    Standalone chassis
+    check_bootmode: grub: Continue grub
+    Trying to read config file /boot/grub/menu.lst.local from (hd0,5)
+     Filesystem type is ext2fs, partition type 0x83
+    
+    Booting bootflash:/nxos64.10.1.1.42-bingo_W11-N9500-1_807694.bin
+    Trying diskboot
+     Filesystem type is ext2fs, partition type 0x83
+    IOFPGA ID: 11514088
+    Image valid
+    OS Image Key Type: Development KEY
+    
+    
+    Image Signature verification was Successful.
+    
+    Boot Time: 3/27/2001  4:6:46
+    [    3.411136] check if this has MMC
+    [    3.450855] may be MMC, Skipping mtd registration on this card
+    mount: overlay mounted on /newroot/usr.
+    Installing klm_card_index
+    done
+    Linking n9k flash devices
+    creating flash devices BOOT_DEV= sda
+    
+    INIT: version 2.88 booting
+    Installing ata_piix module ... done.
+    Unsquashing rootfs ...
+    Total size needed in bootflash is 148060
+    check bootflash : OK
+    Total size needed in bootflash is 49920
+    check bootflash : OK
+    Enabling 8250 serial driver spurious INTs workaround
+    Installing isan procfs ... done.
+    is_lxc: is_titan_eor: is_stby: suffix: klm_ftrace: /isanboot/lib/modules/klm_ftrace.o
+    Installing ftrace in non-lxc mode done
+    Installing SSE module with card index 21018 ... done.
+    Creating SSE device node 244 ... done.
+    Loading I2C driver ... done.
+    Installing CCTRL driver for card_type 64 without NEED_GEM ... done.
+    old data: 4000004 new data: 1
+    Loading IGB driver ... done.
+    Not Micron SSD...
+    
+    Checking all filesystems.
+    Extracting rpms from image...
+    1759367 blocks
+    /
+    Installing SPROM driver ... 21018 IS_N9K done.
+    Resetting Backplane ACT2/SPROM...SUP IOFPGA Base addr 0xe0000000SUP IOFPGA Reset control reg. addr 0xE8000084old data: 0 new    data: 8
+    old data: 8 new data: 0
+    CORTINA-SUPInstalling pfmsvcs module ...done.
+    Installing nvram module ... done.
+    Installing if_index module with port mode 6 ... done.
+    Installing fcfwd
+    Installing RNI lcnd ... done.
+    Installing lcnd ... done.
+    Installing psdev ...
+    Installing veobc module ... done.
+    Clean up previous pcap files present in tmp directory
+    Checking SR card
+    Card Index is 21018
+    Inserting eMMC module ...
+    Inserting OBFL module ... 37.68: eMMC Device found.
+    37.69: card has mmc
+    done.
+    37.69: Making OBFL character devices for mmc
+    mounting plog for N9k!
+    Mounting OBFL for eMMC
+    1+0 records in
+    1+0 records out
+    512 bytes copied, 0.0545019 s, 9.4 kB/s
+    Attach blkoops
+    39.27: Before mounting blkoops
+    39.28: After mounting blkoops
+    Inserting kernel_services module ... done.
+    Making kernel_services character devices
+    cgroups initialized
+    update-alternatives: Linking /usr/bin/unshare to /usr/bin/unshare.util-linux
+     Removing any system startup links for cgroups-init ...
+     Adding system startup for /etc/init.d/cgroups-init.
+    Running groupadd commands...
+    NOTE: docker-ce: Performing groupadd with [ -r docker]
+    update-alternatives: Linking /bin/vi to /usr/bin/vim.tiny
+    update-alternatives: Linking /usr/bin/vim to /usr/bin/vim.tiny
+    exit code: 1
+    tune2fs 1.45.6 (20-Mar-2020)
+    Setting reserved blocks percentage to 0% (0 blocks)
+    Starting rpcbind daemon...done.
+    creating NFS state directory: done
+    starting 8 nfsd kernel threads: done
+    starting mountd: done
+    starting statd: done
+    Saving image for img-sync ...
+    Not Micron SSD...
+    Loading system software
+    Installing local RPMS
+    Patch Repository Setup completed successfully
+    /mnt/pstore/stats_ssd/.ssd_overall_data file exist !!
+    moving /mnt/pstore/stats_ssd/.ssd_overall_data to /mnt/pstore/stats_ssd/.ssd_lastboot_data
+    Starting crond: OK
+    Stopping crond: OK
+    Creating /dev/mcelog
+    Starting mcelog daemon
+    Starting crond: OK
+    
+    INIT: Entering runlevel: 3
+    Running S93thirdparty-script...
+    done
+    Netbroker support IS present in the kernel.
+    done
+    Executing Prune clis.
+    ethernet switching mode Tue Mar 27 04:07:52 UTC 2001
+    Mar 27 04:07:56 %FW_APP-2-FIRMWARE_IMAGE_LOAD_SUCCESS No Firmware needed for Non SR card.
+    2001 Mar 27 04:08:09  %$ VDC-1 %$  %USER-2-SYSTEM_MSG: <<%USBHSD-2-MOUNT>> logflash: online  - usbhsd
+    2001 Mar 27 04:08:14  %$ VDC-1 %$ netstack: Registration with cli server complete
+    2001 Mar 27 04:08:26  %$ VDC-1 %$ %USER-2-SYSTEM_MSG: ssnmgr_app_init called on ssnmgr up - aclmgr
+    2001 Mar 27 04:08:28  %$ VDC-1 %$ %USER-1-SYSTEM_MSG:  VP aclqos tah stats get   - pltfm_config
+    2001 Mar 27 04:08:33  %$ VDC-1 %$ %USER-0-SYSTEM_MSG: end of default policer - copp
+    2001 Mar 27 04:08:34  %$ VDC-1 %$ %COPP-2-COPP_NO_POLICY: Control-plane is unprotected.
+    2001 Mar 27 04:08:37  %$ VDC-1 %$ %CARDCLIENT-2-FPGA_BOOT_PRIMARY: IOFPGA booted from Primary
+    Waiting for system online status before starting POAP ...
+    2001 Mar 27 04:08:46  %$ VDC-1 %$ %VDC_MGR-2-VDC_ONLINE: vdc 1 has come online
+    Waiting for system online status before starting POAP ...
+    Waiting for system online status before starting POAP ...
+    Waiting for system online status before starting POAP ...
+    2001 Mar 27 04:10:24 switch %$ VDC-1 %$ %PLATFORM-2-MOD_PRESENT: Detected the presence of Module 1
+    2001 Mar 27 04:10:24 switch %$ VDC-1 %$ %PLATFORM-2-MOD_PRESENT: Detected the presence of Module 22
+    2001 Mar 27 04:10:24 switch %$ VDC-1 %$ %PLATFORM-2-MOD_PRESENT: Detected the presence of Module 23
+    2001 Mar 27 04:10:24 switch %$ VDC-1 %$ %PLATFORM-2-MOD_PRESENT: Detected the presence of Module 24
+    2001 Mar 27 04:10:24 switch %$ VDC-1 %$ %PLATFORM-2-MOD_PRESENT: Detected the presence of Module 26
+    2001 Mar 27 04:10:24 switch %$ VDC-1 %$ %PLATFORM-2-MOD_PRESENT: Detected the presence of Module 29
+    2001 Mar 27 04:10:24 switch %$ VDC-1 %$ %PLATFORM-2-MOD_PRESENT: Detected the presence of Module 30
+    2001 Mar 27 04:10:24 switch %$ VDC-1 %$ %PLATFORM-2-PS_OK: Power supply 1 ok (Serial number DTM233204EY)
+    2001 Mar 27 04:10:24 switch %$ VDC-1 %$ %PLATFORM-2-PS_FANOK: Fan in Power supply 1 ok
+    2001 Mar 27 04:10:24 switch %$ VDC-1 %$ %PLATFORM-2-PS_OK: Power supply 2 ok (Serial number DTM233204AT)
+    2001 Mar 27 04:10:24 switch %$ VDC-1 %$ %PLATFORM-2-PS_FANOK: Fan in Power supply 2 ok
+    2001 Mar 27 04:10:25 switch %$ VDC-1 %$ %PLATFORM-2-PS_FAIL: Power supply 3 failed or shut down (Serial number DTM233203Z7)
+    2001 Mar 27 04:10:25 switch %$ VDC-1 %$ %PLATFORM-2-PS_ABSENT: Power supply 3 is absent/shutdown, ps-redundancy might be affected
+    2001 Mar 27 04:10:25 switch %$ VDC-1 %$ %PLATFORM-2-FANMOD_FAN_OK: Fan module 1 (Fan1(sys_fan1) fan) ok
+    2001 Mar 27 04:10:25 switch %$ VDC-1 %$ %PLATFORM-2-FANMOD_FAN_OK: Fan module 2 (Fan2(sys_fan2) fan) ok
+    2001 Mar 27 04:10:25 switch %$ VDC-1 %$ %PLATFORM-2-FANMOD_FAN_OK: Fan module 3 (Fan3(sys_fan3) fan) ok
+    2001 Mar 27 04:10:25 switch %$ VDC-1 %$ %PLATFORM-2-MOD_DETECT: Module 29 detected (Serial number FOC233982P9) Module-Type    System Controller Model N9K-SC-A
+    2001 Mar 27 04:10:25 switch %$ VDC-1 %$ %PLATFORM-2-MOD_PWRUP: Module 29 powered up (Serial number FOC233982P9)
+    2001 Mar 27 04:10:25 switch %$ VDC-1 %$ %PLATFORM-2-MOD_DETECT: Module 30 detected (Serial number FOC233982YU) Module-Type    System Controller Model N9K-SC-A
+    2001 Mar 27 04:10:25 switch %$ VDC-1 %$ %PLATFORM-2-MOD_PWRUP: Module 30 powered up (Serial number FOC233982YU)
+    2001 Mar 27 04:10:36 switch %$ VDC-1 %$ %PLATFORM-2-MODULE_EJECTOR_POLICY_ENABLED: All Ejectors closed for module 22. Ejector     based shutdown enabled
+    2001 Mar 27 04:10:36 switch %$ VDC-1 %$ %MODULE-2-MOD_UNKNOWN: Module type [387] in slot 22 is not supported
+    2001 Mar 27 04:10:36 switch %$ VDC-1 %$ %MODULE-2-MOD_FAIL: Initialization of module 22 (Serial number: ) failed
+    2001 Mar 27 04:10:36 switch %$ VDC-1 %$ %PLATFORM-2-MOD_DETECT: Module 22 detected (Serial number FOC233937T7) Module-Type    4-slot Fabric Module Model N9K-C9504-FM-E
+    2001 Mar 27 04:10:36 switch %$ VDC-1 %$ %PLATFORM-2-MOD_PWRDN: Module 22 powered down (Serial number FOC233937T7)
+    2001 Mar 27 04:10:36 switch %$ VDC-1 %$ %PLATFORM-2-MODULE_EJECTOR_POLICY_ENABLED: All Ejectors closed for module 23. Ejector     based shutdown enabled
+    2001 Mar 27 04:10:36 switch %$ VDC-1 %$ %MODULE-2-MOD_UNKNOWN: Module type [387] in slot 23 is not supported
+    2001 Mar 27 04:10:36 switch %$ VDC-1 %$ %MODULE-2-MOD_FAIL: Initialization of module 23 (Serial number: ) failed
+    2001 Mar 27 04:10:36 switch %$ VDC-1 %$ %PLATFORM-2-MOD_DETECT: Module 23 detected (Serial number FOC233937WY) Module-Type    4-slot Fabric Module Model N9K-C9504-FM-E
+    2001 Mar 27 04:10:36 switch %$ VDC-1 %$ %PLATFORM-2-MOD_PWRDN: Module 23 powered down (Serial number FOC233937WY)
+    2001 Mar 27 04:10:36 switch %$ VDC-1 %$ %PLATFORM-2-MODULE_EJECTOR_POLICY_ENABLED: All Ejectors closed for module 24. Ejector     based shutdown enabled
+    2001 Mar 27 04:10:36 switch %$ VDC-1 %$ %MODULE-2-MOD_UNKNOWN: Module type [387] in slot 24 is not supported
+    2001 Mar 27 04:10:36 switch %$ VDC-1 %$ %MODULE-2-MOD_FAIL: Initialization of module 24 (Serial number: ) failed
+    2001 Mar 27 04:10:36 switch %$ VDC-1 %$ %PLATFORM-2-MOD_DETECT: Module 24 detected (Serial number FOC233937TV) Module-Type    4-slot Fabric Module Model N9K-C9504-FM-E
+    2001 Mar 27 04:10:36 switch %$ VDC-1 %$ %PLATFORM-2-MOD_PWRDN: Module 24 powered down (Serial number FOC233937TV)
+    2001 Mar 27 04:10:36 switch %$ VDC-1 %$ %PLATFORM-2-MODULE_EJECTOR_POLICY_ENABLED: All Ejectors closed for module 26. Ejector     based shutdown enabled
+    2001 Mar 27 04:10:36 switch %$ VDC-1 %$ %MODULE-2-MOD_UNKNOWN: Module type [387] in slot 26 is not supported
+    2001 Mar 27 04:10:36 switch %$ VDC-1 %$ %MODULE-2-MOD_FAIL: Initialization of module 26 (Serial number: ) failed
+    2001 Mar 27 04:10:36 switch %$ VDC-1 %$ %PLATFORM-2-MOD_DETECT: Module 26 detected (Serial number FOC2339383W) Module-Type    4-slot Fabric Module Model N9K-C9504-FM-E
+    2001 Mar 27 04:10:36 switch %$ VDC-1 %$ %PLATFORM-2-MOD_PWRDN: Module 26 powered down (Serial number FOC2339383W)
+    Waiting for system online status before starting POAP ...
+    Waiting for system online status before starting POAP ...
+    Waiting for system online status before starting POAP ...
+    Waiting for system online status before starting POAP ...
+    Waiting for system online status before starting POAP ...
+    Waiting for system online status before starting POAP ...
+    Waiting for system online status before starting POAP ...
+    Waiting for system online status before starting POAP ...
+    Waiting for system online status before starting POAP ...
+    Waiting for system online status before starting POAP ...
+    Waiting for system online status before starting POAP ...
+    Waiting for system online status before starting POAP ...
+    Waiting for system online status before starting POAP ...
+    Waiting for system online status before starting POAP ...
+    Waiting for system online status before starting POAP ...
+    Waiting for system online status before starting POAP ...
+  prompt: "System is not fully online. Skip POAP? (yes/no)[n]:"
+  commands:
+    "yes":
+      new_state: reconnect_login
+
 login_after_reload:
   preface: |2
     non_utf-8_character b'[ \xe0'
@@ -214,6 +479,140 @@ login_after_reload:
     "cisco":
       new_state: password_after_reload
 
+login_after_buffer_settle_reload:
+  preface: |2
+    non_utf-8_character b'[ \xe0'
+    b'[ \xe0'
+    CISCO SWITCH Ver7.33
+    Device detected on 0:6:0 after 0 msecs
+    Device detected on 0:1:1 after 0 msecs
+    Device detected on 0:1:0 after 0 msecs
+    MCFrequency 1333Mhz
+    Relocated to memory
+    Time: 6/13/2019  16:40:9
+    NorthStar/Alpine Present
+    MP Card Present
+    MIFPGA Present
+    Code Signing Results:                                    0x0
+    Using Upgrade FPGA
+    Checking and setting PSU fan directions
+    PMB RD: Nack error
+    FPGA Revison        : 0x13
+    FPGA ID             : 0x1237305
+    FPGA Date           : 0x20140213
+    Power Debug Register: 0x0
+    Reset Cause Register: 0x4
+    Boot Ctrl Register  : 0xe0ff
+    FPGA Update Status  : 0x20
+    Detected CISCO MPFPGA
+    FPGA Update Status  : 0x20
+    Detected CISCO MIFPGA
+    Version 2.16.1240. Copyright (C) 2013 American Megatrends, Inc.
+    Board type  2
+    CISCO TOR
+    IOFPGA @ 0xc8000000
+    SLOT_ID @ 0xf
+    check_bootmode: grub: Continue grub
+    Trying to read config file /boot/grub/menu.lst.local from (hd0,5)
+    Filesystem type is ext2fs, partition type 0x83
+
+    Booting bootflash:/ISSUCleanGolden.system.gbin ...
+    Booting bootflash:/ISSUCleanGolden.system.gbin
+    Trying diskboot
+    Filesystem type is ext2fs, partition type 0x83
+    Image valid
+
+
+    Image Signature verification was Successful.
+
+    Boot Time: 6/13/2019  16:41:2
+    Installing klm_card_index
+    done
+    Linking n9k flash devices
+    INIT: version 2.88 booting
+    Installing ata_piix module ... done.
+    Unsquashing rootfs ...
+    Installing isan procfs ... done.
+    Installing SSE module with card index 21022 ... done.
+    Creating SSE device node 246 ... done.
+    Loading I2C driver ... done.
+    Installing CCTRL driver for card_type 6 1263589
+    with mpa_card_type 1 ... done.
+    Loading IGB driver ... done.
+    Checking SSD firmware ...
+        Model Number:       Micron_M550_MTFDDAT064MAY
+        Serial Number:      MSA183101FN
+        Firmware Revision:  MU01
+
+    Checking all filesystems.
+    Installing SPROM driver ... IS_N9K done.
+    1
+    read MPA_ID : 1
+    Installing pfmsvcs module with SPROM card index 21022 ... done.
+    Installing nvram module ... done.
+    Installing if_index module with port mode 6 ... done.
+    Installing fcfwd
+    Installing RNI lcnd ... done
+    Installing LC netdev ... done
+    Installing psdev module ... done.
+    Installing veobc module ... done.
+    Inserting eMMC module ...
+    Inserting OBFL module ... done.
+    Making OBFL character devices
+    mounting plog for N9k!
+    Mounting OBFL pstore for mtd
+    exit code: 1
+    Starting OpenBSD Secure Shell server: sshd ... done.
+    tune2fs 1.42.1 (17-Feb-2012)
+    Setting reserved blocks percentage to 0% (0 blocks)
+    Starting portmap daemon...
+    creating NFS state directory: done
+    starting 8 nfsd kernel threads: done
+    starting mountd: done
+    starting statd: done
+    Saving image for img-sync ...
+    Loading system software
+    Installing local RPMS
+    Patch Repository Setup completed successfully
+    Creating /dev/mcelog
+    Starting mcelog daemon
+    Overwriting dme stub lib
+    INIT: Entering runlevel: 3
+    Running S93thirdparty-script...
+
+    Populating conf files for hybrid sysmgr ...
+    Starting hybrid sysmgr ...
+    Installing FC2 module using inband eth0 vegas 8 fc2_dom_family 25 ...done
+    inserting /isan/lib/modules/klm_cisco_nb.o ... done
+    Executing Prune clis.
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %USER-0-SYSTEM_MSG:  before access to bkout_cfg  - clis
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-PS_OK: Power supply 1 ok (Serial number DCB1833Y4QL)
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-PS_FANOK: Fan in Power supply 1 ok
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-PS_ABSENT: Power supply 2 is absent/shutdown, ps-redundancy might be affected
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-PS_RED_MODE_CHG: Power supply operational redundancy mode changed to non-redundant
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-FANMOD_FAN_OK: Fan module 1 (Fan1(sys_fan1) fan) ok
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-FANMOD_FAN_OK: Fan module 2 (Fan2(sys_fan2) fan) ok
+    2019 Jun 13 16:41:41  %$ VDC-1 %$ %PLATFORM-2-FANMOD_FAN_OK: Fan module 3 (Fan3(sys_fan3) fan) ok
+    2019 Jun 13 16:41:42  %$ VDC-1 %$  %USER-2-SYSTEM_MSG: <<%USBHSD-2-MOUNT>> logflash: online  - usbhsd
+    2019 Jun 13 16:41:44  %$ VDC-1 %$  %DAEMON-2-SYSTEM_MSG: <<%ASCII-CFG-2-CONF_CONTROL>> Ascii replay - ascii-cfg[27976]
+    2019 Jun 13 16:41:46  %$ VDC-1 %$ netstack: Registration with cli server complete
+    2019 Jun 13 16:41:55  %$ VDC-1 %$ %USER-2-SYSTEM_MSG: ssnmgr_app_init called on ssnmgr up - aclmgr
+    2019 Jun 13 16:42:03  %$ VDC-1 %$ %USER-0-SYSTEM_MSG: end of default policer - copp
+    2019 Jun 13 16:42:03  %$ VDC-1 %$ %COPP-2-COPP_DEFAULT_POLICY: Control-plane is unprotected. Default CoPP policy (strict) will be configured.
+    2019 Jun 13 16:42:03  %$ VDC-1 %$ %COPP-2-COPP_POLICY: Control-Plane is protected with policy copp-system-p-policy-strict.
+    2019 Jun 13 16:42:05  %$ VDC-1 %$ %CARDCLIENT-2-FPGA_BOOT_PRIMARY: IOFPGA booted from Primary
+    2019 Jun 13 16:42:05  %$ VDC-1 %$ %CARDCLIENT-2-FPGA_BOOT_PRIMARY: MIFPGA booted from Primary
+    2019 Jun 13 16:42:05  %$ VDC-1 %$ %CARDCLIENT-2-FPGA_BOOT_PRIMARY: GEM_MIFPGA booted from Primary
+    2019 Jun 13 16:42:05  %$ VDC-1 %$ %ASCII-CFG-2-CONFIG_REPLAY_STATUS: Bootstrap Replay Started.
+    2019 Jun 13 16:42:05  %$ VDC-1 %$ %VDC_MGR-2-VDC_ONLINE: vdc 1 has come online
+
+
+    User Access Verification
+  prompt: "Username: "
+  commands:
+    "cisco":
+      new_state: chatty_password_after_reload
+
 reconnect_login:
   prompt: "Username: "
   commands:
@@ -228,7 +627,7 @@ password_after_reload:
 
 exec_after_reload:
   prompt: "switch# "
-  commands:
+  commands: &exec_after_reload
     "not a real command":
       response:
       - |2
@@ -248,11 +647,33 @@ exec_after_reload:
       new_state: config_lock_1_after_reload
     "reload":
       new_state: confirm_reload
+    "reload skip_poap":
+      new_state: confirm_reload3
     "show feature": |
       Feature Name          Instance  State
       --------------------  --------  --------
       bash-shell             1          enabled
       bfd                    1          disabled
+
+chatty_password_after_reload:
+  prompt: "Password: "
+  commands:
+    "cisco":
+      new_state: chatty_exec_after_reload
+
+chatty_exec_after_reload:
+  preface: 
+    response: |2
+      2019 Jun 13 16:42:05  %$ VDC-1 %$ %CARDCLIENT-2-FPGA_BOOT_PRIMARY: GEM_MIFPGA booted from Primary
+    timing:
+      - 0:,1,0
+  prompt: "switch# "
+  commands:
+    <<: *exec_after_reload
+    "config term":
+      new_state: config_unlock_after_reload
+
+
 
 config_lock_1_after_reload:
   preface: |
@@ -279,6 +700,7 @@ config_unlock_after_reload:
   commands:
     "no logging console": ""
     "line console": ""
+    "line vty": ""
     "exec-timeout 0": ""
     "terminal width 511": ""
     'feature bash': ""
