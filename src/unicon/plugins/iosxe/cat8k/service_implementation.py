@@ -162,14 +162,23 @@ class Reload(XEReload):
         self.dialog = Dialog(reload_statement_list + [boot_from_rommon_stmt])
 
     def call_service(self, *args, **kwargs):
+        # IOS XE reload replaces and removes this shared context entry.
+        original_image = self.context.get('image_to_boot')
+        had_original_image = 'image_to_boot' in self.context
         # image_to_boot is a fallback for reloads from enable. Use ROMMON boot
         # syntax only when the reload service starts in ROMMON.
-        if ("image_to_boot" in kwargs and
-                self.get_sm().current_state == 'rommon'):
-            reload_command = "boot {}".format(kwargs["image_to_boot"]).strip()
-            super().call_service(reload_command, *args, **kwargs)
-        else:
-            super().call_service(*args, **kwargs)
+        try:
+            if ("image_to_boot" in kwargs and
+                    self.get_sm().current_state == 'rommon'):
+                reload_command = "boot {}".format(kwargs["image_to_boot"]).strip()
+                super().call_service(reload_command, *args, **kwargs)
+            else:
+                super().call_service(*args, **kwargs)
+        finally:
+            if had_original_image:
+                self.context['image_to_boot'] = original_image
+            else:
+                self.context.pop('image_to_boot', None)
 
 
 class HAReloadService(GenericHAReloadService):
