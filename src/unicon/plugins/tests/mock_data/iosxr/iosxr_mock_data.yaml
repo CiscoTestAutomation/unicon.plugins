@@ -502,6 +502,387 @@ config:
     "redundancy":
       new_state: config_redundancy
 
+config_lock_enable:
+  prompt: "RP/0/RP0/CPU0:%N#"
+  commands:
+    "configure terminal":
+      new_state: config_lock
+    "configure exclusive":
+      new_state: config_lock
+
+config_lock:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "interface Loopback100": ""
+    "description config lock test": ""
+    "hostname R2":
+      new_state: config_lock_hostname
+    "banner motd ^": ""
+    "config lock test": ""
+    "^": ""
+    "!end indicator for bulk configure": ""
+    "commit":
+      response: &config_transaction_locked |2
+        % Failed to commit .. Another configuration session
+        had a lock on the running configuration.
+      new_state: config_lock_failed
+    "commit force":
+      response: *config_transaction_locked
+      new_state: config_lock_failed
+    "commit replace":
+      new_state: config_lock_confirm
+    "commit best-effort":
+      new_state: config_lock_confirm
+
+config_lock_hostname:
+  prompt: "RP/0/RP0/CPU0:R2(config)#"
+  commands:
+    "commit":
+      response: *config_transaction_locked
+      new_state: config_lock_hostname_failed
+
+config_lock_hostname_failed:
+  prompt: "RP/0/RP0/CPU0:R2(config)#"
+  commands:
+    "show configuration commit changes last 1": |2
+      Tue Sep  1 12:00:00.000 UTC
+      Configuration changes for commit 1000000006
+      User admin, Line console
+    "abort":
+      new_state: config_lock_released
+
+config_lock_confirm:
+  preface: |2
+    This commit will replace or remove the entire running configuration. This
+    operation can be service affecting.
+  prompt: "Do you wish to proceed? [no]:"
+  commands:
+    "yes":
+      response: *config_transaction_locked
+      new_state: config_lock_failed
+
+config_lock_failed:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "show configuration commit changes last 1":
+      response: |2
+        Tue Sep  1 12:00:00.000 UTC
+        Configuration changes for commit 1000000001
+        User admin, Line console
+      # Keep this delayed to verify recovery waits for the complete
+      # diagnostic response before sending abort.
+      timing:
+        - 0:,0.2
+    "abort":
+      new_state: config_lock_released
+
+config_lock_released:
+  prompt: "RP/0/RP0/CPU0:%N#"
+  commands:
+    "show configuration lock":
+      response:
+        - |2
+          Tue Sep  1 12:00:01.000 UTC
+          Session Rebase Lock
+          lock_subtree/rebase_lock
+        - |2
+          Tue Sep  1 12:00:02.000 UTC
+          No configuration lock is active
+    "configure terminal":
+      new_state: config_lock_retry
+    "configure exclusive":
+      new_state: config_lock_retry
+
+config_lock_retry:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "interface Loopback100": ""
+    "description config lock test": ""
+    "hostname R2":
+      new_state: config_r2
+    "banner motd ^": ""
+    "config lock test": ""
+    "^": ""
+    "!end indicator for bulk configure": ""
+    "commit": ""
+    "commit force": ""
+    "commit replace":
+      new_state: config_lock_retry_confirm
+    "commit best-effort":
+      new_state: config_lock_retry_confirm
+    "end":
+      new_state: config_lock_released
+
+config_lock_retry_confirm:
+  preface: |2
+    This commit will replace or remove the entire running configuration. This
+    operation can be service affecting.
+  prompt: "Do you wish to proceed? [no]:"
+  commands:
+    "yes":
+      new_state: config_lock_retry
+
+config_lock_persistent_enable:
+  prompt: "RP/0/RP0/CPU0:%N#"
+  commands:
+    "configure terminal":
+      new_state: config_lock_persistent
+
+config_lock_persistent:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "interface Loopback100": ""
+    "commit":
+      response: |2
+        % Failed to commit .. Another configuration session
+        had a lock on the running configuration.
+      new_state: config_lock_persistent_failed
+
+config_lock_persistent_failed:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "show configuration commit changes last 1": |2
+      Tue Sep  1 12:00:00.000 UTC
+      Configuration changes for commit 1000000002
+      User admin, Line console
+    "abort":
+      new_state: config_lock_still_active
+
+config_lock_still_active:
+  prompt: "RP/0/RP0/CPU0:%N#"
+  commands:
+    "show configuration lock": |2
+      Tue Sep  1 12:00:01.000 UTC
+      Session Write Lock
+      00000212-00245489-00000000
+
+config_lock_repeated_enable:
+  prompt: "RP/0/RP0/CPU0:%N#"
+  commands:
+    "show configuration lock": |2
+      Tue Sep  1 12:00:01.000 UTC
+    "configure terminal":
+      new_state: config_lock_repeated
+
+config_lock_repeated:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "interface Loopback100": ""
+    "commit":
+      response: *config_transaction_locked
+      new_state: config_lock_repeated_failed
+
+config_lock_repeated_failed:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "show configuration commit changes last 1": |2
+      Tue Sep  1 12:00:00.000 UTC
+      Configuration changes for commit 1000000004
+      User admin, Line console
+    "abort":
+      new_state: config_lock_repeated_enable
+
+admin_config_lock_enable:
+  prompt: "RP/0/RP0/CPU0:%N#"
+  commands:
+    "admin":
+      new_state: admin_config_lock_admin
+
+admin_config_lock_admin:
+  prompt: "sysadmin-vm:0_RP0#"
+  commands:
+    "config":
+      new_state: admin_config_lock
+    "exit":
+      new_state: admin_config_lock_enable
+
+admin_config_lock:
+  prompt: "sysadmin-vm:0_RP0(config)#"
+  commands:
+    "show configuration": |2
+      % No configuration changes found.
+    "commit":
+      response: *config_transaction_locked
+      new_state: admin_config_lock_failed
+
+admin_config_lock_failed:
+  prompt: "sysadmin-vm:0_RP0(config)#"
+  commands:
+    "show configuration commit changes last 1":
+      response: |2
+        Tue Sep  1 12:00:00.000 UTC
+        Configuration changes for commit 1000000005
+        User admin, Line console
+      timing:
+        - 0:,0.2
+    "abort":
+      new_state: admin_config_lock_abort_admin
+
+admin_config_lock_abort_admin:
+  prompt: "sysadmin-vm:0_RP0#"
+  commands:
+    "exit":
+      new_state: admin_config_lock_released_enable
+
+admin_config_lock_released_enable:
+  prompt: "RP/0/RP0/CPU0:%N#"
+  commands:
+    "show configuration lock":
+      response:
+        - |2
+          Tue Sep  1 12:00:01.000 UTC
+          Session Write Lock
+          00000212-00245489-00000000
+        - |2
+          Tue Sep  1 12:00:02.000 UTC
+          No configuration lock is active
+    "admin":
+      new_state: admin_config_lock_retry_admin
+
+admin_config_lock_retry:
+  prompt: "sysadmin-vm:0_RP0(config)#"
+  commands:
+    "show configuration": |2
+      % No configuration changes found.
+    "commit": ""
+    "exit":
+      new_state: admin_config_lock_retry_admin
+
+admin_config_lock_retry_admin:
+  prompt: "sysadmin-vm:0_RP0#"
+  commands:
+    "config":
+      new_state: admin_config_lock_retry
+    "exit":
+      new_state: admin_config_lock_released_enable
+
+config_inconsistent:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "end":
+      response: "Uncommitted changes found, commit them before exiting(yes/no/cancel)? [cancel]:"
+      new_state: config_inconsistent_uncommitted
+
+config_inconsistent_uncommitted:
+  prompt: ""
+  commands:
+    "no":
+      new_state: enable_inconsistent
+    "yes":
+      response: |2
+        This SDR's running configuration is inconsistent with persistent configuration.
+        No configuration commits for this SDR will be allowed until a 'clear configuration inconsistency' command is performed.
+      new_state: config_inconsistent
+
+enable_inconsistent:
+  prompt: "RP/0/RP0/CPU0:%N#"
+  commands:
+    <<: *enable_cmds
+    "configure terminal":
+      response: |2
+        This SDR's running configuration is inconsistent with persistent configuration.
+        No configuration commits for this SDR will be allowed until a 'clear configuration inconsistency' command is performed.
+      new_state: config_inconsistent_probe
+    "clear configuration inconsistency":
+      response: "Configuration inconsistency successfully cleared."
+      new_state: enable
+
+config_inconsistent_probe:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "end":
+      new_state: enable_inconsistent
+
+config_pending_changes:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "end":
+      response: "Uncommitted changes found, commit them before exiting(yes/no/cancel)? [cancel]:"
+      new_state: config_pending_changes_uncommitted
+
+config_pending_changes_uncommitted:
+  prompt: ""
+  commands:
+    "no":
+      new_state: enable_pending_changes
+
+enable_pending_changes:
+  prompt: "RP/0/RP0/CPU0:%N#"
+  commands:
+    <<: *enable_cmds
+    "configure terminal":
+      new_state: config_pending_changes_probe
+
+config_pending_changes_probe:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "end":
+      new_state: enable_pending_changes
+
+config_essential_ops:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "end":
+      response: "Uncommitted changes found, commit them before exiting(yes/no/cancel)? [cancel]:"
+      new_state: config_essential_ops_uncommitted
+
+config_essential_ops_uncommitted:
+  prompt: ""
+  commands:
+    "no":
+      new_state: enable_essential_ops
+
+enable_essential_ops:
+  prompt: "RP/0/RP0/CPU0:%N#"
+  commands:
+    <<: *enable_cmds
+    "configure terminal":
+      response: "% Invalid command (essential-ops mode)"
+
+config_inconsistent_proceed:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "end":
+      response: "Uncommitted changes found, commit them before exiting(yes/no/cancel)? [cancel]:"
+      new_state: config_inconsistent_proceed_uncommitted
+
+config_inconsistent_proceed_uncommitted:
+  prompt: ""
+  commands:
+    "no":
+      new_state: enable_inconsistent_proceed
+
+enable_inconsistent_proceed:
+  prompt: "RP/0/RP0/CPU0:%N#"
+  commands:
+    "configure terminal":
+      new_state: config_inconsistent_proceed_prompt
+
+config_inconsistent_proceed_prompt:
+  prompt: "Would you like to proceed in configuration mode? [no]: "
+  commands:
+    "no":
+      new_state: enable_inconsistent_after_proceed
+
+enable_inconsistent_after_proceed:
+  prompt: "RP/0/RP0/CPU0:%N#"
+  commands:
+    <<: *enable_cmds
+    "configure terminal":
+      response: |2
+        This SDR's running configuration is inconsistent with persistent configuration.
+        No configuration commits for this SDR will be allowed until a 'clear configuration inconsistency' command is performed.
+      new_state: config_inconsistent_after_proceed_probe
+    "clear configuration inconsistency":
+      response: "Configuration inconsistency successfully cleared."
+      new_state: enable
+
+config_inconsistent_after_proceed_probe:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "end":
+      new_state: enable_inconsistent_after_proceed
+
 commit_prompt_r2:
   prompt: "Uncommitted changes found, commit them before exiting(yes/no/cancel)? [cancel]:"
   commands:

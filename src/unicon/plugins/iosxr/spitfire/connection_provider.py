@@ -76,7 +76,7 @@ class SpitfireSingleRpConnectionProvider(IOSXRSingleRpConnectionProvider):
         # Wait upto 10 mins for config lock to be cleared
         t_end = time.time() + t_out
         while time.time() < t_end:
-            if len(con.execute("show configuration lock", prompt_recovery = self.prompt_recovery).strip().splitlines()) > 1:
+            if con.configure.check_config_lock(con, prompt_recovery=self.prompt_recovery):
                 time.sleep(10)
                 continue
             break

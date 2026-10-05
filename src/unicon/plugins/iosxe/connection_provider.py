@@ -22,16 +22,30 @@ class IosxeSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
         """
         super().__init__(*args, **kwargs)
 
-    def learn_tokens(self):
+    def learn_tokens(self, connection_dialog=None):
+        """Learn connection tokens after confirming the current state.
+
+        Args:
+            connection_dialog (Dialog, optional): Replacement dialog to retain
+                if token discovery recreates the connection. When omitted,
+                the normal provider dialog is used.
+        """
         con = self.connection
         if (not con.learn_tokens or not con.settings.LEARN_DEVICE_TOKENS) and not con.operating_mode:
 
+            dialog_kwargs = {}
+            if connection_dialog is not None:
+                dialog_kwargs = self._connection_dialog_kwargs(
+                    connection_dialog)
+
             # make sure device is in valid unicon state
             con.sendline()
-            con.state_machine.go_to('any',
-                                    con.spawn,
-                                    context=con.context,
-                                    prompt_recovery=con.prompt_recovery)
+            con.state_machine.go_to(
+                'any',
+                con.spawn,
+                context=con.context,
+                prompt_recovery=con.prompt_recovery,
+                **dialog_kwargs)
 
             try:
                 con.state_machine.get_path(con.state_machine.current_state, 'enable')
@@ -75,8 +89,13 @@ class IosxeSingleRpConnectionProvider(GenericSingleRpConnectionProvider):
                 chatty_wait_time = con.settings.CONTROLLER_MODE_CHATTY_WAIT_TIME
                 chatty_term_wait(con.spawn, trim_buffer=True, wait_time=chatty_wait_time)
                 con.sendline()
-                con.state_machine.go_to('any',
-                                        con.spawn,
-                                        context=con.context,
-                                        prompt_recovery=con.prompt_recovery)
-        super().learn_tokens()
+                con.state_machine.go_to(
+                    'any',
+                    con.spawn,
+                    context=con.context,
+                    prompt_recovery=con.prompt_recovery,
+                    **dialog_kwargs)
+        if connection_dialog is None:
+            super().learn_tokens()
+        else:
+            super().learn_tokens(connection_dialog=connection_dialog)

@@ -9,8 +9,8 @@ from unicon.plugins.generic.service_patterns import ReloadPatterns
 class IosvPatterns(GenericPatterns):
     def __init__(self):
         super().__init__()
-        self.rommon_prompt = r'(.*)switch:\s?$'
-        self.shell_prompt = r'(.*?)\[%N.*\]\$\s?$'
+        self.rommon_prompt = r'^(.*)switch:\s?$'
+        self.shell_prompt = r'^(.*?)\[%N.*\]\$\s?$'
         self.access_shell = r'.*Are you sure you want to continue\? \[y/n\]\s?'
         self.overwrite_previous = r'.*Overwrite the previous NVRAM configuration\?\[confirm\]'
         self.are_you_sure = r'Are you sure you want to continue\? \(y\/n\)\[y\]:\s?$'

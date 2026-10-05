@@ -9,6 +9,7 @@ Description:
     Module for defining all the Statements and callback required for the
     Current implementation
 """
+import logging
 import re
 from time import sleep
 from datetime import datetime, timedelta
@@ -29,6 +30,8 @@ from unicon.plugins.utils import (
 
 from unicon.utils import to_plaintext
 from unicon.bases.routers.connection import ENABLE_CRED_NAME
+
+log = logging.getLogger(__name__)
 
 pat = GenericPatterns()
 utils = Utils()
@@ -240,18 +243,17 @@ def user_access_verification(session):
     session['tacacs_login'] = 1
 
 
-def get_enable_credential_password(context):
-    """ Get the enable password from the credentials.
+def get_enable_credential_password(context, logger=log):
+    """Return the enable password selected from ``context['credentials']``.
 
-    1. If there is a previous credential (the last credential used to respond to
-       a password prompt), use its enable_password member if it exists.
-    2. Otherwise, if the user specified a list of credentials, pick the final one in the list and
-       use its enable_password member if it exists.
-    3. Otherwise, if there is a default credential, use its enable_password member if it exists.
-    4. Otherwise, use the well known "enable" credential, password member if it exists.
-    5. Otherwise, use the default credential "password" member if it exists.
-    6. Otherwise, raise error that no enable password could be found.
-
+    For a direct post to the device prompt, ``password`` on the named
+    ``enable`` credential is checked first.  Remaining fields are checked in
+    this order: ``enable_password`` on the previous, final-login, and default
+    credentials; ``password`` on the named ``enable`` credential for normal
+    connections; for a direct post, ``password`` on the final-login, previous,
+    and fallback credentials; then ``password`` on the default credential.
+    The selected credential name and field key are logged at DEBUG level
+    through ``logger``; the value is never logged.
     """
     credentials = context.get('credentials')
     enable_credential_password = ""
@@ -278,21 +280,31 @@ def get_enable_credential_password(context):
     )
 
     if credentials:
-        enable_pw_checks = [
+        enable_pw_checks = []
+        if direct_post_to_device_prompt and ENABLE_CRED_NAME in credentials:
+            enable_pw_checks.append((ENABLE_CRED_NAME, 'password'))
+        enable_pw_checks.extend([
             (previous_credential, 'enable_password'),
             (final_credential, 'enable_password'),
             (fallback_cred, 'enable_password'),
-        ]
+        ])
+        if (not direct_post_to_device_prompt
+                and ENABLE_CRED_NAME in credentials):
+            enable_pw_checks.append((ENABLE_CRED_NAME, 'password'))
         if direct_post_to_device_prompt:
-            # Try the login credentials' passwords before the generic enable lookup.
+            # Try login passwords before the bad-password fallback_creds list.
+            enable_pw_checks.append((final_credential, 'password'))
+            enable_pw_checks.append((previous_credential, 'password'))
             enable_pw_checks.extend(
                 (credential, 'password') for credential in fallback_creds)
-        enable_pw_checks.append((ENABLE_CRED_NAME, 'password'))
         enable_pw_checks.append((context.get('default_cred_name', ""), 'password'))
         for cred_name, key in enable_pw_checks:
             if cred_name:
                 candidate_enable_pw = credentials.get(cred_name, {}).get(key)
                 if candidate_enable_pw is not None:
+                    logger.debug(
+                        "Selected credential '%s' key '%s' for enable password",
+                        cred_name, key)
                     enable_credential_password = candidate_enable_pw
                     break
         else:
@@ -302,6 +314,11 @@ def get_enable_credential_password(context):
 
 
 def enable_password_handler(spawn, context, session):
+    # Track that this dialog session is authenticating an enable transition.
+    # The bad-password statement is shared with the login dialog, where
+    # fallback credentials are valid, so it needs this context to distinguish
+    # a rejected enable secret from a rejected login password.
+    session['enable_password_attempted'] = True
     if 'password_attempts' not in session:
         session['password_attempts'] = 1
     else:
@@ -309,7 +326,8 @@ def enable_password_handler(spawn, context, session):
     if session.password_attempts > spawn.settings.PASSWORD_ATTEMPTS:
         raise UniconAuthenticationError('Too many enable password retries')
 
-    enable_credential_password = get_enable_credential_password(context=context)
+    enable_credential_password = get_enable_credential_password(
+        context=context, logger=getattr(spawn, 'log', log))
     if enable_credential_password:
         spawn.sendline(enable_credential_password)
     else:
@@ -344,7 +362,8 @@ def enable_secret_handler(spawn, context, session):
     if session.password_attempts > spawn.settings.PASSWORD_ATTEMPTS:
         raise UniconAuthenticationError('Too many enable password retries')
 
-    enable_credential_password = get_enable_credential_password(context=context)
+    enable_credential_password = get_enable_credential_password(
+        context=context, logger=getattr(spawn, 'log', log))
     if enable_credential_password and len(enable_credential_password) >= \
             spawn.settings.ENABLE_SECRET_MIN_LENGTH:
         spawn.sendline(enable_credential_password)
@@ -442,6 +461,10 @@ def passphrase_handler(spawn, context, session):
 def bad_password_handler(spawn, context, session):
     """ handles bad password prompt
     """
+    if session.get('enable_password_attempted'):
+        raise UniconAuthenticationError(
+            'Bad enable password sent to device %s' % str(spawn))
+
     # check if there is a fallback credential
     if context['fallback_creds']:
         spawn.log.info('Using fallback credentials for logging in to the device!')
@@ -688,7 +711,13 @@ class GenericStatements():
                                           action=escape_char_callback,
                                           args=None,
                                           loop_continue=True,
-                                          continue_timer=True,
+                                          # Password OK only confirms that the
+                                          # terminal server accepted the
+                                          # credentials.  It is not device
+                                          # console output and must not restart
+                                          # the connection dialog timeout when
+                                          # it remains in the spawn buffer.
+                                          continue_timer=False,
                                           trim_buffer=False)
         self.more_prompt_stmt = Statement(pattern=pat.more_prompt,
                                           action=more_prompt_handler,

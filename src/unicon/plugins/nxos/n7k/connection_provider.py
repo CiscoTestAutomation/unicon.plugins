@@ -19,8 +19,24 @@ class Nxos7kSingleRpConnectionProvider(NxosSingleRpConnectionProvider):
         # in case device is on a vdc, this should be updated.
         self.connection.current_vdc = None
 
-    def establish_connection(self):
-        super().establish_connection()
+    def establish_connection(self, connection_dialog=None,
+                             skip_initialization=False):
+        """Detect the initial Nexus state and update VDC context.
+
+        Args:
+            connection_dialog (Dialog, optional): Replacement dialog for
+                initial state detection. When omitted, the normal provider
+                dialog is used.
+            skip_initialization (bool): Stop after initial state detection.
+        """
+        establish_kwargs = {}
+        if connection_dialog is not None:
+            establish_kwargs['connection_dialog'] = connection_dialog
+        if skip_initialization:
+            establish_kwargs['skip_initialization'] = True
+        super().establish_connection(**establish_kwargs)
+        if skip_initialization:
+            return
         con = self.connection
         m = con.spawn.match.last_match
 

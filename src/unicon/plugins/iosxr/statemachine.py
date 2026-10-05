@@ -2,7 +2,11 @@ __author__ = "Syed Raza <syedraza@cisco.com>"
 
 from unicon.statemachine import StateMachine
 from unicon.plugins.iosxr.patterns import IOSXRPatterns
-from unicon.plugins.iosxr.statements import IOSXRStatements, handle_failed_config
+from unicon.plugins.iosxr.statements import (
+    IOSXRStatements,
+    handle_commit_changes,
+    handle_failed_config,
+)
 from unicon.plugins.generic.statemachine import config_transition
 from unicon.statemachine import State, Path
 from unicon.eal.dialogs import Statement, Dialog
@@ -53,7 +57,7 @@ class IOSXRSingleRpStateMachine(StateMachine):
         self.add_state(admin_host)
 
         config_dialog = Dialog([
-           [patterns.commit_changes_prompt, 'sendline(yes)', None, True, False],
+           [patterns.commit_changes_prompt, handle_commit_changes, None, True, False],
            [patterns.commit_replace_prompt, 'sendline(yes)', None, True, False],
            [patterns.configuration_failed_message, handle_failed_config, None, True, False],
            generic_statements.syslog_msg_stmt,

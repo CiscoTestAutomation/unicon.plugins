@@ -3,7 +3,11 @@ __author__ = "Myles Dear <mdear@cisco.com>"
 from unicon.plugins.iosxr.statemachine import IOSXRSingleRpStateMachine
 
 from unicon.plugins.iosxr.iosxrv.patterns import IOSXRVPatterns
-from unicon.plugins.iosxr.statements import IOSXRStatements, handle_failed_config
+from unicon.plugins.iosxr.statements import (
+    IOSXRStatements,
+    handle_commit_changes,
+    handle_failed_config,
+)
 from unicon.statemachine import State, Path
 from unicon.eal.dialogs import Statement, Dialog
 
@@ -29,7 +33,7 @@ class IOSXRVSingleRpStateMachine(IOSXRSingleRpStateMachine):
         self.add_state(run)
 
         config_dialog = Dialog([
-           [patterns.commit_changes_prompt, 'sendline(yes)', None, True, False],
+           [patterns.commit_changes_prompt, handle_commit_changes, None, True, False],
            [patterns.commit_replace_prompt, 'sendline(yes)', None, True, False],
            [patterns.configuration_failed_message, handle_failed_config, None, True, False]
            ])

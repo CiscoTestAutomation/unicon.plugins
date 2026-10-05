@@ -41,8 +41,8 @@ spitfire_enable:
       response:
         - |2
           Thu Sep 19 14:50:51.247 UTC
-          Not exactly sure what the cli output is like as we only see it sometimes right after reimage and immediate login
-          For now putting some random data and will update once we capture the right cli output.
+          Session Write Lock
+          00000212-00245489-00000000
         - |2
           Thu Sep 19 14:50:51.247 UTC
     'show ztp log | i "SUCCESSFULLY"':
@@ -160,8 +160,8 @@ spitfire_enable2:
       response:
         - |2
           Thu Sep 19 14:50:51.247 UTC
-          Not exactly sure what the cli output is like as we only see it sometimes right after reimage and immediate login
-          For now putting some random data and will update once we capture the right cli output.
+          Session Write Lock
+          00000212-00245489-00000000
         - |2
           Thu Sep 19 14:50:51.247 UTC
     'show ztp log | i "SUCCESSFULLY"':
@@ -169,6 +169,71 @@ spitfire_enable2:
         - ""
         - |2
           Binary file (standard input) matches
+
+spitfire_config_commit_lock_enable:
+  prompt: RP/0/RP0/CPU0:%N#
+  commands:
+    "terminal length 0": ""
+    "terminal width 0": ""
+    "show version": file|mock_data/iosxr/spitfire/show_version.txt
+    "bash cat /etc/bake-info.txt": file|mock_data/iosxr/spitfire/build-info.txt
+    "bash cat /etc/build-info.txt": file|mock_data/iosxr/spitfire/build-info.txt
+    "show configuration lock": |2
+      Thu Sep 19 14:50:51.247 UTC
+    'show ztp log | i "SUCCESSFULLY"': |2
+      Thu Sep 19 14:50:51.247 UTC
+      2019-09-23 01:42:28,757 [INFO] Exiting SUCCESSFULLY
+    "configure terminal":
+      new_state: spitfire_config_commit_lock
+
+spitfire_config_commit_lock:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "logging console disable": ""
+    "line console": ""
+    "exec-timeout 0 0": ""
+    "absolute-timeout 0": ""
+    "session-timeout 0": ""
+    "line default": ""
+    "commit":
+      response: |2
+        % Failed to commit .. Another configuration session
+        had a lock on the running configuration.
+      new_state: spitfire_config_commit_lock_failed
+
+spitfire_config_commit_lock_failed:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "show configuration commit changes last 1":
+      response: |2
+        Thu Sep 19 14:50:52.247 UTC
+        Configuration changes for commit 1000000003
+        User devkeys, Line vty0
+      timing:
+        - 0:,0.2
+    "abort":
+      new_state: spitfire_config_commit_lock_released
+
+spitfire_config_commit_lock_released:
+  prompt: RP/0/RP0/CPU0:%N#
+  commands:
+    "show configuration lock": |2
+      Thu Sep 19 14:50:53.247 UTC
+    "configure terminal":
+      new_state: spitfire_config_commit_lock_retry
+
+spitfire_config_commit_lock_retry:
+  prompt: "RP/0/RP0/CPU0:%N(config)#"
+  commands:
+    "logging console disable": ""
+    "line console": ""
+    "exec-timeout 0 0": ""
+    "absolute-timeout 0": ""
+    "session-timeout 0": ""
+    "line default": ""
+    "commit": ""
+    "end":
+      new_state: spitfire_config_commit_lock_released
 
 
 spitfire_reload_confirm:
@@ -548,8 +613,8 @@ spitfire_enable_config_lock:
       response:
         - |2
           Thu Sep 19 14:50:51.247 UTC
-          Not exactly sure what the cli output is like as we only see it sometimes right after reimage and immediate login
-          For now putting some random data and will update once we capture the right cli output.
+          Session Rebase Lock
+          lock_subtree/rebase_lock
 
 spitfire_enable_ztp_lock:
   prompt: RP/0/RP0/CPU0:%N#
@@ -568,8 +633,8 @@ spitfire_enable_ztp_lock:
       response:
         - |2
           Thu Sep 19 14:50:51.247 UTC
-          Not exactly sure what the cli output is like as we only see it sometimes right after reimage and immediate login
-          For now putting some random data and will update once we capture the right cli output.
+          Session Write Lock
+          00000212-00245489-00000000
         - |2
           Thu Sep 19 14:50:51.247 UTC
     'show ztp log | i "SUCCESSFULLY"':

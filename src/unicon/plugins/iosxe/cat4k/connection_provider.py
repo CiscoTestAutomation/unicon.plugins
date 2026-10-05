@@ -59,9 +59,16 @@ class Cat4kDualRpConnectionProvider(BaseDualRpConnectionProvider):
         con._set_standby_alias(other_alias)
         con._handles_designated = True
 
-    def establish_connection(self):
+    def establish_connection(self, connection_dialog=None,
+                             skip_initialization=False):
 
         """ Reads the device state and brings both RP to the right state
+
+        Args:
+            connection_dialog (Dialog, optional): Replacement dialog for
+                initial state detection. When omitted, the normal Cat4k
+                connection statements are used.
+            skip_initialization (bool): Stop after initial state detection.
         """
         con = self.connection
         subconnections = con.subconnections
@@ -79,34 +86,65 @@ class Cat4kDualRpConnectionProvider(BaseDualRpConnectionProvider):
             context.update(cred_list=context.get('login_creds'))
         futures = []
 
-
-        def detect_state(subcon, dialog= None):
-            subcon.sendline()
+        def detect_state(subconnection, dialog=None):
+            dialog_kwargs = {'dialog': Dialog(connection_statement_list)}
+            if dialog is not None:
+                dialog_kwargs = {
+                    'dialog': dialog,
+                    'dialog_replacement': True,
+                }
+            else:
+                # Preserve the existing prompt probe for normal connections.
+                # In replacement mode the state machine waits for the supplied
+                # dialog/state patterns before deciding whether to probe.
+                subconnection.sendline()
             try:
-                subcon.state_machine.go_to(
+                subconnection.state_machine.go_to(
                     'any',
-                    subcon.spawn,
-                    context=subcon.context,
-                    prompt_recovery=subcon.prompt_recovery,
-                    timeout=subcon.connection_timeout,
-                    dialog=Dialog(connection_statement_list)
+                    subconnection.spawn,
+                    context=subconnection.context,
+                    prompt_recovery=subconnection.prompt_recovery,
+                    timeout=subconnection.connection_timeout,
+                    **dialog_kwargs,
                 )
-            except Exception as e:
-                subcon.log.info(e)
-            subcon.log.debug('{} in state: {}'.format(subcon.alias, subcon.state_machine.current_state))
+            except Exception as error:
+                subconnection.log.info(error)
+                if dialog is not None:
+                    raise
+            subconnection.log.debug('{} in state: {}'.format(
+                subconnection.alias,
+                subconnection.state_machine.current_state))
 
-        executer= ThreadPoolExecutor(max_workers = len(subconnections))
-        for subcon in subconnections:
-            futures.append(executer.submit(
-                # Check current state
-                detect_state,
-                subcon=subcon,
-                dialog=self.get_connection_dialog()))
-        wait_futures(futures, timeout=3, return_when=FIRST_COMPLETED)
+        try:
+            if connection_dialog is not None:
+                # A replacement is part of the caller's connection attempt.
+                # Start every console promptly so no boot-break window is
+                # missed, then surface failures to Connection.connect(),
+                # including ConnectionRefusedError for clear-line retries.
+                self._run_replacement_state_detection(
+                    subconnections,
+                    lambda subconnection: detect_state(
+                        subconnection, dialog=connection_dialog),
+                )
+            else:
+                executor = ThreadPoolExecutor(
+                    max_workers=len(subconnections))
+                for subconnection in subconnections:
+                    futures.append(executor.submit(
+                        # Check current state
+                        detect_state,
+                        subconnection=subconnection))
+                wait_futures(
+                    futures, timeout=3, return_when=FIRST_COMPLETED)
+        finally:
+            for subconnection in subconnections:
+                context = subconnection.context
+                context.pop('cred_list', None)
 
-        for subconnection in subconnections:
-            context = subconnection.context
-            context.pop('cred_list', None)
+        if skip_initialization:
+            for subconnection in subconnections:
+                subconnection.state_machine.learn_hostname = False
+            return
 
         if learn_hostname:
             # Use the learned hostname in %N substitutions from this point on.
@@ -129,4 +167,3 @@ class Cat4kDualRpConnectionProvider(BaseDualRpConnectionProvider):
             for subconnection in subconnections:
                 subconnection.learned_hostname = learned_hostname
                 subconnection.state_machine.learn_hostname = False
-

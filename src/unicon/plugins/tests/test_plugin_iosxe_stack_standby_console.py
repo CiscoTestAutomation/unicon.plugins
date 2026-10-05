@@ -1,5 +1,5 @@
 """
-Unittests for the IOSXE/Stack standby console attach.
+Unittests for the IOSXE/Stack standby console attach (DXCS-57536).
 
 On a C9300 stack every member console presents the active RP's CLI, so the
 handle unicon designates as standby is really a second session on the active.

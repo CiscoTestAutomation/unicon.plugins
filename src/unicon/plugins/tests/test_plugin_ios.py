@@ -21,6 +21,7 @@ from unicon import Connection
 from unicon.core.errors import SubCommandFailure, ConnectionError as UniconConnectionError
 from unicon.eal.dialogs import Dialog
 from unicon.mock.mock_device import mockdata_path
+from unicon.plugins.ios.connection_provider import remove_show_version_init_command
 
 
 def mock_execute(*args, **kwargs):
@@ -33,6 +34,57 @@ def mock_configure(*args, **kwargs):
 
 
 class TestIosPluginConnect(unittest.TestCase):
+
+    def test_remove_show_version_from_default_init_commands(self):
+        connection = Mock()
+        connection.init_exec_commands = None
+        connection.settings.HA_INIT_EXEC_COMMANDS = [
+            'term length 0',
+            'term width 0',
+            'show version'
+        ]
+
+        remove_show_version_init_command(connection)
+
+        self.assertEqual(connection.settings.HA_INIT_EXEC_COMMANDS, [
+            'term length 0',
+            'term width 0'
+        ])
+
+    def test_keep_explicit_show_version_init_command(self):
+        connection = Mock()
+        connection.init_exec_commands = ['show version']
+        connection.settings.HA_INIT_EXEC_COMMANDS = ['show version']
+
+        remove_show_version_init_command(connection)
+
+        self.assertEqual(
+            connection.settings.HA_INIT_EXEC_COMMANDS, ['show version'])
+
+    def test_connect_learn_os_version(self):
+        testbed = """
+        devices:
+            Router:
+                os: ios
+                type: router
+                credentials:
+                    default:
+                        username: cisco
+                        password: cisco
+                connections:
+                    defaults:
+                        class: unicon.Unicon
+                    cli:
+                        command: mock_device_cli --os ios --state login
+        """
+        device = loader.load(testbed).devices.Router
+        try:
+            with patch.dict(os.environ):
+                os.environ.pop('LEARN_OS_VERSION', None)
+                device.connect()
+                self.assertEqual(device.version, '15.0(20100325:222114)')
+        finally:
+            device.disconnect()
 
     def test_login_connect(self):
         c = Connection(hostname='Router',

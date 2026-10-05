@@ -10,6 +10,7 @@ import re
 import time
 import logging
 import unittest
+from types import SimpleNamespace
 from unittest.mock import Mock, call, patch
 from concurrent.futures import ThreadPoolExecutor
 
@@ -20,12 +21,15 @@ from pyats.datastructures import AttrDict
 import unicon
 from unicon import Connection
 from unicon.eal.dialogs import Dialog, Statement
+from unicon.eal.dialog_processor import SimpleDialogProcessor
+from unicon.eal.utils import ExpectMatch
 from unicon.plugins.utils import sanitize
 from unicon.plugins.tests.mock.mock_device_ios import MockDeviceTcpWrapperIOS
 from unicon.mock.mock_device import MockDevice, MockDeviceTcpWrapper
 from unicon.plugins.generic.service_implementation import Enable as GenericEnable
 from unicon.plugins.generic.statements import (login_handler, password_handler,
-    passphrase_handler, connection_refused_handler, get_enable_credential_password)
+    passphrase_handler, connection_refused_handler, enable_password_handler,
+    get_enable_credential_password, bad_password_handler, generic_statements)
 from unicon.plugins.generic.statemachine import config_transition
 from pyats.topology import loader
 from pyats.topology.credentials import Credentials
@@ -33,7 +37,7 @@ from pyats.topology.credentials import Credentials
 
 from unicon.core.errors import (SubCommandFailure, StateMachineError,
     SpawnInitError, CredentialsExhaustedError, UniconAuthenticationError,
-    ConnectionError )
+    ConnectionError, TimeoutError )
 
 
 unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC=0
@@ -61,6 +65,22 @@ class TestGenericEnable(unittest.TestCase):
             context=d.context,
             timeout=d.settings.ENABLE_TIMEOUT,
             prompt_recovery=True)
+
+    def test_enable_authentication_error_is_not_wrapped(self):
+        d = Connection(hostname='Router',
+                       start=['mock_device_cli --os ios'],
+                       os='ios')
+        d.spawn = Mock()
+        d.state_machine = Mock()
+        d.state_machine.go_to.side_effect = UniconAuthenticationError(
+            'Bad enable password')
+
+        enable = GenericEnable(d, d.context)
+        enable.pre_service()
+
+        with self.assertRaisesRegex(
+                UniconAuthenticationError, 'Bad enable password'):
+            enable.call_service()
 
 
 class TestPasswordHandler(unittest.TestCase):
@@ -157,6 +177,147 @@ class TestPasswordHandler(unittest.TestCase):
         with self.assertRaises(UniconAuthenticationError):
             for x in range(4):
                 password_handler(self.spawn, self.context, self.session)
+
+class PasswordOkDialogSpawn:
+    """Small spawn double for exercising the Password OK dialog statement."""
+
+    def __init__(self, events=None, initial_buffer='Password OK',
+                 append_prompt_on_send=False):
+        self.buffer = initial_buffer
+        self.events = list(events or [True])
+        self.append_prompt_on_send = append_prompt_on_send
+        self.timeout = 1
+        self.hostname = None
+        self.hostname_mismatch = False
+        self.last_sent = None
+        self.match = ExpectMatch()
+        self.log = Mock()
+        self.settings = SimpleNamespace(
+            ESCAPE_CHAR_CHATTY_TERM_WAIT=0,
+            ESCAPE_CHAR_CHATTY_TERM_WAIT_RETRIES=0,
+            ESCAPE_CHAR_PROMPT_PATTERN=r'^__no_prompt__$',
+            LOGIN_PROMPT=None,
+            PASSWORD_PROMPT=None,
+            ESCAPE_CHAR_PROMPT_COMMANDS=('\r',),
+            ESCAPE_CHAR_PROMPT_WAIT=0,
+            ESCAPE_CHAR_PROMPT_WAIT_RETRIES=1,
+        )
+
+    def read_update_buffer(self):
+        if not self.events:
+            return True
+
+        event = self.events.pop(0)
+        if isinstance(event, tuple):
+            output, delay = event
+            time.sleep(delay)
+            if output:
+                self.buffer += output
+        return event is not False
+
+    def send(self, command):
+        self.last_sent = command
+        if self.append_prompt_on_send:
+            self.buffer += '\nRouter#'
+
+    def match_buffer(self, patterns):
+        for index, pattern in enumerate(patterns):
+            match = pattern.search(self.buffer)
+            if match:
+                self.match.last_match = match
+                self.match.last_match_mode = 're'
+                self.match.match_output = match.group(0)
+                return index
+        return False
+
+    def trim_buffer(self):
+        self.buffer = ''
+
+
+class TestPasswordOkDialog(unittest.TestCase):
+    """Regression coverage for terminal-server Password OK handling."""
+
+    @staticmethod
+    def _process(spawn, statements, timeout=1, context=None):
+        dialog = Dialog(statements)
+        processor = SimpleDialogProcessor(
+            dialog, spawn, context=context or AttrDict(), timeout=timeout)
+        return processor.process()
+
+    def test_password_ok_silent_console_is_bounded(self):
+        # Keep Password OK in the buffer and repeatedly return it as a match.
+        # The connection timer must remain absolute instead of being restarted
+        # by every repeated match.
+        spawn = PasswordOkDialogSpawn(
+            events=[True] + [(None, 0.4)] * 4)
+        started = time.monotonic()
+
+        with self.assertRaises(TimeoutError):
+            self._process(spawn, [generic_statements.password_ok_stmt])
+
+        self.assertLess(time.monotonic() - started, 2)
+        self.assertFalse(generic_statements.password_ok_stmt.continue_timer)
+
+    def test_password_ok_followed_by_console_output(self):
+        spawn = PasswordOkDialogSpawn(append_prompt_on_send=True)
+        result = self._process(spawn, [
+            generic_statements.password_ok_stmt,
+            Statement(pattern=r'Router#', loop_continue=False),
+        ])
+
+        self.assertEqual(result.last_match_index, 1)
+
+    def test_password_ok_slow_console_within_timeout(self):
+        spawn = PasswordOkDialogSpawn(events=[
+            True,
+            False,
+            ('\nRouter#', 0.1),
+        ])
+        result = self._process(spawn, [
+            generic_statements.password_ok_stmt,
+            Statement(pattern=r'Router#', loop_continue=False),
+        ])
+
+        self.assertEqual(result.last_match_index, 1)
+
+    def test_bad_password_is_still_authentication_failure(self):
+        spawn = PasswordOkDialogSpawn(initial_buffer='% Bad passwords\n')
+
+        with self.assertRaises(UniconAuthenticationError):
+            self._process(
+                spawn,
+                [generic_statements.bad_password_stmt],
+                context=AttrDict(fallback_creds=[]),
+            )
+
+
+class TestBadPasswordHandler(unittest.TestCase):
+
+    def setUp(self):
+        self.spawn = Mock()
+        self.spawn.__str__ = Mock(return_value='Router')
+        self.context = AttrDict({
+            'default_cred_name': 'default',
+            'login_creds': ['default'],
+            'fallback_creds': ['fallback'],
+        })
+
+    def test_enable_bad_password_raises_authentication_error(self):
+        session = AttrDict(enable_password_attempted=True)
+
+        with self.assertRaisesRegex(
+                UniconAuthenticationError, 'Bad enable password'):
+            bad_password_handler(self.spawn, self.context, session)
+
+        self.assertNotIn('current_credential', session)
+
+    def test_login_bad_password_still_uses_fallback(self):
+        session = AttrDict()
+
+        bad_password_handler(self.spawn, self.context, session)
+
+        self.assertEqual(session.current_credential, 'fallback')
+        self.assertEqual(session.cred_list, ['fallback'])
 
 
 class TestCredentialLoginPasswordHandlers(unittest.TestCase):
@@ -264,6 +425,30 @@ class TestCredentialLoginPasswordHandlers(unittest.TestCase):
                        credentials=self.context.credentials,
                        mit=True)
         d.connect()
+
+    def test_enable_bad_secrets_with_fallback_raises_authentication_error(self):
+        credentials = Credentials({
+            'default': {'username': 'admin', 'password': 'loginpw'},
+            'enable': {'password': 'wrong_enable'},
+            'fallback': {'username': 'backup', 'password': 'fallbackpw'},
+        })
+        d = Connection(
+            hostname='Router',
+            start=[
+                'mock_device_cli --os ios '
+                '--state console_test_enable_bad_secret'
+            ],
+            os='ios',
+            connection_timeout=15,
+            credentials=credentials,
+            fallback_creds=['fallback'],
+            init_exec_commands=[],
+            init_config_commands=[],
+        )
+
+        with self.assertRaisesRegex(
+                UniconAuthenticationError, 'Bad enable password'):
+            d.connect()
 
     def test_enable_password_default_cred_explicit(self):
         credentials = Credentials({
@@ -461,29 +646,93 @@ class TestCredentialLoginPasswordHandlers(unittest.TestCase):
 class TestEnableCredentialSelection(unittest.TestCase):
     """Unit tests for get_enable_credential_password() credential ordering."""
 
-    def _context(self, previous_credential):
+    def _context(self, previous_credential, include_enable=True):
+        credentials = {
+            'terminal_server': {'username': 'ts', 'password': 'tspw'},
+            'default': {'username': 'admin', 'password': 'devpw'},
+            'set_1': {'username': 'fallback1', 'password': 'fallback1pw'},
+            'set_2': {'username': 'fallback2', 'password': 'fallback2pw'},
+        }
+        if include_enable:
+            credentials['enable'] = {'password': 'enablepw'}
+
         return AttrDict({
             'hostname': 'Router',
             'login_creds': ['terminal_server', 'default'],
-            'fallback_creds': ['default'],
+            'fallback_creds': ['set_1', 'set_2'],
             'default_cred_name': 'default',
             'previous_credential': previous_credential,
-            'credentials': Credentials({
-                # terminal server cred has no enable_password
-                'terminal_server': {'username': 'ts', 'password': 'tspw'},
-                # device login cred; its password doubles as the enable secret
-                'default': {'username': 'admin', 'password': 'devpw'},
-                # a generic enable cred with a DIFFERENT password
-                'enable': {'password': 'wrongenpw'},
-            }),
+            'credentials': Credentials(credentials),
         })
 
-    def test_terminal_server_direct_post_prefers_login_credential(self):
-        # TS post reached device prompt: use the login credential's password
-        # instead of the wrong generic 'enable' credential.
+    def test_terminal_server_direct_post_prefers_enable_credential(self):
         context = self._context(previous_credential='terminal_server')
         enable_pw = get_enable_credential_password(context)
+        self.assertEqual(enable_pw, 'enablepw')
+
+    def test_terminal_server_fallback_enable_password_does_not_override_enable(self):
+        context = self._context(previous_credential='set_1')
+        context['credentials']['set_1']['enable_password'] = 'fallbackenablepw'
+
+        enable_pw = get_enable_credential_password(context)
+
+        self.assertEqual(enable_pw, 'enablepw')
+
+    def test_terminal_server_direct_post_prefers_login_over_fallback_creds(self):
+        # No explicit enable credential: the enable secret is supplied by the
+        # login credential that reached the device prompt (default), not the
+        # first bad-password fallback (set_1).
+        context = self._context(
+            previous_credential='terminal_server', include_enable=False)
+        enable_pw = get_enable_credential_password(context)
         self.assertEqual(enable_pw, 'devpw')
+
+    def test_terminal_server_direct_post_uses_fallback_when_no_login_password(self):
+        # Login credentials carry no usable password, so the bad-password
+        # fallback_creds list supplies the enable secret in order (set_1).
+        context = self._context(
+            previous_credential='terminal_server', include_enable=False)
+        context['credentials'] = Credentials({
+            'terminal_server': {'username': 'ts'},
+            'default': {'username': 'admin'},
+            'set_1': {'username': 'fallback1', 'password': 'fallback1pw'},
+            'set_2': {'username': 'fallback2', 'password': 'fallback2pw'},
+        })
+        enable_pw = get_enable_credential_password(context)
+        self.assertEqual(enable_pw, 'fallback1pw')
+
+    def test_normal_login_prefers_enable_credential(self):
+        context = self._context(previous_credential='default')
+        enable_pw = get_enable_credential_password(context)
+        self.assertEqual(enable_pw, 'enablepw')
+
+    def test_logs_selected_credential_name_and_key_without_password(self):
+        context = self._context(previous_credential='terminal_server')
+
+        with self.assertLogs(
+                'unicon.plugins.generic.statements', level=logging.DEBUG) as logs:
+            enable_pw = get_enable_credential_password(context)
+
+        self.assertEqual(enable_pw, 'enablepw')
+        log_output = '\n'.join(logs.output)
+        self.assertIn(
+            "Selected credential 'enable' key 'password' "
+            "for enable password",
+            log_output)
+        self.assertNotIn('enablepw', log_output)
+
+    def test_enable_handler_logs_selection_to_connection_logger(self):
+        context = self._context(previous_credential='terminal_server')
+        spawn = Mock()
+        spawn.settings.PASSWORD_ATTEMPTS = 3
+
+        enable_password_handler(spawn, context, AttrDict())
+
+        spawn.log.debug.assert_called_once_with(
+            "Selected credential '%s' key '%s' for enable password",
+            'enable', 'password')
+        self.assertNotIn('enablepw', spawn.log.debug.call_args.args)
+        spawn.sendline.assert_called_once_with('enablepw')
 
 
 class TestGenericServices(unittest.TestCase):

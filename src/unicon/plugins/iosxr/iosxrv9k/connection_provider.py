@@ -61,21 +61,36 @@ class IOSXRV9KSingleRpConnectionProvider(
         check_platform(self)
         self.execute_init_commands()
 
-    def establish_connection(self):
+    def establish_connection(self, connection_dialog=None,
+                             skip_initialization=False):
+        """Wait for IOS XRv 9000 and detect its initial state.
+
+        Args:
+            connection_dialog (Dialog, optional): Replacement dialog for
+                initial state detection. Supplying it skips the normal launch
+                wait so short-lived patterns can be observed.
+            skip_initialization (bool): Stop after initial state detection.
+        """
         con = self.connection
         settings = con.settings
         learn_hostname = con.learn_hostname
 
-        self.wait_for_launch_complete(
-            initial_discovery_wait_sec = \
-                settings.INITIAL_LAUNCH_DISCOVERY_WAIT_SEC,
-            initial_wait_sec = settings.INITIAL_LAUNCH_WAIT_SEC,
-            post_prompt_wait_sec = settings.POST_PROMPT_WAIT_SEC,
-            connection = con, log=con.log, hostname=con.hostname,
-            checkpoint_pattern=patterns.logout_prompt,
-            learn_hostname=learn_hostname
-        )
-        super().establish_connection()
+        if connection_dialog is None:
+            self.wait_for_launch_complete(
+                initial_discovery_wait_sec=(
+                    settings.INITIAL_LAUNCH_DISCOVERY_WAIT_SEC),
+                initial_wait_sec=settings.INITIAL_LAUNCH_WAIT_SEC,
+                post_prompt_wait_sec=settings.POST_PROMPT_WAIT_SEC,
+                connection=con, log=con.log, hostname=con.hostname,
+                checkpoint_pattern=patterns.logout_prompt,
+                learn_hostname=learn_hostname
+            )
+        establish_kwargs = {}
+        if connection_dialog is not None:
+            establish_kwargs['connection_dialog'] = connection_dialog
+        if skip_initialization:
+            establish_kwargs['skip_initialization'] = True
+        super().establish_connection(**establish_kwargs)
 
 """
 class IOSXRV9KDoubleRpConnectionProvider(IOSXRDoubleRpConnectionProvider):

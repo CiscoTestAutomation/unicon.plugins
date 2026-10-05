@@ -275,6 +275,46 @@ class TestIosXrSpitfirePluginConnectReply(unittest.TestCase):
               'CONFIG_LOCK_TIMEOUT', 5)
 class TestIosXrSpitfirePluginConnectConfigLock(unittest.TestCase):
 
+    def test_config_commit_lock_recovery(self):
+        self.md = MockDeviceTcpWrapperSpitfire(
+            port=0, state='spitfire_config_commit_lock_enable')
+        self.md.start()
+        self.r = Connection(
+            hostname='Router',
+            start=['telnet 127.0.0.1 {}'.format(self.md.ports[0])],
+            os='iosxr',
+            platform='spitfire',
+            credentials={
+                'default': {
+                    'username': 'admin',
+                    'password': 'lab'}},
+            log_buffer=True)
+
+        self.r.connect(prompt_recovery=True)
+
+        self.assertTrue(self.r.is_connected)
+        self.assertEqual(self.r.state_machine.current_state, 'enable')
+        self.assertIn(
+            'Configuration changes for commit 1000000003',
+            self.r.log_buffer)
+        for key in (
+                'config_transaction_locked',
+                'config_transaction_lock_output',
+                'config_transaction_lock_timeout'):
+            self.assertNotIn(key, self.r.context)
+        self.assertEqual(
+            self.r.log_buffer.count(
+                'RP/0/RP0/CPU0:Router(config)#logging console disable'),
+            2)
+        self.assertEqual(
+            self.r.log_buffer.count(
+                'RP/0/RP0/CPU0:Router(config)#commit'),
+            2)
+        self.assertEqual(
+            self.r.log_buffer.count(
+                'RP/0/RP0/CPU0:Router(config)#abort'),
+            1)
+
     def test_configlocktimeout(self):
         self.md = MockDeviceTcpWrapperSpitfire(port=0, state='spitfire_login')
         self.md.start()
@@ -335,12 +375,13 @@ class TestIosXrSpitfirePluginConnectConfigLock(unittest.TestCase):
         tb = loader.load(self.testbed)
         self.r = tb.devices.Router
 
-        try:
-            self.r.connect(prompt_recovery=True)
-        except Exception:
-            connect_fail = True
-
-        self.assertTrue(connect_fail, "Connection failed ")
+        with patch.object(
+                unicon.plugins.iosxr.spitfire.settings.SpitfireSettings,
+                'CONFIG_LOCK_TIMEOUT', 0.01), patch(
+                    'unicon.plugins.iosxr.spitfire.connection_provider.time.sleep'):
+            with self.assertRaisesRegex(
+                    Exception, 'Config lock not released even after 10 mins'):
+                self.r.connect(prompt_recovery=True)
 
     def test_configztplock(self):
         self.md = MockDeviceTcpWrapperSpitfire(

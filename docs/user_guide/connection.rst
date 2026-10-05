@@ -1491,7 +1491,9 @@ These tokens include:
 - `device.version`
 - `device.platform`
 - `device.model`
+- `device.submodel`
 - `device.pid`
+- `device.chassis_type`
 
 During the initial connection to a device, Unicon will learn the device abstraction tokens using the following steps:
 

@@ -20,6 +20,7 @@ from .service_statements import (switchover_statement_list,
                                  execution_statement_list,
                                  configure_statement_list,
                                  reload_statement_list)
+from .statements import recover_config_transaction_lock
 
 from .utils import IosxrUtils
 from .patterns import IOSXRPatterns
@@ -66,6 +67,9 @@ class Execute(svc.Execute):
 
 
 class Configure(svc.Configure):
+    transaction_lock_pattern = patterns.config_transaction_lock_message
+    transaction_lock_handler = staticmethod(recover_config_transaction_lock)
+
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'config'
@@ -81,6 +85,16 @@ class Configure(svc.Configure):
                              result_check_per_command=False,
                              *args, **kwargs)
 
+    def check_config_lock(self, handle, timeout=None, prompt_recovery=None):
+        if prompt_recovery is None:
+            prompt_recovery = getattr(self, 'prompt_recovery', handle.prompt_recovery)
+        self.config_lock_output = handle.execute(
+            'show configuration lock',
+            timeout=timeout,
+            allow_state_change=True,
+            prompt_recovery=prompt_recovery)
+        return bool(re.search(patterns.config_lock, self.config_lock_output, re.M))
+
 
 class ConfigureExclusive(Configure):
     def __init__(self, connection, context, **kwargs):
@@ -91,12 +105,17 @@ class ConfigureExclusive(Configure):
 
 
 class HaConfigureService(svc.HaConfigureService):
+    transaction_lock_pattern = patterns.config_transaction_lock_message
+    transaction_lock_handler = staticmethod(recover_config_transaction_lock)
+
     def call_service(self, command=[], reply=Dialog([]), target='active',
                      timeout=None, *args, **kwargs):
         self.commit_cmd = get_commit_cmd(**kwargs)
         super().call_service(command,
                              reply=reply + Dialog(config_commit_stmt_list),
                              target=target, timeout=timeout, *args, **kwargs)
+
+    check_config_lock = Configure.check_config_lock
 
 
 class Reload(svc.Reload):

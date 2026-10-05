@@ -11,7 +11,7 @@ import os
 import yaml
 import logging
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import unicon
 from unicon import Connection
@@ -21,6 +21,7 @@ from unicon.core.errors import SubCommandFailure, StateMachineError, \
 from unicon.plugins.tests.mock.mock_device_nxos import MockDeviceTcpWrapperNXOS
 from unicon.eal.dialogs import Dialog
 from unicon.mock.mock_device import mockdata_path
+from unicon.plugins.nxos.service_implementation import AttachModuleConsole
 
 with open(os.path.join(mockdata_path, 'nxos/nxos_mock_data.yaml'), 'rb') as datafile:
     mock_data = yaml.safe_load(datafile.read())
@@ -245,6 +246,20 @@ class TestNxosPluginGuestshellService(unittest.TestCase):
 
 
 class TestNxosPluginAttachConsoleService(unittest.TestCase):
+
+    def test_attach_console_propagates_attach_command_failure(self):
+        connection = Mock()
+        connection.settings.CONSOLE_TIMEOUT = 1
+        connection.expect.side_effect = SubCommandFailure(
+            'attach console module is unsupported')
+
+        context = AttachModuleConsole.ContextMgr(connection, module_num=1)
+
+        with self.assertRaises(SubCommandFailure):
+            context.__enter__()
+
+        connection.sendline.assert_called_once_with('attach console module 1')
+        connection.expect.assert_called_once()
 
     def test_shell(self):
         c = Connection(hostname='switch',
