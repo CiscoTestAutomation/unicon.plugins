@@ -41,6 +41,8 @@ Changelogs
     * Prevented the terminal-server ``Password OK`` statement from restarting the connection timeout when the device console remains silent.
 
 * iosxe/cat8k
+    * Treated ``image_to_boot`` as a ROMMON fallback during reload instead of
+      forcing devices that autoboot normally to transition through ROMMON.
     * Added the ``C8300-1N1S-6T`` PID mapping so token discovery selects the CAT8K platform and C8300 model instead of the IOS XE software image name.
 
 * aireos
