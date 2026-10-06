@@ -72,17 +72,28 @@ class ConfdConnectionProvider(GenericSingleRpConnectionProvider):
         """
         con = self.connection
 
-        con.state_machine.detect_state(con.spawn)
-        if con.state_machine.current_cli_style == 'cisco':
-            con.state_machine.go_to('cisco_exec',
-                                    self.connection.spawn,
-                                    context=self.connection.context,
-                                    timeout=self.connection.connection_timeout)
-        elif con.state_machine.current_cli_style == 'juniper':
-            con.state_machine.go_to('juniper_exec',
-                                    self.connection.spawn,
-                                    context=self.connection.context,
-                                    timeout=self.connection.connection_timeout)
+        learn_hostname = con.learn_hostname and not con.learned_hostname
+        if learn_hostname:
+            con.state_machine.learn_hostname = True
+
+        try:
+            con.state_machine.detect_state(con.spawn)
+            if con.state_machine.current_cli_style == 'cisco':
+                con.state_machine.go_to(
+                    'cisco_exec', con.spawn,
+                    context=con.context,
+                    timeout=con.connection_timeout)
+            elif con.state_machine.current_cli_style == 'juniper':
+                con.state_machine.go_to(
+                    'juniper_exec', con.spawn,
+                    context=con.context,
+                    timeout=con.connection_timeout)
+
+            if learn_hostname:
+                self.learn_hostname()
+        finally:
+            if learn_hostname:
+                con.state_machine.learn_hostname = False
 
         self.execute_init_commands()
 
@@ -113,4 +124,3 @@ class ConfdConnection(GenericSingleRpConnection):
     connection_provider_class = ConfdConnectionProvider
     subcommand_list = ConfdServiceList
     settings = ConfdSettings()
-

@@ -18,6 +18,7 @@ class IosXEc9800ServiceList(IosXEServiceList):
 
 
 class IosXEc9800SingleRpConnection(IosXESingleRpConnection):
+    os = 'iosxe'
     platform = 'cat9k'
     model = 'c9800'
     state_machine_class = IosXEc9800SingleRpStateMachine
@@ -26,6 +27,7 @@ class IosXEc9800SingleRpConnection(IosXESingleRpConnection):
 
 
 class IosXEc9800DualRPConnection(IosXEDualRPConnection):
+    os = 'iosxe'
     platform = 'cat9k'
     model = 'c9800'
     settings = IosXEc9800Settings()

@@ -25,6 +25,24 @@ sdwan_exec:
     "new_hostname":
       new_state: cpe_hostname
 
+vsmart_exec:
+  prompt: vm9#
+  commands:
+    "screen-length 0": ""
+    "screen-width 256": ""
+    "idle-timeout 0": ""
+    "autowizard false": ""
+    "config term":
+      new_state: vsmart_config
+
+vsmart_config:
+  prompt: vm9(config)#
+  commands:
+    "policy": ""
+    "commit": ""
+    "end":
+      new_state: vsmart_exec
+
 cpe_hostname:
   prompt: "CPE101#"
   commands:

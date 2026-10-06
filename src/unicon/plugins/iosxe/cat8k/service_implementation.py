@@ -161,36 +161,24 @@ class Reload(XEReload):
         super().__init__(connection, context, **kwargs)
         self.dialog = Dialog(reload_statement_list + [boot_from_rommon_stmt])
 
-    def pre_service(self, *args, **kwargs):
-        if "image_to_boot" in kwargs:
-            self.start_state = 'rommon'
-            if 'image_to_boot' in self.context:
-                self.context['orig_image_to_boot'] = self.context['image_to_boot']
-            self.context["image_to_boot"] = kwargs["image_to_boot"]
-            self.connection.log.info("'image_to_boot' specified with reload, transitioning to 'rommon' state")
-        else:
-            if 'image' in kwargs:
-                self.context['image_to_boot'] = kwargs.get('image')
-            self.start_state = 'enable'
-
-        super().pre_service(*args, **kwargs)
-
     def call_service(self, *args, **kwargs):
-        # assume the device is in rommon if image_to_boot is passed
-        # update reload command to use rommon boot syntax
-        if "image_to_boot" in kwargs:
-            self.context["image_to_boot"] = kwargs["image_to_boot"]
-            reload_command = "boot {}".format(
-                self.context['image_to_boot']).strip()
-            super().call_service(reload_command, *args, **kwargs)
-            self.context.pop("image_to_boot", None)
-        else:
-            super().call_service(*args, **kwargs)
-
-    def post_service(self, *args, **kwargs):
-        if 'orig_image_to_boot' in self.context:
-            self.context['image_to_boot'] = self.context.pop('orig_image_to_boot')
-        super().post_service(*args, **kwargs)
+        # IOS XE reload replaces and removes this shared context entry.
+        original_image = self.context.get('image_to_boot')
+        had_original_image = 'image_to_boot' in self.context
+        # image_to_boot is a fallback for reloads from enable. Use ROMMON boot
+        # syntax only when the reload service starts in ROMMON.
+        try:
+            if ("image_to_boot" in kwargs and
+                    self.get_sm().current_state == 'rommon'):
+                reload_command = "boot {}".format(kwargs["image_to_boot"]).strip()
+                super().call_service(reload_command, *args, **kwargs)
+            else:
+                super().call_service(*args, **kwargs)
+        finally:
+            if had_original_image:
+                self.context['image_to_boot'] = original_image
+            else:
+                self.context.pop('image_to_boot', None)
 
 
 class HAReloadService(GenericHAReloadService):

@@ -15,12 +15,50 @@ from unicon.plugins.utils import (
 patterns = IOSXRPatterns()
 
 
+def handle_commit_changes(spawn, context):
+    """Handle pending changes while leaving configuration mode.
+
+    During initial connection, discard pending changes so an inconsistent SDR
+    can reach exec mode without attempting a commit. Preserve the existing
+    commit behavior for normal state transitions after connection.
+    """
+    if context.get('_iosxr_initial_connection'):
+        context['_iosxr_uncommitted_changes'] = True
+        spawn.sendline('no')
+    else:
+        spawn.sendline('yes')
+
+
 def handle_failed_config(spawn, abort=True):
     spawn.read_update_buffer()
     spawn.sendline("show configuration failed")
     if abort:
         spawn.expect([patterns.config_prompt])
         spawn.sendline("abort")
+
+
+def recover_config_transaction_lock(spawn, context, state_machine, start_state, end_state, initial_output):
+    timeout = context.get('config_transaction_lock_timeout')
+    context['config_transaction_lock_output'] = initial_output
+    try:
+        try:
+            spawn.sendline('show configuration commit changes last 1')
+            config_state = state_machine.get_state(start_state)
+            result = spawn.expect([config_state.pattern], timeout=timeout)
+            context['config_transaction_lock_output'] += result.match_output
+        finally:
+            spawn.sendline('abort')
+            if start_state == 'admin_conf':
+                admin_state = state_machine.get_state('admin')
+                spawn.expect([admin_state.pattern], timeout=timeout)
+                spawn.sendline('exit')
+            end_state_pattern = state_machine.get_state(end_state).pattern
+            spawn.expect([end_state_pattern], timeout=timeout)
+    except Exception as err:
+        raise SubCommandFailure(
+            'Configuration transaction lock recovery failed:\n{}'
+            .format(context['config_transaction_lock_output']), err) from err
+    context['config_transaction_locked'] = True
 
 
 def switchover_disallowed_handler(error):

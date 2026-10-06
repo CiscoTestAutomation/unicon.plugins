@@ -9,6 +9,7 @@ import unittest
 
 import unicon
 from unicon import Connection
+from unicon.plugins.tests.mock.mock_device_iosxe import MockDeviceTcpWrapperIOSXE
 
 
 unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
@@ -19,9 +20,13 @@ class TestIosXESwitchover(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.md = MockDeviceTcpWrapperIOSXE(
+            hostname='Router', port=0,
+            state='stack_login' + ',stack_login' * 4, stack=True)
+        cls.md.start()
         cls.c = Connection(
             hostname='Router',
-            start = ['mock_device_cli --os iosxe --state stack_login --hostname Router']*5,
+            start=['telnet 127.0.0.1 {}'.format(port) for port in cls.md.ports[:]],
             os='iosxe',
             chassis_type='stack',
             username='cisco',
@@ -34,6 +39,7 @@ class TestIosXESwitchover(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.c.disconnect()
+        cls.md.stop()
 
     def test_switchover(self):
         self.c.switchover()

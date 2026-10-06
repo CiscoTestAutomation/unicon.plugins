@@ -374,12 +374,15 @@ class AbstractTokenDiscovery:
         except KeyError:
             return {"pid": pid_to_check}
         else:
-            return {
+            tokens = {
                 "os": data["os"],
                 "platform": data["platform"],
                 "model": data["model"],
                 "pid": pid_to_check,
             }
+            if data.get("submodel"):
+                tokens["submodel"] = data["submodel"]
+            return tokens
 
     def discover_tokens(self):
         """

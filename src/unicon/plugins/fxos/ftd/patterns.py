@@ -13,7 +13,7 @@ class FtdPatterns(GenericPatterns):
         self.module_console_prompt = r'^(.*?)Firepower-module\d+>\s*$'
 
         # ftd console prompt overlaps with module console, pattern match includes non-digit before prompt char (>)
-        self.ftd_console_prompt = r'^(.*?)([^\d]+)[\r\n]*>\s*$'
+        self.ftd_console_prompt = r'^(.*?)([^\d])[\r\n]*>\s*$'
         self.ftd_expert_prompt = r'^(.*?)[-\.\w]+@Firepower-module\d+:[/\w]+\s?\$\s*$'
         self.ftd_expert_root_prompt = r'^(.*?)[-\.\w]+@Firepower-module\d+:[~/\w]+\s?#\s*$'
 

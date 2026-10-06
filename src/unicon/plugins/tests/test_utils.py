@@ -80,7 +80,7 @@ devices:
             self.dev.connect(learn_tokens=True, learn_hostname=True)
             self.assertEqual(self.dev.state_machine.current_state, "enable")
             self.assertEqual(self.dev.os, "ios")
-            self.assertEqual(self.dev.version, "15")
+            self.assertEqual(self.dev.version, "15.0(20100325:222114)")
             self.assertEqual(self.dev.platform, "c7200p")
             self.assertEqual(self.dev.pid, "7206VXR")
         finally:
@@ -434,6 +434,29 @@ devices:
         tokens = discovery.lookup_tokens_using_pid("N9K-C9508")
         self.assertDictEqual(
             {"pid": "N9K-C9508", "os": "nxos", "platform": "n9k", "model": "n9500"},
+            tokens,
+        )
+
+        tokens = discovery.lookup_tokens_using_pid("C9800-CL-K9")
+        self.assertDictEqual(
+            {
+                "pid": "C9800-CL-K9",
+                "os": "iosxe",
+                "platform": "cat9k",
+                "model": "c9800",
+                "submodel": "c9800_cl",
+            },
+            tokens,
+        )
+
+        tokens = discovery.lookup_tokens_using_pid("C8300-1N1S-6T")
+        self.assertDictEqual(
+            {
+                "pid": "C8300-1N1S-6T",
+                "os": "iosxe",
+                "platform": "cat8k",
+                "model": "c8300",
+            },
             tokens,
         )
 

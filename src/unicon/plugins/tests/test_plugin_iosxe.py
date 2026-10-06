@@ -741,11 +741,11 @@ class TestIosXEPluginConnect(unittest.TestCase):
         tb = loader.load(testbed)
         device = tb.devices.EWC
         try:
-            os.environ.pop('LEARN_OS_VERSION',None)  
-            device.connect(learn_hostname=True)
-            self.assertEqual(device.version, '17.06.01.0.129467')
-            self.assertEqual(device.state_machine.current_state, 'enable')
-            os.environ['LEARN_OS_VERSION'] = 'False'
+            with patch.dict(os.environ):
+                os.environ.pop('LEARN_OS_VERSION', None)
+                device.connect(learn_hostname=True)
+                self.assertEqual(device.version, '17.06.01.0.129467')
+                self.assertEqual(device.state_machine.current_state, 'enable')
         finally:
             device.disconnect()
             md.stop()

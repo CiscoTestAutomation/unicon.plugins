@@ -62,6 +62,44 @@ class TestIosXrMoonshinePlugin(unittest.TestCase):
         finally:
             c.disconnect()
 
+    def test_connect_ha_recovers_configuration_inconsistency(self):
+        c = Connection(
+            hostname='Router',
+            start=[
+                'mock_device_cli --os iosxr '
+                '--state moonshine_enable_standby',
+                'mock_device_cli --os iosxr '
+                '--state moonshine_config_inconsistent',
+            ],
+            os='iosxr',
+            platform='moonshine',
+            credentials=dict(
+                default=dict(username='admin', password='admin'),
+            ),
+            init_exec_commands=[],
+            init_config_commands=[],
+            log_buffer=True,
+        )
+        try:
+            c.connect()
+            self.assertIs(c.active, c.b)
+            self.assertEqual(c.active.state_machine.current_state, 'enable')
+            self.assertIn(
+                'Configuration inconsistency successfully cleared.',
+                c.log_buffer,
+            )
+            for subconnection in c.subconnections:
+                self.assertNotIn(
+                    '_iosxr_initial_connection',
+                    subconnection.context,
+                )
+                self.assertNotIn(
+                    '_iosxr_uncommitted_changes',
+                    subconnection.context,
+                )
+        finally:
+            c.disconnect()
+
 
 class TestIosXrConfigPrompts(unittest.TestCase):
     """Tests for config prompt handling."""

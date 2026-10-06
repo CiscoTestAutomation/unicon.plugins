@@ -228,11 +228,32 @@ class MockDeviceStackIOSXE(MockDevice):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, device_os="iosxe", **kwargs)
 
+    def stack_exec(self, transport, cmd):
+        if cmd == 'show switch':
+            self.update_show_switch(transport)
+            output = self.mock_data['stack_enable']['commands']['show switch']
+            self._send(transport, output, self.timing)
+            return True
+        if cmd == 'show terminal':
+            output = self.get_show_terminal(transport)
+            self._send(transport, output, self.timing)
+            return True
+
     def stack_enable(self, transport, cmd):
         port = self.transport_handles[transport]
 
         if cmd == 'show switch':
             self.update_show_switch(transport)
+        if cmd == 'show terminal':
+            output = self.get_show_terminal(transport)
+            self._send(transport, output, self.timing)
+            return True
+        if cmd == 'redundancy force-switchover':
+            for details in self.transport_ports.values():
+                if details['role'] == 'Active':
+                    details['role'] = 'Standby'
+                elif details['role'] == 'Standby':
+                    details['role'] = 'Active'
         if cmd == "redundancy reload shelf":
             ports = [p for p in self.transport_ports.keys() \
                 if p != self.transport_handles[transport]]
@@ -250,6 +271,44 @@ class MockDeviceStackIOSXE(MockDevice):
                     prompt = self.get_prompt(other)
                     self._write('\n{}'.format(prompt), other)
 
+    def update_stack_details(self, port, switch_no):
+        if self._uses_extended_stack_login_topology():
+            roles = ['Member', 'Active', 'Member', 'Standby']
+        else:
+            roles = ['Active', 'Standby']
+        role = roles[switch_no] if switch_no < len(roles) else 'Member'
+        self.add_stack_switch(port, switch_no + 1, role, 'Ready')
+
+    def _uses_extended_stack_login_topology(self):
+        """Return whether the configured states use the extended fixture."""
+        return (len(self.states) >= 4 and
+                all(state == 'stack_login' for state in self.states))
+
+    @staticmethod
+    def _get_stack_mac(switch_no):
+        """Return a stable mock MAC address for a switch number."""
+        mac_addresses = {
+            1: 'bcc4.9346.7880',
+            2: 'bcc4.9346.9180',
+            3: 'bcc4.9346.7a00',
+            4: 'bcc4.9346.6780',
+            5: 'bcc4.9346.7280',
+        }
+        if switch_no in mac_addresses:
+            return mac_addresses[switch_no]
+
+        raw_mac = '02{:010x}'.format(switch_no % (1 << 40))
+        return '.'.join(
+            raw_mac[index:index + 4] for index in range(0, 12, 4))
+
+    def get_show_terminal(self, transport):
+        port = self.transport_handles[transport]
+        details = self.transport_ports[port]
+        terminal_line = (0 if details['role'] == 'Active'
+                         else max(1, details['switch_no'] - 1))
+        return 'Line {}, Location: "", Type: "Console"\n'.format(
+            terminal_line)
+
     def update_show_switch(self, transport):
         port = self.transport_handles[transport]
         switch_no = self.transport_ports[port]['switch_no']
@@ -260,13 +319,21 @@ class MockDeviceStackIOSXE(MockDevice):
                 '-------------------------------------------------------------------\n'
 
         for i in self.transport_ports.values():
-            switch_line = '{star}{num}       {role}   5897.bd36.b380     3      V01     {state}  \n'
+            switch_line = '{star}{num}       {role}   {mac}     3      V01     {state}  \n'
             if i['switch_no'] == switch_no:
                 star = '*'
             else:
                 star = ' '
-            switch_line = switch_line.format(star=star, num=i['switch_no'], role=i['role'], state=i['switch_state'])
+            switch_line = switch_line.format(
+                star=star,
+                num=i['switch_no'],
+                role=i['role'],
+                mac=self._get_stack_mac(i['switch_no']),
+                state=i['switch_state'])
             data += switch_line
+        if self._uses_extended_stack_login_topology():
+            data += (
+                ' 10      Standby  e069.ba68.5900     13     PP      Ready\n')
         self.mock_data['stack_enable']['commands']['show switch'] = data
 
 

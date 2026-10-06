@@ -233,6 +233,20 @@ cat8k_enable_reload_to_rommon:
     "reload":
       new_state: cat8k_boot_to_rommon
 
+cat8k_enable_auto_reload:
+  prompt: "switch1#"
+  commands:
+    "show version | include operating mode": ""
+    "reload":
+      new_state: cat8k_auto_reload_boot
+
+cat8k_auto_reload_boot:
+  prompt: ""
+  preface: file|mock_data/iosxe/cat9k_reload_logs.txt
+  commands:
+    "":
+      new_state: c8k_disable
+
 c8k_config:
     prompt: "%N(config)#"
     commands:

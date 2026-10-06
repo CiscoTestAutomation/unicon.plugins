@@ -1521,7 +1521,12 @@ class AttachModuleConsole(BaseService):
                                           r"(?P<escape_chars>.+?)'"],
                                           timeout=self.timeout)
             except SubCommandFailure:
-                pass
+                # The attach command itself can fail (for example on virtual
+                # N9K modules).  Do not turn that command error into several
+                # additional console-login timeouts.
+                self.conn.log.warning(
+                    'Failed to attach console module %s', self.module_num)
+                raise
             else:
                 # save the new escape chars
                 self.escape_chars = match.last_match.groupdict()['escape_chars']

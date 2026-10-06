@@ -837,6 +837,9 @@ class Configure(BaseService):
               output = rtr.configure(cmd)
     """
 
+    transaction_lock_pattern = None
+    transaction_lock_handler = None
+
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
         self.start_state = 'config'
@@ -865,6 +868,27 @@ class Configure(BaseService):
 
         self.utils = ConfigUtils()
 
+    def __call__(self, *args, **kwargs):
+        if not self.transaction_lock_pattern:
+            return super().__call__(*args, **kwargs)
+
+        # Keep context cleanup inside the connection's serialized service lifecycle. BaseService uses a reentrant lock,
+        # so retaining one level here prevents another service from observing transient lock state.
+        self.connection.acquire()
+        try:
+            return super().__call__(*args, **kwargs)
+        finally:
+            try:
+                handle = getattr(self, 'handle', None)
+                if handle is not None:
+                    for key in (
+                            'config_transaction_locked',
+                            'config_transaction_lock_output',
+                            'config_transaction_lock_timeout'):
+                        handle.context.pop(key, None)
+            finally:
+                self.connection.release()
+
     def pre_service(self, *args, **kwargs):
         sm = self.get_sm()
         self.prompt_recovery = kwargs.get('prompt_recovery', False)
@@ -879,6 +903,17 @@ class Configure(BaseService):
 
     def post_service(self, *args, **kwargs):
         pass
+
+    def check_config_lock(self, handle, timeout=None):
+        """Return the configuration lock status, or None if unsupported."""
+        return None
+
+    def _check_transaction_lock(self, handle, match_output):
+        pattern = self.transaction_lock_pattern
+        if pattern and re.search(pattern, match_output, re.IGNORECASE):
+            handle.context['config_transaction_lock_output'] = match_output
+            return True
+        return False
 
     def call_service(self,   # noqa: C901
                      command=[],
@@ -900,6 +935,9 @@ class Configure(BaseService):
         sm = self.get_sm()
         handle = self.get_handle(target)
         timeout = timeout or self.timeout
+        if self.transaction_lock_pattern:
+            handle.context.pop('config_transaction_lock_output', None)
+            handle.context['config_transaction_lock_timeout'] = timeout
 
         if allow_state_change is None:
             allow_state_change = con.settings.CONFIGURE_ALLOW_STATE_CHANGE
@@ -916,18 +954,15 @@ class Configure(BaseService):
             self.error_pattern += append_error_pattern
 
         bulk = self.bulk if bulk is None else bulk
-        bulk_chunk_lines = self.bulk_chunk_lines \
-            if bulk_chunk_lines is None else bulk_chunk_lines
-        bulk_chunk_sleep = self.bulk_chunk_sleep \
-            if bulk_chunk_sleep is None else bulk_chunk_sleep
+        bulk_chunk_lines = self.bulk_chunk_lines if bulk_chunk_lines is None else bulk_chunk_lines
+        bulk_chunk_sleep = self.bulk_chunk_sleep if bulk_chunk_sleep is None else bulk_chunk_sleep
 
         if not isinstance(reply, Dialog):
             raise SubCommandFailure('"reply" must be an instance of Dialog')
 
         def config_state_change(spawn, from_state, sm):
             last_cmd = spawn.last_sent.strip()
-            # check if the last command is not in the list of valid commands and the state is not in the list of valid states
-            # for transition
+            # Check if the last command and state are not in their respective lists of valid transition values.
             if last_cmd not in self.valid_transition_commands and from_state.name not in self.valid_transition_states:
                 invalid_state_change_action(
                     spawn, err_state=from_state, sm=sm)
@@ -942,7 +977,7 @@ class Configure(BaseService):
             dialog = self.dialog + self.service_dialog(handle=handle, service_dialog=reply)
             # Add all known states to detect state changes.
             for state in sm.states:
-                # The current state is already added by the service_dialog method
+                # The current state is already added by the service_dialog method.
                 if state.name != sm.current_state:
                         if allow_state_change:
                             dialog.append(Statement(
@@ -962,88 +997,152 @@ class Configure(BaseService):
             # Use flattened command list
             pre_lines, banner_lines, post_lines, banner_delim = self.get_banner_lines(flat_cmd_list)
 
-            # Populate context for banner_text_handler only if banner was detected
-            if banner_lines:
-                self.connection.log.info('Banner detected, configuring banners without state detection')
+            max_retries = handle.settings.CONFIG_LOCK_RETRIES
+            retry_sleep = handle.settings.CONFIG_LOCK_RETRY_SLEEP
+            lock_recovery_pending = False
+            transaction_hostname = handle.hostname
 
-                for cmd in pre_lines:
-                    handle.spawn.sendline(cmd)
-                    self.update_hostname_if_needed([cmd])
-                    self.process_dialog_on_handle(handle, dialog, timeout)
+            # Abort discards the pending changes, so retry the full transaction.
+            for retry in range(max_retries + 1):
+                self.result = ''
+                transaction_locked = False
 
-                # Send banner lines
-                for line in banner_lines:
-                    handle.spawn.sendline(line)
-                    time.sleep(0.1)
-                    handle.spawn.read_update_buffer()
+                if lock_recovery_pending:
+                    lock_present = self.check_config_lock(handle, timeout=timeout)
+                    if lock_present is None:
+                        raise SubCommandFailure(
+                            'Configuration transaction lock detected, but this plugin does not support '
+                            'lock-status checking')
+                    if lock_present:
+                        if retry == max_retries:
+                            transaction_output = handle.context.get('config_transaction_lock_output', '')
+                            raise SubCommandFailure(
+                                'Configuration lock remained active after {} retries:\n{}\n{}'.format(
+                                    max_retries, transaction_output, self.config_lock_output))
+                        self.connection.log.warning(
+                            'Configuration lock detected, waiting {} seconds. Retry attempt {}/{}'.format(
+                                retry_sleep, retry, max_retries))
+                        sleep(retry_sleep)
+                        continue
 
-                self.process_dialog_on_handle(handle, dialog, timeout)
+                    handle.state_machine.go_to(
+                        self.start_state,
+                        handle.spawn,
+                        context=handle.context,
+                        prompt_recovery=self.prompt_recovery,
+                        timeout=timeout,
+                        hop_wise=True)
+                    lock_recovery_pending = False
 
-                # Recursively handle any additional banner blocks in post_lines
-                remaining = post_lines
-                while remaining:
-                    sub_pre, sub_banner, sub_post, sub_delim = self.get_banner_lines(remaining)
-                    for cmd in sub_pre:
+                if self.transaction_lock_pattern:
+                    handle.context['config_transaction_locked'] = False
+
+                # Populate context for banner_text_handler only if banner was detected
+                if banner_lines:
+                    self.connection.log.info('Banner detected, configuring banners without state detection')
+
+                    for cmd in pre_lines:
                         handle.spawn.sendline(cmd)
                         self.update_hostname_if_needed([cmd])
                         self.process_dialog_on_handle(handle, dialog, timeout)
-                    if sub_banner:
-                        for line in sub_banner:
-                            handle.spawn.sendline(line)
-                            time.sleep(0.1)
-                            handle.spawn.read_update_buffer()
-                        self.process_dialog_on_handle(handle, dialog, timeout)
-                        remaining = sub_post
-                    else:
-                        remaining = None
 
-                if self.commit_cmd:
-                    handle.spawn.sendline(self.commit_cmd)
-                    self.process_dialog_on_handle(handle, dialog, timeout)
-
-            elif bulk:
-                indicator = handle.settings.BULK_CONFIG_END_INDICATOR
-                cmd_lst = list(chain(flat_cmd_list, [indicator]))
-                if bulk_chunk_lines == 0:
-                    chunks = [cmd_lst]
-                else:
-                    chunks = [cmd_lst[i:i + bulk_chunk_lines]
-                              for i in range(0, len(cmd_lst), bulk_chunk_lines)]
-                for idx, chunk in enumerate(chunks, 1):
-                    chunk_cmd = '\n'.join(chunk)
-                    handle.spawn.sendline(chunk_cmd)
-                    if idx != len(chunks):
-                        sleep(bulk_chunk_sleep)
+                    # Send banner lines
+                    for line in banner_lines:
+                        handle.spawn.sendline(line)
+                        time.sleep(0.1)
                         handle.spawn.read_update_buffer()
+
+                    self.process_dialog_on_handle(handle, dialog, timeout)
+
+                    # Recursively handle any additional banner blocks in post_lines
+                    remaining = post_lines
+                    while remaining:
+                        sub_pre, sub_banner, sub_post, sub_delim = self.get_banner_lines(remaining)
+                        for cmd in sub_pre:
+                            handle.spawn.sendline(cmd)
+                            self.update_hostname_if_needed([cmd])
+                            self.process_dialog_on_handle(handle, dialog, timeout)
+                        if sub_banner:
+                            for line in sub_banner:
+                                handle.spawn.sendline(line)
+                                time.sleep(0.1)
+                                handle.spawn.read_update_buffer()
+                            self.process_dialog_on_handle(handle, dialog, timeout)
+                            remaining = sub_post
+                        else:
+                            remaining = None
+
+                    if self.commit_cmd:
+                        handle.spawn.sendline(self.commit_cmd)
+                        transaction_locked = self.process_dialog_on_handle(handle, dialog, timeout)
+
+                elif bulk:
+                    indicator = handle.settings.BULK_CONFIG_END_INDICATOR
+                    cmd_lst = list(chain(flat_cmd_list, [indicator]))
+                    if bulk_chunk_lines == 0:
+                        chunks = [cmd_lst]
                     else:
-                        try:
-                            handle.spawn.expect([indicator], timeout=timeout,
-                                      trim_buffer=False)
-                            self.result, _, handle.spawn.buffer = \
-                                handle.spawn.buffer.rpartition(indicator)
-                        except Exception as err:
-                            raise SubCommandFailure('Configuration failed',
-                                                    err) from err
-                self.process_dialog_on_handle(handle, dialog, timeout)
-                if self.commit_cmd:
-                    handle.spawn.sendline(self.commit_cmd)
+                        chunks = [cmd_lst[i:i + bulk_chunk_lines] for i in range(0, len(cmd_lst), bulk_chunk_lines)]
+                    for idx, chunk in enumerate(chunks, 1):
+                        chunk_cmd = '\n'.join(chunk)
+                        handle.spawn.sendline(chunk_cmd)
+                        if idx != len(chunks):
+                            sleep(bulk_chunk_sleep)
+                            handle.spawn.read_update_buffer()
+                        else:
+                            try:
+                                handle.spawn.expect([indicator], timeout=timeout, trim_buffer=False)
+                                self.result, _, handle.spawn.buffer = handle.spawn.buffer.rpartition(indicator)
+                            except Exception as err:
+                                raise SubCommandFailure('Configuration failed', err) from err
                     self.process_dialog_on_handle(handle, dialog, timeout)
-            else:
-                cmds = chain(flat_cmd_list, [self.commit_cmd]) \
-                    if self.commit_cmd else flat_cmd_list
-                for cmd in cmds:
-                    handle.spawn.sendline(cmd)
-                    self.update_hostname_if_needed([cmd])
-                    self.process_dialog_on_handle(handle, dialog, timeout)
-                    # To handle the session
-                    if handle.context.get('config_session_locked'):
-                        self.connection.log.warning('Config locked, waiting {} seconds'.format(
-                            self.connection.settings.CONFIG_LOCK_RETRY_SLEEP))
-                        sleep(self.connection.settings.CONFIG_LOCK_RETRY_SLEEP)
-                        config_transition(handle.state_machine, handle.spawn, handle.context)
-                        handle.context['config_session_locked'] = False
+                    if self.commit_cmd:
+                        handle.spawn.sendline(self.commit_cmd)
+                        transaction_locked = self.process_dialog_on_handle(handle, dialog, timeout)
+                else:
+                    cmds = chain(flat_cmd_list, [self.commit_cmd]) if self.commit_cmd else flat_cmd_list
+                    for cmd in cmds:
                         handle.spawn.sendline(cmd)
-                        self.process_dialog_on_handle(handle, dialog, timeout)
+                        self.update_hostname_if_needed([cmd])
+                        transaction_locked = self.process_dialog_on_handle(handle, dialog, timeout)
+                        if transaction_locked:
+                            break
+                        # To handle the session
+                        if handle.context.get('config_session_locked'):
+                            settings = self.connection.settings
+                            lock_retry_sleep = settings.CONFIG_LOCK_RETRY_SLEEP
+                            self.connection.log.warning('Config locked, waiting {} seconds'.format(lock_retry_sleep))
+                            sleep(lock_retry_sleep)
+                            config_transition(handle.state_machine, handle.spawn, handle.context)
+                            handle.context['config_session_locked'] = False
+                            handle.spawn.sendline(cmd)
+                            transaction_locked = self.process_dialog_on_handle(handle, dialog, timeout)
+                            if transaction_locked:
+                                break
+
+                if transaction_locked:
+                    if self.transaction_lock_handler is None:
+                        raise SubCommandFailure(
+                            'Configuration transaction lock detected, but no transaction lock handler is configured')
+                    # update_hostname_if_needed() tracks a candidate hostname before commit. Recovery aborts that
+                    # candidate, so restore the running hostname before waiting for end_state.
+                    if handle.hostname != transaction_hostname:
+                        self.connection.hostname = transaction_hostname
+                    self.transaction_lock_handler(
+                        spawn=handle.spawn,
+                        context=handle.context,
+                        state_machine=handle.state_machine,
+                        start_state=self.start_state,
+                        end_state=self.end_state,
+                        initial_output=handle.context['config_transaction_lock_output'])
+                    handle.state_machine.detect_state(handle.spawn, context=handle.context)
+                    lock_recovery_pending = True
+                    continue
+                break
+            else:
+                raise SubCommandFailure(
+                    'Configuration transaction failed after {} lock retries:\n{}'.format(
+                        max_retries, handle.context.get('config_transaction_lock_output', '')))
 
         # store config_result so it can be returned to the user later
         config_result = self.result
@@ -1120,13 +1219,15 @@ class Configure(BaseService):
         except Exception as err:
             raise SubCommandFailure("Command execution failed", err) from err
 
+        transaction_locked = self._check_transaction_lock(handle, cmd_result.match_output)
+
         cmd_result = self.utils.truncate_trailing_prompt(
             handle.state_machine.get_state(handle.state_machine.current_state),
             cmd_result.match_output,
             hostname=handle.hostname,
             result_match=cmd_result)
         self.result += cmd_result
-        if self.result_check_per_command:
+        if self.result_check_per_command and not transaction_locked:
             try:
                 self.get_service_result()
             except SubCommandFailure:
@@ -1135,6 +1236,7 @@ class Configure(BaseService):
                                         handle.spawn,
                                         context=self.context)
                 raise
+        return transaction_locked
 
     def update_hostname_if_needed(self, cmd_list):
         for cmd in cmd_list:
@@ -2777,6 +2879,9 @@ class BashService(BaseService):
                     model=device.model,
                     pid=device.pid,
                 ))
+                submodel = getattr(device, 'submodel', None)
+                if submodel:
+                    abstract_args['submodel'] = submodel
                 return self.conn.device.parse(*args, **kwargs)
             else:
                 self.conn.log.warning('No device object, parse method unavailable')

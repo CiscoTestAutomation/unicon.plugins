@@ -16,9 +16,9 @@ class StackIosXESwitchoverPatterns(SwitchoverPatterns):
         self.press_return = r'Press RETURN to get started.*'
         self.enable_prompt = IosXEPatterns().enable_prompt
         self.disable_prompt = IosXEPatterns().disable_prompt
-        self.rommon_prompt = r'(.*)switch:\s?$'
+        self.rommon_prompt = r'^(.*)switch:\s?$'
         self.fastreload_iosxeswitch = r'^.*Proceed with fast reload\? \[confirm\]'
-        
+
 
 class StackIosXEReloadPatterns(ReloadPatterns):
     def __init__(self):

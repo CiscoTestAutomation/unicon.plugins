@@ -61,6 +61,8 @@ class IOSXRSettings(GenericSettings):
         self.REDUNDANCY_STATE_PATTERN = r'^Node \S+ is in (.*?) role'
 
         self.SHOW_CONFIG_FAILED_CMD = 'show configuration failed'
+        self.CLEAR_CONFIG_INCONSISTENCY_CMD = \
+            'clear configuration inconsistency'
         self.UNICON_BACKEND_DECODE_ERROR_LIMIT = 10
 
         # more prompt pattern is defined in plugins/iosxr/patterns.py as more_prompt

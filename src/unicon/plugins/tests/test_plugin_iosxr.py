@@ -9,9 +9,11 @@ __author__ = "Dave Wapstra <dwapstra@cisco.com>"
 
 import os
 import re
+import threading
 import unittest
 from textwrap import dedent
-from unittest.mock import patch
+from types import SimpleNamespace
+from unittest.mock import Mock, patch
 
 import unicon
 from unicon import Connection
@@ -21,6 +23,9 @@ from unicon.eal.dialogs import Dialog
 from unicon.mock.mock_device import mockdata_path
 
 from unicon.plugins.iosxr.patterns import IOSXRPatterns
+from unicon.plugins.iosxr.statements import (
+    recover_config_transaction_lock,
+)
 
 unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
 unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC = 0.2
@@ -98,6 +103,103 @@ class TestIosXrPlugin(unittest.TestCase):
                 c.connect()
             finally:
                 c.disconnect()
+
+    def test_connect_recovers_configuration_inconsistency(self):
+        c = Connection(
+            hostname='Router',
+            start=[
+                'mock_device_cli --os iosxr --state config_inconsistent'
+            ],
+            os='iosxr',
+            init_exec_commands=[],
+            init_config_commands=[],
+            log_buffer=True,
+        )
+        try:
+            c.connect()
+            self.assertEqual(c.state_machine.current_state, 'enable')
+            self.assertIn(
+                'Configuration inconsistency successfully cleared.',
+                c.log_buffer,
+            )
+        finally:
+            c.disconnect()
+
+    def test_connect_does_not_clear_other_pending_changes(self):
+        c = Connection(
+            hostname='Router',
+            start=[
+                'mock_device_cli --os iosxr --state config_pending_changes'
+            ],
+            os='iosxr',
+            init_exec_commands=[],
+            init_config_commands=[],
+            log_buffer=True,
+        )
+        try:
+            c.connect()
+            self.assertEqual(c.state_machine.current_state, 'enable')
+            self.assertNotIn(
+                'clear configuration inconsistency\r',
+                c.log_buffer,
+            )
+            self.assertNotIn('_iosxr_initial_connection', c.context)
+            self.assertNotIn('_iosxr_uncommitted_changes', c.context)
+        finally:
+            c.disconnect()
+
+    def test_connect_does_not_clear_in_essential_ops_mode(self):
+        c = Connection(
+            hostname='Router',
+            start=[
+                'mock_device_cli --os iosxr --state config_essential_ops'
+            ],
+            os='iosxr',
+            init_exec_commands=[],
+            init_config_commands=[],
+            log_buffer=True,
+        )
+        c.settings.CONFIG_LOCK_RETRY_SLEEP = 0
+        try:
+            c.connect()
+            self.assertEqual(
+                c.state_machine.current_state,
+                'enable',
+            )
+            self.assertIn('% Invalid command (essential-ops mode)', c.log_buffer)
+            self.assertNotIn(
+                'clear configuration inconsistency\r',
+                c.log_buffer,
+            )
+        finally:
+            c.disconnect()
+
+    def test_connect_recovery_uses_config_transition_handling(self):
+        c = Connection(
+            hostname='Router',
+            start=[
+                'mock_device_cli --os iosxr '
+                '--state config_inconsistent_proceed'
+            ],
+            os='iosxr',
+            init_exec_commands=[],
+            init_config_commands=[],
+            log_buffer=True,
+        )
+        c.settings.CONFIG_LOCK_RETRY_SLEEP = 0
+        try:
+            c.connect()
+            self.assertEqual(c.state_machine.current_state, 'enable')
+            self.assertIn(
+                'Would you like to proceed in configuration mode?',
+                c.log_buffer,
+            )
+            self.assertIn(
+                'Configuration inconsistency successfully cleared.',
+                c.log_buffer,
+            )
+        finally:
+            c.disconnect()
 
     def test_configure_root_system_username(self):
         c = Connection(hostname='Router',
@@ -672,6 +774,652 @@ class TestIosxrConfigCommitCommands(unittest.TestCase):
         self.ha_dev.configure(['no logging console'] * 2, force=True, bulk=True)
         self.assertEqual(self.conn.configure.commit_cmd, 'commit force')
         self.assertEqual(self.ha_dev.configure.commit_cmd, 'commit force')
+
+
+class TestIosxrConfigLockRetry(unittest.TestCase):
+
+    transaction_lock_context_keys = (
+        'config_transaction_locked',
+        'config_transaction_lock_output',
+        'config_transaction_lock_timeout',
+    )
+
+    def _assert_transaction_context_clean(self, context=None):
+        context = self.conn.context if context is None else context
+        for key in self.transaction_lock_context_keys:
+            self.assertNotIn(key, context)
+
+    def _connect(self, state='config_lock_enable'):
+        self.md = MockDeviceTcpWrapperIOSXR(port=0, state=state)
+        self.md.start()
+        self.conn = Connection(
+            hostname='Router',
+            start=['telnet 127.0.0.1 {}'.format(self.md.ports[0])],
+            os='iosxr',
+            init_exec_commands=[],
+            init_config_commands=[])
+        self.conn.connect()
+        self.conn.settings.CONFIG_LOCK_RETRY_SLEEP = 0
+
+    def _connect_ha(self, state, peer_state='console_standby'):
+        self.md = MockDeviceTcpWrapperIOSXR(
+            port=0, state='{},{}'.format(state, peer_state))
+        self.md.start()
+        self.conn = Connection(
+            hostname='Router',
+            start=['telnet 127.0.0.1 {}'.format(self.md.ports[0]),
+                   'telnet 127.0.0.1 {}'.format(self.md.ports[1])],
+            credentials={
+                'default': {
+                    'username': 'admin',
+                    'password': 'admin'}},
+            os='iosxr',
+            init_exec_commands=[],
+            init_config_commands=[])
+        self.conn.connect()
+        self.conn.settings.CONFIG_LOCK_RETRY_SLEEP = 0
+
+    def _test_config_lock_retry_commit(self, commit_command, **kwargs):
+        self._connect()
+
+        with patch.object(
+                self.conn.spawn, 'sendline',
+                wraps=self.conn.spawn.sendline) as sendline:
+            self.conn.configure(
+                'interface Loopback100', lock_retries=2, **kwargs)
+
+        sent_commands = [call.args[0] for call in sendline.call_args_list]
+        self.assertEqual(sent_commands.count(commit_command), 2)
+        self.assertEqual(sent_commands.count('abort'), 1)
+        self.assertEqual(self.conn.state_machine.current_state, 'enable')
+
+    def tearDown(self):
+        if hasattr(self, 'conn'):
+            self.conn.disconnect()
+        if hasattr(self, 'md'):
+            self.md.stop()
+
+    def test_config_lock_retries_complete_transaction(self):
+        self._connect()
+        commands = ['interface Loopback100',
+                    'description config lock test']
+
+        with patch.object(
+                self.conn.spawn, 'sendline',
+                wraps=self.conn.spawn.sendline) as sendline, \
+                patch.object(
+                    self.conn.spawn, 'expect',
+                    wraps=self.conn.spawn.expect) as expect:
+            output = self.conn.configure(
+                commands, lock_retries=2, timeout=7)
+
+        sent_commands = [call.args[0] for call in sendline.call_args_list]
+        for command in commands:
+            self.assertEqual(sent_commands.count(command), 2)
+        self.assertEqual(sent_commands.count('commit'), 2)
+        self.assertEqual(sent_commands.count('abort'), 1)
+        self.assertEqual(
+            sent_commands.count('show configuration commit changes last 1'),
+            1)
+        self.assertEqual(sent_commands.count('show configuration lock'), 2)
+        self.assertNotIn('Failed to commit', output)
+        self.assertIn('description config lock test', output)
+        self.assertEqual(self.conn.state_machine.current_state, 'enable')
+        self._assert_transaction_context_clean()
+        expect_calls = [
+            (call.args[0], call.kwargs.get('timeout'))
+            for call in expect.call_args_list]
+        iosxr_patterns = IOSXRPatterns()
+        self.assertIn(([iosxr_patterns.config_prompt], 7), expect_calls)
+        self.assertIn(([
+            iosxr_patterns.enable_prompt.replace('%N', 'Router')], 7),
+            expect_calls)
+
+        self.conn.configure('interface Loopback100')
+        self._assert_transaction_context_clean()
+
+    def test_config_lock_retry_restores_aborted_hostname(self):
+        self._connect()
+
+        with patch.object(
+                self.conn.spawn, 'sendline',
+                wraps=self.conn.spawn.sendline) as sendline:
+            self.conn.configure('hostname R2', lock_retries=2)
+
+        sent_commands = [call.args[0] for call in sendline.call_args_list]
+        self.assertEqual(sent_commands.count('hostname R2'), 2)
+        self.assertEqual(sent_commands.count('commit'), 2)
+        self.assertEqual(sent_commands.count('abort'), 1)
+        self.assertEqual(self.conn.hostname, 'R2')
+        self.assertEqual(self.conn.state_machine.current_state, 'enable')
+        self._assert_transaction_context_clean()
+
+    def test_transaction_context_is_cleaned_before_lock_release(self):
+        self._connect()
+        service = self.conn.configure
+        original_handler = service.transaction_lock_handler
+        handler_done = threading.Event()
+        release_handler = threading.Event()
+        observer_started = threading.Event()
+        observer_done = threading.Event()
+        configure_errors = []
+        observed_context = {}
+
+        def blocking_handler(**kwargs):
+            original_handler(**kwargs)
+            handler_done.set()
+            if not release_handler.wait(10):
+                raise RuntimeError('test timed out waiting to release handler')
+
+        def run_configure():
+            try:
+                self.conn.configure(
+                    'interface Loopback100', lock_retries=2)
+            except Exception as error:
+                configure_errors.append(error)
+
+        def observe_context_after_acquire():
+            observer_started.set()
+            self.conn.acquire()
+            try:
+                observed_context.update(self.conn.context)
+            finally:
+                self.conn.release()
+                observer_done.set()
+
+        with patch.object(
+                service, 'transaction_lock_handler', blocking_handler):
+            configure_thread = threading.Thread(target=run_configure)
+            observer_thread = threading.Thread(
+                target=observe_context_after_acquire)
+            configure_thread.start()
+            try:
+                self.assertTrue(handler_done.wait(10))
+                observer_thread.start()
+                self.assertTrue(observer_started.wait(10))
+                self.assertFalse(observer_done.wait(0.2))
+            finally:
+                release_handler.set()
+                configure_thread.join(20)
+                if observer_thread.ident is not None:
+                    observer_thread.join(20)
+
+        self.assertFalse(configure_thread.is_alive())
+        self.assertFalse(observer_thread.is_alive())
+        self.assertFalse(configure_errors)
+        self._assert_transaction_context_clean(observed_context)
+
+    def test_transaction_context_cleanup_on_handler_exception(self):
+        self._connect()
+        service = self.conn.configure
+
+        def failing_handler(**kwargs):
+            context = kwargs['context']
+            context['config_transaction_locked'] = True
+            context['config_transaction_lock_output'] += 'diagnostic output'
+            raise RuntimeError('synthetic recovery failure')
+
+        with patch.object(
+                service, 'transaction_lock_handler', failing_handler):
+            with self.assertRaisesRegex(
+                    RuntimeError, 'synthetic recovery failure'):
+                self.conn.configure(
+                    'interface Loopback100', lock_retries=2)
+
+        self._assert_transaction_context_clean()
+        self.assertTrue(self.conn.acquire(block=False))
+        self.conn.release()
+
+    def test_config_lock_pattern(self):
+        pattern = IOSXRPatterns().config_lock
+        locked_output = dedent('''\
+            Tue Jun 28 11:22:10.449 UTC
+            Session Write Lock
+            00000212-00245489-00000000
+        ''')
+        write_locked_output = dedent('''\
+            Thu Sep  3 12:15:23.540 UTC
+            Session Locks
+            Write Lock
+            00002000-00001b8c-00000000
+        ''')
+        reserve_locked_output = dedent('''\
+            Thu Sep  3 12:15:25.593 UTC
+            Session Locks
+            Reserve lock
+            00002000-00001b8c-00000000
+        ''')
+        session_rebase_locked_output = dedent('''\
+            Thu Sep 10 04:28:33.549 UTC
+            Session Rebase Lock
+        ''')
+        rebase_lock_identifier_output = dedent('''\
+            Thu Sep 10 04:28:33.549 UTC
+            lock_subtree/rebase_lock
+        ''')
+        unlocked_output = dedent('''\
+            Tue Jun 28 11:22:10.449 UTC
+            Configuration database is available
+        ''')
+
+        self.assertIsNotNone(re.search(pattern, locked_output, re.M))
+        self.assertIsNotNone(re.search(
+            pattern, write_locked_output, re.M))
+        self.assertIsNotNone(re.search(
+            pattern, reserve_locked_output, re.M))
+        self.assertIsNotNone(re.search(
+            pattern, session_rebase_locked_output, re.M))
+        self.assertIsNotNone(re.search(
+            pattern, rebase_lock_identifier_output, re.M))
+        self.assertIsNone(re.search(pattern, unlocked_output, re.M))
+
+    def test_config_transaction_lock_pattern(self):
+        patterns = IOSXRPatterns()
+        locked_output = dedent('''\
+            % Failed to commit .. Another configuration session
+            had a lock on the running configuration.
+            RP/0/RP0/CPU0:Router(config-if)#
+        ''')
+        sysadmin_locked_output = dedent('''\
+            Failed to commit one or more configuration items
+            Another configuration session had a lock on the running
+            configuration
+            sysadmin-vm:0_RP0(config-system)#
+        ''')
+        admin_locked_output = dedent('''\
+            Failed to commit one or more configuration items
+            Another configuration session had a lock on the running
+            configuration
+            RP/0/RP0/CPU0:Router(admin-config)#
+        ''')
+        unrelated_failure = dedent('''\
+            Failed to commit one or more configuration items
+            The configuration contains semantic errors
+            RP/0/RP0/CPU0:Router(config)#
+        ''')
+        unrelated_session_failure = dedent('''\
+            Failed to commit one or more configuration items
+            Another configuration session modified the candidate configuration
+            RP/0/RP0/CPU0:Router(config)#
+        ''')
+        lock_text_without_commit_failure = dedent('''\
+            Another configuration session had a lock on the running
+            configuration
+            RP/0/RP0/CPU0:Router(config)#
+        ''')
+
+        pattern = patterns.config_transaction_lock_message
+        self.assertIsNotNone(re.search(pattern, locked_output, re.I))
+        self.assertIsNotNone(re.search(
+            pattern, sysadmin_locked_output, re.I))
+        self.assertIsNotNone(re.search(
+            pattern, admin_locked_output, re.I))
+        self.assertIsNone(re.search(pattern, unrelated_failure, re.I))
+        self.assertIsNone(re.search(
+            pattern, unrelated_session_failure, re.I))
+        self.assertIsNone(re.search(
+            pattern, lock_text_without_commit_failure, re.I))
+
+    def test_config_lock_cleanup_failure_is_actionable(self):
+        locked_output = dedent('''\
+            % Failed to commit .. Another configuration session
+            had a lock on the running configuration.
+            RP/0/RP0/CPU0:Router(config)#''')
+        diagnostic_output = dedent('''\
+            Configuration changes for commit 1000000007
+            RP/0/RP0/CPU0:Router(config)#''')
+        context = {'config_transaction_lock_timeout': 7}
+        spawn = Mock()
+        state_machine = Mock()
+        states = {
+            'config': SimpleNamespace(
+                pattern=IOSXRPatterns().config_prompt),
+            'enable': SimpleNamespace(
+                pattern=IOSXRPatterns().enable_prompt),
+        }
+        state_machine.get_state.side_effect = states.__getitem__
+        spawn.expect.side_effect = [
+            SimpleNamespace(match_output=diagnostic_output),
+            RuntimeError('enable prompt not reached'),
+        ]
+
+        with self.assertRaisesRegex(
+                SubCommandFailure,
+                'Configuration transaction lock recovery failed'):
+            recover_config_transaction_lock(
+                spawn=spawn,
+                context=context,
+                state_machine=state_machine,
+                start_state='config',
+                end_state='enable',
+                initial_output=locked_output)
+
+        self.assertIn(
+            'Configuration changes for commit 1000000007',
+            context['config_transaction_lock_output'])
+        self.assertNotIn('config_transaction_locked', context)
+        self.assertEqual(
+            [call.args[0] for call in spawn.sendline.call_args_list],
+            ['show configuration commit changes last 1', 'abort'])
+
+    def test_config_lock_recovery_without_admin_state(self):
+        locked_output = dedent('''\
+            % Failed to commit .. Another configuration session
+            had a lock on the running configuration.
+            RP/0/RP0/CPU0:Router(config)#''')
+        diagnostic_output = dedent('''\
+            Configuration changes for commit 1000000008
+            RP/0/RP0/CPU0:Router(config)#''')
+        context = {'config_transaction_lock_timeout': 7}
+        spawn = Mock()
+        spawn.expect.side_effect = [
+            SimpleNamespace(match_output=diagnostic_output),
+            SimpleNamespace(match_output='RP/0/RP0/CPU0:Router#'),
+        ]
+        state_machine = Mock()
+        states = {
+            'config': SimpleNamespace(
+                pattern=IOSXRPatterns().config_prompt),
+            'enable': SimpleNamespace(
+                pattern=IOSXRPatterns().enable_prompt),
+        }
+        state_machine.get_state.side_effect = states.__getitem__
+
+        recover_config_transaction_lock(
+            spawn=spawn,
+            context=context,
+            state_machine=state_machine,
+            start_state='config',
+            end_state='enable',
+            initial_output=locked_output)
+
+        self.assertTrue(context['config_transaction_locked'])
+        self.assertIn(
+            'Configuration changes for commit 1000000008',
+            context['config_transaction_lock_output'])
+        self.assertEqual(
+            [call.args[0]
+             for call in state_machine.get_state.call_args_list],
+            ['config', 'enable'])
+        self.assertEqual(
+            [call.args[0] for call in spawn.sendline.call_args_list],
+            ['show configuration commit changes last 1', 'abort'])
+
+    def test_transaction_lock_detection_precedes_error_validation(self):
+        self._connect()
+        match_output = dedent('''\
+            commit
+            % Failed to commit .. Another configuration session
+            had a lock on the running configuration.
+            RP/0/RP0/CPU0:Router(config)#''')
+        dialog = Mock()
+        dialog.process.return_value = SimpleNamespace(
+            match_output=match_output)
+        service = self.conn.configure
+        service.result = ''
+        service.prompt_recovery = False
+        service.result_check_per_command = True
+        service.error_pattern = [r'%\s+Failed to commit']
+
+        transaction_locked = service.process_dialog_on_handle(
+            self.conn, dialog, timeout=7)
+
+        self.assertTrue(transaction_locked)
+        self.assertEqual(
+            self.conn.context['config_transaction_lock_output'],
+            match_output)
+
+    def test_config_lock_retries_bulk_transaction(self):
+        self._connect()
+        commands = ['interface Loopback100',
+                    'description config lock test']
+        bulk_command = '\n'.join(
+            commands + [self.conn.settings.BULK_CONFIG_END_INDICATOR])
+
+        with patch.object(
+                self.conn.spawn, 'sendline',
+                wraps=self.conn.spawn.sendline) as sendline:
+            self.conn.configure(commands, bulk=True, lock_retries=2)
+
+        sent_commands = [call.args[0] for call in sendline.call_args_list]
+        self.assertEqual(sent_commands.count(bulk_command), 2)
+        self.assertEqual(sent_commands.count('commit'), 2)
+        self.assertEqual(self.conn.state_machine.current_state, 'enable')
+
+    def test_config_lock_retries_banner_transaction(self):
+        self._connect()
+        commands = ['banner motd ^', 'config lock test', '^']
+
+        with patch.object(
+                self.conn.spawn, 'sendline',
+                wraps=self.conn.spawn.sendline) as sendline:
+            self.conn.configure(commands, lock_retries=2)
+
+        sent_commands = [call.args[0] for call in sendline.call_args_list]
+        for command in commands:
+            self.assertEqual(sent_commands.count(command), 2)
+        self.assertEqual(sent_commands.count('commit'), 2)
+        self.assertEqual(self.conn.state_machine.current_state, 'enable')
+
+    def test_config_lock_retries_exclusive_transaction(self):
+        self._connect()
+
+        with patch.object(
+                self.conn.spawn, 'sendline',
+                wraps=self.conn.spawn.sendline) as sendline:
+            self.conn.configure_exclusive(
+                'interface Loopback100', lock_retries=2)
+
+        sent_commands = [call.args[0] for call in sendline.call_args_list]
+        self.assertEqual(sent_commands.count('configure exclusive'), 2)
+        self.assertNotIn('configure terminal', sent_commands)
+        self.assertEqual(sent_commands.count('interface Loopback100'), 2)
+        self.assertEqual(sent_commands.count('commit'), 2)
+        self.assertEqual(sent_commands.count('abort'), 1)
+        self.assertEqual(self.conn.state_machine.current_state, 'enable')
+        self._assert_transaction_context_clean()
+
+    def test_config_lock_retries_commit_force(self):
+        self._test_config_lock_retry_commit('commit force', force=True)
+
+    def test_config_lock_retries_commit_replace(self):
+        self._test_config_lock_retry_commit('commit replace', replace=True)
+
+    def test_config_lock_retries_commit_best_effort(self):
+        self._test_config_lock_retry_commit(
+            'commit best-effort', best_effort=True)
+
+    def test_config_lock_retry_exhaustion_reports_details(self):
+        self._connect('config_lock_persistent_enable')
+
+        with patch.object(
+                self.conn.spawn, 'sendline',
+                wraps=self.conn.spawn.sendline) as sendline:
+            with self.assertRaisesRegex(
+                    SubCommandFailure,
+                    '00000212-00245489-00000000') as error:
+                self.conn.configure(
+                    'interface Loopback100', lock_retries=1)
+
+        self.assertIn(
+            'Configuration changes for commit 1000000002',
+            str(error.exception))
+        sent_commands = [call.args[0] for call in sendline.call_args_list]
+        self.assertEqual(sent_commands.count('commit'), 1)
+        self.assertEqual(sent_commands.count('abort'), 1)
+        self.assertFalse(any(
+            command.startswith('clear configuration lock')
+            for command in sent_commands))
+        self.assertEqual(self.conn.state_machine.current_state, 'enable')
+        self._assert_transaction_context_clean()
+
+    def test_config_lock_retry_exhaustion_after_repeated_race(self):
+        self._connect('config_lock_repeated_enable')
+
+        with patch.object(
+                self.conn.spawn, 'sendline',
+                wraps=self.conn.spawn.sendline) as sendline:
+            with self.assertRaisesRegex(
+                    SubCommandFailure,
+                    'Configuration transaction failed after 1 lock retries'):
+                self.conn.configure(
+                    'interface Loopback100', lock_retries=1)
+
+        sent_commands = [call.args[0] for call in sendline.call_args_list]
+        self.assertEqual(sent_commands.count('commit'), 2)
+        self.assertEqual(sent_commands.count('abort'), 2)
+        self.assertEqual(sent_commands.count('show configuration lock'), 1)
+        self.assertEqual(self.conn.state_machine.current_state, 'enable')
+
+    def test_config_lock_retry_zero(self):
+        self._connect('config_lock_repeated_enable')
+
+        with patch.object(
+                self.conn.spawn, 'sendline',
+                wraps=self.conn.spawn.sendline) as sendline:
+            with self.assertRaisesRegex(
+                    SubCommandFailure,
+                    'Configuration transaction failed after 0 lock retries'):
+                self.conn.configure(
+                    'interface Loopback100', lock_retries=0)
+
+        sent_commands = [call.args[0] for call in sendline.call_args_list]
+        self.assertEqual(sent_commands.count('commit'), 1)
+        self.assertEqual(sent_commands.count('abort'), 1)
+        self.assertNotIn('show configuration lock', sent_commands)
+        self.assertEqual(self.conn.state_machine.current_state, 'enable')
+
+    def test_admin_config_lock_retries_complete_transaction(self):
+        self._connect('admin_config_lock_enable')
+
+        with patch.object(
+                self.conn.spawn, 'sendline',
+                wraps=self.conn.spawn.sendline) as sendline:
+            self.conn.admin_configure(
+                'show configuration', lock_retries=2)
+
+        sent_commands = [call.args[0] for call in sendline.call_args_list]
+        self.assertEqual(sent_commands.count('show configuration'), 2)
+        self.assertEqual(sent_commands.count('commit'), 2)
+        self.assertEqual(sent_commands.count('abort'), 1)
+        self.assertEqual(self.conn.state_machine.current_state, 'enable')
+        self._assert_transaction_context_clean()
+
+    def test_ha_config_lock_retries_active_transaction(self):
+        self._connect_ha('config_lock_enable')
+        commands = ['interface Loopback100',
+                    'description config lock test']
+
+        with patch.object(
+                self.conn.active.spawn, 'sendline',
+                wraps=self.conn.active.spawn.sendline) as sendline:
+            self.conn.configure(
+                commands,
+                target='active', lock_retries=2)
+
+        sent_commands = [call.args[0] for call in sendline.call_args_list]
+        for command in commands:
+            self.assertEqual(sent_commands.count(command), 2)
+        self.assertEqual(sent_commands.count('commit'), 2)
+        self.assertEqual(sent_commands.count('abort'), 1)
+        self.assertEqual(
+            self.conn.active.state_machine.current_state, 'enable')
+        self._assert_transaction_context_clean(self.conn.active.context)
+
+    def test_ha_config_lock_retries_standby_transaction(self):
+        # When neither peer reports standby_locked, IOS XR designates the
+        # second peer active and the first peer standby.  This leaves the
+        # transaction-lock mock reachable through target='standby'.
+        self._connect_ha('config_lock_enable', peer_state='enable')
+        commands = ['interface Loopback100',
+                    'description config lock test']
+
+        with patch.object(
+                self.conn.standby.spawn, 'sendline',
+                wraps=self.conn.standby.spawn.sendline) as standby_sendline, \
+                patch.object(
+                    self.conn.active.spawn, 'sendline',
+                    wraps=self.conn.active.spawn.sendline) as active_sendline:
+            self.conn.configure(
+                commands,
+                target='standby', lock_retries=2)
+
+        sent_commands = [
+            call.args[0] for call in standby_sendline.call_args_list]
+        self.assertEqual(sent_commands, [
+            'configure terminal',
+            *commands,
+            'commit',
+            'show configuration commit changes last 1',
+            'abort',
+            'show configuration lock',
+            'show configuration lock',
+            'configure terminal',
+            *commands,
+            'commit',
+            'end',
+        ])
+        self.assertFalse(active_sendline.called)
+        self.assertEqual(
+            self.conn.standby.state_machine.current_state, 'enable')
+        self._assert_transaction_context_clean(self.conn.standby.context)
+        self._assert_transaction_context_clean(self.conn.active.context)
+
+    def test_ha_admin_config_lock_retries_active_transaction(self):
+        self._connect_ha('admin_config_lock_enable')
+
+        with patch.object(
+                self.conn.active.spawn, 'sendline',
+                wraps=self.conn.active.spawn.sendline) as sendline:
+            self.conn.admin_configure(
+                'show configuration', target='active', lock_retries=2)
+
+        sent_commands = [call.args[0] for call in sendline.call_args_list]
+        self.assertEqual(sent_commands.count('show configuration'), 2)
+        self.assertEqual(sent_commands.count('commit'), 2)
+        self.assertEqual(sent_commands.count('abort'), 1)
+        self.assertEqual(
+            self.conn.active.state_machine.current_state, 'enable')
+        self._assert_transaction_context_clean(self.conn.active.context)
+
+    def test_ha_admin_config_lock_retries_standby_transaction(self):
+        # Keep the transaction-lock mock on the handle selected as standby.
+        self._connect_ha('admin_config_lock_enable', peer_state='enable')
+
+        with patch.object(
+                self.conn.standby.spawn, 'sendline',
+                wraps=self.conn.standby.spawn.sendline) as standby_sendline, \
+                patch.object(
+                    self.conn.active.spawn, 'sendline',
+                    wraps=self.conn.active.spawn.sendline) as active_sendline:
+            self.conn.admin_configure(
+                'show configuration', target='standby', lock_retries=2)
+
+        sent_commands = [
+            call.args[0] for call in standby_sendline.call_args_list]
+        self.assertEqual(sent_commands, [
+            'admin',
+            'config',
+            'show configuration',
+            'commit',
+            'show configuration commit changes last 1',
+            'abort',
+            'exit',
+            'show configuration lock',
+            'show configuration lock',
+            'admin',
+            'config',
+            'show configuration',
+            'commit',
+            'exit',
+            'exit',
+        ])
+        self.assertFalse(active_sendline.called)
+        self.assertEqual(
+            self.conn.standby.state_machine.current_state, 'enable')
+        self._assert_transaction_context_clean(self.conn.standby.context)
+        self._assert_transaction_context_clean(self.conn.active.context)
+
 
 class TestIosxrConfigure(unittest.TestCase):
 

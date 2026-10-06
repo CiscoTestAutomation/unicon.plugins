@@ -26,8 +26,23 @@ class IOSXRPatterns(GenericPatterns):
         self.password_prompt = r'^.*[Pp]assword:\s?$'
         self.secret_password_prompt = r'^.*Enter secret(\sagain)?:\s?$'
         self.commit_changes_prompt = r'Uncommitted changes found, commit them.*$'
+        self.configuration_inconsistency_message = (
+            r"^(?:This SDR's running configuration is inconsistent with "
+            r"persistent configuration\.|No configuration commits for this "
+            r"SDR will be allowed until a 'clear configuration inconsistency' "
+            r"command is performed\.)\s*$"
+        )
+        self.essential_ops_message = (
+            r'^%\s*Invalid command\s*\(essential-ops mode\)\s*$'
+        )
         self.logout_prompt = r'^.*Press RETURN to get started\..*'
         self.commit_replace_prompt = r'Do you wish to proceed?.*$'
+        self.config_lock = (
+            r'^\s*(?:Session (?:Write|Rebase) Lock|Write Lock|Reserve lock|lock_subtree/rebase_lock)\s*$')
+        self.config_transaction_lock_message = (
+            r'Failed\s+to\s+commit[\s\S]*?'
+            r'Another\s+configuration\s+session\s+'
+            r'had\s+a\s+lock\s+on\s+the\s+running\s+configuration')
         self.admin_prompt = r'^(.*?)(?:sysadmin-vm:0_(.*)\s?#\s?$|RP/\S+\(admin\)\s?#\s?)$'
         self.admin_conf_prompt = r'^(.*?)(?:sysadmin-vm:0_(.*)\(config.*\)\s?#\s?|RP/\S+\(admin-config(\S+)?\)\s?#\s?)$'
         self.admin_run_prompt = r'^(.*?)(?:\[sysadmin-vm:0_.*:([\s\S]+)?\]\s?\$\s?|[\r\n]+\s?#\s?)$'

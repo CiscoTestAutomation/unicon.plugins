@@ -1086,13 +1086,21 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
                        platform='cat9k',
                        credentials=dict(default=dict(username='admin', password='cisco')),
                        settings=dict(POST_DISCONNECT_WAIT_SEC=0, GRACEFUL_DISCONNECT_WAIT_SEC=0.2),
+                       mit=True,
                        log_buffer=True
                        )
-        d.connect()
-        d.settings.CONFIG_LOCK_RETRY_SLEEP = 1
-        d.configure(["no boot system",
-                     "no boot system"])
-        d.disconnect()
+        try:
+            d.connect()
+            d.settings.CONFIG_LOCK_RETRY_SLEEP = 1
+            with mock.patch.object(
+                    d.spawn, 'sendline', wraps=d.spawn.sendline) as sendline:
+                d.configure(["no logging console", "no boot system"])
+            sent_commands = [call.args[0]
+                             for call in sendline.call_args_list]
+            self.assertEqual(sent_commands.count('no logging console'), 1)
+            self.assertEqual(sent_commands.count('no boot system'), 2)
+        finally:
+            d.disconnect()
 
     def test_quick_reload(self):
         md = MockDeviceTcpWrapperIOSXE(port=0, state='c9k_enable')

@@ -35,6 +35,46 @@ moonshine_enable_standby:
       Node 0/1/CPU0 is in STANDBY role
 
 
+moonshine_config_inconsistent:
+  prompt: "RP/0/0/CPU0:%N(config)#"
+  commands:
+    "end":
+      response: "Uncommitted changes found, commit them before exiting(yes/no/cancel)? [cancel]:"
+      new_state: moonshine_config_inconsistent_uncommitted
+
+moonshine_config_inconsistent_uncommitted:
+  prompt: ""
+  commands:
+    "no":
+      new_state: moonshine_enable_inconsistent
+    "yes":
+      response: |2
+        This SDR's running configuration is inconsistent with persistent configuration.
+        No configuration commits for this SDR will be allowed until a 'clear configuration inconsistency' command is performed.
+      new_state: moonshine_config_inconsistent
+
+moonshine_enable_inconsistent:
+  prompt: "RP/0/0/CPU0:%N#"
+  commands:
+    <<: *enable_cmds
+    "configure terminal":
+      response: |2
+        This SDR's running configuration is inconsistent with persistent configuration.
+        No configuration commits for this SDR will be allowed until a 'clear configuration inconsistency' command is performed.
+      new_state: moonshine_config_inconsistent_probe
+    "clear configuration inconsistency":
+      response: "Configuration inconsistency successfully cleared."
+      new_state: moonshine_enable
+    "show redundancy | inc ^Node": |
+      Node 0/0/CPU0 is in ACTIVE role
+
+moonshine_config_inconsistent_probe:
+  prompt: "RP/0/0/CPU0:%N(config)#"
+  commands:
+    "end":
+      new_state: moonshine_enable_inconsistent
+
+
 moonshine_config:
   prompt: "RP/0/0/CPU0:%N(config)#"
   commands:

@@ -600,6 +600,20 @@ check_enable_passwd:
       response: "Invalid password."
       new_state: console_test_enable
 
+console_test_enable_bad_secret:
+  preface: *CC
+  prompt: "%N> "
+  commands:
+    "enable":
+      new_state: check_enable_bad_secret
+
+check_enable_bad_secret:
+  prompt: "Password: "
+  commands:
+    "wrong_enable":
+      response: "% Bad secrets"
+      new_state: console_test_enable_bad_secret
+
 ts_login:
   prompt: "login: "
   commands:

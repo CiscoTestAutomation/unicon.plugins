@@ -4,18 +4,28 @@ from unicon.plugins.generic.connection_provider import GenericDualRpConnectionPr
 
 class AireosDualRpConnectionProvider(GenericDualRpConnectionProvider):
 
-
-    def connect(self):
+    def connect(self, connection_dialog=None, skip_initialization=False):
         """ Connects, initializes and designates handle
+
+        Args:
+            connection_dialog (Dialog, optional): Replacement dialog for
+                initial state detection. When omitted, the normal provider
+                dialog is used.
+            skip_initialization (bool): Stop after initial state detection.
         """
         con = self.connection
 
         con.log.info('+++ connection to %s +++' % str(self.connection.a.spawn))
         con.log.info('+++ connection to %s +++' % str(self.connection.b.spawn))
-        self.establish_connection()
+        establish_kwargs = {}
+        if connection_dialog is not None:
+            establish_kwargs['connection_dialog'] = connection_dialog
+        if skip_initialization:
+            establish_kwargs['skip_initialization'] = True
+        self.establish_connection(**establish_kwargs)
 
         # Maintain initial state
-        if not con.mit:
+        if not con.mit and not skip_initialization:
 
             con.log.info('+++ designating handles +++')
             self.designate_handles()

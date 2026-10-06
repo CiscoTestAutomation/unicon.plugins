@@ -8,8 +8,6 @@ Uses the mock_device_cli script to test.
 import re
 import unittest
 
-from pyats.topology import loader
-
 from unicon.core.errors import SubCommandFailure
 from unicon import Connection
 
@@ -36,6 +34,32 @@ class TestSDWANPlugin(unittest.TestCase):
         c.connect()
         c.execute('')
         self.assertEqual(c.spawn.match.match_output.split()[-1], 'vedge#')
+
+    def test_connect_and_configure_with_learned_vsmart_hostname(self):
+        c = Connection(hostname='vsmart',
+                       start=['mock_device_cli --os sdwan --state vsmart_exec'],
+                       os='sdwan',
+                       platform='viptela',
+                       credentials={
+                           'default': {
+                               'username': 'admin',
+                               'password': 'admin',
+                           },
+                       },
+                       settings={
+                           'GRACEFUL_DISCONNECT_WAIT_SEC': 0,
+                           'POST_DISCONNECT_WAIT_SEC': 0,
+                       },
+                       learn_hostname=True)
+
+        try:
+            c.connect()
+            self.assertEqual(c.hostname, 'vm9')
+            c.configure('policy')
+            self.assertEqual(c.state_machine.current_state, 'cisco_exec')
+        finally:
+            if c.connected:
+                c.disconnect()
 
     def test_connect_reboot(self):
         c = Connection(hostname='vedge',
