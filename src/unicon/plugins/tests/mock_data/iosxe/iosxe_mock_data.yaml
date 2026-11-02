@@ -1,4 +1,34 @@
 
+incomplete_command:
+  preface: |
+    s^@
+
+    % Type "show ?" for a list of subcommands
+  prompt: "Switch#how wireless running-con"
+  keys:
+    ctrl-a:
+      new_state: escape_command
+
+escape_command:
+  prompt: "Switch#how wireless running-con"
+  keys:
+    ctrl-k:
+      new_state: wireless_command_cleared
+
+wireless_command_cleared:
+  prompt: "%N#"
+  commands:
+    "show wireless client incomplete":
+      response: |
+        Number of Clients: 1
+
+        MAC Address    AP Name    Type ID   State   Protocol   Method   Role
+        -----------------------------------------------------------------
+        84a9.3869.0001 test-0001  WLAN 1    Run     11ax(5)    Dot1x    Local
+
+        Number of Excluded Clients: 0
+      new_state: general_enable
+
 general_login:
   prompt: "Username: "
   commands:
@@ -10,6 +40,35 @@ general_password:
   commands:
     "cisco":
       new_state: general_exec
+
+press_return_then_login:
+  preface:
+    response: |
+      Press RETURN to get started!
+      User Access Verification
+    # Without the retry, this delayed login prompt arrives while
+    # wait_and_enter() is settling.
+    timing:
+      - 0:1,0
+      - 1:,0.1
+  prompt: "Username: "
+  commands:
+    "cisco":
+      new_state: general_password
+    "":
+      response: "BLANK RETURN RECEIVED AT USERNAME"
+      new_state: press_return_login_desynchronized
+
+press_return_login_desynchronized:
+  prompt: ""
+  commands: {}
+
+press_return_only:
+  preface: "Press RETURN to get started!"
+  prompt: ""
+  commands:
+    "":
+      new_state: general_enable
 
 general_exec:
   prompt: "%N>"
@@ -91,6 +150,10 @@ enable_password:
 general_enable:
   prompt: "%N#"
   commands: &gen_enable_cmds
+    "show wireless client incomplete":
+      new_state: incomplete_command
+    "s^@":
+      new_state: incomplete_command
     "start maintenance":
       new_state: general_maintence_mode_confirm
     "term length 0": ""
@@ -857,6 +920,22 @@ enable_with_msgs2:
       new_state: enable_msg
     "config term":
       new_state: config_with_msgs2
+
+# Absorb the Telnet transport's initial newline before exposing the retained
+# prompt-plus-PnP sequence to the IOS XE connection state machine.
+pnp_timeout_after_prompt:
+  prompt: ""
+  commands:
+    "":
+      new_state: pnp_timeout_visible
+
+pnp_timeout_visible:
+  prompt: |
+    (unlicensed)Router#
+    PnP HTTP timed out (5/10) on connection to PnP server (http://devicehelper-ng.cisco.com.:80/pnp/HELLO)
+  commands:
+    "":
+      new_state: general_enable
 
 enable_msg:
   preface: |

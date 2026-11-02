@@ -1271,6 +1271,84 @@ c9k_console_available:
       new_state: c9k_login7_device
 
 # ================================
+# Login sequence where the terminal-server post credential action lands
+# directly on an already-authenticated enable prompt.
+
+c9k_login9:
+  prompt: "Password: "
+  commands:
+    "ts_line_pass_9":
+      response: |
+
+        Password OK
+
+      new_state: c9k_password9_ok
+
+c9k_password9_ok:
+  prompt: ""
+  commands:
+    "":
+      new_state: enable_c9k_relogin9
+
+enable_c9k_relogin9:
+  prompt: "%N#"
+  commands:
+    "term length 0": ""
+    "term width 0": ""
+    "show version | include operating mode": ""
+    "show install summary": ""
+    "show version": |2
+      Cisco IOS XE Software, Version 16.09.02
+      Cisco IOS Software [Fuji], Catalyst L3 Switch Software (c9k_IOSXE), Version 16.9.2, RELEASE SOFTWARE (fc4)
+    "config term":
+      new_state: c9k_config_relogin9
+    "exit":
+      new_state: c9k_console_available9
+
+c9k_config_relogin9:
+  prompt: "%N(config)#"
+  commands:
+    "no logging console": ""
+    "line console 0":
+      new_state: c9k_config_line_relogin9
+    "end":
+      new_state: enable_c9k_relogin9
+
+c9k_config_line_relogin9:
+  prompt: "%N(config-line)#"
+  commands:
+    "exec-timeout 0": ""
+    "line vty 0 4": ""
+    "exit":
+      new_state: c9k_config_relogin9
+    "end":
+      new_state: enable_c9k_relogin9
+
+c9k_console_available9:
+  prompt: |
+    ENG-RTP-POOL-C8500-12X4QC-10 con0 is now available
+
+
+
+
+    Press RETURN to get started.
+  commands:
+    "":
+      new_state: c9k_login9_device
+
+c9k_login9_device:
+  prompt: "Username: "
+  commands:
+    "device_user_9":
+      new_state: c9k_password9_device
+
+c9k_password9_device:
+  prompt: "Password: "
+  commands:
+    "device_pass_9":
+      new_state: enable_c9k_relogin9
+
+# ================================
 # Login sequence for login_creds with fallback testing
 c9k_login8:
   prompt: "Username: "

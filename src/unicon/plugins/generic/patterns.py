@@ -56,7 +56,18 @@ class GenericPatterns(UniconCorePatterns):
 
         self.passphrase_prompt = r'^.*Enter passphrase for key .*?:\s*?'
 
-        self.learn_os_prompt = r'^(.*?(?<!config)(?<!conf)([>\$~%]|[^#\s]#|~ #|~/|^admin:|^#)\s?(\x1b\S+)?)$'
+        # Keep the legacy loose match for prompt markers attached to the prompt
+        # text. When a space precedes '$' or '#', require a prompt-shaped body
+        # so arbitrary output such as a generated config line ending in '$'
+        # does not end OS learning early. Horizontal whitespace is intentional:
+        # a newline must not act as the separator before a prompt marker.
+        self.learn_os_prompt = (
+            r'^(?:'
+            r'(?:[\w.@:/()+~-]+|\[[^\]\r\n]+\])[ \t]+\$|'
+            r'(?:[\w.@:/()+~-]+(?:[ \t]+~)?|\[[^\]\r\n]+\])[ \t]+#|'
+            r'.*?(?<!config)(?<!conf)(?:[>~%]|(?<!\s)\$|[^#\s]#|~ #|~/|^admin:|^#)'
+            r')\s?(\x1b\S+)?$'
+        )
 
         self.sudo_password_prompt = r'^.*(\[sudo\] password for .*?:|This is your UNIX password:)\s*$'
 
@@ -77,9 +88,14 @@ class GenericPatterns(UniconCorePatterns):
         # Configure the master key by using the following command: "key config-key password-encrypt <encryption-key>
         # Applying config on Switch 3...[DONE]
         # UNIX ERR:tcgetattr:Inappropriate ioctl for device
+        self.pnp_http_timeout_pattern = (
+            r"PnP HTTP timed out(?: \(\d+/\d+\))? on connection to "
+            r"PnP server \(\S+\)"
+        )
         self.syslog_message_pattern = (
             r"^.*?(%\w+(-\S+)?-\d+-\w+|"
             r"yang-infra:|PKI_SSL_IPC:|Guestshell destroyed successfully|"
+            r"^" + self.pnp_http_timeout_pattern + r"|"
             r"%Error opening tftp:\/\/255\.255\.255\.255|Autoinstall trying|"
             r"audit: kauditd hold queue overflow|SECURITY WARNING|%RSA key|INSECURE DYNAMIC WARNING|"
             r"key config-key password-encrypt|"

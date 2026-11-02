@@ -5,7 +5,9 @@ from unicon.eal.dialogs import Dialog
 from unicon.plugins.nxos.service_implementation import Reload, \
     HANxosReloadService, AttachModuleConsole
 
-from .service_statements import loader
+from .service_statements import (
+    admin_password_setup_stmt, loader, secure_password_setup_stmt,
+    setup_syslog_stmt)
 from unicon.core.errors import SubCommandFailure, TimeoutError
 
 class Nxos9kReload(Reload):
@@ -52,7 +54,9 @@ class Nxos9kReload(Reload):
         try:
             super().call_service(
                 reload_command=reload_command,
-                dialog=Dialog([loader]) + dialog,
+                dialog=Dialog([loader]) + dialog + Dialog([
+                    secure_password_setup_stmt, admin_password_setup_stmt,
+                    setup_syslog_stmt]),
                 timeout=timeout,
                 return_output=return_output,
                 config_lock_retries=config_lock_retries,
@@ -112,7 +116,9 @@ class HANxos9kReloadService(HANxosReloadService):
         try:
             super().call_service(
                 reload_command=reload_command,
-                dialog=Dialog([loader]) + dialog,
+                dialog=Dialog([loader]) + dialog + Dialog([
+                    secure_password_setup_stmt, admin_password_setup_stmt,
+                    setup_syslog_stmt]),
                 target=target,
                 timeout=timeout,
                 return_output=return_output,

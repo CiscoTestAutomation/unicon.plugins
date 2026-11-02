@@ -26,6 +26,7 @@ from unicon.plugins.utils import (
     _get_creds_to_try,
     common_cred_username_handler,
     common_cred_password_handler,
+    select_next_credential,
 )
 
 from unicon.utils import to_plaintext
@@ -84,54 +85,94 @@ def buffer_wait(spawn, wait_time):
         current_time = datetime.now()
 
 
-def buffer_settled(spawn, wait_time):
-    """Wait up to wait_time for the buffer to settle.
+def buffer_settled(spawn, wait_time, max_wait_time=None):
+    """Wait for the buffer to settle.
 
     Args:
         wait_time (float): wait time in seconds
+        max_wait_time (float): optional overall settling deadline in seconds
     Returns:
         True/False
 
-    If the buffer is growing, return False immediately,
-    if the buffer did not grow during wait_time,
-    return True.
+    Without max_wait_time, return False immediately when the buffer grows.
+    With max_wait_time, reset the quiet interval after each new chunk and
+    continue until the buffer remains unchanged for wait_time or the overall
+    deadline expires.
     """
-    wait_time = timedelta(seconds=wait_time)
+    quiet_time = timedelta(seconds=wait_time)
     start_time = current_time = datetime.now()
     prev_buf_len = len(spawn.buffer)
-    while (current_time - start_time) < wait_time:
+
+    if max_wait_time is None:
+        while (current_time - start_time) < quiet_time:
+            spawn.read_update_buffer()
+            cur_buf_len = len(spawn.buffer)
+
+            if cur_buf_len > prev_buf_len:
+                return False
+
+            current_time = datetime.now()
+        return True
+
+    deadline = start_time + timedelta(
+        seconds=max(wait_time, max_wait_time)
+    )
+    quiet_start = start_time
+    while current_time < deadline:
         spawn.read_update_buffer()
+        current_time = datetime.now()
         cur_buf_len = len(spawn.buffer)
 
         if cur_buf_len > prev_buf_len:
-            return False
+            prev_buf_len = cur_buf_len
+            quiet_start = current_time
+        elif (current_time - quiet_start) >= quiet_time:
+            return True
 
-        current_time = datetime.now()
-    return True
+    return False
 
 
-def syslog_wait_send_return(spawn, session):
+def syslog_wait_send_return(spawn, session, wait_time=None):
     """Handle syslog messages observed in the buffer.
 
-    If a syslog messsage was seen, this handler is executed.
-    Read the buffer, if its growing, return.
-
-    If the buffer is not growing, read updates up to SYSLOG_WAIT
-    and check if in that period the buffer stayed the same.
-    If so, the last message was a syslog message and we want
-    to send a return to get back the prompt. A return is sent
-    and the length of the buffer is stored, another return
-    is sent only if the buffer size changed the next time
-    this handler is called (i.e. another syslog message was received).
+    PnP HTTP-timeout output can arrive after the prompt with no subsequent
+    callback, so settle it immediately across asynchronous chunks, bounded by
+    SYSLOG_SETTLE_TIMEOUT. Preserve the existing deferred behavior for other
+    syslog matches because their dialogs may need to process intervening
+    output themselves. By default, wait_time uses the connection's SYSLOG_WAIT
+    setting.
     """
+    if wait_time is None:
+        wait_time = spawn.settings.SYSLOG_WAIT
+
+    match = getattr(spawn, 'match', None)
+    match_output = getattr(match, 'match_output', '')
+    pnp_http_timeout = isinstance(match_output, str) and re.search(
+        r'^' + pat.pnp_http_timeout_pattern + r'\s*$',
+        match_output,
+        flags=re.M,
+    )
     buffer_len = session.get('buffer_len', 0)
-    if len(spawn.buffer) == buffer_len:
+
+    if pnp_http_timeout:
+        if len(spawn.buffer) != buffer_len:
+            session['syslog_sent_cr'] = False
+
+        if not session.get('syslog_sent_cr', False):
+            if buffer_settled(
+                    spawn,
+                    wait_time,
+                    max_wait_time=spawn.settings.SYSLOG_SETTLE_TIMEOUT):
+                spawn.sendline()
+                session['syslog_sent_cr'] = True
+    elif len(spawn.buffer) == buffer_len:
         if not session.get('syslog_sent_cr', False) and \
-                buffer_settled(spawn, spawn.settings.SYSLOG_WAIT):
+                buffer_settled(spawn, wait_time):
             spawn.sendline()
             session['syslog_sent_cr'] = True
     else:
         session['syslog_sent_cr'] = False
+
     session['buffer_len'] = len(spawn.buffer)
 
 
@@ -446,6 +487,15 @@ def password_handler(spawn, context, session):
         spawn.log.info("Sending return after credential '{}'".format(credential))
         spawn.sendline()
 
+    # Advance after every completed cred_list item. A terminal-server login
+    # may land directly at the device prompt without requesting the next
+    # credential, but that next credential must still be retained for relogin.
+    if credential:
+        next_credential = select_next_credential(
+            context=context, session=session, credential=credential)
+        if next_credential:
+            context['previous_credential'] = next_credential
+
 
 def passphrase_handler(spawn, context, session):
     """ Handles SSH passphrase prompt """
@@ -643,10 +693,14 @@ class GenericStatements():
                                           matched_retries=1,
                                           matched_retry_sleep=1)
 
+        # Recheck for authentication prompts that can arrive immediately
+        # after the press-return banner before sending Return.
         self.press_return_stmt = Statement(pattern=pat.press_return,
                                            action=wait_and_enter, args=None,
                                            loop_continue=True,
-                                           continue_timer=False)
+                                           continue_timer=False,
+                                           matched_retries=1,
+                                           matched_retry_sleep=1)
         self.connection_refused_stmt = \
             Statement(pattern=pat.connection_refused,
                       action=connection_refused_handler,

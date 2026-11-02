@@ -28,6 +28,11 @@ class IosXEPatterns(GenericPatterns):
             r'^(?!.*?grub)(?!.*<\S+>\s*$)(.*?)(\(unlicensed\))?(wlc|WLC|[Rr]outer|RouterRP|Switch|ios|switch|(?!["\'<])%N)([0-9])?(\(recovery-mode\))?(\(rp-rec-mode\))?(\(standby\))?(-stby)?(-standby)?(\(boot\))?(?<! -)>\s?$'
         self.enable_prompt = \
             r'^(.*?)(\(unlicensed\))?(wlc|WLC|eWLC|[Rr]outer|RouterRP|Switch|ios|switch|%N)([a-zA-Z0-9-]*)(\(recovery-mode\))?(\(rp-rec-mode\))?(\(standby\))?(-stby)?(-standby)?(\(boot\))?#[\s\x07]*$'
+        self.enable_prompt_incomplete_command = (
+            r'(?:\x00|\^@)[\r\n]+.*?'
+            + self.enable_prompt[6:-1]
+            + r'\w+[\w\s-]+$'
+        )
         self.maintenance_mode_prompt = \
             r'^(.*?)(\(unlicensed\))?(wlc|WLC|Router|RouterRP|Switch|ios|switch|%N)([0-9])?(\(standby\))?(-stby)?(-standby)?(\(boot\))?\(maint-mode\)#[\s\x07]*$'
         self.press_enter = ReloadPatterns().press_enter

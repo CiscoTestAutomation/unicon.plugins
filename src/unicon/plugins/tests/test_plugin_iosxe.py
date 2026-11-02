@@ -11,6 +11,7 @@ import re
 import os 
 import time
 import unittest
+from contextlib import contextmanager
 from types import SimpleNamespace
 from unittest.mock import patch, Mock, MagicMock
 from pyats.topology import loader
@@ -21,6 +22,9 @@ from unicon.plugins.generic.statements import (
     generic_statements,
     terminal_position_handler,
 )
+from unicon.plugins.generic.service_implementation import (
+    Reload as GenericReload,
+)
 from unicon import Connection
 from unicon.eal.dialogs import Dialog, Statement
 from unicon.eal.utils import ExpectMatch, MatchMode
@@ -30,7 +34,14 @@ from unicon.core.errors import (
     SubCommandFailure,
     UniconAuthenticationError,
 )
+from unicon.plugins.iosxe.ie3k.settings import IosXEIe3kSettings
+from unicon.plugins.iosxe.ie9k.settings import IosXEIe9kSettings
+from unicon.plugins.iosxe.service_implementation import Reload as IosXEReload
 from unicon.plugins.iosxe.patterns import IosXEPatterns
+from unicon.plugins.iosxe.service_statements import (
+    command_echo_corruption_stmt,
+    command_echo_statement_list,
+)
 from unicon.plugins.iosxe.sdwan.statemachine import (
     SDWANDualRpStateMachine,
     SDWANSingleRpStateMachine,
@@ -50,6 +61,61 @@ from unicon.plugins.tests.mock.mock_device_iosxe import (
 
 unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC = 0
 unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC = 0.2
+
+
+class TestIosXEPatterns(unittest.TestCase):
+
+    def test_enable_prompt_incomplete_command_pattern(self):
+        patterns = IosXEPatterns()
+        expected = (
+            r'(?:\x00|\^@)[\r\n]+.*?'
+            + patterns.enable_prompt[6:-1]
+            + r'\w+[\w\s-]+$'
+        )
+        self.assertEqual(patterns.enable_prompt_incomplete_command, expected)
+        self.assertTrue(patterns.enable_prompt.startswith(r'^(.*?)'))
+        self.assertTrue(patterns.enable_prompt.endswith('$'))
+
+        # Dialog processes multiline console output with DOTALL enabled.
+        pattern = re.compile(expected, re.DOTALL)
+        for marker in ('^@', '\x00'):
+            with self.subTest(marker=repr(marker)):
+                wireless = (
+                    's' + marker + '\r\n'
+                    '% Type "show ?" for a list of subcommands\r\n'
+                    'Switch#how wireless cl'
+                )
+                self.assertRegex(wireless, pattern)
+                hyphenated = wireless.replace(
+                    'Switch#how wireless cl',
+                    'Switch#how wireless running-con')
+                self.assertRegex(hyphenated, pattern)
+                self.assertRegex(wireless.replace(
+                    'Switch#how wireless cl', 'Switch#how running-con'),
+                    pattern)
+                self.assertNotRegex(hyphenated.replace(
+                    'Switch#', 'Switch(config)#'), pattern)
+                self.assertNotRegex(
+                    wireless.replace('Switch#', 'Switch(config)#'), pattern)
+                self.assertNotRegex(
+                    wireless.replace('Switch#', 'Switch>'), pattern)
+                self.assertNotRegex(
+                    wireless.replace('Switch#', 'arbitrary-output#'), pattern)
+
+    def test_incomplete_command_requires_marker_and_pending_input(self):
+        pattern = re.compile(
+            IosXEPatterns().enable_prompt_incomplete_command, re.DOTALL)
+        self.assertNotRegex('s\r\nSwitch#how wireless cl', pattern)
+        self.assertNotRegex('s^@\r\nSwitch#', pattern)
+        self.assertNotRegex('s^@\r\nSwitch#\r\n', pattern)
+
+    def test_incomplete_command_statement_uses_iosxe_pattern(self):
+        self.assertEqual(
+            command_echo_corruption_stmt.pattern,
+            IosXEPatterns().enable_prompt_incomplete_command)
+        self.assertFalse(command_echo_corruption_stmt.loop_continue)
+        self.assertEqual(
+            command_echo_statement_list, [command_echo_corruption_stmt])
 
 
 class TestIosXEStatements(unittest.TestCase):
@@ -205,6 +271,38 @@ class TestIosXEStatements(unittest.TestCase):
         )
         self.assertEqual(context['boot_prompt_count'], 2)
 
+    @patch('unicon.plugins.iosxe.statements._find_boot_images')
+    def test_boot_image_skips_emergency_discovery_without_complete_settings(
+        self, find_boot_images
+    ):
+        settings_without_emergency_discovery = (
+            {},
+            {'EMERGENCY_FILESYSTEMS': []},
+            {'EMERGENCY_FILESYSTEMS': ['emgy:']},
+        )
+        for emergency_settings in settings_without_emergency_discovery:
+            with self.subTest(emergency_settings=emergency_settings):
+                spawn = Mock()
+                spawn.settings = SimpleNamespace(
+                    MAX_BOOT_ATTEMPTS=5,
+                    FIND_BOOT_IMAGE=True,
+                    BOOT_FILESYSTEM=['flash:'],
+                    BOOT_FILE_REGEX=r'(\S+\.bin)',
+                    **emergency_settings,
+                )
+                find_boot_images.reset_mock()
+                find_boot_images.return_value = ['flash:image.bin']
+
+                boot_image(spawn, {}, {})
+
+                find_boot_images.assert_called_once_with(
+                    spawn,
+                    ['flash:'],
+                    r'(\S+\.bin)',
+                )
+                spawn.sendline.assert_called_once_with(
+                    'boot flash:image.bin')
+
     def test_boot_image_uses_cached_filesystem_images_fifo_order(self):
         spawn = Mock()
         spawn.settings = SimpleNamespace(
@@ -234,6 +332,49 @@ class TestIosXEStatements(unittest.TestCase):
         spawn.sendline.assert_called_once_with('boot bootflash:cat9k_prod.bin')
         self.assertEqual(context['filesystem_images'], ['flash:emergency.bin'])
         self.assertEqual(context['boot_prompt_count'], 3)
+
+    def test_boot_image_does_not_rebuild_an_exhausted_queue(self):
+        spawn = Mock()
+        spawn.settings = SimpleNamespace(
+            MAX_BOOT_ATTEMPTS=5,
+            FIND_BOOT_IMAGE=True,
+            BOOT_FILESYSTEM=['bootflash:'],
+            BOOT_FILE_REGEX=r'(\S+\.bin)',
+        )
+        spawn.expect.return_value = Mock(
+            match_output='bootflash: fallback.bin')
+        context = {}
+
+        boot_image(spawn, context, {})
+        boot_image(spawn, context, {})
+
+        spawn.expect.assert_called_once()
+        self.assertEqual(
+            spawn.sendline.call_args_list,
+            [
+                unittest.mock.call('dir bootflash:'),
+                unittest.mock.call('boot bootflash:fallback.bin'),
+                unittest.mock.call('boot'),
+            ],
+        )
+
+    def test_boot_image_honors_max_boot_attempts(self):
+        spawn = Mock()
+        spawn.settings = SimpleNamespace(
+            MAX_BOOT_ATTEMPTS=3,
+            FIND_BOOT_IMAGE=False,
+        )
+        context = {}
+
+        for _ in range(3):
+            boot_image(spawn, context, {})
+        with self.assertRaisesRegex(Exception, 'Too many failed boot attempts'):
+            boot_image(spawn, context, {})
+
+        self.assertEqual(
+            spawn.sendline.call_args_list,
+            [unittest.mock.call('boot')] * 3,
+        )
 
     def test_boot_image_orders_images_with_boot_file_regex_list(self):
         spawn = Mock()
@@ -394,6 +535,256 @@ class TestIosXEStatements(unittest.TestCase):
             unittest.mock.ANY, timeout=120
         )
 
+    def test_boot_image_prioritizes_emergency_filesystems(self):
+        spawn = Mock()
+        spawn.settings = SimpleNamespace(
+            MAX_BOOT_ATTEMPTS=5,
+            FIND_BOOT_IMAGE=True,
+            EMERGENCY_FILESYSTEMS=['emgy:', 'emgy0:'],
+            EMERGENCY_IMAGE_PATTERN=r'(\d+)\s+(\S+\.bin)',
+            BOOT_FILESYSTEM=['flash:', 'sdflash:'],
+            BOOT_FILE_REGEX=[
+                r'(\S+\.SSA\.bin)',
+                r'(\S+\.SPA\.bin)',
+                r'(\S+\.bin)',
+            ],
+        )
+        spawn.expect.side_effect = [
+            Mock(match_output='emgy: 1234 emergency.bin'),
+            Mock(match_output='emgy0: 2345 alternate.SPA.bin'),
+            Mock(match_output='flash: flash.SPA.bin flash.SSA.bin'),
+            Mock(match_output='sdflash: sdflash.SSA.bin fallback.bin'),
+        ]
+
+        context = {'recovery_images': ['flash:golden_image.bin']}
+        boot_image(spawn, context, {})
+
+        self.assertEqual(
+            spawn.sendline.call_args_list,
+            [
+                unittest.mock.call('dir emgy:'),
+                unittest.mock.call('dir emgy0:'),
+                unittest.mock.call('dir flash:'),
+                unittest.mock.call('dir sdflash:'),
+                unittest.mock.call('boot emgy:emergency.bin'),
+            ],
+        )
+        self.assertEqual(
+            context['filesystem_images'],
+            [
+                'emgy0:alternate.SPA.bin',
+                'flash:golden_image.bin',
+                'flash:flash.SSA.bin',
+                'sdflash:sdflash.SSA.bin',
+                'flash:flash.SPA.bin',
+                'sdflash:fallback.bin',
+            ],
+        )
+
+    def test_boot_image_prioritizes_recovery_before_normal_filesystems(self):
+        spawn = Mock()
+        spawn.settings = SimpleNamespace(
+            MAX_BOOT_ATTEMPTS=5,
+            FIND_BOOT_IMAGE=True,
+            BOOT_FILESYSTEM=['flash:', 'sdflash:'],
+            BOOT_FILE_REGEX=[
+                r'(\S+\.SSA\.bin)',
+                r'(\S+\.SPA\.bin)',
+                r'(\S+\.bin)',
+            ],
+        )
+        spawn.expect.side_effect = [
+            Mock(match_output='flash: fallback.SPA.bin'),
+            Mock(match_output=(
+                'sdflash: preferred.SSA.bin golden_image.bin')),
+        ]
+        context = {
+            'recovery_images': ['sdflash:golden_image.bin'],
+        }
+
+        boot_image(spawn, context, {})
+
+        spawn.sendline.assert_called_with(
+            'boot sdflash:golden_image.bin')
+        self.assertEqual(
+            context['filesystem_images'],
+            ['sdflash:preferred.SSA.bin', 'flash:fallback.SPA.bin'],
+        )
+
+    def test_boot_image_uses_recovery_when_discovery_is_disabled(self):
+        spawn = Mock()
+        spawn.settings = SimpleNamespace(
+            MAX_BOOT_ATTEMPTS=3,
+            FIND_BOOT_IMAGE=False,
+        )
+        context = {'recovery_images': 'bootflash:golden_image.bin'}
+
+        boot_image(spawn, context, {})
+
+        spawn.expect.assert_not_called()
+        spawn.sendline.assert_called_once_with(
+            'boot bootflash:golden_image.bin')
+
+    def test_boot_image_normalizes_mapping_recovery_image(self):
+        spawn = Mock()
+        spawn.settings = SimpleNamespace(
+            MAX_BOOT_ATTEMPTS=3,
+            FIND_BOOT_IMAGE=False,
+        )
+        context = {
+            'recovery_images': {
+                'system': 'flash:golden_image.bin',
+            },
+        }
+
+        boot_image(spawn, context, {})
+
+        spawn.expect.assert_not_called()
+        spawn.sendline.assert_called_once_with(
+            'boot flash:golden_image.bin')
+
+    def test_reload_publishes_and_cleans_recovery_image_context(self):
+        service = object.__new__(IosXEReload)
+        service.context = {}
+        service.connection = SimpleNamespace(
+            settings=SimpleNamespace(USE_RECOVERY_IMAGE_ON_RELOAD=True),
+            device=SimpleNamespace(clean={
+                'device_recovery': {
+                    'golden_image': ['bootflash:golden_image.bin'],
+                },
+            }),
+        )
+        service.get_sm = Mock(
+            return_value=SimpleNamespace(current_state='enable'))
+        captured_context = {}
+
+        def fail_reload(*args, **kwargs):
+            captured_context.update(service.context)
+            raise RuntimeError('reload failed')
+
+        with patch.object(
+                GenericReload, 'call_service', side_effect=fail_reload):
+            with self.assertRaisesRegex(RuntimeError, 'reload failed'):
+                service.call_service()
+
+        self.assertEqual(
+            captured_context['recovery_images'],
+            ['bootflash:golden_image.bin'],
+        )
+        for context_key in (
+            'image_to_boot',
+            'grub_boot_image',
+            'recovery_images',
+            'filesystem_images',
+            'boot_image_queue_initialized',
+            'boot_prompt_count',
+        ):
+            self.assertNotIn(context_key, service.context)
+
+    def test_reload_recovery_image_is_disabled_for_other_platforms(self):
+        service = object.__new__(IosXEReload)
+        service.context = {}
+        service.connection = SimpleNamespace(
+            settings=SimpleNamespace(),
+            device=SimpleNamespace(clean={
+                'device_recovery': {
+                    'golden_image': ['bootflash:golden_image.bin'],
+                },
+            }),
+        )
+        service.get_sm = Mock(
+            return_value=SimpleNamespace(current_state='enable'))
+        captured_context = {}
+
+        def fail_reload(*args, **kwargs):
+            captured_context.update(service.context)
+            raise RuntimeError('reload failed')
+
+        with patch.object(
+                GenericReload, 'call_service', side_effect=fail_reload):
+            with self.assertRaisesRegex(RuntimeError, 'reload failed'):
+                service.call_service()
+
+        self.assertEqual(captured_context['recovery_images'], [])
+
+    def test_reload_cleans_explicit_boot_command_context(self):
+        service = object.__new__(IosXEReload)
+        service.context = {}
+        service.connection = SimpleNamespace(
+            settings=SimpleNamespace(USE_RECOVERY_IMAGE_ON_RELOAD=True),
+            device=SimpleNamespace(clean={}),
+        )
+        service.get_sm = Mock(
+            return_value=SimpleNamespace(current_state='rommon'))
+        captured_contexts = []
+
+        def capture_reload_context(*args, **kwargs):
+            captured_contexts.append(service.context.copy())
+
+        with patch.object(
+                GenericReload, 'call_service',
+                side_effect=capture_reload_context):
+            service.call_service(
+                reload_command='boot flash:explicit.bin')
+            service.call_service()
+
+        self.assertEqual(
+            captured_contexts[0]['boot_cmd'],
+            'boot flash:explicit.bin',
+        )
+        self.assertNotIn('boot_cmd', captured_contexts[1])
+        self.assertNotIn('boot_cmd', service.context)
+
+    def test_boot_image_falls_back_when_no_emergency_image_is_found(self):
+        spawn = Mock()
+        spawn.settings = SimpleNamespace(
+            MAX_BOOT_ATTEMPTS=5,
+            FIND_BOOT_IMAGE=True,
+            EMERGENCY_FILESYSTEMS=['emgy:', 'emgy0:'],
+            EMERGENCY_IMAGE_PATTERN=r'(\d+)\s+(\S+\.bin)',
+            BOOT_FILESYSTEM=['flash:', 'sdflash:'],
+            BOOT_FILE_REGEX=[
+                r'(\S+\.SSA\.bin)',
+                r'(\S+\.SPA\.bin)',
+                r'(\S+\.bin)',
+            ],
+        )
+        spawn.expect.side_effect = [
+            Mock(match_output='emgy: unknown filesystem'),
+            Mock(match_output='emgy0: directory is empty'),
+            Mock(match_output='flash: fallback.SPA.bin'),
+            Mock(match_output='sdflash: preferred.SSA.bin'),
+        ]
+
+        context = {}
+        boot_image(spawn, context, {})
+
+        spawn.sendline.assert_called_with('boot sdflash:preferred.SSA.bin')
+        self.assertEqual(
+            context['filesystem_images'],
+            ['flash:fallback.SPA.bin'],
+        )
+
+    def test_ie_settings_define_emergency_and_ranked_boot_images(self):
+        for settings in (IosXEIe3kSettings(), IosXEIe9kSettings()):
+            with self.subTest(settings=type(settings).__name__):
+                self.assertEqual(
+                    settings.EMERGENCY_FILESYSTEMS,
+                    ['emgy:', 'emgy0:'],
+                )
+                self.assertEqual(
+                    settings.EMERGENCY_IMAGE_PATTERN,
+                    r'(\d+)\s+(\S+\.bin)',
+                )
+                self.assertEqual(
+                    settings.BOOT_FILE_REGEX,
+                    [
+                        r'(\S+\.SSA\.bin)',
+                        r'(\S+\.SPA\.bin)',
+                        r'(\S+\.bin)',
+                    ],
+                )
+
 
 class TestIosXEStateMachine(unittest.TestCase):
 
@@ -545,6 +936,55 @@ class TestIosXEPluginConnect(unittest.TestCase):
             self.assertEqual(c.spawn.match.match_output, 'end\r\nRouter#')
         finally:
             c.disconnect()
+
+    def test_press_return_rechecks_for_login_prompt(self):
+        c = Connection(
+            hostname='Router',
+            start=['mock_device_cli --os iosxe '
+                   '--state press_return_then_login --hostname Router'],
+            os='iosxe',
+            platform='cat8k',
+            credentials=dict(
+                default=dict(username='cisco', password='cisco')),
+            connection_timeout=5,
+            log_buffer=True,
+            mit=True,
+        )
+        try:
+            c.connect()
+            self.assertEqual(c.state_machine.current_state, 'enable')
+            self.assertNotIn(
+                'BLANK RETURN RECEIVED AT USERNAME', c.log_buffer)
+            self.assertLess(
+                c.log_buffer.index('Username: cisco'),
+                c.log_buffer.index('Password: cisco'),
+            )
+        finally:
+            c.disconnect()
+
+    def test_press_return_without_login_still_sends_return(self):
+        c = Connection(
+            hostname='Router',
+            start=['mock_device_cli --os iosxe '
+                   '--state press_return_only --hostname Router'],
+            os='iosxe',
+            credentials=dict(
+                default=dict(username='cisco', password='cisco')),
+            connection_timeout=5,
+            log_buffer=True,
+            mit=True,
+        )
+        try:
+            c.connect()
+            self.assertEqual(c.state_machine.current_state, 'enable')
+        finally:
+            c.disconnect()
+
+    def test_press_return_matched_retry_is_bounded(self):
+        self.assertEqual(
+            generic_statements.press_return_stmt.matched_retries, 1)
+        self.assertEqual(
+            generic_statements.press_return_stmt.matched_retry_sleep, 1)
 
     def test_general_login_connect_syslog(self):
         c = Connection(hostname='Router',
@@ -772,6 +1212,39 @@ class TestIosXEPluginConnect(unittest.TestCase):
         finally:
             c.disconnect()
 
+    def test_connect_recovers_from_pnp_timeout_after_prompt(self):
+        md = MockDeviceTcpWrapperIOSXE(
+            port=0,
+            state='pnp_timeout_after_prompt',
+            mock_data_dir=os.path.join(
+                os.path.dirname(__file__), 'mock_data', 'iosxe'
+            ),
+        )
+        md.start()
+
+        c = Connection(
+            hostname='Router',
+            start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
+            os='iosxe',
+            platform='sdwan',
+            mit=True,
+            log_buffer=True,
+            connection_timeout=3,
+            settings=dict(
+                POST_DISCONNECT_WAIT_SEC=0,
+                GRACEFUL_DISCONNECT_WAIT_SEC=0.2,
+                SYSLOG_WAIT=0,
+            ),
+        )
+        try:
+            c.connect()
+            self.assertEqual(c.state_machine.current_state, 'enable')
+            self.assertIn('PnP HTTP timed out', c.log_buffer)
+        finally:
+            c.disconnect()
+            md.stop()
+
+
 class TestIosXEPluginExecute(unittest.TestCase):
 
     @classmethod
@@ -817,6 +1290,228 @@ class TestIosXEPluginExecute(unittest.TestCase):
         finally:
             c.disconnect()
             md.stop()
+
+
+class TestIosXECommandEchoRecoveryIntegration(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        # TERM=dumb uses line input and does not interpret editing keys.
+        terminal = patch.dict(os.environ, {'TERM': 'vt100'})
+        terminal.start()
+        cls.addClassCleanup(terminal.stop)
+        cls.device = Connection(
+            hostname='Router',
+            start=[
+                'mock_device_cli --os iosxe --state general_enable '
+                '--hostname Router'
+            ],
+            os='iosxe',
+            credentials={
+                'default': {
+                    'username': 'cisco',
+                    'password': 'cisco',
+                },
+            },
+            mit=True,
+            log_buffer=True,
+        )
+        cls.device.connect()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.device.disconnect()
+
+    @contextmanager
+    def inject_corrupt_echo_once(self, target_command):
+        """Inject a rendered NUL once per target command on the PTY."""
+        original_sendline = self.device.spawn.sendline
+        calls = []
+        targets = ([target_command] if isinstance(target_command, str)
+                   else target_command)
+        injected = set()
+
+        def sendline(command=None):
+            calls.append(command)
+            if command in targets and command not in injected:
+                injected.add(command)
+                self.device.spawn.send(command[:1])
+                self.device.spawn.send('^@')
+                return self.device.spawn.send(
+                    '{}\r'.format(command[1:])
+                )
+            return original_sendline(command)
+
+        self.device.spawn.sendline = sendline
+        try:
+            yield calls
+        finally:
+            self.device.spawn.sendline = original_sendline
+
+    def test_terminal_recovery_and_single_retry(self):
+        command = 'show clock'
+        log_start = len(self.device.log_buffer)
+
+        with patch.object(
+                self.device.spawn, 'send',
+                wraps=self.device.spawn.send) as send:
+            with self.inject_corrupt_echo_once(command) as calls:
+                output = self.device.execute(command, timeout=5)
+
+        output_log = self.device.log_buffer[log_start:]
+        self.assertIn('UTC', output)
+        self.assertEqual(calls, [command, command])
+        self.assertIn('s^@how clock', output_log)
+        self.assertIn("% Invalid command 's^@how clock'", output_log)
+        self.assertEqual(
+            output_log.count('Command echo corruption detected'),
+            1,
+        )
+        self.assertEqual(
+            [args.args[0] for args in send.call_args_list
+             if args.args[0] in ('\x01', '\x0b')],
+            ['\x01', '\x0b'],
+        )
+
+    def test_terminal_retry_failure_is_not_retried(self):
+        command = 'show command-echo failure'
+        log_start = len(self.device.log_buffer)
+
+        with self.inject_corrupt_echo_once(command) as calls:
+            with self.assertRaises(SubCommandFailure):
+                self.device.execute(command, timeout=5)
+
+        output_log = self.device.log_buffer[log_start:]
+        self.assertEqual(calls, [command, command])
+        self.assertIn('s^@how command-echo failure', output_log)
+        self.assertIn(
+            "% Invalid command 'show command-echo failure'",
+            output_log,
+        )
+        self.assertEqual(
+            output_log.count('Command echo corruption detected'),
+            1,
+        )
+
+    def test_configure_terminal_recovery_and_single_retry(self):
+        command = 'no logging console'
+        log_start = len(self.device.log_buffer)
+        with patch.object(
+                self.device.spawn, 'send',
+                wraps=self.device.spawn.send) as send:
+            with self.inject_corrupt_echo_once(command) as calls:
+                output = self.device.configure(command, timeout=5, bulk=False)
+        self.assertEqual(calls.count(command), 2)
+        self.assertIn(command, output)
+        self.assertIn('n^@o logging console',
+                      self.device.log_buffer[log_start:])
+        self.assertEqual(
+            [args.args[0] for args in send.call_args_list
+             if args.args[0] in ('\x01', '\x0b')],
+            ['\x01', '\x0b'],
+        )
+
+    def test_configure_terminal_retry_failure_is_not_retried(self):
+        command = 'command-echo failure'
+        log_start = len(self.device.log_buffer)
+        with self.inject_corrupt_echo_once(command) as calls:
+            with self.assertRaises(SubCommandFailure):
+                self.device.configure(command, timeout=5, bulk=False)
+        self.assertEqual(calls.count(command), 2)
+        self.assertIn("% Invalid command 'command-echo failure'",
+                      self.device.log_buffer[log_start:])
+
+    def test_configure_recovers_each_command_independently(self):
+        commands = ['no logging console', 'service internal']
+        with self.inject_corrupt_echo_once(commands) as calls:
+            self.device.configure(commands, timeout=5, bulk=False)
+        for command in commands:
+            self.assertEqual(calls.count(command), 2)
+
+    def test_execute_recovers_each_command_independently(self):
+        commands = ['show clock', 'show version']
+        with self.inject_corrupt_echo_once(commands) as calls:
+            output = self.device.execute(commands, timeout=5)
+        self.assertIn('UTC', output['show clock'])
+        self.assertIn('Cisco', output['show version'])
+        for command in commands:
+            self.assertEqual(calls.count(command), 2)
+
+    def test_bulk_configure_does_not_recover_echo(self):
+        commands = ['no logging console', 'service internal']
+        chunk = '\n'.join(commands + [
+            self.device.settings.BULK_CONFIG_END_INDICATOR])
+        with patch.object(
+                self.device.spawn, 'send',
+                wraps=self.device.spawn.send) as send:
+            with self.inject_corrupt_echo_once(chunk) as calls:
+                with self.assertRaises(SubCommandFailure):
+                    self.device.configure(
+                        commands, timeout=5, bulk=True, bulk_chunk_lines=0)
+        self.assertEqual(calls.count(chunk), 1)
+        self.assertFalse(any(
+            args.args[0] in ('\x01', '\x0b')
+            for args in send.call_args_list))
+
+    def test_ordinary_execute_and_configure_are_single_attempt(self):
+        with patch.object(
+                self.device.spawn, 'sendline',
+                wraps=self.device.spawn.sendline) as sendline:
+            self.device.execute('show clock', timeout=5)
+            self.device.configure('no logging console', timeout=5, bulk=False)
+        commands = [args.args[0] for args in sendline.call_args_list]
+        self.assertEqual(commands.count('show clock'), 1)
+        self.assertEqual(commands.count('no logging console'), 1)
+
+
+class TestIosXEWirelessIncompleteCommand(unittest.TestCase):
+
+    def test_execute_incomplete_command(self):
+        # PR #676's wireless reproduction leaves input after the enable
+        # prompt. Put the corrupt echo first, as it is in the device log.
+        terminal = patch.dict(os.environ, {'TERM': 'vt100'})
+        terminal.start()
+        self.addCleanup(terminal.stop)
+        device = Connection(
+            hostname='Switch',
+            start=['mock_device_cli --os iosxe --state general_enable'],
+            os='iosxe',
+            log_buffer=True,
+            mit=True,
+        )
+        device.connect()
+        command = 'show wireless client incomplete'
+        original_sendline = device.spawn.sendline
+        commands = []
+        injected = False
+
+        def sendline(value=None):
+            nonlocal injected
+            commands.append(value)
+            if value == command and not injected:
+                injected = True
+                return original_sendline('s^@')
+            return original_sendline(value)
+
+        try:
+            device.spawn.sendline = sendline
+            with patch.object(
+                    device.spawn, 'send', wraps=device.spawn.send) as send:
+                output = device.execute(command, timeout=5)
+            self.assertIn('Number of Excluded Clients: 0', output)
+            self.assertEqual(commands, [command, command])
+            self.assertIn('s^@', device.log_buffer)
+            self.assertIn('% Type "show ?" for a list of subcommands',
+                          device.log_buffer)
+            self.assertIn('Switch#how wireless running-con', device.log_buffer)
+            self.assertEqual(
+                [args.args[0] for args in send.call_args_list
+                 if args.args[0] in ('\x01', '\x0b')],
+                ['\x01', '\x0b'],
+            )
+        finally:
+            device.spawn.sendline = original_sendline
+            device.disconnect()
 
 
 class TestIosXEPluginDisableEnable(unittest.TestCase):

@@ -19,6 +19,16 @@ def send_response(spawn, response=""):
 patterns = IosXEPatterns()
 
 
+# Return the incomplete enable prompt to the per-command recovery flow.
+command_echo_corruption_stmt = Statement(
+    pattern=patterns.enable_prompt_incomplete_command,
+    loop_continue=False,
+)
+
+# Kept separate from the default lists to exclude bulk configuration.
+command_echo_statement_list = [command_echo_corruption_stmt]
+
+
 overwrite_previous = Statement(pattern=patterns.overwrite_previous,
                                action='sendline()',
                                loop_continue=True,

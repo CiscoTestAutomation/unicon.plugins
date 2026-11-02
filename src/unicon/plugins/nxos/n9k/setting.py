@@ -8,3 +8,4 @@ class Nxos9kSettings(NxosSettings):
     def __init__(self):
         super().__init__()
         self.MAX_BOOT_ATTEMPTS = 3
+        self.BOOT_SETUP_SYSLOG_WAIT = 30

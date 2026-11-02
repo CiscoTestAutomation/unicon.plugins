@@ -38,6 +38,19 @@ def send_response(spawn, response=""):
     spawn.sendline(response)
 
 
+def clear_command_line_handler(spawn):
+    """Discard unfinished console input and drain terminal editing output."""
+    for key in ('\x01', '\x0b'):  # Ctrl-A, Ctrl-K
+        spawn.send(key)
+        spawn.read_update_buffer()
+        # Bound the drain even if asynchronous console messages continue.
+        for _ in range(10):
+            if not spawn.is_readable(timeout=0.1):
+                break
+            spawn.read_update_buffer()
+    spawn.buffer = ''
+
+
 def send_no_callback(spawn):
     sleep(0.5)
     spawn.sendline("n")

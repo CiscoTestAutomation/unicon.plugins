@@ -148,3 +148,259 @@ c9k_config_line4:
       new_state: c9k_enable4
     "line vty 0 4":
       new_state: c9k_config_line4
+
+
+c9k_enable_submode_lock:
+  prompt: "%N#"
+  commands:
+    "enable": ""
+    "show version | include operating mode": ""
+    "config term":
+      new_state: c9k_config_submode_lock
+
+c9k_config_submode_lock:
+  prompt: "%N(config)#"
+  commands:
+    "no logging console": ""
+    "interface GigabitEthernet1/4":
+      new_state: c9k_config_if_submode_lock
+    "end":
+      new_state: c9k_enable_submode_lock
+
+c9k_config_if_submode_lock:
+  prompt: "%N(config-if)#"
+  commands:
+    "description local_interface":
+      response: >-
+        Config session is locked by process '566', user will be pushed back to
+        exec mode. Command execution is locked, Please try later.
+      new_state: c9k_enable_after_submode_lock
+    "end":
+      new_state: c9k_enable_submode_lock
+
+c9k_enable_after_submode_lock:
+  prompt: "%N#"
+  commands:
+    "config term":
+      new_state: c9k_config_after_submode_lock
+
+c9k_config_after_submode_lock:
+  prompt: "%N(config)#"
+  commands:
+    "interface GigabitEthernet1/4":
+      new_state: c9k_config_if_after_submode_lock
+    "end":
+      new_state: c9k_enable_after_submode_lock
+
+c9k_config_if_after_submode_lock:
+  prompt: "%N(config-if)#"
+  commands:
+    "description local_interface": ""
+    "end":
+      new_state: c9k_enable_after_submode_lock
+
+c9k_enable_same_submode_lock:
+  prompt: "%N#"
+  commands:
+    "enable": ""
+    "show version | include operating mode": ""
+    "config term":
+      new_state: c9k_config_same_submode_lock
+
+c9k_config_same_submode_lock:
+  prompt: "%N(config)#"
+  commands:
+    "interface GigabitEthernet1/3":
+      new_state: c9k_config_if_first_same_submode_lock
+    "end":
+      new_state: c9k_enable_same_submode_lock
+
+c9k_config_if_first_same_submode_lock:
+  prompt: "%N(config-if)#"
+  commands:
+    "interface GigabitEthernet1/4":
+      new_state: c9k_config_if_second_same_submode_lock
+    "end":
+      new_state: c9k_enable_same_submode_lock
+
+c9k_config_if_second_same_submode_lock:
+  prompt: "%N(config-if)#"
+  commands:
+    "description local_interface":
+      response: >-
+        Config session is locked by process '566', user will be pushed back to
+        exec mode. Command execution is locked, Please try later.
+      new_state: c9k_enable_after_same_submode_lock
+    "end":
+      new_state: c9k_enable_same_submode_lock
+
+c9k_enable_after_same_submode_lock:
+  prompt: "%N#"
+  commands:
+    "config term":
+      new_state: c9k_config_after_same_submode_lock
+
+c9k_config_after_same_submode_lock:
+  prompt: "%N(config)#"
+  commands:
+    "interface GigabitEthernet1/3":
+      new_state: c9k_config_if_first_after_same_submode_lock
+
+c9k_config_if_first_after_same_submode_lock:
+  prompt: "%N(config-if)#"
+  commands:
+    "interface GigabitEthernet1/4":
+      new_state: c9k_config_if_after_same_submode_lock
+    "end":
+      new_state: c9k_enable_after_same_submode_lock
+
+c9k_config_if_after_same_submode_lock:
+  prompt: "%N(config-if)#"
+  commands:
+    "description local_interface": ""
+    "end":
+      new_state: c9k_enable_after_same_submode_lock
+
+c9k_enable_same_line_submode_lock:
+  prompt: "%N#"
+  commands:
+    "enable": ""
+    "show version | include operating mode": ""
+    "config term":
+      new_state: c9k_config_same_line_submode_lock
+
+c9k_config_same_line_submode_lock:
+  prompt: "%N(config)#"
+  commands:
+    "line vty 0 4":
+      new_state: c9k_config_line_first_same_submode_lock
+    "end":
+      new_state: c9k_enable_same_line_submode_lock
+
+c9k_config_line_first_same_submode_lock:
+  prompt: "%N(config-line)#"
+  commands:
+    "line vty 5 15":
+      new_state: c9k_config_line_second_same_submode_lock
+    "end":
+      new_state: c9k_enable_same_line_submode_lock
+
+c9k_config_line_second_same_submode_lock:
+  prompt: "%N(config-line)#"
+  commands:
+    "exec-timeout 0":
+      response: >-
+        Config session is locked by process '566', user will be pushed back to
+        exec mode. Command execution is locked, Please try later.
+      new_state: c9k_enable_after_same_line_submode_lock
+    "end":
+      new_state: c9k_enable_same_line_submode_lock
+
+c9k_enable_after_same_line_submode_lock:
+  prompt: "%N#"
+  commands:
+    "config term":
+      new_state: c9k_config_after_same_line_submode_lock
+
+c9k_config_after_same_line_submode_lock:
+  prompt: "%N(config)#"
+  commands:
+    "line vty 0 4":
+      new_state: c9k_config_line_first_after_same_submode_lock
+    "end":
+      new_state: c9k_enable_after_same_line_submode_lock
+
+c9k_config_line_first_after_same_submode_lock:
+  prompt: "%N(config-line)#"
+  commands:
+    "line vty 5 15":
+      new_state: c9k_config_line_after_same_submode_lock
+    "end":
+      new_state: c9k_enable_after_same_line_submode_lock
+
+c9k_config_line_after_same_submode_lock:
+  prompt: "%N(config-line)#"
+  commands:
+    "exec-timeout 0": ""
+    "end":
+      new_state: c9k_enable_after_same_line_submode_lock
+
+c9k_enable_hierarchical_submode_lock:
+  prompt: "%N#"
+  commands:
+    "enable": ""
+    "show version | include operating mode": ""
+    "config term":
+      new_state: c9k_config_hierarchical_submode_lock
+
+c9k_config_hierarchical_submode_lock:
+  prompt: "%N(config)#"
+  commands:
+    "router bgp 65000":
+      new_state: c9k_config_router_hierarchical_submode_lock
+    "end":
+      new_state: c9k_enable_hierarchical_submode_lock
+
+c9k_config_router_hierarchical_submode_lock:
+  prompt: "%N(config-router)#"
+  commands:
+    "address-family ipv4 unicast":
+      new_state: c9k_config_router_af_discarded_hierarchical_submode_lock
+    "end":
+      new_state: c9k_enable_hierarchical_submode_lock
+
+c9k_config_router_af_discarded_hierarchical_submode_lock:
+  prompt: "%N(config-router-af)#"
+  commands:
+    "exit-address-family":
+      new_state: c9k_config_router_target_hierarchical_submode_lock
+    "end":
+      new_state: c9k_enable_hierarchical_submode_lock
+
+c9k_config_router_target_hierarchical_submode_lock:
+  prompt: "%N(config-router)#"
+  commands:
+    "address-family vpnv4":
+      new_state: c9k_config_router_af_hierarchical_submode_lock
+    "end":
+      new_state: c9k_enable_hierarchical_submode_lock
+
+c9k_config_router_af_hierarchical_submode_lock:
+  prompt: "%N(config-router-af)#"
+  commands:
+    "neighbor 192.0.2.1 activate":
+      response: >-
+        Config session is locked by process '566', user will be pushed back to
+        exec mode. Command execution is locked, Please try later.
+      new_state: c9k_enable_after_hierarchical_submode_lock
+    "end":
+      new_state: c9k_enable_hierarchical_submode_lock
+
+c9k_enable_after_hierarchical_submode_lock:
+  prompt: "%N#"
+  commands:
+    "config term":
+      new_state: c9k_config_after_hierarchical_submode_lock
+
+c9k_config_after_hierarchical_submode_lock:
+  prompt: "%N(config)#"
+  commands:
+    "router bgp 65000":
+      new_state: c9k_config_router_after_hierarchical_submode_lock
+    "end":
+      new_state: c9k_enable_after_hierarchical_submode_lock
+
+c9k_config_router_after_hierarchical_submode_lock:
+  prompt: "%N(config-router)#"
+  commands:
+    "address-family vpnv4":
+      new_state: c9k_config_router_af_after_hierarchical_submode_lock
+    "end":
+      new_state: c9k_enable_after_hierarchical_submode_lock
+
+c9k_config_router_af_after_hierarchical_submode_lock:
+  prompt: "%N(config-router-af)#"
+  commands:
+    "neighbor 192.0.2.1 activate": ""
+    "end":
+      new_state: c9k_enable_after_hierarchical_submode_lock

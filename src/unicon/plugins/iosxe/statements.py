@@ -1,6 +1,7 @@
 import re
 import time
 import logging
+from collections.abc import Mapping
 from copy import copy
 from functools import wraps
 from inspect import Parameter, signature
@@ -172,85 +173,138 @@ def grub_prompt_handler(spawn, session, context):
     spawn.sendline()
 
 
+def _as_filesystem_list(filesystems):
+    """Normalize a filesystem setting to a list."""
+    if not filesystems:
+        return []
+    if isinstance(filesystems, list):
+        return filesystems
+    return [filesystems]
+
+
+def _as_image_list(images):
+    """Normalize configured recovery images to a list."""
+    if not images:
+        return []
+    if isinstance(images, Mapping):
+        return _as_image_list(images.get('system'))
+    if isinstance(images, (list, tuple)):
+        return [image for image in images if image]
+    return [images]
+
+
+def _find_boot_images(spawn, filesystems, boot_file_regex):
+    """Discover ROMMON boot images using filesystem and regex ordering."""
+    filesystems = _as_filesystem_list(filesystems)
+    rommon_dir_timeout = getattr(spawn.settings, 'ROMMON_DIR_TIMEOUT', None)
+
+    def image_names(pattern, listing):
+        """Get image names and discard zero-byte size/name matches."""
+        names = []
+        for match in re.findall(pattern, listing):
+            if isinstance(match, tuple):
+                if match[0].isdigit() and int(match[0]) == 0:
+                    continue
+                match = match[-1]
+            names.append(match)
+        return names
+
+    if isinstance(boot_file_regex, list):
+        # Group matches into one bucket per BOOT_FILE_REGEX entry. Flattening
+        # the buckets makes regex priority global across all filesystems.
+        ranked_matches = [[] for _ in boot_file_regex]
+        for fs in filesystems:
+            spawn.buffer = ''
+            spawn.sendline('dir {}'.format(fs))
+            dir_listing = spawn.expect(
+                patterns.rommon_prompt,
+                timeout=rommon_dir_timeout).match_output
+            seen = set()
+            for rank, pattern in enumerate(boot_file_regex):
+                for image_name in image_names(pattern, dir_listing):
+                    full_image_name = fs + image_name
+                    if full_image_name not in seen:
+                        ranked_matches[rank].append(full_image_name)
+                        seen.add(full_image_name)
+        return [
+            image_name
+            for rank_bucket in ranked_matches
+            for image_name in rank_bucket
+        ]
+
+    filesystem_images = []
+    for fs in filesystems:
+        spawn.buffer = ''
+        spawn.sendline('dir {}'.format(fs))
+        dir_listing = spawn.expect(
+            patterns.rommon_prompt,
+            timeout=rommon_dir_timeout).match_output
+        matches = image_names(boot_file_regex, dir_listing)
+        if matches:
+            filesystem_images.extend(
+                [fs + image_name for image_name in matches]
+            )
+    return filesystem_images
+
+
 def boot_image(spawn, context, session):
     if not context.get('boot_prompt_count'):
         context['boot_prompt_count'] = 1
-    if context.get('boot_prompt_count') < \
+    if context.get('boot_prompt_count') <= \
             spawn.settings.MAX_BOOT_ATTEMPTS:
         if "boot_cmd" in context:
             cmd = context.get('boot_cmd')
         elif context.get('image_to_boot', '').strip():
             cmd = "boot {}".format(context['image_to_boot']).strip()
-        elif spawn.settings.FIND_BOOT_IMAGE:
-            if context.get('filesystem_images'):
-                # Attempt to boot the next image from the list of images
-                # collected from the possible boot filesystems.
+        elif (spawn.settings.FIND_BOOT_IMAGE or
+              _as_image_list(context.get('recovery_images'))):
+            if not context.get('boot_image_queue_initialized'):
+                filesystems = getattr(
+                    spawn.settings, 'BOOT_FILESYSTEM', 'flash:')
+                boot_file_regex = getattr(
+                    spawn.settings, 'BOOT_FILE_REGEX', r'(\S+\.bin)')
+
+                context['filesystem_images'] = []
+
+                if spawn.settings.FIND_BOOT_IMAGE:
+                    # Some IE platforms expose emgy:/emgy0: only in ROMMON.
+                    # Emergency images are owned by DEVX-61625 and precede the
+                    # configured recovery and normal filesystem candidates.
+                    emergency_filesystems = getattr(
+                        spawn.settings, 'EMERGENCY_FILESYSTEMS', [])
+                    if emergency_filesystems:
+                        emergency_image_pattern = getattr(
+                            spawn.settings, 'EMERGENCY_IMAGE_PATTERN', None)
+                        if emergency_image_pattern:
+                            context['filesystem_images'].extend(
+                                _find_boot_images(
+                                    spawn,
+                                    emergency_filesystems,
+                                    emergency_image_pattern,
+                                )
+                            )
+
+                # The recovery image copied by Clean is tried before images
+                # discovered through the platform's filesystem/regex order.
+                context['filesystem_images'].extend(
+                    _as_image_list(context.get('recovery_images')))
+
+                if spawn.settings.FIND_BOOT_IMAGE:
+                    context['filesystem_images'].extend(_find_boot_images(
+                        spawn,
+                        filesystems,
+                        boot_file_regex,
+                    ))
+                context['filesystem_images'] = list(dict.fromkeys(
+                    context['filesystem_images']))
+                context['boot_image_queue_initialized'] = True
+
+            # Attempt the next ordered image without rebuilding the queue when
+            # a failed candidate returns to ROMMON.
+            if context['filesystem_images']:
                 cmd = "boot {}".format(context['filesystem_images'].pop(0))
             else:
-                if hasattr(spawn.settings, 'BOOT_FILESYSTEM'):
-                    if isinstance(spawn.settings.BOOT_FILESYSTEM, list):
-                        filesystems = spawn.settings.BOOT_FILESYSTEM
-                    else:
-                        filesystems = [spawn.settings.BOOT_FILESYSTEM]
-                else:
-                    filesystems = ["flash:"]
-                # Collect all possible boot images from the filesystems and
-                # attempt to boot each one until successful / max attempts reached.
-                boot_file_regex = spawn.settings.BOOT_FILE_REGEX if \
-                    hasattr(spawn.settings, 'BOOT_FILE_REGEX') else r'(\S+\.bin)'
-                if isinstance(boot_file_regex, list):
-                    # Group matches into one bucket per BOOT_FILE_REGEX entry.
-                    # Example:
-                    # BOOT_FILE_REGEX = [r'(\S+\.SSA\.bin)', r'(\S+\.SPA\.bin)', r'(\S+\.bin)']
-                    # ranked_matches[0] collects all .SSA.bin images,
-                    # ranked_matches[1] collects all .SPA.bin images,
-                    # ranked_matches[2] collects the remaining .bin images.
-                    #
-                    # Flattening these buckets later makes the final boot queue
-                    # prefer earlier BOOT_FILE_REGEX entries across all
-                    # filesystems instead of only within each filesystem.
-                    ranked_matches = [[] for _ in boot_file_regex]
-                    rommon_dir_timeout = getattr(
-                        spawn.settings, 'ROMMON_DIR_TIMEOUT', None)
-                    for fs in filesystems:
-                        spawn.buffer = ''
-                        spawn.sendline('dir {}'.format(fs))
-                        dir_listing = spawn.expect(
-                            patterns.rommon_prompt,
-                            timeout=rommon_dir_timeout).match_output
-                        seen = set()
-                        for rank, pattern in enumerate(boot_file_regex):
-                            image_names = re.findall(pattern, dir_listing)
-                            for image_name in image_names:
-                                full_image_name = fs + image_name
-                                if full_image_name not in seen:
-                                    ranked_matches[rank].append(full_image_name)
-                                    seen.add(full_image_name)
-                    context['filesystem_images'] = [
-                        image_name
-                        for rank_bucket in ranked_matches
-                        for image_name in rank_bucket
-                    ]
-                else:
-                    context['filesystem_images'] = []
-                    rommon_dir_timeout = getattr(
-                        spawn.settings, 'ROMMON_DIR_TIMEOUT', None)
-                    for fs in filesystems:
-                        spawn.buffer = ''
-                        spawn.sendline('dir {}'.format(fs))
-                        dir_listing = spawn.expect(
-                            patterns.rommon_prompt,
-                            timeout=rommon_dir_timeout).match_output
-                        matches = re.findall(boot_file_regex, dir_listing)
-                        if matches:
-                            context['filesystem_images'].extend(
-                                [fs + image_name for image_name in matches]
-                            )
-                # Attempt to boot the first image from the list.
-                if context['filesystem_images']:
-                    cmd = "boot {}".format(context['filesystem_images'].pop(0))
-                else:
-                    cmd = "boot"
+                cmd = "boot"
         else:
             cmd = "boot"
         spawn.sendline(cmd)

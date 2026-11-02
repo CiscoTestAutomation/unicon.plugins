@@ -7,6 +7,7 @@ from unicon.plugins.utils import AbstractTokenDiscovery
 from unicon.plugins.utils import _get_current_credentials
 from unicon.plugins.utils import get_current_credential
 from unicon.plugins.utils import load_token_csv_file
+from unicon.plugins.utils import select_next_credential
 from unicon.plugins.tests.mock.mock_device_generic import MockDeviceTcpWrapperGeneric
 from unicon.core.errors import CredentialsExhaustedError
 from unicon.core.errors import LearnTokenError
@@ -382,6 +383,20 @@ devices:
         self.dev.connect()
         mock_call.assert_not_called()
 
+    @patch(
+        "unicon.plugins.utils._load_token_discovery_parsers",
+        side_effect=ImportError("No module named 'genie'"),
+    )
+    def test_learn_tokens_skipped_without_genie(self, _load_parsers):
+        self.dev.os = "iosxe"
+        discovery = AbstractTokenDiscovery(self.mock_con)
+
+        learned_tokens = discovery.learn_device_tokens()
+
+        self.assertEqual(learned_tokens["os"], "iosxe")
+        self.mock_con.sendline.assert_not_called()
+        self.mock_con.log.warning.assert_called_once()
+
     def test_assign_tokens(self):
         self.dev.os = "generic"
         self.dev.version = "0"
@@ -635,6 +650,28 @@ class TestCredentialSelection(unittest.TestCase):
 
         with self.assertRaises(CredentialsExhaustedError):
             get_current_credential(context, session)
+
+    def test_select_next_credential_after_post_action(self):
+        context = {
+            "credentials": {
+                "ts": {"username": "ts_user", "password": "ts_pw"},
+                "default": {"username": "device_user", "password": "device_pw"},
+            },
+            "login_creds": ["ts", "default"],
+            "cred_list": ["ts", "default"],
+        }
+        session = {}
+
+        next_credential = select_next_credential(
+            context=context,
+            session=session,
+            credential="ts",
+        )
+
+        self.assertEqual(next_credential, "default")
+        self.assertEqual(session["current_credential"], "default")
+        with self.assertRaises(StopIteration):
+            next(session["cred_iter"])
 
 
 if __name__ == "__main__":

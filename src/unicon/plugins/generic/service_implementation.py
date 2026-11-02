@@ -41,18 +41,51 @@ from unicon.plugins.generic.service_statements import reload_statement_list, \
     ping_dialog_list, extended_ping_dialog_list, copy_statement_list, \
     ha_reload_statement_list, switchover_statement_list, \
     standby_reset_rp_statement_list, trace_route_dialog_list
-from unicon.plugins.generic.service_patterns import CopyPatterns
+from unicon.plugins.generic.service_patterns import ConfigPatterns, CopyPatterns
 from unicon.utils import AttributeDict, to_plaintext
 from unicon import logs
 from unicon.logs import UniconStreamHandler, UNICON_LOG_FORMAT
 
 from unicon.plugins.generic.utils import GenericUtils
-from .service_statements import execution_statement_list, configure_statement_list
+from .service_statements import (
+    execution_statement_list,
+    configure_statement_list,
+    clear_command_line_handler,
+)
 from .statements import disable_enable_transition_statements
 from unicon.plugins.generic.statemachine import config_transition
 
 utils = GenericUtils()
 ReloadResult = collections.namedtuple('ReloadResult', ['result', 'output'])
+
+
+def _first_line_has_corrupt_echo(match_output):
+    """Check only the command echo for raw or terminal-rendered NUL."""
+    first_line = re.split(r'\r\n|\n|\r', match_output or '', maxsplit=1)[0]
+    return '\x00' in first_line or '^@' in first_line
+
+
+def _process_command(dialog, spawn, command, timeout, context,
+                     prompt_recovery, recover_echo=True):
+    """Send a command and retry a corrupt echo at most once."""
+    for attempt in range(2):
+        if attempt:
+            spawn.log.warning(
+                'Command echo corruption detected; clearing input and '
+                'retrying once')
+            clear_command_line_handler(spawn)
+        spawn.sendline(command)
+        match = dialog.process(
+            spawn,
+            timeout=timeout,
+            context=context,
+            prompt_recovery=prompt_recovery,
+        )
+        if (attempt == 0 and recover_echo and match and
+                _first_line_has_corrupt_echo(match.match_output)):
+            continue
+        return match
+
 
 class SwitchoverResult:
     def __init__(self, result, output, **kwargs):
@@ -599,6 +632,8 @@ class Execute(BaseService):
 
     """
 
+    command_echo_statement_list = []
+
     def __init__(self, connection, context, **kwargs):
         # Connection object will have all the received details
         super().__init__(connection, context, **kwargs)
@@ -713,6 +748,9 @@ class Execute(BaseService):
                             matched_retry_sleep=self.state_change_matched_retry_sleep
                         ))
 
+        if con.settings.COMMAND_ECHO_CORRUPTION_RECOVERY:
+            dialog += Dialog(self.command_echo_statement_list)
+
         # store the last used dialog, used by unittest
         self._last_dialog = dialog
 
@@ -736,13 +774,16 @@ class Execute(BaseService):
             message = f"executing command '{command}'"
             super().log_service_call(message)
 
-            con.sendline(command)
             try:
-                dialog_match = dialog.process(
+                self.result = None
+                dialog_match = _process_command(
+                    dialog,
                     con.spawn,
-                    timeout=timeout,
-                    prompt_recovery=self.prompt_recovery,
-                    context=con.context
+                    command,
+                    timeout,
+                    con.context,
+                    self.prompt_recovery,
+                    recover_echo=con.settings.COMMAND_ECHO_CORRUPTION_RECOVERY,
                 )
                 if dialog_match:
                     self.result = dialog_match.match_output
@@ -753,7 +794,8 @@ class Execute(BaseService):
             except UniconBackendDecodeError:
                 pass
             except Exception as err:
-                raise SubCommandFailure("Command execution failed", err) from err
+                raise SubCommandFailure(
+                    "Command execution failed", err) from err
 
             if self.result:
                 output = self.utils.truncate_trailing_prompt(
@@ -837,6 +879,8 @@ class Configure(BaseService):
               output = rtr.configure(cmd)
     """
 
+    command_echo_statement_list = []
+    config_patterns = ConfigPatterns()
     transaction_lock_pattern = None
     transaction_lock_handler = None
 
@@ -914,6 +958,13 @@ class Configure(BaseService):
             handle.context['config_transaction_lock_output'] = match_output
             return True
         return False
+
+    def _config_mode_from_output(self, output):
+        """Return an IOS-style configuration prompt mode from output."""
+        if not output:
+            return None
+        match = re.search(self.config_patterns.config_mode, output, re.IGNORECASE)
+        return match.group(1).lower() if match else None
 
     def call_service(self,   # noqa: C901
                      command=[],
@@ -1001,6 +1052,40 @@ class Configure(BaseService):
             retry_sleep = handle.settings.CONFIG_LOCK_RETRY_SLEEP
             lock_recovery_pending = False
             transaction_hostname = handle.hostname
+            current_config_mode = 'config'
+            submode_commands = []
+
+            def record_config_mode(command, transaction_locked, current_mode, commands):
+                """Return the active config mode and commands after a command."""
+                if transaction_locked or handle.context.get('config_session_locked'):
+                    return current_mode, commands
+
+                new_mode = self._last_config_mode
+                self.connection.log.debug(
+                    'Configuration mode after %r: current_mode=%r, new_mode=%r',
+                    command, current_mode, new_mode)
+                if not new_mode:
+                    return current_mode, commands
+                if new_mode == 'config':
+                    commands = []
+                elif new_mode == current_mode:
+                    # The prompt alone cannot distinguish a context selector
+                    # from a configuration command that remains in the same
+                    # mode. Retain both so replay restores the exact active
+                    # branch without platform-specific command knowledge.
+                    commands.append((command, new_mode))
+                else:
+                    # Returning to an ancestor mode abandons any deeper
+                    # branch. Keep every successful command in the retained
+                    # branch so same-prompt context changes are reproducible.
+                    for index in range(len(commands) - 1, -1, -1):
+                        _, mode = commands[index]
+                        if mode == new_mode:
+                            commands = commands[:index + 1]
+                            break
+                    else:
+                        commands.append((command, new_mode))
+                return new_mode, commands
 
             # Abort discards the pending changes, so retry the full transaction.
             for retry in range(max_retries + 1):
@@ -1042,9 +1127,10 @@ class Configure(BaseService):
                     self.connection.log.info('Banner detected, configuring banners without state detection')
 
                     for cmd in pre_lines:
-                        handle.spawn.sendline(cmd)
                         self.update_hostname_if_needed([cmd])
-                        self.process_dialog_on_handle(handle, dialog, timeout)
+                        self.process_dialog_on_handle(
+                            handle, dialog, timeout, command=cmd,
+                            recover_echo=not bulk)
 
                     # Send banner lines
                     for line in banner_lines:
@@ -1059,9 +1145,10 @@ class Configure(BaseService):
                     while remaining:
                         sub_pre, sub_banner, sub_post, sub_delim = self.get_banner_lines(remaining)
                         for cmd in sub_pre:
-                            handle.spawn.sendline(cmd)
                             self.update_hostname_if_needed([cmd])
-                            self.process_dialog_on_handle(handle, dialog, timeout)
+                            self.process_dialog_on_handle(
+                                handle, dialog, timeout, command=cmd,
+                                recover_echo=not bulk)
                         if sub_banner:
                             for line in sub_banner:
                                 handle.spawn.sendline(line)
@@ -1073,8 +1160,9 @@ class Configure(BaseService):
                             remaining = None
 
                     if self.commit_cmd:
-                        handle.spawn.sendline(self.commit_cmd)
-                        transaction_locked = self.process_dialog_on_handle(handle, dialog, timeout)
+                        transaction_locked = self.process_dialog_on_handle(
+                            handle, dialog, timeout, command=self.commit_cmd,
+                            recover_echo=not bulk)
 
                 elif bulk:
                     indicator = handle.settings.BULK_CONFIG_END_INDICATOR
@@ -1102,9 +1190,11 @@ class Configure(BaseService):
                 else:
                     cmds = chain(flat_cmd_list, [self.commit_cmd]) if self.commit_cmd else flat_cmd_list
                     for cmd in cmds:
-                        handle.spawn.sendline(cmd)
                         self.update_hostname_if_needed([cmd])
-                        transaction_locked = self.process_dialog_on_handle(handle, dialog, timeout)
+                        transaction_locked = self.process_dialog_on_handle(
+                            handle, dialog, timeout, command=cmd)
+                        current_config_mode, submode_commands = record_config_mode(
+                            cmd, transaction_locked, current_config_mode, submode_commands)
                         if transaction_locked:
                             break
                         # To handle the session
@@ -1115,8 +1205,30 @@ class Configure(BaseService):
                             sleep(lock_retry_sleep)
                             config_transition(handle.state_machine, handle.spawn, handle.context)
                             handle.context['config_session_locked'] = False
-                            handle.spawn.sendline(cmd)
-                            transaction_locked = self.process_dialog_on_handle(handle, dialog, timeout)
+                            # config_transition returns to global configuration
+                            # mode. Replay the saved active submode branch to
+                            # restore the state that preceded the lock.
+                            current_config_mode = 'config'
+                            for submode_cmd, submode_mode in submode_commands:
+                                self.connection.log.debug(
+                                    'Restoring config submode: current_mode=%r, target_mode=%r, command=%r',
+                                    current_config_mode, submode_mode, submode_cmd)
+                                self.update_hostname_if_needed([submode_cmd])
+                                transaction_locked = (
+                                    self.process_dialog_on_handle(
+                                        handle, dialog, timeout,
+                                        command=submode_cmd))
+                                if transaction_locked or handle.context.get('config_session_locked'):
+                                    raise SubCommandFailure(
+                                        'Configuration session locked again '
+                                        'while restoring submode {!r}'
+                                        .format(submode_mode))
+                                current_config_mode = (
+                                    self._last_config_mode or submode_mode)
+                            transaction_locked = self.process_dialog_on_handle(
+                                handle, dialog, timeout, command=cmd)
+                            current_config_mode, submode_commands = record_config_mode(
+                                cmd, transaction_locked, current_config_mode, submode_commands)
                             if transaction_locked:
                                 break
 
@@ -1206,20 +1318,38 @@ class Configure(BaseService):
 
         return pre_lines, banner_lines, post_lines, banner_delim
 
-    def process_dialog_on_handle(self, handle, dialog, timeout):
+    def process_dialog_on_handle(self, handle, dialog, timeout, command=None,
+                                recover_echo=True):
         try:
-            cmd_result = dialog.process(
-                handle.spawn,
-                timeout=timeout,
-                prompt_recovery=self.prompt_recovery,
-                context=handle.context
-            )
+            if command is None:
+                cmd_result = dialog.process(
+                    handle.spawn,
+                    timeout=timeout,
+                    prompt_recovery=self.prompt_recovery,
+                    context=handle.context,
+                )
+            else:
+                recover_echo = (
+                    recover_echo and
+                    handle.settings.COMMAND_ECHO_CORRUPTION_RECOVERY)
+                if recover_echo:
+                    dialog = dialog + Dialog(self.command_echo_statement_list)
+                cmd_result = _process_command(
+                    dialog,
+                    handle.spawn,
+                    command,
+                    timeout,
+                    handle.context,
+                    self.prompt_recovery,
+                    recover_echo=recover_echo,
+                )
         except StateMachineError:
             raise
         except Exception as err:
             raise SubCommandFailure("Command execution failed", err) from err
 
         transaction_locked = self._check_transaction_lock(handle, cmd_result.match_output)
+        self._last_config_mode = self._config_mode_from_output(cmd_result.match_output)
 
         cmd_result = self.utils.truncate_trailing_prompt(
             handle.state_machine.get_state(handle.state_machine.current_state),

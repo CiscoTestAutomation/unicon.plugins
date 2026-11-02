@@ -1,4 +1,5 @@
 import unittest
+from pathlib import Path
 
 import unicon
 from unicon import Connection
@@ -39,6 +40,26 @@ class TestCheetahAp(unittest.TestCase):
         output = self.c.execute('show command with more')
         self.assertEqual(output, 'first\r\n\r\nsecond\r\n\r\nthird')
         self.assertEqual(repr(output), repr('first\r\n\r\nsecond\r\n\r\nthird'))
+
+    def test_extended_ping_with_prefilled_data_pattern(self):
+        mock_data_dir = Path(__file__).parent / 'mock_data' / 'cheetah'
+        device = Connection(
+            hostname=self.hostname,
+            start=[f'mock_device_cli --os cheetah '
+                   f'--state ap_enable '
+                   f'--hostname {self.hostname} '
+                   f'--mock_data_dir {mock_data_dir}'],
+            os='cheetah',
+            platform='ap',
+        )
+        device.connect()
+        self.addCleanup(device.disconnect)
+
+        output = device.ping(addr='192.0.2.1', source='wired0', count=5)
+
+        self.assertIn('Data pattern [0xABCD]: 0x', output)
+        self.assertIn('Sweep range of sizes [n]:', output)
+        self.assertIn('Success rate is 100 percent (5/5)', output)
 
     def test_ap_shell_prompt_matches_home_directory(self):
         patterns = CheetahAPPatterns()
