@@ -53,6 +53,8 @@ def enable_bash_console_transition(statemachine, spawn, context):
 def boot_from_rommon(statemachine, spawn, context):
     context['boot_start_time'] = datetime.now()
     context['boot_prompt_count'] = 1
+    context.pop('filesystem_images', None)
+    context.pop('boot_image_queue_initialized', None)
     boot_image(spawn, context, None)
 
 

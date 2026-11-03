@@ -6,9 +6,7 @@ import re
 
 from unicon.eal.dialogs import Dialog, Statement
 from unicon.bases.routers.connection_provider import BaseStackRpConnectionProvider
-
-from genie.metaparser.util.exceptions import SchemaEmptyParserError
-
+from unicon.plugins.iosxe.stack.connection_provider import SHOW_SWITCH_ROW_RE
 from unicon.plugins.generic.statements import connection_statement_list, custom_auth_statements
 
 
@@ -86,19 +84,15 @@ class StackwiseVirtualConnectionProvider(BaseStackRpConnectionProvider):
         device = con.device
         try:
             # To check if the device is in SVL state
-            try:
-                show_switch_output = device.execute(
-                    "show switch",
-                    matched_retries=SHOW_SWITCH_MATCHED_RETRIES,
-                    matched_retry_sleep=SHOW_SWITCH_MATCHED_RETRY_SLEEP,
-                )
-                output = device.parse("show switch", output=show_switch_output)
-            except SchemaEmptyParserError:
-                con.log.debug("show switch returned empty output")
-                output = {}
-            stack_info = output.get("switch", {}).get("stack", {})
-            roles = [switch_info.get("role") for switch_info in stack_info.values()]
-            roles_lower = [str(role).lower() for role in roles if role is not None]
+            show_switch_output = device.execute(
+                "show switch",
+                matched_retries=SHOW_SWITCH_MATCHED_RETRIES,
+                matched_retry_sleep=SHOW_SWITCH_MATCHED_RETRY_SLEEP,
+            )
+            roles_lower = [
+                match.group("role").lower()
+                for match in SHOW_SWITCH_ROW_RE.finditer(show_switch_output or "")
+            ]
 
             if "active" in roles_lower and "standby" in roles_lower:
                 # Only designate handle when in SVL state

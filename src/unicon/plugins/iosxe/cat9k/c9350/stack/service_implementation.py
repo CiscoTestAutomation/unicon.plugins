@@ -129,6 +129,8 @@ class C9350StackReload(BaseService):
         reload_cmd_output = None
 
         def task(con):
+            # Only states observed during this reload can end its dialog loop.
+            con.context.pop('state', None)
             for _ in range(3):
                 # The dialog handles the initial reload interaction for c9350 member consoles.
                 # It monitors for the prompt "Press RETURN to get started" and responds by sending a RETURN key. 
@@ -141,9 +143,10 @@ class C9350StackReload(BaseService):
                 self.result = reload_cmd_output.match_output
                 self.get_service_result()
 
-                # If device entered rommon state, break out of the loop
-                if 'state' in con.context and con.context.state == 'rommon':
-                    con.log.info(f"Device {con.alias} entered rommon state, breaking out of reload dialog loop")
+                # If device reached enable or rommon state, break out of the loop
+                state = con.context.get('state')
+                if state in ('enable', 'rommon'):
+                    con.log.info(f"Device {con.alias} reached {state} state, breaking out of reload dialog loop")
                     break
 
         futures = []

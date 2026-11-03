@@ -13,8 +13,6 @@ from pyats.aetest.steps import Steps
 from pyats.results import Passed, Failed
 from pyats.aetest.signals import TerminateStepSignal
 
-from genie.libs.clean.stages.tests.utils import create_test_device
-
 
 class TestC9350StackReload(unittest.TestCase):
     """
@@ -29,8 +27,10 @@ class TestC9350StackReload(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures before each test method"""
-        # Instantiate device object using clean test utilities
-        self.device = create_test_device('C9350-Stack', os='iosxe', platform='cat9k')
+        # A plain mock avoids depending on Genie Clean test utilities.
+        self.device = Mock(name='C9350-Stack')
+        self.device.os = 'iosxe'
+        self.device.platform = 'cat9k'
         self.device.model = 'c9350'
         self.device.chassis_type = 'stack'
         

@@ -38,6 +38,9 @@ ap_enable:
     "show command with more":
       new_state: show_command_with_more_first
 
+    "ping":
+      new_state: ap_ping_target
+
 
 show_command_with_more_first:
   preface: "first"
@@ -53,6 +56,76 @@ show_command_with_more_second:
   commands:
     "":
       response: "third"
+      new_state: ap_enable
+
+
+ap_ping_target:
+  prompt: "Target IP address: "
+  commands:
+    "192.0.2.1":
+      response: "ash: bad number"
+      new_state: ap_ping_repeat
+
+
+ap_ping_repeat:
+  prompt: "Repeat count [5]: "
+  commands:
+    "5":
+      new_state: ap_ping_timeout
+
+
+ap_ping_timeout:
+  prompt: "Timeout in seconds [2]: "
+  commands:
+    "":
+      new_state: ap_ping_size
+
+
+ap_ping_size:
+  prompt: "Datagram size [100]: "
+  commands:
+    "":
+      new_state: ap_ping_extended
+
+
+ap_ping_extended:
+  prompt: "Extended commands [n]: "
+  commands:
+    "y":
+      new_state: ap_ping_tos
+
+
+ap_ping_tos:
+  prompt: "Type of service [0]: "
+  commands:
+    "":
+      new_state: ap_ping_df_bit
+
+
+ap_ping_df_bit:
+  prompt: "Set DF bit in IP header? [n]: "
+  commands:
+    "":
+      new_state: ap_ping_data_pattern
+
+
+ap_ping_data_pattern:
+  prompt: "Data pattern [0xABCD]: 0x"
+  commands:
+    "":
+      new_state: ap_ping_sweep
+
+
+ap_ping_sweep:
+  prompt: "Sweep range of sizes [n]: "
+  commands:
+    "":
+      response: |
+        Sending 5, 100-byte ICMP Echos to 192.0.2.1, timeout is 2 seconds
+
+        PING 192.0.2.1
+        !!!!!
+        Success rate is 100 percent (5/5), round-trip min/avg/max = 1/2/3 ms
       new_state: ap_enable
 
 

@@ -1,11 +1,12 @@
-__version__ = "26.9"
+__version__ = "26.10"
 
 supported_chassis = [
     'single_rp',
     'dual_rp',
     'stack',
     'quad',
-    'stackwise_virtual'
+    'stackwise_virtual',
+    'ha_group'
 ]
 
 supported_os = [

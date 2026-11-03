@@ -31,9 +31,6 @@ TOKEN_TYPES = [
     "chassis_type",
 ]
 OPTIONAL_TOKENS = ["os_flavor"]
-ShowVersion = None
-ShowInventory = None
-Uname = None
 PID_TOKEN_FILE = Path(__file__).parent / "pid_tokens.csv"
 
 ContextDict = dict[str, Any]
@@ -194,6 +191,55 @@ def invalidate_current_credential(context, session):
     session["current_credential"] = None
 
 
+def select_next_credential(
+    context: ContextDict,
+    session: SessionDict,
+    credential: str,
+) -> Optional[str]:
+    """Select the credential following ``credential`` in the login order.
+
+    A credential in ``cred_list`` can complete a terminal-server hop without
+    producing another username prompt. Advance the iterator after each item
+    so a later prompt, or relogin after logout, uses the next credential.
+
+    Args:
+        context: Connection context containing credential-order configuration.
+        session: Session state containing the credential iterator.
+        credential: Credential whose password was just sent.
+
+    Returns:
+        The next credential name, or ``None`` when ``credential`` is last.
+    """
+    # Only advance an explicit credential sequence. ``fallback_creds`` has
+    # separate retry semantics and must not be consumed after every password.
+    creds_to_try = context.get("cred_list")
+    if creds_to_try is None:
+        return None
+    if not isinstance(creds_to_try, list):
+        creds_to_try = [creds_to_try]
+
+    try:
+        credential_index = creds_to_try.index(credential)
+    except ValueError:
+        return None
+
+    if credential_index >= len(creds_to_try) - 1:
+        return None
+
+    # A credential selected through current_credentials has no iterator yet.
+    # Start one after the credential that just completed its post action.
+    if session.get("cred_iter") is None:
+        session["cred_iter"] = iter(creds_to_try[credential_index + 1:])
+
+    try:
+        next_credential = next(session["cred_iter"])
+    except StopIteration:
+        return None
+
+    session["current_credential"] = next_credential
+    return next_credential
+
+
 def common_cred_username_handler(spawn, context, credential):
     """Send the current credential's username."""
     try:
@@ -318,20 +364,23 @@ def get_device_mode(con):
             return m.groupdict().get("mode")
 
 
+def _load_token_discovery_parsers():
+    """Load the optional Genie parsers used for token discovery."""
+    from genie.libs.parser.generic.rv1.show_platform import (
+        ShowInventory,
+        ShowVersion,
+    )
+    from genie.libs.parser.generic.show_platform import Uname
+
+    return {
+        "show version": ShowVersion,
+        "show inventory": ShowInventory,
+        "uname -a": Uname,
+    }
+
+
 class AbstractTokenDiscovery:
     def __init__(self, con, execute_target=None):
-        # Putting these imports at the top creates a circular import chain
-        # Import them during object initialization if not already imported
-        global ShowVersion
-        if not ShowVersion:
-            from genie.libs.parser.generic.rv1.show_platform import ShowVersion
-        global ShowInventory
-        if not ShowInventory:
-            from genie.libs.parser.generic.rv1.show_platform import ShowInventory
-        global Uname
-        if not Uname:
-            from genie.libs.parser.generic.show_platform import Uname
-
         self.con = con
         self.device = con.device
         self.execute_target = execute_target
@@ -341,12 +390,7 @@ class AbstractTokenDiscovery:
         self.pid_lookup_file = PID_TOKEN_FILE
         self.pid_data = load_token_csv_file(file_path=self.pid_lookup_file)
 
-        # Attach commands and accompying classes for cleaner looping
-        self.commands_and_classes = {
-            "show version": ShowVersion,
-            "show inventory": ShowInventory,
-            "uname -a": Uname,
-        }
+        self.commands_and_classes = {}
 
         # Fill in starting token values
         self.learned_tokens = {token_type: None for token_type in TOKEN_TYPES}
@@ -652,6 +696,16 @@ class AbstractTokenDiscovery:
         if self.con.state_machine.current_state == "standby_locked":
             self.con.log.info("Device is locked, cannot learn tokens")
             return {}
+
+        try:
+            self.commands_and_classes = _load_token_discovery_parsers()
+        except ImportError as error:
+            self.con.log.warning(
+                "Genie parsers are not available; skipping device token "
+                "learning. Reason: %s",
+                error,
+            )
+            return self.predefined_tokens.copy()
 
         if overwrite_testbed_tokens:
             self.con.log.info("+++ Learning device tokens +++")

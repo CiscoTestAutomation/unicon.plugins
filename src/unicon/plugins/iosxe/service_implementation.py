@@ -26,6 +26,7 @@ from unicon.plugins.generic.service_implementation import (
 from .service_statements import (
     execute_statement_list,
     configure_statement_list,
+    command_echo_statement_list,
     confirm,
     rsa_modulus,
     want_continue,
@@ -47,6 +48,8 @@ def _with_rsa_modulus_fallback(reply):
 # Simplex Services
 # ----------------
 class Configure(GenericConfigure):
+
+    command_echo_statement_list = command_echo_statement_list
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -134,6 +137,8 @@ class ConfigSyntax(Configure):
 
 class Execute(GenericExecute):
 
+    command_echo_statement_list = command_echo_statement_list
+
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
         self.dialog += Dialog(execute_statement_list)
@@ -167,6 +172,8 @@ class Copy(GenericCopy):
 # HA Services
 # -----------
 class HAConfigure(GenericHAConfigure):
+
+    command_echo_statement_list = command_echo_statement_list
 
     def __init__(self, connection, context, **kwargs):
         super().__init__(connection, context, **kwargs)
@@ -387,6 +394,9 @@ class Reload(GenericReload):
         if 'prompt_recovery' in kwargs:
             self.prompt_recovery = kwargs.get('prompt_recovery')
         self.context.pop('boot_prompt_count', None)
+        self.context.pop('filesystem_images', None)
+        self.context.pop('boot_image_queue_initialized', None)
+        self.context.pop('recovery_images', None)
         sm = self.get_sm()
         if sm.current_state != 'rommon':
             return super().pre_service(*args, **kwargs)
@@ -409,22 +419,40 @@ class Reload(GenericReload):
         self.context["image_to_boot"] = \
             kwargs.get("image_to_boot", kwargs.get('image', ''))
 
+        recovery_info = {}
+        if getattr(
+                self.connection.settings,
+                'USE_RECOVERY_IMAGE_ON_RELOAD', False):
+            try:
+                recovery_info = self.connection.device.clean.get(
+                    'device_recovery', {}) or {}
+            except AttributeError:
+                pass
+        self.context['recovery_images'] = recovery_info.get(
+            'golden_image', [])
+
         # boot_cmd is used by the boot_image handler, see statements.py
         if sm.current_state == 'rommon' and reload_command != 'reload':
             self.context['boot_cmd'] = reload_command
 
-        super().call_service(
-            reload_command=reload_command,
-            dialog=dialog,
-            reply=reply,
-            timeout=timeout,
-            return_output=return_output,
-            reload_creds=reload_creds,
-            post_reload_wait_time=post_reload_wait_time,
-            *args, **kwargs)
-
-        self.context.pop("image_to_boot", None)
-        self.context.pop("grub_boot_image", None)
+        try:
+            super().call_service(
+                reload_command=reload_command,
+                dialog=dialog,
+                reply=reply,
+                timeout=timeout,
+                return_output=return_output,
+                reload_creds=reload_creds,
+                post_reload_wait_time=post_reload_wait_time,
+                *args, **kwargs)
+        finally:
+            self.context.pop("boot_cmd", None)
+            self.context.pop("image_to_boot", None)
+            self.context.pop("grub_boot_image", None)
+            self.context.pop("recovery_images", None)
+            self.context.pop("filesystem_images", None)
+            self.context.pop("boot_image_queue_initialized", None)
+            self.context.pop("boot_prompt_count", None)
 
 
 class Rommon(GenericExecute):

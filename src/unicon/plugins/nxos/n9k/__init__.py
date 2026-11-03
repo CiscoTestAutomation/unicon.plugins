@@ -4,6 +4,8 @@ from unicon.plugins.nxos import NxosServiceList, HANxosServiceList
 from unicon.plugins.nxos import NxosSingleRpConnection, NxosDualRPConnection
 
 from .setting import Nxos9kSettings
+from .connection_provider import (Nxos9kSingleRpConnectionProvider,
+                                  Nxos9kDualRpConnectionProvider)
 from .service_implementation import Nxos9kReload, HANxos9kReloadService, AttachModuleConsoleN9k
 
 
@@ -23,11 +25,13 @@ class HANxos9kServiceList(HANxosServiceList):
 
 class Nxos9kSingleRpConnection(NxosSingleRpConnection):
     platform = 'n9k'
+    connection_provider_class = Nxos9kSingleRpConnectionProvider
     subcommand_list = Nxos9kServiceList
     settings = Nxos9kSettings()
 
 
 class Nxos9kDualRPConnection(NxosDualRPConnection):
     platform = 'n9k'
+    connection_provider_class = Nxos9kDualRpConnectionProvider
     subcommand_list = HANxos9kServiceList
     settings = Nxos9kSettings()

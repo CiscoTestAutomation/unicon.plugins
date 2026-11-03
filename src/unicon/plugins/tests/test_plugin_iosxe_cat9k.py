@@ -308,6 +308,130 @@ class TestIosXeCat9kPlugin(unittest.TestCase):
             device.disconnect()
             md.stop()
 
+    def test_logout_relogin_sends_device_credential_sequence(self):
+        """
+        Test that a post-logout relogin does not restart with the terminal
+        server credential after the device connection is already established.
+
+        The mock accepts only the device credential after the console banner,
+        so using the terminal-server username or password makes the relogin
+        fail.  Capture the sends as well to make the credential sequence
+        explicit in the regression.
+        """
+        md = MockDeviceTcpWrapperIOSXE(port=0, state='c9k_login7', hostname='switch')
+        md.start()
+
+        testbed = """
+        devices:
+            R1:
+                os: iosxe
+                type: cat9k
+                credentials:
+                    default:
+                        username: device_user_7
+                        password: device_pass_7
+                    ts:
+                        username: ts_line_user_7
+                        password: ts_line_pass_7
+                connections:
+                    defaults:
+                        class: unicon.Unicon
+                    a:
+                        protocol: telnet
+                        ip: 127.0.0.1
+                        port: {}
+                        login_creds: [ts, default]
+                        arguments:
+                            settings:
+                                SENDLINE_AFTER_CRED: ts
+        """.format(md.ports[0])
+
+        tb = loader.load(testbed)
+        device = tb.devices.R1
+        try:
+            device.connect()
+            device.logout()
+
+            with mock.patch.object(
+                    device.spawn, 'sendline', wraps=device.spawn.sendline) as sendline:
+                device.connection_provider.connect()
+
+            relogin_sends = [
+                call.args[0] for call in sendline.call_args_list if call.args
+            ]
+            self.assertIn('device_user_7', relogin_sends)
+            self.assertIn('device_pass_7', relogin_sends)
+            self.assertNotIn('ts_line_user_7', relogin_sends)
+            self.assertNotIn('ts_line_pass_7', relogin_sends)
+            self.assertEqual(device.credentials['current_credentials'],
+                             device.credentials['default'])
+        finally:
+            device.disconnect()
+            md.stop()
+
+    def test_logout_relogin_after_post_credential_enable_uses_device_credential(self):
+        """
+        Test relogin when a terminal-server post credential action lands
+        directly on an already-authenticated enable prompt.
+
+        The terminal-server credential authenticates the console server, but
+        the device credential must be selected for the later login prompt
+        after logout.
+        """
+        md = MockDeviceTcpWrapperIOSXE(port=0, state='c9k_login9', hostname='switch')
+        md.start()
+
+        testbed = """
+        devices:
+            R1:
+                os: iosxe
+                type: cat9k
+                credentials:
+                    default:
+                        username: device_user_9
+                        password: device_pass_9
+                    ts:
+                        username: ts_line_user_9
+                        password: ts_line_pass_9
+                connections:
+                    defaults:
+                        class: unicon.Unicon
+                    a:
+                        protocol: telnet
+                        ip: 127.0.0.1
+                        port: {}
+                        login_creds: [ts, default]
+                        arguments:
+                            cred_action:
+                                ts:
+                                    post: sendline()
+        """.format(md.ports[0])
+
+        tb = loader.load(testbed)
+        device = tb.devices.R1
+        try:
+            device.connect()
+            self.assertEqual(device.state_machine.current_state, 'enable')
+
+            device.logout()
+
+            with mock.patch.object(
+                    device.spawn, 'sendline', wraps=device.spawn.sendline) as sendline:
+                device.connection_provider.connect()
+
+            relogin_sends = [
+                call.args[0] for call in sendline.call_args_list if call.args
+            ]
+            self.assertIn('device_user_9', relogin_sends)
+            self.assertIn('device_pass_9', relogin_sends)
+            self.assertNotIn('ts_line_user_9', relogin_sends)
+            self.assertNotIn('ts_line_pass_9', relogin_sends)
+            self.assertEqual(device.credentials['current_credentials'],
+                             device.credentials['default'])
+        finally:
+            device.disconnect()
+            md.stop()
+
     def test_connect_login_creds_with_fallback(self):
         """
         Test login credentials with fallback mechanism for IOSXE Cat9k device connection.
@@ -1101,6 +1225,259 @@ class TestIosXECat9kPluginReload(unittest.TestCase):
             self.assertEqual(sent_commands.count('no boot system'), 2)
         finally:
             d.disconnect()
+
+    def test_config_lock_restores_submode_before_retry(self):
+        md = MockDeviceTcpWrapperIOSXE(
+            port=0,
+            state='c9k_enable_submode_lock',
+        )
+        md.start()
+        d = Connection(
+            hostname='Router',
+            start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
+            os='iosxe',
+            platform='cat9k',
+            credentials=dict(
+                default=dict(username='admin', password='cisco')
+            ),
+            settings=dict(
+                POST_DISCONNECT_WAIT_SEC=0,
+                GRACEFUL_DISCONNECT_WAIT_SEC=0.2,
+            ),
+            mit=True,
+            log_buffer=True,
+        )
+        try:
+            d.connect()
+            d.settings.CONFIG_LOCK_RETRY_SLEEP = 0
+            with mock.patch.object(
+                    d.spawn, 'sendline', wraps=d.spawn.sendline) as sendline:
+                d.configure([
+                    'no logging console',
+                    'interface GigabitEthernet1/4',
+                    'description local_interface',
+                ])
+
+            sent_commands = [
+                call.args[0] for call in sendline.call_args_list
+            ]
+            relevant_commands = [
+                command for command in sent_commands
+                if command in {
+                    'no logging console',
+                    'interface GigabitEthernet1/4',
+                    'description local_interface',
+                }
+            ]
+            self.assertEqual(
+                relevant_commands,
+                [
+                    'no logging console',
+                    'interface GigabitEthernet1/4',
+                    'description local_interface',
+                    'interface GigabitEthernet1/4',
+                    'description local_interface',
+                ],
+            )
+            self.assertEqual(
+                sent_commands.count('no logging console'), 1
+            )
+            self.assertEqual(
+                sent_commands.count('interface GigabitEthernet1/4'), 2
+            )
+            self.assertEqual(
+                sent_commands.count('description local_interface'), 2
+            )
+        finally:
+            if d.connected:
+                d.disconnect()
+            md.stop()
+
+    def test_config_lock_replays_same_mode_interface_contexts(self):
+        md = MockDeviceTcpWrapperIOSXE(
+            port=0,
+            state='c9k_enable_same_submode_lock',
+        )
+        md.start()
+        d = Connection(
+            hostname='Router',
+            start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
+            os='iosxe',
+            platform='cat9k',
+            credentials=dict(
+                default=dict(username='admin', password='cisco')
+            ),
+            settings=dict(
+                POST_DISCONNECT_WAIT_SEC=0,
+                GRACEFUL_DISCONNECT_WAIT_SEC=0.2,
+            ),
+            mit=True,
+            log_buffer=True,
+        )
+        try:
+            d.connect()
+            d.settings.CONFIG_LOCK_RETRY_SLEEP = 0
+            with mock.patch.object(
+                    d.spawn, 'sendline', wraps=d.spawn.sendline) as sendline:
+                d.configure([
+                    'interface GigabitEthernet1/3',
+                    'interface GigabitEthernet1/4',
+                    'description local_interface',
+                ])
+
+            sent_commands = [
+                call.args[0] for call in sendline.call_args_list
+            ]
+            relevant_commands = [
+                command for command in sent_commands
+                if command in {
+                    'interface GigabitEthernet1/3',
+                    'interface GigabitEthernet1/4',
+                    'description local_interface',
+                }
+            ]
+            self.assertEqual(
+                relevant_commands,
+                [
+                    'interface GigabitEthernet1/3',
+                    'interface GigabitEthernet1/4',
+                    'description local_interface',
+                    'interface GigabitEthernet1/3',
+                    'interface GigabitEthernet1/4',
+                    'description local_interface',
+                ],
+            )
+            self.assertEqual(
+                sent_commands.count('interface GigabitEthernet1/3'), 2
+            )
+            self.assertEqual(
+                sent_commands.count('interface GigabitEthernet1/4'), 2
+            )
+            self.assertEqual(
+                sent_commands.count('description local_interface'), 2
+            )
+        finally:
+            if d.connected:
+                d.disconnect()
+            md.stop()
+
+    def test_config_lock_replays_non_interface_same_mode_contexts(self):
+        md = MockDeviceTcpWrapperIOSXE(
+            port=0,
+            state='c9k_enable_same_line_submode_lock',
+        )
+        md.start()
+        d = Connection(
+            hostname='Router',
+            start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
+            os='iosxe',
+            platform='cat9k',
+            credentials=dict(
+                default=dict(username='admin', password='cisco')
+            ),
+            settings=dict(
+                POST_DISCONNECT_WAIT_SEC=0,
+                GRACEFUL_DISCONNECT_WAIT_SEC=0.2,
+            ),
+            mit=True,
+            log_buffer=True,
+        )
+        try:
+            d.connect()
+            d.settings.CONFIG_LOCK_RETRY_SLEEP = 0
+            with mock.patch.object(
+                    d.spawn, 'sendline', wraps=d.spawn.sendline) as sendline:
+                d.configure([
+                    'line vty 0 4',
+                    'line vty 5 15',
+                    'exec-timeout 0',
+                ])
+
+            relevant_commands = [
+                call.args[0] for call in sendline.call_args_list
+                if call.args[0] in {
+                    'line vty 0 4',
+                    'line vty 5 15',
+                    'exec-timeout 0',
+                }
+            ]
+            self.assertEqual(
+                relevant_commands,
+                [
+                    'line vty 0 4',
+                    'line vty 5 15',
+                    'exec-timeout 0',
+                    'line vty 0 4',
+                    'line vty 5 15',
+                    'exec-timeout 0',
+                ],
+            )
+        finally:
+            if d.connected:
+                d.disconnect()
+            md.stop()
+
+    def test_config_lock_restores_hierarchical_submodes(self):
+        md = MockDeviceTcpWrapperIOSXE(
+            port=0,
+            state='c9k_enable_hierarchical_submode_lock',
+        )
+        md.start()
+        d = Connection(
+            hostname='Router',
+            start=['telnet 127.0.0.1 {}'.format(md.ports[0])],
+            os='iosxe',
+            platform='cat9k',
+            credentials=dict(
+                default=dict(username='admin', password='cisco')
+            ),
+            settings=dict(
+                POST_DISCONNECT_WAIT_SEC=0,
+                GRACEFUL_DISCONNECT_WAIT_SEC=0.2,
+            ),
+            mit=True,
+            log_buffer=True,
+        )
+        try:
+            d.connect()
+            d.settings.CONFIG_LOCK_RETRY_SLEEP = 0
+            with mock.patch.object(
+                    d.spawn, 'sendline', wraps=d.spawn.sendline) as sendline:
+                d.configure([
+                    'router bgp 65000',
+                    'address-family ipv4 unicast',
+                    'exit-address-family',
+                    'address-family vpnv4',
+                    'neighbor 192.0.2.1 activate',
+                ])
+
+            relevant_commands = [
+                call.args[0] for call in sendline.call_args_list
+                if call.args[0] in {
+                    'router bgp 65000',
+                    'address-family ipv4 unicast',
+                    'exit-address-family',
+                    'address-family vpnv4',
+                    'neighbor 192.0.2.1 activate',
+                }
+            ]
+            self.assertEqual(
+                relevant_commands,
+                [
+                    'router bgp 65000',
+                    'address-family ipv4 unicast',
+                    'exit-address-family',
+                    'address-family vpnv4',
+                    'neighbor 192.0.2.1 activate',
+                    'router bgp 65000',
+                    'address-family vpnv4',
+                    'neighbor 192.0.2.1 activate',
+                ],
+            )
+        finally:
+            if d.connected:
+                d.disconnect()
+            md.stop()
 
     def test_quick_reload(self):
         md = MockDeviceTcpWrapperIOSXE(port=0, state='c9k_enable')

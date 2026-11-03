@@ -10,8 +10,9 @@ import re
 import time
 import logging
 import unittest
+from collections import deque
 from types import SimpleNamespace
-from unittest.mock import Mock, call, patch
+from unittest.mock import Mock, MagicMock, call, patch
 from concurrent.futures import ThreadPoolExecutor
 
 multiprocessing = __import__('multiprocessing').get_context('fork')
@@ -20,28 +21,156 @@ from pyats.datastructures import AttrDict
 
 import unicon
 from unicon import Connection
+from unicon.eal.backend.spawn import RawSpawn
 from unicon.eal.dialogs import Dialog, Statement
 from unicon.eal.dialog_processor import SimpleDialogProcessor
 from unicon.eal.utils import ExpectMatch
-from unicon.plugins.utils import sanitize
+from unicon.plugins.utils import AbstractTokenDiscovery, sanitize
 from unicon.plugins.tests.mock.mock_device_ios import MockDeviceTcpWrapperIOS
 from unicon.mock.mock_device import MockDevice, MockDeviceTcpWrapper
-from unicon.plugins.generic.service_implementation import Enable as GenericEnable
-from unicon.plugins.generic.statements import (login_handler, password_handler,
+from unicon.plugins.generic.service_implementation import (
+    Enable as GenericEnable,
+    _first_line_has_corrupt_echo,
+    _process_command,
+)
+from unicon.plugins.generic.patterns import GenericPatterns
+from unicon.plugins.generic.service_statements import (
+    clear_command_line_handler,
+)
+from unicon.plugins.generic.statements import (connection_statement_list,
+    enable_secret_handler, login_handler, password_handler,
     passphrase_handler, connection_refused_handler, enable_password_handler,
     get_enable_credential_password, bad_password_handler, generic_statements)
 from unicon.plugins.generic.statemachine import config_transition
+from unicon.settings import Settings
 from pyats.topology import loader
 from pyats.topology.credentials import Credentials
 
 
-from unicon.core.errors import (SubCommandFailure, StateMachineError,
-    SpawnInitError, CredentialsExhaustedError, UniconAuthenticationError,
-    ConnectionError, TimeoutError )
+from unicon.core.errors import (
+    SubCommandFailure,
+    StateMachineError,
+    SpawnInitError,
+    CredentialsExhaustedError,
+    UniconAuthenticationError,
+    ConnectionError,
+    TimeoutError,
+)
 
 
 unicon.settings.Settings.POST_DISCONNECT_WAIT_SEC=0
 unicon.settings.Settings.GRACEFUL_DISCONNECT_WAIT_SEC=0.2
+
+
+class SetupSelectionReplaySpawn(RawSpawn):
+
+    def __init__(self, chunks):
+        settings = Settings()
+        settings.PASSWORD_ATTEMPTS = 3
+        settings.ENABLE_SECRET_MIN_LENGTH = 10
+        settings.TEMP_ENABLE_SECRET = 'SyntheticTempSecret!'
+        settings.EXEC_TIMEOUT = 2
+        super().__init__(
+            'setup-selection-replay',
+            timeout=2,
+            settings=settings,
+            logger=logging.getLogger('setup-selection-replay'),
+            hostname='Router',
+        )
+        self.chunks = deque(chunks)
+        self.sent_inputs = []
+
+    def read_update_buffer(self, size=None):
+        if not self.chunks:
+            return False
+        self.buffer += self.chunks.popleft()
+        return True
+
+    def send(self, command, *args, **kwargs):
+        command = str(command).rstrip('\r\n')
+        if command == '0' or command == 'enable':
+            self.sent_inputs.append(command)
+        else:
+            # Do not retain credentials in the test's recorded interaction.
+            self.sent_inputs.append('temporary_secret')
+        return True
+
+    def sendline(self, command=None):
+        return self.send('' if command is None else command)
+
+
+class TestLearnOsPrompt(unittest.TestCase):
+
+    def setUp(self):
+        self.pattern = re.compile(GenericPatterns().learn_os_prompt)
+
+    def test_shell_and_ios_prompts_still_match(self):
+        for prompt in (
+            '$', 'user@host:~$', 'user@host $', '[user@host ~]$',
+            'Router#', 'Router #', 'Router\t#', 'host ~ #', '[Linux] #',
+        ):
+            with self.subTest(prompt=prompt):
+                self.assertIsNotNone(self.pattern.match(prompt))
+
+    def test_generated_secret_chunk_is_not_a_prompt(self):
+        for output in (
+            'enable secret 9 $',
+            '2026-10-16 12:00:00 %SYS-5-CONFIG_I: Configured from console by console #',
+        ):
+            with self.subTest(output=output):
+                self.assertIsNone(self.pattern.match(output))
+
+    def test_setup_menu_is_discarded_before_token_discovery_enables(self):
+        spawn = SetupSelectionReplaySpawn([
+            'The following configuration command script was created:\r\n'
+            '\r\nenable secret 9 $',
+            'SYNTHETIC_HASH\r\n!\r\nend\r\n\r\n'
+            '[0] Go to the IOS command prompt without saving this config.\r\n'
+            '[1] Return back to the setup without saving this config.\r\n'
+            '[2] Save this configuration to nvram and exit.\r\n\r\n'
+            'Enter your selection [2]: \r\n',
+            'Router>\r\n',
+            'Router#\r\n',
+        ])
+        context = AttrDict({
+            'credentials': {'default': {'enable_password': 'short'}},
+            'default_cred_name': 'default',
+            'login_creds': ['default'],
+        })
+
+        # Exercise the real handler that selects discard when the configured
+        # enable secret is below the setup minimum.
+        enable_secret_handler(spawn, context, AttrDict())
+        self.assertEqual(context['setup_selection'], 0)
+
+        connection = SimpleNamespace(
+            spawn=spawn,
+            context=context,
+            device=SimpleNamespace(),
+            log=logging.getLogger('setup-selection-replay'),
+            sendline=lambda command=None: spawn.sendline(command),
+            state_machine=SimpleNamespace(
+                get_state=lambda name: SimpleNamespace(
+                    pattern=GenericPatterns().learn_os_prompt
+                )
+            ),
+        )
+        dialog = Dialog(connection_statement_list)
+        dialog.append(Statement(
+            pattern=GenericPatterns().learn_os_prompt,
+            action=None,
+            loop_continue=False,
+            continue_timer=False,
+        ))
+        dialog.process(spawn, context=context, timeout=2)
+
+        discovery = AbstractTokenDiscovery.__new__(AbstractTokenDiscovery)
+        discovery.con = connection
+        discovery.device = connection.device
+        discovery.commands_and_classes = {}
+        discovery.discover_tokens()
+
+        self.assertEqual(spawn.sent_inputs, ['temporary_secret', '0', 'enable'])
 
 
 class TestGenericEnable(unittest.TestCase):
@@ -733,6 +862,172 @@ class TestEnableCredentialSelection(unittest.TestCase):
             'enable', 'password')
         self.assertNotIn('enablepw', spawn.log.debug.call_args.args)
         spawn.sendline.assert_called_once_with('enablepw')
+
+
+class TestExecuteCommandEchoRecovery(unittest.TestCase):
+
+    def setUp(self):
+        self.spawn = Mock(buffer='')
+        self.spawn.is_readable.return_value = False
+        self.dialog = MagicMock()
+        self.context = AttrDict()
+        self.command = 'show clock'
+        self.success = SimpleNamespace(
+            match_output='show clock\r\n12:00:00 UTC\r\nRouter#')
+
+    def process(self, recover_echo=True):
+        return _process_command(
+            self.dialog, self.spawn, self.command, 5, self.context,
+            prompt_recovery=False, recover_echo=recover_echo)
+
+    def test_first_line_raw_and_rendered_nul(self):
+        for marker in ('\x00', '^@'):
+            for newline in ('\r\n', '\n', '\r'):
+                with self.subTest(marker=repr(marker), newline=repr(newline)):
+                    self.assertTrue(_first_line_has_corrupt_echo(
+                        's' + marker + newline + 'Router#how clock'))
+                    self.assertFalse(_first_line_has_corrupt_echo(
+                        'show clock' + newline + marker))
+        self.assertFalse(_first_line_has_corrupt_echo(None))
+
+    def test_clear_command_line_bounds_buffer_drain(self):
+        self.spawn.is_readable.return_value = True
+        clear_command_line_handler(self.spawn)
+        self.assertEqual(
+            self.spawn.send.call_args_list, [call('\x01'), call('\x0b')])
+        self.assertEqual(self.spawn.is_readable.call_count, 20)
+        self.assertEqual(self.spawn.read_update_buffer.call_count, 22)
+        self.assertEqual(self.spawn.buffer, '')
+
+    def test_clears_input_and_retries_once(self):
+        for marker in ('\x00', '^@'):
+            with self.subTest(marker=repr(marker)):
+                self.spawn.reset_mock()
+                self.spawn.buffer = 'pending console input'
+                self.dialog.process.side_effect = [
+                    SimpleNamespace(match_output='s' + marker + '\r\nRouter#'),
+                    self.success,
+                ]
+                result = self.process()
+                self.assertIs(result, self.success)
+                self.assertEqual(self.spawn.mock_calls, [
+                    call.sendline(self.command),
+                    call.log.warning(
+                        'Command echo corruption detected; clearing input and '
+                        'retrying once'),
+                    call.send('\x01'),
+                    call.read_update_buffer(),
+                    call.is_readable(timeout=0.1),
+                    call.send('\x0b'),
+                    call.read_update_buffer(),
+                    call.is_readable(timeout=0.1),
+                    call.sendline(self.command),
+                ])
+                self.assertEqual(self.spawn.buffer, '')
+
+    def test_ordinary_success_is_single_attempt(self):
+        self.dialog.process.return_value = self.success
+        self.assertIs(self.process(), self.success)
+        self.spawn.sendline.assert_called_once_with(self.command)
+        self.spawn.send.assert_not_called()
+        self.dialog.process.assert_called_once_with(
+            self.spawn, timeout=5, context=self.context,
+            prompt_recovery=False)
+        self.dialog.__add__.assert_not_called()
+
+    def test_marker_in_output_is_not_retried(self):
+        self.dialog.process.return_value = SimpleNamespace(
+            match_output='show clock\r\noutput contains ^@\r\nRouter#')
+        self.process()
+        self.spawn.sendline.assert_called_once_with(self.command)
+        self.spawn.send.assert_not_called()
+
+    def test_ordinary_timeout_is_not_retried(self):
+        self.dialog.process.side_effect = TimeoutError('ordinary timeout')
+        with self.assertRaises(TimeoutError):
+            self.process()
+        self.spawn.sendline.assert_called_once_with(self.command)
+        self.spawn.send.assert_not_called()
+
+    def test_timeout_with_corrupted_buffer_is_not_retried(self):
+        self.spawn.buffer = 's^@\r\nRouter#how clock'
+        self.dialog.process.side_effect = TimeoutError('no dialog result')
+        with self.assertRaises(TimeoutError):
+            self.process()
+        self.spawn.sendline.assert_called_once_with(self.command)
+        self.spawn.send.assert_not_called()
+
+    def test_retry_timeout_is_surfaced(self):
+        self.dialog.process.side_effect = [
+            SimpleNamespace(match_output='s^@\r\nRouter#'),
+            TimeoutError('retry timeout'),
+        ]
+        with self.assertRaisesRegex(TimeoutError, 'retry timeout'):
+            self.process()
+        self.assertEqual(self.spawn.sendline.call_count, 2)
+        self.assertEqual(self.dialog.process.call_count, 2)
+
+    def test_retry_rejection_returned_to_normal_error_check(self):
+        rejected = SimpleNamespace(
+            match_output='show clock\r\n% Invalid input\r\nRouter#')
+        self.dialog.process.side_effect = [
+            SimpleNamespace(match_output='s^@\r\nRouter#'), rejected]
+        self.assertIs(self.process(), rejected)
+        self.assertEqual(self.spawn.sendline.call_count, 2)
+
+    def test_second_corruption_returned_without_third_attempt(self):
+        for marker in ('^@', '\x00'):
+            with self.subTest(marker=repr(marker)):
+                self.spawn.reset_mock()
+                self.dialog.reset_mock()
+                retry_result = SimpleNamespace(
+                    match_output='s' + marker + '\r\nRouter#how clock')
+                self.dialog.process.side_effect = [
+                    SimpleNamespace(match_output='s^@\r\nRouter#'),
+                    retry_result,
+                ]
+                self.assertIs(self.process(), retry_result)
+                self.assertEqual(self.spawn.sendline.call_count, 2)
+                self.assertEqual(self.dialog.process.call_count, 2)
+                self.assertEqual(self.spawn.send.call_args_list, [
+                    call('\x01'), call('\x0b'),
+                ])
+
+    def test_retry_processing_failure_is_surfaced_unchanged(self):
+        failure = SubCommandFailure('retry processing failed')
+        self.dialog.process.side_effect = [
+            SimpleNamespace(match_output='s^@\r\nRouter#'), failure,
+        ]
+        with self.assertRaises(SubCommandFailure) as raised:
+            self.process()
+        self.assertIs(raised.exception, failure)
+        self.assertEqual(self.spawn.sendline.call_count, 2)
+        self.assertEqual(self.dialog.process.call_count, 2)
+
+    def test_disabled_recovery_is_single_attempt(self):
+        self.dialog.process.return_value = SimpleNamespace(
+            match_output='s^@\r\nRouter#how clock')
+        self.process(recover_echo=False)
+        self.spawn.sendline.assert_called_once_with(self.command)
+        self.spawn.send.assert_not_called()
+        self.dialog.__add__.assert_not_called()
+
+    def test_retry_budget_resets_for_each_command(self):
+        self.dialog.process.side_effect = [
+            SimpleNamespace(match_output='s^@\r\nRouter#'), self.success,
+            SimpleNamespace(match_output='s^@\r\nRouter#'), self.success,
+        ]
+        self.process()
+        self.process()
+        self.assertEqual(self.spawn.sendline.call_count, 4)
+
+    def test_input_clear_failure_is_surfaced_without_retry(self):
+        self.dialog.process.return_value = SimpleNamespace(
+            match_output='s^@\r\nRouter#how clock')
+        self.spawn.send.side_effect = RuntimeError('transport closed')
+        with self.assertRaisesRegex(RuntimeError, 'transport closed'):
+            self.process()
+        self.spawn.sendline.assert_called_once_with(self.command)
 
 
 class TestGenericServices(unittest.TestCase):

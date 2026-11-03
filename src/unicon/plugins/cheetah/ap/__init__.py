@@ -20,6 +20,7 @@ class ApServiceList(ServiceList):
         self.enable = gsvc.Enable
         self.disable = gsvc.Disable
         self.reload = svc.Reload
+        self.ping = svc.Ping
         self.log_user = gsvc.LogUser
         self.bash_console = iosxe_svc.BashService
 

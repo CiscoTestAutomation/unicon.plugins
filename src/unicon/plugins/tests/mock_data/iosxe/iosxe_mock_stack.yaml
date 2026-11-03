@@ -212,6 +212,8 @@ stack_enable:
     "show version": *SV
     "show version | include operating mode" : ""
     "show switch": *SS
+    "show terminal": |
+      Line 0, Location: "", Type: ""
     "sh redundancy state": *SRS
     "disable":
       new_state: stack_exec

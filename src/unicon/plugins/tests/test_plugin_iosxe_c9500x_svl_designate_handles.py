@@ -21,16 +21,11 @@ class TestIosxeC9500xSVLDesignateHandles(unittest.TestCase):
         con.settings.BOOT_TIMEOUT = 1
         con.settings.EXEC_TIMEOUT = 1
         con.device = MagicMock()
-        show_switch_output = "show switch output"
+        show_switch_output = (
+            "*1       Active   74e2.e72d.8180     1      V07     Ready\n"
+            " 2       Standby  74e2.e72d.9080     1      V07     Ready\n"
+        )
         con.device.execute.return_value = show_switch_output
-        con.device.parse.return_value = {
-            'switch': {
-                'stack': {
-                    '1': {'role': 'active'},
-                    '2': {'role': 'standby'}
-                }
-            }
-        }
 
         redundancy_output = "my state = 8  -STANDBY HOT \n"
         show_redundancy_cmd = "show redundancy states"
@@ -63,10 +58,7 @@ class TestIosxeC9500xSVLDesignateHandles(unittest.TestCase):
             matched_retries=SHOW_SWITCH_MATCHED_RETRIES,
             matched_retry_sleep=SHOW_SWITCH_MATCHED_RETRY_SLEEP,
         )
-        con.device.parse.assert_called_once_with(
-            "show switch",
-            output=show_switch_output,
-        )
+        con.device.parse.assert_not_called()
         subcon_a.spawn.sendline.assert_called_with(show_redundancy_cmd)
         self.assertEqual(con._set_active_alias.call_args_list[-1].args[0], 'b')
         self.assertEqual(con._set_standby_alias.call_args_list[-1].args[0], 'a')

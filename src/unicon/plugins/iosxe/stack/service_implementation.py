@@ -641,10 +641,9 @@ class StackResetStandbyRP(BaseService):
                         return True
                 return False
 
-            from genie.utils.timeout import Timeout
-            exec_timeout = Timeout(timeout, 15)
+            poll_deadline = time() + timeout
             found_invalid_mac = False
-            while exec_timeout.iterate():
+            while True:
                 con.log.info('Make sure no invalid mac address 0000.0000.0000')
                 if not _check_invalid_mac(con):
                     con.log.info('Did not find invalid mac as 0000.0000.0000')
@@ -653,13 +652,13 @@ class StackResetStandbyRP(BaseService):
                 else:
                     con.log.warning('Found 0000.0000.0000 mac address')
                     found_invalid_mac = True
-                    exec_timeout.sleep()
-                    continue
-            else:
-                if found_invalid_mac:
-                    raise SubCommandFailure('Found 0000.0000.0000 mac address. Stack is not really ready')
-                else:
-                    con.log.info('Did not find invalid mac as 0000.0000.0000. Stack is ready')
+                    remaining_time = poll_deadline - time()
+                    if remaining_time <= 0:
+                        break
+                    sleep(min(15, remaining_time))
+
+            if found_invalid_mac:
+                raise SubCommandFailure('Found 0000.0000.0000 mac address. Stack is not really ready')
 
             con.log.info("Successfully reloaded Standby RP")
             con.log.info("Reconnecting to the device, to make sure console is ready")

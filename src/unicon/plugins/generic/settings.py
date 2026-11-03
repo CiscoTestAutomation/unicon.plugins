@@ -103,6 +103,8 @@ class GenericSettings(Settings):
 
         # syslog message handling timers
         self.SYSLOG_WAIT = 1
+        # maximum time to wait for a complete quiet interval
+        self.SYSLOG_SETTLE_TIMEOUT = 30
         # syslog wait time for reload service
         self.RELOAD_SYSLOG_WAIT = 10
 
@@ -175,6 +177,9 @@ class GenericSettings(Settings):
         # execute statement match retry for state change patterns
         self.EXECUTE_STATE_CHANGE_MATCH_RETRIES = 1
         self.EXECUTE_STATE_CHANGE_MATCH_RETRY_SLEEP = 3
+
+        # Enable command echo recovery only for supported platforms.
+        self.COMMAND_ECHO_CORRUPTION_RECOVERY = False
 
         # User defined login and password prompt pattern.
         self.LOGIN_PROMPT = None

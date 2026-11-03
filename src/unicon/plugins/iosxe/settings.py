@@ -44,6 +44,8 @@ class IosXESettings(GenericSettings):
         self.EXECUTE_MATCHED_RETRIES = 1
         self.EXECUTE_MATCHED_RETRY_SLEEP = 0.1
 
+        self.COMMAND_ECHO_CORRUPTION_RECOVERY = True
+
         self.RELOAD_WAIT = 300
 
         # wait time for buffer to settle down

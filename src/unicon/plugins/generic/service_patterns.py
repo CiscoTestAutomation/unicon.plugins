@@ -11,6 +11,14 @@ Description:
 """
 from unicon.patterns import UniconCorePatterns
 
+
+class ConfigPatterns:
+    def __init__(self):
+        # IE-3105-18T2C-uut9-s(config)#
+        # IE-3105-18T2C-uut9-s(config-line)#
+        self.config_mode = r'\((config(?:-[^()\r\n]*)?)\)[#>]\s*$'
+
+
 class ReloadPatterns(UniconCorePatterns):
     def __init__(self):
         super().__init__()
