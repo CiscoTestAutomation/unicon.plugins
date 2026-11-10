@@ -15,7 +15,8 @@ Description:
 from unicon.bases.routers.connection_provider import BaseSingleRpConnectionProvider
 from unicon.bases.routers.connection_provider import BaseDualRpConnectionProvider
 from unicon.eal.dialogs import Dialog
-from .statements import connection_statement_list, custom_auth_statements
+from .statements import (connection_statement_list, custom_auth_statements,
+                         connect_reply_statements)
 from unicon import log
 
 
@@ -40,9 +41,12 @@ class GenericSingleRpConnectionProvider(BaseSingleRpConnectionProvider):
         custom_auth_stmt = custom_auth_statements(
                              self.connection.settings.LOGIN_PROMPT,
                              self.connection.settings.PASSWORD_PROMPT)
+        reply_stmts = connect_reply_statements(
+            getattr(self.connection.settings, 'CONNECT_REPLIES', None))
         return con.connect_reply + \
-                    Dialog(custom_auth_stmt + connection_statement_list
-                        if custom_auth_stmt else connection_statement_list)
+                    Dialog(reply_stmts +
+                        (custom_auth_stmt + connection_statement_list
+                         if custom_auth_stmt else connection_statement_list))
 
 class GenericDualRpConnectionProvider(BaseDualRpConnectionProvider):
     """ Implements Generic dualRP Connection Provider,
@@ -65,6 +69,9 @@ class GenericDualRpConnectionProvider(BaseDualRpConnectionProvider):
         custom_auth_stmt = custom_auth_statements(
                              self.connection.settings.LOGIN_PROMPT,
                              self.connection.settings.PASSWORD_PROMPT)
+        reply_stmts = connect_reply_statements(
+            getattr(self.connection.settings, 'CONNECT_REPLIES', None))
         return con.connect_reply + \
-                    Dialog(custom_auth_stmt + connection_statement_list
-                        if custom_auth_stmt else connection_statement_list)
+                    Dialog(reply_stmts +
+                        (custom_auth_stmt + connection_statement_list
+                         if custom_auth_stmt else connection_statement_list))

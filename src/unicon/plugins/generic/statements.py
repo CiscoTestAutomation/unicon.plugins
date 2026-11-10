@@ -637,6 +637,23 @@ def custom_auth_statements(login_pattern=None, password_pattern=None):
         return stmt_list
 
 
+def connect_reply_statements(replies=None):
+    """ Return a list of Statements from the CONNECT_REPLIES setting.
+
+    `replies` maps a regular expression to the line sent when it matches,
+    for example {r'connect to this port\\? \\[no\\]\\s*$': 'yes'}.
+    An empty string sends a bare return.
+    """
+    stmt_list = []
+    for pattern, reply in (replies or {}).items():
+        stmt_list.append(Statement(pattern=pattern,
+                                   action=sendline,
+                                   args={'command': '' if reply is None else str(reply)},
+                                   loop_continue=True,
+                                   continue_timer=False))
+    return stmt_list
+
+
 def update_context(spawn, context, session, **kwargs):
     context.update(kwargs)
 
