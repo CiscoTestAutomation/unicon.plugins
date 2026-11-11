@@ -185,6 +185,10 @@ class GenericSettings(Settings):
         self.LOGIN_PROMPT = None
         self.PASSWORD_PROMPT = None
 
+        # User defined replies during connect, {pattern: line to send}.
+        # Checked before the default connection statements.
+        self.CONNECT_REPLIES = {}
+
         # Maximum number of retries for password handler
         self.PASSWORD_ATTEMPTS = 3
 

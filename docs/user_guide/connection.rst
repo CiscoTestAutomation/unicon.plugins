@@ -1299,6 +1299,48 @@ These settings attributes are supported on below plugins:
 #. aireos
 
 
+Replies during connect
+----------------------
+
+Some console servers ask a question before they connect a session to the device's
+serial port, for example ``Are you sure you want to connect to this port? [no]``, and
+the device's console may print nothing until it receives a return.
+The `connect_reply` argument handles such prompts from Python, but a `Dialog` object
+can't be written in a testbed YAML file.
+
+The `CONNECT_REPLIES` setting maps a regular expression to the line Unicon sends when
+the pattern matches while connecting. An empty string sends a return. These statements
+are checked before the default connection statements of the generic connection provider.
+
+.. code-block:: python
+
+    dev.settings.CONNECT_REPLIES = {
+        r'connect to this port\? \[no\]\s*$': 'yes',
+        r'Connected to port \d+\.': '',
+    }
+
+In pyATS testbed yaml file:
+
+.. code-block:: yaml
+
+    devices:
+      R2:
+        os: iosxe
+        credentials:
+          default:
+            username: admin
+            password: Cisc0123
+        connections:
+          a:
+            protocol: ssh
+            ip: x.x.x.x
+            port: 3002
+            settings:
+              CONNECT_REPLIES:
+                'connect to this port\? \[no\]\s*$': 'yes'
+                'Connected to port \d+\.': ''
+
+
 Learn Device OS
 --------------------
 

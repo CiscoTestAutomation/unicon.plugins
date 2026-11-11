@@ -26,6 +26,21 @@ ios_connect_console_server:
     "":
       new_state: login
 
+console_port_confirm:
+  preface: |
+    Port 14 has an onboarded managed device.
+  prompt: "Are you sure you want to connect to this port? [no] "
+  commands:
+    "yes":
+      response: "Connected to port 14."
+      new_state: console_port_silent
+
+console_port_silent:
+  prompt: ""
+  commands:
+    "":
+      new_state: login
+
 connect_ssh:
   preface: |
     The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.

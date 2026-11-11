@@ -2195,5 +2195,68 @@ class TestGenericConnectionRefused(unittest.TestCase):
             finally:
                 c.disconnect()
 
+
+class TestConnectReplies(unittest.TestCase):
+    """CONNECT_REPLIES answers prompts that appear while connecting, here a
+    console server port that asks for confirmation and then stays silent
+    until it gets a return."""
+
+    replies = {r'connect to this port\? \[no\]\s*$': 'yes',
+               r'Connected to port \d+\.': ''}
+
+    def _connection(self, **kwargs):
+        return Connection(hostname='Router',
+                          start=['mock_device_cli --os ios --state console_port_confirm'],
+                          os='ios',
+                          credentials={'default': {'username': 'cisco', 'password': 'cisco'}},
+                          init_exec_commands=[], init_config_commands=[],
+                          learn_hostname=True, **kwargs)
+
+    def test_connect_with_connect_replies(self):
+        d = self._connection()
+        d.settings.CONNECT_REPLIES = self.replies
+        try:
+            d.connect()
+            self.assertIn(d.state_machine.current_state, ('enable', 'disable'))
+        finally:
+            d.disconnect()
+
+    def test_connect_without_connect_replies_times_out(self):
+        d = self._connection(connection_timeout=5)
+        try:
+            with self.assertRaises(unicon.core.errors.ConnectionError):
+                d.connect()
+        finally:
+            d.disconnect()
+
+    def test_topology_connect_with_connect_replies(self):
+        testbed = r"""
+        devices:
+          Router:
+            os: ios
+            type: router
+            credentials:
+              default:
+                username: cisco
+                password: cisco
+            connections:
+              defaults:
+                class: unicon.Unicon
+              a:
+                command: mock_device_cli --os ios --state console_port_confirm
+                settings:
+                  CONNECT_REPLIES:
+                    'connect to this port\? \[no\]\s*$': 'yes'
+                    'Connected to port \d+\.': ''
+        """
+        t = loader.load(testbed)
+        d = t.devices['Router']
+        try:
+            d.connect(init_exec_commands=[], init_config_commands=[], learn_hostname=True)
+            self.assertIn(d.state_machine.current_state, ('enable', 'disable'))
+        finally:
+            d.disconnect()
+
+
 if __name__ == "__main__":
     unittest.main()
